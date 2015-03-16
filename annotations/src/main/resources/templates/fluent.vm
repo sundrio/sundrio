@@ -1,0 +1,26 @@
+package ${model.packageName};
+
+import me.builder.Fluent;
+#if ( ${model.superClassModel})
+#if (${model.superClassModel.packageName} != ${model.packageName})
+import ${model.superClassModel.packageName}.${model.superClassModel.className};
+#end#end
+public class ${model.className}Fluent<T extends ${model.className}Fluent<T>>#if ( ${model.superClassModel}) extends ${model.superClassModel.className}Fluent<T>#end implements Fluent<T> {
+
+#foreach($f in $model.fields)
+    private ${f.type} ${f.name};
+#end
+
+#foreach($f in $model.fields)
+    public T with${f.name.substring(0,1).toUpperCase()}${f.name.substring(1)}(${f.type} ${f.name}){
+      this.${f.name}=${f.name};
+      return (T) this;
+    }
+#end
+
+#foreach($f in $model.fields)
+    public ${f.type}#if (${f.type} == "boolean"  || ${f.type.contains("Boolean")}) is#else get#end${f.name.substring(0,1).toUpperCase()}${f.name.substring(1)}(){
+        return ${f.name};
+    } 
+#end
+}
