@@ -4,7 +4,7 @@ import me.builder.annotations.Buildable;
 
 public class Circle extends Shape {
 
-    private final long radius;
+    private final Long radius;
 
     @Buildable
     public Circle(int x, int y, long radius) {

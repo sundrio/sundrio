@@ -1,13 +1,16 @@
 package me.builder.examples;
 
 import me.builder.annotations.Buildable;
+import me.builder.examples.other.Square;
 
 public class Canvas {
-    
-    private final Shape shape;
+
+    private final Square area;
+    private final Shape[] shapes;
 
     @Buildable
-    public Canvas(Shape shape) {
-        this.shape = shape;
+    public Canvas(Square area, Shape[] shapes) {
+        this.area = area;
+        this.shapes = shapes;
     }
 }

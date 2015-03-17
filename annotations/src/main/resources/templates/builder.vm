@@ -1,10 +1,10 @@
-package ${model.packageName};
+package ${model.type.packageName};
 
 import me.builder.Builder;
 
-public class ${model.className}Builder extends ${model.className}Fluent<${model.className}Builder> implements Builder<${model.className}> {
+public class ${model.type.className}Builder extends ${model.type.className}Fluent<${model.type.className}Builder> implements Builder<${model.type.className}> {
 
-    public ${model.className} build() {
-       return new ${model.className}(#foreach($arg in $model.constructorArguments)#if (${arg.type} == "boolean" || ${arg.type.contains("Boolean")}) is#else get#end${arg.name.substring(0,1).toUpperCase()}${arg.name.substring(1)}()#if( $foreach.hasNext ),#end#end );
+    public ${model.type.className} build() {
+       return new ${model.type.className}( #foreach($arg in $model.arguments)${arg.getter}()#if( $foreach.hasNext ), #end#end );
     }
 }

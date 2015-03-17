@@ -12,12 +12,11 @@ public class BuilderGeneratorTest {
     @Test
     public void testFluentTemplate() throws IOException {
         Model model = new Model.Builder()
-                .withPackageName("my.test")
-                .withClassName("Circle")
-                .withConstructorArgument("java.lang.Integer", "x")
-                .withConstructorArgument("java.lang.Integer", "y")
-                .withConstructorArgument("java.lang.Boolean", "hidden")
-                .withConstructorArgument("java.lang.Integer", "radius").build();
+                .withType("my.test", "Circle")
+                .addArgument("java.lang", "Integer", "x")
+                .addArgument("java.lang", "Integer", "y")
+                .addArgument("java.lang", "Boolean", "hidden")
+                .addArgument("java.lang", "Integer", "radius").build();
 
         File tmp = new File("/tmp");
         generate(model, tmp, "CircleFluent.java", GeneratorUtils.DEFAULT_FLUENT_TEMPLATE_LOCATION);

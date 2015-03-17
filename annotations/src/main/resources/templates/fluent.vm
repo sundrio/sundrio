@@ -1,26 +1,40 @@
-package ${model.packageName};
+package ${model.type.packageName};
 
 import me.builder.Fluent;
-#if ( ${model.superClassModel})
-#if (${model.superClassModel.packageName} != ${model.packageName})
-import ${model.superClassModel.packageName}.${model.superClassModel.className};
+#foreach($i in $model.imports)
+import $i;
+#end
+#if ( ${model.type.superClass})
+#if (${model.superClass.packageName} != ${model.type.packageName})
+import ${model.superClas.packageName}.${model.superClass.className};
 #end#end
-public class ${model.className}Fluent<T extends ${model.className}Fluent<T>>#if ( ${model.superClassModel}) extends ${model.superClassModel.className}Fluent<T>#end implements Fluent<T> {
+public class ${model.type.className}Fluent<T extends ${model.type.className}Fluent<T>>#if ( ${model.superClass}) extends ${model.superClass.className}Fluent<T>#end implements Fluent<T> {
 
 #foreach($f in $model.fields)
-    private ${f.type} ${f.name};
+    private ${f.type.className}#if($f.array)[]#end ${f.name};
 #end
 
 #foreach($f in $model.fields)
-    public T with${f.name.substring(0,1).toUpperCase()}${f.name.substring(1)}(${f.type} ${f.name}){
+    public T ${f.withSetter}(${f.type.className}#if($f.type.array)[]#end ${f.name}) {
       this.${f.name}=${f.name};
       return (T) this;
     }
 #end
 
 #foreach($f in $model.fields)
-    public ${f.type}#if (${f.type} == "boolean"  || ${f.type.contains("Boolean")}) is#else get#end${f.name.substring(0,1).toUpperCase()}${f.name.substring(1)}(){
+    public ${f.type.className}#if($f.array)[]#end ${f.getter}() {
         return ${f.name};
     } 
+#end
+
+#foreach($n in $model.nestedTypes)
+    class ${n.className}Nested<T> extends ${n.className}Fluent<${n.className}Nested<T>> implements Nested<T> {
+        private final ${n.className}Builder builder = new ${n.className}Builder();
+
+        @Override
+        public T  and() {
+            return (T) add${n.className}(builder.build());
+        }
+    }
 #end
 }

@@ -1,91 +1,120 @@
 package me.builder.internal.processor.model;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Model {
-    
+
     public static class Builder implements me.builder.Builder<Model> {
-        
-        private String packageName;
-        private String className;
-        private Model superClassModel;
-        private Set<Type> fields = new LinkedHashSet<>();
-        private Set<Type> constructorArguments = new LinkedHashSet<>();
-        
-        public Builder withPackageName(String packageName) {
-            this.packageName = packageName;
+
+        private Type type;
+        private Type superClass;
+        private Set<Property> arguments = new LinkedHashSet<>();
+        private Set<Property> fields = new LinkedHashSet<>();
+        private Set<Type> nestedTypes = new LinkedHashSet<>();
+
+        public Builder withType(Type type) {
+            this.type = type;
             return this;
         }
 
-        public Builder withClassName(String className) {
-            this.className = className;
+        public Builder withType(String packageName, String className) {
+            this.type = new Type(packageName, className);
             return this;
         }
 
-        public Builder withSuperClassModel(Model superClassModel) {
-            this.superClassModel = superClassModel;
-            return this;
-        }
-        
-        public Builder addConstructorArgument(Type parameter) {
-            this.constructorArguments.add(parameter);
+        public Builder withSuperClass(Type superClass) {
+            this.superClass = superClass;
             return this;
         }
 
-        public Builder withConstructorArgument(String type, String name) {
-            return addConstructorArgument(new Type(type, name));
-        }
-
-        public Builder addField(Type parameter) {
-            this.fields.add(parameter);
+        public Builder withSuperClass(String packageName, String className) {
+            this.superClass = new Type(packageName, className);
             return this;
         }
 
-        public Builder withField(String type, String name) {
-            return addField(new Type(type, name));
+        public Builder addNested(Type nested) {
+            this.nestedTypes.add(nested);
+            return this;
+        }
+
+        public Builder addNested(String packageName, String className) {
+            this.nestedTypes.add(new Type(packageName, className));
+            return this;
+        }
+
+        public Builder addArgument(String packageName, String className, String name) {
+            this.arguments.add(new Property(new Type(packageName, className), name));
+            return this;
+        }
+
+        public Builder addArgument(Type type, String name) {
+            this.arguments.add(new Property(type, name));
+            return this;
+        }
+
+        public Builder addField(String packageName, String className, String name) {
+            this.fields.add(new Property(new Type(packageName, className), name));
+            return this;
+        }
+
+        public Builder addField(String packageName, String className, String name, boolean isArrayType) {
+            this.fields.add(new Property(new Type(packageName, className, isArrayType), name));
+            return this;
+        }
+
+        public Builder addField(Type type, String name) {
+            this.fields.add(new Property(type, name));
+            return this;
         }
 
         @Override
         public Model build() {
-            return new Model(packageName, className,
-                    superClassModel, Collections.unmodifiableSet(fields), 
-                    Collections.unmodifiableSet(constructorArguments));
+            return new Model(type, superClass, arguments, fields, nestedTypes);
         }
     }
-    
-    private final String packageName;
-    private final String className;
-    private final Model superClassModel;
-    private final Set<Type> fields;
-    private final Set<Type> constructorArguments;
 
-    public Model(String packageName, String className, Model superClassModel, Set<Type> fields, Set<Type> constructorArguments) {
-        this.packageName = packageName;
-        this.className = className;
-        this.superClassModel = superClassModel;
+    private final Type type;
+    private final Type superClass;
+    private final Set<Property> arguments;
+    private final Set<Property> fields;
+    private final Set<Type> nestedTypes;
+
+    public Model(Type type, Type superClass, Set<Property> arguments, Set<Property> fields, Set<Type> nestedTypes) {
+        this.type = type;
+        this.superClass = superClass;
+        this.arguments = arguments;
         this.fields = fields;
-        this.constructorArguments = constructorArguments;
+        this.nestedTypes = nestedTypes;
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public String getPackageName() {
-        return packageName;
+        return type.getPackageName();
     }
 
     public String getClassName() {
-        return className;
+        return type.getClassName();
     }
 
-    public Set<Type> getFields() {
+    public Set<Property> getFields() {
         return fields;
     }
 
-    public Set<Type> getConstructorArguments() {
-        return constructorArguments;
+    public Set<Property> getArguments() {
+        return arguments;
     }
 
-    public Model getSuperClassModel() {
-        return superClassModel;
+    public Type getSuperClass() {
+        return superClass;
     }
+
+    public Set<Type> getNestedTypes() {
+        return nestedTypes;
+    }
+
 }
