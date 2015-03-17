@@ -1,5 +1,6 @@
 package me.builder.internal.processor;
 
+import me.builder.annotations.Buildable;
 import me.builder.internal.processor.model.Model;
 import me.builder.internal.processor.model.Type;
 
@@ -32,6 +33,8 @@ public class ModelFactory {
     }
 
     Model create(ExecutableElement constructor) {
+        TypeElement buildableElement = elements.getTypeElement(Buildable.class.getName());
+        
         TypeElement classElement = getClassElement(constructor);
 
         Model.Builder builder = new Model.Builder()
@@ -39,22 +42,32 @@ public class ModelFactory {
 
         //Populate constructor parameters
         for (VariableElement variableElement : constructor.getParameters()) {
-            Type type = typeOfVariable(variableElement);
+            Type type = toType(variableElement);
             String name = variableElement.getSimpleName().toString();
             builder = builder.addArgument(type, name);
         }
 
         //Populate Fields
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
-            Type type = typeOfVariable(variableElement);
+            Type type = toType(variableElement);
             String name = variableElement.getSimpleName().toString();
             builder = builder.addField(type, name);
+
+            TypeMirror variableType = toTypeMirror(variableElement);
+            Element typeElement = types.asElement(variableType);
+            if (typeElement != null) {
+                for (Element el : types.asElement(variableType).getEnclosedElements()) {
+                    if (el.getAnnotation(Buildable.class) != null) {
+                    //    builder = builder.addNested(type.getPackageName(), type.getClassName());
+                    }
+                }
+            }
         }
 
+        //Check SuperClass
         TypeMirror superClass = classElement.getSuperclass();
         elements.getTypeElement(superClass.toString());
         TypeElement superClassElement = getElementMatching(buildables, superClass);
-
         if (superClassElement != null) {
             String superClassPackage = getPackageName(superClassElement);
             String superClassName = getClassName(superClassElement);
@@ -63,8 +76,17 @@ public class ModelFactory {
 
         return builder.build();
     }
-    
-    private Type typeOfVariable(VariableElement variableElement) {
+
+    private TypeMirror toTypeMirror(VariableElement variableElement) {
+        TypeMirror variableType = variableElement.asType();
+        if (variableType instanceof ArrayType) {
+            variableType = ((ArrayType) variableType).getComponentType();
+        }
+        return variableType;
+    }
+
+
+    private Type toType(VariableElement variableElement) {
         boolean isArrayType = false;
         TypeMirror variableType = variableElement.asType();
         if (variableType instanceof ArrayType) {
@@ -82,6 +104,10 @@ public class ModelFactory {
         } else {
             packageName = elements.getPackageOf(typeElement).toString();
             className = fullName.contains(packageName) ? fullName.substring(packageName.length() + 1) : fullName;
+        }
+
+        if (isArrayType && className.endsWith("[]")) {
+            className = className.substring(0, className.length() - 2);
         }
         return new Type(packageName, className, isArrayType);
     }

@@ -37,6 +37,11 @@ public class FluentModel extends Model {
     public Set<String> getImports() {
         Set<String> imports = new LinkedHashSet<>();
         for (Type t : getReferencedTypes()) {
+            if (t.isArrayType()) {
+                imports.add("java.util.List");
+                imports.add("java.util.ArrayList");
+                        
+            }
             if (t.getPackageName() != null && !t.getPackageName().equals(getType().getPackageName())) {
                 imports.add(t.getPackageName() + "." + t.getClassName());
             }

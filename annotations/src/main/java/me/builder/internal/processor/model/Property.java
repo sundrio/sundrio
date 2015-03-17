@@ -37,4 +37,12 @@ public class Property {
         sb.append(name.substring(1));
         return sb.toString();
     }
+
+    public String getAddSetter() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("add");
+        sb.append(type.getClassName().substring(0, 1).toUpperCase());
+        sb.append(type.getClassName().substring(1));
+        return sb.toString();
+    }
 }

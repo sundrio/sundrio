@@ -11,20 +11,36 @@ import ${model.superClas.packageName}.${model.superClass.className};
 public class ${model.type.className}Fluent<T extends ${model.type.className}Fluent<T>>#if ( ${model.superClass}) extends ${model.superClass.className}Fluent<T>#end implements Fluent<T> {
 
 #foreach($f in $model.fields)
-    private ${f.type.className}#if($f.array)[]#end ${f.name};
-#end
+#if (${f.type.arrayType})
+    private final List<${f.type.className}> ${f.name} = new ArrayList<>();
 
-#foreach($f in $model.fields)
-    public T ${f.withSetter}(${f.type.className}#if($f.type.array)[]#end ${f.name}) {
-      this.${f.name}=${f.name};
-      return (T) this;
+    public T ${f.withSetter}(${f.type.simpleName} ${f.name}) {
+        for (${f.type.className} item : ${f.name}) {
+            this.${f.name}.add(item);
+        }
+        return (T) this;
+    }
+
+    public T ${f.addSetter}(${f.type.className} ${f.name}) {
+        this.${f.name}.add(${f.name});
+        return (T) this;
+    }
+
+    public ${f.type.simpleName} ${f.getter}() {
+        return ${f.name}.toArray(new ${f.type.className}[${f.name}.size()]);
+    }
+#else
+    private ${f.type.simpleName} ${f.name};
+
+    public T ${f.withSetter}(${f.type.simpleName} ${f.name}) {
+        this.${f.name}=${f.name};
+        return (T) this;
+    }
+
+    public ${f.type.simpleName} ${f.getter}() {
+        return ${f.name};
     }
 #end
-
-#foreach($f in $model.fields)
-    public ${f.type.className}#if($f.array)[]#end ${f.getter}() {
-        return ${f.name};
-    } 
 #end
 
 #foreach($n in $model.nestedTypes)
