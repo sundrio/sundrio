@@ -20,14 +20,6 @@ public final class ModelUtils {
         }
     }
 
-    public static PackageElement getPackageElement(Element element) {
-        if (element instanceof PackageElement) {
-            return (PackageElement) element;
-        } else {
-            return getPackageElement(element.getEnclosingElement());
-        }
-    }
-
     public static String getClassName(Element element) {
         TypeElement typeElement = getClassElement(element);
         String qualifiedName = typeElement.getQualifiedName().toString();
@@ -37,6 +29,14 @@ public final class ModelUtils {
         }
         String result = qualifiedName.substring(packageName.length() + 1);
         return result;
+    }
+
+    public static PackageElement getPackageElement(Element element) {
+        if (element instanceof PackageElement) {
+            return (PackageElement) element;
+        } else {
+            return getPackageElement(element.getEnclosingElement());
+        }
     }
 
     public static String getPackageName(Element element) {
