@@ -1,6 +1,5 @@
 package me.builder.internal.processor.model;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -45,27 +44,27 @@ public class Model {
         }
 
         public Builder addArgument(String packageName, String className, String name) {
-            this.arguments.add(new Property(new Type(packageName, className), name));
+            this.arguments.add(new Property(new Type(packageName, className), name, false));
             return this;
         }
 
         public Builder addArgument(Type type, String name) {
-            this.arguments.add(new Property(type, name));
+            this.arguments.add(new Property(type, name, false));
             return this;
         }
 
         public Builder addField(String packageName, String className, String name) {
-            this.fields.add(new Property(new Type(packageName, className), name));
+            this.fields.add(new Property(new Type(packageName, className), name, false));
             return this;
         }
 
         public Builder addField(String packageName, String className, String name, boolean isArrayType) {
-            this.fields.add(new Property(new Type(packageName, className, isArrayType), name));
+            this.fields.add(new Property(new Type(packageName, className, isArrayType), name, false));
             return this;
         }
 
-        public Builder addField(Type type, String name) {
-            this.fields.add(new Property(type, name));
+        public Builder addField(Type type, String name, boolean isBuildable) {
+            this.fields.add(new Property(type, name, isBuildable));
             return this;
         }
 

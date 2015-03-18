@@ -1,5 +1,7 @@
 package me.builder.internal.processor.model;
 
+import me.builder.Nested;
+
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -22,6 +24,11 @@ public class FluentModel extends Model {
         for (Property field : getFields()) {
             types.add(field.getType());
             types.addAll(Arrays.asList(field.getType().getGenericTypes()));
+            if (field.isBuildable()) {
+                types.add(new Type(field.getType().getPackageName(), field.getType().getClassName() + "Fluent"));
+                types.add(new Type(field.getType().getPackageName(), field.getType().getClassName() + "Builder"));
+                types.add(new Type(Nested.class.getPackage().getName(), Nested.class.getSimpleName()));
+            }
         }
 
         for (Property field : getArguments()) {
@@ -46,6 +53,7 @@ public class FluentModel extends Model {
                 imports.add(t.getPackageName() + "." + t.getClassName());
             }
         }
+        
         return imports;
     }
 }

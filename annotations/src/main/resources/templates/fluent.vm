@@ -41,16 +41,24 @@ public class ${model.type.className}Fluent<T extends ${model.type.className}Flue
         return ${f.name};
     }
 #end
-#end
 
-#foreach($n in $model.nestedTypes)
-    class ${n.className}Nested<T> extends ${n.className}Fluent<${n.className}Nested<T>> implements Nested<T> {
-        private final ${n.className}Builder builder = new ${n.className}Builder();
+#if (${f.buildable})
+    public ${f.nestedClassName}<T> ${f.addSetter}() {
+        return new ${f.nestedClassName}<T>();
+    }
+
+    class ${f.nestedClassName}<N> extends ${f.type.className}Fluent<${f.nestedClassName}<N>> implements Nested<N> {
+        private final ${f.type.className}Builder builder = new ${f.type.className}Builder();
 
         @Override
-        public T  and() {
-            return (T) add${n.className}(builder.build());
+        public N and() {
+#if (${f.type.arrayType})
+            return (N) ${f.addSetter}(builder.build());
+#else
+            return (N) ${f.withSetter}(builder.build());
+#end
         }
     }
+#end    
 #end
 }

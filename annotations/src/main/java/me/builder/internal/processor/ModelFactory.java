@@ -51,17 +51,9 @@ public class ModelFactory {
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
             Type type = toType(variableElement);
             String name = variableElement.getSimpleName().toString();
-            builder = builder.addField(type, name);
-
             TypeMirror variableType = toTypeMirror(variableElement);
-            Element typeElement = types.asElement(variableType);
-            if (typeElement != null) {
-                for (Element el : types.asElement(variableType).getEnclosedElements()) {
-                    if (el.getAnnotation(Buildable.class) != null) {
-                    //    builder = builder.addNested(type.getPackageName(), type.getClassName());
-                    }
-                }
-            }
+            boolean isBuildable = isBuildable(variableType);
+            builder = builder.addField(type, name, isBuildable);
         }
 
         //Check SuperClass
@@ -85,6 +77,17 @@ public class ModelFactory {
         return variableType;
     }
 
+    private boolean isBuildable(TypeMirror typeMirror) {
+        Element typeElement = types.asElement(typeMirror);
+        if (typeElement != null) {
+            for (Element el : types.asElement(typeMirror).getEnclosedElements()) {
+                if (el.getAnnotation(Buildable.class) != null) {
+                    return true;
+                }
+            }
+        }  
+        return false;
+    }
 
     private Type toType(VariableElement variableElement) {
         boolean isArrayType = false;
