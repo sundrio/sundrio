@@ -6,6 +6,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class ModelUtils {
@@ -54,5 +55,35 @@ public final class ModelUtils {
             }
         }
         return null;
+    }
+
+    public static List<String> splitTypes(String fullName) {
+        String name = fullName.replace(" ", "");
+        List<String> result = new ArrayList<>();
+        int openBrackets = 0;
+        int lastIndex = 0;
+        for (int i = 0; i < name.length(); i++) {
+            if (name.charAt(i) == ',' && openBrackets == 0) {
+                result.add(name.substring(0, i));
+                lastIndex = i + 1;
+            } else if (name.charAt(i) == '<') {
+                openBrackets++;
+            } else if (name.charAt(i) == '>') {
+                openBrackets--;
+            }
+        }
+        result.add(name.substring(lastIndex));
+        return result;
+    }
+
+    public static String getFullyQualifiedName(String fullName) {
+        String result = fullName.trim();
+        if (result.contains("[")) {
+            result = result.substring(0, result.indexOf("["));
+        }
+        if (result.contains("<")) {
+            result = result.substring(0, result.indexOf("<"));
+        }
+        return result;
     }
 }

@@ -11,8 +11,8 @@ import java.io.Writer;
 
 public final class GeneratorUtils {
 
-    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/fluent.vm";
-    public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder.vm";
+    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
+    public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
 
     private GeneratorUtils() {
         //Utility Class

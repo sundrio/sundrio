@@ -1,0 +1,88 @@
+#macro (addToMap $f)
+#if ($f.type.collection && $f.type.className == "Map")
+    public T with${f.nameCapitalizedSingular}(${f.type.genericTypes[0].className} key, ${f.type.genericTypes[0].className} value) {
+        this.${f.name}.put(key,value);
+        return (T) this;
+    }
+#end
+#end
+#macro (addToList $f)
+#if ($f.type.collection && ($f.type.className == "Set")||($f.type.className == "List"))
+    public T with${f.nameCapitalizedSingular}(${f.type.genericTypes[0].className} item) {
+        this.${f.name}.add(item);
+        return (T) this;
+    }
+#end
+#end
+package ${model.type.packageName};
+
+import me.builder.Fluent;
+#foreach($i in $model.imports)
+import $i.fullyQualifiedName;
+#end
+
+#if (${model.type.superClass.attributes.get("BUILDABLE")})
+public class ${model.type.className}Fluent<T extends ${model.type.className}Fluent<T>>#if ( ${model.type.superClass}) extends ${model.type.superClass.className}Fluent<T>#end implements Fluent<T> {
+#else
+public class ${model.type.className}Fluent<T extends ${model.type.className}Fluent<T>> implements Fluent<T> {
+#end    
+
+
+#foreach($f in $model.fields)
+#if (${f.type.array})
+    private final List<${f.type.className}> ${f.name} = new ArrayList<>();
+
+    public T with${f.nameCapitalized}(${f.type.simpleName} ${f.name}) {
+        for (${f.type.className} item : ${f.name}) {
+            this.${f.name}.add(item);
+        }
+        return (T) this;
+    }
+
+    public T add${f.nameCapitalized}(${f.type.className} ${f.name}) {
+        this.${f.name}.add(${f.name});
+        return (T) this;
+    }
+
+    public ${f.type.simpleName} ${f.getter}() {
+        return ${f.name}.toArray(new ${f.type.className}[${f.name}.size()]);
+    }
+#else
+    private ${f.type.simpleName} ${f.name} #if(${f.type.collection}) = new ${f.type.defaultImplementation.className}()#end;
+    
+    public T with${f.nameCapitalized}(${f.type.simpleName} ${f.name}) {
+        this.${f.name}=${f.name};
+        return (T) this;
+    }
+    
+#addToList( $f )
+#addToMap( $f )
+    public ${f.type.simpleName} ${f.getter}() {
+        return ${f.name};
+    }
+#end
+
+#if (${f.type.attributes.get("BUILDABLE")})
+    public ${f.nameCapitalized}Nested<T> add${f.nameCapitalized}() {
+        return new ${f.nameCapitalized}Nested<T>();
+    }
+
+    public class ${f.nameCapitalized}Nested<N> extends ${f.type.className}Fluent<${f.nameCapitalized}Nested<N>> implements Nested<N> {
+        private final ${f.type.className}Builder builder = new ${f.type.className}Builder();
+    
+        public N end${f.nameCapitalized}() {
+            return and();
+        }
+    
+        @Override
+        public N and() {
+#if (${f.type.array})
+            return (N) add${f.nameCapitalized}(builder.build());
+#else
+            return (N) with${f.nameCapitalized}(builder.build());
+#end
+        }
+    }
+#end    
+#end
+}

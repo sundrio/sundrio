@@ -3,8 +3,9 @@ package me.builder.internal.processor;
 import me.builder.annotations.Buildable;
 import me.builder.internal.processor.generator.CodeGenerator;
 import me.builder.internal.processor.generator.GeneratorUtils;
-import me.builder.internal.processor.model.FluentModel;
-import me.builder.internal.processor.model.Model;
+import me.builder.internal.processor.model.FluentJavaClazz;
+import me.builder.internal.processor.model.JavaClazz;
+import me.builder.internal.processor.model.JavaClazzFactory;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -34,16 +35,15 @@ public class BuildableProcessor extends AbstractProcessor {
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 if (element instanceof ExecutableElement) {
-                    ModelFactory modelFactory = new ModelFactory(elements, types, getBuildableTypes(buildables));
-                    Model model = modelFactory.create((ExecutableElement) element);
-
+                    JavaClazzFactory modelFactory = new JavaClazzFactory(elements, types, getBuildableTypes(buildables));
+                    JavaClazz clazz = modelFactory.create((ExecutableElement) element);
                     try {
-                        generateFromModel(FluentModel.wrap(model),
-                                processingEnv.getFiler().createSourceFile(model.getClassName() + "Fluent", ModelUtils.getPackageElement(element)),
+                        generateFromModel(FluentJavaClazz.wrap(clazz),
+                                processingEnv.getFiler().createSourceFile(clazz.getType().getClassName() + "Fluent", ModelUtils.getPackageElement(element)),
                                 GeneratorUtils.DEFAULT_FLUENT_TEMPLATE_LOCATION);
 
-                        generateFromModel(model,
-                                processingEnv.getFiler().createSourceFile(model.getClassName() + "Builder", ModelUtils.getPackageElement(element)),
+                        generateFromModel(clazz,
+                                processingEnv.getFiler().createSourceFile(clazz.getType().getClassName() + "Builder", ModelUtils.getPackageElement(element)),
                                 GeneratorUtils.DEFAULT_BUILDER_TEMPLATE_LOCATION);
 
                     } catch (IOException e) {
@@ -63,7 +63,7 @@ public class BuildableProcessor extends AbstractProcessor {
         return typeElements;
     }
 
-    private void generateFromModel(Model model, JavaFileObject fileObject, String resourceName) throws IOException {
+    private void generateFromModel(JavaClazz model, JavaFileObject fileObject, String resourceName) throws IOException {
         CodeGenerator codeGenerator = new CodeGenerator(model, fileObject.openWriter(), resourceName);
         codeGenerator.generate();
     }
