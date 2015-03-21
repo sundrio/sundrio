@@ -1,6 +1,14 @@
 package me.builder.internal.processor.model;
 
 import me.builder.annotations.Buildable;
+import me.codegen.model.JavaClazz;
+import me.codegen.model.JavaClazzBuilder;
+import me.codegen.model.JavaMethod;
+import me.codegen.model.JavaMethodBuilder;
+import me.codegen.model.JavaProperty;
+import me.codegen.model.JavaPropertyBuilder;
+import me.codegen.model.JavaType;
+import me.codegen.model.JavaTypeBuilder;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
@@ -55,7 +63,7 @@ public class JavaClazzFactory {
 
         //Populate Fields
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
-            builder.addField(toJavaProperty(variableElement));
+            builder.addToFields(toJavaProperty(variableElement));
         }
 
         return builder.build();
@@ -85,7 +93,7 @@ public class JavaClazzFactory {
         JavaMethodBuilder constructorBuilder = new JavaMethodBuilder();
         //Populate constructor parameters
         for (VariableElement variableElement : executableElement.getParameters()) {
-            constructorBuilder = constructorBuilder.addArguments(
+            constructorBuilder = constructorBuilder.addToArguments(
                     toJavaProperty(variableElement));
         }
         return constructorBuilder.build();
@@ -93,13 +101,16 @@ public class JavaClazzFactory {
 
     private JavaProperty toJavaProperty(VariableElement variableElement) {
         String name = variableElement.getSimpleName().toString();
-        JavaType type = toType(variableElement);
         TypeMirror variableType = toTypeMirror(variableElement);
+        boolean isArray = variableElement.asType().toString().endsWith("[]");
+        JavaType type = toType(variableElement);
+        
         boolean isBuildable = isBuildable(variableType);
         return new JavaPropertyBuilder()
                 .withName(name)
                 .withType(type)
-                .withAttribute(BUILDABLE, isBuildable)
+                .withArray(isArray)
+                .addAttributes(BUILDABLE, isBuildable)
                 .build();
 
     }
@@ -115,7 +126,6 @@ public class JavaClazzFactory {
 
     private JavaType toType(String fullName) {
         boolean isBuildable = false;
-        boolean isArrayType = false;
         String packageName = null;
         String className = null;
         List<JavaType> genericTypes = new ArrayList<>();
@@ -132,7 +142,6 @@ public class JavaClazzFactory {
         }
 
         if (fullName.endsWith("[]")) {
-            isArrayType = true;
             className = className.substring(0, className.indexOf("["));
         }
         if (className.contains("<")) {
@@ -160,8 +169,7 @@ public class JavaClazzFactory {
         return new JavaTypeBuilder()
                 .withPackageName(packageName)
                 .withClassName(className)
-                .withArray(isArrayType)
-                .withAttribute(BUILDABLE, isBuildable)
+                .addAttributes(BUILDABLE, isBuildable)
                 .withConcrete(defaultImplementation == null)
                 .withCollection(collection)
                 .withDefaultImplementation(defaultImplementation)

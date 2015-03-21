@@ -11,4 +11,8 @@ public class Circle extends Shape {
         super(x, y);
         this.radius = radius;
     }
+
+    public Long getRadius() {
+        return radius;
+    }
 }

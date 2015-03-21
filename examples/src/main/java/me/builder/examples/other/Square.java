@@ -12,4 +12,8 @@ public class Square extends Shape {
         super(x, y);
         this.size = size;
     }
+
+    public Long getSize() {
+        return size;
+    }
 }

@@ -1,4 +1,4 @@
-package me.builder.internal.processor.model;
+package me.dsl.internal.processor.model;
 
 public class Type {
 

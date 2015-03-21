@@ -4,6 +4,15 @@ import me.builder.Builder;
 
 public class ${model.type.className}Builder extends ${model.type.className}Fluent<${model.type.className}Builder> implements Builder<${model.type.className}> {
 
+    public ${model.type.className}Builder() {
+    }
+    
+    public ${model.type.className}Builder(${model.type.className} instance) {
+#foreach($arg in $model.constructor.arguments)
+        with${arg.nameCapitalized}(instance.${arg.getter}());
+#end
+    }
+    
     public ${model.type.className} build() {
        return new ${model.type.className}( #foreach($arg in $model.constructor.arguments)${arg.getter}()#if( $foreach.hasNext ), #end#end );
     }

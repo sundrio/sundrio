@@ -1,6 +1,7 @@
 package me.builder.internal.processor.generator;
 
-import me.builder.internal.processor.model.Model;
+import me.codegen.model.JavaClazz;
+import me.codegen.model.JavaClazzBuilder;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,19 +12,32 @@ public class BuilderGeneratorTest {
 
     @Test
     public void testFluentTemplate() throws IOException {
-        Model model = new Model.Builder()
-                .withType("my.test", "Circle")
-                .addArgument("java.lang", "Integer", "x")
-                .addArgument("java.lang", "Integer", "y")
-                .addArgument("java.lang", "Boolean", "hidden")
-                .addArgument("java.lang", "Integer", "radius").build();
+        
+        
+        JavaClazz javaClazz = new JavaClazzBuilder()
+                .addType()
+                    .withClassName("Circle")
+                    .withPackageName("my.Test")
+                    .endType()
+                .addConstructor()
+                    .addArguments()
+                        .withName("w")
+                        .addType().withPackageName("java.lang").withClassName("Integer").endType()
+                        .endArguments()
+                    .addArguments()
+                        .withName("w")
+                        .addType().withPackageName("java.lang").withClassName("Integer").endType()
+                        .endArguments()
+                    .endConstructor()
+                .build();
 
         File tmp = new File("/tmp");
-        generate(model, tmp, "CircleFluent.java", GeneratorUtils.DEFAULT_FLUENT_TEMPLATE_LOCATION);
-        generate(model, tmp, "CircleBuilder.java", GeneratorUtils.DEFAULT_BUILDER_TEMPLATE_LOCATION);
+        generate(javaClazz, tmp, "CircleFluent.java", GeneratorUtils.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+        generate(javaClazz, tmp, "CircleBuilder.java", GeneratorUtils.DEFAULT_BUILDER_TEMPLATE_LOCATION);
+        
     }
     
-    private static void generate(Model model, File dir, String name, String templateResource) {
+    private static void generate(JavaClazz model, File dir, String name, String templateResource) {
         try (FileWriter fluentWriter = new FileWriter(new File(dir, name))) {
             CodeGenerator generator = new CodeGenerator(model, fluentWriter, templateResource);
             generator.generate();    

@@ -13,4 +13,12 @@ public class Canvas {
         this.area = area;
         this.shapes = shapes;
     }
+
+    public Square getArea() {
+        return area;
+    }
+
+    public Shape[] getShapes() {
+        return shapes;
+    }
 }

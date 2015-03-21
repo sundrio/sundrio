@@ -12,10 +12,6 @@ public interface Type {
      */
     String getClassName();
 
-    /**
-     * @return true if type is an array type.
-     */
-    boolean isArray();
 
     /**
      * @return true if type is a Collection type.

@@ -1,5 +1,6 @@
-package me.builder.internal.processor.model;
+package me.codegen.impl;
 
+import me.builder.annotations.Buildable;
 import me.codegen.Method;
 
 import java.util.Map;
@@ -12,6 +13,7 @@ public class JavaMethod extends AttributeSupport implements Method<JavaType, Jav
     private final JavaProperty[] arguments;
     private final Set<JavaType> exceptions;
 
+    @Buildable
     public JavaMethod(String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
         super(attributes);
         this.name = name;

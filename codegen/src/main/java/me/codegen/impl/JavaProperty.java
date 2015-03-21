@@ -1,18 +1,22 @@
-package me.builder.internal.processor.model;
+package me.codegen.impl;
 
+import me.builder.annotations.Buildable;
 import me.codegen.Property;
 
 import java.util.Map;
 
 public class JavaProperty extends AttributeSupport implements Property<JavaType> {
-    
+
     private final JavaType type;
     private final String name;
+    private final boolean array;
 
-    public JavaProperty(JavaType type, String name, Map<String, Object> attributes) {
+    @Buildable
+    public JavaProperty(JavaType type, String name, Map<String, Object> attributes, boolean array) {
         super(attributes);
         this.type = type;
         this.name = name;
+        this.array = array;
     }
 
     public String getNameCapitalized() {
@@ -53,5 +57,9 @@ public class JavaProperty extends AttributeSupport implements Property<JavaType>
     @Override
     public String getName() {
         return name;
+    }
+
+    public boolean isArray() {
+        return array;
     }
 }

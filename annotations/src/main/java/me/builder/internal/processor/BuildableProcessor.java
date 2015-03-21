@@ -4,8 +4,9 @@ import me.builder.annotations.Buildable;
 import me.builder.internal.processor.generator.CodeGenerator;
 import me.builder.internal.processor.generator.GeneratorUtils;
 import me.builder.internal.processor.model.FluentJavaClazz;
-import me.builder.internal.processor.model.JavaClazz;
+import me.codegen.model.JavaClazz;
 import me.builder.internal.processor.model.JavaClazzFactory;
+import me.codegen.model.JavaClazzBuilder;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -45,6 +46,11 @@ public class BuildableProcessor extends AbstractProcessor {
                         generateFromModel(clazz,
                                 processingEnv.getFiler().createSourceFile(clazz.getType().getClassName() + "Builder", ModelUtils.getPackageElement(element)),
                                 GeneratorUtils.DEFAULT_BUILDER_TEMPLATE_LOCATION);
+
+//                        new JavaClazzBuilder(clazz)
+//                        generateFromModel(clazz,
+//                                processingEnv.getFiler().createSourceFile(clazz.getType().getClassName() + "TestBuilder", ModelUtils.getPackageElement(element)),
+//                                GeneratorUtils.DEFAULT_BUILDER_TEMPLATE_LOCATION);
 
                     } catch (IOException e) {
                         throw new RuntimeException(e);

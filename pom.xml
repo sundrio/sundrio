@@ -19,6 +19,7 @@
         <module>api</module>
         <module>annotations</module>
         <module>examples</module>
+        <module>codegen</module>
     </modules>
 
     <dependencyManagement>
