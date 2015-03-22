@@ -3,10 +3,6 @@ package me.codegen.model;
 import me.builder.Fluent;
 import me.builder.Nested;
 
-/*
-public class JavaProperty extends AttributeSupport{}
-*/
-
 public class JavaPropertyFluent<T extends JavaPropertyFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
 
 

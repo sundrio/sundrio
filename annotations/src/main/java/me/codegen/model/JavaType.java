@@ -4,26 +4,31 @@ import me.builder.annotations.Buildable;
 import me.codegen.Type;
 
 import java.util.Map;
+import java.util.Set;
 
 public class JavaType extends AttributeSupport implements Type {
     
+    private final JavaKind kind;
     private final String packageName;
     private final String className;
     private final boolean collection;
     private final boolean concrete;
     private final JavaType defaultImplementation;
     private final JavaType superClass;
+    private final Set<JavaType> interfaces;
     private final JavaType[] genericTypes;
 
     @Buildable
-    public JavaType(String packageName, String className, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, JavaType[] genericTypes, Map<String, Object> attributes) {
+    public JavaType(JavaKind kind, String packageName, String className, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
         super(attributes);
+        this.kind = kind;
         this.packageName = packageName;
         this.className = className;
         this.collection = collection;
         this.concrete = concrete;
         this.defaultImplementation = defaultImplementation;
         this.superClass = superClass;
+        this.interfaces = interfaces;
         this.genericTypes = genericTypes;
     }
 
@@ -63,7 +68,10 @@ public class JavaType extends AttributeSupport implements Type {
         return (("boolean".equals(className)) ||
                 ("Boolean".equals(className)));
     }
-    
+
+    public JavaKind getKind() {
+        return kind;
+    }
     @Override
     public String getPackageName() {
         return packageName;
@@ -92,6 +100,10 @@ public class JavaType extends AttributeSupport implements Type {
     @Override
     public JavaType getSuperClass() {
         return superClass;
+    }
+
+    public Set<JavaType> getInterfaces() {
+        return interfaces;
     }
 
     @Override

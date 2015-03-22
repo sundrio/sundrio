@@ -13,7 +13,7 @@ import java.io.Writer;
 
 public class AddToMapMethodDirective extends Directive {
 
-    private static final String FORMAT = "\tpublic T %s(%s key, %s value) {\n\t\tthis.%s.put(key, value);\n\t\treturn (T) this;\n\t}\n";
+    private static final String FORMAT = "\n\tpublic T %s(%s key, %s value) {\n\t\tthis.%s.put(key, value);\n\t\treturn (T) this;\n\t}\n";
     @Override
     public String getName() {
         return "addToMapMethod";

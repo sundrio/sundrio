@@ -6,41 +6,30 @@ import $i.fullyQualifiedName;
 #end
 
 /*
-#class( $model )
+#class ( $model )
 #end
 */
-
 #if (${model.type.superClass.attributes.get("BUILDABLE")})
 public class ${model.type.className}Fluent<T extends ${model.type.className}Fluent<T>>#if ( ${model.type.superClass}) extends ${model.type.superClass.className}Fluent<T>#end implements Fluent<T> {
 #else
 public class ${model.type.className}Fluent<T extends ${model.type.className}Fluent<T>> implements Fluent<T> {
-#end    
-
-#foreach($f in $model.fields)
-
-#if (${f.array})
-    private final List<${f.type.className}> ${f.name} = new ArrayList<>();
-
-#withArrayMethod ($f)
-#addToListMethod ($f)
-#getterToArrayMethod( $f)
-    
-#else
-    private ${f.type.simpleName} ${f.name} #if(${f.type.collection}) = new ${f.type.defaultImplementation.className}()#end;
-    
-#withMethod ($f)
-#addToListMethod ( $f )
-#addToMapMethod ( $f )
-#getterMethod ( $f)
 #end
-
-#if (${f.type.attributes.get("BUILDABLE")})
-#addNestedMethod ( $f )
-    
-#nestedClass ( $f )
-        //Just add here anything else that needs to go inside the nested class.
-#end    
-
-#end    
+#foreach($f in $model.fields)
+    #if (${f.array})
+    private final List<${f.type.className}> ${f.name} = new ArrayList<>();
+        #withArrayMethod ($f)
+        #addToListMethod ($f)
+        #getterToArrayMethod( $f)
+    #else
+    private ${f.type.simpleName} ${f.name} #if(${f.type.collection}) = new ${f.type.defaultImplementation.className}()#end;
+        #withMethod ($f)
+        #addToListMethod ( $f )
+        #addToMapMethod ( $f )
+        #getterMethod ( $f)
+    #end
+    #if (${f.type.attributes.get("BUILDABLE")})
+        #addNestedMethod ( $f )
+        #nestedClass ( $f )#end
+    #end
 #end
 }

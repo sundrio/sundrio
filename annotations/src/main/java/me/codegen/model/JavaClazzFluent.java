@@ -7,10 +7,6 @@ import me.codegen.Method;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-/*
-public class JavaClazz extends AttributeSupport{}
-*/
-
 public class JavaClazzFluent<T extends JavaClazzFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
 
 

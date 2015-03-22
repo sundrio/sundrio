@@ -13,7 +13,7 @@ import java.io.Writer;
 
 public class GetterToArrayMethodDirective extends Directive {
     
-    private static final String FORMAT = "\tpublic %s[] %s() {\n\t\treturn this.%s.toArray(new %s[%s.size()]);\n\t}\n";
+    private static final String FORMAT = "\n\tpublic %s[] %s() {\n\t\treturn this.%s.toArray(new %s[%s.size()]);\n\t}\n";
     
     @Override
     public String getName() {

@@ -3,6 +3,7 @@ package me.builder.internal.processor.model;
 import me.builder.annotations.Buildable;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
+import me.codegen.model.JavaKind;
 import me.codegen.model.JavaMethod;
 import me.codegen.model.JavaMethodBuilder;
 import me.codegen.model.JavaProperty;
@@ -21,6 +22,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,8 @@ public class JavaClazzFactory {
     private final Elements elements;
     private final Types types;
     private final Set<TypeElement> buildables;
+    private final Map<String, JavaType> knownTypes = new HashMap<>();
+    private final Set<String> visited = new HashSet<>();
 
     public JavaClazzFactory(Elements elements, Types types, Set<TypeElement> buildables) {
         this.elements = elements;
@@ -121,20 +125,30 @@ public class JavaClazzFactory {
     }
 
     private JavaType toType(TypeMirror variableType) {
-        return toType(variableType.toString());
+        return toType(variableType.toString(), true);
     }
 
-    private JavaType toType(String fullName) {
+    private JavaType toType(String fullName, boolean recursive) {
+        if (knownTypes.containsKey(fullName)) {
+            return knownTypes.get(fullName);
+        }
+        
         boolean isBuildable = false;
         String packageName = null;
         String className = null;
+        List<JavaType> interfaces = new ArrayList<>();
         List<JavaType> genericTypes = new ArrayList<>();
 
         TypeElement typeElement = elements.getTypeElement(getFullyQualifiedName(fullName));
-
         if (typeElement == null) {
             className = fullName;
         } else {
+            for (TypeMirror interfaceType : typeElement.getInterfaces()) {
+                if (recursive) {
+                    interfaces.add(toType(interfaceType.toString(), false));
+                }
+            }
+            
             TypeMirror typeMirror = typeElement.asType();
             isBuildable = isBuildable(typeMirror);
             packageName = elements.getPackageOf(typeElement).toString();
@@ -147,7 +161,7 @@ public class JavaClazzFactory {
         if (className.contains("<")) {
             String genericTypeList = fullName.substring(fullName.indexOf("<") + 1, fullName.lastIndexOf(">"));
             for (String genericType : splitTypes(genericTypeList)) {
-                JavaType t = toType(genericType);
+                JavaType t = toType(genericType, false);
                 genericTypes.add(t);
             }
             className = className.substring(0, className.indexOf("<"));
@@ -156,17 +170,18 @@ public class JavaClazzFactory {
         String qualifiedName = packageName + "." + className;
         boolean collection = false;
         if (qualifiedName.equals(Set.class.getCanonicalName())) {
-            defaultImplementation = toType(LinkedHashSet.class.getCanonicalName());
+            defaultImplementation = toType(LinkedHashSet.class.getCanonicalName(), false);
             collection = true;
         } else if (qualifiedName.equals(List.class.getCanonicalName())) {
-            defaultImplementation = toType(ArrayList.class.getCanonicalName());
+            defaultImplementation = toType(ArrayList.class.getCanonicalName(), false);
             collection = true;
         } else if (qualifiedName.equals(Map.class.getCanonicalName())) {
-            defaultImplementation = toType(HashMap.class.getCanonicalName());
+            defaultImplementation = toType(HashMap.class.getCanonicalName(), false);
             collection = true;
         }
 
-        return new JavaTypeBuilder()
+        JavaType type = new JavaTypeBuilder()
+                .withKind(JavaKind.CLASS)
                 .withPackageName(packageName)
                 .withClassName(className)
                 .addAttributes(BUILDABLE, isBuildable)
@@ -174,5 +189,8 @@ public class JavaClazzFactory {
                 .withCollection(collection)
                 .withDefaultImplementation(defaultImplementation)
                 .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()])).build();
+        
+        knownTypes.put(fullName, type);
+        return type;
     }
 }

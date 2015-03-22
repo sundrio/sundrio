@@ -1,6 +1,5 @@
 package me.dsl.internal.processor;
 
-import me.builder.internal.processor.generator.CodeGenerator;
 import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.Keyword;
 import me.dsl.annotations.Transition;
@@ -15,8 +14,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.JavaFileObject;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

@@ -5,10 +5,6 @@ import me.builder.Fluent;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-public class AttributeSupport{}
-*/
-
 public class AttributeSupportFluent<T extends AttributeSupportFluent<T>> implements Fluent<T> {
 
 
@@ -20,7 +16,8 @@ public class AttributeSupportFluent<T extends AttributeSupportFluent<T>> impleme
 	}
 	public T addAttributes(String key, Object value) {
 		this.attributes.put(key, value);
-		return (T) this;	}
+		return (T) this;
+	}
 	public Map<String,Object> getAttributes() {
 		return this.attributes;
 	}

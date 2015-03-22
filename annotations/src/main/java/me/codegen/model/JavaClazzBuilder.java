@@ -7,7 +7,7 @@ public class JavaClazzBuilder extends JavaClazzFluent<JavaClazzBuilder> implemen
     public JavaClazzBuilder() {
     }
     
-    public JavaClazzBuilder(JavaClazzBuilder instance) {
+    public JavaClazzBuilder(JavaClazz instance) {
         withType(instance.getType());
         withConstructor(instance.getConstructor());
         withMethods(instance.getMethods());

@@ -13,7 +13,7 @@ import java.io.Writer;
 
 public class WithMethodDirective extends Directive {
     
-    private static final String FORMAT = "\tpublic T %s(%s %s) {\n\t\tthis.%s=%s;\n\t\treturn (T)this;\n\t}\n";
+    private static final String FORMAT = "\n\tpublic T %s(%s %s) {\n\t\tthis.%s=%s;\n\t\treturn (T)this;\n\t}\n";
     @Override
     public String getName() {
         return "withMethod";

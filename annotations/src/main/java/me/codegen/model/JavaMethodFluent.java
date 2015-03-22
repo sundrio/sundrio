@@ -8,10 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-/*
-public class JavaMethod extends AttributeSupport{}
-*/
-
 public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
 
 

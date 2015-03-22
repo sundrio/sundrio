@@ -7,7 +7,7 @@ public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder>
     public JavaPropertyBuilder() {
     }
     
-    public JavaPropertyBuilder(JavaPropertyBuilder instance) {
+    public JavaPropertyBuilder(JavaProperty instance) {
         withType(instance.getType());
         withName(instance.getName());
         withAttributes(instance.getAttributes());

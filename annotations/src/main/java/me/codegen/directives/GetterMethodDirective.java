@@ -13,7 +13,7 @@ import java.io.Writer;
 
 public class GetterMethodDirective extends Directive {
     
-    private static final String FORMAT = "\tpublic %s %s() {\n\t\treturn this.%s;\n\t}\n";
+    private static final String FORMAT = "\n\tpublic %s %s() {\n\t\treturn this.%s;\n\t}\n";
     @Override
     public String getName() {
         return "getterMethod";

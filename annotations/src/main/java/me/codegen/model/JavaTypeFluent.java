@@ -4,13 +4,22 @@ import me.builder.Fluent;
 import me.builder.Nested;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
-
-/*
-public class JavaType extends AttributeSupport{}
-*/
+import java.util.Set;
 
 public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
+
+
+    private JavaKind kind = JavaKind.CLASS;
+    
+	public T withKind(JavaKind kind) {
+		this.kind=kind;
+		return (T)this;
+	}
+	public JavaKind getKind() {
+		return this.kind;
+	}
 
 
     private String packageName ;
@@ -102,6 +111,21 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
 			return (N) withSuperClass(builder.build());
 		}
         //Just add here anything else that needs to go inside the nested class.
+	}
+
+
+    private Set<JavaType> interfaces  = new LinkedHashSet();
+    
+	public T withInterfaces(Set interfaces) {
+		this.interfaces=interfaces;
+		return (T)this;
+	}
+	public T addToInterfaces(JavaType item) {
+		this.interfaces.add(item);
+		return (T)this;
+	}
+	public Set<JavaType> getInterfaces() {
+		return this.interfaces;
 	}
 
 

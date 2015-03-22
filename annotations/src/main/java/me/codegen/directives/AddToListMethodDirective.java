@@ -13,7 +13,7 @@ import java.io.Writer;
 
 public class AddToListMethodDirective extends Directive {
 
-    private static final String FORMAT = "\tpublic T %s(%s item) {\n\t\tthis.%s.add(item);\n\t\treturn (T)this;\n\t}\n";
+    private static final String FORMAT = "\n\tpublic T %s(%s item) {\n\t\tthis.%s.add(item);\n\t\treturn (T)this;\n\t}\n";
     @Override
     public String getName() {
         return "addToListMethod";

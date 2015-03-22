@@ -50,7 +50,7 @@ public class NestedClassDirective extends Directive {
         }
         String name = property.getNameCapitalized();
         String className = property.getType().getClassName();
-        writer.append("\tpublic class ").append(name).append("Nested<N> extends ")
+        writer.append("\n\tpublic class ").append(name).append("Nested<N> extends ")
                 .append(className).append("Fluent<").append(name).append("Nested<N>> implements Nested<N> {\n");
         writer.append("\t\tprivate final ").append(className).append("Builder builder = new ").append(className).append("Builder();\n");
         writer.append("\t\tpublic N end").append(name).append("() { return and(); }\n");

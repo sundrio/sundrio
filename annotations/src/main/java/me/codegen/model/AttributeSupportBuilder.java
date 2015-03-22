@@ -7,7 +7,7 @@ public class AttributeSupportBuilder extends AttributeSupportFluent<AttributeSup
     public AttributeSupportBuilder() {
     }
     
-    public AttributeSupportBuilder(AttributeSupportBuilder instance) {
+    public AttributeSupportBuilder(AttributeSupport instance) {
         withAttributes(instance.getAttributes());
     }
     

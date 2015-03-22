@@ -1,6 +1,7 @@
 package me.codegen.directives;
 
 import me.codegen.model.JavaClazz;
+import me.codegen.model.JavaKind;
 import me.codegen.model.JavaType;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.exception.MethodInvocationException;
@@ -17,7 +18,7 @@ import java.util.Collections;
 
 public class ClassDirective extends Directive {
 
-    private static final JavaType OBJECT_TYPE = new JavaType("java.lang", "Object", false, true, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
+    private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
     @Override
     public String getName() {
         return "class";
@@ -51,13 +52,28 @@ public class ClassDirective extends Directive {
                 }
             }
         }
-                
-        writer.append("public class ").append(clazz.getType().getClassName());
-        if (clazz.getType().getSuperClass() != null && !OBJECT_TYPE.equals(clazz.getType().getSuperClass())) {
-            writer.append(" extends ").append(clazz.getType().getSuperClass().getClassName());
+        
+        if (clazz != null) {
+            JavaType type = clazz.getType();
+            writer.append("public ").append(type.getKind().name().toLowerCase()).append(" ").append(clazz.getType().getClassName());
+            if (clazz.getType().getSuperClass() != null && !OBJECT_TYPE.equals(clazz.getType().getSuperClass())) {
+                writer.append(" extends ").append(clazz.getType().getSuperClass().getClassName());
+            }
+
+            boolean firstInterface = true;
+            for (JavaType iface : type.getInterfaces()) {
+                if (firstInterface) {
+                    writer.append(" implements ");
+                    firstInterface = false;
+                } else {
+                    writer.append(", ");
+                }
+                writer.append(iface.getClassName());
+            }
+
+            writer.append("{");
+            writer.append(block).append("}\n");
         }
-        writer.append("{");
-        writer.append(block).append("}\n");
         return true;
     }
 }

@@ -7,7 +7,7 @@ public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> imple
     public JavaMethodBuilder() {
     }
     
-    public JavaMethodBuilder(JavaMethodBuilder instance) {
+    public JavaMethodBuilder(JavaMethod instance) {
         withName(instance.getName());
         withReturnType(instance.getReturnType());
         withArguments(instance.getArguments());
