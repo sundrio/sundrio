@@ -20,9 +20,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>me.builder</groupId>
-            <artifactId>builder-annotations</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
         </dependency>
     </dependencies>
 
@@ -34,6 +33,7 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <compilerArgument>-proc:none</compilerArgument>
                 </configuration>
             </plugin>
         </plugins>

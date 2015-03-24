@@ -1,5 +1,11 @@
 package me.builder.internal.processor.generator;
 
+import me.builder.internal.directives.AddNestedMethodDirective;
+import me.builder.internal.directives.NestedClassDirective;
+import me.builder.internal.processor.BuildableProcessor;
+import me.codegen.generator.CodeGenerator;
+import me.codegen.generator.CodeGeneratorBuilder;
+import me.codegen.generator.GeneratorUtils;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
 import org.junit.Test;
@@ -19,7 +25,7 @@ public class BuilderGeneratorTest {
                     .withClassName("Circle")
                     .withPackageName("my.Test")
                     .endType()
-                .addConstructor()
+                .addToConstructors()
                     .addArguments()
                         .withName("w")
                         .addType().withPackageName("java.lang").withClassName("Integer").endType()
@@ -32,15 +38,19 @@ public class BuilderGeneratorTest {
                 .build();
 
         File tmp = new File("/tmp");
-        generate(javaClazz, tmp, "CircleFluent.java", GeneratorUtils.DEFAULT_FLUENT_TEMPLATE_LOCATION);
-        generate(javaClazz, tmp, "CircleBuilder.java", GeneratorUtils.DEFAULT_BUILDER_TEMPLATE_LOCATION);
+        generate(javaClazz, tmp, "CircleFluent.java", BuildableProcessor.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+        generate(javaClazz, tmp, "CircleBuilder.java", BuildableProcessor.DEFAULT_BUILDER_TEMPLATE_LOCATION);
         
     }
     
     private static void generate(JavaClazz model, File dir, String name, String templateResource) {
         try (FileWriter fluentWriter = new FileWriter(new File(dir, name))) {
-            CodeGenerator generator = new CodeGenerator(model, fluentWriter, templateResource);
-            generator.generate();    
+            new CodeGeneratorBuilder<JavaClazz>()
+                    .withModel(model)
+                    .withWriter(fluentWriter)
+                    .withTemplateResource(templateResource)
+                    .addToDirectives(AddNestedMethodDirective.class)
+                    .addToDirectives(NestedClassDirective.class).build().generate();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

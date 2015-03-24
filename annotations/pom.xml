@@ -38,8 +38,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
+            <groupId>me.builder</groupId>
+            <artifactId>builder-codegen</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

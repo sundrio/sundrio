@@ -1,14 +1,18 @@
 package me.builder.internal.processor;
 
-import me.builder.annotations.Buildable;
-import me.builder.internal.processor.generator.CodeGenerator;
-import me.builder.internal.processor.generator.GeneratorUtils;
-import me.builder.internal.processor.model.FluentJavaClazz;
+import me.Converter;
+import me.builder.internal.directives.AddNestedMethodDirective;
+import me.builder.internal.directives.NestedClassDirective;
+import me.builder.internal.model.BuildableJavaPropertyConverter;
+import me.builder.internal.model.BuildableJavaTypeConverter;
+import me.builder.internal.model.FluentJavaClazz;
+import me.codegen.coverters.JavaClazzConverter;
+import me.codegen.coverters.JavaMethodConverter;
+import me.codegen.generator.CodeGeneratorBuilder;
 import me.codegen.model.JavaClazz;
-import me.builder.internal.processor.model.JavaClazzFactory;
-import me.codegen.model.JavaClazzBuilder;
+import me.codegen.model.JavaProperty;
 import me.codegen.model.JavaType;
-import me.codegen.model.JavaTypeBuilder;
+import me.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -16,38 +20,45 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Set;
 
 @SupportedAnnotationTypes("me.builder.annotations.Buildable")
 public class BuildableProcessor extends AbstractProcessor {
 
+    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
+    public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
+
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        Set<Element> buildables = new HashSet<>();
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
 
+        Converter<JavaType, String> typeConverter = new BuildableJavaTypeConverter(elements, types);
+        Converter<JavaProperty, VariableElement> propertyConverter = new BuildableJavaPropertyConverter(typeConverter);
+        JavaMethodConverter methodConverter = new JavaMethodConverter(propertyConverter);
+        JavaClazzConverter clazzConverter = new JavaClazzConverter(types, typeConverter, methodConverter, propertyConverter);
 
-        buildables.addAll(env.getElementsAnnotatedWith(Buildable.class));
 
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 if (element instanceof ExecutableElement) {
-                    JavaClazzFactory modelFactory = new JavaClazzFactory(elements, types, getBuildableTypes(buildables));
-                    JavaClazz clazz = modelFactory.create((ExecutableElement) element);
+
+                    JavaClazz clazz = clazzConverter.covert(ModelUtils.getClassElement(element));
+
                     try {
                         generateFromModel(FluentJavaClazz.wrap(clazz),
                                 processingEnv.getFiler().createSourceFile(clazz.getType().getClassName() + "Fluent", ModelUtils.getPackageElement(element)),
-                                GeneratorUtils.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+                                DEFAULT_FLUENT_TEMPLATE_LOCATION);
 
                         generateFromModel(clazz,
                                 processingEnv.getFiler().createSourceFile(clazz.getType().getClassName() + "Builder", ModelUtils.getPackageElement(element)),
-                                GeneratorUtils.DEFAULT_BUILDER_TEMPLATE_LOCATION);
+                                DEFAULT_BUILDER_TEMPLATE_LOCATION);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -57,16 +68,14 @@ public class BuildableProcessor extends AbstractProcessor {
         return true;
     }
 
-    private Set<TypeElement> getBuildableTypes(Set<Element> elements) {
-        Set<TypeElement> typeElements = new HashSet<>();
-        for (Element element : elements) {
-            typeElements.add(ModelUtils.getClassElement(element));
-        }
-        return typeElements;
-    }
-
     private void generateFromModel(JavaClazz model, JavaFileObject fileObject, String resourceName) throws IOException {
-        CodeGenerator codeGenerator = new CodeGenerator(model, fileObject.openWriter(), resourceName);
-        codeGenerator.generate();
+        new CodeGeneratorBuilder<JavaClazz>()
+                .withModel(model)
+                .withWriter(fileObject.openWriter())
+                .withTemplateResource(resourceName)
+                .addToDirectives(NestedClassDirective.class)
+                .addToDirectives(AddNestedMethodDirective.class)
+                .build()
+                .generate();
     }
 }

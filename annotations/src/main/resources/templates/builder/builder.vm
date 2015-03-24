@@ -8,12 +8,12 @@ public class ${model.type.className}Builder extends ${model.type.className}Fluen
     }
     
     public ${model.type.className}Builder(${model.type.className} instance) {
-#foreach($arg in $model.constructor.arguments)
+#foreach($arg in $model.constructors.iterator().next().arguments)
         with${arg.nameCapitalized}(instance.${arg.getter}());
 #end
     }
     
     public ${model.type.className} build() {
-       return new ${model.type.className}( #foreach($arg in $model.constructor.arguments)${arg.getter}()#if( $foreach.hasNext ), #end#end );
+       return new ${model.type.className}( #foreach($arg in $model.constructors.iterator().next().arguments)${arg.getter}()#if( $foreach.hasNext ), #end#end );
     }
 }

@@ -1,5 +1,6 @@
 package me.dsl.internal.processor;
 
+import me.codegen.model.JavaClazzBuilder;
 import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.Keyword;
 import me.dsl.annotations.Transition;
@@ -26,12 +27,16 @@ public class DslProcessor extends AbstractProcessor {
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
 
-
         Set<TypeElement> customAnnotations = ElementFilter.typesIn(env.getElementsAnnotatedWith(Keyword.class));
+        
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 if (element instanceof TypeElement) {
                     TypeElement typeElement = (TypeElement) element;
+                    
+                    JavaClazzBuilder builder = new JavaClazzBuilder();
+                    
+                    
 
                     List<ExecutableElement> entryPoints = new ArrayList<>();
                     List<ExecutableElement> terminals = new ArrayList<>();
