@@ -50,12 +50,18 @@ public class NestedClassDirective extends Directive {
         }
         String name = property.getNameCapitalized();
         String className = property.getType().getClassName();
+        boolean multiple = property.isArray() || property.getType().isCollection();
+        
+        if (property.getType().isCollection() && className.endsWith("Set") || className.endsWith("List")) {
+            className = property.getType().getGenericTypes()[0].getClassName();
+        }
+        
         writer.append("\n\tpublic class ").append(name).append("Nested<N> extends ")
                 .append(className).append("Fluent<").append(name).append("Nested<N>> implements Nested<N> {\n");
-        writer.append("\t\tprivate final ").append(className).append("Builder builder = new ").append(className).append("Builder();\n");
+        writer.append("\t\tprivate final ").append(className).append("Builder builder = new ").append(className).append("Builder(this);\n");
         writer.append("\t\tpublic N end").append(name).append("() { return and(); }\n");
         writer.append("\t\tpublic N and() {\n");
-        if (property.isArray()) {
+        if (multiple) {
             writer.append("\t\t\treturn (N) addTo").append(name).append("(builder.build());\n");
         } else {
             writer.append("\t\t\treturn (N) with").append(name).append("(builder.build());\n");

@@ -32,7 +32,7 @@ public class ShapesTest {
 
     @Test
     public void testCanvasBuilder() {
-        Canvas canvas = new CanvasBuilder().addCircle().withY(1).withY(0).withRadius(10).and().build();
+        Canvas canvas = new CanvasBuilder().addCircle().withY(1).withX(0).withRadius(10).and().build();
         Assert.assertFalse(canvas.getShapes().isEmpty());
     }
 }

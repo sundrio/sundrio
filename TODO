@@ -1,0 +1,1 @@
+1. Add builder/fluent support for types with generics (see CodeGenerator as an example use case).

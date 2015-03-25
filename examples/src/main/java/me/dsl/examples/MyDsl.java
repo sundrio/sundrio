@@ -6,7 +6,7 @@ import me.dsl.annotations.Keyword;
 import me.dsl.annotations.Terminal;
 import me.dsl.annotations.Transition;
 
-@Dsl
+@Dsl(targetInterface = "MyDslInterface")
 public interface MyDsl {
 
     @EntryPoint

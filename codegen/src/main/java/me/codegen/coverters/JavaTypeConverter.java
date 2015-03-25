@@ -58,7 +58,7 @@ public class JavaTypeConverter implements Converter<JavaType, String> {
         if (className.contains("<")) {
             String genericTypeList = fullName.substring(fullName.indexOf("<") + 1, fullName.lastIndexOf(">"));
             for (String genericType : splitTypes(genericTypeList)) {
-                JavaType t = shallow.covert(genericType);
+                JavaType t = covert(genericType);
                 genericTypes.add(t);
             }
             className = className.substring(0, className.indexOf("<"));

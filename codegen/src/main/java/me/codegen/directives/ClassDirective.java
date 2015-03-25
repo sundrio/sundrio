@@ -55,7 +55,8 @@ public class ClassDirective extends Directive {
         
         if (clazz != null) {
             JavaType type = clazz.getType();
-            writer.append("public ").append(type.getKind().name().toLowerCase()).append(" ").append(clazz.getType().getClassName());
+            JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
+            writer.append("public ").append(kind.name().toLowerCase()).append(" ").append(clazz.getType().getClassName());
             if (clazz.getType().getSuperClass() != null && !OBJECT_TYPE.equals(clazz.getType().getSuperClass())) {
                 writer.append(" extends ").append(clazz.getType().getSuperClass().getClassName());
             }

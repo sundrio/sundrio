@@ -4,10 +4,18 @@ import me.builder.Builder;
 
 public class JavaTypeBuilder extends JavaTypeFluent<JavaTypeBuilder> implements Builder<JavaType> {
 
+    private final JavaTypeFluent fluent;
+    
     public JavaTypeBuilder() {
+        this.fluent = this;
+    }
+
+    public JavaTypeBuilder(JavaTypeFluent fluent) {
+        this.fluent = fluent;
     }
     
     public JavaTypeBuilder(JavaType instance) {
+        this();
         withKind(instance.getKind());
         withPackageName(instance.getPackageName());
         withClassName(instance.getClassName());
@@ -21,6 +29,6 @@ public class JavaTypeBuilder extends JavaTypeFluent<JavaTypeBuilder> implements 
     }
     
     public JavaType build() {
-       return new JavaType( getKind(), getPackageName(), getClassName(), isCollection(), isConcrete(), getDefaultImplementation(), getSuperClass(), getInterfaces(), getGenericTypes(), getAttributes() );
+       return new JavaType( fluent.getKind(), fluent.getPackageName(), fluent.getClassName(), fluent.isCollection(), fluent.isConcrete(), fluent.getDefaultImplementation(), fluent.getSuperClass(), fluent.getInterfaces(), fluent.getGenericTypes(), fluent.getAttributes() );
     }
 }

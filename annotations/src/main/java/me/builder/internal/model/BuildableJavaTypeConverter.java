@@ -13,6 +13,8 @@ import javax.lang.model.util.Types;
 import java.util.HashMap;
 import java.util.Map;
 
+import static me.codegen.utils.ModelUtils.splitTypes;
+
 public class BuildableJavaTypeConverter implements Converter<JavaType, String> {
 
     private static final String BUILDABLE = "BUILDABLE";
@@ -29,9 +31,21 @@ public class BuildableJavaTypeConverter implements Converter<JavaType, String> {
     @Override
     public JavaType covert(String fullName) {
         JavaType type = delegate.covert(fullName);
-        boolean isBuildable = isBuildable(elements.getTypeElement(fullName));
+        TypeElement typeElement = elements.getTypeElement(fullName);
+        boolean isBuildable = false;
+        if (fullName.endsWith("[]")) {
+            typeElement  = elements.getTypeElement(fullName.substring(0, fullName.length() - 2));
+            isBuildable = isBuildable(typeElement);
+        } else if (type.isCollection()) {
+            for (JavaType genericType : type.getGenericTypes()) {
+                isBuildable = isBuildable(elements.getTypeElement(genericType.getFullyQualifiedName()));
+            }
+        } else {
+            isBuildable = isBuildable(typeElement);
+        }
         Map<String, Object> attributes = new HashMap<>(type.getAttributes());
         attributes.put(BUILDABLE, isBuildable);
+        
         return new JavaTypeBuilder(type).withAttributes(attributes).build();
     }
 

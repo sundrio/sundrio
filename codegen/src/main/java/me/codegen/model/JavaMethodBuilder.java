@@ -4,10 +4,18 @@ import me.builder.Builder;
 
 public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> implements Builder<JavaMethod> {
 
+    private final JavaMethodFluent fluent;
+    
     public JavaMethodBuilder() {
+        this.fluent = this;
+    }
+
+    public JavaMethodBuilder(JavaMethodFluent fluent) {
+        this.fluent = fluent;
     }
     
     public JavaMethodBuilder(JavaMethod instance) {
+        this();
         withName(instance.getName());
         withReturnType(instance.getReturnType());
         withArguments(instance.getArguments());
@@ -16,6 +24,6 @@ public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> imple
     }
     
     public JavaMethod build() {
-       return new JavaMethod( getName(), getReturnType(), getArguments(), getExceptions(), getAttributes() );
+       return new JavaMethod( fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes() );
     }
 }

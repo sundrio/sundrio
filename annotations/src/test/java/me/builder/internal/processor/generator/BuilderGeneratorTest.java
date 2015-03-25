@@ -18,14 +18,14 @@ public class BuilderGeneratorTest {
 
     @Test
     public void testFluentTemplate() throws IOException {
-        
-        
+
+
         JavaClazz javaClazz = new JavaClazzBuilder()
                 .addType()
                     .withClassName("Circle")
                     .withPackageName("my.Test")
                     .endType()
-                .addToConstructors()
+                .addConstructors()
                     .addArguments()
                         .withName("w")
                         .addType().withPackageName("java.lang").withClassName("Integer").endType()
@@ -34,13 +34,13 @@ public class BuilderGeneratorTest {
                         .withName("w")
                         .addType().withPackageName("java.lang").withClassName("Integer").endType()
                         .endArguments()
-                    .endConstructor()
+                    .endConstructors()
                 .build();
 
         File tmp = new File("/tmp");
         generate(javaClazz, tmp, "CircleFluent.java", BuildableProcessor.DEFAULT_FLUENT_TEMPLATE_LOCATION);
         generate(javaClazz, tmp, "CircleBuilder.java", BuildableProcessor.DEFAULT_BUILDER_TEMPLATE_LOCATION);
-        
+
     }
     
     private static void generate(JavaClazz model, File dir, String name, String templateResource) {

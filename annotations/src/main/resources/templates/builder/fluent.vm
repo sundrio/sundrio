@@ -5,10 +5,6 @@ import me.builder.Fluent;
 import $i.fullyQualifiedName;
 #end
 
-/*
-#class ( $model )
-#end
-*/
 #if (${model.type.superClass.attributes.get("BUILDABLE")})
 public class ${model.type.className}Fluent<T extends ${model.type.className}Fluent<T>>#if ( ${model.type.superClass}) extends ${model.type.superClass.className}Fluent<T>#end implements Fluent<T> {
 #else

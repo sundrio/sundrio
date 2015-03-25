@@ -67,7 +67,7 @@ public class FluentJavaClazz extends JavaClazz {
             }
             
             boolean buildable = field.getAttributes().containsKey("BUILDABLE") && (boolean) field.getAttributes().get(BUILDABLE);
-            if (buildable) {
+            if (buildable && !field.getType().isCollection()) {
                 types.add(new JavaTypeBuilder()
                         .withPackageName(field.getType().getPackageName())
                         .withClassName(field.getType().getClassName() + "Fluent")
@@ -94,7 +94,7 @@ public class FluentJavaClazz extends JavaClazz {
         
         if (getType().getSuperClass() != null) {
             boolean buildable = getType().getSuperClass().getAttributes().containsKey(BUILDABLE) && (boolean) getType().getSuperClass().getAttributes().get(BUILDABLE);
-            if (buildable) {
+            if (buildable && !getType().getSuperClass().isCollection()) {
                 types.add(new JavaTypeBuilder()
                         .withPackageName(getType().getSuperClass().getPackageName())
                         .withClassName(getType().getSuperClass().getClassName() + "Fluent")
