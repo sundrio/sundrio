@@ -1,4 +1,4 @@
-package me.dsl.examples;
+package me.dsl.examples.curator;
 
 import me.dsl.annotations.Keyword;
 
@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Keyword
-public @interface MyGroup {
+public @interface SetDataOption {
 }

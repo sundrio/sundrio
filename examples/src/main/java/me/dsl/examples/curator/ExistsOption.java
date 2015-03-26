@@ -1,11 +1,14 @@
-package me.dsl.annotations;
+package me.dsl.examples.curator;
+
+import me.dsl.annotations.Keyword;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Dsl {
+@Keyword
+public @interface ExistsOption {
 }

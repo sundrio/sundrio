@@ -1,8 +1,10 @@
 package ${model.type.packageName};
 
-public interface ${model.type.className}<T> {
+
+#class ($model)
 
 #foreach($m in $model.methods)
     ${m.returnType.className} ${m.name}( #foreach($p in ${m.arguments})$p.type.className $p.name#if( $foreach.hasNext ), #end#end );
 #end
-}    
+
+#end

@@ -16,6 +16,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
 
+import static me.codegen.utils.StringUtils.join;
+
 public class ClassDirective extends Directive {
 
     private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
@@ -56,22 +58,18 @@ public class ClassDirective extends Directive {
         if (clazz != null) {
             JavaType type = clazz.getType();
             JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
+            
             writer.append("public ").append(kind.name().toLowerCase()).append(" ").append(clazz.getType().getClassName());
-            if (clazz.getType().getSuperClass() != null && !OBJECT_TYPE.equals(clazz.getType().getSuperClass())) {
-                writer.append(" extends ").append(clazz.getType().getSuperClass().getClassName());
+            
+            if (type.getKind() == JavaKind.INTERFACE && !type.getInterfaces().isEmpty()) {
+                writer.append(" extends ").append(join(type.getInterfaces(), ", "));
             }
-
-            boolean firstInterface = true;
-            for (JavaType iface : type.getInterfaces()) {
-                if (firstInterface) {
-                    writer.append(" implements ");
-                    firstInterface = false;
-                } else {
-                    writer.append(", ");
-                }
-                writer.append(iface.getClassName());
+            
+            if (type.getSuperClass() != null && !OBJECT_TYPE.equals(type.getSuperClass())) {
+                writer.append(" extends ").append(type.getSuperClass().getClassName());
+                writer.append(" implements ").append(join(type.getInterfaces(), ", "));
             }
-
+            
             writer.append("{");
             writer.append(block).append("}\n");
         }

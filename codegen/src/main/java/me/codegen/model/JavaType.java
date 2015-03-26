@@ -129,4 +129,9 @@ public class JavaType extends AttributeSupport implements Type {
         result = 31 * result + (className != null ? className.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return className;
+    }
 }

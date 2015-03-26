@@ -22,7 +22,9 @@ public class JavaMethodConverter implements Converter<JavaMethod, ExecutableElem
 
     @Override
     public JavaMethod covert(ExecutableElement executableElement) {
-        JavaMethodBuilder methodBuilder = new JavaMethodBuilder();
+        JavaMethodBuilder methodBuilder = new JavaMethodBuilder()
+                .withName(executableElement.getSimpleName().toString())
+                .withReturnType(toJavaType.covert(executableElement.getReturnType().toString()));
         //Populate constructor parameters
         for (VariableElement variableElement : executableElement.getParameters()) {
             methodBuilder = methodBuilder
