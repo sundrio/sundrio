@@ -1,12 +1,11 @@
 package me.dsl.internal.processor;
 
-import me.codegen.Type;
 import me.codegen.utils.ModelUtils;
+import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.Terminal;
 import me.dsl.annotations.Transition;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
@@ -19,12 +18,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class TransitionSort {
+public class DependencyManager {
 
     private final Elements elements;
     private final Types types;
 
-    public TransitionSort(Elements elements, Types types) {
+    public DependencyManager(Elements elements, Types types) {
         this.elements = elements;
         this.types = types;
     }
@@ -43,13 +42,13 @@ public class TransitionSort {
         if (!visited.add(element)) {
             return;
         }
-        for (ExecutableElement e : collectDependencies(element)) {
+        for (ExecutableElement e : findDependencies(element)) {
             visit(e, visited, sorted);
         }
         sorted.add(element);
     }
 
-    public Set<ExecutableElement> collectDependencies(ExecutableElement element) {
+    public Set<ExecutableElement> findDependencies(ExecutableElement element) {
         Set<ExecutableElement> result = new LinkedHashSet<>();
         TypeElement classElement = ModelUtils.getClassElement(element);
         TypeElement transitionElement = elements.getTypeElement(Transition.class.getCanonicalName());
@@ -58,7 +57,8 @@ public class TransitionSort {
 
         ExecutableElement toElement = transitionMethods.get(0);
         ExecutableElement anyElement = transitionMethods.get(1);
-        AnnotationMirror transition = getAnnotationMirror(element, transitionElement);
+        //AnnotationMirror transition = getAnnotationMirror(element, transitionElement);
+        AnnotationMirror transition = getTransitionMirror(element);
 
         if (element.getAnnotation(Terminal.class) != null) {
             //Do nothing and return
@@ -77,12 +77,7 @@ public class TransitionSort {
             for (Object m : anyMethods) {
                 String annotationClassName = m.toString();
                 annotationClassName = annotationClassName.substring(0, annotationClassName.lastIndexOf("."));
-                TypeElement annotationType = elements.getTypeElement(annotationClassName);
-                for (ExecutableElement methodElement : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
-                    if (getAnnotationMirror(methodElement, annotationType) != null) {
-                        result.add(methodElement);
-                    }
-                }
+                result.addAll(findMethodsAnnotatedWith(classElement, annotationClassName));
             }
         } else {
             for (ExecutableElement methodElement : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
@@ -91,7 +86,35 @@ public class TransitionSort {
                 }
             }
         }
+        result.removeAll(findMethodsAnnotatedWith(classElement, EntryPoint.class));
         return result;
+    }
+
+    private <A extends Annotation> Set<ExecutableElement> findMethodsAnnotatedWith(TypeElement classElement, Class<A> annotation) {
+        return findMethodsAnnotatedWith(classElement, annotation.getCanonicalName());
+    }
+
+    private Set<ExecutableElement> findMethodsAnnotatedWith(TypeElement classElement, String className) {
+        Set<ExecutableElement> result = new LinkedHashSet<>();
+        TypeElement annotationType = elements.getTypeElement(className);
+        for (ExecutableElement methodElement : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
+            if (getAnnotationMirror(methodElement, annotationType) != null) {
+                result.add(methodElement);
+            }
+        }
+        return result;
+    }
+    
+    
+    private AnnotationMirror getTransitionMirror(ExecutableElement executableElement) {
+        for (AnnotationMirror mirror : executableElement.getAnnotationMirrors()) {
+            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
+                if (innerMirror.getAnnotationType().asElement().equals(elements.getTypeElement(Transition.class.getCanonicalName()))) {
+                    return innerMirror;
+                }
+            }
+        }
+        return null;
     }
 
     /**

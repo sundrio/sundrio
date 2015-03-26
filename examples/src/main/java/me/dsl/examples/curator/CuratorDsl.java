@@ -5,7 +5,6 @@ import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.Keyword;
 import me.dsl.annotations.TargetName;
 import me.dsl.annotations.Terminal;
-import me.dsl.annotations.Transition;
 
 @Dsl
 @TargetName("CuratorFramework")
@@ -13,26 +12,25 @@ public interface CuratorDsl {
 
     
     @EntryPoint
-    @Transition(any = GetDataOption.class)        
+    @GetDataOption
     void getData();
     
     @EntryPoint
-    @Transition(any = SetDataOption.class)            
+    @SetDataOption
     void setData();
 
     @EntryPoint
-    @Transition(any = DeleteDataOption.class)        
+    @DeleteOption
     void deleteData();
     
     @EntryPoint
-    @Transition(any = ExistsOption.class)
+    @ExistsOption
     void checkExists();
     
     @CreateOption
-    @Transition(any = CreateOption.class)
     void createParentsIfNeeded();
     
-    @DeleteDataOption
+    @DeleteOption
     void deleteChildrenIfNeeded();
 
     @Keyword
@@ -44,17 +42,22 @@ public interface CuratorDsl {
     void withMode(Integer mode);
     
     @Keyword
+    @SetDataOption
     @GetDataOption
+    @ExistsOption
     public void watched();
 
     @Keyword
     @GetDataOption
     @SetDataOption
+    @DeleteOption
     @ExistsOption
     public void inBackground();
 
     @Terminal
+    @CreateOption
     @GetDataOption
+    @DeleteOption
     @SetDataOption
     @ExistsOption
     void forPath(String path);

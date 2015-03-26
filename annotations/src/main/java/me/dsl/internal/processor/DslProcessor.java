@@ -15,7 +15,6 @@ import me.codegen.model.JavaProperty;
 import me.codegen.model.JavaType;
 import me.codegen.model.JavaTypeBuilder;
 import me.codegen.utils.ModelUtils;
-import me.dsl.annotations.Dsl;
 import me.dsl.annotations.TargetName;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -47,7 +46,7 @@ public class DslProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
-        TransitionSort transitionSort = new TransitionSort(elements, types);
+        DependencyManager dependencyManager = new DependencyManager(elements, types);
 
         Converter<JavaType, String> typeConverter = new JavaTypeConverter(elements, true);
         Converter<JavaProperty, VariableElement> propertyConverter = new JavaPropertyConverter(typeConverter);
@@ -65,7 +64,7 @@ public class DslProcessor extends AbstractProcessor {
                     JavaType annotatedType = typeConverter.covert(element.toString());
                     JavaType targetType = new JavaTypeBuilder(annotatedType).withClassName(targetInterface).build();
 
-                    Collection<ExecutableElement> sorted = transitionSort.sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
+                    Collection<ExecutableElement> sorted = dependencyManager.sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
                     
                     try {
                         for (ExecutableElement current : sorted) {
@@ -76,7 +75,7 @@ public class DslProcessor extends AbstractProcessor {
                                     targetInterfaceName.value() :
                                     toInterfaceName(method.getName());
                             
-                            Set<ExecutableElement> dependencies = transitionSort.collectDependencies(current);
+                            Set<ExecutableElement> dependencies = dependencyManager.findDependencies(current);
                             
                             if (dependencies.isEmpty()) {
                                 //nothing do here.
