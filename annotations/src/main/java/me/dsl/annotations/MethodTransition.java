@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface Transition {
-
+public @interface MethodTransition {
+    String value();
 }

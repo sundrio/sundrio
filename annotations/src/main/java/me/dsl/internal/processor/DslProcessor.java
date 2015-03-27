@@ -65,7 +65,6 @@ public class DslProcessor extends AbstractProcessor {
                     JavaType targetType = new JavaTypeBuilder(annotatedType).withClassName(targetInterface).build();
 
                     Collection<ExecutableElement> sorted = dependencyManager.sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
-                    
                     try {
                         for (ExecutableElement current : sorted) {
                             JavaMethod method = methodConverter.covert(current); 

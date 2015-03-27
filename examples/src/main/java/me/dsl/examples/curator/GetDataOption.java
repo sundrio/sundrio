@@ -1,7 +1,7 @@
 package me.dsl.examples.curator;
 
+import me.dsl.annotations.AnnotationTransition;
 import me.dsl.annotations.Keyword;
-import me.dsl.annotations.Transition;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Keyword
-@Transition(any = {GetDataOption.class})
+@AnnotationTransition(GetDataOption.class)
 public @interface GetDataOption {
 }

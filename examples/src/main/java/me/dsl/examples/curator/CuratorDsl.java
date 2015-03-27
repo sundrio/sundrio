@@ -3,13 +3,13 @@ package me.dsl.examples.curator;
 import me.dsl.annotations.Dsl;
 import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.Keyword;
+import me.dsl.annotations.MethodTransition;
 import me.dsl.annotations.TargetName;
 import me.dsl.annotations.Terminal;
 
 @Dsl
 @TargetName("CuratorFramework")
 public interface CuratorDsl {
-
     
     @EntryPoint
     @GetDataOption
@@ -21,11 +21,15 @@ public interface CuratorDsl {
 
     @EntryPoint
     @DeleteOption
-    void deleteData();
+    void delete();
     
     @EntryPoint
     @ExistsOption
-    void checkExists();
+    void exists();
+
+    @EntryPoint
+    @CreateOption
+    void create();
     
     @CreateOption
     void createParentsIfNeeded();
@@ -60,7 +64,7 @@ public interface CuratorDsl {
     @DeleteOption
     @SetDataOption
     @ExistsOption
-    void forPath(String path);
+    String forPath(String path);
 
     @Terminal
     @SetDataOption

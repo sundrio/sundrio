@@ -1,19 +1,21 @@
 package me.dsl.internal.processor;
 
 import me.codegen.utils.ModelUtils;
+import me.dsl.annotations.AnnotationTransition;
 import me.dsl.annotations.EntryPoint;
+import me.dsl.annotations.MethodTransition;
 import me.dsl.annotations.Terminal;
-import me.dsl.annotations.Transition;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,12 +25,19 @@ public class DependencyManager {
     private final Elements elements;
     private final Types types;
 
+    private final TypeElement ANNOTATTED_TRANSITION;
+    private final TypeElement METHOD_TRANSITION;
+    private final TypeElement TERMINAL;
+    
     public DependencyManager(Elements elements, Types types) {
         this.elements = elements;
         this.types = types;
+        this.ANNOTATTED_TRANSITION = elements.getTypeElement(AnnotationTransition.class.getCanonicalName());
+        this.METHOD_TRANSITION = elements.getTypeElement(MethodTransition.class.getCanonicalName());
+        this.TERMINAL = elements.getTypeElement(Terminal.class.getCanonicalName());
     }
 
-    public Collection<ExecutableElement> sort(Collection<ExecutableElement> elements) {
+    public Set<ExecutableElement> sort(Collection<ExecutableElement> elements) {
         Set<ExecutableElement> sorted = new LinkedHashSet<>();
         Set<ExecutableElement> visited = new LinkedHashSet<>();
         for (ExecutableElement e : elements) {
@@ -51,44 +60,55 @@ public class DependencyManager {
     public Set<ExecutableElement> findDependencies(ExecutableElement element) {
         Set<ExecutableElement> result = new LinkedHashSet<>();
         TypeElement classElement = ModelUtils.getClassElement(element);
-        TypeElement transitionElement = elements.getTypeElement(Transition.class.getCanonicalName());
-        TypeElement terminalElement = elements.getTypeElement(Terminal.class.getCanonicalName());
-        List<ExecutableElement> transitionMethods = ElementFilter.methodsIn(transitionElement.getEnclosedElements());
+        
+        Element annotationValue =  ANNOTATTED_TRANSITION.getEnclosedElements().get(0);
+        Element methodValue = METHOD_TRANSITION.getEnclosedElements().get(0);
 
-        ExecutableElement toElement = transitionMethods.get(0);
-        ExecutableElement anyElement = transitionMethods.get(1);
-        //AnnotationMirror transition = getAnnotationMirror(element, transitionElement);
-        AnnotationMirror transition = getTransitionMirror(element);
-
+        List<AnnotationMirror> transitions = getTransitionMirror(element);
         if (element.getAnnotation(Terminal.class) != null) {
             //Do nothing and return
-        } else if (transition != null) {
-            Iterable toMethods = transition.getElementValues().containsKey(toElement) ? (Iterable) transition.getElementValues().get(toElement).getValue() : Collections.emptyList();
-            Iterable anyMethods = transition.getElementValues().containsKey(anyElement) ? (Iterable) transition.getElementValues().get(anyElement).getValue() : Collections.emptyList();
-
-            for (Object m : toMethods) {
-                for (ExecutableElement methodElement : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
-                    if (m.toString().replaceAll("\"", "").equals(methodElement.getSimpleName().toString())) {
-                        result.add(methodElement);
+        } else if (!transitions.isEmpty()) {
+            for (AnnotationMirror transition : transitions) {
+                if (transition.getAnnotationType().asElement().equals(METHOD_TRANSITION)) {
+                    String toMethod = (String) transition.getElementValues().get(methodValue).getValue();
+                    for (ExecutableElement methodElement : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
+                        if (toMethod.equals(methodElement.getSimpleName().toString())) {
+                            result.add(methodElement);
+                        }
                     }
+                } else if (transition.getAnnotationType().asElement().equals(ANNOTATTED_TRANSITION)) {
+                    String annotationClassName = String.valueOf(transition.getElementValues().get(annotationValue).getValue());
+                    result.addAll(findMethodsAnnotatedWith(classElement, annotationClassName));
                 }
             }
-
-            for (Object m : anyMethods) {
-                String annotationClassName = m.toString();
-                annotationClassName = annotationClassName.substring(0, annotationClassName.lastIndexOf("."));
-                result.addAll(findMethodsAnnotatedWith(classElement, annotationClassName));
-            }
         } else {
-            for (ExecutableElement methodElement : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
-                if (getAnnotationMirror(methodElement, terminalElement) != null) {
-                    result.add(methodElement);
+            result.addAll(findMethodsAnnotatedWith(classElement, Terminal.class));
+        }
+        result.removeAll(findMethodsAnnotatedWith(classElement, EntryPoint.class));
+        result.remove(element);
+        return result;
+    }
+
+    private List<AnnotationMirror> getTransitionMirror(Element element) {
+        List<AnnotationMirror> annotationMirrors = new ArrayList<>();
+        for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+            if (mirror.getAnnotationType().asElement().equals(elements.getTypeElement(MethodTransition.class.getCanonicalName()))) {
+                annotationMirrors.add(mirror);
+            } else if (mirror.getAnnotationType().asElement().equals(elements.getTypeElement(AnnotationTransition.class.getCanonicalName()))) {
+                annotationMirrors.add(mirror);
+            }
+            //Also look for use on custom annotations
+            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
+                if (innerMirror.getAnnotationType().asElement().equals(elements.getTypeElement(MethodTransition.class.getCanonicalName()))) {
+                    annotationMirrors.add(innerMirror);
+                } else if (innerMirror.getAnnotationType().asElement().equals(elements.getTypeElement(AnnotationTransition.class.getCanonicalName()))) {
+                    annotationMirrors.add(innerMirror);
                 }
             }
         }
-        result.removeAll(findMethodsAnnotatedWith(classElement, EntryPoint.class));
-        return result;
+        return annotationMirrors;
     }
+
 
     private <A extends Annotation> Set<ExecutableElement> findMethodsAnnotatedWith(TypeElement classElement, Class<A> annotation) {
         return findMethodsAnnotatedWith(classElement, annotation.getCanonicalName());
@@ -104,18 +124,6 @@ public class DependencyManager {
         }
         return result;
     }
-    
-    
-    private AnnotationMirror getTransitionMirror(ExecutableElement executableElement) {
-        for (AnnotationMirror mirror : executableElement.getAnnotationMirrors()) {
-            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(elements.getTypeElement(Transition.class.getCanonicalName()))) {
-                    return innerMirror;
-                }
-            }
-        }
-        return null;
-    }
 
     /**
      * Find and return the {@link AnnotationMirror} that matches the specified {@link TypeElement}.
@@ -124,7 +132,7 @@ public class DependencyManager {
      * @param typeElement
      * @return
      */
-    private final AnnotationMirror getAnnotationMirror(ExecutableElement executableElement, TypeElement typeElement) {
+    private AnnotationMirror getAnnotationMirror(ExecutableElement executableElement, TypeElement typeElement) {
         for (AnnotationMirror mirror : executableElement.getAnnotationMirrors()) {
             {
                 if (mirror.getAnnotationType().asElement().equals(typeElement)) {
