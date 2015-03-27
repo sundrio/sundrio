@@ -13,14 +13,12 @@ import javax.lang.model.util.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-import static me.codegen.utils.ModelUtils.splitTypes;
-
-public class BuildableJavaTypeConverter implements Converter<JavaType, String> {
+public class BuildableJavaTypeConverter implements Converter<String, JavaType> {
 
     private static final String BUILDABLE = "BUILDABLE";
     private final Elements elements;
     private final Types types;
-    private final Converter<JavaType, String> delegate;
+    private final Converter<String, JavaType> delegate;
     
     public BuildableJavaTypeConverter(Elements elements, Types types) {
         this.elements = elements;

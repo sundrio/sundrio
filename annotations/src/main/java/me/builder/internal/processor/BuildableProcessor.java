@@ -39,8 +39,8 @@ public class BuildableProcessor extends AbstractProcessor {
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
 
-        Converter<JavaType, String> typeConverter = new BuildableJavaTypeConverter(elements, types);
-        Converter<JavaProperty, VariableElement> propertyConverter = new BuildableJavaPropertyConverter(typeConverter);
+        Converter<String, JavaType> typeConverter = new BuildableJavaTypeConverter(elements, types);
+        Converter<VariableElement, JavaProperty> propertyConverter = new BuildableJavaPropertyConverter(typeConverter);
         JavaMethodConverter methodConverter = new JavaMethodConverter(typeConverter, propertyConverter);
         JavaClazzConverter clazzConverter = new JavaClazzConverter(types, typeConverter, methodConverter, propertyConverter);
 

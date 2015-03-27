@@ -1,13 +1,17 @@
 package me.codegen.utils;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public final class ModelUtils {
 
@@ -48,7 +52,7 @@ public final class ModelUtils {
         return ElementFilter.fieldsIn(element.getEnclosedElements());
     }
 
-     static final TypeElement getElementMatching(Iterable<TypeElement> typeElements, TypeMirror type) {
+    static final TypeElement getElementMatching(Iterable<TypeElement> typeElements, TypeMirror type) {
         for (TypeElement typeElement : typeElements) {
             if (typeElement.asType().equals(type)) {
                 return typeElement;
@@ -83,6 +87,21 @@ public final class ModelUtils {
         }
         if (result.contains("<")) {
             result = result.substring(0, result.indexOf("<"));
+        }
+        return result;
+    }
+
+
+    public static <A extends Annotation> List<ExecutableElement> findMethodsAnnotatedWith(TypeElement classElement, Class<A> annotation) {
+        return filterByAnnotation(ElementFilter.methodsIn(classElement.getEnclosedElements()), annotation);
+    }
+
+    public static <A extends Annotation, E extends Element> List<E> filterByAnnotation(List<E> elements, Class<A> annotation) {
+        List<E> result = new ArrayList<>();
+        for (E executableElement : elements) {
+            if (executableElement.getAnnotation(annotation) != null) {
+                result.add(executableElement);
+            }
         }
         return result;
     }

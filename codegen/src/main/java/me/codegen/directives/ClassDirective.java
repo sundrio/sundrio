@@ -1,5 +1,6 @@
 package me.codegen.directives;
 
+import me.Converter;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaKind;
 import me.codegen.model.JavaType;
@@ -21,6 +22,7 @@ import static me.codegen.utils.StringUtils.join;
 public class ClassDirective extends Directive {
 
     private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
+
     @Override
     public String getName() {
         return "class";
@@ -54,25 +56,39 @@ public class ClassDirective extends Directive {
                 }
             }
         }
-        
+
         if (clazz != null) {
             JavaType type = clazz.getType();
             JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
-            
-            writer.append("public ").append(kind.name().toLowerCase()).append(" ").append(clazz.getType().getClassName());
-            
+
+            writer.append("public ").append(kind.name().toLowerCase()).append(" ");
+            writer.append(JavaTypeToString.INSTANCE.covert(type));
             if (type.getKind() == JavaKind.INTERFACE && !type.getInterfaces().isEmpty()) {
-                writer.append(" extends ").append(join(type.getInterfaces(), ", "));
+                writer.append(" extends ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
             }
-            
+
             if (type.getSuperClass() != null && !OBJECT_TYPE.equals(type.getSuperClass())) {
                 writer.append(" extends ").append(type.getSuperClass().getClassName());
-                writer.append(" implements ").append(join(type.getInterfaces(), ", "));
+                writer.append(" implements ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
             }
-            
+
             writer.append("{");
             writer.append(block).append("}\n");
         }
         return true;
+    }
+    
+    //Enum Singleton
+    private enum JavaTypeToString implements Converter<JavaType, String> {
+        INSTANCE;
+        @Override
+        public String covert(JavaType item) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(item.getClassName());
+            if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
+                sb.append("<").append(join(item.getGenericTypes(), ",")).append(">");
+            }
+            return sb.toString();
+        }
     }
 }

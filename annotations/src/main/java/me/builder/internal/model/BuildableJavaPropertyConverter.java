@@ -10,12 +10,12 @@ import javax.lang.model.element.VariableElement;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BuildableJavaPropertyConverter implements Converter<JavaProperty, VariableElement> {
+public class BuildableJavaPropertyConverter implements Converter<VariableElement, JavaProperty> {
     
     private static final String BUILDABLE = "BUILDABLE";
-    private Converter<JavaProperty, VariableElement> delegate;
+    private Converter<VariableElement, JavaProperty> delegate;
     
-    public BuildableJavaPropertyConverter(Converter<JavaType, String> toType) {
+    public BuildableJavaPropertyConverter(Converter<String, JavaType> toType) {
         this.delegate = new JavaPropertyConverter(toType);
     }
 

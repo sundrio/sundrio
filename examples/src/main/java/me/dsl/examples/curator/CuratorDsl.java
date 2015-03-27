@@ -3,7 +3,6 @@ package me.dsl.examples.curator;
 import me.dsl.annotations.Dsl;
 import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.Keyword;
-import me.dsl.annotations.MethodTransition;
 import me.dsl.annotations.TargetName;
 import me.dsl.annotations.Terminal;
 

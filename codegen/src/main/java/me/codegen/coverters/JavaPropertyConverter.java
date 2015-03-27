@@ -7,11 +7,11 @@ import me.codegen.model.JavaType;
 
 import javax.lang.model.element.VariableElement;
 
-public class JavaPropertyConverter implements Converter<JavaProperty, VariableElement> {
+public class JavaPropertyConverter implements Converter<VariableElement, JavaProperty> {
 
-    private final Converter<JavaType, String> toType;
+    private final Converter<String, JavaType> toType;
 
-    public JavaPropertyConverter(Converter<JavaType, String> toType) {
+    public JavaPropertyConverter(Converter<String, JavaType> toType) {
         this.toType = toType;
     }
 

@@ -10,12 +10,12 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-public class JavaMethodConverter implements Converter<JavaMethod, ExecutableElement> {
+public class JavaMethodConverter implements Converter<ExecutableElement, JavaMethod> {
 
-    private final Converter<JavaType, String> toJavaType;
-    private final Converter<JavaProperty, VariableElement> toJavaProperty;
+    private final Converter<String, JavaType> toJavaType;
+    private final Converter<VariableElement, JavaProperty> toJavaProperty;
 
-    public JavaMethodConverter(Converter<JavaType, String> toJavaType, Converter<JavaProperty, VariableElement> toJavaProperty) {
+    public JavaMethodConverter(Converter<String, JavaType> toJavaType, Converter<VariableElement, JavaProperty> toJavaProperty) {
         this.toJavaType = toJavaType;
         this.toJavaProperty = toJavaProperty;
     }

@@ -18,13 +18,13 @@ import javax.lang.model.util.Types;
 import static me.codegen.utils.ModelUtils.getClassName;
 import static me.codegen.utils.ModelUtils.getPackageName;
 
-public class JavaClazzConverter implements Converter<JavaClazz, TypeElement> {
+public class JavaClazzConverter implements Converter<TypeElement, JavaClazz> {
 
-    private final Converter<JavaType, String> toJavaType;
-    private final Converter<JavaMethod, ExecutableElement> toJavaMethod;
-    private final Converter<JavaProperty, VariableElement> toJavaProperty;
+    private final Converter<String, JavaType> toJavaType;
+    private final Converter<ExecutableElement, JavaMethod> toJavaMethod;
+    private final Converter<VariableElement, JavaProperty> toJavaProperty;
 
-    public JavaClazzConverter(Types types, Converter<JavaType, String> toJavaType, Converter<JavaMethod, ExecutableElement> toJavaMethod, Converter<JavaProperty, VariableElement> toJavaProperty) {
+    public JavaClazzConverter(Types types, Converter<String, JavaType> toJavaType, Converter<ExecutableElement, JavaMethod> toJavaMethod, Converter<VariableElement, JavaProperty> toJavaProperty) {
         this.toJavaType = toJavaType;
         this.toJavaMethod = toJavaMethod;
         this.toJavaProperty = toJavaProperty;

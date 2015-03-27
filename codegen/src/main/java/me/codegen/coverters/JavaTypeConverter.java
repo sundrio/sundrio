@@ -18,7 +18,7 @@ import java.util.Set;
 import static me.codegen.utils.ModelUtils.getFullyQualifiedName;
 import static me.codegen.utils.ModelUtils.splitTypes;
 
-public class JavaTypeConverter implements Converter<JavaType, String> {
+public class JavaTypeConverter implements Converter<String, JavaType> {
 
     private final Elements elements;
     private final boolean deep;
