@@ -165,7 +165,7 @@ public class DslProcessor extends AbstractProcessor {
             return new Node(current, Collections.<Node<ExecutableElement>>emptySet());
         } else {
             Set<Node<ExecutableElement>> toAdd = new LinkedHashSet<>();
-            Set<ExecutableElement> dependencies = context.getDependencyManager().findDependencies(current);
+            Set<ExecutableElement> dependencies = context.getDependencyManager().collectDependencies(current);
             Set<ExecutableElement> unvisited = new LinkedHashSet<>();
 
             for (ExecutableElement dep : dependencies) {
