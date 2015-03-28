@@ -1,12 +1,12 @@
 package me.codegen.utils;
 
-import me.Converter;
+import me.Function;
 
 public class StringUtils {
 
-    public static final class StringConverter<X> implements Converter<X, String> {
+    public static final class ToString<X> implements Function<X, String> {
         @Override
-        public String covert(X item) {
+        public String apply(X item) {
             return String.valueOf(item);
         }
     }
@@ -25,34 +25,34 @@ public class StringUtils {
     }
 
     public static <T> String join(Iterable<T> items, String delimiter) {
-        return join(items, new StringConverter<T>(), delimiter);
+        return join(items, new ToString<T>(), delimiter);
     }
     
-    public static <T> String join(Iterable<T> items, Converter<T, String> converter,String delimiter) {
+    public static <T> String join(Iterable<T> items, Function<T, String> function,String delimiter) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (T item : items) {
             if (!first) {
                 sb.append(delimiter);
             }
-            sb.append(converter.covert(item));
+            sb.append(function.apply(item));
             first = false;
         }
         return sb.toString();
     }
 
     public static <T> String join(T[] items, String delimiter) {
-        return join(items, new StringConverter<T>(), delimiter);  
+        return join(items, new ToString<T>(), delimiter);
     }
     
-    public static <T> String join(T[] items, Converter<T, String> converter, String delimiter) {
+    public static <T> String join(T[] items, Function<T, String> function, String delimiter) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (T item : items) {
             if (!first) {
                 sb.append(delimiter);
             }
-            sb.append(converter.covert(item));
+            sb.append(function.apply(item));
             first = false;
         }
         return sb.toString();

@@ -1,6 +1,6 @@
 package me.codegen.coverters;
 
-import me.Converter;
+import me.Function;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
 import me.codegen.model.JavaMethod;
@@ -18,23 +18,23 @@ import javax.lang.model.util.Types;
 import static me.codegen.utils.ModelUtils.getClassName;
 import static me.codegen.utils.ModelUtils.getPackageName;
 
-public class JavaClazzConverter implements Converter<TypeElement, JavaClazz> {
+public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
 
-    private final Converter<String, JavaType> toJavaType;
-    private final Converter<ExecutableElement, JavaMethod> toJavaMethod;
-    private final Converter<VariableElement, JavaProperty> toJavaProperty;
+    private final Function<String, JavaType> toJavaType;
+    private final Function<ExecutableElement, JavaMethod> toJavaMethod;
+    private final Function<VariableElement, JavaProperty> toJavaProperty;
 
-    public JavaClazzConverter(Types types, Converter<String, JavaType> toJavaType, Converter<ExecutableElement, JavaMethod> toJavaMethod, Converter<VariableElement, JavaProperty> toJavaProperty) {
+    public JavaClazzFunction(Types types, Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
         this.toJavaType = toJavaType;
         this.toJavaMethod = toJavaMethod;
         this.toJavaProperty = toJavaProperty;
     }
 
     @Override
-    public JavaClazz covert(TypeElement classElement) {
+    public JavaClazz apply(TypeElement classElement) {
         //Check SuperClass
         TypeMirror superClass = classElement.getSuperclass();
-        JavaType superClassType = toJavaType.covert(superClass.toString());
+        JavaType superClassType = toJavaType.apply(superClass.toString());
         JavaClazzBuilder builder = new JavaClazzBuilder()
                 .withType(new JavaTypeBuilder()
                         .withPackageName(getPackageName(classElement))
@@ -43,12 +43,12 @@ public class JavaClazzConverter implements Converter<TypeElement, JavaClazz> {
                         .build());
 
         for (ExecutableElement constructor : ElementFilter.constructorsIn(classElement.getEnclosedElements())) {
-            builder.addToConstructors(toJavaMethod.covert(constructor));
+            builder.addToConstructors(toJavaMethod.apply(constructor));
         }
 
         //Populate Fields
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
-            builder.addToFields(toJavaProperty.covert(variableElement));
+            builder.addToFields(toJavaProperty.apply(variableElement));
         }
 
         return builder.build();

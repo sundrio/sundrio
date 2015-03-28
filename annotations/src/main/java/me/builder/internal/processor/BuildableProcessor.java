@@ -1,13 +1,13 @@
 package me.builder.internal.processor;
 
-import me.Converter;
+import me.Function;
 import me.builder.internal.directives.AddNestedMethodDirective;
 import me.builder.internal.directives.NestedClassDirective;
-import me.builder.internal.model.BuildableJavaPropertyConverter;
-import me.builder.internal.model.BuildableJavaTypeConverter;
+import me.builder.internal.model.ToBuildableJavaProperty;
+import me.builder.internal.model.ToBuildableJavaType;
 import me.builder.internal.model.FluentJavaClazz;
-import me.codegen.coverters.JavaClazzConverter;
-import me.codegen.coverters.JavaMethodConverter;
+import me.codegen.coverters.JavaClazzFunction;
+import me.codegen.coverters.JavaMethodFunction;
 import me.codegen.generator.CodeGeneratorBuilder;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaProperty;
@@ -39,17 +39,17 @@ public class BuildableProcessor extends AbstractProcessor {
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
 
-        Converter<String, JavaType> typeConverter = new BuildableJavaTypeConverter(elements, types);
-        Converter<VariableElement, JavaProperty> propertyConverter = new BuildableJavaPropertyConverter(typeConverter);
-        JavaMethodConverter methodConverter = new JavaMethodConverter(typeConverter, propertyConverter);
-        JavaClazzConverter clazzConverter = new JavaClazzConverter(types, typeConverter, methodConverter, propertyConverter);
+        Function<String, JavaType> toType = new ToBuildableJavaType(elements, types);
+        Function<VariableElement, JavaProperty> toProperty = new ToBuildableJavaProperty(toType);
+        JavaMethodFunction toMethod = new JavaMethodFunction(toType, toProperty);
+        JavaClazzFunction toClazz = new JavaClazzFunction(types, toType, toMethod, toProperty);
 
 
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 if (element instanceof ExecutableElement) {
 
-                    JavaClazz clazz = clazzConverter.covert(ModelUtils.getClassElement(element));
+                    JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(element));
 
                     try {
                         generateFromModel(FluentJavaClazz.wrap(clazz),

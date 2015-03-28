@@ -1,6 +1,6 @@
 package me.codegen.coverters;
 
-import me.Converter;
+import me.Function;
 import me.codegen.model.JavaKind;
 import me.codegen.model.JavaType;
 import me.codegen.model.JavaTypeBuilder;
@@ -18,20 +18,20 @@ import java.util.Set;
 import static me.codegen.utils.ModelUtils.getFullyQualifiedName;
 import static me.codegen.utils.ModelUtils.splitTypes;
 
-public class JavaTypeConverter implements Converter<String, JavaType> {
+public class JavaTypeFunction implements Function<String, JavaType> {
 
     private final Elements elements;
     private final boolean deep;
-    private final JavaTypeConverter shallow;
+    private final JavaTypeFunction shallow;
 
-    public JavaTypeConverter(Elements elements, boolean deep) {
+    public JavaTypeFunction(Elements elements, boolean deep) {
         this.elements = elements;
         this.deep = deep;
-        this.shallow = deep ? new JavaTypeConverter(elements, false) : this;
+        this.shallow = deep ? new JavaTypeFunction(elements, false) : this;
     }
 
     @Override
-    public JavaType covert(String fullName) {
+    public JavaType apply(String fullName) {
         String packageName = null;
         String className = null;
         List<JavaType> interfaces = new ArrayList<>();
@@ -43,7 +43,7 @@ public class JavaTypeConverter implements Converter<String, JavaType> {
         } else {
             for (TypeMirror interfaceType : typeElement.getInterfaces()) {
                 if (deep) {
-                    interfaces.add(shallow.covert(interfaceType.toString()));
+                    interfaces.add(shallow.apply(interfaceType.toString()));
                 }
             }
 
@@ -58,7 +58,7 @@ public class JavaTypeConverter implements Converter<String, JavaType> {
         if (className.contains("<")) {
             String genericTypeList = fullName.substring(fullName.indexOf("<") + 1, fullName.lastIndexOf(">"));
             for (String genericType : splitTypes(genericTypeList)) {
-                JavaType t = covert(genericType);
+                JavaType t = apply(genericType);
                 genericTypes.add(t);
             }
             className = className.substring(0, className.indexOf("<"));
@@ -67,13 +67,13 @@ public class JavaTypeConverter implements Converter<String, JavaType> {
         String qualifiedName = packageName + "." + className;
         boolean collection = false;
         if (qualifiedName.equals(Set.class.getCanonicalName())) {
-            defaultImplementation = covert(LinkedHashSet.class.getCanonicalName());
+            defaultImplementation = apply(LinkedHashSet.class.getCanonicalName());
             collection = true;
         } else if (qualifiedName.equals(List.class.getCanonicalName())) {
-            defaultImplementation = covert(ArrayList.class.getCanonicalName());
+            defaultImplementation = apply(ArrayList.class.getCanonicalName());
             collection = true;
         } else if (qualifiedName.equals(Map.class.getCanonicalName())) {
-            defaultImplementation = covert(HashMap.class.getCanonicalName());
+            defaultImplementation = apply(HashMap.class.getCanonicalName());
             collection = true;
         }
 

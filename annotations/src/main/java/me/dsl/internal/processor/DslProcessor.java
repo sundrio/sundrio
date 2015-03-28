@@ -56,7 +56,7 @@ public class DslProcessor extends AbstractProcessor {
                     TargetName targetName = element.getAnnotation(TargetName.class);
                     String targetInterface = targetName.value();
 
-                    JavaType annotatedType = context.getTypeConverter().covert(element.toString());
+                    JavaType annotatedType = context.getToType().apply(element.toString());
                     JavaType targetType = new JavaTypeBuilder(annotatedType).withClassName(targetInterface).build();
 
                     Collection<ExecutableElement> sorted = dependencyManager.sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
@@ -74,7 +74,7 @@ public class DslProcessor extends AbstractProcessor {
                                 tranisitionsTo.add(transition.getItem());
                             }
                             ExecutableElement current = node.getItem();
-                            JavaMethod method = context.getMethodConverter().covert(current);
+                            JavaMethod method = context.getToMethod().apply(current);
                             TargetName targetInterfaceName = current.getAnnotation(TargetName.class);
 
                             String interfaceName = targetInterfaceName != null ?
@@ -130,7 +130,7 @@ public class DslProcessor extends AbstractProcessor {
             }
             //Do generate the interface
             JavaType genericType = new JavaTypeBuilder().withClassName("T").build();
-            JavaMethod method = new JavaMethodBuilder(context.getMethodConverter().covert(current)).withReturnType(genericType).build();
+            JavaMethod method = new JavaMethodBuilder(context.getToMethod().apply(current)).withReturnType(genericType).build();
 
             TargetName targetInterfaceName = current.getAnnotation(TargetName.class);
 
@@ -162,7 +162,7 @@ public class DslProcessor extends AbstractProcessor {
 
     private Node<ExecutableElement> createGraph(DslProcessorContext context, ExecutableElement current, Set<ExecutableElement> visited) {
         if (current.getAnnotation(Terminal.class) != null) {
-            return new Node<ExecutableElement>(current, Collections.<Node<ExecutableElement>>emptySet());
+            return new Node(current, Collections.<Node<ExecutableElement>>emptySet());
         } else {
             Set<Node<ExecutableElement>> toAdd = new LinkedHashSet<>();
             Set<ExecutableElement> dependencies = context.getDependencyManager().findDependencies(current);
@@ -173,11 +173,11 @@ public class DslProcessor extends AbstractProcessor {
                     unvisited.add(dep);
                 }
             }
-            
+
             for (ExecutableElement dependency : unvisited) {
                 toAdd.add(createGraph(context, dependency, visited));
             }
-            return new Node<ExecutableElement>(current, toAdd);
+            return new Node(current, toAdd);
         }
     }
 
@@ -201,7 +201,7 @@ public class DslProcessor extends AbstractProcessor {
                     targetName.value() :
                     dependency.getSimpleName().toString();
 
-            JavaType returnType = context.getTypeConverter().covert(dependency.getReturnType().toString());
+            JavaType returnType = context.getToType().apply(dependency.getReturnType().toString());
 
             interfaceTypes.add(new JavaTypeBuilder()
                     .withClassName(toInterfaceName(className))

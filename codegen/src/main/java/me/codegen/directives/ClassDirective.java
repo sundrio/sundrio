@@ -1,6 +1,6 @@
 package me.codegen.directives;
 
-import me.Converter;
+import me.Function;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaKind;
 import me.codegen.model.JavaType;
@@ -62,7 +62,7 @@ public class ClassDirective extends Directive {
             JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
 
             writer.append("public ").append(kind.name().toLowerCase()).append(" ");
-            writer.append(JavaTypeToString.INSTANCE.covert(type));
+            writer.append(JavaTypeToString.INSTANCE.apply(type));
             if (type.getKind() == JavaKind.INTERFACE && !type.getInterfaces().isEmpty()) {
                 writer.append(" extends ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
             }
@@ -79,10 +79,10 @@ public class ClassDirective extends Directive {
     }
     
     //Enum Singleton
-    private enum JavaTypeToString implements Converter<JavaType, String> {
+    private enum JavaTypeToString implements Function<JavaType, String> {
         INSTANCE;
         @Override
-        public String covert(JavaType item) {
+        public String apply(JavaType item) {
             StringBuilder sb = new StringBuilder();
             sb.append(item.getClassName());
             if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {

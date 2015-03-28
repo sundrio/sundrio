@@ -1,8 +1,8 @@
 package me.builder.internal.model;
 
-import me.Converter;
+import me.Function;
 import me.builder.annotations.Buildable;
-import me.codegen.coverters.JavaTypeConverter;
+import me.codegen.coverters.JavaTypeFunction;
 import me.codegen.model.JavaType;
 import me.codegen.model.JavaTypeBuilder;
 
@@ -13,22 +13,22 @@ import javax.lang.model.util.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BuildableJavaTypeConverter implements Converter<String, JavaType> {
+public class ToBuildableJavaType implements Function<String, JavaType> {
 
     private static final String BUILDABLE = "BUILDABLE";
     private final Elements elements;
     private final Types types;
-    private final Converter<String, JavaType> delegate;
+    private final Function<String, JavaType> delegate;
     
-    public BuildableJavaTypeConverter(Elements elements, Types types) {
+    public ToBuildableJavaType(Elements elements, Types types) {
         this.elements = elements;
         this.types = types;
-        delegate = new JavaTypeConverter(elements, true);
+        delegate = new JavaTypeFunction(elements, true);
     }
 
     @Override
-    public JavaType covert(String fullName) {
-        JavaType type = delegate.covert(fullName);
+    public JavaType apply(String fullName) {
+        JavaType type = delegate.apply(fullName);
         TypeElement typeElement = elements.getTypeElement(fullName);
         boolean isBuildable = false;
         if (fullName.endsWith("[]")) {

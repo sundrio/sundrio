@@ -1,10 +1,10 @@
 package me.dsl.internal.processor;
 
-import me.Converter;
-import me.codegen.coverters.JavaClazzConverter;
-import me.codegen.coverters.JavaMethodConverter;
-import me.codegen.coverters.JavaPropertyConverter;
-import me.codegen.coverters.JavaTypeConverter;
+import me.Function;
+import me.codegen.coverters.JavaClazzFunction;
+import me.codegen.coverters.JavaMethodFunction;
+import me.codegen.coverters.JavaPropertyFunction;
+import me.codegen.coverters.JavaTypeFunction;
 import me.codegen.model.JavaProperty;
 import me.codegen.model.JavaType;
 
@@ -16,19 +16,19 @@ public class DslProcessorContext {
 
     private final Elements elements;
     private final Types types;
-    private final Converter<String, JavaType> typeConverter;
-    private final Converter<VariableElement, JavaProperty> propertyConverter;
-    private final JavaMethodConverter methodConverter;
-    private final JavaClazzConverter clazzConverter;
+    private final Function<String, JavaType> toType;
+    private final Function<VariableElement, JavaProperty> toProperty;
+    private final JavaMethodFunction toMethod;
+    private final JavaClazzFunction toClazz;
     private final DependencyManager dependencyManager;
 
     public DslProcessorContext(Elements elements, Types types) {
         this.types = types;
         this.elements = elements;
-        this.typeConverter = new JavaTypeConverter(elements, true);
-        this.propertyConverter = new JavaPropertyConverter(typeConverter);
-        this.methodConverter = new JavaMethodConverter(typeConverter, propertyConverter);
-        this.clazzConverter = new JavaClazzConverter(types, typeConverter, methodConverter, propertyConverter);
+        this.toType = new JavaTypeFunction(elements, true);
+        this.toProperty = new JavaPropertyFunction(toType);
+        this.toMethod = new JavaMethodFunction(toType, toProperty);
+        this.toClazz = new JavaClazzFunction(types, toType, toMethod, toProperty);
         this.dependencyManager = new DependencyManager(elements, types);
     }
 
@@ -40,20 +40,20 @@ public class DslProcessorContext {
         return elements;
     }
 
-    public Converter<String, JavaType> getTypeConverter() {
-        return typeConverter;
+    public Function<String, JavaType> getToType() {
+        return toType;
     }
 
-    public Converter<VariableElement, JavaProperty> getPropertyConverter() {
-        return propertyConverter;
+    public Function<VariableElement, JavaProperty> getToProperty() {
+        return toProperty;
     }
 
-    public JavaMethodConverter getMethodConverter() {
-        return methodConverter;
+    public JavaMethodFunction getToMethod() {
+        return toMethod;
     }
 
-    public JavaClazzConverter getClazzConverter() {
-        return clazzConverter;
+    public JavaClazzFunction getToClazz() {
+        return toClazz;
     }
 
     public DependencyManager getDependencyManager() {
