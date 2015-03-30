@@ -7,6 +7,8 @@ import me.codegen.coverters.JavaPropertyFunction;
 import me.codegen.coverters.JavaTypeFunction;
 import me.codegen.model.JavaProperty;
 import me.codegen.model.JavaType;
+import me.dsl.internal.functions.ToTransitionAnnotations;
+import me.dsl.internal.functions.ToTransitionClassName;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -21,6 +23,8 @@ public class DslProcessorContext {
     private final JavaMethodFunction toMethod;
     private final JavaClazzFunction toClazz;
     private final DependencyManager dependencyManager;
+    private final ToTransitionAnnotations toTransitionAnnotations;
+    private final ToTransitionClassName toTransitionClassName;
 
     public DslProcessorContext(Elements elements, Types types) {
         this.types = types;
@@ -29,7 +33,9 @@ public class DslProcessorContext {
         this.toProperty = new JavaPropertyFunction(toType);
         this.toMethod = new JavaMethodFunction(toType, toProperty);
         this.toClazz = new JavaClazzFunction(types, toType, toMethod, toProperty);
-        this.dependencyManager = new DependencyManager(elements, types);
+        this.dependencyManager = new DependencyManager(elements);
+        this.toTransitionAnnotations = new ToTransitionAnnotations(elements);
+        toTransitionClassName = new ToTransitionClassName(elements);
     }
 
     public Types getTypes() {
@@ -58,5 +64,13 @@ public class DslProcessorContext {
 
     public DependencyManager getDependencyManager() {
         return dependencyManager;
+    }
+
+    public ToTransitionAnnotations getToTransitionAnnotations() {
+        return toTransitionAnnotations;
+    }
+
+    public ToTransitionClassName getToTransitionClassName() {
+        return toTransitionClassName;
     }
 }

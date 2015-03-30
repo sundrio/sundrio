@@ -1,5 +1,6 @@
 package me.dsl.internal.processor;
 
+import me.Function;
 import me.codegen.generator.CodeGeneratorBuilder;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
@@ -12,11 +13,13 @@ import me.codegen.utils.ModelUtils;
 import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.TargetName;
 import me.dsl.annotations.Terminal;
+import me.dsl.internal.functions.FindTransitions;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
@@ -45,8 +48,6 @@ public class DslProcessor extends AbstractProcessor {
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
         DslProcessorContext context = new DslProcessorContext(elements, types);
-        DependencyManager dependencyManager = new DependencyManager(elements, types);
-
 
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
@@ -59,8 +60,7 @@ public class DslProcessor extends AbstractProcessor {
                     JavaType annotatedType = context.getToType().apply(element.toString());
                     JavaType targetType = new JavaTypeBuilder(annotatedType).withClassName(targetInterface).build();
 
-                    Collection<ExecutableElement> sorted = dependencyManager.sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
-
+                    Collection<ExecutableElement> sorted = context.getDependencyManager().sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
                     try {
                         //1st step generate generic interface for all types.
                         generateGenericInterfaces(context, sorted);
@@ -155,17 +155,20 @@ public class DslProcessor extends AbstractProcessor {
     private Set<Node<ExecutableElement>> createGraph(DslProcessorContext context, List<ExecutableElement> elements) {
         Set<Node<ExecutableElement>> nodes = new LinkedHashSet<>();
         for (ExecutableElement executableElement : ModelUtils.filterByAnnotation(elements, EntryPoint.class)) {
-            nodes.add(createGraph(context, executableElement, new LinkedHashSet<ExecutableElement>()));
+            Set<AnnotationMirror> transitions = context.getToTransitionAnnotations().apply(executableElement);
+
+            FindTransitions findTransitions = new FindTransitions(context.getElements(), transitions);
+            nodes.add(createGraph(findTransitions, executableElement, new LinkedHashSet<ExecutableElement>()));
         }
         return nodes;
     }
 
-    private Node<ExecutableElement> createGraph(DslProcessorContext context, ExecutableElement current, Set<ExecutableElement> visited) {
+    private Node<ExecutableElement> createGraph(Function<ExecutableElement, Set<ExecutableElement>> findTransitions, ExecutableElement current, Set<ExecutableElement> visited) {
         if (current.getAnnotation(Terminal.class) != null) {
             return new Node(current, Collections.<Node<ExecutableElement>>emptySet());
         } else {
             Set<Node<ExecutableElement>> toAdd = new LinkedHashSet<>();
-            Set<ExecutableElement> dependencies = context.getDependencyManager().collectDependencies(current);
+            Set<ExecutableElement> dependencies = findTransitions.apply(current);
             Set<ExecutableElement> unvisited = new LinkedHashSet<>();
 
             for (ExecutableElement dep : dependencies) {
@@ -175,7 +178,7 @@ public class DslProcessor extends AbstractProcessor {
             }
 
             for (ExecutableElement dependency : unvisited) {
-                toAdd.add(createGraph(context, dependency, visited));
+                toAdd.add(createGraph(findTransitions, dependency, visited));
             }
             return new Node(current, toAdd);
         }
