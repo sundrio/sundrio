@@ -124,7 +124,15 @@ public class JavaTypeUtils {
             interfaceTypes.add(right.getType());
             interfaceTypes.add(new JavaTypeBuilder(left.getType()).withGenericTypes(new JavaType[]{right.getType()}).build());
             originalReturnType = (JavaType) right.getType().getAttributes().get(ORIGINAL_RETURN_TYPE);
-        } else {
+        } else if (!isComposite(left) && isComposite(right)) {
+            interfaceTypes.add(left.getType());
+            interfaceTypes.add(new JavaTypeBuilder(right.getType()).withGenericTypes(new JavaType[]{left.getType()}).build());
+            originalReturnType = (JavaType) left.getType().getAttributes().get(ORIGINAL_RETURN_TYPE);
+        } else if (isComposite(left) && !isComposite(right)) {
+            interfaceTypes.add(right.getType());
+            interfaceTypes.add(new JavaTypeBuilder(left.getType()).withGenericTypes(new JavaType[]{right.getType()}).build());
+            originalReturnType = (JavaType) right.getType().getAttributes().get(ORIGINAL_RETURN_TYPE);
+        }else {
             interfaceTypes.add(left.getType());
             interfaceTypes.add(right.getType());
             genericTypes.add(getMapping(VOID));
@@ -278,6 +286,12 @@ public class JavaTypeUtils {
         return clazz.getType().getAttributes().containsKey(ORIGINAL_RETURN_TYPE)
                 && (clazz.getType().getAttributes().get(ORIGINAL_RETURN_TYPE) instanceof JavaType)
                 && !((JavaType) clazz.getType().getAttributes().get(ORIGINAL_RETURN_TYPE)).equals(VOID);
+    }
+
+    static boolean isComposite(JavaClazz clazz) {
+        return clazz.getType().getAttributes().containsKey(IS_COMPOSITE)
+                && (clazz.getType().getAttributes().get(IS_COMPOSITE) instanceof Boolean)
+                && !(Boolean) clazz.getType().getAttributes().get(IS_COMPOSITE);
     }
     
     static boolean isTerminal(JavaClazz clazz) {
