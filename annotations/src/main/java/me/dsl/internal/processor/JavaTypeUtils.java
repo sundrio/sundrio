@@ -34,12 +34,14 @@ public class JavaTypeUtils {
     static final String IS_COMPOSITE = "IS_COMPOSITE";
     static final String COMBINATION_OF = "COMBINATION_OF";
     static final JavaType VOID = new JavaTypeBuilder().withClassName("Void").build();
-    
-    private static int counter = 0;
-    private static final Map<JavaType, JavaType> GENERIC_MAPPINGS = new HashMap<>();
+
+    static final Map<JavaType, JavaType> GENERIC_MAPPINGS = new HashMap<>();
     static  {
         GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withClassName("T").build());
     }
+    
+    private static int counter = 0;
+    
     
     /**
      * Convert an {@link javax.lang.model.element.ExecutableElement} to a {@link me.codegen.model.JavaClazz}
@@ -125,6 +127,7 @@ public class JavaTypeUtils {
         } else {
             interfaceTypes.add(left.getType());
             interfaceTypes.add(right.getType());
+            genericTypes.add(getMapping(VOID));
         }
         
         return new JavaClazzBuilder()

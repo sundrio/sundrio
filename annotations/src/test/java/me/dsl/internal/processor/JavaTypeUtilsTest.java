@@ -5,6 +5,7 @@ import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaType;
+import me.codegen.model.JavaTypeBuilder;
 import me.dsl.internal.processor.matchers.TypeNamed;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
@@ -32,7 +33,10 @@ public class JavaTypeUtilsTest {
     private final Elements elements = JavacElements.instance(context);
     private final Types types = JavacTypes.instance(context);
     private final DslProcessorContext dslContext = new DslProcessorContext(elements, types);
-
+    private final JavaType STRING = new JavaTypeBuilder().withPackageName("java.lang").withClassName("String").build();
+    private final JavaType INTEGER = new JavaTypeBuilder().withPackageName("java.lang").withClassName("Integer").build();
+    private final JavaType LONG = new JavaTypeBuilder().withPackageName("java.lang").withClassName("Long").build();
+    
     @Test
     public void testExecutableToInterface() throws Exception {
         TypeElement typeElement = elements.getTypeElement(TwoWithTerminal.class.getCanonicalName());
@@ -68,13 +72,14 @@ public class JavaTypeUtilsTest {
         JavaClazz combined = JavaTypeUtils.combine(simpleClazz, teminalClazz);
         Assert.assertNotNull(combined);
 
+        String T = GENERIC_MAPPINGS.get(STRING).getClassName();
         assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
-        assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo("T"));
+        assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo(T));
         assertThat(combined.getType().getInterfaces().size(), is(2));
-        assertThat(combined.getType().getInterfaces(), hasItem(typeNamed("MethodAInterface<MethodBInterface<T>>")));
-        assertThat(combined.getType().getInterfaces(), hasItem(typeNamed("MethodBInterface<T>")));
+        assertThat(combined.getType().getInterfaces(), hasItem(typeNamed("MethodAInterface<MethodBInterface<" + T + ">>")));
+        assertThat(combined.getType().getInterfaces(), hasItem(typeNamed("MethodBInterface<"+T+">")));
         assertFalse((Boolean) combined.getType().getAttributes().get(IS_TERMINAL));
     }
 
@@ -114,7 +119,7 @@ public class JavaTypeUtilsTest {
 
         assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
-        assertThat(combined.getType().getGenericTypes().length, is(0));
+        assertThat(combined.getType().getGenericTypes().length, is(2));
         assertThat(combined.getType().getInterfaces().size(), is(2));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodAInterface<Integer>")));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodBInterface<Long>")));
