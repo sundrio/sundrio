@@ -133,6 +133,7 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
             private final List<JavaType> genericTypes = new ArrayList<>();
         
 	public T withGenericTypes(JavaType[] genericTypes) {
+		this.genericTypes.clear();
 		for(JavaType item : genericTypes) {
 			this.genericTypes.add(item);
 		}

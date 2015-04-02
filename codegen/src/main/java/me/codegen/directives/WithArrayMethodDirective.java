@@ -13,7 +13,7 @@ import java.io.Writer;
 
 public class WithArrayMethodDirective extends Directive {
     
-    private static final String FORMAT = "\n\tpublic T %s(%s[] %s) {\n\t\tfor(%s item : %s) {\n\t\t\tthis.%s.add(item);\n\t\t}\n\t\treturn (T)this;\n\t}\n";
+    private static final String FORMAT = "\n\tpublic T %s(%s[] %s) {\n\t\tthis.%s.clear();\n\t\tfor(%s item : %s) {\n\t\t\tthis.%s.add(item);\n\t\t}\n\t\treturn (T)this;\n\t}\n";
     @Override
     public String getName() {
         return "withArrayMethod";
@@ -30,7 +30,7 @@ public class WithArrayMethodDirective extends Directive {
         String methodName = "with" + property.getNameCapitalized();
         String type = property.getType().getClassName();
         String name = property.getName();
-        writer.write(String.format(FORMAT, methodName, type, name, type, name, name));
+        writer.write(String.format(FORMAT, methodName, type, name, name, type, name, name));
         return true;
     }
 }

@@ -45,4 +45,9 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
     public Set<JavaType> getImports() {
         return imports;
     }
+
+    @Override
+    public String toString() {
+        return type.getClassName();
+    }
 }

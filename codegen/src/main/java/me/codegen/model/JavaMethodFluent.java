@@ -44,6 +44,7 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
             private final List<JavaProperty> arguments = new ArrayList<>();
         
 	public T withArguments(JavaProperty[] arguments) {
+		this.arguments.clear();
 		for(JavaProperty item : arguments) {
 			this.arguments.add(item);
 		}

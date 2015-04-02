@@ -65,9 +65,11 @@ public interface CuratorDsl {
     @ExistsOption
     String forPath(String path);
 
+
     @Terminal
     @SetDataOption
     @TargetName("ForPathAndBytesInterface")        
     void forPath(String path, byte[] data);
+
 
 }

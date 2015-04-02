@@ -5,9 +5,9 @@ import java.util.Set;
 public class Node<T> {
 
     private final T item;
-    private final Set<Node<T>> transitions;
+    private final Set<T> transitions;
 
-    public Node(T item, Set<Node<T>> transitions) {
+    public Node(T item, Set<T> transitions) {
         this.item = item;
         this.transitions = transitions;
     }
@@ -16,7 +16,7 @@ public class Node<T> {
         return item;
     }
 
-    public Set<Node<T>> getTransitions() {
+    public Set<T> getTransitions() {
         return transitions;
     }
 }

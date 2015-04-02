@@ -86,7 +86,7 @@ public class ClassDirective extends Directive {
             StringBuilder sb = new StringBuilder();
             sb.append(item.getClassName());
             if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
-                sb.append("<").append(join(item.getGenericTypes(), ",")).append(">");
+                sb.append("<").append(join(item.getGenericTypes(), JavaTypeToString.INSTANCE, ",")).append(">");
             }
             return sb.toString();
         }
