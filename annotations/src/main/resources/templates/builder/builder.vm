@@ -2,26 +2,27 @@ package ${model.type.packageName};
 
 import me.builder.Builder;
 
-public class ${model.type.className}Builder extends ${model.type.className}Fluent<${model.type.className}Builder> implements Builder<${model.type.className}> {
-
-    private final ${model.type.className}Fluent fluent;
+#class ($model)
+    private final ${model.type.superClass.className} fluent;
     
-    public ${model.type.className}Builder() {
+    public ${model.type.className}() {
         this.fluent = this;
     }
 
-    public ${model.type.className}Builder(${model.type.className}Fluent fluent) {
+    public ${model.type.className}(${model.type.superClass.className} fluent) {
         this.fluent = fluent;
     }
     
-    public ${model.type.className}Builder(${model.type.className} instance) {
+    public ${model.type.className}(${model.type.className} instance) {
         this();
 #foreach($arg in $model.constructors.iterator().next().arguments)
         with${arg.nameCapitalized}(instance.${arg.getter}());
 #end
     }
     
-    public ${model.type.className} build() {
-       return new ${model.type.className}( #foreach($arg in $model.constructors.iterator().next().arguments)fluent.${arg.getter}()#if( $foreach.hasNext ), #end#end );
+    public ${model.attributes.get("BUILDS")} build() {
+       return new ${model.attributes.get("BUILDS")}( #foreach($arg in $model.constructors.iterator().next().arguments)fluent.${arg.getter}()#if( $foreach.hasNext ), #end#end );
     }
-}
+
+#end    
+    

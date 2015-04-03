@@ -1,28 +1,24 @@
 package me.dsl.internal.processor;
 
-import me.codegen.generator.CodeGeneratorBuilder;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
 import me.codegen.model.JavaKind;
 import me.codegen.model.JavaMethod;
+import me.codegen.processor.JavaGeneratingProcessor;
 import me.codegen.utils.ModelUtils;
 import me.dsl.annotations.EntryPoint;
 import me.dsl.annotations.TargetName;
 import me.dsl.internal.functions.FindTransitions;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,10 +26,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static me.dsl.internal.processor.DslUtils.*;
+import static me.dsl.internal.processor.DslUtils.createEntryPointMethod;
+import static me.dsl.internal.processor.DslUtils.createGenericInterfaces;
+import static me.dsl.internal.processor.DslUtils.createTransitionInterface;
 
 @SupportedAnnotationTypes("me.dsl.annotations.Dsl")
-public class DslProcessor extends AbstractProcessor {
+public class DslProcessor extends JavaGeneratingProcessor {
 
     public static final String DEFAULT_TEMPLATE_LOCATION = "templates/dsl/dsl.vm";
 
@@ -75,10 +73,9 @@ public class DslProcessor extends AbstractProcessor {
                             .withMethods(methods)
                             .build());
 
-
                     try {
                         for (JavaClazz clazz : interfacesToGenerate) {
-                            generateFromModel(clazz, processingEnv);
+                            generateFromClazz(clazz, processingEnv, DEFAULT_TEMPLATE_LOCATION);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -101,32 +98,5 @@ public class DslProcessor extends AbstractProcessor {
         return nodes;
     }
 
-    private void generateFromModel(JavaClazz model, ProcessingEnvironment processingEnvironment) throws IOException {
-        PackageElement packageElement = processingEnvironment.getElementUtils().getPackageElement(model.getType().getPackageName());
-        try {
-            generateFromModel(model, processingEnv
-                    .getFiler()
-                    .createSourceFile(model.getType().getClassName(), packageElement), DEFAULT_TEMPLATE_LOCATION);
-        } catch (Exception e) {
-            //TODO: Need to avoid dublicate interfaces here.
-        }
-    }
-
-    /**
-     * Generates a source file from the specified {@link me.codegen.model.JavaClazz}.
-     *
-     * @param model        The model of the class to generate.
-     * @param fileObject   Where to save the generated class.
-     * @param resourceName Which is the template to use.
-     * @throws IOException
-     */
-    private void generateFromModel(JavaClazz model, JavaFileObject fileObject, String resourceName) throws IOException {
-        new CodeGeneratorBuilder<JavaClazz>()
-                .withModel(model)
-                .withWriter(fileObject.openWriter())
-                .withTemplateResource(resourceName)
-                .build()
-                .generate();
-    }
 
 }

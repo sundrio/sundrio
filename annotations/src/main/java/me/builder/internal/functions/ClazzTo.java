@@ -1,95 +1,98 @@
 package me.builder.internal.functions;
 
 import me.Function;
-import me.codegen.functions.ClassToJavaType;
 import me.codegen.model.AttributeSupport;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
 import me.codegen.model.JavaMethod;
-import me.codegen.model.JavaMethodBuilder;
 import me.codegen.model.JavaProperty;
 import me.codegen.model.JavaPropertyBuilder;
 import me.codegen.model.JavaType;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-
-import static me.codegen.utils.StringUtils.captializeFirst;
 
 public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
 
-    FLUENT;
+    FLUENT {
+        @Override
+        public JavaClazz apply(JavaClazz item) {
+            Set<JavaMethod> methods = new LinkedHashSet<>();
+            Set<JavaClazz> nestedClazzes = new LinkedHashSet<>();
+            Set<JavaProperty> properties = new LinkedHashSet<>();
 
-    private static final String BUILDABLE = "BUILDABLE";
-
-    @Override
-    public JavaClazz apply(JavaClazz item) {
-        Set<JavaMethod> methods = new LinkedHashSet<>();
-        Set<JavaClazz> nested = new LinkedHashSet<>();
-        Set<JavaProperty> properties = new LinkedHashSet<>();
-        Set<JavaType> extraImports = new HashSet<>();
-
-        for (JavaProperty property : item.getFields()) {
-            boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
-            if (property.isArray()) {
-                methods.add(ProtpertyToMethod.WITH_ARRAY.apply(property));
-                methods.add(ProtpertyToMethod.GETTER_ARRAY.apply(property));
-
-                properties.add(new JavaPropertyBuilder(property)
-                        .withArray(false)
-                        .withType(
-                                TypeTo.LIST_OF.apply(
-                                        TypeTo.UNWRAP_ARRAY_OF.apply(property.getType()))
-                        )
-                        .addToAttributes(BUILDABLE, buildable)
-                        .build());
-            } else {
-                properties.add(new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build());
-                methods.add(ProtpertyToMethod.GETTER.apply(property));
-                methods.add(ProtpertyToMethod.WITH.apply(property));
-            }
-        }
-
-        for (JavaProperty property : properties) {
-            if (property.getType().isCollection()) {
-                if (property.getType().getClassName().contains("Set") || property.getType().getClassName().contains("List")) {
-                    methods.add(ProtpertyToMethod.ADD_TO_COLLECTION.apply(property));
-                } else if (property.getType().getClassName().contains("Map")) {
-                    methods.add(ProtpertyToMethod.ADD_TO_MAP.apply(property));
+            for (JavaProperty property : item.getFields()) {
+                boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
+                if (property.isArray()) {
+                    methods.add(ProtpertyToMethod.WITH_ARRAY.apply(property));
+                    methods.add(ProtpertyToMethod.GETTER_ARRAY.apply(property));
+                    properties.add(arrayAsList(property, buildable));
+                } else {
+                    properties.add(new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build());
+                    methods.add(ProtpertyToMethod.GETTER.apply(property));
+                    methods.add(ProtpertyToMethod.WITH.apply(property));
                 }
             }
 
-            if (isBuildable(property)) {
-                methods.add(ProtpertyToMethod.ADD_NESTED.apply(property));
-                JavaType nestedType = PropretyTo.NESTED.apply(property);
-                Set<JavaMethod> nestedMethods = new HashSet<>();
-                nestedMethods.add(ProtpertyToMethod.AND.apply(property));
-                nestedMethods.add(ProtpertyToMethod.END.apply(property));
+            for (JavaProperty property : properties) {
+                if (property.getType().isCollection()) {
+                    if (property.getType().getClassName().contains("Set") || property.getType().getClassName().contains("List")) {
+                        methods.add(ProtpertyToMethod.ADD_TO_COLLECTION.apply(property));
+                    } else if (property.getType().getClassName().contains("Map")) {
+                        methods.add(ProtpertyToMethod.ADD_TO_MAP.apply(property));
+                    }
+                }
 
-                nested.add(createNested(nestedType, TypeTo.UNWRAP_COLLECTION_OF.apply(property.getType()), nestedMethods));
+                if (isBuildable(property)) {
+                    methods.add(ProtpertyToMethod.ADD_NESTED.apply(property));
+                    nestedClazzes.add(toNestedClazz(property));
+                }
             }
+
+            return new JavaClazzBuilder(item)
+                    .withType(TypeTo.FLUENT.apply(item.getType()))
+                    .withFields(properties)
+                    .withNested(nestedClazzes)
+                    .withMethods(methods)
+                    .build();
+        }
+    }, BUILDER {
+        @Override
+        public JavaClazz apply(JavaClazz item) {
+            return new JavaClazzBuilder(item)
+                    .withType(TypeTo.BUILDER.apply(item.getType()))
+                    .addToAttributes(BUILDS, item.getType())
+                    .build();
         }
 
-        JavaClazz actual = new JavaClazzBuilder(item)
-                .withType(TypeTo.FLUENT.apply(item.getType()))
-                .withImports(extraImports)
-                .withFields(properties)
-                .withNested(nested)
-                .withMethods(methods)
-                .build();
+    };
 
-        return actual;
+    private static final String BUILDABLE = "BUILDABLE";
+    private static final String BUILDS = "BUILDS";
+
+    private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
+        return new JavaPropertyBuilder(property)
+                .withArray(false)
+                .withType(TypeTo.ARRAY_AS_LIST.apply(property.getType()))
+                .addToAttributes(BUILDABLE, buildable)
+                .build();
     }
 
-    private static JavaClazz createNested(JavaType nestedType, JavaType original, Set<JavaMethod> methods) {
+    private static JavaClazz toNestedClazz(JavaProperty property) {
+        JavaType nestedType = PropretyTo.NESTED.apply(property);
+        Set<JavaMethod> nestedMethods = new HashSet<>();
+        nestedMethods.add(ProtpertyToMethod.AND.apply(property));
+        nestedMethods.add(ProtpertyToMethod.END.apply(property));
+        return createNestedClazz(nestedType, TypeTo.UNWRAP_COLLECTION_OF.apply(property.getType()), nestedMethods);
+    }
+
+    private static JavaClazz createNestedClazz(JavaType nestedType, JavaType originalType, Set<JavaMethod> methods) {
         Set<JavaProperty> properties = new HashSet<>();
 
         properties.add(new JavaPropertyBuilder()
                 .withName("builder")
-                .withType(TypeTo.SHALLOW_BUILDER.apply(original)).build());
+                .withType(TypeTo.SHALLOW_BUILDER.apply(originalType)).build());
 
         return new JavaClazzBuilder()
                 .withType(nestedType)

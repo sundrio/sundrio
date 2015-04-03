@@ -51,14 +51,13 @@ public enum TypeTo implements Function<JavaType, JavaType> {
         @Override
         public JavaType apply(JavaType item) {
             JavaType builder = SHALLOW_BUILDER.apply(item);
-            JavaType generic = typeExtends(T, builder);
-            JavaType fluent = SHALLOW_FLUENT.apply(item);
+            JavaType fluent = typeGenericOf(SHALLOW_FLUENT.apply(item), builder);
 
             return new JavaTypeBuilder(item)
-                    .withClassName(item.getClassName() + "Fluent")
-                    .withGenericTypes(new JavaType[]{generic})
+                    .withClassName(item.getClassName() + "Builder")
+                    .withGenericTypes(new JavaType[]{})
                     .withSuperClass(fluent)
-                    .withInterfaces(new HashSet(Arrays.asList(BUILDER_INTERFACE)))
+                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BUILDER_INTERFACE, item))))
                     .build();
 
         }
@@ -68,7 +67,6 @@ public enum TypeTo implements Function<JavaType, JavaType> {
         public JavaType apply(JavaType item) {
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Builder")
-                    .withGenericTypes(new JavaType[]{T})
                     .build();
         }
 
@@ -84,6 +82,12 @@ public enum TypeTo implements Function<JavaType, JavaType> {
                     .build();
         }
 
+    },
+    ARRAY_AS_LIST {
+      public JavaType apply(JavaType item) {
+          return LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item));
+
+      }
     },
     ARRAY_LIST_OF {
         public JavaType apply(JavaType item) {
