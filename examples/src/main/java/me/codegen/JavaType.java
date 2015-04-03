@@ -1,5 +1,7 @@
 package me.codegen;
 
+import me.builder.annotations.Buildable;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -16,6 +18,7 @@ public class JavaType extends AttributeSupport implements Type {
     private final Set<JavaType> interfaces;
     private final JavaType[] genericTypes;
 
+    @Buildable
     public JavaType(JavaKind kind, String packageName, String className, boolean array, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
         super(attributes);
         this.kind = kind;

@@ -9,7 +9,7 @@ public class AttributeSupportFluent<T extends AttributeSupportFluent<T>> impleme
         private Map<String,Object> attributes  = new HashMap();
         
 	public T withAttributes(Map attributes) {
-		this.attributes=attributes;
+		this.attributes.putAll(attributes);
 		return (T)this;
 	}
                 

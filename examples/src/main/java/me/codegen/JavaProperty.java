@@ -1,7 +1,6 @@
 package me.codegen;
 
 import me.builder.annotations.Buildable;
-
 import java.util.Map;
 
 public class JavaProperty extends AttributeSupport implements Property<JavaType> {

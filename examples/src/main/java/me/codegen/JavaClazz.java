@@ -14,10 +14,10 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
     private final Set<JavaMethod> constructors;
     private final Set<JavaProperty> fields;
     private final Set<JavaType> imports;
-    private final Set<JavaClazz> nested;
+    private final Set<me.codegen.model.JavaClazz> nested;
 
     @Buildable
-    public JavaClazz(JavaType type, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
+    public JavaClazz(JavaType type, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<me.codegen.model.JavaClazz> nested) {
         super(attributes);
         this.type = type;
         this.methods = methods;
@@ -65,7 +65,7 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
         return result;
     }
 
-    public Set<JavaClazz> getNested() {
+    public Set<me.codegen.model.JavaClazz> getNested() {
         return nested;
     }
 

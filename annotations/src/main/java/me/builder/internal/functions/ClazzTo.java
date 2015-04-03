@@ -2,6 +2,7 @@ package me.builder.internal.functions;
 
 import me.Function;
 import me.codegen.functions.ClassToJavaType;
+import me.codegen.model.AttributeSupport;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
 import me.codegen.model.JavaMethod;
@@ -32,16 +33,10 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
         Set<JavaType> extraImports = new HashSet<>();
 
         for (JavaProperty property : item.getFields()) {
-            if (property.isArray()) {
-                extraImports.add(ClassToJavaType.FUNCTION.apply(List.class));
-                extraImports.add(ClassToJavaType.FUNCTION.apply(ArrayList.class));
-            }
+            boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
             if (property.isArray()) {
                 methods.add(ProtpertyToMethod.WITH_ARRAY.apply(property));
                 methods.add(ProtpertyToMethod.GETTER_ARRAY.apply(property));
-
-                extraImports.add(ClassToJavaType.FUNCTION.apply(List.class));
-                extraImports.add(ClassToJavaType.FUNCTION.apply(ArrayList.class));
 
                 properties.add(new JavaPropertyBuilder(property)
                         .withArray(false)
@@ -49,9 +44,10 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
                                 TypeTo.LIST_OF.apply(
                                         TypeTo.UNWRAP_ARRAY_OF.apply(property.getType()))
                         )
+                        .addAttributes(BUILDABLE, buildable)
                         .build());
             } else {
-                properties.add(property);
+                properties.add(new JavaPropertyBuilder(property).addAttributes(BUILDABLE, buildable).build());
                 methods.add(ProtpertyToMethod.GETTER.apply(property));
                 methods.add(ProtpertyToMethod.WITH.apply(property));
             }
@@ -66,7 +62,7 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
                 }
             }
 
-            if (isBuildable(property.getType())) {
+            if (isBuildable(property)) {
                 methods.add(ProtpertyToMethod.ADD_NESTED.apply(property));
                 JavaType nestedType = PropretyTo.NESTED.apply(property);
                 Set<JavaMethod> nestedMethods = new HashSet<>();
@@ -105,14 +101,14 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
     /**
      * Checks if {@link me.codegen.model.JavaType} has the BUILDABLE attribute set to true.
      *
-     * @param type The type to check.
+     * @param item The type to check.
      * @return
      */
-    private static boolean isBuildable(JavaType type) {
-        if (type == null) {
+    private static boolean isBuildable(AttributeSupport item) {
+        if (item == null) {
             return false;
-        } else if (type.getAttributes().containsKey(BUILDABLE)) {
-            return (Boolean) type.getAttributes().get(BUILDABLE);
+        } else if (item.getAttributes().containsKey(BUILDABLE)) {
+            return (Boolean) item.getAttributes().get(BUILDABLE);
         }
         return false;
     }
