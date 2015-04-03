@@ -24,7 +24,7 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
     private final Function<ExecutableElement, JavaMethod> toJavaMethod;
     private final Function<VariableElement, JavaProperty> toJavaProperty;
 
-    public JavaClazzFunction(Types types, Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
+    public JavaClazzFunction(Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
         this.toJavaType = toJavaType;
         this.toJavaMethod = toJavaMethod;
         this.toJavaProperty = toJavaProperty;

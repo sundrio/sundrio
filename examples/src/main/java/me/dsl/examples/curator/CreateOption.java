@@ -2,7 +2,6 @@ package me.dsl.examples.curator;
 
 import me.dsl.annotations.AnnotationTransition;
 import me.dsl.annotations.Keyword;
-import me.dsl.annotations.Transition;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -20,7 +20,11 @@ import static me.dsl.internal.processor.JavaTypeUtils.executableToInterface;
 import static me.dsl.internal.processor.JavaTypeUtils.toInterfaceName;
 import static me.dsl.internal.processor.JavaTypeUtils.unwrapGenerics;
 
-public class DslUtils {
+public final class DslUtils {
+    
+    private DslUtils() {
+        //Utility Class
+    }
     
     static Set<JavaClazz> createGenericInterfaces(DslProcessorContext context, Collection<ExecutableElement> elements) {
         Set<JavaClazz> result = new LinkedHashSet<>();

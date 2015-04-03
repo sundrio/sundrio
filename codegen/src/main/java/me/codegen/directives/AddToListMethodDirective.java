@@ -25,13 +25,13 @@ public class AddToListMethodDirective extends Directive {
     }
 
     @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException {
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         JavaProperty property = (JavaProperty) node.jjtGetChild(0).value(context);
         String type = property.getType().getClassName();
         String methodName = "addTo" + property.getNameCapitalized();
         String name = property.getName();
         if (property.isArray()) {
-            writer.write(String.format(FORMAT, methodName, type, name, name, name));
+            writer.write(String.format(FORMAT, methodName, type, name, name));
         }  else if (property.getType().isCollection() && (type.equals("Set") || type.equals("List"))) {
             type = property.getType().getGenericTypes()[0].getClassName();
             writer.write(String.format(FORMAT, methodName, type, name));

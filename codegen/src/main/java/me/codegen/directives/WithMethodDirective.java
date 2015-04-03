@@ -25,7 +25,7 @@ public class WithMethodDirective extends Directive {
     }
 
     @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException {
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         JavaProperty property = (JavaProperty) node.jjtGetChild(0).value(context);
         String methodName = "with" + property.getNameCapitalized();
         String type = property.getType().getClassName();

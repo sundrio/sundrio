@@ -34,7 +34,7 @@ public class ClassDirective extends Directive {
     }
 
     @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException {
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         String block = "";
         JavaClazz clazz = null;
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
@@ -56,7 +56,11 @@ public class ClassDirective extends Directive {
                 }
             }
         }
+        writeClazz(writer, clazz, block);
+        return true;
+    }
 
+    private void writeClazz(Writer writer, JavaClazz clazz, String block) throws IOException {
         if (clazz != null) {
             JavaType type = clazz.getType();
             JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
@@ -75,7 +79,6 @@ public class ClassDirective extends Directive {
             writer.append("{");
             writer.append(block).append("}\n");
         }
-        return true;
     }
     
     //Enum Singleton

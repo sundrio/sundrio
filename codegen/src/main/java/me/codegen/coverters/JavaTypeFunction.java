@@ -47,21 +47,20 @@ public class JavaTypeFunction implements Function<String, JavaType> {
                 }
             }
 
-            TypeMirror typeMirror = typeElement.asType();
             packageName = elements.getPackageOf(typeElement).toString();
             className = fullName.contains(packageName) ? fullName.substring(packageName.length() + 1) : fullName;
         }
 
         if (fullName.endsWith("[]")) {
-            className = className.substring(0, className.indexOf("["));
+            className = className.substring(0, className.indexOf('['));
         }
         if (className.contains("<")) {
-            String genericTypeList = fullName.substring(fullName.indexOf("<") + 1, fullName.lastIndexOf(">"));
+            String genericTypeList = fullName.substring(fullName.indexOf('<') + 1, fullName.lastIndexOf('>'));
             for (String genericType : splitTypes(genericTypeList)) {
                 JavaType t = apply(genericType);
                 genericTypes.add(t);
             }
-            className = className.substring(0, className.indexOf("<"));
+            className = className.substring(0, className.indexOf('<'));
         }
         JavaType defaultImplementation = null;
         String qualifiedName = packageName + "." + className;

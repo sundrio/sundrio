@@ -20,8 +20,7 @@ public class ToTransitionClassName implements Function<AnnotationMirror, String>
 
     public String apply(AnnotationMirror annotationMirror) {
         if (annotationMirror.getAnnotationType().asElement().equals(ANNOTATED_TRANSITION)) {
-            String annotationClassName = String.valueOf(annotationMirror.getElementValues().get(ANNOTATION_VALUE).getValue());
-            return annotationClassName;
+            return String.valueOf(annotationMirror.getElementValues().get(ANNOTATION_VALUE).getValue());
         }
         return null;
     }

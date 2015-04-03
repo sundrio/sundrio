@@ -2,7 +2,7 @@ package me.codegen.utils;
 
 import me.Function;
 
-public class StringUtils {
+public final class StringUtils {
 
     public static final class ToString<X> implements Function<X, String> {
         @Override

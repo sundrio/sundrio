@@ -25,7 +25,7 @@ public class AddToMapMethodDirective extends Directive {
     }
 
     @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException {
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         JavaProperty property = (JavaProperty) node.jjtGetChild(0).value(context);
         String type = property.getType().getClassName();
         if (property.getType().isCollection() && type.equals("Map")) {

@@ -23,7 +23,7 @@ import java.util.Set;
 
 import static me.codegen.utils.StringUtils.captializeFirst;
 
-public class JavaTypeUtils {
+public final class JavaTypeUtils {
 
     static final String[] GENERIC_NAMES = {"X", "Y", "Z"};
     
@@ -41,6 +41,10 @@ public class JavaTypeUtils {
     }
     
     private static int counter = 0;
+    
+    private JavaTypeUtils() {
+        //Utility Class
+    }
     
     
     /**
@@ -249,7 +253,6 @@ public class JavaTypeUtils {
     }
 
     static synchronized final JavaType unwrapGenerics(JavaType type) {
-        JavaType result = type;
         Set<JavaType> interfaces = new LinkedHashSet<>();
         Set<JavaType> generics = new LinkedHashSet<>();
 

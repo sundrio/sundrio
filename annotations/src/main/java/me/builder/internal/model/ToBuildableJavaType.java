@@ -17,12 +17,10 @@ public class ToBuildableJavaType implements Function<String, JavaType> {
 
     private static final String BUILDABLE = "BUILDABLE";
     private final Elements elements;
-    private final Types types;
     private final Function<String, JavaType> delegate;
     
-    public ToBuildableJavaType(Elements elements, Types types) {
+    public ToBuildableJavaType(Elements elements) {
         this.elements = elements;
-        this.types = types;
         delegate = new JavaTypeFunction(elements, true);
     }
 

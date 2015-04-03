@@ -22,7 +22,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.util.Set;
@@ -37,13 +36,10 @@ public class BuildableProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
-        Types types = processingEnv.getTypeUtils();
-
-        Function<String, JavaType> toType = new ToBuildableJavaType(elements, types);
+        Function<String, JavaType> toType = new ToBuildableJavaType(elements);
         Function<VariableElement, JavaProperty> toProperty = new ToBuildableJavaProperty(toType);
         JavaMethodFunction toMethod = new JavaMethodFunction(toType, toProperty);
-        JavaClazzFunction toClazz = new JavaClazzFunction(types, toType, toMethod, toProperty);
-
+        JavaClazzFunction toClazz = new JavaClazzFunction(toType, toMethod, toProperty);
 
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {

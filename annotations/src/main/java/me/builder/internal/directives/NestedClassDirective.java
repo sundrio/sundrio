@@ -26,7 +26,7 @@ public class NestedClassDirective extends Directive {
     }
     
     @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException {
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         String block = "";
         JavaProperty property = null;
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {

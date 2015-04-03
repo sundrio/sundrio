@@ -32,7 +32,7 @@ public class DslProcessorContext {
         this.toType = new JavaTypeFunction(elements, true);
         this.toProperty = new JavaPropertyFunction(toType);
         this.toMethod = new JavaMethodFunction(toType, toProperty);
-        this.toClazz = new JavaClazzFunction(types, toType, toMethod, toProperty);
+        this.toClazz = new JavaClazzFunction(toType, toMethod, toProperty);
         this.dependencyManager = new DependencyManager(elements);
         this.toTransitionAnnotations = new ToTransitionAnnotations(elements);
         toTransitionClassName = new ToTransitionClassName(elements);

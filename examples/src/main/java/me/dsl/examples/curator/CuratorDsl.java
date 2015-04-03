@@ -38,7 +38,7 @@ public interface CuratorDsl {
 
     @Keyword
     @ExistsOption
-    public void storingStatIn(Object stat);
+    void storingStatIn(Object stat);
 
     @Keyword
     @CreateOption        
@@ -55,7 +55,7 @@ public interface CuratorDsl {
     @SetDataOption
     @DeleteOption
     @ExistsOption
-    public void inBackground();
+    void inBackground();
 
     @Terminal
     @CreateOption

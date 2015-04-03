@@ -25,7 +25,7 @@ public class GetterMethodDirective extends Directive {
     }
 
     @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException, ResourceNotFoundException, ParseErrorException, MethodInvocationException {
+    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         JavaProperty property = (JavaProperty) node.jjtGetChild(0).value(context);
         String prefix = property.getType().isBoolean() ? "is" : "get";
         String methodName = prefix + property.getNameCapitalized();

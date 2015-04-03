@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.Set;
 
 public final class ModelUtils {
+    
+    private ModelUtils(){
+        //Utility Class
+    }
 
     public static TypeElement getClassElement(Element element) {
         if (element instanceof PackageElement) {
@@ -32,8 +36,7 @@ public final class ModelUtils {
         if (packageName.isEmpty()) {
             return qualifiedName;
         }
-        String result = qualifiedName.substring(packageName.length() + 1);
-        return result;
+        return  qualifiedName.substring(packageName.length() + 1);
     }
 
     public static PackageElement getPackageElement(Element element) {
@@ -52,7 +55,7 @@ public final class ModelUtils {
         return ElementFilter.fieldsIn(element.getEnclosedElements());
     }
 
-    static final TypeElement getElementMatching(Iterable<TypeElement> typeElements, TypeMirror type) {
+    static TypeElement getElementMatching(Iterable<TypeElement> typeElements, TypeMirror type) {
         for (TypeElement typeElement : typeElements) {
             if (typeElement.asType().equals(type)) {
                 return typeElement;
@@ -83,10 +86,10 @@ public final class ModelUtils {
     public static String getFullyQualifiedName(String fullName) {
         String result = fullName.trim();
         if (result.contains("[")) {
-            result = result.substring(0, result.indexOf("["));
+            result = result.substring(0, result.indexOf('['));
         }
         if (result.contains("<")) {
-            result = result.substring(0, result.indexOf("<"));
+            result = result.substring(0, result.indexOf('<'));
         }
         return result;
     }

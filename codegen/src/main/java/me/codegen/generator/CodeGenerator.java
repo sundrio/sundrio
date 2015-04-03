@@ -19,8 +19,7 @@ import java.io.Writer;
 import java.util.Set;
 
 public class CodeGenerator<M> {
-
-    private final VelocityEngine engine;
+    
     private final VelocityContext context;
     private final Writer writer;
     private final M model;
@@ -33,8 +32,9 @@ public class CodeGenerator<M> {
         this.writer = writer;
         this.templateResource = templateResource;
         this.context = new VelocityContext();
-        this.engine = new VelocityEngine();
         this.directives = directives;
+        
+        VelocityEngine engine = new VelocityEngine();
         engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 
