@@ -30,7 +30,7 @@ public class FindTransitions implements Function<ExecutableElement, Set<Executab
     public FindTransitions(Elements elements, Set<AnnotationMirror> whiteList) {
         this.elements = elements;
         this.whiteList = whiteList;
-        this.TO_TRANSITION_ANNOTATIONS = new ToTransitionAnnotations(elements);
+        TO_TRANSITION_ANNOTATIONS = new ToTransitionAnnotations(elements);
         TO_TRANSITION_CLASSNAME = new ToTransitionClassName(elements);
     }
 

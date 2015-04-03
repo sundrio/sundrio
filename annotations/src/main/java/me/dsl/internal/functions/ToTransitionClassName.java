@@ -14,8 +14,8 @@ public class ToTransitionClassName implements Function<AnnotationMirror, String>
     private final Element ANNOTATION_VALUE;
 
     public ToTransitionClassName(Elements elements) {
-        this.ANNOTATED_TRANSITION = elements.getTypeElement(AnnotationTransition.class.getCanonicalName());
-        this.ANNOTATION_VALUE = ANNOTATED_TRANSITION.getEnclosedElements().get(0);
+        ANNOTATED_TRANSITION = elements.getTypeElement(AnnotationTransition.class.getCanonicalName());
+        ANNOTATION_VALUE = ANNOTATED_TRANSITION.getEnclosedElements().get(0);
     }
 
     public String apply(AnnotationMirror annotationMirror) {

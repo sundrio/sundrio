@@ -16,7 +16,7 @@ public class ToTransitionAnnotations implements Function<ExecutableElement, Set<
 
 
     public ToTransitionAnnotations(Elements elements) {
-        this.ANNOTATED_TRANSITION = elements.getTypeElement(AnnotationTransition.class.getCanonicalName());
+        ANNOTATED_TRANSITION = elements.getTypeElement(AnnotationTransition.class.getCanonicalName());
     }
 
     public Set<AnnotationMirror> apply(ExecutableElement element) {
