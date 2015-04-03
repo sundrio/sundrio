@@ -1,4 +1,4 @@
-package me.builder.internal.model;
+package me.builder.internal.functions.overrides;
 
 import me.Function;
 import me.codegen.coverters.JavaPropertyFunction;

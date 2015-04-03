@@ -39,7 +39,17 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
 	public String getClassName() {
 		return this.className;
 	}
-                private boolean collection ;
+	private boolean array ;
+
+	public T withArray(boolean array) {
+		this.array=array;
+		return (T)this;
+	}
+
+	public boolean isArray() {
+		return this.array;
+	}
+	private boolean collection ;
         
 	public T withCollection(boolean collection) {
 		this.collection=collection;
@@ -49,7 +59,7 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
 	public boolean isCollection() {
 		return this.collection;
 	}
-                private boolean concrete ;
+    private boolean concrete ;
         
 	public T withConcrete(boolean concrete) {
 		this.concrete=concrete;
@@ -59,7 +69,7 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
 	public boolean isConcrete() {
 		return this.concrete;
 	}
-                private JavaType defaultImplementation ;
+   private JavaType defaultImplementation ;
         
 	public T withDefaultImplementation(JavaType defaultImplementation) {
 		this.defaultImplementation=defaultImplementation;

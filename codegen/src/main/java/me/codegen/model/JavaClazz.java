@@ -1,9 +1,11 @@
 package me.codegen.model;
 
 import me.codegen.Clazz;
+import me.codegen.functions.JavaClazzToReferences;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaProperty> {
 
@@ -12,14 +14,20 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
     private final Set<JavaMethod> constructors;
     private final Set<JavaProperty> fields;
     private final Set<JavaType> imports;
+    private final Set<JavaClazz> nested;
 
-    public JavaClazz(JavaType type, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes) {
+    public JavaClazz(JavaType type, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
         super(attributes);
         this.type = type;
         this.methods = methods;
         this.constructors = constructors;
         this.fields = fields;
         this.imports = imports;
+        this.nested = nested;
+    }
+
+    private Set<JavaType> getReferencedTypes() {
+        return JavaClazzToReferences.FUNCTION.apply(this);
     }
 
     public Set<JavaMethod> getConstructors() {
@@ -43,7 +51,21 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
 
     @Override
     public Set<JavaType> getImports() {
-        return imports;
+        Set<JavaType> result = new CopyOnWriteArraySet<>();
+        Set<JavaType> tmp = new CopyOnWriteArraySet<>();
+        tmp.addAll(this.imports);
+        tmp.addAll(getReferencedTypes());
+
+        for (JavaType t : tmp) {
+            if (t.getPackageName() != null && !t.getPackageName().equals(getType().getPackageName()) && !t.getPackageName().equals("java.lang")) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    public Set<JavaClazz> getNested() {
+        return nested;
     }
 
     @Override

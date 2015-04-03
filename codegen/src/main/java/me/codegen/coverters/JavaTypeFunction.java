@@ -32,6 +32,7 @@ public class JavaTypeFunction implements Function<String, JavaType> {
 
     @Override
     public JavaType apply(String fullName) {
+        boolean isArray = false;
         String packageName = null;
         String className = null;
         List<JavaType> interfaces = new ArrayList<>();
@@ -53,6 +54,7 @@ public class JavaTypeFunction implements Function<String, JavaType> {
 
         if (fullName.endsWith("[]")) {
             className = className.substring(0, className.indexOf('['));
+            isArray = true;
         }
         if (className.contains("<")) {
             String genericTypeList = fullName.substring(fullName.indexOf('<') + 1, fullName.lastIndexOf('>'));
@@ -80,6 +82,7 @@ public class JavaTypeFunction implements Function<String, JavaType> {
                 .withKind(JavaKind.CLASS)
                 .withPackageName(packageName)
                 .withClassName(className)
+                .withArray(isArray)
                 .withConcrete(defaultImplementation == null)
                 .withCollection(collection)
                 .withDefaultImplementation(defaultImplementation)

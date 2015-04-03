@@ -5,9 +5,6 @@ import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaKind;
 import me.codegen.model.JavaType;
 import org.apache.velocity.context.InternalContextAdapter;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
@@ -21,7 +18,7 @@ import static me.codegen.utils.StringUtils.join;
 
 public class ClassDirective extends Directive {
 
-    private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
+    private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
 
     @Override
     public String getName() {
@@ -67,20 +64,36 @@ public class ClassDirective extends Directive {
 
             writer.append("public ").append(kind.name().toLowerCase()).append(" ");
             writer.append(JavaTypeToString.INSTANCE.apply(type));
-            if (type.getKind() == JavaKind.INTERFACE && !type.getInterfaces().isEmpty()) {
-                writer.append(" extends ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
-            }
 
-            if (type.getSuperClass() != null && !OBJECT_TYPE.equals(type.getSuperClass())) {
-                writer.append(" extends ").append(type.getSuperClass().getClassName());
-                writer.append(" implements ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
-            }
+            writeExtends(writer, type);
+            writeImplements(writer, type);
 
-            writer.append("{");
-            writer.append(block).append("}\n");
+            writer.append("{\n");
+            writer.append(block).append("\n}\n");
         }
     }
-    
+
+    private void writeExtends(Writer writer, JavaType type) throws IOException {
+        if (type.getKind() != JavaKind.INTERFACE) {
+            if (type.getSuperClass() != null && !OBJECT_TYPE.equals(type.getSuperClass())) {
+                writer.append(" extends ").append(JavaTypeToString.INSTANCE.apply(type.getSuperClass()));
+            }
+        } else {
+            if (type.getInterfaces().size() > 0) {
+                writer.append(" extends ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
+            }
+        }
+    }
+
+    private void writeImplements(Writer writer, JavaType type) throws IOException {
+        if (type.getKind() != JavaKind.INTERFACE) {
+            if (type.getInterfaces().size() > 0) {
+                writer.append(" implements ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
+            }
+        }
+    }
+
+
     //Enum Singleton
     private enum JavaTypeToString implements Function<JavaType, String> {
         INSTANCE;
@@ -88,6 +101,9 @@ public class ClassDirective extends Directive {
         public String apply(JavaType item) {
             StringBuilder sb = new StringBuilder();
             sb.append(item.getClassName());
+            if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
+                sb.append(" extends " + apply(item.getSuperClass()));
+            }
             if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
                 sb.append("<").append(join(item.getGenericTypes(), JavaTypeToString.INSTANCE, ",")).append(">");
             }

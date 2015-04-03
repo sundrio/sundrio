@@ -1,11 +1,7 @@
 package me.builder.internal.processor.generator;
 
-import me.builder.internal.directives.AddNestedMethodDirective;
-import me.builder.internal.directives.NestedClassDirective;
 import me.builder.internal.processor.BuildableProcessor;
-import me.codegen.generator.CodeGenerator;
 import me.codegen.generator.CodeGeneratorBuilder;
-import me.codegen.generator.GeneratorUtils;
 import me.codegen.model.JavaClazz;
 import me.codegen.model.JavaClazzBuilder;
 import org.junit.Test;
@@ -49,8 +45,7 @@ public class BuilderGeneratorTest {
                     .withModel(model)
                     .withWriter(fluentWriter)
                     .withTemplateResource(templateResource)
-                    .addToDirectives(AddNestedMethodDirective.class)
-                    .addToDirectives(NestedClassDirective.class).build().generate();
+                    .build().generate();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

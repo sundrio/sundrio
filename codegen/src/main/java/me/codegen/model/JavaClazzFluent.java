@@ -29,7 +29,8 @@ public class JavaClazzFluent<T extends JavaClazzFluent<T>> extends AttributeSupp
 			return (N) withType(builder.build());
 		}
 	}
-            private Set<JavaMethod> methods  = new LinkedHashSet();
+    
+	private Set<JavaMethod> methods  = new LinkedHashSet();
         
 	public T withMethods(Set methods) {
 		this.methods=methods;
@@ -137,4 +138,20 @@ public class JavaClazzFluent<T extends JavaClazzFluent<T>> extends AttributeSupp
 			return (N) addToImports(builder.build());
 		}
 	}
-    }
+
+	private Set<JavaClazz> nested  = new LinkedHashSet();
+
+	public Set<JavaClazz> getNested() {
+		return nested;
+	}
+	
+	public T withNested(Set nested) {
+		this.nested=nested;
+		return (T)this;
+	}
+
+	public T addToNested(JavaClazz item) {
+		this.nested.add(item);
+		return (T)this;
+	}
+}

@@ -1,11 +1,9 @@
 package me.builder.internal.processor;
 
 import me.Function;
-import me.builder.internal.directives.AddNestedMethodDirective;
-import me.builder.internal.directives.NestedClassDirective;
-import me.builder.internal.model.ToBuildableJavaProperty;
-import me.builder.internal.model.ToBuildableJavaType;
-import me.builder.internal.model.FluentJavaClazz;
+import me.builder.internal.functions.overrides.ToBuildableJavaProperty;
+import me.builder.internal.functions.overrides.ToBuildableJavaType;
+import me.builder.internal.functions.ClazzTo;
 import me.codegen.coverters.JavaClazzFunction;
 import me.codegen.coverters.JavaMethodFunction;
 import me.codegen.generator.CodeGeneratorBuilder;
@@ -48,7 +46,7 @@ public class BuildableProcessor extends AbstractProcessor {
                     JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(element));
 
                     try {
-                        generateFromModel(FluentJavaClazz.wrap(clazz),
+                        generateFromModel(ClazzTo.FLUENT.apply(clazz),
                                 processingEnv.getFiler().createSourceFile(clazz.getType().getClassName() + "Fluent", ModelUtils.getPackageElement(element)),
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);
 
@@ -69,8 +67,6 @@ public class BuildableProcessor extends AbstractProcessor {
                 .withModel(model)
                 .withWriter(fileObject.openWriter())
                 .withTemplateResource(resourceName)
-                .addToDirectives(NestedClassDirective.class)
-                .addToDirectives(AddNestedMethodDirective.class)
                 .build()
                 .generate();
     }

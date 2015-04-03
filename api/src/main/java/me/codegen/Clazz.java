@@ -9,4 +9,5 @@ public interface Clazz<T extends Type, P extends Property<T>> {
     Set<? extends Method<T, P>> getMethods();
     Set<P> getFields();
     Set<T> getImports();
+    Set<? extends Clazz> getNested();
 }

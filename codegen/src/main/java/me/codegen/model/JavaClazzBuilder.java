@@ -25,6 +25,6 @@ public class JavaClazzBuilder extends JavaClazzFluent<JavaClazzBuilder> implemen
     }
     
     public JavaClazz build() {
-       return new JavaClazz( fluent.getType(), fluent.getConstructors(), fluent.getMethods(), fluent.getFields(), fluent.getImports(), fluent.getAttributes() );
+       return new JavaClazz( fluent.getType(), fluent.getConstructors(), fluent.getMethods(), fluent.getFields(), fluent.getImports(), fluent.getAttributes(), fluent.getNested());
     }
 }

@@ -1,4 +1,4 @@
-package me.builder.internal.model;
+package me.builder.internal.functions.overrides;
 
 import me.Function;
 import me.builder.annotations.Buildable;
@@ -9,7 +9,6 @@ import me.codegen.model.JavaTypeBuilder;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,7 +1,5 @@
 package me.codegen;
 
-import me.builder.annotations.Buildable;
-
 import java.util.Map;
 import java.util.Set;
 
@@ -10,6 +8,7 @@ public class JavaType extends AttributeSupport implements Type {
     private final JavaKind kind;
     private final String packageName;
     private final String className;
+    private final boolean array;
     private final boolean collection;
     private final boolean concrete;
     private final JavaType defaultImplementation;
@@ -17,12 +16,12 @@ public class JavaType extends AttributeSupport implements Type {
     private final Set<JavaType> interfaces;
     private final JavaType[] genericTypes;
 
-    @Buildable
-    public JavaType(JavaKind kind, String packageName, String className, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
+    public JavaType(JavaKind kind, String packageName, String className, boolean array, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
         super(attributes);
         this.kind = kind;
         this.packageName = packageName;
         this.className = className;
+        this.array = array;
         this.collection = collection;
         this.concrete = concrete;
         this.defaultImplementation = defaultImplementation;
@@ -60,6 +59,9 @@ public class JavaType extends AttributeSupport implements Type {
             }
             sb.append(">");
         }
+        if (isArray()) {
+            sb.append("[]");
+        }
         return sb.toString();
     }
 
@@ -80,7 +82,11 @@ public class JavaType extends AttributeSupport implements Type {
     public String getClassName() {
         return className;
     }
-
+    @Override
+    public boolean isArray() {
+        return array;
+    }
+    
     @Override
     public boolean isCollection() {
         return collection;

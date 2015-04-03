@@ -1,13 +1,7 @@
 package me.codegen.generator;
 
-import me.codegen.directives.AddToListMethodDirective;
-import me.codegen.directives.AddToMapMethodDirective;
 import me.codegen.directives.ClassDirective;
-import me.codegen.directives.GetterMethodDirective;
-import me.codegen.directives.GetterToArrayMethodDirective;
-import me.codegen.directives.SetterMethodDirective;
-import me.codegen.directives.WithArrayMethodDirective;
-import me.codegen.directives.WithMethodDirective;
+import me.codegen.directives.MethodDirective;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -41,14 +35,8 @@ public class CodeGenerator<M> {
         engine.init();
         
         //Load standard directives
-        engine.loadDirective(SetterMethodDirective.class.getCanonicalName());
-        engine.loadDirective(WithMethodDirective.class.getCanonicalName());
-        engine.loadDirective(WithArrayMethodDirective.class.getCanonicalName());
-        engine.loadDirective(GetterMethodDirective.class.getCanonicalName());
-        engine.loadDirective(AddToListMethodDirective.class.getCanonicalName());
-        engine.loadDirective(AddToMapMethodDirective.class.getCanonicalName());
-        engine.loadDirective(GetterToArrayMethodDirective.class.getCanonicalName());
         engine.loadDirective(ClassDirective.class.getCanonicalName());
+        engine.loadDirective(MethodDirective.class.getCanonicalName());
 
         for (Class<? extends Directive> directive :directives){
             engine.loadDirective(directive.getCanonicalName());
