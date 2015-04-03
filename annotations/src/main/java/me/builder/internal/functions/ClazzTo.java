@@ -44,10 +44,10 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
                                 TypeTo.LIST_OF.apply(
                                         TypeTo.UNWRAP_ARRAY_OF.apply(property.getType()))
                         )
-                        .addAttributes(BUILDABLE, buildable)
+                        .addToAttributes(BUILDABLE, buildable)
                         .build());
             } else {
-                properties.add(new JavaPropertyBuilder(property).addAttributes(BUILDABLE, buildable).build());
+                properties.add(new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build());
                 methods.add(ProtpertyToMethod.GETTER.apply(property));
                 methods.add(ProtpertyToMethod.WITH.apply(property));
             }

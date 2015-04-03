@@ -21,21 +21,38 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{property})
-                    .addAttributes(BODY, "this." + property.getName() + "=" + property.getName() + "; return (T) this;")
+                    .addToAttributes(BODY, getBody(property))
                     .build();
+        }
+
+        private String getBody(JavaProperty property) {
+            String name = property.getName();
+            JavaType type = property.getType();
+            String className = type.getClassName();
+            StringBuilder sb = new StringBuilder();
+            if (type.isCollection()) {
+                sb.append("this." + name + ".clear();");
+                if (className.contains("Map")) {
+                    sb.append("this." + name + ".putAll(" +name + "); return (T) this;");
+                } else if (className.contains("List") || className.contains("Set")) {
+                    sb.append("this." +name + ".addAll(" + name + "); return (T) this;");
+                }
+                return sb.toString();
+            }
+            return "this." + property.getName() + "=" + property.getName() + "; return (T) this;";
         }
 
     }, WITH_ARRAY {
         @Override
         public JavaMethod apply(JavaProperty property) {
             String methodName = "with" + property.getNameCapitalized();
-            JavaType unwraped =  TypeTo.UNWRAP_ARRAY_OF.apply(property.getType());
-            
+            JavaType unwraped = TypeTo.UNWRAP_ARRAY_OF.apply(property.getType());
+
             return new JavaMethodBuilder()
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{property})
-                    .addAttributes(BODY, "for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + property.getName() + ".add(item);} return (T) this;")
+                    .addToAttributes(BODY, "this." + property.getName() + ".clear(); for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + property.getName() + ".add(item);} return (T) this;")
                     .build();
         }
 
@@ -48,10 +65,10 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
-                    .addAttributes(BODY, "return this." + property.getName() + ";")
+                    .addToAttributes(BODY, "return this." + property.getName() + ";")
                     .build();
         }
-    },GETTER_ARRAY {
+    }, GETTER_ARRAY {
         @Override
         public JavaMethod apply(JavaProperty property) {
             String prefix = property.getType().isBoolean() ? "is" : "get";
@@ -60,7 +77,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
-                    .addAttributes(BODY, "return this." + property.getName() + ".toArray(new " + property.getType().getClassName() + "[" + property.getName() + ".size()]);")
+                    .addToAttributes(BODY, "return this." + property.getName() + ".toArray(new " + property.getType().getClassName() + "[" + property.getName() + ".size()]);")
                     .build();
         }
     },
@@ -72,7 +89,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(VOID)
                     .withArguments(new JavaProperty[]{property})
-                    .addAttributes(BODY, "this." + property.getName() + "=" + property.getName() + ";")
+                    .addToAttributes(BODY, "this." + property.getName() + "=" + property.getName() + ";")
                     .build();
         }
     },
@@ -83,13 +100,13 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName("item")
                     .withType(TypeTo.UNWRAP_COLLECTION_OF.apply(property.getType()))
                     .build();
-            
+
             String methodName = "addTo" + property.getNameCapitalized();
             return new JavaMethodBuilder()
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{item})
-                    .addAttributes(BODY, "this." + property.getName() + ".add(item); return (T)this;")
+                    .addToAttributes(BODY, "this." + property.getName() + ".add(item); return (T)this;")
                     .build();
         }
     },
@@ -107,7 +124,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{keyProperty, valueProperty})
-                    .addAttributes(BODY, "this." + property.getName() + ".put(key, value); return (T)this;")
+                    .addToAttributes(BODY, "this." + property.getName() + ".put(key, value); return (T)this;")
                     .build();
         }
     }, ADD_NESTED {
@@ -119,7 +136,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
             return new JavaMethodBuilder()
                     .withReturnType(rewraped)
                     .withName("add" + captializeFirst(property.getName()))
-                    .addAttributes(BODY, "return new " + rewraped.getSimpleName() + "();")
+                    .addToAttributes(BODY, "return new " + rewraped.getSimpleName() + "();")
                     .build();
 
         }
@@ -128,11 +145,11 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             String builderName = TypeTo.UNWRAP_COLLECTION_OF.apply(property.getType()).getClassName() + "Builder";
             String prefix = property.getType().isCollection() ? "addTo" : "with";
-            String withMethodName = prefix +captializeFirst(property.getName());
+            String withMethodName = prefix + captializeFirst(property.getName());
             return new JavaMethodBuilder()
                     .withReturnType(N)
                     .withName("and")
-                    .addAttributes(BODY, "return (N) " + withMethodName + "(new " + builderName + "(this).build());")
+                    .addToAttributes(BODY, "return (N) " + withMethodName + "(new " + builderName + "(this).build());")
                     .build();
 
         }
@@ -142,7 +159,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
             return new JavaMethodBuilder()
                     .withReturnType(N)
                     .withName("end" + captializeFirst(property.getName()))
-                    .addAttributes(BODY, "return and();")
+                    .addToAttributes(BODY, "return and();")
                     .build();
 
         }
