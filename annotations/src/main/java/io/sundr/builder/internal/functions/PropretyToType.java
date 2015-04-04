@@ -30,16 +30,16 @@ import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 
-public enum PropretyTo implements Function<JavaProperty, JavaType> {
+public enum PropretyToType implements Function<JavaProperty, JavaType> {
 
     NESTED {
         @Override
         public JavaType apply(JavaProperty item) {
             JavaType nested = SHALLOW_NESTED.apply(item);
             //Not a typical fluent
-            JavaType fluent = TypeTo.UNWRAP_COLLECTION_OF.apply(item.getType());
+            JavaType fluent = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
             JavaType superClassFluent = new JavaTypeBuilder(fluent)
-                    .withClassName(TypeTo.UNWRAP_COLLECTION_OF.apply(item.getType()) + "Fluent")
+                    .withClassName(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType()) + "Fluent")
                     .withGenericTypes(new JavaType[]{nested})
                     .build();
 

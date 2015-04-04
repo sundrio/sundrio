@@ -62,7 +62,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             String methodName = "with" + property.getNameCapitalized();
-            JavaType unwraped = TypeTo.UNWRAP_ARRAY_OF.apply(property.getType());
+            JavaType unwraped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getType());
 
             return new JavaMethodBuilder()
                     .withName(methodName)
@@ -114,7 +114,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             JavaProperty item = new JavaPropertyBuilder(property)
                     .withName("item")
-                    .withType(TypeTo.UNWRAP_COLLECTION_OF.apply(property.getType()))
+                    .withType(TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()))
                     .build();
 
             String methodName = "addTo" + property.getNameCapitalized();
@@ -147,7 +147,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             //We need to repackage because we are nesting under this class.
-            JavaType nestedType = PropretyTo.NESTED.apply(property);
+            JavaType nestedType = PropretyToType.NESTED.apply(property);
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
             return new JavaMethodBuilder()
                     .withReturnType(rewraped)
@@ -159,7 +159,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
     }, AND {
         @Override
         public JavaMethod apply(JavaProperty property) {
-            String builderName = TypeTo.UNWRAP_COLLECTION_OF.apply(property.getType()).getClassName() + "Builder";
+            String builderName = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()).getClassName() + "Builder";
             String prefix = property.getType().isCollection() ? "addTo" : "with";
             String withMethodName = prefix + captializeFirst(property.getName());
             return new JavaMethodBuilder()

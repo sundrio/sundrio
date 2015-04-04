@@ -32,7 +32,7 @@ import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
-public enum TypeTo implements Function<JavaType, JavaType> {
+public enum TypeAs implements Function<JavaType, JavaType> {
 
 
     FLUENT {

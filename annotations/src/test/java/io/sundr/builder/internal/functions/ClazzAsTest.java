@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import static io.sundr.codegen.utils.StringUtils.join;
 
-public class ClazzToTest {
+public class ClazzAsTest {
 
     @Test
     public void testToFluent() {
@@ -36,7 +36,7 @@ public class ClazzToTest {
                     .withPackageName(getClass().getPackage().getName())
                 .endType().build();
         
-        JavaClazz result = ClazzTo.FLUENT.apply(clazz);
+        JavaClazz result = ClazzAs.FLUENT.apply(clazz);
         System.out.println(JavaTypeToString.INSTANCE.apply(result.getType()));
     }
 

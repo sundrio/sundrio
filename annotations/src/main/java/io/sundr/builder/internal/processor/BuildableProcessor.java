@@ -17,7 +17,7 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.Function;
-import io.sundr.builder.internal.functions.ClazzTo;
+import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
 import io.sundr.codegen.coverters.JavaClazzFunction;
@@ -58,11 +58,11 @@ public class BuildableProcessor extends JavaGeneratingProcessor {
                 if (element instanceof ExecutableElement) {
                     JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(element));
                     try {
-                        generateFromClazz(ClazzTo.BUILDER.apply(clazz),
+                        generateFromClazz(ClazzAs.BUILDER.apply(clazz),
                                 processingEnv,
                                 DEFAULT_BUILDER_TEMPLATE_LOCATION);
                         
-                        generateFromClazz(ClazzTo.FLUENT.apply(clazz),
+                        generateFromClazz(ClazzAs.FLUENT.apply(clazz),
                                 processingEnv,
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);
                     } catch (IOException e) {

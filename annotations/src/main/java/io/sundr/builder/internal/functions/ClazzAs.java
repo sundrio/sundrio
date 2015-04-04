@@ -29,7 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
+public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
     FLUENT {
         @Override
@@ -67,7 +67,7 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
             }
 
             return new JavaClazzBuilder(item)
-                    .withType(TypeTo.FLUENT.apply(item.getType()))
+                    .withType(TypeAs.FLUENT.apply(item.getType()))
                     .withFields(properties)
                     .withNested(nestedClazzes)
                     .withMethods(methods)
@@ -77,7 +77,7 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
         @Override
         public JavaClazz apply(JavaClazz item) {
             return new JavaClazzBuilder(item)
-                    .withType(TypeTo.BUILDER.apply(item.getType()))
+                    .withType(TypeAs.BUILDER.apply(item.getType()))
                     .addToAttributes(BUILDS, item.getType())
                     .build();
         }
@@ -90,17 +90,17 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
         return new JavaPropertyBuilder(property)
                 .withArray(false)
-                .withType(TypeTo.ARRAY_AS_LIST.apply(property.getType()))
+                .withType(TypeAs.ARRAY_AS_LIST.apply(property.getType()))
                 .addToAttributes(BUILDABLE, buildable)
                 .build();
     }
 
     private static JavaClazz toNestedClazz(JavaProperty property) {
-        JavaType nestedType = PropretyTo.NESTED.apply(property);
+        JavaType nestedType = PropretyToType.NESTED.apply(property);
         Set<JavaMethod> nestedMethods = new HashSet<>();
         nestedMethods.add(ProtpertyToMethod.AND.apply(property));
         nestedMethods.add(ProtpertyToMethod.END.apply(property));
-        return createNestedClazz(nestedType, TypeTo.UNWRAP_COLLECTION_OF.apply(property.getType()), nestedMethods);
+        return createNestedClazz(nestedType, TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()), nestedMethods);
     }
 
     private static JavaClazz createNestedClazz(JavaType nestedType, JavaType originalType, Set<JavaMethod> methods) {
@@ -108,7 +108,7 @@ public enum ClazzTo implements Function<JavaClazz, JavaClazz> {
 
         properties.add(new JavaPropertyBuilder()
                 .withName("builder")
-                .withType(TypeTo.SHALLOW_BUILDER.apply(originalType)).build());
+                .withType(TypeAs.SHALLOW_BUILDER.apply(originalType)).build());
 
         return new JavaClazzBuilder()
                 .withType(nestedType)
