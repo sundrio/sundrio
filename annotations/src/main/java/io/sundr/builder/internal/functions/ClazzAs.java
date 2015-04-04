@@ -62,7 +62,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
                 if (isBuildable(property)) {
                     methods.add(ProtpertyToMethod.ADD_NESTED.apply(property));
-                    nestedClazzes.add(toNestedClazz(property));
+                    nestedClazzes.add(PropertyToClazz.NESTED.apply(property));
                 }
             }
 
@@ -92,28 +92,6 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 .withArray(false)
                 .withType(TypeAs.ARRAY_AS_LIST.apply(property.getType()))
                 .addToAttributes(BUILDABLE, buildable)
-                .build();
-    }
-
-    private static JavaClazz toNestedClazz(JavaProperty property) {
-        JavaType nestedType = PropretyToType.NESTED.apply(property);
-        Set<JavaMethod> nestedMethods = new HashSet<>();
-        nestedMethods.add(ProtpertyToMethod.AND.apply(property));
-        nestedMethods.add(ProtpertyToMethod.END.apply(property));
-        return createNestedClazz(nestedType, TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()), nestedMethods);
-    }
-
-    private static JavaClazz createNestedClazz(JavaType nestedType, JavaType originalType, Set<JavaMethod> methods) {
-        Set<JavaProperty> properties = new HashSet<>();
-
-        properties.add(new JavaPropertyBuilder()
-                .withName("builder")
-                .withType(TypeAs.SHALLOW_BUILDER.apply(originalType)).build());
-
-        return new JavaClazzBuilder()
-                .withType(nestedType)
-                .withFields(properties)
-                .withMethods(methods)
                 .build();
     }
 
