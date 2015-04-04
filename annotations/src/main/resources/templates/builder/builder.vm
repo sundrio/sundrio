@@ -1,6 +1,6 @@
 package ${model.type.packageName};
 
-import me.builder.Builder;
+import io.sundr.builder.Builder;
 
 #class ($model)
     private final ${model.type.superClass.className} fluent;
