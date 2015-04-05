@@ -1,6 +1,8 @@
 package ${model.type.packageName};
 
-import io.sundr.builder.Builder;
+#foreach($i in $model.imports)
+import $i.fullyQualifiedName;
+#end
 
 #class ($model)
     private final ${model.type.superClass.className} fluent;
@@ -13,7 +15,7 @@ import io.sundr.builder.Builder;
         this.fluent = fluent;
     }
     
-    public ${model.type.className}(${model.type.className} instance) {
+    public ${model.type.className}(${model.attributes.get("BUILDS")} instance) {
         this();
 #foreach($arg in $model.constructors.iterator().next().arguments)
         with${arg.nameCapitalized}(instance.${arg.getter}());
