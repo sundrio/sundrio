@@ -22,18 +22,38 @@
         <artifactId>sundr-pom</artifactId>
         <groupId>io.sundr</groupId>
         <version>1.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
-    <artifactId>examples</artifactId>
-    <name>Sundrio :: Examples</name>
-    <packaging>pom</packaging>
+    <groupId>io.sundr.examples</groupId>
+    <artifactId>shapes</artifactId>
+    <name>Sundrio :: Examples :: Shapes</name>
 
 
-    <modules>
-        <module>shapes</module>
-        <module>codegen</module>
-        <module>curator</module>
-    </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-annotations</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

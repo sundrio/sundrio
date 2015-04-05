@@ -27,13 +27,15 @@ import java.lang.annotation.Annotation;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToTransitionAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
+public class ToAnnotationMirrors implements Function<ExecutableElement, Set<AnnotationMirror>> {
 
     private final TypeElement ANNOTATED_TRANSITION;
+    private final Class<? extends Annotation> annotationClass;
 
 
-    public ToTransitionAnnotations(Elements elements) {
-        ANNOTATED_TRANSITION = elements.getTypeElement(AnnotationTransition.class.getCanonicalName());
+    public ToAnnotationMirrors(Elements elements, Class<? extends Annotation> annotationClass) {
+        this.annotationClass = annotationClass;
+        ANNOTATED_TRANSITION = elements.getTypeElement(annotationClass.getCanonicalName());
     }
 
     public Set<AnnotationMirror> apply(ExecutableElement element) {

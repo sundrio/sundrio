@@ -38,7 +38,6 @@
         <module>codegen</module>
         <module>annotations</module>
         <module>examples</module>
-
     </modules>
 
     <dependencyManagement>

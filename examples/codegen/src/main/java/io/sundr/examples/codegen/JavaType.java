@@ -14,21 +14,16 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.examples.codegen;
 
+import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.Type;
 
 import java.util.Map;
 import java.util.Set;
 
 public class JavaType extends AttributeSupport implements Type {
-    
-    private static final String IS_ARRAY = "IS_ARRAY";
-    private static final String IS_COLLECTION = "IS_COLLECTION";
-    private static final String IS_CONCRETE = "IS_CONCRETE";
-    private static final String DEFAULT_IMPLEMENTATION = "DEFAULT_IMPLEMENTATION";
-    
-    
+
     private final JavaKind kind;
     private final String packageName;
     private final String className;
@@ -40,6 +35,7 @@ public class JavaType extends AttributeSupport implements Type {
     private final Set<JavaType> interfaces;
     private final JavaType[] genericTypes;
 
+    @Buildable
     public JavaType(JavaKind kind, String packageName, String className, boolean array, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
         super(attributes);
         this.kind = kind;

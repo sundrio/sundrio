@@ -23,6 +23,8 @@ import io.sundr.codegen.coverters.JavaPropertyFunction;
 import io.sundr.codegen.coverters.JavaTypeFunction;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.dsl.internal.functions.ToKeywordAnnotations;
+import io.sundr.dsl.internal.functions.ToKeywordClassName;
 import io.sundr.dsl.internal.functions.ToTransitionAnnotations;
 import io.sundr.dsl.internal.functions.ToTransitionClassName;
 
@@ -40,7 +42,9 @@ public class DslProcessorContext {
     private final JavaClazzFunction toClazz;
     private final DependencyManager dependencyManager;
     private final ToTransitionAnnotations toTransitionAnnotations;
+    private final ToKeywordAnnotations toKeywordAnnotations;
     private final ToTransitionClassName toTransitionClassName;
+    private final ToKeywordClassName toKeywordClassName;
 
     public DslProcessorContext(Elements elements, Types types) {
         this.types = types;
@@ -52,6 +56,8 @@ public class DslProcessorContext {
         this.dependencyManager = new DependencyManager(elements);
         this.toTransitionAnnotations = new ToTransitionAnnotations(elements);
         toTransitionClassName = new ToTransitionClassName(elements);
+        toKeywordAnnotations = new ToKeywordAnnotations(elements);
+        toKeywordClassName = new ToKeywordClassName();
     }
 
     public Types getTypes() {
@@ -85,8 +91,15 @@ public class DslProcessorContext {
     public ToTransitionAnnotations getToTransitionAnnotations() {
         return toTransitionAnnotations;
     }
-
     public ToTransitionClassName getToTransitionClassName() {
         return toTransitionClassName;
+    }
+
+    public ToKeywordAnnotations getToKeywordAnnotations() {
+        return toKeywordAnnotations;
+    }
+
+    public ToKeywordClassName getToKeywordClassName() {
+        return toKeywordClassName;
     }
 }
