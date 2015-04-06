@@ -74,7 +74,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     //2nd step create dependency graph.
                     Set<JavaMethod> methods = new LinkedHashSet<>();
-                    Set<Node<JavaClazz>> graph = createGraph(context, genericInterfaces);
+                    Set<Node<JavaClazz>> graph = createGraph(genericInterfaces);
                     for (Node<JavaClazz> node : graph) {
                         JavaClazz current = node.getItem();
                         methods.add(new JavaMethodBuilder().withName((String) current.getType().getAttributes().get(METHOD_NAME))
@@ -106,7 +106,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
     }
 
 
-    private Set<Node<JavaClazz>> createGraph(DslProcessorContext context, Set<JavaClazz> clazzes) {
+    private Set<Node<JavaClazz>> createGraph(Set<JavaClazz> clazzes) {
         Set<Node<JavaClazz>> nodes = new LinkedHashSet<>();
         for (JavaClazz clazz : clazzes) {
             if (JavaTypeUtils.isEntryPoint(clazz)) {
