@@ -34,14 +34,13 @@ import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
-import static io.sundr.dsl.internal.Constants.VOID;
+import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.getTerminatingTypes;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.hasReturnType;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.isComposite;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.isTerminal;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.stripSuffix;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.toInterfaceName;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.unwrapGenerics;
 
 public class Combine implements Function<Set<JavaClazz>, JavaClazz> {
 
@@ -62,7 +61,7 @@ public class Combine implements Function<Set<JavaClazz>, JavaClazz> {
 
     public static JavaClazz combineTwo(JavaClazz left, JavaClazz right) {
         boolean isTerminal = false;
-        JavaType originalReturnType = VOID;
+        JavaType originalReturnType = TRANSPARENT;
         Set<JavaType> genericTypes = new LinkedHashSet<>();
         Set<JavaType> interfaceTypes = new LinkedHashSet<>();
         Set<JavaType> terminatingTypes = new LinkedHashSet<>();
@@ -82,8 +81,6 @@ public class Combine implements Function<Set<JavaClazz>, JavaClazz> {
             isTerminal = true;
             interfaceTypes.add(left.getType());
             interfaceTypes.add(right.getType());
-            //interfaceTypes.add(unwrapGenerics(left).getType());
-            //interfaceTypes.add(unwrapGenerics(right).getType());
         } else if (isTerminal(left)) {
             interfaceTypes.add(left.getType());
             interfaceTypes.add(new JavaTypeBuilder(right.getType()).withGenericTypes(new JavaType[]{left.getType()}).build());
@@ -111,7 +108,7 @@ public class Combine implements Function<Set<JavaClazz>, JavaClazz> {
         } else {
             interfaceTypes.add(left.getType());
             interfaceTypes.add(right.getType());
-            genericTypes.add(Generics.MAP.apply(VOID));
+            genericTypes.add(Generics.MAP.apply(TRANSPARENT));
         }
 
         return new JavaClazzBuilder()

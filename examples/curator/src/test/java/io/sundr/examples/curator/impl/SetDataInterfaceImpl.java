@@ -16,23 +16,25 @@
 
 package io.sundr.examples.curator.impl;
 
-import io.sundr.examples.curator.ForPathForPathAndBytesInBackgroundInterface;
 import io.sundr.examples.curator.ForPathForPathAndBytesInterface;
+import io.sundr.examples.curator.ForPathForPathAndBytesWatchableInterface;
 import io.sundr.examples.curator.SetDataInterface;
 
 public class SetDataInterfaceImpl implements SetDataInterface {
-
-
-    static {
-        new SetDataInterfaceImpl().forPath("somePath");
-        new SetDataInterfaceImpl().forPath("somePath", (byte) 0);
-        new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 0);
-        new SetDataInterfaceImpl().forPath("somePath");
-        new SetDataInterfaceImpl().watched().forPath("somePath");
-        new SetDataInterfaceImpl().watched().inBackground().forPath("somePath", (byte) 9);
-        String s = new SetDataInterfaceImpl().watched().inBackground().forPath("somePath");
+    @Override
+    public ForPathForPathAndBytesWatchableInterface<String, Void> inBackground(Object context) {
+        return null;
     }
 
+    @Override
+    public ForPathForPathAndBytesWatchableInterface<String, Void> inBackground() {
+        return null;
+    }
+
+    @Override
+    public ForPathForPathAndBytesWatchableInterface<String, Void> inBackground(boolean flag) {
+        return null;
+    }
 
     @Override
     public Void forPath(String path, byte data) {
@@ -41,21 +43,25 @@ public class SetDataInterfaceImpl implements SetDataInterface {
 
     @Override
     public String forPath(String path) {
-        return "";
+        return null;
     }
 
     @Override
-    public ForPathForPathAndBytesInterface<String, Void> inBackground(boolean flag) {
-        return this;
+    public ForPathForPathAndBytesInterface<String, Void> watched() {
+        return null;
     }
 
-    @Override
-    public ForPathForPathAndBytesInterface<String, Void> inBackground() {
-        return this;
+
+    static {
+        new SetDataInterfaceImpl().forPath("somePath");
+        new SetDataInterfaceImpl().forPath("somePath", (byte) 0);
+        new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 0);
+        new SetDataInterfaceImpl().forPath("somePath");
+        new SetDataInterfaceImpl().watched().forPath("somePath");
+        new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 9);
+        String s = new SetDataInterfaceImpl().inBackground().forPath("somePath");
     }
 
-    @Override
-    public ForPathForPathAndBytesInBackgroundInterface<String, Void> watched() {
-        return this;
-    }
+
+    
 }

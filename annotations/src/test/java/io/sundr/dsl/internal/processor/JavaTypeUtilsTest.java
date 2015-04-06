@@ -124,11 +124,11 @@ public class JavaTypeUtilsTest {
         assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
-        assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo("V"));
+        assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo("T"));
         assertThat(combined.getType().getInterfaces().size(), is(2));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodAInterface<T>")));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodBInterface<T>")));
-        assertEquals(combined.getType().getAttributes().get(ORIGINAL_RETURN_TYPE), VOID);
+        assertEquals(combined.getType().getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT);
         assertFalse((Boolean) combined.getType().getAttributes().get(IS_TERMINAL));
     }
 
@@ -149,7 +149,7 @@ public class JavaTypeUtilsTest {
         assertThat(combined.getType().getInterfaces().size(), is(2));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodAInterface<T>")));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodBInterface<T>")));
-        assertEquals(combined.getType().getAttributes().get(ORIGINAL_RETURN_TYPE), VOID);
+        assertEquals(combined.getType().getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT);
         assertTrue((Boolean) combined.getType().getAttributes().get(IS_TERMINAL));
     }
 

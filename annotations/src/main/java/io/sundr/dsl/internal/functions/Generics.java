@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.VOID;
 
@@ -39,7 +40,7 @@ public enum Generics implements Function<JavaType, JavaType> {
                     name += iteration;
                 }
                 counter++;
-                GENERIC_MAPPINGS.put(item, new JavaTypeBuilder().withClassName(name).build());
+                GENERIC_MAPPINGS.put(item, new JavaTypeBuilder().withClassName(name).addToAttributes(IS_GENERIC, true).build());
             }
             return GENERIC_MAPPINGS.get(item);
         }

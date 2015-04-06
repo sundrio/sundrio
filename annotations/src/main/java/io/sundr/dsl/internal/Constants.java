@@ -26,6 +26,7 @@ public final class Constants {
     public static final String TERMINATING_TYPES = "TERMINATING_TYPES";
     public static final String IS_ENTRYPOINT = "IS_ENTRYPOINT";
     public static final String IS_TERMINAL = "IS_TERMINAL";
+    public static final String IS_GENERIC = "IS_GENERIC";
     public static final String KEYWORDS = "KEYWORDS";
     public static final String TRANSITIONS = "TRANSITIONS";
     public static final String IS_COMPOSITE = "IS_COMPOSITE";
@@ -33,5 +34,5 @@ public final class Constants {
     public static final String METHOD_NAME = "METHOD_NAME";
 
     public static final JavaType VOID = new JavaTypeBuilder().withClassName("Void").build();
-    public static final JavaType TRANSPARENT = new JavaTypeBuilder().withClassName("T").build();
+    public static final JavaType TRANSPARENT = new JavaTypeBuilder().withClassName("T").addToAttributes(IS_GENERIC, true).build();
 }

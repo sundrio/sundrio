@@ -117,6 +117,9 @@ public class ClassDirective extends Directive {
         public String apply(JavaType item) {
             StringBuilder sb = new StringBuilder();
             sb.append(item.getClassName());
+            if (item.isArray()) {
+                sb.append("[]");
+            }
             if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
                 sb.append(" extends " + apply(item.getSuperClass()));
             }

@@ -16,18 +16,24 @@
 
 package io.sundr.examples.curator.impl;
 
-import io.sundr.examples.curator.ForPathInBackgroundInterface;
 import io.sundr.examples.curator.ForPathInterface;
+import io.sundr.examples.curator.ForPathWatchableInterface;
 import io.sundr.examples.curator.GetDataInterface;
 
-public class GetDataInterfaceImpl implements GetDataInterface {
+public  class GetDataInterfaceImpl implements GetDataInterface {
+    @Override
+    public ForPathWatchableInterface<String> inBackground(Object context) {
+        return null;
+    }
 
+    @Override
+    public ForPathWatchableInterface<String> inBackground() {
+        return null;
+    }
 
-    static {
-        new GetDataInterfaceImpl().watched().forPath("somePath");
-        new GetDataInterfaceImpl().inBackground().forPath("somePath");
-        new GetDataInterfaceImpl().forPath("somePath");
-        new GetDataInterfaceImpl().watched().inBackground().forPath("somePath");
+    @Override
+    public ForPathWatchableInterface<String> inBackground(boolean flag) {
+        return null;
     }
 
     @Override
@@ -36,17 +42,17 @@ public class GetDataInterfaceImpl implements GetDataInterface {
     }
 
     @Override
-    public ForPathInterface<String> inBackground(boolean flag) {
+    public ForPathInterface<String> watched() {
         return null;
     }
 
-    @Override
-    public ForPathInterface<String> inBackground() {
-        return null;
+
+    static {
+        new GetDataInterfaceImpl().watched().forPath("somePath");
+        new GetDataInterfaceImpl().inBackground().watched().forPath("somePath");
+        new GetDataInterfaceImpl().forPath("somePath");
+        new GetDataInterfaceImpl().inBackground().forPath("somePath");
     }
 
-    @Override
-    public ForPathInBackgroundInterface<String> watched() {
-        return null;
-    }
+
 }

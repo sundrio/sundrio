@@ -42,6 +42,7 @@ import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
+import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
@@ -50,7 +51,6 @@ import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSITIONS;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.VOID;
-import static io.sundr.dsl.internal.Constants.TRANSITIONS;
 
 public final class JavaTypeUtils {
 
@@ -83,7 +83,7 @@ public final class JavaTypeUtils {
         }
 
         JavaType returnType = null;
-        
+
         if (isTerminal(executableElement)) {
             returnType = isVoid(executableElement) ?
                     VOID :
@@ -173,8 +173,22 @@ public final class JavaTypeUtils {
         if (type.getAttributes().containsKey(TERMINATING_TYPES)) {
             result.addAll((Collection<JavaType>) type.getAttributes().get(TERMINATING_TYPES));
         }
-        if (type.getAttributes().containsKey(IS_COMPOSITE) && (Boolean) type.getAttributes().get(IS_TERMINAL)) {
+        if (type.getAttributes().containsKey(IS_COMPOSITE)
+                && (Boolean) type.getAttributes().get(IS_TERMINAL)
+                && !(type.getAttributes().get(ORIGINAL_RETURN_TYPE).equals(TRANSPARENT))) {
             result.add((JavaType) type.getAttributes().get(ORIGINAL_RETURN_TYPE));
+        }
+        return result;
+    }
+
+    public static final Set<JavaType> getRequiredGenerics(JavaType type) {
+        Set<JavaType> result = new LinkedHashSet<>();
+        for (JavaType interfaceType : type.getInterfaces()) {
+            for (JavaType genericType : interfaceType.getGenericTypes()) {
+                if (isGeneric(genericType)) {
+                    result.add(genericType);
+                }
+            }
         }
         return result;
     }
@@ -223,5 +237,11 @@ public final class JavaTypeUtils {
         return clazz.getType().getAttributes().containsKey(IS_TERMINAL)
                 && (clazz.getType().getAttributes().get(IS_TERMINAL) instanceof Boolean)
                 && (Boolean) clazz.getType().getAttributes().get(IS_TERMINAL);
+    }
+
+    public static boolean isGeneric(JavaType type) {
+        return type.getAttributes().containsKey(IS_GENERIC)
+                && (type.getAttributes().get(IS_GENERIC) instanceof Boolean)
+                && (Boolean) type.getAttributes().get(IS_GENERIC);
     }
 }

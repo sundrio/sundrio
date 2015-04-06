@@ -25,11 +25,11 @@ import io.sundr.dsl.annotations.Terminal;
 @Dsl
 @TargetName("CuratorFramework")
 public interface CuratorDsl {
-    
+
     @EntryPoint
     @GetDataOption
     void getData();
-    
+
     @EntryPoint
     @SetDataOption
     void setData();
@@ -37,7 +37,7 @@ public interface CuratorDsl {
     @EntryPoint
     @DeleteOption
     void delete();
-    
+
     @EntryPoint
     @ExistsOption
     void exists();
@@ -45,40 +45,84 @@ public interface CuratorDsl {
     @EntryPoint
     @CreateOption
     void create();
-    
+
+    @EntryPoint
+    @ReconfigOption
+    @TargetName("ReconfigBuilder")
+    void reconfig();
+
+    @EntryPoint
+    @ConfigOption
+    @TargetName("GetConfigBuilder")
+    void getConfig();
+
     @CreateOption
     void createParentsIfNeeded();
-    
+
     @DeleteOption
     void deleteChildrenIfNeeded();
 
     @Keyword
-    @ExistsOption
-    void storingStatIn(Object stat);
-
-    @Keyword
-    @CreateOption        
+    @CreateOption
     void withMode(Integer mode);
     
-    @Keyword
-    @SetDataOption
-    @GetDataOption
-    @ExistsOption
-    public void watched();
 
     @Keyword
     @GetDataOption
     @SetDataOption
     @DeleteOption
     @ExistsOption
+    @TargetName("Backgroundable")
+    void inBackground(boolean flag);
+
+    @TargetName("Leavable")
+    @ReconfigOption
+    void leaving(String... server);
+
+    @TargetName("Joinable")
+    @ReconfigOption
+    void joining(String... server);
+
+    @TargetName("Memberable")
+    @ReconfigOption
+    void withMembers(String... server);
+
+    @TargetName("Configurable")
+    @ReconfigOption
+    void fromConfig(long config) throws Exception;
+
+    @TargetName("Statable")
+    @ConfigOption
+    @ExistsOption
+    void storingStatIn(String stat);
+
+    @TargetName("Backgroundable")
+    @GetDataOption
+    @SetDataOption
+    @DeleteOption
+    @ExistsOption
+    @ReconfigOption
     void inBackground();
 
-    @Keyword
+    @TargetName("Backgroundable")
     @GetDataOption
     @SetDataOption
     @DeleteOption
     @ExistsOption
-    void inBackground(boolean flag);
+    @ReconfigOption
+    void inBackground(Object context);
+
+    @ConfigOption
+    @GetDataOption
+    @SetDataOption
+    @TargetName("Watchable")
+    void watched();
+
+    @Terminal
+    @ReconfigOption
+    @ConfigOption
+    @TargetName("Ensemblable")
+    byte[] forEnsemble();
 
     @Terminal
     @CreateOption
@@ -91,7 +135,7 @@ public interface CuratorDsl {
 
     @Terminal
     @SetDataOption
-    @TargetName("ForPathAndBytesInterface")        
+    @TargetName("ForPathAndBytesInterface")
     void forPath(String path, byte[] data);
 
 }
