@@ -83,7 +83,7 @@ public final class DslUtils {
             JavaClazz clazz = current.getItem();
             JavaClazz nextClazz = createTransitionInterface(next, intermediate);
             JavaClazz transition = Transition.create(clazz, nextClazz);
-            intermediate.add(transition);
+            //intermediate.add(transition);
             intermediate.add(nextClazz);
             return transition;
         } else {

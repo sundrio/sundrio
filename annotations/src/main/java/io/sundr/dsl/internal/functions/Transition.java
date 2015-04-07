@@ -34,25 +34,11 @@ import static io.sundr.dsl.internal.processor.JavaTypeUtils.*;
 public class Transition {
 
     public static JavaClazz create(JavaClazz from, JavaClazz to) {
-        String className = toInterfaceName(stripSuffix(from.getType().getClassName()) +
-                "To" +
-                stripSuffix(to.getType().getClassName()));
-
         JavaType transitionInterface = new JavaTypeBuilder(from.getType())
                 .withGenericTypes(new JavaType[]{to.getType()}).build();
 
-        return new JavaClazzBuilder()
-                .addType()
-                .withKind(JavaKind.INTERFACE)
-                .withClassName(className)
-                .withPackageName(from.getType().getPackageName())
-                .withGenericTypes(to.getType().getGenericTypes())
-                .withInterfaces(new LinkedHashSet<>(Arrays.asList(transitionInterface)))
-                .addToAttributes(ORIGINAL_RETURN_TYPE, to.getType().getAttributes().get(ORIGINAL_RETURN_TYPE))
-                .addToAttributes(TERMINATING_TYPES, to.getType().getAttributes().get(TERMINATING_TYPES))
-                .addToAttributes(IS_TERMINAL, false)
-                .addToAttributes(IS_COMPOSITE, false)
-                .endType()
+        return new JavaClazzBuilder(from)
+                .withType(transitionInterface)
                 .build();
 
     }
