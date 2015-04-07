@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor;
+package io.sundr.dsl.internal.utils;
 
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
@@ -22,9 +22,10 @@ import com.sun.tools.javac.util.Context;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
-import io.sundr.dsl.internal.functions.Combination;
-import io.sundr.dsl.internal.functions.Generics;
-import io.sundr.dsl.internal.processor.matchers.TypeNamed;
+import io.sundr.dsl.internal.processor.DslProcessorContext;
+import io.sundr.dsl.internal.type.functions.Combine;
+import io.sundr.dsl.internal.type.functions.Generics;
+import io.sundr.dsl.internal.utils.matchers.TypeNamed;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,14 +34,15 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.executableToInterface;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.isVoid;
-import static io.sundr.dsl.internal.processor.matchers.TypeNamed.typeNamed;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.executableToInterface;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.isVoid;
+import static io.sundr.dsl.internal.utils.matchers.TypeNamed.typeNamed;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -92,18 +94,17 @@ public class JavaTypeUtilsTest {
         ExecutableElement terminal = !isVoid(methods.get(0)) ? methods.get(0) : methods.get(1);
         JavaClazz simpleClazz = JavaTypeUtils.executableToInterface(dslContext, simple);
         JavaClazz teminalClazz = JavaTypeUtils.executableToInterface(dslContext, terminal);
-        JavaClazz combined = Combination.create(simpleClazz, teminalClazz);
+        JavaClazz combined = Combine.FUNCTION.apply(Arrays.asList(simpleClazz, teminalClazz));
         Assert.assertNotNull(combined);
 
         String T = Generics.MAP.apply(TRANSPARENT).getClassName();
-        assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
+        assertThat(combined.getType().getClassName(), equalTo("MethodAOrMethodBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
         assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo(T));
         assertThat(combined.getType().getInterfaces().size(), is(2));
-        assertThat(combined.getType().getInterfaces(), hasItem(typeNamed("MethodAInterface<MethodBInterface<" + T + ">>")));
+        assertThat(combined.getType().getInterfaces(), hasItem(typeNamed("MethodAInterface<" + T + ">")));
         assertThat(combined.getType().getInterfaces(), hasItem(typeNamed("MethodBInterface<" + T + ">")));
-        assertFalse((Boolean) combined.getType().getAttributes().get(IS_TERMINAL));
     }
 
 
@@ -115,10 +116,10 @@ public class JavaTypeUtilsTest {
         ExecutableElement right = !isVoid(methods.get(0)) ? methods.get(0) : methods.get(1);
         JavaClazz leftClazz = executableToInterface(dslContext, left);
         JavaClazz rightClazz = executableToInterface(dslContext, right);
-        JavaClazz combined = Combination.create(leftClazz, rightClazz);
+        JavaClazz combined = Combine.FUNCTION.apply(Arrays.asList(leftClazz, rightClazz));
         Assert.assertNotNull(combined);
 
-        assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
+        assertThat(combined.getType().getClassName(), equalTo("MethodAOrMethodBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
         assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo("T"));
@@ -126,7 +127,6 @@ public class JavaTypeUtilsTest {
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodAInterface<T>")));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodBInterface<T>")));
         assertEquals(combined.getType().getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT);
-        assertFalse((Boolean) combined.getType().getAttributes().get(IS_TERMINAL));
     }
 
     @Test
@@ -137,17 +137,16 @@ public class JavaTypeUtilsTest {
         ExecutableElement right = methods.get(1);
         JavaClazz leftClazz = executableToInterface(dslContext, left);
         JavaClazz rightClazz = executableToInterface(dslContext, right);
-        JavaClazz combined = Combination.create(leftClazz, rightClazz);
+        JavaClazz combined = Combine.FUNCTION.apply(Arrays.asList(leftClazz, rightClazz));
         Assert.assertNotNull(combined);
 
-        assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
+        assertThat(combined.getType().getClassName(), equalTo("MethodAOrMethodBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
         assertThat(combined.getType().getInterfaces().size(), is(2));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodAInterface<T>")));
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodBInterface<T>")));
         assertEquals(combined.getType().getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT);
-        assertTrue((Boolean) combined.getType().getAttributes().get(IS_TERMINAL));
     }
 
 }

@@ -27,7 +27,7 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 
-public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
+public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
     WITH {
         @Override
@@ -147,7 +147,7 @@ public enum ProtpertyToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             //We need to repackage because we are nesting under this class.
-            JavaType nestedType = PropretyToType.NESTED.apply(property);
+            JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
             return new JavaMethodBuilder()
                     .withReturnType(rewraped)

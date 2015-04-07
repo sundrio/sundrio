@@ -31,7 +31,6 @@ public final class Constants {
     public static final String USE_PREVIOUS_TRANSITIONS = "USE_PREVIOUS_TRANSITIONS";
     public static final String TRANSITIONS = "TRANSITIONS";
     public static final String IS_COMPOSITE = "IS_COMPOSITE";
-    public static final String COMBINATION_OF = "COMBINATION_OF";
     public static final String METHOD_NAME = "METHOD_NAME";
 
     public static final JavaType VOID = new JavaTypeBuilder().withClassName("Void").build();

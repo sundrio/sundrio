@@ -23,10 +23,10 @@ import io.sundr.codegen.coverters.JavaPropertyFunction;
 import io.sundr.codegen.coverters.JavaTypeFunction;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.dsl.internal.functions.ToKeywordAnnotations;
-import io.sundr.dsl.internal.functions.ToKeywordClassName;
-import io.sundr.dsl.internal.functions.ToTransitionAnnotations;
-import io.sundr.dsl.internal.functions.ToTransitionClassName;
+import io.sundr.dsl.internal.element.functions.ToKeywordAnnotations;
+import io.sundr.dsl.internal.element.functions.ToKeywordClassName;
+import io.sundr.dsl.internal.element.functions.ToTransitionAnnotations;
+import io.sundr.dsl.internal.element.functions.ToTransitionClassName;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -35,11 +35,9 @@ import javax.lang.model.util.Types;
 public class DslProcessorContext {
 
     private final Elements elements;
-    private final Types types;
     private final Function<String, JavaType> toType;
     private final Function<VariableElement, JavaProperty> toProperty;
     private final JavaMethodFunction toMethod;
-    private final JavaClazzFunction toClazz;
     private final DependencyManager dependencyManager;
     private final ToTransitionAnnotations toTransitionAnnotations;
     private final ToKeywordAnnotations toKeywordAnnotations;
@@ -47,21 +45,15 @@ public class DslProcessorContext {
     private final ToKeywordClassName toKeywordClassName;
 
     public DslProcessorContext(Elements elements, Types types) {
-        this.types = types;
         this.elements = elements;
         this.toType = new JavaTypeFunction(elements, true);
         this.toProperty = new JavaPropertyFunction(toType);
         this.toMethod = new JavaMethodFunction(toType, toProperty);
-        this.toClazz = new JavaClazzFunction(toType, toMethod, toProperty);
         this.dependencyManager = new DependencyManager(elements);
         this.toTransitionAnnotations = new ToTransitionAnnotations(elements);
         toTransitionClassName = new ToTransitionClassName(elements);
         toKeywordAnnotations = new ToKeywordAnnotations(elements);
         toKeywordClassName = new ToKeywordClassName();
-    }
-
-    public Types getTypes() {
-        return types;
     }
 
     public Elements getElements() {
@@ -72,17 +64,11 @@ public class DslProcessorContext {
         return toType;
     }
 
-    public Function<VariableElement, JavaProperty> getToProperty() {
-        return toProperty;
-    }
 
     public JavaMethodFunction getToMethod() {
         return toMethod;
     }
 
-    public JavaClazzFunction getToClazz() {
-        return toClazz;
-    }
 
     public DependencyManager getDependencyManager() {
         return dependencyManager;

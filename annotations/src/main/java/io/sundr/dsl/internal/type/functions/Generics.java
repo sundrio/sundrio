@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.functions;
+package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaType;

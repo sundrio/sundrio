@@ -23,9 +23,7 @@ import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
-import io.sundr.codegen.model.JavaType;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -41,28 +39,28 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             for (JavaProperty property : item.getFields()) {
                 boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
                 if (property.isArray()) {
-                    methods.add(ProtpertyToMethod.WITH_ARRAY.apply(property));
-                    methods.add(ProtpertyToMethod.GETTER_ARRAY.apply(property));
+                    methods.add(ToMethod.WITH_ARRAY.apply(property));
+                    methods.add(ToMethod.GETTER_ARRAY.apply(property));
                     properties.add(arrayAsList(property, buildable));
                 } else {
                     properties.add(new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build());
-                    methods.add(ProtpertyToMethod.GETTER.apply(property));
-                    methods.add(ProtpertyToMethod.WITH.apply(property));
+                    methods.add(ToMethod.GETTER.apply(property));
+                    methods.add(ToMethod.WITH.apply(property));
                 }
             }
 
             for (JavaProperty property : properties) {
                 if (property.getType().isCollection()) {
                     if (property.getType().getClassName().contains("Set") || property.getType().getClassName().contains("List")) {
-                        methods.add(ProtpertyToMethod.ADD_TO_COLLECTION.apply(property));
+                        methods.add(ToMethod.ADD_TO_COLLECTION.apply(property));
                     } else if (property.getType().getClassName().contains("Map")) {
-                        methods.add(ProtpertyToMethod.ADD_TO_MAP.apply(property));
+                        methods.add(ToMethod.ADD_TO_MAP.apply(property));
                     }
                 }
 
                 if (isBuildable(property)) {
-                    methods.add(ProtpertyToMethod.ADD_NESTED.apply(property));
-                    nestedClazzes.add(PropertyToClazz.NESTED.apply(property));
+                    methods.add(ToMethod.ADD_NESTED.apply(property));
+                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(property));
                 }
             }
 

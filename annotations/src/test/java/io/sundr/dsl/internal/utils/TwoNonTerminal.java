@@ -14,12 +14,11 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor;
+package io.sundr.dsl.internal.utils;
 
-public interface MoreMethods {
+public interface TwoNonTerminal {
     
     void methodA();
-    void methodC();
-    void methodD();
-    Long methodE();
+
+    void methodB();
 }

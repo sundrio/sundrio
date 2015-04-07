@@ -17,7 +17,7 @@
 package io.sundr.dsl.internal.processor;
 
 import io.sundr.dependency.TopologicalSort;
-import io.sundr.dsl.internal.functions.FindTransitions;
+import io.sundr.dsl.internal.element.functions.FindTransitions;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.util.Elements;

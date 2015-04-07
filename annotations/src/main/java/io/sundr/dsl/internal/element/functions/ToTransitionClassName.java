@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.functions;
+package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
 import io.sundr.dsl.annotations.AnnotationTransition;

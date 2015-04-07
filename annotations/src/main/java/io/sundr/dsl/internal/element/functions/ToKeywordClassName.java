@@ -14,34 +14,19 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor;
+package io.sundr.dsl.internal.element.functions;
 
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.Function;
+import io.sundr.dsl.annotations.AnnotationTransition;
 
-import java.util.Set;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 
-public class Vertx<T> {
+public class ToKeywordClassName implements Function<AnnotationMirror, String> {
 
-    private final T item;
-    private final Set<Vertx<T>> transitions;
-
-    public Vertx(T item, Set<Vertx<T>> transitions) {
-        this.item = item;
-        this.transitions = transitions;
-    }
-
-    public T getItem() {
-        return item;
-    }
-
-    public Set<Vertx<T>> getTransitions() {
-        return transitions;
-    }
-
-    @Override
-    public String toString() {
-        return item + "[" +
-                  StringUtils.join(transitions, ",") +
-                "]";
+    public String apply(AnnotationMirror annotationMirror) {
+        return annotationMirror.getAnnotationType().toString();
     }
 }

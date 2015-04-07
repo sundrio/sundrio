@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor.matchers;
+package io.sundr.dsl.internal.utils.matchers;
 
 import io.sundr.codegen.model.JavaType;
 import org.hamcrest.BaseMatcher;

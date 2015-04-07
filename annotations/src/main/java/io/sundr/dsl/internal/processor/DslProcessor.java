@@ -21,10 +21,10 @@ import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.TargetName;
+import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -39,12 +39,10 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
-import static io.sundr.dsl.internal.Constants.TRANSITIONS;
-import static io.sundr.dsl.internal.processor.DslUtils.createGenericInterfaces;
-import static io.sundr.dsl.internal.processor.DslUtils.createRootInterface;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.*;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.executablesToInterfaces;
+import static io.sundr.dsl.internal.utils.DslUtils.createRootInterface;
+import static io.sundr.dsl.internal.utils.GraphUtils.*;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {
@@ -67,7 +65,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     Collection<ExecutableElement> sorted = context.getDependencyManager().sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
                     //1st step generate generic interface for all types.
-                    Set<JavaClazz> genericInterfaces = createGenericInterfaces(context, sorted);
+                    Set<JavaClazz> genericInterfaces = executablesToInterfaces(context, sorted);
                     for (JavaClazz clazz : genericInterfaces) {
                         if (!JavaTypeUtils.isEntryPoint(clazz)) {
                             interfacesToGenerate.add(clazz);
@@ -76,8 +74,8 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     //2nd step create dependency graph.
                     Set<JavaMethod> methods = new LinkedHashSet<>();
-                    Set<Vertx<JavaClazz>> graph = createGraph(genericInterfaces);
-                    for (Vertx<JavaClazz> root : graph) {
+                    Set<Node<JavaClazz>> graph = createGraph(genericInterfaces);
+                    for (Node<JavaClazz> root : graph) {
                         JavaClazz current = root.getItem();
                         methods.add(new JavaMethodBuilder().withName((String) current.getType().getAttributes().get(METHOD_NAME))
                                 .withReturnType(current.getType()).build());
@@ -106,60 +104,5 @@ public class DslProcessor extends JavaGeneratingProcessor {
         return true;
     }
 
-
-    private Set<Vertx<JavaClazz>> createGraph(Set<JavaClazz> clazzes) {
-        Set<Vertx<JavaClazz>> nodes = new LinkedHashSet<>();
-        for (JavaClazz clazz : clazzes) {
-            if (JavaTypeUtils.isEntryPoint(clazz)) {
-                nodes.add(createGraph(clazz, new LinkedHashSet<String>(), clazzes, new LinkedHashSet<JavaType>()));
-
-            }
-        }
-        return nodes;
-    }
-
-    private Vertx<JavaClazz> createGraph(JavaClazz root, Set<String> previous, Set<JavaClazz> all, Set<JavaType> visited) {
-        Boolean usePrevious = usePreviousTransitions(root);
-        Set<JavaClazz> next = new LinkedHashSet<>();
-        Set<JavaType> visitedPath = new LinkedHashSet<>(visited);
-        Set<String> transitions = usePrevious ? previous : (Set<String>) root.getType().getAttributes().get(TRANSITIONS);
-        
-        if (!isTerminal(root)) {
-            for (JavaClazz candidate : exclusion(all, visited)) {
-                if (!isEntryPoint(candidate)) {
-                    Set<String> keywords = (Set<String>) candidate.getType().getAttributes().get(KEYWORDS);
-                    for (String keyword : keywords) {
-                        if (transitions.contains(keyword)) {
-                            next.add(candidate);
-                        }
-                    }
-                }
-            }
-            next.remove(root);
-            visitedPath.add(root.getType());
-        }
-        
-        Set<Vertx<JavaClazz>> nextVertices = new LinkedHashSet<>();
-        Set<JavaType> levelInterfaces = new LinkedHashSet<>();
-        levelInterfaces.addAll(visitedPath);
-        
-        for (JavaClazz c : next) {
-            Vertx<JavaClazz> subGraph = createGraph(c, usePrevious ? previous : transitions, all, levelInterfaces);
-            levelInterfaces.add(subGraph.getItem().getType());
-            levelInterfaces.addAll(subGraph.getItem().getType().getInterfaces());
-            nextVertices.add(subGraph);
-        }
-        return new Vertx<>(root, nextVertices);
-    }
-
-    private  Set<JavaClazz> exclusion(Set<JavaClazz> one, Set<JavaType> excluded) {
-        Set<JavaClazz> result = new LinkedHashSet<>();
-        for (JavaClazz item : one) {
-            if (!excluded.contains(item.getType()) || isTerminal(item)) {
-                result.add(item);
-            }
-        }
-        return result;
-    }
 
 }

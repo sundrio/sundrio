@@ -14,11 +14,11 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor;
+package io.sundr.dsl.internal.utils;
 
-public interface TwoNonTerminal {
+public interface TwoWithTerminal {
     
     void methodA();
 
-    void methodB();
+    String methodB();
 }

@@ -14,42 +14,41 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.functions;
+package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
+import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.getTerminatingTypes;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.isGeneric;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.stripSuffix;
-import static io.sundr.dsl.internal.processor.JavaTypeUtils.toInterfaceName;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.getTerminatingTypes;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.isGeneric;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.toInterfaceName;
 
-public class Combination {
+public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
 
-    public static JavaClazz create(JavaClazz... alternatives) {
-        return create(Arrays.asList(alternatives));
-    }
-    
-    public static JavaClazz create(Collection<JavaClazz> alternatives) {
+    FUNCTION;
+
+    @Override
+    public JavaClazz apply(Collection<JavaClazz> alternatives) {
         Set<JavaType> genericTypes = new LinkedHashSet<>();
         Set<JavaType> interfaces = new LinkedHashSet<>();
         Set<JavaType> terminatingTypes = new LinkedHashSet<>();
-        
+
         JavaClazz fallback = null;
         for (JavaClazz alternative : alternatives) {
             if (!canBeExcluded(alternative, alternatives)) {
@@ -62,7 +61,7 @@ public class Combination {
                 }
             } else {
                 if (fallback == null) {
-                    fallback = alternative;    
+                    fallback = alternative;
                 } else if (canBeExcluded(fallback, Arrays.asList(alternative))) {
                     fallback = alternative;
                 }
@@ -79,7 +78,7 @@ public class Combination {
         }
 
         String className = classNameOf(interfaces);
-        
+
         return new JavaClazzBuilder()
                 .addType()
                 .withKind(JavaKind.INTERFACE)
@@ -93,53 +92,39 @@ public class Combination {
                 .addToAttributes(IS_COMPOSITE, false)
                 .endType()
                 .build();
-
     }
 
     private static final String classNameOf(Set<JavaType> types) {
         return toInterfaceName(StringUtils.join(types, new Function<JavaType, String>() {
             @Override
             public String apply(JavaType item) {
-                return item.getClassName();
+                return stripSuffix(item.getClassName());
             }
         }, "Or"));
     }
-    
-            
+
+
     private static boolean canBeExcluded(JavaClazz candidate, Iterable<JavaClazz> provided) {
         Set<JavaType> allOther = new LinkedHashSet<>();
         for (JavaClazz c : provided) {
             if (!c.equals(candidate)) {
-                allOther.addAll(extractInterfaces(c.getType()));
+                allOther.addAll(JavaTypeUtils.extractInterfaces(c.getType()));
             }
         }
 
-        Set<JavaType> allProvided = extractInterfaces(allOther);
-        for (JavaType type : extractInterfaces(candidate.getType())) {
+        Set<JavaType> allProvided = JavaTypeUtils.extractInterfaces(allOther);
+        for (JavaType type : JavaTypeUtils.extractInterfaces(candidate.getType())) {
             if (!allProvided.contains(type)) {
                 return false;
             }
         }
         return true;
     }
-    
-    private static Set<JavaType> extractInterfaces(Set<JavaType> types) {
-        Set<JavaType> result = new LinkedHashSet<>();
-        for (JavaType type : types) {
-            result.addAll(extractInterfaces(type));
+
+    public static final String stripSuffix(String str) {
+        if (str.endsWith(INTERFACE_SUFFIX)) {
+            return str.substring(0, str.length() - INTERFACE_SUFFIX.length());
         }
-        return result;
-    }
-    
-    private static Set<JavaType> extractInterfaces(JavaType type) {
-        Set<JavaType> result = new LinkedHashSet<>();
-        if (type.getInterfaces().isEmpty()) {
-            result.add(type);
-        } else {
-            for (JavaType interfaceType : type.getInterfaces()) {
-                result.addAll(extractInterfaces(interfaceType));
-            }
-        }
-        return result;
+        return str;
     }
 }

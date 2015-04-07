@@ -14,29 +14,31 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor;
+package io.sundr.dsl.internal.utils;
 
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.Previous;
 import io.sundr.dsl.annotations.TargetName;
 import io.sundr.dsl.annotations.Terminal;
-import io.sundr.dsl.internal.functions.Generics;
+import io.sundr.dsl.internal.processor.DslProcessorContext;
+import io.sundr.dsl.internal.type.functions.Generics;
+import io.sundr.dsl.internal.type.functions.Merge;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
@@ -65,7 +67,7 @@ public final class JavaTypeUtils {
      *
      * @param context           The context of the operation.
      * @param executableElement The target element.
-     * @return An instance of {@link io.sundr.codegen.model.JavaClazz} that describes the interface.
+     * @return                  An instance of {@link io.sundr.codegen.model.JavaClazz} that describes the interface.
      */
     public static JavaClazz executableToInterface(DslProcessorContext context, ExecutableElement executableElement) {
         //Do generate the interface
@@ -86,7 +88,6 @@ public final class JavaTypeUtils {
         }
 
         JavaType returnType = null;
-
         if (isTerminal(executableElement)) {
             returnType = isVoid(executableElement) ?
                     VOID :
@@ -118,7 +119,6 @@ public final class JavaTypeUtils {
                 .addToAttributes(TRANSITIONS, isTerminal ? Collections.emptySet() : transitions)
                 .addToAttributes(USE_PREVIOUS_TRANSITIONS, usePreviousTransitions)
                 .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<>(Arrays.asList(returnType)) : Collections.emptySet())
-                .addToAttributes(IS_COMPOSITE, false)
                 .addToAttributes(METHOD_NAME, methodName)
                 .endType()
                 .addToMethods(targetMethod)
@@ -126,36 +126,28 @@ public final class JavaTypeUtils {
     }
 
 
-    public static JavaType merge(JavaType left, JavaType right) {
-        JavaTypeBuilder builder = new JavaTypeBuilder(left);
-        for (JavaType type : right.getInterfaces()) {
-            builder = builder.addToInterfaces(type);
-        }
-
-        for (JavaType type : right.getGenericTypes()) {
-            if (!Arrays.asList(left.getGenericTypes()).contains(type)) {
-                builder = builder.addToGenericTypes(type);
+    /**
+     * Convert a {@link Collection} of {@link javax.lang.model.element.ExecutableElement}s to a {@link java.util.Set} of {@link io.sundr.codegen.model.JavaClazz}es.
+     *
+     * @param context           The context of the operation.
+     * @param elements          The target elements.
+     * @return                  A set of {@link io.sundr.codegen.model.JavaClazz} that describes the interfaces.
+     */
+    public static Set<JavaClazz> executablesToInterfaces(DslProcessorContext context, Collection<ExecutableElement> elements) {
+        Map<String, JavaClazz> byName = new LinkedHashMap<>();
+        for (ExecutableElement current : elements) {
+            JavaClazz clazz = executableToInterface(context, current);
+            String name = clazz.getType().getFullyQualifiedName();
+            if (byName.containsKey(name)) {
+                JavaClazz other = byName.remove(name);
+                byName.put(name, Merge.CLASSES.apply(new JavaClazz[]{other, clazz}));
+            } else {
+                byName.put(name, clazz);
             }
         }
-        return builder.build();
+        return new LinkedHashSet<>(byName.values());
     }
 
-    public static JavaClazz merge(JavaClazz left, JavaClazz right) {
-        JavaType mergedType = merge(left.getType(), right.getType());
-
-        JavaClazzBuilder builder = new JavaClazzBuilder(left).withType(mergedType);
-        for (JavaMethod constructor : right.getConstructors()) {
-            builder = builder.addToConstructors(constructor);
-        }
-
-        for (JavaMethod method : right.getMethods()) {
-            builder = builder.addToMethods(method);
-        }
-        for (JavaProperty property : right.getFields()) {
-            builder = builder.addToFields(property);
-        }
-        return builder.build();
-    }
 
 
     public static final Set<JavaType> getTerminatingTypes(JavaType type) {
@@ -171,23 +163,24 @@ public final class JavaTypeUtils {
         return result;
     }
 
-    public static final Set<JavaType> getRequiredGenerics(JavaType type) {
+    public static Set<JavaType> extractInterfaces(Set<JavaType> types) {
         Set<JavaType> result = new LinkedHashSet<>();
-        for (JavaType interfaceType : type.getInterfaces()) {
-            for (JavaType genericType : interfaceType.getGenericTypes()) {
-                if (isGeneric(genericType)) {
-                    result.add(genericType);
-                }
-            }
+        for (JavaType type : types) {
+            result.addAll(extractInterfaces(type));
         }
         return result;
     }
 
-    public static final String stripSuffix(String str) {
-        if (str.endsWith(INTERFACE_SUFFIX)) {
-            return str.substring(0, str.length() - INTERFACE_SUFFIX.length());
+    public static Set<JavaType> extractInterfaces(JavaType type) {
+        Set<JavaType> result = new LinkedHashSet<>();
+        if (type.getInterfaces().isEmpty()) {
+            result.add(type);
+        } else {
+            for (JavaType interfaceType : type.getInterfaces()) {
+                result.addAll(extractInterfaces(interfaceType));
+            }
         }
-        return str;
+        return result;
     }
 
     public static String toInterfaceName(String name) {
@@ -203,18 +196,6 @@ public final class JavaTypeUtils {
 
     public static boolean isTerminal(ExecutableElement executableElement) {
         return executableElement.getAnnotation(Terminal.class) != null;
-    }
-
-    public static boolean hasReturnType(JavaClazz clazz) {
-        return clazz.getType().getAttributes().containsKey(ORIGINAL_RETURN_TYPE)
-                && (clazz.getType().getAttributes().get(ORIGINAL_RETURN_TYPE) instanceof JavaType)
-                && !((JavaType) clazz.getType().getAttributes().get(ORIGINAL_RETURN_TYPE)).equals(TRANSPARENT);
-    }
-
-    public static boolean isComposite(JavaClazz clazz) {
-        return clazz.getType().getAttributes().containsKey(IS_COMPOSITE)
-                && (clazz.getType().getAttributes().get(IS_COMPOSITE) instanceof Boolean)
-                && !(Boolean) clazz.getType().getAttributes().get(IS_COMPOSITE);
     }
 
     public static boolean isEntryPoint(JavaClazz clazz) {

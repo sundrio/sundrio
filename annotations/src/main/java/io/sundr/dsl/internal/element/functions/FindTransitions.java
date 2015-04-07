@@ -14,12 +14,14 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.functions;
+package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.Terminal;
+import io.sundr.dsl.internal.element.functions.ToTransitionAnnotations;
+import io.sundr.dsl.internal.element.functions.ToTransitionClassName;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
