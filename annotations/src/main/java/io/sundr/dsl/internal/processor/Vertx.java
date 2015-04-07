@@ -14,18 +14,34 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.curator;
+package io.sundr.dsl.internal.processor;
 
-import io.sundr.dsl.annotations.AnnotationTransition;
-import io.sundr.dsl.annotations.Keyword;
+import io.sundr.codegen.utils.StringUtils;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Set;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.SOURCE)
-@Keyword
-public @interface ReconfigOption {
+public class Vertx<T> {
+
+    private final T item;
+    private final Set<Vertx<T>> transitions;
+
+    public Vertx(T item, Set<Vertx<T>> transitions) {
+        this.item = item;
+        this.transitions = transitions;
+    }
+
+    public T getItem() {
+        return item;
+    }
+
+    public Set<Vertx<T>> getTransitions() {
+        return transitions;
+    }
+
+    @Override
+    public String toString() {
+        return item + "[" +
+                  StringUtils.join(transitions, ",") +
+                "]";
+    }
 }

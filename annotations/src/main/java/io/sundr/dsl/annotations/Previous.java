@@ -14,18 +14,15 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.curator;
-
-import io.sundr.dsl.annotations.AnnotationTransition;
-import io.sundr.dsl.annotations.Keyword;
+package io.sundr.dsl.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-@Keyword
-public @interface ReconfigOption {
+public @interface Previous {
+
 }

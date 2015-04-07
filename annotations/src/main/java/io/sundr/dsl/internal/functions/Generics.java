@@ -83,7 +83,7 @@ public enum Generics implements Function<JavaType, JavaType> {
 
     
     static {
-        GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withClassName("V").build());
+        GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withClassName("V").addToAttributes(IS_GENERIC, true).build());
         GENERIC_MAPPINGS.put(TRANSPARENT, TRANSPARENT);
     }
 

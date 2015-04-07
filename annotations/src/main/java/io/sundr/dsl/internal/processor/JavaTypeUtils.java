@@ -26,6 +26,7 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.EntryPoint;
+import io.sundr.dsl.annotations.Previous;
 import io.sundr.dsl.annotations.TargetName;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.dsl.internal.functions.Generics;
@@ -50,6 +51,7 @@ import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSITIONS;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
+import static io.sundr.dsl.internal.Constants.USE_PREVIOUS_TRANSITIONS;
 import static io.sundr.dsl.internal.Constants.VOID;
 
 public final class JavaTypeUtils {
@@ -68,6 +70,7 @@ public final class JavaTypeUtils {
     public static JavaClazz executableToInterface(DslProcessorContext context, ExecutableElement executableElement) {
         //Do generate the interface
         String methodName = executableElement.getSimpleName().toString();
+        Boolean usePreviousTransitions = executableElement.getAnnotation(Previous.class) != null;
         Boolean isEntryPoint = executableElement.getAnnotation(EntryPoint.class) != null;
         Boolean isTerminal = executableElement.getAnnotation(Terminal.class) != null
                 || !isVoid(executableElement);
@@ -75,7 +78,7 @@ public final class JavaTypeUtils {
         Set<String> transitions = new LinkedHashSet<>();
         Set<String> keywords = new LinkedHashSet<>();
         for (AnnotationMirror annotationMirror : context.getToTransitionAnnotations().apply(executableElement)) {
-            transitions.add(context.getToTransitionClassName().apply(annotationMirror));
+            transitions.addAll(context.getToTransitionClassName().apply(annotationMirror));
         }
 
         for (AnnotationMirror annotationMirror : context.getToKeywordAnnotations().apply(executableElement)) {
@@ -113,6 +116,7 @@ public final class JavaTypeUtils {
                 .addToAttributes(IS_TERMINAL, isTerminal)
                 .addToAttributes(KEYWORDS, keywords)
                 .addToAttributes(TRANSITIONS, isTerminal ? Collections.emptySet() : transitions)
+                .addToAttributes(USE_PREVIOUS_TRANSITIONS, usePreviousTransitions)
                 .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<>(Arrays.asList(returnType)) : Collections.emptySet())
                 .addToAttributes(IS_COMPOSITE, false)
                 .addToAttributes(METHOD_NAME, methodName)
@@ -153,20 +157,6 @@ public final class JavaTypeUtils {
         return builder.build();
     }
 
-    public static final JavaClazz unwrapGenerics(JavaClazz clazz) {
-        if (clazz.getType().getGenericTypes().length == 0) {
-            return clazz;
-        } else if (clazz.getType().getGenericTypes().length == 1) {
-            Object originalType = clazz.getType().getAttributes().get(ORIGINAL_RETURN_TYPE);
-            if (originalType instanceof JavaType) {
-                JavaType unwrapped = new JavaTypeBuilder(clazz.getType()).withGenericTypes(new JavaType[]{(JavaType) originalType}).build();
-                return new JavaClazzBuilder(clazz).withType(unwrapped).build();
-            }
-            throw new IllegalStateException("Invalid original type");
-        } else {
-            throw new UnsupportedOperationException("Unwrapping types with multiple generic arguments is currently not supported");
-        }
-    }
 
     public static final Set<JavaType> getTerminatingTypes(JavaType type) {
         Set<JavaType> result = new LinkedHashSet<>();
@@ -243,5 +233,11 @@ public final class JavaTypeUtils {
         return type.getAttributes().containsKey(IS_GENERIC)
                 && (type.getAttributes().get(IS_GENERIC) instanceof Boolean)
                 && (Boolean) type.getAttributes().get(IS_GENERIC);
+    }
+
+    public static boolean usePreviousTransitions(JavaClazz clazz) {
+        return clazz.getType().getAttributes().containsKey(USE_PREVIOUS_TRANSITIONS)
+                && (clazz.getType().getAttributes().get(USE_PREVIOUS_TRANSITIONS) instanceof Boolean)
+                && (Boolean) clazz.getType().getAttributes().get(USE_PREVIOUS_TRANSITIONS);
     }
 }

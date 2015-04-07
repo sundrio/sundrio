@@ -27,6 +27,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Keyword
-@AnnotationTransition(ExistsOption.class)
 public @interface ExistsOption {
 }

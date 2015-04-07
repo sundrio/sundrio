@@ -17,32 +17,16 @@
 package io.sundr.examples.curator.impl;
 
 
-import io.sundr.examples.curator.CreateInterface;
-import io.sundr.examples.curator.ForPathInterface;
-import io.sundr.examples.curator.ForPathWithModeInterface;
+public class CreateInterfaceImpl  {
 
-public class CreateInterfaceImpl implements CreateInterface {
-
+    /*
     static {
         new CreateInterfaceImpl().createParentsIfNeeded().withMode(1).forPath("somePath");
         new CreateInterfaceImpl().withMode(1).forPath("somePath");
         new CreateInterfaceImpl().createParentsIfNeeded().forPath("somePath");
         new CreateInterfaceImpl().forPath("somePath");
     }
+    */
 
 
-    @Override
-    public ForPathWithModeInterface<String> createParentsIfNeeded() {
-        return null;
-    }
-
-    @Override
-    public String forPath(String path) {
-        return null;
-    }
-
-    @Override
-    public ForPathInterface<String> withMode(Integer mode) {
-        return null;
-    }
 }

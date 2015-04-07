@@ -16,42 +16,33 @@
 
 package io.sundr.examples.curator.impl;
 
-import io.sundr.examples.curator.ForPathForPathAndBytesInterface;
-import io.sundr.examples.curator.ForPathForPathAndBytesWatchableInterface;
+import io.sundr.examples.curator.PathAndBytesable;
 import io.sundr.examples.curator.SetDataInterface;
 
 public class SetDataInterfaceImpl implements SetDataInterface {
+    
     @Override
-    public ForPathForPathAndBytesWatchableInterface<String, Void> inBackground(Object context) {
-        return null;
+    public PathAndBytesable<Void> inBackground(boolean flag) {
+        return this;
     }
 
     @Override
-    public ForPathForPathAndBytesWatchableInterface<String, Void> inBackground() {
-        return null;
+    public PathAndBytesable<Void> inBackground(Object context) {
+        return this;
     }
 
     @Override
-    public ForPathForPathAndBytesWatchableInterface<String, Void> inBackground(boolean flag) {
-        return null;
+    public PathAndBytesable<Void> inBackground() {
+        return this;
     }
 
     @Override
-    public Void forPath(String path, byte data) {
-        return null;
-    }
-
-    @Override
-    public String forPath(String path) {
-        return null;
-    }
-
-    @Override
-    public ForPathForPathAndBytesInterface<String, Void> watched() {
+    public Void forPath(String path, byte bytes) {
         return null;
     }
 
 
+    /*
     static {
         new SetDataInterfaceImpl().forPath("somePath");
         new SetDataInterfaceImpl().forPath("somePath", (byte) 0);
@@ -61,7 +52,7 @@ public class SetDataInterfaceImpl implements SetDataInterface {
         new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 9);
         String s = new SetDataInterfaceImpl().inBackground().forPath("somePath");
     }
-
+*/
 
     
 }

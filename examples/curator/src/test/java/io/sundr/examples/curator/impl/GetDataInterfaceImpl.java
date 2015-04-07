@@ -16,24 +16,26 @@
 
 package io.sundr.examples.curator.impl;
 
-import io.sundr.examples.curator.ForPathInterface;
-import io.sundr.examples.curator.ForPathWatchableInterface;
+
+import io.sundr.examples.curator.BackgroundableToPathableInterfaceOrPathableInterface;
 import io.sundr.examples.curator.GetDataInterface;
+import io.sundr.examples.curator.Pathable;
 
-public  class GetDataInterfaceImpl implements GetDataInterface {
+public class GetDataInterfaceImpl implements GetDataInterface, BackgroundableToPathableInterfaceOrPathableInterface<String> {
+    
     @Override
-    public ForPathWatchableInterface<String> inBackground(Object context) {
-        return null;
+    public Pathable<String> inBackground(boolean flag) {
+        return this;
     }
 
     @Override
-    public ForPathWatchableInterface<String> inBackground() {
-        return null;
+    public Pathable<String> inBackground(Object context) {
+        return this;
     }
 
     @Override
-    public ForPathWatchableInterface<String> inBackground(boolean flag) {
-        return null;
+    public Pathable<String> inBackground() {
+        return this;
     }
 
     @Override
@@ -42,17 +44,16 @@ public  class GetDataInterfaceImpl implements GetDataInterface {
     }
 
     @Override
-    public ForPathInterface<String> watched() {
-        return null;
+    public BackgroundableToPathableInterfaceOrPathableInterface<String> watched() {
+        return this;
     }
 
 
     static {
         new GetDataInterfaceImpl().watched().forPath("somePath");
-        new GetDataInterfaceImpl().inBackground().watched().forPath("somePath");
+        new GetDataInterfaceImpl().inBackground().forPath("somePath");
         new GetDataInterfaceImpl().forPath("somePath");
         new GetDataInterfaceImpl().inBackground().forPath("somePath");
+        new GetDataInterfaceImpl().inBackground().forPath("somePath");
     }
-
-
 }

@@ -21,6 +21,7 @@ import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.TargetName;
@@ -42,7 +43,8 @@ import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
 import static io.sundr.dsl.internal.Constants.TRANSITIONS;
 import static io.sundr.dsl.internal.processor.DslUtils.createGenericInterfaces;
-import static io.sundr.dsl.internal.processor.DslUtils.createTransitionInterface;
+import static io.sundr.dsl.internal.processor.DslUtils.createRootInterface;
+import static io.sundr.dsl.internal.processor.JavaTypeUtils.*;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {
@@ -74,13 +76,12 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     //2nd step create dependency graph.
                     Set<JavaMethod> methods = new LinkedHashSet<>();
-                    Set<Node<JavaClazz>> graph = createGraph(genericInterfaces);
-                    for (Node<JavaClazz> node : graph) {
-                        JavaClazz current = node.getItem();
+                    Set<Vertx<JavaClazz>> graph = createGraph(genericInterfaces);
+                    for (Vertx<JavaClazz> root : graph) {
+                        JavaClazz current = root.getItem();
                         methods.add(new JavaMethodBuilder().withName((String) current.getType().getAttributes().get(METHOD_NAME))
                                 .withReturnType(current.getType()).build());
-
-                        interfacesToGenerate.addAll(createTransitionInterface(context, current, node.getTransitions()));
+                        interfacesToGenerate.add(createRootInterface(root, interfacesToGenerate));
                     }
 
                     //Do generate the DSL interface
@@ -106,13 +107,26 @@ public class DslProcessor extends JavaGeneratingProcessor {
     }
 
 
-    private Set<Node<JavaClazz>> createGraph(Set<JavaClazz> clazzes) {
-        Set<Node<JavaClazz>> nodes = new LinkedHashSet<>();
+    private Set<Vertx<JavaClazz>> createGraph(Set<JavaClazz> clazzes) {
+        Set<Vertx<JavaClazz>> nodes = new LinkedHashSet<>();
         for (JavaClazz clazz : clazzes) {
             if (JavaTypeUtils.isEntryPoint(clazz)) {
-                Set<JavaClazz> next = new LinkedHashSet<>();
-                Set<String> transitions = (Set<String>) clazz.getType().getAttributes().get(TRANSITIONS);
-                for (JavaClazz candidate : clazzes) {
+                nodes.add(createGraph(clazz, new LinkedHashSet<String>(), clazzes, new LinkedHashSet<JavaType>()));
+
+            }
+        }
+        return nodes;
+    }
+
+    private Vertx<JavaClazz> createGraph(JavaClazz root, Set<String> previous, Set<JavaClazz> all, Set<JavaType> visited) {
+        Boolean usePrevious = usePreviousTransitions(root);
+        Set<JavaClazz> next = new LinkedHashSet<>();
+        Set<JavaType> visitedPath = new LinkedHashSet<>(visited);
+        Set<String> transitions = usePrevious ? previous : (Set<String>) root.getType().getAttributes().get(TRANSITIONS);
+        
+        if (!isTerminal(root)) {
+            for (JavaClazz candidate : exclusion(all, visited)) {
+                if (!isEntryPoint(candidate)) {
                     Set<String> keywords = (Set<String>) candidate.getType().getAttributes().get(KEYWORDS);
                     for (String keyword : keywords) {
                         if (transitions.contains(keyword)) {
@@ -120,10 +134,32 @@ public class DslProcessor extends JavaGeneratingProcessor {
                         }
                     }
                 }
-                next.remove(clazz);
-                nodes.add(new Node(clazz, next));
+            }
+            next.remove(root);
+            visitedPath.add(root.getType());
+        }
+        
+        Set<Vertx<JavaClazz>> nextVertices = new LinkedHashSet<>();
+        Set<JavaType> levelInterfaces = new LinkedHashSet<>();
+        levelInterfaces.addAll(visitedPath);
+        
+        for (JavaClazz c : next) {
+            Vertx<JavaClazz> subGraph = createGraph(c, usePrevious ? previous : transitions, all, levelInterfaces);
+            levelInterfaces.add(subGraph.getItem().getType());
+            levelInterfaces.addAll(subGraph.getItem().getType().getInterfaces());
+            nextVertices.add(subGraph);
+        }
+        return new Vertx<>(root, nextVertices);
+    }
+
+    private  Set<JavaClazz> exclusion(Set<JavaClazz> one, Set<JavaType> excluded) {
+        Set<JavaClazz> result = new LinkedHashSet<>();
+        for (JavaClazz item : one) {
+            if (!excluded.contains(item.getType()) || isTerminal(item)) {
+                result.add(item);
             }
         }
-        return nodes;
+        return result;
     }
+
 }

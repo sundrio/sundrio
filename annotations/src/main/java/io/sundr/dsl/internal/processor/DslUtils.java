@@ -18,14 +18,15 @@ package io.sundr.dsl.internal.processor;
 
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.dsl.internal.functions.Combine;
+import io.sundr.codegen.model.JavaMethod;
+import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.dsl.internal.functions.Combination;
 import io.sundr.dsl.internal.functions.Generics;
+import io.sundr.dsl.internal.functions.Transition;
 
 import javax.lang.model.element.ExecutableElement;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -55,37 +56,48 @@ public final class DslUtils {
         return new LinkedHashSet<>(byName.values());
     }
 
-
-    static Set<JavaClazz> createTransitionInterface(DslProcessorContext context, JavaClazz current, Set<JavaClazz> next) {
-        Set<JavaClazz> result = new LinkedHashSet<>();
-        String interfaceName = current.getType().getClassName();
-        Map<String, JavaClazz> nextInterfacesByName = new LinkedHashMap<>();
-        Set<JavaClazz> nextInterfaces = new LinkedHashSet<>();
-
-        for (JavaClazz clazz : next) {
-            String name = clazz.getType().getFullyQualifiedName();
-            if (nextInterfacesByName.containsKey(name)) {
-                JavaClazz other = nextInterfacesByName.remove(name);
-                nextInterfacesByName.put(name, merge(other, clazz));
-            } else {
-                nextInterfacesByName.put(name, clazz);
-            }
+    static JavaClazz createRootInterface(Vertx<JavaClazz> current, Set<JavaClazz> intermediate) {
+        JavaClazz rootInterface = null;
+        Set<JavaType> interfaces = new LinkedHashSet<>();
+        for (Vertx<JavaClazz> child : current.getTransitions()) {
+            JavaClazz transitionInterface = createTransitionInterface(child, intermediate);
+            interfaces.add(transitionInterface.getType());
+            intermediate.add(transitionInterface);
+            intermediate.add(child.getItem());
         }
-        nextInterfaces.addAll(nextInterfacesByName.values());
-        Combine combine = new Combine(result);
-        JavaClazz dependencyInterface = combine.apply(nextInterfaces);
-
-        JavaClazz entryInterface = new JavaClazzBuilder()
-                .addType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(dependencyInterface.getType().getPackageName())
-                .withClassName(interfaceName)
-                .addToInterfaces(Generics.UNWRAP.apply(dependencyInterface.getType()))
-                .endType()
+        JavaType rootType = new JavaTypeBuilder(current.getItem().getType())
+                .withInterfaces(interfaces)
+                .withGenericTypes(new JavaType[]{})
                 .build();
-
-        result.add(entryInterface);
-        result.add(dependencyInterface);
-        return result;
+        return new JavaClazzBuilder(current.getItem())
+                .withType(Generics.UNWRAP.apply(rootType))
+                .withMethods(new LinkedHashSet<JavaMethod>())
+                .build();
     }
+    
+    static JavaClazz createTransitionInterface(Vertx<JavaClazz> current, Set<JavaClazz> intermediate) {
+        if (current.getTransitions().isEmpty()) {
+            return current.getItem();
+        } else if (current.getTransitions().size() == 1) {
+            Vertx next = current.getTransitions().iterator().next();
+            JavaClazz clazz = current.getItem();
+            JavaClazz nextClazz = createTransitionInterface(next, intermediate);
+            JavaClazz transition = Transition.create(clazz, nextClazz);
+            intermediate.add(transition);
+            intermediate.add(nextClazz);
+            return transition;
+        } else {
+            JavaClazz clazz = current.getItem();
+            Set<JavaClazz> toCombine = new LinkedHashSet<>();
+
+            for (Vertx<JavaClazz> v : current.getTransitions()) {
+                toCombine.add(createTransitionInterface(v, intermediate));
+            }
+            JavaClazz combined = Combination.create(toCombine);
+            intermediate.addAll(toCombine);
+            intermediate.add(combined);
+            return Transition.create(clazz, combined);
+        }
+    }
+    
 }

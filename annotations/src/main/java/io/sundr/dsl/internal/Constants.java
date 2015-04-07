@@ -28,6 +28,7 @@ public final class Constants {
     public static final String IS_TERMINAL = "IS_TERMINAL";
     public static final String IS_GENERIC = "IS_GENERIC";
     public static final String KEYWORDS = "KEYWORDS";
+    public static final String USE_PREVIOUS_TRANSITIONS = "USE_PREVIOUS_TRANSITIONS";
     public static final String TRANSITIONS = "TRANSITIONS";
     public static final String IS_COMPOSITE = "IS_COMPOSITE";
     public static final String COMBINATION_OF = "COMBINATION_OF";

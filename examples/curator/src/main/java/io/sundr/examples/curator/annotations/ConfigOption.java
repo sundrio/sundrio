@@ -14,25 +14,17 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor;
+package io.sundr.examples.curator.annotations;
 
-import java.util.Set;
+import io.sundr.dsl.annotations.Keyword;
 
-public class Node<T> {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    private final T item;
-    private final Set<T> transitions;
-
-    public Node(T item, Set<T> transitions) {
-        this.item = item;
-        this.transitions = transitions;
-    }
-
-    public T getItem() {
-        return item;
-    }
-
-    public Set<T> getTransitions() {
-        return transitions;
-    }
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.SOURCE)
+@Keyword
+public @interface ConfigOption {
 }

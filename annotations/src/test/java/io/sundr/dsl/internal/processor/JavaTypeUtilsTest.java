@@ -22,7 +22,7 @@ import com.sun.tools.javac.util.Context;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
-import io.sundr.dsl.internal.functions.Combine;
+import io.sundr.dsl.internal.functions.Combination;
 import io.sundr.dsl.internal.functions.Generics;
 import io.sundr.dsl.internal.processor.matchers.TypeNamed;
 import org.junit.Assert;
@@ -33,14 +33,11 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
-import static io.sundr.dsl.internal.Constants.VOID;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.executableToInterface;
 import static io.sundr.dsl.internal.processor.JavaTypeUtils.isVoid;
 import static io.sundr.dsl.internal.processor.matchers.TypeNamed.typeNamed;
@@ -95,7 +92,7 @@ public class JavaTypeUtilsTest {
         ExecutableElement terminal = !isVoid(methods.get(0)) ? methods.get(0) : methods.get(1);
         JavaClazz simpleClazz = JavaTypeUtils.executableToInterface(dslContext, simple);
         JavaClazz teminalClazz = JavaTypeUtils.executableToInterface(dslContext, terminal);
-        JavaClazz combined = Combine.combineTwo(simpleClazz, teminalClazz);
+        JavaClazz combined = Combination.create(simpleClazz, teminalClazz);
         Assert.assertNotNull(combined);
 
         String T = Generics.MAP.apply(TRANSPARENT).getClassName();
@@ -118,7 +115,7 @@ public class JavaTypeUtilsTest {
         ExecutableElement right = !isVoid(methods.get(0)) ? methods.get(0) : methods.get(1);
         JavaClazz leftClazz = executableToInterface(dslContext, left);
         JavaClazz rightClazz = executableToInterface(dslContext, right);
-        JavaClazz combined = Combine.combineTwo(leftClazz, rightClazz);
+        JavaClazz combined = Combination.create(leftClazz, rightClazz);
         Assert.assertNotNull(combined);
 
         assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
@@ -140,7 +137,7 @@ public class JavaTypeUtilsTest {
         ExecutableElement right = methods.get(1);
         JavaClazz leftClazz = executableToInterface(dslContext, left);
         JavaClazz rightClazz = executableToInterface(dslContext, right);
-        JavaClazz combined = Combine.combineTwo(leftClazz, rightClazz);
+        JavaClazz combined = Combination.create(leftClazz, rightClazz);
         Assert.assertNotNull(combined);
 
         assertThat(combined.getType().getClassName(), equalTo("MethodAMethodBInterface"));
@@ -151,19 +148,6 @@ public class JavaTypeUtilsTest {
         assertThat(combined.getType().getInterfaces(), hasItem(TypeNamed.typeNamed("MethodBInterface<T>")));
         assertEquals(combined.getType().getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT);
         assertTrue((Boolean) combined.getType().getAttributes().get(IS_TERMINAL));
-    }
-
-    @Test
-    public void testCombineMoreMethods() throws Exception {
-        TypeElement typeElement = elements.getTypeElement(MoreMethods.class.getCanonicalName());
-        Set<JavaClazz> clazzes = new LinkedHashSet<>();
-        List<ExecutableElement> methods = ElementFilter.methodsIn(typeElement.getEnclosedElements());
-        for (ExecutableElement element : methods) {
-            clazzes.add(executableToInterface(dslContext, element));
-        }
-        Set<JavaClazz> result = new LinkedHashSet<>();
-        result.add(new Combine(result).apply(clazzes));
-        assertThat(result.size(), is(3));
     }
 
 }

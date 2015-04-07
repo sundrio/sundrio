@@ -60,7 +60,9 @@ public class FindTransitions implements Function<ExecutableElement, Set<Executab
         } else if (!annotationTransition.isEmpty()) {
             for (AnnotationMirror transition : annotationTransition) {
                 if (whiteList.isEmpty() || whiteList.contains(transition )) {
-                    result.addAll(findMethodsAnnotatedWithClassName(classElement, TO_TRANSITION_CLASSNAME.apply(transition)));
+                    for (String className : TO_TRANSITION_CLASSNAME.apply(transition)) {
+                        result.addAll(findMethodsAnnotatedWithClassName(classElement, className));
+                    }
                 }
             }
         } else {

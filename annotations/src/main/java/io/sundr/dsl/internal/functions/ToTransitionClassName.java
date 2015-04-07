@@ -23,8 +23,10 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ToTransitionClassName implements Function<AnnotationMirror, String> {
+public class ToTransitionClassName implements Function<AnnotationMirror, List<String>> {
 
     private final TypeElement ANNOTATED_TRANSITION;
     private final Element ANNOTATION_VALUE;
@@ -34,10 +36,30 @@ public class ToTransitionClassName implements Function<AnnotationMirror, String>
         ANNOTATION_VALUE = ANNOTATED_TRANSITION.getEnclosedElements().get(0);
     }
 
-    public String apply(AnnotationMirror annotationMirror) {
+    public List<String> apply(AnnotationMirror annotationMirror) {
+        List<String> classNames = new ArrayList<>();
         if (annotationMirror.getAnnotationType().asElement().equals(ANNOTATED_TRANSITION)) {
-            return String.valueOf(annotationMirror.getElementValues().get(ANNOTATION_VALUE).getValue());
+            Object value = annotationMirror.getElementValues().get(ANNOTATION_VALUE).getValue();
+            if (value instanceof String) {
+                classNames.add(removeSuffix((String) value));
+            } else if (value instanceof List) {
+                List list = (List) value;
+                for (Object item : list) {
+                    String str = String.valueOf(item);
+                    classNames.add(removeSuffix(str));
+                }
+            }
+            return classNames;
         }
         return null;
+    }
+
+    private static String removeSuffix(String str) {
+        if (str.endsWith(".class")) {
+            return str.substring(0, str.length() - 6);
+        } else {
+            return str;
+        }
+
     }
 }
