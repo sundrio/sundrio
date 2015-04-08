@@ -21,11 +21,16 @@ import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
+import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
+import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
@@ -74,16 +79,60 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     }, BUILDER {
         @Override
         public JavaClazz apply(JavaClazz item) {
+            JavaType builderType = TypeAs.BUILDER.apply(item.getType());
+            JavaType fluent = TypeAs.GENERIC_FLUENT.apply(item.getType());
+            Set<JavaMethod> constructors = new LinkedHashSet<>();
+            Set<JavaMethod> methods = new LinkedHashSet<>();
+            Set<JavaProperty> fields = new LinkedHashSet<>();
+            
+            JavaProperty fluentProperty = new JavaPropertyBuilder().withType(fluent).withName("fluent").build();
+            fields.add(fluentProperty);
+            
+            JavaMethod emptyConstructor = new JavaMethodBuilder()
+                    .withReturnType(builderType)
+                    .addToAttributes(BODY, "this.fluent = this;")
+                    .build();
+            JavaMethod fluentConstructor = new JavaMethodBuilder()
+                    .withReturnType(builderType)
+                    .addArguments()
+                    .withType(fluent)
+                    .withName("fluent")
+                    .and()
+                    .addToAttributes(BODY, "this.fluent = fluent;")
+                    .build();
+
+            JavaMethod instanceConstructor = new JavaMethodBuilder()
+                    .withReturnType(builderType)
+                    .addArguments()
+                    .withType(item.getType())
+                    .withName("instance").and()
+                    .addToAttributes(BODY, toInstanceConstructorBody(item))
+                    .build();
+
+            constructors.add(emptyConstructor);
+            constructors.add(fluentConstructor);
+            constructors.add(instanceConstructor);
+
+            JavaMethod build = new JavaMethodBuilder()
+                    .withReturnType(item.getType())
+                    .withName("build")
+                    .addToAttributes(BODY, toBuild(item))
+                    .build();
+
+            methods.add(build);
+
             return new JavaClazzBuilder(item)
-                    .withType(TypeAs.BUILDER.apply(item.getType()))
-                    .addToAttributes(BUILDS, item.getType())
+                    .withType(builderType)
+                    .withFields(fields)
+                    .withConstructors(constructors)
+                    .withMethods(methods)
                     .build();
         }
 
     };
 
+    static final String BODY = "BODY";
     private static final String BUILDABLE = "BUILDABLE";
-    private static final String BUILDS = "BUILDS";
 
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
         return new JavaPropertyBuilder(property)
@@ -91,6 +140,31 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 .withType(TypeAs.ARRAY_AS_LIST.apply(property.getType()))
                 .addToAttributes(BUILDABLE, buildable)
                 .build();
+    }
+
+    private static String toInstanceConstructorBody(JavaClazz clazz) {
+        JavaMethod constructor = clazz.getConstructors().iterator().next();
+        StringBuilder sb = new StringBuilder();
+        sb.append("this(); ");
+        for (JavaProperty property : constructor.getArguments()) {
+            sb.append("with").append(property.getNameCapitalized()).append("(instance.").append(property.getGetter()).append("()); ");
+        }
+        return sb.toString();
+    }
+
+    private static String toBuild(JavaClazz clazz) {
+        JavaMethod constructor = clazz.getConstructors().iterator().next();
+        StringBuilder sb = new StringBuilder();
+        sb.append("return new ").append(clazz.getType().getSimpleName()).append("(");
+        sb.append(StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
+            @Override
+            public String apply(JavaProperty item) {
+                return "fluent." + item.getGetter() + "()";
+            }
+        }, ","));
+
+        sb.append(");\n");
+        return sb.toString();
     }
 
     /**

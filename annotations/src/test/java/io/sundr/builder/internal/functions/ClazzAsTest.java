@@ -34,6 +34,7 @@ public class ClazzAsTest {
                 .addType()
                     .withClassName("MyClass")
                     .withPackageName(getClass().getPackage().getName())
+                    .withGenericTypes(new JavaType[]{})
                 .endType().build();
         
         JavaClazz result = ClazzAs.FLUENT.apply(clazz);

@@ -161,7 +161,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
     }, AND {
         @Override
         public JavaMethod apply(JavaProperty property) {
-            String builderName = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()).getClassName() + "Builder";
+            String builderName = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()).getSimpleName("Builder");
             String prefix = property.getType().isCollection() ? "addTo" : "with";
             String withMethodName = prefix + captializeFirst(property.getName());
             return new JavaMethodBuilder()

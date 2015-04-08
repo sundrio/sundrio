@@ -39,7 +39,12 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         @Override
         public JavaType apply(JavaType item) {
             JavaType fluent = SHALLOW_FLUENT.apply(item);
+            List<JavaType> generics = new ArrayList<>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
             JavaType generic = typeExtends(T, fluent);
+            generics.add(generic);
 
             JavaType superClass = isBuildable(item.getSuperClass()) ?
                     SHALLOW_FLUENT.apply(item.getSuperClass()) :
@@ -48,7 +53,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
                     .withPackageName(item.getPackageName())
-                    .withGenericTypes(new JavaType[]{generic})
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClass)
                     .withInterfaces(new HashSet(Arrays.asList(FLUENT_INTEFACE)))
                     .build();
@@ -57,21 +62,45 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     },
     SHALLOW_FLUENT {
         public JavaType apply(JavaType item) {
+            List<JavaType> generics = new ArrayList<>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
+            generics.add(T);
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
-                    .withGenericTypes(new JavaType[]{T})
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .build();
+        }
+    },
+    GENERIC_FLUENT {
+        public JavaType apply(JavaType item) {
+            List<JavaType> generics = new ArrayList<>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
+            generics.add(Q);
+            return new JavaTypeBuilder(item)
+                    .withClassName(item.getClassName() + "Fluent")
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .build();
         }
     },
     BUILDER {
         @Override
         public JavaType apply(JavaType item) {
+            List<JavaType> generics = new ArrayList<>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
             JavaType builder = SHALLOW_BUILDER.apply(item);
-            JavaType fluent = typeGenericOf(SHALLOW_FLUENT.apply(item), builder);
+            generics.add(builder);
+            JavaType fluent = typeGenericOf(SHALLOW_FLUENT.apply(item), generics.toArray(new JavaType[generics.size()]));
+            generics.remove(builder);
 
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Builder")
-                    .withGenericTypes(new JavaType[]{})
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(fluent)
                     .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BUILDER_INTERFACE, item))))
                     .build();
@@ -81,8 +110,13 @@ public enum TypeAs implements Function<JavaType, JavaType> {
 
     SHALLOW_BUILDER {
         public JavaType apply(JavaType item) {
+            List<JavaType> generics = new ArrayList<>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Builder")
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .build();
         }
 
@@ -100,10 +134,10 @@ public enum TypeAs implements Function<JavaType, JavaType> {
 
     },
     ARRAY_AS_LIST {
-      public JavaType apply(JavaType item) {
-          return LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item));
+        public JavaType apply(JavaType item) {
+            return LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item));
 
-      }
+        }
     },
     ARRAY_LIST_OF {
         public JavaType apply(JavaType item) {
@@ -128,6 +162,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
 
     private static final String BUILDABLE = "BUILDABLE";
     private static final JavaType T = newGeneric("T");
+    private static final JavaType Q = newGeneric("?");
     private static final JavaType FLUENT_INTEFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     private static final JavaType BUILDER_INTERFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
     private static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);

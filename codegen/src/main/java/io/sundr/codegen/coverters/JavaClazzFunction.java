@@ -26,9 +26,13 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.sundr.codegen.utils.ModelUtils.getClassName;
 import static io.sundr.codegen.utils.ModelUtils.getPackageName;
@@ -50,10 +54,16 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
         //Check SuperClass
         TypeMirror superClass = classElement.getSuperclass();
         JavaType superClassType = toJavaType.apply(superClass.toString());
+        List<JavaType> genericTypes = new ArrayList<>();
+        for (TypeParameterElement typeParameter: classElement.getTypeParameters()) {
+            JavaType genericType = toJavaType.apply(typeParameter.toString());
+            genericTypes.add(genericType);
+        }
         JavaClazzBuilder builder = new JavaClazzBuilder()
                 .withType(new JavaTypeBuilder()
                         .withPackageName(getPackageName(classElement))
                         .withClassName(getClassName(classElement))
+                        .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()]))
                         .withSuperClass(superClassType)
                         .build());
 
