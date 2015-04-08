@@ -16,6 +16,7 @@
 
 package io.sundr.dsl.internal.utils;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
@@ -24,6 +25,7 @@ import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.EntryPoint;
+import io.sundr.dsl.annotations.Multiple;
 import io.sundr.dsl.annotations.Previous;
 import io.sundr.dsl.annotations.TargetName;
 import io.sundr.dsl.annotations.Terminal;
@@ -49,6 +51,7 @@ import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
+import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSITIONS;
@@ -72,6 +75,7 @@ public final class JavaTypeUtils {
     public static JavaClazz executableToInterface(DslProcessorContext context, ExecutableElement executableElement) {
         //Do generate the interface
         String methodName = executableElement.getSimpleName().toString();
+        Boolean multiple = executableElement.getAnnotation(Multiple.class) != null;
         Boolean usePreviousTransitions = executableElement.getAnnotation(Previous.class) != null;
         Boolean isEntryPoint = executableElement.getAnnotation(EntryPoint.class) != null;
         Boolean isTerminal = executableElement.getAnnotation(Terminal.class) != null
@@ -117,6 +121,7 @@ public final class JavaTypeUtils {
                 .addToAttributes(IS_TERMINAL, isTerminal)
                 .addToAttributes(KEYWORDS, keywords)
                 .addToAttributes(TRANSITIONS, isTerminal ? Collections.emptySet() : transitions)
+                .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                 .addToAttributes(USE_PREVIOUS_TRANSITIONS, usePreviousTransitions)
                 .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<>(Arrays.asList(returnType)) : Collections.emptySet())
                 .addToAttributes(METHOD_NAME, methodName)
@@ -208,6 +213,12 @@ public final class JavaTypeUtils {
         return clazz.getType().getAttributes().containsKey(IS_TERMINAL)
                 && (clazz.getType().getAttributes().get(IS_TERMINAL) instanceof Boolean)
                 && (Boolean) clazz.getType().getAttributes().get(IS_TERMINAL);
+    }
+
+    public static boolean isCardinalityMultiple(JavaClazz clazz) {
+        return clazz.getType().getAttributes().containsKey(CARDINALITY_MULTIPLE)
+                && (clazz.getType().getAttributes().get(CARDINALITY_MULTIPLE) instanceof Boolean)
+                && (Boolean) clazz.getType().getAttributes().get(CARDINALITY_MULTIPLE);
     }
 
     public static boolean isGeneric(JavaType type) {

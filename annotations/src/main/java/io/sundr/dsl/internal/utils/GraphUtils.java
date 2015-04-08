@@ -25,7 +25,9 @@ import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.TRANSITIONS;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
 
 public final class GraphUtils {
 
@@ -36,7 +38,7 @@ public final class GraphUtils {
     public static Set<Node<JavaClazz>> createGraph(Set<JavaClazz> clazzes) {
         Set<Node<JavaClazz>> nodes = new LinkedHashSet<>();
         for (JavaClazz clazz : clazzes) {
-            if (JavaTypeUtils.isEntryPoint(clazz)) {
+            if (isEntryPoint(clazz)) {
                 nodes.add(createGraph(clazz, new LinkedHashSet<String>(), clazzes, new LinkedHashSet<JavaType>()));
 
             }
@@ -81,7 +83,7 @@ public final class GraphUtils {
     private static Set<JavaClazz> exclusion(Set<JavaClazz> one, Set<JavaType> excluded) {
         Set<JavaClazz> result = new LinkedHashSet<>();
         for (JavaClazz item : one) {
-            if (!excluded.contains(item.getType()) || JavaTypeUtils.isTerminal(item)) {
+            if (!excluded.contains(item.getType()) || isTerminal(item) || isCardinalityMultiple(item)) {
                 result.add(item);
             }
         }

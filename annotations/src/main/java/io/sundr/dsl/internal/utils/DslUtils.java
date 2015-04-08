@@ -25,6 +25,7 @@ import io.sundr.dsl.internal.processor.Node;
 import io.sundr.dsl.internal.type.functions.Combine;
 import io.sundr.dsl.internal.type.functions.Generics;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -61,7 +62,6 @@ public final class DslUtils {
             JavaClazz clazz = current.getItem();
             JavaClazz nextClazz = createTransitionInterface(next, intermediate);
             JavaClazz transition = transition(clazz, nextClazz);
-            //intermediate.add(transition);
             intermediate.add(nextClazz);
             return transition;
         } else {
@@ -73,8 +73,14 @@ public final class DslUtils {
             }
             JavaClazz combined = Combine.FUNCTION.apply(toCombine);
             intermediate.addAll(toCombine);
-            intermediate.add(combined);
-            return transition(clazz, combined);
+            
+            if (JavaTypeUtils.isCardinalityMultiple(clazz)) {
+                JavaClazz selfRef = transition(clazz, combined);
+                return transition(clazz, Combine.FUNCTION.apply(Arrays.asList(combined, selfRef)));
+            } else {
+                intermediate.add(combined);
+                return transition(clazz, combined);
+            }
         }
     }
 

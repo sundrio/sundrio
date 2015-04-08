@@ -59,7 +59,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 }
 
                 if (isBuildable(property)) {
-                    methods.add(ToMethod.ADD_NESTED.apply(property));
+                    methods.add(ToMethod.WITH_NEW_NESTED.apply(property));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(property));
                 }
             }

@@ -40,6 +40,14 @@ public final class StringUtils {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    public static String singularize(String str) {
+        //TODO: Apparently this needs a lot of work.
+        if (str.endsWith("s") && str.length() > 1) {
+            return str.substring(0, str.length() - 1);
+        }
+        return str;
+    }
+
     public static <T> String join(Iterable<T> items, String delimiter) {
         return join(items, new ToString<T>(), delimiter);
     }

@@ -25,6 +25,7 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.singularize;
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 
 public enum ToMethod implements Function<JavaProperty, JavaMethod> {
@@ -143,15 +144,16 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .addToAttributes(BODY, "this." + property.getName() + ".put(key, value); return (T)this;")
                     .build();
         }
-    }, ADD_NESTED {
+    }, WITH_NEW_NESTED {
         @Override
         public JavaMethod apply(JavaProperty property) {
             //We need to repackage because we are nesting under this class.
             JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
+            String prefix = property.getType().isCollection() ? "addNew" : "withNew";
             return new JavaMethodBuilder()
                     .withReturnType(rewraped)
-                    .withName("add" + captializeFirst(property.getName()))
+                    .withName(prefix + captializeFirst(singularize(property.getName())))
                     .addToAttributes(BODY, "return new " + rewraped.getSimpleName() + "();")
                     .build();
 
@@ -174,7 +176,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             return new JavaMethodBuilder()
                     .withReturnType(N)
-                    .withName("end" + captializeFirst(property.getName()))
+                    .withName("end" + captializeFirst(singularize(property.getName())))
                     .addToAttributes(BODY, "return and();")
                     .build();
 
