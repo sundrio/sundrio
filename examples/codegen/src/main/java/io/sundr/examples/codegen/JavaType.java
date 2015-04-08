@@ -67,8 +67,17 @@ public class JavaType extends AttributeSupport implements Type {
      * @return
      */
     public String getSimpleName() {
+        return getSimpleName("");
+    }
+
+    /**
+     * Returns the simple name of the type.
+     * @return
+     */
+    public String getSimpleName(String suffix) {
         StringBuilder sb = new StringBuilder();
         sb.append(className);
+        sb.append(suffix);
         if (genericTypes.length > 0) {
             sb.append("<");
             for (int i = 0; i < genericTypes.length; i++) {

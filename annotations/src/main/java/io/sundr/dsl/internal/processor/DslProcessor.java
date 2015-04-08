@@ -83,10 +83,11 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     }
 
                     //Do generate the DSL interface
-                    interfacesToGenerate.add(new JavaClazzBuilder().addType()
-                            .withPackageName(ModelUtils.getPackageElement(element).toString())
-                            .withClassName(targetInterface)
-                            .withKind(JavaKind.INTERFACE)
+                    interfacesToGenerate.add(new JavaClazzBuilder()
+                            .withNewType()
+                                .withPackageName(ModelUtils.getPackageElement(element).toString())
+                                .withClassName(targetInterface)
+                                .withKind(JavaKind.INTERFACE)
                             .and()
                             .withMethods(methods)
                             .build());

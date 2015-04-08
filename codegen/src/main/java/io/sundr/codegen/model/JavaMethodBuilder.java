@@ -20,16 +20,16 @@ import io.sundr.builder.Builder;
 
 public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> implements Builder<JavaMethod> {
 
-    private final JavaMethodFluent fluent;
-    
+    private final JavaMethodFluent<?> fluent;
+
     public JavaMethodBuilder() {
         this.fluent = this;
     }
 
-    public JavaMethodBuilder(JavaMethodFluent fluent) {
+    public JavaMethodBuilder(JavaMethodFluent<?> fluent) {
         this.fluent = fluent;
     }
-    
+
     public JavaMethodBuilder(JavaMethod instance) {
         this();
         withName(instance.getName());
@@ -38,8 +38,12 @@ public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> imple
         withExceptions(instance.getExceptions());
         withAttributes(instance.getAttributes());
     }
-    
+
     public JavaMethod build() {
-       return new JavaMethod( fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes() );
+        return new JavaMethod(fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes());
+
     }
+
+
 }
+    

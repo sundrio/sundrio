@@ -80,16 +80,16 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
         String className = classNameOf(interfaces);
 
         return new JavaClazzBuilder()
-                .addType()
-                .withKind(JavaKind.INTERFACE)
-                .withClassName(className)
-                .withPackageName(interfaces.iterator().next().getPackageName())
-                .withInterfaces(interfaces)
-                .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()]))
-                .addToAttributes(ORIGINAL_RETURN_TYPE, TRANSPARENT)
-                .addToAttributes(TERMINATING_TYPES, terminatingTypes)
-                .addToAttributes(IS_TERMINAL, false)
-                .addToAttributes(IS_COMPOSITE, false)
+                .withNewType()
+                    .withKind(JavaKind.INTERFACE)
+                    .withClassName(className)
+                    .withPackageName(interfaces.iterator().next().getPackageName())
+                    .withInterfaces(interfaces)
+                    .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()]))
+                    .addToAttributes(ORIGINAL_RETURN_TYPE, TRANSPARENT)
+                    .addToAttributes(TERMINATING_TYPES, terminatingTypes)
+                    .addToAttributes(IS_TERMINAL, false)
+                    .addToAttributes(IS_COMPOSITE, false)
                 .endType()
                 .build();
     }

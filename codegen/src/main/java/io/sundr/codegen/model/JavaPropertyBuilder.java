@@ -20,16 +20,16 @@ import io.sundr.builder.Builder;
 
 public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder> implements Builder<JavaProperty> {
 
-    private final JavaPropertyFluent fluent;
-    
+    private final JavaPropertyFluent<?> fluent;
+
     public JavaPropertyBuilder() {
         this.fluent = this;
     }
 
-    public JavaPropertyBuilder(JavaPropertyFluent fluent) {
+    public JavaPropertyBuilder(JavaPropertyFluent<?> fluent) {
         this.fluent = fluent;
     }
-    
+
     public JavaPropertyBuilder(JavaProperty instance) {
         this();
         withType(instance.getType());
@@ -37,8 +37,10 @@ public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder>
         withAttributes(instance.getAttributes());
         withArray(instance.isArray());
     }
-    
+
     public JavaProperty build() {
-       return new JavaProperty( fluent.getType(), fluent.getName(), fluent.getAttributes(), fluent.isArray() );
+        return new JavaProperty(fluent.getType(), fluent.getName(), fluent.getAttributes(), fluent.isArray());
+
     }
 }
+    

@@ -18,6 +18,7 @@ package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.Clazz;
+import io.sundr.codegen.functions.JavaClazzToReferences;
 
 import java.util.Collections;
 import java.util.Map;

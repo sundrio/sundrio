@@ -31,7 +31,7 @@ public class ClazzAsTest {
     public void testToFluent() {
 
         JavaClazz clazz = new JavaClazzBuilder()
-                .addType()
+                .withNewType()
                     .withClassName("MyClass")
                     .withPackageName(getClass().getPackage().getName())
                     .withGenericTypes(new JavaType[]{})

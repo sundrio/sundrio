@@ -33,20 +33,20 @@ public class BuilderGeneratorTest {
 
 
         JavaClazz javaClazz = new JavaClazzBuilder()
-                .addType()
+                .withNewType()
                     .withClassName("Circle")
                     .withPackageName("my.Test")
                     .endType()
-                .addConstructors()
-                    .addArguments()
+                .addNewConstructor()
+                    .addNewArgument()
                         .withName("w")
-                        .addType().withPackageName("java.lang").withClassName("Integer").endType()
-                        .endArguments()
-                    .addArguments()
+                        .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
+                        .endArgument()
+                    .addNewArgument()
                         .withName("w")
-                        .addType().withPackageName("java.lang").withClassName("Integer").endType()
-                        .endArguments()
-                    .endConstructors()
+                        .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
+                        .endArgument()
+                    .endConstructor()
                 .build();
 
         File tmp = new File("/tmp");

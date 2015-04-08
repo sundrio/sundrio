@@ -94,7 +94,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .build();
             JavaMethod fluentConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
-                    .addArguments()
+                    .addNewArgument()
                     .withType(fluent)
                     .withName("fluent")
                     .and()
@@ -103,7 +103,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             JavaMethod instanceConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
-                    .addArguments()
+                    .addNewArgument()
                     .withType(item.getType())
                     .withName("instance").and()
                     .addToAttributes(BODY, toInstanceConstructorBody(item))
