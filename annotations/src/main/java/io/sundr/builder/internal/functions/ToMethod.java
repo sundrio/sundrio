@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
@@ -162,15 +163,24 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             String builderName = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()).getSimpleName("Builder");
+            String classPrefix = getClassPrefix(property);
             String prefix = property.getType().isCollection() ? "addTo" : "with";
             String withMethodName = prefix + captializeFirst(property.getName());
             return new JavaMethodBuilder()
                     .withReturnType(N)
                     .withName("and")
-                    .addToAttributes(BODY, "return (N) " + withMethodName + "(new " + builderName + "(this).build());")
+                    .addToAttributes(BODY, "return (N) " + classPrefix + withMethodName + "(new " + builderName + "(this).build());")
                     .build();
 
         }
+        
+        private String getClassPrefix(JavaProperty property) {
+            Object memberOf = property.getAttributes().get(ClazzAs.MEMBER_OF);
+            if ( memberOf instanceof JavaType) {
+                return ((JavaType)memberOf).getClassName() +".this.";
+            } else return "";
+        }
+        
     }, END {
         @Override
         public JavaMethod apply(JavaProperty property) {

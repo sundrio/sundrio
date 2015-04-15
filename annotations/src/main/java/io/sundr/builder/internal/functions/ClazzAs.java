@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
@@ -28,8 +29,9 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
@@ -40,6 +42,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             Set<JavaClazz> nestedClazzes = new LinkedHashSet<>();
             Set<JavaProperty> properties = new LinkedHashSet<>();
 
+            JavaType fluentType = TypeAs.FLUENT.apply(item.getType());
             for (JavaProperty property : item.getFields()) {
                 boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
                 if (property.isArray()) {
@@ -55,21 +58,21 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             for (JavaProperty property : properties) {
                 if (property.getType().isCollection()) {
-                    if (property.getType().getClassName().contains("Set") || property.getType().getClassName().contains("List")) {
+                    if (isSet(property.getType()) || isList(property.getType())) {
                         methods.add(ToMethod.ADD_TO_COLLECTION.apply(property));
                     } else if (property.getType().getClassName().contains("Map")) {
                         methods.add(ToMethod.ADD_TO_MAP.apply(property));
                     }
                 }
 
-                if (isBuildable(property)) {
+                if (isBuildable(property) && !isMap(property.getType())) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(property));
-                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(property));
+                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(property).addToAttributes(MEMBER_OF, fluentType).build()));
                 }
             }
 
             return new JavaClazzBuilder(item)
-                    .withType(TypeAs.FLUENT.apply(item.getType()))
+                    .withType(fluentType)
                     .withFields(properties)
                     .withNested(nestedClazzes)
                     .withMethods(methods)
@@ -131,7 +134,11 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     };
 
     static final String BODY = "BODY";
+    static final String MEMBER_OF = "MEMBER_OF";
     private static final String BUILDABLE = "BUILDABLE";
+    private static final JavaType MAP = ClassToJavaType.FUNCTION.apply(Map.class);
+    private static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
+    private static final JavaType SET = ClassToJavaType.FUNCTION.apply(Set.class);
 
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
         return new JavaPropertyBuilder(property)
@@ -214,5 +221,17 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             return (Boolean) item.getAttributes().get(BUILDABLE);
         }
         return false;
+    }
+    
+    private static boolean isMap(JavaType type) {
+        return type.equals(MAP) || type.getInterfaces().contains(MAP);
+    }
+
+    private static boolean isList(JavaType type) {
+        return type.equals(LIST) || type.getInterfaces().contains(LIST);
+    }
+
+    private static boolean isSet(JavaType type) {
+        return type.equals(SET) || type.getInterfaces().contains(SET);
     }
 }
