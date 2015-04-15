@@ -15,4 +15,5 @@
 #
 
 io.sundr.builder.internal.processor.BuildableProcessor
+io.sundr.builder.internal.processor.ExternalBuildableProcessor
 io.sundr.dsl.internal.processor.DslProcessor

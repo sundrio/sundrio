@@ -17,6 +17,8 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.Function;
+import io.sundr.builder.annotations.ExternalBuildables;
+import io.sundr.builder.internal.ExternalRepository;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
@@ -31,15 +33,14 @@ import io.sundr.codegen.utils.ModelUtils;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.Set;
 
-@SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
-public class BuildableProcessor extends JavaGeneratingProcessor {
+@SupportedAnnotationTypes("io.sundr.builder.annotations.GeneratedBuildables")
+public class ExternalBuildableProcessor extends JavaGeneratingProcessor {
 
     public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
     public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
@@ -53,15 +54,26 @@ public class BuildableProcessor extends JavaGeneratingProcessor {
         JavaMethodFunction toMethod = new JavaMethodFunction(toType, toProperty);
         JavaClazzFunction toClazz = new JavaClazzFunction(elements, toType, toMethod, toProperty);
 
+        //First pass register all externals
+        for (TypeElement ann : annotations) {
+            for (Element element : env.getElementsAnnotatedWith(ann)) {
+                ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
+                for (String name : generated.value()) {
+                    ExternalRepository.register(name);
+                }
+            }
+        }
+
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-                if (element instanceof ExecutableElement) {
-                    JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(element));
+                ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
+                for (String name : generated.value()) {
+                    JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(elements.getTypeElement(name)));
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
                                 processingEnv,
                                 DEFAULT_BUILDER_TEMPLATE_LOCATION);
-                        
+
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
                                 processingEnv,
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);

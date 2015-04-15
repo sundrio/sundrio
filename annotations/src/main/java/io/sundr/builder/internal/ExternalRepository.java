@@ -14,17 +14,25 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.kubernetes;
+package io.sundr.builder.internal;
 
-public class KubernetesImpl implements io.sundr.examples.kubernetes.Kubernetes {
-    
-    @Override
-    public io.sundr.examples.kubernetes.CreatePodBuilder create() {
-        return null;
+import javax.lang.model.element.TypeElement;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+public class ExternalRepository {
+
+    private static final Set<String> buildables = new LinkedHashSet<>();
+
+    public static void register(String buildable) {
+        buildables.add(buildable);
     }
-    
-    static {
-        new KubernetesImpl().create().withImage("").addLabel("key", "value").addLabel("key2", "value2").execute();
-        
+
+    public static boolean isBuildable(TypeElement buildable) {
+        return buildable != null && buildables.contains(buildable.getQualifiedName().toString());
+    }
+
+    public static void clear() {
+        buildables.clear();
     }
 }

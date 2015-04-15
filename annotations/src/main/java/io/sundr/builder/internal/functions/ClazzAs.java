@@ -84,10 +84,10 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             Set<JavaMethod> constructors = new LinkedHashSet<>();
             Set<JavaMethod> methods = new LinkedHashSet<>();
             Set<JavaProperty> fields = new LinkedHashSet<>();
-            
+
             JavaProperty fluentProperty = new JavaPropertyBuilder().withType(fluent).withName("fluent").build();
             fields.add(fluentProperty);
-            
+
             JavaMethod emptyConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addToAttributes(BODY, "this.fluent = this;")
@@ -143,7 +143,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     }
 
     private static String toInstanceConstructorBody(JavaClazz clazz) {
-        JavaMethod constructor = clazz.getConstructors().iterator().next();
+        JavaMethod constructor = findBuildableConstructor(clazz);
         StringBuilder sb = new StringBuilder();
         sb.append("this(); ");
         for (JavaProperty property : constructor.getArguments()) {
@@ -153,7 +153,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     }
 
     private static String toBuild(JavaClazz clazz) {
-        JavaMethod constructor = clazz.getConstructors().iterator().next();
+        JavaMethod constructor = findBuildableConstructor(clazz);
         StringBuilder sb = new StringBuilder();
         sb.append("return new ").append(clazz.getType().getSimpleName()).append("(");
         sb.append(StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
@@ -165,6 +165,15 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
         sb.append(");\n");
         return sb.toString();
+    }
+
+    private static JavaMethod findBuildableConstructor(JavaClazz clazz) {
+        for (JavaMethod candidate : clazz.getConstructors()) {
+            if (candidate.getArguments().length != 0) {
+                return candidate;
+            }
+        }
+        return clazz.getConstructors().iterator().next();
     }
 
     /**

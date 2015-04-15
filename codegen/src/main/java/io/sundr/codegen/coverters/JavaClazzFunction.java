@@ -30,6 +30,7 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +40,13 @@ import static io.sundr.codegen.utils.ModelUtils.getPackageName;
 
 public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
 
+    private final Elements elements;
     private final Function<String, JavaType> toJavaType;
     private final Function<ExecutableElement, JavaMethod> toJavaMethod;
     private final Function<VariableElement, JavaProperty> toJavaProperty;
 
-    public JavaClazzFunction(Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
+    public JavaClazzFunction(Elements elements, Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
+        this.elements = elements;
         this.toJavaType = toJavaType;
         this.toJavaMethod = toJavaMethod;
         this.toJavaProperty = toJavaProperty;
@@ -55,7 +58,7 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
         TypeMirror superClass = classElement.getSuperclass();
         JavaType superClassType = toJavaType.apply(superClass.toString());
         List<JavaType> genericTypes = new ArrayList<>();
-        for (TypeParameterElement typeParameter: classElement.getTypeParameters()) {
+        for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
             JavaType genericType = toJavaType.apply(typeParameter.toString());
             genericTypes.add(genericType);
         }
@@ -76,6 +79,9 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
             builder.addToFields(toJavaProperty.apply(variableElement));
         }
 
+        for (ExecutableElement method : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
+            builder.addToMethods(toJavaMethod.apply(method));
+        }
         return builder.build();
     }
 }

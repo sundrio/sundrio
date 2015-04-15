@@ -14,19 +14,16 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.kubernetes;
-
-import io.sundr.dsl.annotations.AnnotationTransition;
-import io.sundr.dsl.annotations.Keyword;
+package io.sundr.builder.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
-@Keyword
-@AnnotationTransition(CreateOption.class)
-public @interface CreateOption {
+public @interface ExternalBuildables {
+
+    String[] value() default {};
 }
