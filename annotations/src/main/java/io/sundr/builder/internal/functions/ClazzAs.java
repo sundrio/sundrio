@@ -30,7 +30,6 @@ import io.sundr.codegen.utils.StringUtils;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 

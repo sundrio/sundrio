@@ -18,6 +18,7 @@ package io.sundr.builder.internal.processor;
 
 import io.sundr.Function;
 import io.sundr.builder.annotations.ExternalBuildables;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.ExternalRepository;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
@@ -40,12 +41,7 @@ import java.io.IOException;
 import java.util.Set;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
-public class ExternalBuildableProcessor extends JavaGeneratingProcessor {
-
-    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
-    public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
-
-
+public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
@@ -69,6 +65,13 @@ public class ExternalBuildableProcessor extends JavaGeneratingProcessor {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
                 for (String name : generated.value()) {
                     JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(elements.getTypeElement(name)));
+                    if (generated.nodeps()) {
+                        BuilderContextManager.create(clazz.getType().getPackageName());
+                        generateLocalDependencies();
+                    } else {
+                        BuilderContextManager.create();
+                    }
+                    
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
                                 processingEnv,

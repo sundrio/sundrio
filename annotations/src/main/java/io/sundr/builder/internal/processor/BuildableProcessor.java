@@ -17,12 +17,17 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.Function;
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.ExternalBuildables;
+import io.sundr.builder.internal.BuilderContext;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
 import io.sundr.codegen.coverters.JavaClazzFunction;
 import io.sundr.codegen.coverters.JavaMethodFunction;
 import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
@@ -39,12 +44,7 @@ import java.io.IOException;
 import java.util.Set;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
-public class BuildableProcessor extends JavaGeneratingProcessor {
-
-    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
-    public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
-
-
+public class BuildableProcessor extends AbstractBuilderProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
@@ -55,13 +55,20 @@ public class BuildableProcessor extends JavaGeneratingProcessor {
 
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+                Buildable buildable = element.getAnnotation(Buildable.class);
                 if (element instanceof ExecutableElement) {
                     JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(element));
+                    if (buildable.nodeps()) {
+                        BuilderContextManager.create(clazz.getType().getPackageName());
+                        generateLocalDependencies();
+                    } else {
+                        BuilderContextManager.create();
+                    }
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
                                 processingEnv,
                                 DEFAULT_BUILDER_TEMPLATE_LOCATION);
-                        
+
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
                                 processingEnv,
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);

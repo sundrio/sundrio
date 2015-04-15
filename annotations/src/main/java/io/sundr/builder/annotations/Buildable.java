@@ -24,6 +24,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.CONSTRUCTOR)
 @Retention(RetentionPolicy.SOURCE)
 public @interface Buildable {
-    
-    boolean fluent() default false;
+
+    boolean nodeps() default false;
 }

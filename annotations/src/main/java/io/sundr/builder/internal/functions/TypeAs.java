@@ -17,8 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
-import io.sundr.builder.Builder;
-import io.sundr.builder.Fluent;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
@@ -55,7 +54,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .withPackageName(item.getPackageName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClass)
-                    .withInterfaces(new HashSet(Arrays.asList(FLUENT_INTERFACE)))
+                    .withInterfaces(new HashSet(Arrays.asList(BuilderContextManager.getContext().getFluentInterface().getType())))
                     .build();
         }
 
@@ -102,7 +101,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .withClassName(item.getClassName() + "Builder")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(fluent)
-                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BUILDER_INTERFACE, item))))
+                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getBuilderInterface().getType(), item))))
                     .build();
 
         }
@@ -163,8 +162,6 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     private static final String BUILDABLE = "BUILDABLE";
     private static final JavaType T = newGeneric("T");
     private static final JavaType Q = newGeneric("?");
-    private static final JavaType FLUENT_INTERFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
-    private static final JavaType BUILDER_INTERFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
     private static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);
     private static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
     private static final JavaType ARRAY_LIST = ClassToJavaType.FUNCTION.apply(ArrayList.class);

@@ -17,8 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
-import io.sundr.builder.Nested;
-import io.sundr.codegen.functions.ClassToJavaType;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
@@ -33,7 +32,6 @@ import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public final class PropertyAs {
 
@@ -74,7 +72,7 @@ public final class PropertyAs {
             return new JavaTypeBuilder(nested)
                     .withGenericTypes(new JavaType[]{N})
                     .withSuperClass(superClassFluent)
-                    .withInterfaces(new HashSet(Arrays.asList(NESTED_INTEFACE)))
+                    .withInterfaces(new HashSet(Arrays.asList(BuilderContextManager.getContext().getNestedInterface().getType())))
                     .build();
         }
 
@@ -90,7 +88,6 @@ public final class PropertyAs {
     };
 
     private static final JavaType N = newGeneric("N");
-    private static final JavaType NESTED_INTEFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
 
 
 }
