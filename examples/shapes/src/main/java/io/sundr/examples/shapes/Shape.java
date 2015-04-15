@@ -16,24 +16,8 @@
 
 package io.sundr.examples.shapes;
 
-import io.sundr.builder.annotations.Buildable;
+public interface Shape {
 
-public class Shape {
-
-    private final int x;
-    private final int y;
-
-    @Buildable
-    public Shape(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
+    int getX();
+    int getY();
 }

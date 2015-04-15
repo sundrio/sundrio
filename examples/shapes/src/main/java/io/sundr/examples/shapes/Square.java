@@ -18,17 +18,36 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 
-public class Square extends Shape {
+public class Square implements Rectangle {
 
-    private final Long size;
-    
+    private final int x;
+    private final int y;
+    private final int height;
+
     @Buildable
-    public Square(int x, int y, Long size) {
-        super(x, y);
-        this.size = size;
+    public Square(int x, int y, int height) {
+        this.x = x;
+        this.y = y;
+        this.height = height;
     }
 
-    public Long getSize() {
-        return size;
+    @Override
+    public int getWidth() {
+        return height;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public int getX() {
+        return x;
+    }
+
+    @Override
+    public int getY() {
+        return y;
     }
 }

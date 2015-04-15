@@ -18,22 +18,19 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 
+import java.util.Collections;
+import java.util.List;
+
 public class Canvas {
 
-    private final Square area;
-    private final Shape[] shapes;
+    private final List<Shape> shapes;
 
     @Buildable
-    public Canvas(Square area, Shape[] shapes) {
-        this.area = area;
-        this.shapes = shapes;
+    public Canvas(List<Shape> shapes) {
+        this.shapes = Collections.unmodifiableList(shapes);
     }
 
-    public Square getArea() {
-        return area;
-    }
-
-    public Shape[] getShapes() {
+    public List<Shape> getShapes() {
         return shapes;
     }
 }

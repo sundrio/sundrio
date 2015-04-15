@@ -18,17 +18,28 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 
-public class Circle extends Shape {
+public class Circle implements Shape{
 
-    private final Long radius;
+    private final int x;
+    private final int y;
+    private final int radius;
 
     @Buildable
-    public Circle(int x, int y, long radius) {
-        super(x, y);
+    public Circle(int x, int y, int radius) {
+        this.x = x;
+        this.y = y;
         this.radius = radius;
     }
 
-    public Long getRadius() {
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getRadius() {
         return radius;
     }
 }

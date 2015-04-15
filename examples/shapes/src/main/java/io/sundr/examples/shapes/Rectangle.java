@@ -14,14 +14,10 @@
  *    limitations under the License.
  */
 
-package io.sundr.builder.shape;
+package io.sundr.examples.shapes;
 
-import io.sundr.builder.Builder;
+public interface Rectangle extends Shape {
 
-public class CanvasBuilder extends CanvasFluent<CanvasBuilder> implements Builder<Canvas> {
-
-    @Override
-    public Canvas build() {
-        return new Canvas(shapes);
-    }
+    int getWidth();
+    int getHeight();
 }
