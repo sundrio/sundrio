@@ -39,7 +39,7 @@ import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.Set;
 
-@SupportedAnnotationTypes("io.sundr.builder.annotations.GeneratedBuildables")
+@SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
 public class ExternalBuildableProcessor extends JavaGeneratingProcessor {
 
     public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
