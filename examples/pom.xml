@@ -35,6 +35,5 @@
         <module>shapes</module>
         <module>codegen</module>
         <module>curator</module>
-        <module>kubernetes</module>
     </modules>
 </project>
