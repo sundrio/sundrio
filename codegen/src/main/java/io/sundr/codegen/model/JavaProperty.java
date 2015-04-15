@@ -52,17 +52,6 @@ public class JavaProperty extends AttributeSupport implements Property<JavaType>
         return sb.toString();
     }
 
-    public String getGetter() {
-        StringBuilder sb = new StringBuilder();
-        if (type.isBoolean()) {
-            sb.append("is");
-        } else {
-            sb.append("get");
-        }
-        sb.append(getNameCapitalized());
-        return sb.toString();
-    }
-
     @Override
     public JavaType getType() {
         return type;

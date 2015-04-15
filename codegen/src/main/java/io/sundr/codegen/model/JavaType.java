@@ -163,6 +163,21 @@ public class JavaType extends AttributeSupport implements Type {
         return true;
     }
 
+    public boolean isAssignable(JavaType o) {
+        if (this == o || this.equals(o)) {
+            return true;
+        }
+
+        if (packageName == null && o.packageName.equals("java.lang") && className.toLowerCase().equals(o.className.toLowerCase())) {
+            return true;
+        }
+        if (o.packageName == null && packageName.equals("java.lang") && className.toLowerCase().equals(o.className.toLowerCase())) {
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public int hashCode() {
         int result = packageName != null ? packageName.hashCode() : 0;

@@ -146,7 +146,8 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         StringBuilder sb = new StringBuilder();
         sb.append("this(); ");
         for (JavaProperty property : constructor.getArguments()) {
-            sb.append("with").append(property.getNameCapitalized()).append("(instance.").append(property.getGetter()).append("()); ");
+            JavaMethod getter = findGetter(clazz, property);
+            sb.append("with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
         }
         return sb.toString();
     }
@@ -158,7 +159,8 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         sb.append(StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
             @Override
             public String apply(JavaProperty item) {
-                return "fluent." + item.getGetter() + "()";
+                String prefix = item.getType().isBoolean() ? "is" : "get";
+                return "fluent." + prefix + item.getNameCapitalized() + "()";
             }
         }, ","));
 
@@ -173,6 +175,30 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             }
         }
         return clazz.getConstructors().iterator().next();
+    }
+
+    private static JavaMethod findGetter(JavaClazz clazz, JavaProperty property) {
+        for (JavaMethod method : clazz.getMethods()) {
+            if (isApplicableGetterOf(method, property)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isApplicableGetterOf(JavaMethod method, JavaProperty property) {
+        if (!method.getReturnType().isAssignable(property.getType())) {
+            return false;
+        }
+
+        if (method.getName().endsWith("get" + property.getNameCapitalized())) {
+            return true;
+        }
+
+        if (method.getName().endsWith("is" + property.getNameCapitalized())) {
+            return true;
+        }
+        return false;
     }
 
     /**

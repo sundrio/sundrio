@@ -25,6 +25,7 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
@@ -33,7 +34,9 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.sundr.codegen.utils.ModelUtils.getClassName;
 import static io.sundr.codegen.utils.ModelUtils.getPackageName;
@@ -79,9 +82,29 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
             builder.addToFields(toJavaProperty.apply(variableElement));
         }
 
-        for (ExecutableElement method : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
+        Set<ExecutableElement> allMethods = new LinkedHashSet<>();
+        allMethods.addAll(ElementFilter.methodsIn(classElement.getEnclosedElements()));
+        allMethods.addAll(getInheritedMethods(classElement));
+
+        for (ExecutableElement method : allMethods) {
             builder.addToMethods(toJavaMethod.apply(method));
         }
         return builder.build();
+    }
+
+    public Set<ExecutableElement> getInheritedMethods(TypeElement typeElement) {
+        Set<ExecutableElement> result = new LinkedHashSet<>();
+        if (typeElement != null) {
+            for (ExecutableElement method : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
+                if (!method.getModifiers().contains(Modifier.PRIVATE)) {
+                    result.add(method);
+                }
+            }
+            result.addAll(getInheritedMethods(typeElement.getSuperclass() != null ?
+                    elements.getTypeElement(typeElement.getSuperclass().toString()) : null));
+
+        }
+
+        return result;
     }
 }
