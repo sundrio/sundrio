@@ -63,7 +63,7 @@
         <sun.tools.version>1.7</sun.tools.version>
         <velocity.version>1.7</velocity.version>
 
-        <release.plugin.version>2.2.2</release.plugin.version>
+        <release.plugin.version>2.5.1</release.plugin.version>
     </properties>
 
     <modules>
