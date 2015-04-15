@@ -55,7 +55,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .withPackageName(item.getPackageName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClass)
-                    .withInterfaces(new HashSet(Arrays.asList(FLUENT_INTEFACE)))
+                    .withInterfaces(new HashSet(Arrays.asList(FLUENT_INTERFACE)))
                     .build();
         }
 
@@ -163,7 +163,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     private static final String BUILDABLE = "BUILDABLE";
     private static final JavaType T = newGeneric("T");
     private static final JavaType Q = newGeneric("?");
-    private static final JavaType FLUENT_INTEFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
+    private static final JavaType FLUENT_INTERFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     private static final JavaType BUILDER_INTERFACE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
     private static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);
     private static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
