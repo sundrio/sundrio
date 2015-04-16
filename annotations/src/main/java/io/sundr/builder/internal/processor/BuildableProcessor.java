@@ -18,8 +18,6 @@ package io.sundr.builder.internal.processor;
 
 import io.sundr.Function;
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.builder.annotations.ExternalBuildables;
-import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
@@ -27,10 +25,8 @@ import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
 import io.sundr.codegen.coverters.JavaClazzFunction;
 import io.sundr.codegen.coverters.JavaMethodFunction;
 import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -58,12 +54,8 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                 Buildable buildable = element.getAnnotation(Buildable.class);
                 if (element instanceof ExecutableElement) {
                     JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(element));
-                    if (buildable.nodeps()) {
-                        BuilderContextManager.create(clazz.getType().getPackageName());
-                        generateLocalDependencies();
-                    } else {
-                        BuilderContextManager.create();
-                    }
+                    BuilderContextManager.create(buildable.builderPackage());
+                    generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
                                 DEFAULT_BUILDER_TEMPLATE_LOCATION);

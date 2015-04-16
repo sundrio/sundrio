@@ -14,19 +14,8 @@
  *    limitations under the License.
  */
 
-package io.sundr.builder.annotations;
+package io.sundr.builder;
 
-import io.sundr.builder.Constants;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
-public @interface ExternalBuildables {
-
-    String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
-    String[] value() default {};
+public class Constants {
+    public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 }

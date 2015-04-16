@@ -16,6 +16,7 @@
 
 package io.sundr.builder.internal.processor;
 
+import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
@@ -26,22 +27,24 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
     public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
 
-    void generateLocalDependencies() {
+    void generateLocalDependenciesIfNeeded() {
         BuilderContext context = BuilderContextManager.getContext();
-        try {
-            generateFromClazz(context.getBuilderInterface(),
-                    DEFAULT_INTERFACE_TEMPLATE_LOCATION
-            );
+        if (!Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getTargetPackage())) {
+            try {
+                generateFromClazz(context.getBuilderInterface(),
+                        DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
 
-            generateFromClazz(context.getFluentInterface(),
-                    DEFAULT_INTERFACE_TEMPLATE_LOCATION
-            );
+                generateFromClazz(context.getFluentInterface(),
+                        DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
 
-            generateFromClazz(context.getNestedInterface(),
-                    DEFAULT_INTERFACE_TEMPLATE_LOCATION
-            );
-        } catch (Exception e) {
-            //
+                generateFromClazz(context.getNestedInterface(),
+                        DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
+            } catch (Exception e) {
+                //
+            }
         }
     }
 }

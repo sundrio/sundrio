@@ -29,25 +29,24 @@ import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class BuilderContext {
-
+    
     private static final JavaType T = newGeneric("T");
     private static final JavaType N = newGeneric("N");
     private static final JavaType BASE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
     private static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     private static final JavaType BASE_NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
-
-    private final boolean nodeps;
+    
     private final JavaClazz fluentInterface;
     private final JavaClazz builderInterface;
     private final JavaClazz nestedInterface;
+    private final String targetPackage;
 
-    public BuilderContext(String targetPackage, boolean nodeps) {
-        this.nodeps = nodeps;
-        String packageName = nodeps ? targetPackage : "io.sundr.builder";
-
+    public BuilderContext(String targetPackage) {
+        this.targetPackage = targetPackage;
+        
         builderInterface = new JavaClazzBuilder()
                 .withNewType()
-                .withPackageName(packageName)
+                .withPackageName(targetPackage)
                 .withKind(JavaKind.INTERFACE)
                 .withClassName(BASE_BUILDER.getClassName())
                 .withGenericTypes(BASE_BUILDER.getGenericTypes())
@@ -61,7 +60,7 @@ public class BuilderContext {
         fluentInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(packageName)
+                .withPackageName(targetPackage)
                 .withClassName(BASE_FLUENT.getClassName())
                 .withGenericTypes(BASE_FLUENT.getGenericTypes())
                 .and()
@@ -70,7 +69,7 @@ public class BuilderContext {
         nestedInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(packageName)
+                .withPackageName(targetPackage)
                 .withClassName(BASE_NESTED.getClassName())
                 .withGenericTypes(BASE_NESTED.getGenericTypes())
                 .and()
@@ -81,10 +80,9 @@ public class BuilderContext {
                 .build();
     }
 
-    public boolean isNodeps() {
-        return nodeps;
+    public String getTargetPackage() {
+        return targetPackage;
     }
-
     public JavaClazz getFluentInterface() {
         return fluentInterface;
     }

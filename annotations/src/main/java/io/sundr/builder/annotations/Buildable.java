@@ -16,6 +16,8 @@
 
 package io.sundr.builder.annotations;
 
+import io.sundr.builder.Constants;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -25,5 +27,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Buildable {
 
-    boolean nodeps() default false;
+    String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
 }

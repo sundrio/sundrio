@@ -30,11 +30,11 @@ public class BuilderContextManager {
     private static final ThreadLocal<BuilderContext> context = new ThreadLocal<>();
 
     public static void create() {
-        context.set(new BuilderContext(Builder.class.getPackage().getName(), false));
+        context.set(new BuilderContext(Builder.class.getPackage().getName()));
     }
 
     public static void create(String packageName) {
-        context.set(new BuilderContext(packageName, true));
+        context.set(new BuilderContext(packageName));
     }
 
     public static synchronized BuilderContext getContext() {

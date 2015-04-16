@@ -28,7 +28,6 @@ import io.sundr.codegen.coverters.JavaMethodFunction;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -65,13 +64,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
                 for (String name : generated.value()) {
                     JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(elements.getTypeElement(name)));
-                    if (generated.nodeps()) {
-                        BuilderContextManager.create(clazz.getType().getPackageName());
-                        generateLocalDependencies();
-                    } else {
-                        BuilderContextManager.create();
-                    }
-                    
+                    BuilderContextManager.create(generated.builderPackage());
+                    generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
                                 DEFAULT_BUILDER_TEMPLATE_LOCATION);
