@@ -74,49 +74,69 @@ public class ClassDirective extends Directive {
     }
 
     private void writeClazz(Writer writer, JavaClazz clazz, String block) throws IOException {
+        JavaTypeToString toString = new JavaTypeToString(getEnclosingType(clazz));
+
         if (clazz != null) {
             JavaType type = clazz.getType();
             JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
 
             writer.append("public ").append(kind.name().toLowerCase()).append(" ");
-            writer.append(JavaTypeToString.INSTANCE.apply(type));
+            writer.append(toString.apply(type));
 
-            writeExtends(writer, type);
-            writeImplements(writer, type);
+            writeExtends(writer, type, toString);
+            writeImplements(writer, type, toString);
 
             writer.append("{\n");
             writer.append(block).append("\n}\n");
         }
     }
 
-    private void writeExtends(Writer writer, JavaType type) throws IOException {
+    private void writeExtends(Writer writer, JavaType type, Function<JavaType, String> toString) throws IOException {
         if (type.getKind() != JavaKind.INTERFACE) {
             if (type.getSuperClass() != null && !OBJECT_TYPE.equals(type.getSuperClass())) {
-                writer.append(" extends ").append(JavaTypeToString.INSTANCE.apply(type.getSuperClass()));
+                writer.append(" extends ").append(toString.apply(type.getSuperClass()));
             }
         } else {
             if (type.getInterfaces().size() > 0) {
-                writer.append(" extends ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
+                writer.append(" extends ").append(join(type.getInterfaces(), toString, ", "));
             }
         }
     }
 
-    private void writeImplements(Writer writer, JavaType type) throws IOException {
+    private void writeImplements(Writer writer, JavaType type, Function<JavaType, String> toString) throws IOException {
         if (type.getKind() != JavaKind.INTERFACE) {
             if (type.getInterfaces().size() > 0) {
-                writer.append(" implements ").append(join(type.getInterfaces(), JavaTypeToString.INSTANCE, ", "));
+                writer.append(" implements ").append(join(type.getInterfaces(), toString, ", "));
             }
+        }
+    }
+
+    private static JavaType getEnclosingType(JavaClazz clazz) {
+        Object obj = clazz.getAttributes().get("MEMBER_OF");
+        if (obj instanceof JavaType) {
+            return (JavaType) obj;
+        } else {
+            return clazz.getType();
         }
     }
 
 
     //Enum Singleton
-    private enum JavaTypeToString implements Function<JavaType, String> {
-        INSTANCE;
+    private class JavaTypeToString implements Function<JavaType, String> {
+
+        private final JavaType enclosingType;
+
+        JavaTypeToString(JavaType enclosingType) {
+            this.enclosingType = enclosingType;
+        }
+
         @Override
         public String apply(JavaType item) {
             StringBuilder sb = new StringBuilder();
-            sb.append(item.getClassName());
+            if (item.getClassName().equals(enclosingType.getClassName())
+                    && !item.getFullyQualifiedName().equals(enclosingType.getFullyQualifiedName())) {
+                sb.append(item.getFullyQualifiedName());
+            } else sb.append(item.getClassName());
             if (item.isArray()) {
                 sb.append("[]");
             }
@@ -124,7 +144,7 @@ public class ClassDirective extends Directive {
                 sb.append(" extends " + apply(item.getSuperClass()));
             }
             if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
-                sb.append("<").append(join(item.getGenericTypes(), JavaTypeToString.INSTANCE, ",")).append(">");
+                sb.append("<").append(join(item.getGenericTypes(), this, ",")).append(">");
             }
             return sb.toString();
         }

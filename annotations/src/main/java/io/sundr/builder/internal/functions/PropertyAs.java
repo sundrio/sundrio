@@ -44,7 +44,9 @@ public final class PropertyAs {
             nestedMethods.add(ToMethod.END.apply(item));
 
             Set<JavaProperty> properties = new HashSet<>();
-
+            
+            JavaType memberOf = (JavaType) item.getAttributes().get(ClazzAs.MEMBER_OF); 
+                    
             properties.add(new JavaPropertyBuilder()
                     .withName("builder")
                     .withType(TypeAs.SHALLOW_BUILDER.apply(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType()))).build());
@@ -53,6 +55,7 @@ public final class PropertyAs {
                     .withType(nestedType)
                     .withFields(properties)
                     .withMethods(nestedMethods)
+                    .addToAttributes(ClazzAs.MEMBER_OF, memberOf)
                     .build();
         }
     };
