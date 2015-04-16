@@ -94,7 +94,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     try {
                         for (JavaClazz clazz : interfacesToGenerate) {
-                            generateFromClazz(clazz, processingEnv, DEFAULT_TEMPLATE_LOCATION);
+                            generateFromClazz(clazz, DEFAULT_TEMPLATE_LOCATION);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);

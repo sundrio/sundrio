@@ -30,17 +30,14 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         BuilderContext context = BuilderContextManager.getContext();
         try {
             generateFromClazz(context.getBuilderInterface(),
-                    processingEnv,
                     DEFAULT_INTERFACE_TEMPLATE_LOCATION
             );
 
             generateFromClazz(context.getFluentInterface(),
-                    processingEnv,
                     DEFAULT_INTERFACE_TEMPLATE_LOCATION
             );
 
             generateFromClazz(context.getNestedInterface(),
-                    processingEnv,
                     DEFAULT_INTERFACE_TEMPLATE_LOCATION
             );
         } catch (Exception e) {

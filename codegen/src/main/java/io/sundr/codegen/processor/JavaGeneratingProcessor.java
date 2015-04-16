@@ -30,16 +30,14 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
     /**
      * Generates a source file from the specified {@link io.sundr.codegen.model.JavaClazz}.*
      * @param model                     The model of the class to generate.
-     * @param processingEnvironment     The processing environment
      * @param resourceName              The template to use.
      * @throws IOException
      */
-    public void generateFromClazz(JavaClazz model, ProcessingEnvironment processingEnvironment, String resourceName) throws IOException {
-        PackageElement packageElement = processingEnvironment.getElementUtils().getPackageElement(model.getType().getPackageName());
+    public void generateFromClazz(JavaClazz model, String resourceName) throws IOException {
         try {
             generateFromClazz(model, processingEnv
                     .getFiler()
-                    .createSourceFile(model.getType().getClassName(), packageElement), resourceName);
+                    .createSourceFile(model.getType().getFullyQualifiedName()), resourceName);
         } catch (Exception e) {
             //TODO: Need to avoid dublicate interfaces here.
         }

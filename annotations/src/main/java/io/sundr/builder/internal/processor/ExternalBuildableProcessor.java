@@ -74,11 +74,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
-                                processingEnv,
                                 DEFAULT_BUILDER_TEMPLATE_LOCATION);
 
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
-                                processingEnv,
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
