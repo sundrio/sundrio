@@ -92,7 +92,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             JavaMethod emptyConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
-                    .addToAttributes(BODY, "this.fluent = this;")
+                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(new "+item.getType().getClassName()+"());" : "this.fluent = this;")
                     .build();
             JavaMethod fluentConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
@@ -102,7 +102,6 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .and()
                     .addToAttributes(BODY, "this.fluent = fluent;")
                     .build();
-
             JavaMethod instanceConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
@@ -151,7 +150,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     private static String toInstanceConstructorBody(JavaClazz clazz) {
         JavaMethod constructor = findBuildableConstructor(clazz);
         StringBuilder sb = new StringBuilder();
-        sb.append("this(); ");
+        sb.append("this.fluent = this; ");
         for (JavaProperty property : constructor.getArguments()) {
             JavaMethod getter = findGetter(clazz, property);
             sb.append("with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
@@ -204,6 +203,26 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
         if (method.getName().endsWith("is" + property.getNameCapitalized())) {
             return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if there is a default constructor available.
+     * @param item  The clazz to check.
+     * @return
+     */
+    private static boolean hasDefaultConstructor(JavaClazz item) {
+        if (item == null) {
+            return false;
+        } else if (item.getConstructors().isEmpty()) {
+            return true;
+        } else {
+            for (JavaMethod constructor : item.getConstructors()) {
+                if (constructor.getArguments().length == 0) {
+                    return true;
+                }
+            }
         }
         return false;
     }
