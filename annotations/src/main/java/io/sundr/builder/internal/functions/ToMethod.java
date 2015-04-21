@@ -51,9 +51,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             if (type.isCollection()) {
                 sb.append("this." + name + ".clear();");
                 if (className.contains("Map")) {
-                    sb.append("this." + name + ".putAll(" +name + "); return (T) this;");
+                    sb.append("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (T) this;");
                 } else if (className.contains("List") || className.contains("Set")) {
-                    sb.append("this." +name + ".addAll(" + name + "); return (T) this;");
+                    sb.append("if (" + name + " != null) {this." + name + ".addAll(" + name + ");} return (T) this;");
                 }
                 return sb.toString();
             }
@@ -70,7 +70,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{property})
-                    .addToAttributes(BODY, "this." + property.getName() + ".clear(); for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + property.getName() + ".add(item);} return (T) this;")
+                    .addToAttributes(BODY, "this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + property.getName() + ".add(item);}} return (T) this;")
                     .build();
         }
 
@@ -124,7 +124,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{item})
-                    .addToAttributes(BODY, "this." + property.getName() + ".add(item); return (T)this;")
+                    .addToAttributes(BODY, "if (item != null) {this." + property.getName() + ".add(item);} return (T)this;")
                     .build();
         }
     },
@@ -142,7 +142,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{keyProperty, valueProperty})
-                    .addToAttributes(BODY, "this." + property.getName() + ".put(key, value); return (T)this;")
+                    .addToAttributes(BODY, "if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return (T)this;")
                     .build();
         }
     }, WITH_NEW_NESTED {
