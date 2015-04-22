@@ -36,6 +36,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Set;
 
@@ -50,8 +51,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         JavaClazzFunction toClazz = new JavaClazzFunction(elements, toType, toMethod, toProperty);
 
         //First pass register all externals
-        for (TypeElement ann : annotations) {
-            for (Element element : env.getElementsAnnotatedWith(ann)) {
+        for (TypeElement annotation : annotations) {
+            for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
                 for (String name : generated.value()) {
                     ExternalRepository.register(name);
@@ -59,11 +60,18 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
             }
         }
 
-        for (TypeElement typeElement : annotations) {
-            for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+        for (TypeElement annotation : annotations) {
+            for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
                 for (String name : generated.value()) {
-                    JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(elements.getTypeElement(name)));
+                    TypeElement typeElement = elements.getTypeElement(name);
+                    if (typeElement == null) {
+                        processingEnv
+                                .getMessager()
+                                .printMessage(Diagnostic.Kind.WARNING, "Type:" + name + " doesn't exists. Ignoring...");
+                        continue;
+                    }
+                    JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(typeElement));
                     BuilderContextManager.create(generated.builderPackage());
                     generateLocalDependenciesIfNeeded();
                     try {
