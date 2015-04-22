@@ -26,6 +26,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
     public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
     public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
+    public static final String VALIDATING_BUILDER_TEMPLATE_LOCATION = "templates/builder/validating-builder.vm";
 
     void generateLocalDependenciesIfNeeded() {
         BuilderContext context = BuilderContextManager.getContext();
@@ -45,6 +46,19 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
             } catch (Exception e) {
                 //
             }
+        }
+    }
+
+    /**
+     * Selects a builder template based on the criteria.
+     * @param validationEnabled Flag that indicates if validationEnabled is enabled.
+     * @return
+     */
+    String selectBuilderTemplate(boolean validationEnabled) {
+        if (validationEnabled) {
+            return VALIDATING_BUILDER_TEMPLATE_LOCATION;
+        } else {
+            return DEFAULT_BUILDER_TEMPLATE_LOCATION;
         }
     }
 }

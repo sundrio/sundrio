@@ -176,7 +176,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     private static String toBuild(JavaClazz clazz) {
         JavaMethod constructor = findBuildableConstructor(clazz);
         StringBuilder sb = new StringBuilder();
-        sb.append("return new ").append(clazz.getType().getSimpleName()).append("(");
+        sb.append(clazz.getType().getSimpleName()).append(" buildable = new ").append(clazz.getType().getSimpleName()).append("(");
         sb.append(StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
             @Override
             public String apply(JavaProperty item) {
@@ -186,6 +186,8 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         }, ","));
 
         sb.append(");\n");
+        sb.append("validate(buildable);\n");
+        sb.append("return buildable;\n");
         return sb.toString();
     }
 

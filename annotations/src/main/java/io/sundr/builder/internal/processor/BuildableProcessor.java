@@ -58,7 +58,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
-                                DEFAULT_BUILDER_TEMPLATE_LOCATION);
+                                selectBuilderTemplate(buildable.validationEnabled()));
 
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);

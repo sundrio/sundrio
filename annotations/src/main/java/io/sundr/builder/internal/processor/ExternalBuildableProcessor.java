@@ -76,7 +76,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
-                                DEFAULT_BUILDER_TEMPLATE_LOCATION);
+                                selectBuilderTemplate(generated.validationEnabled()));
 
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);
