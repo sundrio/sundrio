@@ -18,7 +18,11 @@ import $i.fullyQualifiedName;
 
 #foreach($n in $model.nested)
     #class ($n)
-    
+
+    #foreach($f in $n.fields)
+    private final ${f.type.simpleName} ${f.name} = new ${f.type.simpleName}(this);
+    #end
+
     #foreach($m in $n.methods)
         #method ($m)
             ${m.attributes.get("BODY")}

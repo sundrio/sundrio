@@ -169,7 +169,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             return new JavaMethodBuilder()
                     .withReturnType(N)
                     .withName("and")
-                    .addToAttributes(BODY, "return (N) " + classPrefix + withMethodName + "(new " + builderName + "(this).build());")
+                    .addToAttributes(BODY, "return (N) " + classPrefix + withMethodName + "(builder.build());")
                     .build();
 
         }

@@ -94,24 +94,39 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withReturnType(builderType)
                     .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(new "+item.getType().getClassName()+"());" : "this.fluent = this;")
                     .build();
+            
             JavaMethod fluentConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
                     .withType(fluent)
                     .withName("fluent")
                     .and()
-                    .addToAttributes(BODY, "this.fluent = fluent;")
+                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(fluent, new "+item.getType().getClassName()+"());" : "this.fluent = fluent;")
                     .build();
+
+            JavaMethod instanceAndFluentCosntructor = new JavaMethodBuilder()
+                    .withReturnType(builderType)
+                    .addNewArgument()
+                    .withType(fluent)
+                    .withName("fluent")
+                    .and()
+                    .addNewArgument()
+                    .withType(item.getType())
+                    .withName("instance").and()
+                    .addToAttributes(BODY, toInstanceConstructorBody(item, "fluent"))
+                    .build();
+            
             JavaMethod instanceConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
                     .withType(item.getType())
                     .withName("instance").and()
-                    .addToAttributes(BODY, toInstanceConstructorBody(item))
+                    .addToAttributes(BODY, toInstanceConstructorBody(item, "this"))
                     .build();
 
             constructors.add(emptyConstructor);
             constructors.add(fluentConstructor);
+            constructors.add(instanceAndFluentCosntructor);
             constructors.add(instanceConstructor);
 
             JavaMethod build = new JavaMethodBuilder()
@@ -147,13 +162,13 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 .build();
     }
 
-    private static String toInstanceConstructorBody(JavaClazz clazz) {
+    private static String toInstanceConstructorBody(JavaClazz clazz, String fluent) {
         JavaMethod constructor = findBuildableConstructor(clazz);
         StringBuilder sb = new StringBuilder();
-        sb.append("this.fluent = this; ");
+        sb.append("this.fluent = " + fluent + "; ");
         for (JavaProperty property : constructor.getArguments()) {
             JavaMethod getter = findGetter(clazz, property);
-            sb.append("with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
+            sb.append(fluent).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
         }
         return sb.toString();
     }
