@@ -89,16 +89,35 @@ As shown below:
         CircleBuilder
 
 
+### Integration with Bean Validation
+The generated builders can validate the objects before returning them (if a validation provider is available). To enable this feature
+just set the validationEnabled flag to true:
+
+        package my.demo
+    
+        import javax.validation.constraints.NotNull;
+        
+        public class Demo {
+            @NotNull
+            private String value;
+            
+            @Buildable(validationEnabled=true)
+            public Demo(....) {
+                ...
+            }
+        }
+
+
 ### Eliminating runtime dependencies
 
 In case you need to avoid having any kind of runtime dependency to this tools interfaces like Builder or Fluent interfaces, you can set
-the nodeps flag on the Buildable annotation to true. This will result in generating the base interfaces themselves in the target package,
+the builderPackage flag on the Buildable annotation to true. This will result in generating the base interfaces themselves in the target package,
 eliminating all runtime dependencies to this too.
 
         package my.demo
 
         public class Demo {
-            @Buildable(nodeps=true)
+            @Buildable(builderPackage="my.pkg")
             public Demo(....) {
                 ...
             }
