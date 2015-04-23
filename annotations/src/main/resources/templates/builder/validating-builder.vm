@@ -36,7 +36,7 @@ private <T> void validate(T item) {
         Set<ConstraintViolation<T>> violations = validator.validate(item);
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            sb.append("Constraint Violations:");
+            sb.append("Constraint Violations:\n");
             for (ConstraintViolation violation : violations) {
                 sb.append("\t").append(violation.getRootBeanClass().getSimpleName()).append(" ").append(violation.getPropertyPath()).append(":").append(violation.getMessage()).append("\n");
             }
