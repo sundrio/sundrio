@@ -38,7 +38,7 @@ private <T> void validate(T item) {
             StringBuilder sb = new StringBuilder();
             sb.append("Constraint Violations:");
             for (ConstraintViolation violation : violations) {
-                sb.append("\t").append(violation.getPropertyPath()).append(":").append(violation.getMessage()).append("\n");
+                sb.append("\t").append(violation.getRootBeanClass().getSimpleName()).append(" ").append(violation.getPropertyPath()).append(":").append(violation.getMessage()).append("\n");
             }
             throw new IllegalStateException(sb.toString());
         }
