@@ -42,7 +42,9 @@ public final class StringUtils {
 
     public static String singularize(String str) {
         //TODO: Apparently this needs a lot of work.
-        if (str.endsWith("s") && str.length() > 1) {
+        if (str.endsWith("ies")) {
+            return str.substring(0, str.length() - 3) + "y";
+        } else if (str.endsWith("s") && str.length() > 1) {
             return str.substring(0, str.length() - 1);
         }
         return str;
