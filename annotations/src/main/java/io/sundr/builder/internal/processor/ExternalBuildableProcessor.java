@@ -56,7 +56,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
                 BuilderContextManager.create(generated.builderPackage());
                 for (String name : generated.value()) {
-                    BuilderContextManager.getContext().getRepository().register(name);
+                    TypeElement typeElement = elements.getTypeElement(name);
+                    BuilderContextManager.getContext().getRepository().register(typeElement);
                 }
             }
         }

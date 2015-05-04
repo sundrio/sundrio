@@ -22,9 +22,9 @@ import java.util.Set;
 
 public class BuildableRepository {
 
-    private final Set<String> buildables = new LinkedHashSet<>();
+    private final Set<TypeElement> buildables = new LinkedHashSet<>();
 
-    public void register(String buildable) {
+    public void register(TypeElement buildable) {
         buildables.add(buildable);
     }
 
