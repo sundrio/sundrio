@@ -19,7 +19,7 @@ package io.sundr.builder.internal.processor;
 import io.sundr.Function;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.ExternalRepository;
+import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
@@ -54,8 +54,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
+                BuilderContextManager.create(generated.builderPackage());
                 for (String name : generated.value()) {
-                    ExternalRepository.register(name);
+                    BuilderContextManager.getContext().getRepository().register(name);
                 }
             }
         }
@@ -72,7 +73,6 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                         continue;
                     }
                     JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(typeElement));
-                    BuilderContextManager.create(generated.builderPackage());
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),

@@ -20,19 +20,19 @@ import javax.lang.model.element.TypeElement;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ExternalRepository {
+public class BuildableRepository {
 
-    private static final Set<String> buildables = new LinkedHashSet<>();
+    private final Set<String> buildables = new LinkedHashSet<>();
 
-    public static void register(String buildable) {
+    public void register(String buildable) {
         buildables.add(buildable);
     }
 
-    public static boolean isBuildable(TypeElement buildable) {
+    public boolean isBuildable(TypeElement buildable) {
         return buildable != null && buildables.contains(buildable.getQualifiedName().toString());
     }
 
-    public static void clear() {
+    public void clear() {
         buildables.clear();
     }
 }

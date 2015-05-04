@@ -17,24 +17,30 @@
 package io.sundr.builder.internal;
 
 import io.sundr.builder.Builder;
-import io.sundr.builder.Fluent;
-import io.sundr.codegen.functions.ClassToJavaType;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
 
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class BuilderContextManager {
 
-    private static final ThreadLocal<BuilderContext> context = new ThreadLocal<>();
+    private static final AtomicReference<BuilderContext> context = new AtomicReference<>();
 
     public static void create() {
         context.set(new BuilderContext(Builder.class.getPackage().getName()));
     }
 
-    public static void create(String packageName) {
-        context.set(new BuilderContext(packageName));
+    public static BuilderContext create(String packageName) {
+        BuilderContext ctx = new BuilderContext(packageName);
+        if (context.compareAndSet(null, ctx)) {
+            return ctx;
+        } else {
+            BuilderContext existing = context.get();
+            if (packageName.equals(existing.getTargetPackage())) {
+                return existing;
+            }
+            throw new IllegalStateException("Cannot use different target package names in a single project. Used:"
+                    + packageName + "but package:"
+                    + existing.getTargetPackage() + " already exists.");
+        }
     }
 
     public static synchronized BuilderContext getContext() {

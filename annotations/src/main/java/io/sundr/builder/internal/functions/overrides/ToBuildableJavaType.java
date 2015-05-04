@@ -18,7 +18,8 @@ package io.sundr.builder.internal.functions.overrides;
 
 import io.sundr.Function;
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.builder.internal.ExternalRepository;
+import io.sundr.builder.internal.BuildableRepository;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.coverters.JavaTypeFunction;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
@@ -69,6 +70,6 @@ public class ToBuildableJavaType implements Function<String, JavaType> {
                 }
             }
         }
-        return ExternalRepository.isBuildable(typeElement);
+        return BuilderContextManager.getContext().getRepository().isBuildable(typeElement);
     }
 }

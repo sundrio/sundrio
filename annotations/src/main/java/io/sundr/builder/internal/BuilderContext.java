@@ -40,9 +40,13 @@ public class BuilderContext {
     private final JavaClazz builderInterface;
     private final JavaClazz nestedInterface;
     private final String targetPackage;
+    
+    private final BuildableRepository repository;
 
     public BuilderContext(String targetPackage) {
         this.targetPackage = targetPackage;
+        
+        repository = new BuildableRepository();
         
         builderInterface = new JavaClazzBuilder()
                 .withNewType()
@@ -93,5 +97,9 @@ public class BuilderContext {
 
     public JavaClazz getNestedInterface() {
         return nestedInterface;
+    }
+
+    public BuildableRepository getRepository() {
+        return repository;
     }
 }
