@@ -16,14 +16,23 @@
 
 package io.sundr.builder.internal;
 
+import io.sundr.Function;
 import io.sundr.builder.Builder;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
+import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
+import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
+import io.sundr.codegen.coverters.JavaClazzFunction;
+import io.sundr.codegen.coverters.JavaMethodFunction;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
+import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
+
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.util.Elements;
 
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
@@ -35,7 +44,13 @@ public class BuilderContext {
     private static final JavaType BASE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
     private static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     private static final JavaType BASE_NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
-    
+
+    private final Function<String, JavaType> toType;
+    private final Function<VariableElement, JavaProperty> toProperty;
+    private final JavaMethodFunction toMethod;
+    private final JavaClazzFunction toClazz;
+
+            
     private final JavaClazz fluentInterface;
     private final JavaClazz builderInterface;
     private final JavaClazz nestedInterface;
@@ -43,8 +58,13 @@ public class BuilderContext {
     
     private final BuildableRepository repository;
 
-    public BuilderContext(String targetPackage) {
+    public BuilderContext(Elements elements, String targetPackage) {
         this.targetPackage = targetPackage;
+
+        toType = new ToBuildableJavaType(elements);
+        toProperty = new ToBuildableJavaProperty(toType);
+        toMethod = new JavaMethodFunction(toType, toProperty);
+        toClazz = new JavaClazzFunction(elements, toType, toMethod, toProperty);
         
         repository = new BuildableRepository();
         
@@ -101,5 +121,21 @@ public class BuilderContext {
 
     public BuildableRepository getRepository() {
         return repository;
+    }
+
+    public Function<String, JavaType> getToType() {
+        return toType;
+    }
+
+    public Function<VariableElement, JavaProperty> getToProperty() {
+        return toProperty;
+    }
+
+    public JavaMethodFunction getToMethod() {
+        return toMethod;
+    }
+
+    public JavaClazzFunction getToClazz() {
+        return toClazz;
     }
 }

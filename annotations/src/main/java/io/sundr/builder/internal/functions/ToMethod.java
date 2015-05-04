@@ -17,7 +17,6 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;

@@ -17,6 +17,7 @@
 package io.sundr.builder.internal;
 
 import javax.lang.model.element.TypeElement;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -26,6 +27,10 @@ public class BuildableRepository {
 
     public void register(TypeElement buildable) {
         buildables.add(buildable);
+    }
+
+    public Set<TypeElement> getBuildables() {
+        return Collections.unmodifiableSet(buildables);
     }
 
     public boolean isBuildable(TypeElement buildable) {

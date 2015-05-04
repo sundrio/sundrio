@@ -18,18 +18,19 @@ package io.sundr.builder.internal;
 
 import io.sundr.builder.Builder;
 
+import javax.lang.model.util.Elements;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BuilderContextManager {
 
     private static final AtomicReference<BuilderContext> context = new AtomicReference<>();
 
-    public static void create() {
-        context.set(new BuilderContext(Builder.class.getPackage().getName()));
+    public static void create(Elements elements) {
+        context.set(new BuilderContext(elements, Builder.class.getPackage().getName()));
     }
 
-    public static BuilderContext create(String packageName) {
-        BuilderContext ctx = new BuilderContext(packageName);
+    public static BuilderContext create(Elements elements, String packageName) {
+        BuilderContext ctx = new BuilderContext(elements, packageName);
         if (context.compareAndSet(null, ctx)) {
             return ctx;
         } else {
@@ -45,7 +46,7 @@ public class BuilderContextManager {
 
     public static synchronized BuilderContext getContext() {
         if (context.get() == null) {
-            create();
+            throw new IllegalStateException("Builder context not available.");
         }
         return context.get();
     }

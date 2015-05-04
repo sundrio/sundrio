@@ -16,17 +16,11 @@
 
 package io.sundr.builder.internal.processor;
 
-import io.sundr.Function;
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
-import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
-import io.sundr.codegen.coverters.JavaClazzFunction;
-import io.sundr.codegen.coverters.JavaMethodFunction;
 import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -34,7 +28,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import java.io.IOException;
 import java.util.Set;
@@ -44,17 +37,24 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
-        Function<String, JavaType> toType = new ToBuildableJavaType(elements);
-        Function<VariableElement, JavaProperty> toProperty = new ToBuildableJavaProperty(toType);
-        JavaMethodFunction toMethod = new JavaMethodFunction(toType, toProperty);
-        JavaClazzFunction toClazz = new JavaClazzFunction(elements, toType, toMethod, toProperty);
+        
+        //First pass register all buildables
+        for (TypeElement typeElement : annotations) {
+            for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+                Buildable buildable = element.getAnnotation(Buildable.class);
+                BuilderContext ctx = BuilderContextManager.create(elements, buildable.builderPackage());
+                if (element instanceof ExecutableElement) {
+                    ctx.getRepository().register(ModelUtils.getClassElement(element));
+                }
+            }
+        }
 
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
                 if (element instanceof ExecutableElement) {
-                    JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(element));
-                    BuilderContextManager.create(buildable.builderPackage());
+                    BuilderContext ctx = BuilderContextManager.create(elements, buildable.builderPackage());
+                    JavaClazz clazz = ctx.getToClazz().apply(ModelUtils.getClassElement(element));
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),

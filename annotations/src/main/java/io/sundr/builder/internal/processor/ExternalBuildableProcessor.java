@@ -16,25 +16,16 @@
 
 package io.sundr.builder.internal.processor;
 
-import io.sundr.Function;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
-import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
-import io.sundr.codegen.coverters.JavaClazzFunction;
-import io.sundr.codegen.coverters.JavaMethodFunction;
 import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import java.io.IOException;
@@ -45,16 +36,12 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
-        Function<String, JavaType> toType = new ToBuildableJavaType(elements);
-        Function<VariableElement, JavaProperty> toProperty = new ToBuildableJavaProperty(toType);
-        JavaMethodFunction toMethod = new JavaMethodFunction(toType, toProperty);
-        JavaClazzFunction toClazz = new JavaClazzFunction(elements, toType, toMethod, toProperty);
 
         //First pass register all externals
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
-                BuilderContextManager.create(generated.builderPackage());
+                BuilderContextManager.create(elements, generated.builderPackage());
                 for (String name : generated.value()) {
                     TypeElement typeElement = elements.getTypeElement(name);
                     BuilderContextManager.getContext().getRepository().register(typeElement);
@@ -73,7 +60,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                                 .printMessage(Diagnostic.Kind.WARNING, "Type:" + name + " doesn't exists. Ignoring...");
                         continue;
                     }
-                    JavaClazz clazz = toClazz.apply(ModelUtils.getClassElement(typeElement));
+                    JavaClazz clazz = BuilderContextManager.getContext().getToClazz().apply(ModelUtils.getClassElement(typeElement));
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.BUILDER.apply(clazz),
