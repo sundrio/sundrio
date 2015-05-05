@@ -160,17 +160,18 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
 
         }
-    }, WITH_NEW_NESTED_INLINE {
+    }, WITH_NESTED_INLINE {
         @Override
         public JavaMethod apply(JavaProperty property) {
             JavaClazz clazz = PropertyAs.CLASS.apply(property);
             JavaMethod constructor = clazz.getConstructors().iterator().next();
+            
+            String ownPrefix = property.getType().isCollection() ? "addNew" : "withNew";
+            String ownName = ownPrefix + captializeFirst(singularize(property.getName()));
 
-            //We need to repackage because we are nesting under this class.
-            JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
-            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
-            String prefix = property.getType().isCollection() ? "addNew" : "withNew";
-            String methodName = prefix + captializeFirst(singularize(property.getName()));
+            String delegatePrefix = property.getType().isCollection() ? "addTo" : "with";
+            String delegateName = delegatePrefix + captializeFirst(property.getName());
+            
             String args = StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
                 @Override
                 public String apply(JavaProperty item) {
@@ -179,15 +180,12 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             }, ", ");
 
             return new JavaMethodBuilder()
-                    .withReturnType(rewraped)
+                    .withReturnType(T)
                     .withArguments(constructor.getArguments())
-                    .withName(methodName)
-                    .addToAttributes(BODY, "return " + methodName + "(" + args + ");")
+                    .withName(ownName)
+                    .addToAttributes(BODY, "return " + delegateName + "(new " + clazz.getType().getSimpleName() + "(" + args + "));")
                     .build();
-
         }
-
-
     }, AND {
         @Override
         public JavaMethod apply(JavaProperty property) {

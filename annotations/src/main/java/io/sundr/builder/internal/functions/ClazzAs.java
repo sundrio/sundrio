@@ -72,7 +72,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 if (isBuildable(property) && !isMap(property.getType())) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(property));
                     if (isInlinable(property)) {
-                        methods.add(ToMethod.WITH_NEW_NESTED_INLINE.apply(property));
+                        methods.add(ToMethod.WITH_NESTED_INLINE.apply(property));
                     }
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(property).addToAttributes(MEMBER_OF, fluentType).build()));
                 }
