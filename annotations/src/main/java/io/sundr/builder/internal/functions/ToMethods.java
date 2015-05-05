@@ -46,9 +46,10 @@ public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
             JavaClazz clazz = PropertyAs.CLASS.apply(property);
             
             for (JavaMethod constructor : getInlineableConstructors(property)) {
-
                 String ownPrefix = property.getType().isCollection() ? "addNew" : "withNew";
-                String ownName = ownPrefix + captializeFirst(singularize(property.getName()));
+                String ownName = ownPrefix + captializeFirst(property.getType().isCollection()
+                        ? singularize(property.getName())
+                        : property.getName());
 
                 String delegatePrefix = property.getType().isCollection() ? "addTo" : "with";
                 String delegateName = delegatePrefix + captializeFirst(property.getName());

@@ -151,9 +151,13 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
             String prefix = property.getType().isCollection() ? "addNew" : "withNew";
+            String methodName = prefix + captializeFirst(property.getType().isCollection()
+                    ? singularize(property.getName())
+                    : property.getName());
+            
             return new JavaMethodBuilder()
                     .withReturnType(rewraped)
-                    .withName(prefix + captializeFirst(singularize(property.getName())))
+                    .withName(methodName)
                     .addToAttributes(BODY, "return new " + rewraped.getSimpleName() + "();")
                     .build();
 
@@ -183,9 +187,13 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
     }, END {
         @Override
         public JavaMethod apply(JavaProperty property) {
+            String methodName = "end" + captializeFirst(property.getType().isCollection()
+                    ? singularize(property.getName())
+                    : property.getName());
+            
             return new JavaMethodBuilder()
                     .withReturnType(N)
-                    .withName("end" + captializeFirst(singularize(property.getName())))
+                    .withName(methodName)
                     .addToAttributes(BODY, "return and();")
                     .build();
 
