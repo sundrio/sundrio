@@ -41,7 +41,7 @@ public class BuilderContextManager {
                 return existing;
             }
             throw new IllegalStateException("Cannot use different target package names in a single project. Used:"
-                    + packageName + "but package:"
+                    + packageName + " but package:"
                     + existing.getTargetPackage() + " already exists.");
         }
     }
