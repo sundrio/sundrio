@@ -37,7 +37,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstruc
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.builder.internal.utils.BuilderUtils.isInlinable;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
@@ -73,9 +72,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
                 if (isBuildable(property) && !isMap(property.getType())) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(property));
-                    if (isInlinable(property)) {
-                        methods.add(ToMethod.WITH_NESTED_INLINE.apply(property));
-                    }
+                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(property));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(property).addToAttributes(MEMBER_OF, fluentType).build()));
                 }
             }

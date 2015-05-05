@@ -23,6 +23,9 @@ import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.utils.StringUtils;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class BuilderUtils {
 
     public static final String BUILDABLE = "BUILDABLE";
@@ -96,26 +99,30 @@ public class BuilderUtils {
         return false;
     }
 
-
-    public static boolean isInlinable(JavaProperty property) {
+    public static Set<JavaMethod> getInlineableConstructors(JavaProperty property) {
+        Set<JavaMethod> result = new HashSet<>();
         JavaClazz clazz = PropertyAs.CLASS.apply(property);
-        if (clazz.getConstructors().size() == 0) {
+        for (JavaMethod candidate : clazz.getConstructors()) {
+            if (isInlineable(candidate)) {
+                result.add(candidate);
+            }
+        }
+        return result;
+    }
+
+    public static boolean isInlineable(JavaMethod method) {
+        if (method.getArguments().length == 0 || method.getArguments().length > 5) {
             return false;
         }
-
-        JavaMethod constructor = findBuildableConstructor(clazz);
-        if (constructor.getArguments().length == 0 || constructor.getArguments().length > 5) {
-            return false;
-        } else {
-            for (JavaProperty argument : constructor.getArguments()) {
-                if (StringUtils.isNullOrEmpty(argument.getType().getPackageName())) {
-                    continue;
-                } else if (property.getType().getPackageName().startsWith("java.lang")) {
-                    continue;
-                } else {
-                    return false;
-                }
-            }
+        
+        for (JavaProperty argument : method.getArguments()) {
+            if (StringUtils.isNullOrEmpty(argument.getType().getPackageName())) {
+                continue;
+            } else if (argument.getType().getPackageName().startsWith("java.lang")) {
+                continue;
+            } else {
+                return false;
+            } 
         }
         return true;
     }
