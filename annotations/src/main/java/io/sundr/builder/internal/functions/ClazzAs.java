@@ -20,7 +20,6 @@ import io.sundr.Function;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.functions.ClassToJavaType;
-import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
@@ -36,6 +35,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
+import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
+import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
+import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
+import static io.sundr.builder.internal.utils.BuilderUtils.isInlinable;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
@@ -156,7 +162,6 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
     static final String BODY = "BODY";
     static final String MEMBER_OF = "MEMBER_OF";
-    private static final String BUILDABLE = "BUILDABLE";
     private static final JavaType MAP = ClassToJavaType.FUNCTION.apply(Map.class);
     private static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
     private static final JavaType SET = ClassToJavaType.FUNCTION.apply(Set.class);
@@ -198,98 +203,6 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         return sb.toString();
     }
 
-    private static JavaMethod findBuildableConstructor(JavaClazz clazz) {
-        for (JavaMethod candidate : clazz.getConstructors()) {
-            if (candidate.getArguments().length != 0) {
-                return candidate;
-            }
-        }
-        return clazz.getConstructors().iterator().next();
-    }
-
-    private static JavaMethod findGetter(JavaClazz clazz, JavaProperty property) {
-        for (JavaMethod method : clazz.getMethods()) {
-            if (isApplicableGetterOf(method, property)) {
-                return method;
-            }
-        }
-        return null;
-    }
-
-    private static boolean isApplicableGetterOf(JavaMethod method, JavaProperty property) {
-        if (!method.getReturnType().isAssignable(property.getType())) {
-            return false;
-        }
-
-        if (method.getName().endsWith("get" + property.getNameCapitalized())) {
-            return true;
-        }
-
-        if (method.getName().endsWith("is" + property.getNameCapitalized())) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if there is a default constructor available.
-     * @param item  The clazz to check.
-     * @return
-     */
-    private static boolean hasDefaultConstructor(JavaClazz item) {
-        if (item == null) {
-            return false;
-        } else if (item.getConstructors().isEmpty()) {
-            return true;
-        } else {
-            for (JavaMethod constructor : item.getConstructors()) {
-                if (constructor.getArguments().length == 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if {@link io.sundr.codegen.model.JavaType} has the BUILDABLE attribute set to true.
-     *
-     * @param item The type to check.
-     * @return
-     */
-    private static boolean isBuildable(AttributeSupport item) {
-        if (item == null) {
-            return false;
-        } else if (item.getAttributes().containsKey(BUILDABLE)) {
-            return (Boolean) item.getAttributes().get(BUILDABLE);
-        }
-        return false;
-    }
-
-
-    private static boolean isInlinable(JavaProperty property) {
-        JavaClazz clazz = PropertyAs.CLASS.apply(property);
-        if (clazz.getConstructors().size() == 0) {
-            return false;
-        }
-        
-        JavaMethod constructor = clazz.getConstructors().iterator().next();
-        if (constructor.getArguments().length > 5) {
-            return false;
-        } else {
-            for (JavaProperty argument : constructor.getArguments()) {
-                if (StringUtils.isNullOrEmpty(argument.getType().getPackageName())) {
-                    continue;
-                } else if (property.getType().getPackageName().startsWith("java.lang")) {
-                    continue;
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
     private static boolean isMap(JavaType type) {
         return type.equals(MAP) || type.getInterfaces().contains(MAP);
     }
