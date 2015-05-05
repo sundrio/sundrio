@@ -34,7 +34,7 @@ public class BuildableRepository {
     }
 
     public boolean isBuildable(TypeElement buildable) {
-        return buildable != null && buildables.contains(buildable.getQualifiedName().toString());
+        return buildable != null && buildables.contains(buildable);
     }
 
     public void clear() {
