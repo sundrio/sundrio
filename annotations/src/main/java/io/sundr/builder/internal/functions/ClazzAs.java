@@ -17,8 +17,6 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
-import io.sundr.builder.internal.BuilderContext;
-import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
@@ -29,8 +27,6 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
