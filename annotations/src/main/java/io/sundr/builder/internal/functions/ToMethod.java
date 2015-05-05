@@ -29,6 +29,7 @@ import io.sundr.codegen.utils.StringUtils;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.singularize;
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
+import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 
 public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
@@ -164,7 +165,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             JavaClazz clazz = PropertyAs.CLASS.apply(property);
-            JavaMethod constructor = clazz.getConstructors().iterator().next();
+            JavaMethod constructor = findBuildableConstructor(clazz);
             
             String ownPrefix = property.getType().isCollection() ? "addNew" : "withNew";
             String ownName = ownPrefix + captializeFirst(singularize(property.getName()));
