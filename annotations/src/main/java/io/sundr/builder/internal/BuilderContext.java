@@ -45,11 +45,12 @@ public class BuilderContext {
     private static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     private static final JavaType BASE_NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
 
+    private final Elements elements;
+            
     private final Function<String, JavaType> toType;
     private final Function<VariableElement, JavaProperty> toProperty;
     private final JavaMethodFunction toMethod;
     private final JavaClazzFunction toClazz;
-
             
     private final JavaClazz fluentInterface;
     private final JavaClazz builderInterface;
@@ -59,6 +60,7 @@ public class BuilderContext {
     private final BuildableRepository repository;
 
     public BuilderContext(Elements elements, String targetPackage) {
+        this.elements = elements;
         this.targetPackage = targetPackage;
 
         toType = new ToBuildableJavaType(elements);
@@ -102,6 +104,10 @@ public class BuilderContext {
                 .withName("and")
                 .and()
                 .build();
+    }
+
+    public Elements getElements() {
+        return elements;
     }
 
     public String getTargetPackage() {

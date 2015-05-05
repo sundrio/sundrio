@@ -17,12 +17,14 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.utils.StringUtils;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.singularize;
@@ -158,6 +160,34 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
 
         }
+    }, WITH_NEW_NESTED_INLINE {
+        @Override
+        public JavaMethod apply(JavaProperty property) {
+            JavaClazz clazz = PropertyAs.CLASS.apply(property);
+            JavaMethod constructor = clazz.getConstructors().iterator().next();
+
+            //We need to repackage because we are nesting under this class.
+            JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
+            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
+            String prefix = property.getType().isCollection() ? "addNew" : "withNew";
+            String methodName = prefix + captializeFirst(singularize(property.getName()));
+            String args = StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
+                @Override
+                public String apply(JavaProperty item) {
+                    return item.getName();
+                }
+            }, ", ");
+
+            return new JavaMethodBuilder()
+                    .withReturnType(rewraped)
+                    .withArguments(constructor.getArguments())
+                    .withName(methodName)
+                    .addToAttributes(BODY, "return " + methodName + "(" + args + ");")
+                    .build();
+
+        }
+
+
     }, AND {
         @Override
         public JavaMethod apply(JavaProperty property) {
@@ -172,14 +202,14 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
 
         }
-        
+
         private String getClassPrefix(JavaProperty property) {
             Object memberOf = property.getAttributes().get(ClazzAs.MEMBER_OF);
             if ( memberOf instanceof JavaType) {
                 return ((JavaType)memberOf).getClassName() +".this.";
             } else return "";
         }
-        
+
     }, END {
         @Override
         public JavaMethod apply(JavaProperty property) {

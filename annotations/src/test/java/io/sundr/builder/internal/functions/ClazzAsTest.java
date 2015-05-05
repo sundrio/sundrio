@@ -16,16 +16,26 @@
 
 package io.sundr.builder.internal.functions;
 
+import com.sun.tools.javac.model.JavacElements;
+import com.sun.tools.javac.util.Context;
 import io.sundr.Function;
+import io.sundr.builder.internal.BuilderContext;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaType;
 import org.junit.Test;
 
+import javax.lang.model.util.Elements;
+
 import static io.sundr.codegen.utils.StringUtils.join;
 
 public class ClazzAsTest {
+
+    private final Context context = new Context();
+    private final Elements elements = JavacElements.instance(context);
+    private final BuilderContext builderContext = BuilderContextManager.create(elements);
 
     @Test
     public void testToFluent() {

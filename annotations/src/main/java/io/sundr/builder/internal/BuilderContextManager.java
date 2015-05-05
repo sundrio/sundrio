@@ -25,8 +25,10 @@ public class BuilderContextManager {
 
     private static final AtomicReference<BuilderContext> context = new AtomicReference<>();
 
-    public static void create(Elements elements) {
-        context.set(new BuilderContext(elements, Builder.class.getPackage().getName()));
+    public static BuilderContext create(Elements elements) {
+        BuilderContext ctx = new BuilderContext(elements, Builder.class.getPackage().getName());
+        context.set(ctx);
+        return ctx;
     }
 
     public static BuilderContext create(Elements elements, String packageName) {
