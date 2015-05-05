@@ -18,19 +18,35 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Canvas {
 
+    private final List<Circle> circles;
+    private final List<Square> squares;
     private final List<Shape> shapes;
 
     @Buildable
-    public Canvas(List<Shape> shapes) {
-        this.shapes = Collections.unmodifiableList(shapes);
+    public Canvas(List<Circle> circles, List<Square> squares, List<Shape> shapes) {
+        List<Shape> list = new ArrayList<>();
+        list.addAll(circles);
+        list.addAll(squares);
+        this.circles = Collections.unmodifiableList(circles);
+        this.squares = Collections.unmodifiableList(squares);
+        this.shapes = Collections.unmodifiableList(list);
     }
 
     public List<Shape> getShapes() {
         return shapes;
+    }
+
+    public List<Circle> getCircles() {
+        return circles;
+    }
+
+    public List<Square> getSquares() {
+        return squares;
     }
 }

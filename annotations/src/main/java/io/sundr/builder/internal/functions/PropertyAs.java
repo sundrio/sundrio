@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
@@ -26,6 +27,8 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +37,17 @@ import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 
 public final class PropertyAs {
+
+    public static final Function<JavaProperty, JavaClazz> CLASS = new Function<JavaProperty, JavaClazz>() {
+        @Override
+        public JavaClazz apply(JavaProperty item) {
+            BuilderContext context = BuilderContextManager.getContext();
+            Elements elements = context.getElements();
+            JavaType type = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+            TypeElement typeElement = elements.getTypeElement(type.getFullyQualifiedName());
+            return BuilderContextManager.getContext().getToClazz().apply(typeElement);
+        }
+    };
 
     public static final Function<JavaProperty, JavaClazz> NESTED_CLASS = new Function<JavaProperty, JavaClazz>() {
         @Override

@@ -67,6 +67,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
                 if (isBuildable(property) && !isMap(property.getType())) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(property));
+                    if (isInlinable(property)) {
+                        methods.add(ToMethod.WITH_NESTED_INLINE.apply(property));
+                    }
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(property).addToAttributes(MEMBER_OF, fluentType).build()));
                 }
             }
@@ -257,6 +260,30 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             return (Boolean) item.getAttributes().get(BUILDABLE);
         }
         return false;
+    }
+
+
+    private static boolean isInlinable(JavaProperty property) {
+        JavaClazz clazz = PropertyAs.CLASS.apply(property);
+        if (clazz.getConstructors().size() == 0) {
+            return false;
+        }
+        
+        JavaMethod constructor = clazz.getConstructors().iterator().next();
+        if (constructor.getArguments().length > 5) {
+            return false;
+        } else {
+            for (JavaProperty argument : constructor.getArguments()) {
+                if (StringUtils.isNullOrEmpty(argument.getType().getPackageName())) {
+                    continue;
+                } else if (property.getType().getPackageName().startsWith("java.lang")) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     
     private static boolean isMap(JavaType type) {
