@@ -1,0 +1,23 @@
+package ${model.type.packageName};
+
+#foreach($i in $model.imports)
+import $i.fullyQualifiedName;
+#end
+
+#class ($model)
+
+#foreach ($c in ${model.constructors})
+public ${c.returnType.className}(#foreach ($a in ${c.arguments}) ${a.type.simpleName} ${a.name} #if( $foreach.hasNext ),#end#end){
+    ${c.attributes.get("BODY")}
+}
+#end
+
+
+#foreach ($m in $model.methods)
+public ${m.returnType.simpleName} ${m.name}(#foreach ($a in ${m.arguments}) ${a.type.simpleName} ${a.name} #if( $foreach.hasNext ),#end#end){
+    ${m.attributes.get("BODY")}
+}
+#end
+
+#end    
+    

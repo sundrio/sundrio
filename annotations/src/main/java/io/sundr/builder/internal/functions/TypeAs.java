@@ -105,9 +105,22 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .build();
 
         }
-    },
+    }, EDITABLE {
+        @Override
+        public JavaType apply(JavaType item) {
+            List<JavaType> generics = new ArrayList<>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
+            return new JavaTypeBuilder(item)
+                    .withClassName("Editable" + item.getClassName())
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withSuperClass(item)
+                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getEditableInterface().getType(), SHALLOW_BUILDER.apply(item)))))
+                    .build();
 
-    SHALLOW_BUILDER {
+        }
+    }, SHALLOW_BUILDER {
         public JavaType apply(JavaType item) {
             List<JavaType> generics = new ArrayList<>();
             for (JavaType generic : item.getGenericTypes()) {

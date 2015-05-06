@@ -18,6 +18,7 @@ package io.sundr.builder.internal;
 
 import io.sundr.Function;
 import io.sundr.builder.Builder;
+import io.sundr.builder.Editable;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
@@ -38,12 +39,14 @@ import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class BuilderContext {
-    
+
+    private static final JavaType B = newGeneric("B");
     private static final JavaType T = newGeneric("T");
     private static final JavaType N = newGeneric("N");
     private static final JavaType BASE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
     private static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     private static final JavaType BASE_NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
+    private static final JavaType BASE_EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), B);
 
     private final Elements elements;
             
@@ -55,6 +58,7 @@ public class BuilderContext {
     private final JavaClazz fluentInterface;
     private final JavaClazz builderInterface;
     private final JavaClazz nestedInterface;
+    private final JavaClazz editableInterface;
     private final String targetPackage;
     
     private final BuildableRepository repository;
@@ -104,6 +108,20 @@ public class BuilderContext {
                 .withName("and")
                 .and()
                 .build();
+
+        editableInterface = new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.INTERFACE)
+                .withPackageName(targetPackage)
+                .withClassName(BASE_EDITABLE.getClassName())
+                .withGenericTypes(BASE_EDITABLE.getGenericTypes())
+                .and()
+                .addNewMethod()
+                .withReturnType(B)
+                .withName("edit")
+                .and()
+                .build();
+
     }
 
     public Elements getElements() {
@@ -123,6 +141,10 @@ public class BuilderContext {
 
     public JavaClazz getNestedInterface() {
         return nestedInterface;
+    }
+
+    public JavaClazz getEditableInterface() {
+        return editableInterface;
     }
 
     public BuildableRepository getRepository() {

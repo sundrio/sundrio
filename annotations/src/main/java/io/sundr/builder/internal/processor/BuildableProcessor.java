@@ -57,11 +57,20 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     JavaClazz clazz = ctx.getToClazz().apply(ModelUtils.getClassElement(element));
                     generateLocalDependenciesIfNeeded();
                     try {
-                        generateFromClazz(ClazzAs.BUILDER.apply(clazz),
-                                selectBuilderTemplate(buildable.validationEnabled()));
 
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
                                 DEFAULT_FLUENT_TEMPLATE_LOCATION);
+
+                        if (buildable.editableEnabled()) {
+                            generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(clazz),
+                                    selectBuilderTemplate(buildable.validationEnabled()));
+
+                            generateFromClazz(ClazzAs.EDITABLE.apply(clazz),
+                                    DEFAULT_EDITABLE_TEMPLATE_LOCATION);
+                        } else {
+                            generateFromClazz(ClazzAs.BUILDER.apply(clazz),
+                                    selectBuilderTemplate(buildable.validationEnabled()));
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

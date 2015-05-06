@@ -25,6 +25,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
     public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
+    public static final String DEFAULT_EDITABLE_TEMPLATE_LOCATION = "templates/builder/editable.vm";
     public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
     public static final String VALIDATING_BUILDER_TEMPLATE_LOCATION = "templates/builder/validating-builder.vm";
 
@@ -41,6 +42,9 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 );
 
                 generateFromClazz(context.getNestedInterface(),
+                        DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
+                generateFromClazz(context.getEditableInterface(),
                         DEFAULT_INTERFACE_TEMPLATE_LOCATION
                 );
             } catch (Exception e) {

@@ -151,7 +151,57 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .build();
         }
 
-    };
+    }, EDITABLE_BUILDER {
+        @Override
+        public JavaClazz apply(JavaClazz item) {
+            JavaClazz builder = BUILDER.apply(item);
+            Set<JavaMethod> methods = new LinkedHashSet<>();
+            for (JavaMethod m : builder.getMethods()) {
+                if (m.getName().equals("build")) {
+
+                    methods.add(new JavaMethodBuilder()
+                            .withReturnType(TypeAs.EDITABLE.apply(m.getReturnType()))
+                            .withName("build")
+                            .addToAttributes(BODY, toBuild(EDITABLE.apply(item)))
+                            .build());
+                } else {
+                    methods.add(m);
+                }
+            }
+            return new JavaClazzBuilder(builder)
+                    .withMethods(methods)
+                    .build();
+
+        }
+    }, EDITABLE {
+            @Override
+            public JavaClazz apply(JavaClazz item) {
+                JavaType type = item.getType();
+                JavaType editableType = TypeAs.EDITABLE.apply(type);
+                JavaType builderType = TypeAs.BUILDER.apply(type);
+
+                Set<JavaMethod> constructors = new LinkedHashSet<>();
+                Set<JavaMethod> methods = new LinkedHashSet<>();
+
+                for (JavaMethod constructor : item.getConstructors()) {
+                    constructors.add(superConstructorOf(constructor, editableType));
+                }
+
+                JavaMethod edit = new JavaMethodBuilder()
+                        .withReturnType(builderType)
+                        .withName("edit")
+                        .addToAttributes(BODY, "return new "+builderType.getSimpleName()+ "(this);")
+                        .build();
+
+                methods.add(edit);
+
+                return new JavaClazzBuilder()
+                        .withType(editableType)
+                        .withConstructors(constructors)
+                        .withMethods(methods)
+                        .build();
+            }
+        };
 
     static final String BODY = "BODY";
     static final String MEMBER_OF = "MEMBER_OF";
@@ -194,6 +244,18 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         sb.append("validate(buildable);\n");
         sb.append("return buildable;\n");
         return sb.toString();
+    }
+
+    private static JavaMethod superConstructorOf(JavaMethod constructor, JavaType constructorType) {
+       return new JavaMethodBuilder(constructor)
+                .withReturnType(constructorType)
+                .addToAttributes(BODY, "super(" + StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
+                    @Override
+                    public String apply(JavaProperty item) {
+                        return item.getName();
+                    }
+                }, ", ") + ");")
+                .build();
     }
 
     private static boolean isMap(JavaType type) {

@@ -10,4 +10,4 @@ import $i.fullyQualifiedName;
     ${m.returnType.simpleName} ${m.name}(#foreach ($a in ${m.arguments}) ${a.type.simpleName} ${a.name} #if( $foreach.hasNext ),#end#end);
 #end
 
-#end   
+#end
