@@ -35,6 +35,9 @@ public enum JavaClazzToReferences implements Function<JavaClazz, Set<JavaType>> 
 
         result.addAll(JavaTypeToReferences.FUNCTION.apply(item.getType()));
 
+        for (JavaMethod c : item.getConstructors()) {
+            result.addAll(JavaMethodToReferences.FUNCTION.apply(c));
+        }
         for (JavaProperty p : item.getFields()) {
             result.addAll(JavaPropertyToReferences.FUNCTION.apply(p));
         }
