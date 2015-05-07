@@ -16,8 +16,12 @@
 
 package io.sundr.codegen;
 
+import javax.lang.model.element.Modifier;
+import java.util.Set;
+
 public interface Property<T extends Type> {
-    
+
+    Set<Modifier> getModifiers();
     T getType();
     String getName();
     boolean isArray();

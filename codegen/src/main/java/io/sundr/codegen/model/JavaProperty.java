@@ -18,18 +18,22 @@ package io.sundr.codegen.model;
 
 import io.sundr.codegen.Property;
 
+import javax.lang.model.element.Modifier;
 import java.util.Map;
+import java.util.Set;
 
 public class JavaProperty extends AttributeSupport implements Property<JavaType> {
 
+    private final Set<Modifier> modifiers;
     private final JavaType type;
     private final String name;
     private final boolean array;
 
-    public JavaProperty(JavaType type, String name, Map<String, Object> attributes, boolean array) {
+    public JavaProperty(Set<Modifier> modifiers, JavaType type, String name, boolean array, Map<String, Object> attributes) {
         super(attributes);
         this.type = type;
         this.name = name;
+        this.modifiers = modifiers;
         this.array = array;
     }
 
@@ -50,6 +54,10 @@ public class JavaProperty extends AttributeSupport implements Property<JavaType>
             sb.append(name.substring(1));
         }
         return sb.toString();
+    }
+
+    public Set<Modifier> getModifiers() {
+        return modifiers;
     }
 
     @Override

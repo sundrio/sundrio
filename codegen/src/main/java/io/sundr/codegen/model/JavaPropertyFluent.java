@@ -19,11 +19,34 @@ package io.sundr.codegen.model;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
 
+import javax.lang.model.element.Modifier;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 public class JavaPropertyFluent<T extends JavaPropertyFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
 
+    private Set<Modifier> modifiers = new LinkedHashSet<>();
     private JavaType type;
     private String name;
     private boolean array;
+
+    public T addToModifiers(Modifier item) {
+        this.modifiers.add(item);
+        return (T) this;
+    }
+
+    public T withModifiers(Set<Modifier> modifiers) {
+        this.modifiers.clear();
+        for (Modifier item : modifiers) {
+            this.modifiers.add(item);
+        }
+        return (T) this;
+    }
+
+    public Set<Modifier> getModifiers() {
+        return this.modifiers;
+    }
+
 
     public JavaType getType() {
         return this.type;

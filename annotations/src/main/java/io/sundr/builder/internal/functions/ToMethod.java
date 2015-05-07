@@ -24,6 +24,8 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
+import javax.lang.model.element.Modifier;
+
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.singularize;
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
@@ -35,6 +37,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             String methodName = "with" + property.getNameCapitalized();
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{property})
@@ -66,6 +69,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaType unwraped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getType());
 
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{property})
@@ -79,6 +83,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
@@ -91,6 +96,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
@@ -103,6 +109,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             String methodName = "set" + property.getNameCapitalized();
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(VOID)
                     .withArguments(new JavaProperty[]{property})
@@ -120,6 +127,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
             String methodName = "addTo" + property.getNameCapitalized();
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{item})
@@ -138,6 +146,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaProperty valueProperty = new JavaPropertyBuilder().withName("value").withType(valueType).build();
             String methodName = "addTo" + property.getNameCapitalized();
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{keyProperty, valueProperty})
@@ -156,6 +165,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     : property.getName());
             
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .addToAttributes(BODY, "return new " + rewraped.getSimpleName() + "();")
@@ -170,6 +180,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String prefix = property.getType().isCollection() ? "addTo" : "with";
             String withMethodName = prefix + captializeFirst(property.getName());
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withReturnType(N)
                     .withName("and")
                     .addToAttributes(BODY, "return (N) " + classPrefix + withMethodName + "(builder.build());")
@@ -192,6 +203,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     : property.getName());
             
             return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
                     .withReturnType(N)
                     .withName(methodName)
                     .addToAttributes(BODY, "return and();")

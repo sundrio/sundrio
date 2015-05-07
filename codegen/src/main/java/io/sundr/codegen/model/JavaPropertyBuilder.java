@@ -39,7 +39,7 @@ public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder>
     }
 
     public JavaProperty build() {
-        return new JavaProperty(fluent.getType(), fluent.getName(), fluent.getAttributes(), fluent.isArray());
+        return new JavaProperty(fluent.getModifiers(), fluent.getType(), fluent.getName(), fluent.isArray(), fluent.getAttributes());
 
     }
 }
