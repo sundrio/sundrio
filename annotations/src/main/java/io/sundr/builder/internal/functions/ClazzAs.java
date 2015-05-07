@@ -49,32 +49,35 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             JavaType fluentType = TypeAs.FLUENT.apply(item.getType());
             for (JavaProperty property : item.getFields()) {
+                JavaProperty toAdd = property;
                 boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
                 if (property.isArray()) {
+                    JavaProperty asList = arrayAsList(property, buildable);
                     methods.add(ToMethod.WITH_ARRAY.apply(property));
                     methods.add(ToMethod.GETTER_ARRAY.apply(property));
-                    properties.add(arrayAsList(property, buildable));
+                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
+                    toAdd = asList;
+                } else if (isSet(property.getType()) || isList(property.getType())) {
+                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
+                } else if (isMap(property.getType())) {
+                    methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    properties.add(new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build());
-                    methods.add(ToMethod.GETTER.apply(property));
-                    methods.add(ToMethod.WITH.apply(property));
-                }
-            }
-
-            for (JavaProperty property : properties) {
-                if (property.getType().isCollection()) {
-                    if (isSet(property.getType()) || isList(property.getType())) {
-                        methods.add(ToMethod.ADD_TO_COLLECTION.apply(property));
-                    } else if (property.getType().getClassName().contains("Map")) {
-                        methods.add(ToMethod.ADD_TO_MAP.apply(property));
-                    }
+                    toAdd = new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build();
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                if (isBuildable(property) && !isMap(property.getType())) {
-                    methods.add(ToMethod.WITH_NEW_NESTED.apply(property));
-                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(property));
-                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(property).addToAttributes(MEMBER_OF, fluentType).build()));
+                if (isBuildable(toAdd) && !isMap(toAdd.getType())) {
+                    methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
+                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
+                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
                 }
+
+                properties.add(toAdd);
             }
 
             return new JavaClazzBuilder(item)
@@ -100,7 +103,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withReturnType(builderType)
                     .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(new "+item.getType().getClassName()+"());" : "this.fluent = this;")
                     .build();
-            
+
             JavaMethod fluentConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
@@ -121,7 +124,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withName("instance").and()
                     .addToAttributes(BODY, toInstanceConstructorBody(item, "fluent"))
                     .build();
-            
+
             JavaMethod instanceConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
