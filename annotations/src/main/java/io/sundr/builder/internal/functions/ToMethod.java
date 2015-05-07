@@ -55,7 +55,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 if (className.contains("Map")) {
                     sb.append("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (T) this;");
                 } else if (className.contains("List") || className.contains("Set")) {
-                    sb.append("if (" + name + " != null) {this." + name + ".addAll(" + name + ");} return (T) this;");
+                    JavaType unwraped = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
+                    String addToMethodName = "addTo" + property.getNameCapitalized();
+                    sb.append("if (" + name + " != null) {for ("+unwraped.getSimpleName()+" item : " + name + "){this." + addToMethodName + "(item);}} return (T) this;");
                 }
                 return sb.toString();
             }
@@ -67,13 +69,14 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             String methodName = "with" + property.getNameCapitalized();
             JavaType unwraped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getType());
+            String addToMethodName = "addTo" + property.getNameCapitalized();
 
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{property})
-                    .addToAttributes(BODY, "this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + property.getName() + ".add(item);}} return (T) this;")
+                    .addToAttributes(BODY, "this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (T) this;")
                     .build();
         }
 
