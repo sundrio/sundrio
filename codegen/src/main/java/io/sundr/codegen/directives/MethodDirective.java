@@ -92,8 +92,12 @@ public class MethodDirective extends Directive {
                     .append(")");
 
             writeExceptions(writer, method);
-            writer.append("{\n");
-            writer.append(block).append("}\n");
+            if (!StringUtils.isNullOrEmpty(block)) {
+                writer.append("{\n");
+                writer.append(block).append("}\n");
+            } else {
+                writer.append(";");
+            }
         }
     }
 
