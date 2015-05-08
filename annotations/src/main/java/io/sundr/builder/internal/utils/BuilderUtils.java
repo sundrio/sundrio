@@ -16,15 +16,19 @@
 
 package io.sundr.builder.internal.utils;
 
+
 import io.sundr.builder.internal.functions.PropertyAs;
 import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static io.sundr.builder.Constants.*;
 
 public class BuilderUtils {
 
@@ -125,5 +129,18 @@ public class BuilderUtils {
             } 
         }
         return true;
+    }
+
+
+    public static boolean isMap(JavaType type) {
+        return type.equals(MAP) || type.getInterfaces().contains(MAP);
+    }
+
+    public static boolean isList(JavaType type) {
+        return type.equals(LIST) || type.getInterfaces().contains(LIST);
+    }
+
+    public static boolean isSet(JavaType type) {
+        return type.equals(SET) || type.getInterfaces().contains(SET);
     }
 }

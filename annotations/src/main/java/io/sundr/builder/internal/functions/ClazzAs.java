@@ -17,7 +17,6 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
-import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
@@ -28,15 +27,16 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
+import static io.sundr.builder.internal.utils.BuilderUtils.*;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
@@ -206,11 +206,6 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             }
         };
 
-    static final String BODY = "BODY";
-    static final String MEMBER_OF = "MEMBER_OF";
-    private static final JavaType MAP = ClassToJavaType.FUNCTION.apply(Map.class);
-    private static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
-    private static final JavaType SET = ClassToJavaType.FUNCTION.apply(Set.class);
 
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
         return new JavaPropertyBuilder(property)
@@ -261,15 +256,4 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 .build();
     }
 
-    private static boolean isMap(JavaType type) {
-        return type.equals(MAP) || type.getInterfaces().contains(MAP);
-    }
-
-    private static boolean isList(JavaType type) {
-        return type.equals(LIST) || type.getInterfaces().contains(LIST);
-    }
-
-    private static boolean isSet(JavaType type) {
-        return type.equals(SET) || type.getInterfaces().contains(SET);
-    }
 }

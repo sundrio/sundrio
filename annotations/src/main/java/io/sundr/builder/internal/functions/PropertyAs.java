@@ -33,8 +33,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.MEMBER_OF;
+import static io.sundr.builder.Constants.N;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 
 public final class PropertyAs {
 
@@ -59,7 +60,7 @@ public final class PropertyAs {
 
             Set<JavaProperty> properties = new HashSet<>();
             
-            JavaType memberOf = (JavaType) item.getAttributes().get(ClazzAs.MEMBER_OF); 
+            JavaType memberOf = (JavaType) item.getAttributes().get(MEMBER_OF);
 
             properties.add(new JavaPropertyBuilder()
                     .withName("builder")
@@ -69,7 +70,7 @@ public final class PropertyAs {
                     .withType(nestedType)
                     .withFields(properties)
                     .withMethods(nestedMethods)
-                    .addToAttributes(ClazzAs.MEMBER_OF, memberOf)
+                    .addToAttributes(MEMBER_OF, memberOf)
                     .build();
         }
     };
@@ -103,8 +104,5 @@ public final class PropertyAs {
                     .build();
         }
     };
-
-    private static final JavaType N = newGeneric("N");
-
 
 }

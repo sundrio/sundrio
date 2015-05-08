@@ -26,9 +26,14 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 
 import javax.lang.model.element.Modifier;
 
+import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.MEMBER_OF;
+import static io.sundr.builder.Constants.N;
+import static io.sundr.builder.Constants.T;
+import static io.sundr.builder.Constants.VOID;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.singularize;
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
+
 
 public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
@@ -57,7 +62,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 } else if (className.contains("List") || className.contains("Set")) {
                     JavaType unwraped = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
                     String addToMethodName = "addTo" + property.getNameCapitalized();
-                    sb.append("if (" + name + " != null) {for ("+unwraped.getSimpleName()+" item : " + name + "){this." + addToMethodName + "(item);}} return (T) this;");
+                    sb.append("if (" + name + " != null) {for (" + unwraped.getSimpleName() + " item : " + name + "){this." + addToMethodName + "(item);}} return (T) this;");
                 }
                 return sb.toString();
             }
@@ -166,7 +171,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String methodName = prefix + captializeFirst(property.getType().isCollection()
                     ? singularize(property.getName())
                     : property.getName());
-            
+
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withReturnType(rewraped)
@@ -192,9 +197,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         }
 
         private String getClassPrefix(JavaProperty property) {
-            Object memberOf = property.getAttributes().get(ClazzAs.MEMBER_OF);
-            if ( memberOf instanceof JavaType) {
-                return ((JavaType)memberOf).getClassName() +".this.";
+            Object memberOf = property.getAttributes().get(MEMBER_OF);
+            if (memberOf instanceof JavaType) {
+                return ((JavaType) memberOf).getClassName() + ".this.";
             } else return "";
         }
 
@@ -204,19 +209,13 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String methodName = "end" + captializeFirst(property.getType().isCollection()
                     ? singularize(property.getName())
                     : property.getName());
-            
+
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withReturnType(N)
                     .withName(methodName)
                     .addToAttributes(BODY, "return and();")
                     .build();
-
         }
     };
-
-    static final String BODY = "BODY";
-    static final JavaType VOID = new JavaTypeBuilder().withClassName("void").build();
-    private static final JavaType T = newGeneric("T");
-    private static final JavaType N = newGeneric("N");
 }
