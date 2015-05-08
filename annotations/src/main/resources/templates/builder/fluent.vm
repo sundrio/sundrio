@@ -7,8 +7,9 @@ import $i.fullyQualifiedName;
 #class ($model)
 
 #foreach($f in $model.fields)
-    private ${f.type.simpleName} ${f.name} #if(${f.type.collection}) = new ${f.type.defaultImplementation.className}()#end;
-#end    
+    #field ($f)
+#end
+
 
 #foreach($m in $model.methods)
     #method ($m)

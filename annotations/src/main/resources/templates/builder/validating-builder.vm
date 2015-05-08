@@ -12,8 +12,8 @@ import $i.fullyQualifiedName;
 
 #class ($model)
 
-#foreach ($f in $model.fields)
-private final ${f.type.simpleName} ${f.name};
+#foreach($f in $model.fields)
+    #field ($f)
 #end
 
 #foreach ($c in ${model.constructors})
