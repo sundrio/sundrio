@@ -172,4 +172,18 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             return new JavaTypeBuilder(type).withArray(false).build();
         }
     };
+
+
+    public static Function<JavaType, JavaType> combine(final Function<JavaType, JavaType>... functions) {
+        return new Function<JavaType, JavaType>() {
+            @Override
+            public JavaType apply(JavaType item) {
+                JavaType result = item;
+                for (Function<JavaType, JavaType> f : functions) {
+                    result = f.apply(result);
+                }
+                return result;
+            }
+        };
+    }
 }

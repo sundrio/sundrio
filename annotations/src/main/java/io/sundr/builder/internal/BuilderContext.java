@@ -43,6 +43,8 @@ import static io.sundr.builder.Constants.LIST;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.NESTED;
 import static io.sundr.builder.Constants.T;
+import static io.sundr.builder.Constants.Q;
+import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class BuilderContext {
@@ -110,23 +112,23 @@ public class BuilderContext {
                     .withName("build")
                     .withReturnType(typeGenericOf(ARRAY_LIST, T))
                     .addNewArgument()
-                        .withType(typeGenericOf(LIST, typeGenericOf(BUILDER, T)))
+                        .withType(typeGenericOf(LIST, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
                         .withName("list")
                     .endArgument()
-                    .addToAttributes(BODY, "ArrayList<T> r = new ArrayList<>();for (Builder<T> b : list) {r.add(b.build());}return r;")
+                .addToAttributes(BODY, "ArrayList<T> r = new ArrayList<>();for (Builder<T> b : list) {r.add(b.build());}return r;")
                 .and()
                 .addNewMethod()
-                    .addToTypeParameters(T)
-                    .addToModifiers(Modifier.PUBLIC)
+                .addToTypeParameters(T)
+                .addToModifiers(Modifier.PUBLIC)
                     .withName("build")
-                    .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
+                .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
                     .addNewArgument()
-                        .withType(typeGenericOf(LINKED_HASH_SET, typeGenericOf(BUILDER, T)))
+                .withType(typeGenericOf(LINKED_HASH_SET, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
                         .withName("set")
-                    .endArgument()
-                    .addToAttributes(BODY, "LinkedHashSet<T> r = new LinkedHashSet<>();for (Builder<T> b : set) {r.add(b.build());}return r;")
-                .and()
-                .build();
+                        .endArgument()
+                        .addToAttributes(BODY, "LinkedHashSet<T> r = new LinkedHashSet<>();for (Builder<T> b : set) {r.add(b.build());}return r;")
+                        .and()
+                        .build();
 
         nestedInterface = new JavaClazzBuilder()
                 .withNewType()

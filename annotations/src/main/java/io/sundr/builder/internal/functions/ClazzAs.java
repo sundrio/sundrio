@@ -36,7 +36,10 @@ import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstruc
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.builder.internal.utils.BuilderUtils.*;
+import static io.sundr.builder.internal.utils.BuilderUtils.isList;
+import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
+import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
@@ -75,6 +78,14 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
+
+                    JavaType builderType = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.BUILDER).apply(toAdd.getType());
+                    if (toAdd.getType().isCollection()) {
+                        builderType = typeGenericOf(toAdd.getType(), builderType);
+                    }
+
+                    toAdd = new JavaPropertyBuilder(toAdd).withType(builderType).build();
+
                 }
 
                 properties.add(toAdd);

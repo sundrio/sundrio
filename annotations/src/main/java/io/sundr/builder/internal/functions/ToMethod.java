@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
@@ -31,8 +32,13 @@ import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.VOID;
+import static io.sundr.builder.internal.utils.BuilderUtils.isList;
+import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
+import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.singularize;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
+import static io.sundr.builder.internal.functions.TypeAs.*;
 
 
 public enum ToMethod implements Function<JavaProperty, JavaMethod> {
@@ -41,6 +47,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             String methodName = "with" + property.getNameCapitalized();
+
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
@@ -65,6 +72,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     sb.append("if (" + name + " != null) {for (" + unwraped.getSimpleName() + " item : " + name + "){this." + addToMethodName + "(item);}} return (T) this;");
                 }
                 return sb.toString();
+            } else if (isBuildable(property)) {
+                JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
+                return "this." + property.getName() + "= " + property.getName() + "!= null ? new " + builder.getSimpleName() + "(" + property.getName() + ") : new " + builder.getSimpleName() + "(); return (T) this;";
             }
             return "this." + property.getName() + "=" + property.getName() + "; return (T) this;";
         }
@@ -90,12 +100,22 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
+            String body = null;
+
+            if (!isBuildable(property) || isMap(property.getType())) {
+                body = "return this." + property.getName() + ";";
+            } else if (isList(property.getType()) || isSet(property.getType())) {
+                body = "return build(" + property.getName() +");";
+            } else {
+                body = "return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;";
+            }
+
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
-                    .addToAttributes(BODY, "return this." + property.getName() + ";")
+                    .addToAttributes(BODY, body)
                     .build();
         }
     }, GETTER_ARRAY {
@@ -134,12 +154,20 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
 
             String methodName = "addTo" + property.getNameCapitalized();
+            String body = "";
+            if (!isBuildable(property)) {
+                body = "if (item != null) {this." + property.getName() + ".add(item);} return (T)this;";
+            } else {
+                JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
+                body = "if (item != null) {this." + property.getName() + ".add(new " + builder.getSimpleName() + "(item));} return (T)this;";
+            }
+
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{item})
-                    .addToAttributes(BODY, "if (item != null) {this." + property.getName() + ".add(item);} return (T)this;")
+                    .addToAttributes(BODY, body)
                     .build();
         }
     },
