@@ -1,0 +1,5 @@
+ArrayList<T> r = new ArrayList<>();
+for (Builder<T> b : list) {
+    r.add(b.build());
+}
+return r;

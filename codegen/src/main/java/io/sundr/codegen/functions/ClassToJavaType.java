@@ -29,7 +29,7 @@ public enum ClassToJavaType implements Function<Class, JavaType> {
         return new JavaTypeBuilder()
                 .withKind(ClassToJavaKind.FUNCTION.apply(item))
                 .withClassName(item.getSimpleName())
-                .withPackageName(item.getPackage().getName())
+                .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
                 .build();
     }
 }

@@ -19,14 +19,18 @@ package io.sundr.codegen.directives;
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.utils.StringUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
 
+import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+
 
 import static io.sundr.codegen.utils.StringUtils.join;
 
@@ -72,8 +76,14 @@ public class MethodDirective extends Directive {
     private void writeMethod(Writer writer, JavaMethod method, String block) throws IOException {
         if (method != null) {
 
-            writer.append("public ")
-                    .append(method.getReturnType().getSimpleName())
+            writer.append(join(method.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
+            if (method.getTypeParameters() != null && !method.getTypeParameters().isEmpty()) {
+                writer.append("<")
+                        .append(StringUtils.join(method.getTypeParameters(), JavaTypeToString.INSTANCE, ", "))
+                        .append("> ");
+            }
+
+            writer.append(method.getReturnType().getSimpleName())
                     .append(" ")
                     .append(method.getName())
                     .append("(")
@@ -81,8 +91,12 @@ public class MethodDirective extends Directive {
                     .append(")");
 
             writeExceptions(writer, method);
-            writer.append("{\n");
-            writer.append(block).append("}\n");
+            if (!StringUtils.isNullOrEmpty(block)) {
+                writer.append("{\n");
+                writer.append(block).append("}\n");
+            } else {
+                writer.append(";");
+            }
         }
     }
 
@@ -92,6 +106,24 @@ public class MethodDirective extends Directive {
         }
 
     }
+    //Enum Singleton
+    private enum ModifierToString implements Function<Modifier, String> {
+        INSTANCE;
+
+        public String apply(Modifier modifier) {
+            return modifier.name().toLowerCase();
+        }
+    }
+
+    //Enum Singleton
+    private enum JavaTypeToString implements Function<JavaType, String> {
+        INSTANCE;
+
+        @Override
+        public String apply(JavaType item) {
+            return item.getSimpleName();
+        }
+    }
 
     //Enum Singleton
     private enum JavaPropertyToString implements Function<JavaProperty, String> {
@@ -100,6 +132,7 @@ public class MethodDirective extends Directive {
         @Override
         public String apply(JavaProperty item) {
             StringBuilder sb = new StringBuilder();
+            sb.append(join(item.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
             sb.append(item.getType().getSimpleName()).append(" ").append(item.getName());
             return sb.toString();
         }

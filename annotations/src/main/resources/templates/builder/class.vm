@@ -6,8 +6,15 @@ import $i.fullyQualifiedName;
 
 #class ($model)
 
+
+#foreach($f in $model.fields)
+    #field ($f)
+#end
+
 #foreach($m in $model.methods)
-    #method ($m)#end
+    #method ($m)
+    ${m.attributes.get("BODY")}
+#end
 #end
 
 #end

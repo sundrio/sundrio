@@ -1,0 +1,5 @@
+for (Visitable v : _visitables) {
+    v.accept(visitor);
+}
+visitor.visit(this);
+return (T) this;

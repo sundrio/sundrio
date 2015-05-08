@@ -17,8 +17,9 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.builder.Constants;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
@@ -27,9 +28,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 
 public enum TypeAs implements Function<JavaType, JavaType> {
 
@@ -37,24 +38,25 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     FLUENT {
         @Override
         public JavaType apply(JavaType item) {
+            BuilderContext ctx = BuilderContextManager.getContext();
             JavaType fluent = SHALLOW_FLUENT.apply(item);
             List<JavaType> generics = new ArrayList<>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            JavaType generic = typeExtends(T, fluent);
+            JavaType generic = typeExtends(Constants.T, fluent);
             generics.add(generic);
 
             JavaType superClass = isBuildable(item.getSuperClass()) ?
                     SHALLOW_FLUENT.apply(item.getSuperClass()) :
-                    OBJECT;
+                    ctx.getBaseFluentClass().getType();
 
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
                     .withPackageName(item.getPackageName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClass)
-                    .withInterfaces(new HashSet(Arrays.asList(BuilderContextManager.getContext().getFluentInterface().getType())))
+                    .withInterfaces(new HashSet(Arrays.asList(ctx.getFluentInterface().getType())))
                     .build();
         }
 
@@ -65,7 +67,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            generics.add(T);
+            generics.add(Constants.T);
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
@@ -78,7 +80,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            generics.add(Q);
+            generics.add(Constants.Q);
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
@@ -105,9 +107,22 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .build();
 
         }
-    },
+    }, EDITABLE {
+        @Override
+        public JavaType apply(JavaType item) {
+            List<JavaType> generics = new ArrayList<>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
+            return new JavaTypeBuilder(item)
+                    .withClassName("Editable" + item.getClassName())
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withSuperClass(item)
+                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getEditableInterface().getType(), SHALLOW_BUILDER.apply(item)))))
+                    .build();
 
-    SHALLOW_BUILDER {
+        }
+    }, SHALLOW_BUILDER {
         public JavaType apply(JavaType item) {
             List<JavaType> generics = new ArrayList<>();
             for (JavaType generic : item.getGenericTypes()) {
@@ -124,10 +139,10 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     LIST_OF {
         @Override
         public JavaType apply(JavaType item) {
-            return new JavaTypeBuilder(LIST)
+            return new JavaTypeBuilder(Constants.LIST)
                     .withCollection(true)
                     .withGenericTypes(new JavaType[]{item})
-                    .withDefaultImplementation(ARRAY_LIST_OF.apply(item))
+                    .withDefaultImplementation(Constants.ARRAY_LIST)
                     .build();
         }
 
@@ -140,7 +155,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     },
     ARRAY_LIST_OF {
         public JavaType apply(JavaType item) {
-            return typeGenericOf(ARRAY_LIST, item);
+            return typeGenericOf(Constants.ARRAY_LIST, item);
         }
 
     }, UNWRAP_COLLECTION_OF {
@@ -159,25 +174,16 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     };
 
 
-    private static final String BUILDABLE = "BUILDABLE";
-    private static final JavaType T = newGeneric("T");
-    private static final JavaType Q = newGeneric("?");
-    private static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);
-    private static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
-    private static final JavaType ARRAY_LIST = ClassToJavaType.FUNCTION.apply(ArrayList.class);
-
-    /**
-     * Checks if {@link io.sundr.codegen.model.JavaType} has the BUILDABLE attribute set to true.
-     *
-     * @param type The type to check.
-     * @return
-     */
-    private static boolean isBuildable(JavaType type) {
-        if (type == null) {
-            return false;
-        } else if (type.getAttributes().containsKey(BUILDABLE)) {
-            return (Boolean) type.getAttributes().get(BUILDABLE);
-        }
-        return false;
+    public static Function<JavaType, JavaType> combine(final Function<JavaType, JavaType>... functions) {
+        return new Function<JavaType, JavaType>() {
+            @Override
+            public JavaType apply(JavaType item) {
+                JavaType result = item;
+                for (Function<JavaType, JavaType> f : functions) {
+                    result = f.apply(result);
+                }
+                return result;
+            }
+        };
     }
 }

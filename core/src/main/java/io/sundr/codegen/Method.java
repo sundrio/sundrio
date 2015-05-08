@@ -16,10 +16,13 @@
 
 package io.sundr.codegen;
 
+import javax.lang.model.element.Modifier;
 import java.util.Set;
 
 public interface Method<T extends Type, P extends Property<T>> {
-    
+
+    Set<Modifier> getModifiers();
+    Set<T> getTypeParameters();
     String getName();
     T getReturnType();
     P[] getArguments();

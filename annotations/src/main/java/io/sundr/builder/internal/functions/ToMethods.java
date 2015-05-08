@@ -21,20 +21,16 @@ import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaPropertyBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
+import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.singularize;
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 
 public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
 
@@ -73,6 +69,5 @@ public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
         }
     };
 
-    static final String BODY = "BODY";
-    private static final JavaType T = newGeneric("T");
+
 }

@@ -16,7 +16,9 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.Function;
 import io.sundr.codegen.Type;
+import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Map;
 import java.util.Set;
@@ -84,12 +86,16 @@ public class JavaType extends AttributeSupport implements Type {
         sb.append(suffix);
         if (genericTypes.length > 0) {
             sb.append("<");
-            for (int i = 0; i < genericTypes.length; i++) {
-                if (i != 0) {
-                    sb.append(",");
+            sb.append(StringUtils.join(genericTypes, new Function<JavaType, String>() {
+                @Override
+                public String apply(JavaType item) {
+                    if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
+                        return item.getSimpleName() + " extends " + item.getSuperClass().getSimpleName();
+                    } else {
+                     return item.getSimpleName();
+                    }
                 }
-                sb.append(genericTypes[i].getSimpleName());
-            }
+            }, ", "));
             sb.append(">");
         }
         if (isArray()) {

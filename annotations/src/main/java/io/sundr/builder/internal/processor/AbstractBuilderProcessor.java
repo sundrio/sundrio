@@ -23,25 +23,33 @@ import io.sundr.codegen.processor.JavaGeneratingProcessor;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
-    public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
-    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
-    public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
-    public static final String VALIDATING_BUILDER_TEMPLATE_LOCATION = "templates/builder/validating-builder.vm";
-
     void generateLocalDependenciesIfNeeded() {
         BuilderContext context = BuilderContextManager.getContext();
         if (!Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getTargetPackage())) {
             try {
+                generateFromClazz(context.getVisitableInteface(),
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
+                generateFromClazz(context.getVisitorInterface(),
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
                 generateFromClazz(context.getBuilderInterface(),
-                        DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
                 );
 
                 generateFromClazz(context.getFluentInterface(),
-                        DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
+
+                generateFromClazz(context.getBaseFluentClass(),
+                        Constants.DEFAULT_CLASS_TEMPLATE_LOCATION
                 );
 
                 generateFromClazz(context.getNestedInterface(),
-                        DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
+                generateFromClazz(context.getEditableInterface(),
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
                 );
             } catch (Exception e) {
                 //
@@ -56,9 +64,9 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
      */
     String selectBuilderTemplate(boolean validationEnabled) {
         if (validationEnabled) {
-            return VALIDATING_BUILDER_TEMPLATE_LOCATION;
+            return Constants.VALIDATING_BUILDER_TEMPLATE_LOCATION;
         } else {
-            return DEFAULT_BUILDER_TEMPLATE_LOCATION;
+            return Constants.DEFAULT_BUILDER_TEMPLATE_LOCATION;
         }
     }
 }

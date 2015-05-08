@@ -14,15 +14,9 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen;
+package io.sundr.builder;
 
-import javax.lang.model.element.Modifier;
-import java.util.Set;
+public interface Visitable<T> {
 
-public interface Property<T extends Type> {
-
-    Set<Modifier> getModifiers();
-    T getType();
-    String getName();
-    boolean isArray();
+    T accept(Visitor visitor);
 }

@@ -36,6 +36,15 @@ public final class TypeUtils {
     }
 
     /**
+     * Removes a new generic JavaType.
+     * @param base       The base type.
+     * @return
+     */
+    public static JavaType unwrapGeneric(JavaType base) {
+        return new JavaTypeBuilder(base).withGenericTypes(new JavaType[0]).build();
+    }
+
+    /**
      * Sets one {@link io.sundr.codegen.model.JavaType} as a generic of an other.
      *
      * @param base       The base type.

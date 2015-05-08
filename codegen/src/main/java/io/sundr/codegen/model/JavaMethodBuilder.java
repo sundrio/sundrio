@@ -40,7 +40,7 @@ public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> imple
     }
 
     public JavaMethod build() {
-        return new JavaMethod(fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes());
+        return new JavaMethod(fluent.getModifiers(), fluent.getTypeParameters(), fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes());
 
     }
 

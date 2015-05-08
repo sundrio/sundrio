@@ -17,6 +17,7 @@
 package io.sundr.codegen.generator;
 
 import io.sundr.codegen.directives.ClassDirective;
+import io.sundr.codegen.directives.FieldDirective;
 import io.sundr.codegen.directives.MethodDirective;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -53,6 +54,7 @@ public class CodeGenerator<M> {
         //Load standard directives
         engine.loadDirective(ClassDirective.class.getCanonicalName());
         engine.loadDirective(MethodDirective.class.getCanonicalName());
+        engine.loadDirective(FieldDirective.class.getCanonicalName());
 
         for (Class<? extends Directive> directive :directives){
             engine.loadDirective(directive.getCanonicalName());

@@ -19,6 +19,7 @@ package io.sundr.codegen.model;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
 
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,10 +27,46 @@ import java.util.Set;
 
 public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
 
+    private Set<Modifier> modifiers = new LinkedHashSet<>();
+    private Set<JavaType> typeParameters = new LinkedHashSet<>();
     private String name;
     private JavaType returnType;
     private List<JavaProperty> arguments = new ArrayList();
     private Set<JavaType> exceptions = new LinkedHashSet();
+
+    public T addToModifiers(Modifier item) {
+        this.modifiers.add(item);
+        return (T) this;
+    }
+
+    public T withModifiers(Set<Modifier> modifiers) {
+        this.modifiers.clear();
+        for (Modifier item : modifiers) {
+            this.modifiers.add(item);
+        }
+        return (T) this;
+    }
+
+    public Set<Modifier> getModifiers() {
+        return this.modifiers;
+    }
+
+    public T addToTypeParameters(JavaType item) {
+        this.typeParameters.add(item);
+        return (T) this;
+    }
+
+    public T withTypeParameters(Set<JavaType> typeParameters) {
+        this.typeParameters.clear();
+        for (JavaType item : typeParameters) {
+            this.typeParameters.add(item);
+        }
+        return (T) this;
+    }
+
+    public Set<JavaType> getTypeParameters() {
+        return this.typeParameters;
+    }
 
     public String getName() {
         return this.name;

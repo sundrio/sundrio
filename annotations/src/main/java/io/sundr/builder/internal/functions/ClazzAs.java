@@ -17,7 +17,6 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
-import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
@@ -28,15 +27,19 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
+import static io.sundr.builder.internal.utils.BuilderUtils.isList;
+import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
+import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
@@ -49,32 +52,43 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             JavaType fluentType = TypeAs.FLUENT.apply(item.getType());
             for (JavaProperty property : item.getFields()) {
+                JavaProperty toAdd = property;
                 boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
                 if (property.isArray()) {
+                    JavaProperty asList = arrayAsList(property, buildable);
                     methods.add(ToMethod.WITH_ARRAY.apply(property));
                     methods.add(ToMethod.GETTER_ARRAY.apply(property));
-                    properties.add(arrayAsList(property, buildable));
+                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
+                    toAdd = asList;
+                } else if (isSet(property.getType()) || isList(property.getType())) {
+                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
+                } else if (isMap(property.getType())) {
+                    methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    properties.add(new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build());
-                    methods.add(ToMethod.GETTER.apply(property));
-                    methods.add(ToMethod.WITH.apply(property));
+                    toAdd = new JavaPropertyBuilder(property).addToAttributes(BUILDABLE, buildable).build();
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
                 }
-            }
 
-            for (JavaProperty property : properties) {
-                if (property.getType().isCollection()) {
-                    if (isSet(property.getType()) || isList(property.getType())) {
-                        methods.add(ToMethod.ADD_TO_COLLECTION.apply(property));
-                    } else if (property.getType().getClassName().contains("Map")) {
-                        methods.add(ToMethod.ADD_TO_MAP.apply(property));
+                if (isBuildable(toAdd) && !isMap(toAdd.getType())) {
+                    methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
+                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
+                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
+
+                    JavaType builderType = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.BUILDER).apply(toAdd.getType());
+                    if (toAdd.getType().isCollection()) {
+                        builderType = typeGenericOf(toAdd.getType(), builderType);
                     }
+
+                    toAdd = new JavaPropertyBuilder(toAdd).withType(builderType).build();
+
                 }
 
-                if (isBuildable(property) && !isMap(property.getType())) {
-                    methods.add(ToMethod.WITH_NEW_NESTED.apply(property));
-                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(property));
-                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(property).addToAttributes(MEMBER_OF, fluentType).build()));
-                }
+                properties.add(toAdd);
             }
 
             return new JavaClazzBuilder(item)
@@ -100,7 +114,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withReturnType(builderType)
                     .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(new "+item.getType().getClassName()+"());" : "this.fluent = this;")
                     .build();
-            
+
             JavaMethod fluentConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
@@ -121,7 +135,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withName("instance").and()
                     .addToAttributes(BODY, toInstanceConstructorBody(item, "fluent"))
                     .build();
-            
+
             JavaMethod instanceConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
@@ -151,13 +165,58 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .build();
         }
 
-    };
+    }, EDITABLE_BUILDER {
+        @Override
+        public JavaClazz apply(JavaClazz item) {
+            JavaClazz builder = BUILDER.apply(item);
+            Set<JavaMethod> methods = new LinkedHashSet<>();
+            for (JavaMethod m : builder.getMethods()) {
+                if (m.getName().equals("build")) {
 
-    static final String BODY = "BODY";
-    static final String MEMBER_OF = "MEMBER_OF";
-    private static final JavaType MAP = ClassToJavaType.FUNCTION.apply(Map.class);
-    private static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
-    private static final JavaType SET = ClassToJavaType.FUNCTION.apply(Set.class);
+                    methods.add(new JavaMethodBuilder()
+                            .withReturnType(TypeAs.EDITABLE.apply(m.getReturnType()))
+                            .withName("build")
+                            .addToAttributes(BODY, toBuild(EDITABLE.apply(item)))
+                            .build());
+                } else {
+                    methods.add(m);
+                }
+            }
+            return new JavaClazzBuilder(builder)
+                    .withMethods(methods)
+                    .build();
+
+        }
+    }, EDITABLE {
+            @Override
+            public JavaClazz apply(JavaClazz item) {
+                JavaType type = item.getType();
+                JavaType editableType = TypeAs.EDITABLE.apply(type);
+                JavaType builderType = TypeAs.BUILDER.apply(type);
+
+                Set<JavaMethod> constructors = new LinkedHashSet<>();
+                Set<JavaMethod> methods = new LinkedHashSet<>();
+
+                for (JavaMethod constructor : item.getConstructors()) {
+                    constructors.add(superConstructorOf(constructor, editableType));
+                }
+
+                JavaMethod edit = new JavaMethodBuilder()
+                        .withReturnType(builderType)
+                        .withName("edit")
+                        .addToAttributes(BODY, "return new "+builderType.getSimpleName()+ "(this);")
+                        .build();
+
+                methods.add(edit);
+
+                return new JavaClazzBuilder()
+                        .withType(editableType)
+                        .withConstructors(constructors)
+                        .withMethods(methods)
+                        .build();
+            }
+        };
+
 
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
         return new JavaPropertyBuilder(property)
@@ -196,15 +255,16 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         return sb.toString();
     }
 
-    private static boolean isMap(JavaType type) {
-        return type.equals(MAP) || type.getInterfaces().contains(MAP);
+    private static JavaMethod superConstructorOf(JavaMethod constructor, JavaType constructorType) {
+       return new JavaMethodBuilder(constructor)
+                .withReturnType(constructorType)
+                .addToAttributes(BODY, "super(" + StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
+                    @Override
+                    public String apply(JavaProperty item) {
+                        return item.getName();
+                    }
+                }, ", ") + ");")
+                .build();
     }
 
-    private static boolean isList(JavaType type) {
-        return type.equals(LIST) || type.getInterfaces().contains(LIST);
-    }
-
-    private static boolean isSet(JavaType type) {
-        return type.equals(SET) || type.getInterfaces().contains(SET);
-    }
 }

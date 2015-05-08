@@ -27,6 +27,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface ExternalBuildables {
 
+    boolean editableEnabled() default true;
     boolean validationEnabled() default false;
     String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
     String[] value() default {};

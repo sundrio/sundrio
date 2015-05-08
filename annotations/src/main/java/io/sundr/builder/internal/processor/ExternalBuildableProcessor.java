@@ -16,6 +16,7 @@
 
 package io.sundr.builder.internal.processor;
 
+import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
@@ -63,11 +64,19 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     JavaClazz clazz = BuilderContextManager.getContext().getToClazz().apply(ModelUtils.getClassElement(typeElement));
                     generateLocalDependenciesIfNeeded();
                     try {
-                        generateFromClazz(ClazzAs.BUILDER.apply(clazz),
-                                selectBuilderTemplate(generated.validationEnabled()));
-
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
-                                DEFAULT_FLUENT_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+
+                        if (generated.editableEnabled()) {
+                            generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(clazz),
+                                    selectBuilderTemplate(generated.validationEnabled()));
+
+                            generateFromClazz(ClazzAs.EDITABLE.apply(clazz),
+                                    Constants.DEFAULT_EDITABLE_TEMPLATE_LOCATION);
+                        } else {
+                            generateFromClazz(ClazzAs.BUILDER.apply(clazz),
+                                    selectBuilderTemplate(generated.validationEnabled()));
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
