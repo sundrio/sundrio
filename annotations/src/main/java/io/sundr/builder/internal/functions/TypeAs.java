@@ -142,7 +142,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             return new JavaTypeBuilder(Constants.LIST)
                     .withCollection(true)
                     .withGenericTypes(new JavaType[]{item})
-                    .withDefaultImplementation(ARRAY_LIST_OF.apply(item))
+                    .withDefaultImplementation(Constants.ARRAY_LIST)
                     .build();
         }
 
