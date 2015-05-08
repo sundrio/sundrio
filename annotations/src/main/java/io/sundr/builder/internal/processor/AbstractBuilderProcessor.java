@@ -24,6 +24,7 @@ import io.sundr.codegen.processor.JavaGeneratingProcessor;
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
+    public static final String DEFAULT_CLASS_TEMPLATE_LOCATION = "templates/builder/class.vm";
     public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
     public static final String DEFAULT_EDITABLE_TEMPLATE_LOCATION = "templates/builder/editable.vm";
     public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
@@ -39,6 +40,10 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
                 generateFromClazz(context.getFluentInterface(),
                         DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
+
+                generateFromClazz(context.getBaseFluentClass(),
+                        DEFAULT_CLASS_TEMPLATE_LOCATION
                 );
 
                 generateFromClazz(context.getNestedInterface(),

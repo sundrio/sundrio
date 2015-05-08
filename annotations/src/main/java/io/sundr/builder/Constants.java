@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.TypeUtils.newGeneric;
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class Constants {
 
@@ -37,6 +38,7 @@ public class Constants {
     public static final String MEMBER_OF = "MEMBER_OF";
     public static final String BODY = "BODY";
 
+    public static final JavaType B = newGeneric("B");
     public static final JavaType T = newGeneric("T");
     public static final JavaType N = newGeneric("N");
     public static final JavaType VOID = new JavaTypeBuilder().withClassName("void").build();
@@ -48,4 +50,11 @@ public class Constants {
     public static final JavaType ARRAY_LIST = ClassToJavaType.FUNCTION.apply(ArrayList.class);
     public static final JavaType SET = ClassToJavaType.FUNCTION.apply(Set.class);
     public static final JavaType LINKED_HASH_SET = ClassToJavaType.FUNCTION.apply(LinkedHashSet.class);
+
+    public static final JavaType BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
+    public static final JavaType FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
+    public static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(BaseFluent.class), T);
+    public static final JavaType NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
+    public static final JavaType EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), B);
+
 }

@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.Constants;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
@@ -37,6 +38,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     FLUENT {
         @Override
         public JavaType apply(JavaType item) {
+            BuilderContext ctx = BuilderContextManager.getContext();
             JavaType fluent = SHALLOW_FLUENT.apply(item);
             List<JavaType> generics = new ArrayList<>();
             for (JavaType generic : item.getGenericTypes()) {
@@ -47,14 +49,14 @@ public enum TypeAs implements Function<JavaType, JavaType> {
 
             JavaType superClass = isBuildable(item.getSuperClass()) ?
                     SHALLOW_FLUENT.apply(item.getSuperClass()) :
-                    Constants.OBJECT;
+                    ctx.getBaseFluentClass().getType();
 
             return new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
                     .withPackageName(item.getPackageName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClass)
-                    .withInterfaces(new HashSet(Arrays.asList(BuilderContextManager.getContext().getFluentInterface().getType())))
+                    .withInterfaces(new HashSet(Arrays.asList(ctx.getFluentInterface().getType())))
                     .build();
         }
 

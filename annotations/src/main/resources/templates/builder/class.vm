@@ -1,0 +1,15 @@
+package ${model.type.packageName};
+
+#foreach($i in $model.imports)
+import $i.fullyQualifiedName;
+#end
+
+#class ($model)
+
+#foreach($m in $model.methods)
+    #method ($m)
+    ${m.attributes.get("BODY")}
+#end
+#end
+
+#end

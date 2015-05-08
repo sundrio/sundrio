@@ -17,36 +17,35 @@
 package io.sundr.builder.internal;
 
 import io.sundr.Function;
-import io.sundr.builder.Builder;
-import io.sundr.builder.Editable;
-import io.sundr.builder.Fluent;
-import io.sundr.builder.Nested;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
 import io.sundr.codegen.coverters.JavaClazzFunction;
 import io.sundr.codegen.coverters.JavaMethodFunction;
-import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
+import static io.sundr.builder.Constants.ARRAY_LIST;
+import static io.sundr.builder.Constants.B;
+import static io.sundr.builder.Constants.BASE_FLUENT;
+import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.BUILDER;
+import static io.sundr.builder.Constants.EDITABLE;
+import static io.sundr.builder.Constants.FLUENT;
+import static io.sundr.builder.Constants.LINKED_HASH_SET;
+import static io.sundr.builder.Constants.LIST;
+import static io.sundr.builder.Constants.N;
+import static io.sundr.builder.Constants.NESTED;
+import static io.sundr.builder.Constants.T;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class BuilderContext {
-
-    private static final JavaType B = newGeneric("B");
-    private static final JavaType T = newGeneric("T");
-    private static final JavaType N = newGeneric("N");
-    private static final JavaType BASE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
-    private static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
-    private static final JavaType BASE_NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
-    private static final JavaType BASE_EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), B);
 
     private final Elements elements;
             
@@ -54,7 +53,8 @@ public class BuilderContext {
     private final Function<VariableElement, JavaProperty> toProperty;
     private final JavaMethodFunction toMethod;
     private final JavaClazzFunction toClazz;
-            
+
+    private final JavaClazz baseFluentClass;
     private final JavaClazz fluentInterface;
     private final JavaClazz builderInterface;
     private final JavaClazz nestedInterface;
@@ -78,8 +78,8 @@ public class BuilderContext {
                 .withNewType()
                 .withPackageName(targetPackage)
                 .withKind(JavaKind.INTERFACE)
-                .withClassName(BASE_BUILDER.getClassName())
-                .withGenericTypes(BASE_BUILDER.getGenericTypes())
+                .withClassName(BUILDER.getClassName())
+                .withGenericTypes(BUILDER.getGenericTypes())
                 .and()
                 .addNewMethod()
                 .withReturnType(T)
@@ -91,8 +91,40 @@ public class BuilderContext {
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
                 .withPackageName(targetPackage)
+                .withClassName(FLUENT.getClassName())
+                .withGenericTypes(FLUENT.getGenericTypes())
+                .and()
+                .build();
+
+        baseFluentClass = new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.CLASS)
+                .withPackageName(targetPackage)
                 .withClassName(BASE_FLUENT.getClassName())
                 .withGenericTypes(BASE_FLUENT.getGenericTypes())
+                .addToInterfaces(fluentInterface.getType())
+                .and()
+                .addNewMethod()
+                    .addToTypeParameters(T)
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withName("build")
+                    .withReturnType(typeGenericOf(ARRAY_LIST, T))
+                    .addNewArgument()
+                        .withType(typeGenericOf(LIST, typeGenericOf(BUILDER, T)))
+                        .withName("list")
+                    .endArgument()
+                    .addToAttributes(BODY, "ArrayList<T> r = new ArrayList<>();for (Builder<T> b : list) {r.add(b.build());}return r;")
+                .and()
+                .addNewMethod()
+                    .addToTypeParameters(T)
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withName("build")
+                    .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
+                    .addNewArgument()
+                        .withType(typeGenericOf(LINKED_HASH_SET, typeGenericOf(BUILDER, T)))
+                        .withName("set")
+                    .endArgument()
+                    .addToAttributes(BODY, "LinkedHashSet<T> r = new LinkedHashSet<>();for (Builder<T> b : set) {r.add(b.build());}return r;")
                 .and()
                 .build();
 
@@ -100,8 +132,8 @@ public class BuilderContext {
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
                 .withPackageName(targetPackage)
-                .withClassName(BASE_NESTED.getClassName())
-                .withGenericTypes(BASE_NESTED.getGenericTypes())
+                .withClassName(NESTED.getClassName())
+                .withGenericTypes(NESTED.getGenericTypes())
                 .and()
                 .addNewMethod()
                 .withReturnType(N)
@@ -113,8 +145,8 @@ public class BuilderContext {
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
                 .withPackageName(targetPackage)
-                .withClassName(BASE_EDITABLE.getClassName())
-                .withGenericTypes(BASE_EDITABLE.getGenericTypes())
+                .withClassName(EDITABLE.getClassName())
+                .withGenericTypes(EDITABLE.getGenericTypes())
                 .and()
                 .addNewMethod()
                 .withReturnType(B)
@@ -131,6 +163,11 @@ public class BuilderContext {
     public String getTargetPackage() {
         return targetPackage;
     }
+
+    public JavaClazz getBaseFluentClass() {
+        return baseFluentClass;
+    }
+
     public JavaClazz getFluentInterface() {
         return fluentInterface;
     }
