@@ -74,7 +74,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 return sb.toString();
             } else if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
-                return "this." + property.getName() + "= " + property.getName() + "!= null ? new " + builder.getSimpleName() + "(" + property.getName() + ") : new " + builder.getSimpleName() + "(); return (T) this;";
+                String propertyName = property.getName();
+                String builderClass = builder.getSimpleName();
+                return "this." + propertyName + "= " + propertyName + "!= null ? new " + builderClass + "(" + propertyName + ") : new " + builderClass + "();_visitables.add(this." + propertyName + "); return (T) this;";
             }
             return "this." + property.getName() + "=" + property.getName() + "; return (T) this;";
         }
@@ -159,7 +161,8 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 body = "if (item != null) {this." + property.getName() + ".add(item);} return (T)this;";
             } else {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
-                body = "if (item != null) {this." + property.getName() + ".add(new " + builder.getSimpleName() + "(item));} return (T)this;";
+                String builderClass = builder.getSimpleName();
+                body = "if (item != null) {"+builderClass+" builder = new "+builderClass+"(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
             }
 
             return new JavaMethodBuilder()

@@ -16,7 +16,7 @@
 
 package io.sundr.builder.internal.processor.generator;
 
-import io.sundr.builder.internal.processor.BuildableProcessor;
+import io.sundr.builder.Constants;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
@@ -50,8 +50,8 @@ public class BuilderGeneratorTest {
                 .build();
 
         File tmp = new File("/tmp");
-        generate(javaClazz, tmp, "CircleFluent.java", BuildableProcessor.DEFAULT_FLUENT_TEMPLATE_LOCATION);
-        generate(javaClazz, tmp, "CircleBuilder.java", BuildableProcessor.DEFAULT_BUILDER_TEMPLATE_LOCATION);
+        generate(javaClazz, tmp, "CircleFluent.java", Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+        generate(javaClazz, tmp, "CircleBuilder.java", Constants.DEFAULT_BUILDER_TEMPLATE_LOCATION);
 
     }
     

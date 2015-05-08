@@ -18,6 +18,11 @@ package io.sundr.codegen.utils;
 
 import io.sundr.Function;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 public final class StringUtils {
 
     public static final class ToString<X> implements Function<X, String> {
@@ -82,5 +87,19 @@ public final class StringUtils {
             first = false;
         }
         return sb.toString();
+    }
+
+    public static String loadResource(String resourceName) {
+        try (InputStream is = StringUtils.class.getClassLoader().getResourceAsStream(resourceName);
+             BufferedReader in = new BufferedReader(new InputStreamReader(is))) {
+            String line = null;
+            StringBuffer sb = new StringBuffer();
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

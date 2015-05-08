@@ -30,8 +30,7 @@ import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.List;
+
 
 import static io.sundr.codegen.utils.StringUtils.join;
 

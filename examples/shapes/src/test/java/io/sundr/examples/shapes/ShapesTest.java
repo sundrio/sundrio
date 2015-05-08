@@ -16,6 +16,7 @@
 
 package io.sundr.examples.shapes;
 
+import io.sundr.builder.Visitor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -44,6 +45,36 @@ public class ShapesTest {
         Assert.assertEquals(1, circle3.getX());
         Assert.assertEquals(1, circle3.getY());
         Assert.assertEquals(20, circle3.getRadius());
+    }
+
+    @Test
+    public void testVisitor() {
+        Canvas canvas = new CanvasBuilder()
+                .addNewCircle()
+                .withX(0)
+                .withY(0)
+                .withRadius(10)
+                .and()
+                .addNewSquare()
+                .withY(10)
+                .withY(20)
+                .withHeight(30)
+                .and()
+                .build();
+
+        canvas = new CanvasBuilder(canvas).accept(new Visitor() {
+            @Override
+            public void visit(Object element) {
+                if (element instanceof CircleBuilder) {
+                    CircleBuilder builder = (CircleBuilder) element;
+                    builder.withRadius(100 + builder.getRadius());
+                }
+            }
+        }).build();
+
+
+        Assert.assertEquals(110, canvas.getCircles().get(0).getRadius());
+
     }
 
 }

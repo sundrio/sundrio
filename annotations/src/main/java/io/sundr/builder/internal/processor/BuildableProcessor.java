@@ -16,6 +16,7 @@
 
 package io.sundr.builder.internal.processor;
 
+import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -59,14 +60,14 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     try {
 
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
-                                DEFAULT_FLUENT_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
 
                         if (buildable.editableEnabled()) {
                             generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(clazz),
                                     selectBuilderTemplate(buildable.validationEnabled()));
 
                             generateFromClazz(ClazzAs.EDITABLE.apply(clazz),
-                                    DEFAULT_EDITABLE_TEMPLATE_LOCATION);
+                                    Constants.DEFAULT_EDITABLE_TEMPLATE_LOCATION);
                         } else {
                             generateFromClazz(ClazzAs.BUILDER.apply(clazz),
                                     selectBuilderTemplate(buildable.validationEnabled()));

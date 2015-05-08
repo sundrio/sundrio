@@ -26,6 +26,8 @@ import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
+
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
@@ -44,8 +46,15 @@ import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.NESTED;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.Q;
+import static io.sundr.builder.Constants.V;
+import static io.sundr.builder.Constants.VISITABLE;
+import static io.sundr.builder.Constants.VISITOR;
+import static io.sundr.builder.Constants.VOID;
+import static io.sundr.builder.Constants.*;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
+import static io.sundr.codegen.utils.StringUtils.loadResource;
 
 public class BuilderContext {
 
@@ -61,6 +70,8 @@ public class BuilderContext {
     private final JavaClazz builderInterface;
     private final JavaClazz nestedInterface;
     private final JavaClazz editableInterface;
+    private final JavaClazz visitableInteface;
+    private final JavaClazz visitorInterface;
     private final String targetPackage;
     
     private final BuildableRepository repository;
@@ -75,6 +86,46 @@ public class BuilderContext {
         toClazz = new JavaClazzFunction(elements, toType, toMethod, toProperty);
         
         repository = new BuildableRepository();
+
+        visitorInterface = new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.INTERFACE)
+                .withPackageName(targetPackage)
+                .withClassName(VISITOR.getClassName())
+                .withGenericTypes(VISITOR.getGenericTypes())
+                .and()
+                .addNewMethod()
+                .addToModifiers(Modifier.PUBLIC)
+                .withReturnType(VOID)
+                .withName("visit")
+                .addNewArgument()
+                .withName("item")
+                .withType(V)
+                .endArgument()
+                .and()
+                .build();
+
+        JavaType visitorBase = unwrapGeneric(visitorInterface.getType());
+
+        visitableInteface = new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.INTERFACE)
+                .withPackageName(targetPackage)
+                .withClassName(VISITABLE.getClassName())
+                .withGenericTypes(new JavaType[]{T})
+                .and()
+                .addNewMethod()
+                .addToModifiers(Modifier.PUBLIC)
+                .withReturnType(T)
+                .withName("accept")
+                .addNewArgument()
+                .withName("visitor")
+                .withType(visitorBase)
+                .endArgument()
+                .and()
+                .build();
+
+        JavaType visitableBase = unwrapGeneric(visitableInteface.getType());
         
         builderInterface = new JavaClazzBuilder()
                 .withNewType()
@@ -105,6 +156,7 @@ public class BuilderContext {
                 .withClassName(BASE_FLUENT.getClassName())
                 .withGenericTypes(BASE_FLUENT.getGenericTypes())
                 .addToInterfaces(fluentInterface.getType())
+                .addToInterfaces(typeGenericOf(visitableInteface.getType(),T))
                 .and()
                 .addNewMethod()
                     .addToTypeParameters(T)
@@ -115,20 +167,38 @@ public class BuilderContext {
                         .withType(typeGenericOf(LIST, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
                         .withName("list")
                     .endArgument()
-                .addToAttributes(BODY, "ArrayList<T> r = new ArrayList<>();for (Builder<T> b : list) {r.add(b.build());}return r;")
+                .addToAttributes(BODY, loadResource(BUILD_LIST_SNIPPET))
                 .and()
                 .addNewMethod()
-                .addToTypeParameters(T)
-                .addToModifiers(Modifier.PUBLIC)
-                    .withName("build")
-                .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
-                    .addNewArgument()
-                .withType(typeGenericOf(LINKED_HASH_SET, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
-                        .withName("set")
+                    .addToTypeParameters(T)
+                    .addToModifiers(Modifier.PUBLIC)
+                        .withName("build")
+                        .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
+                        .addNewArgument()
+                            .withType(typeGenericOf(LINKED_HASH_SET, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
+                            .withName("set")
                         .endArgument()
-                        .addToAttributes(BODY, "LinkedHashSet<T> r = new LinkedHashSet<>();for (Builder<T> b : set) {r.add(b.build());}return r;")
-                        .and()
-                        .build();
+                    .addToAttributes(BODY, loadResource(BUILD_SET_SNIPPET))
+                .and()
+                .addNewMethod()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withName("accept")
+                    .withReturnType(T)
+                    .addNewArgument()
+                        .withType(visitorBase)
+                        .withName("visitor")
+                    .endArgument()
+                .addToAttributes(BODY, loadResource(ACCEPT_VISITOR_SNIPPET))
+                .and()
+                .addNewField()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .addToModifiers(Modifier.FINAL)
+                    .withName("_visitables")
+                    .withType(new JavaTypeBuilder(typeGenericOf(LIST, visitableBase))
+                            .withDefaultImplementation(typeGenericOf(ARRAY_LIST, visitableBase))
+                            .build())
+                .and()
+                .build();
 
         nestedInterface = new JavaClazzBuilder()
                 .withNewType()
@@ -155,7 +225,6 @@ public class BuilderContext {
                 .withName("edit")
                 .and()
                 .build();
-
     }
 
     public Elements getElements() {
@@ -184,6 +253,14 @@ public class BuilderContext {
 
     public JavaClazz getEditableInterface() {
         return editableInterface;
+    }
+
+    public JavaClazz getVisitableInteface() {
+        return visitableInteface;
+    }
+
+    public JavaClazz getVisitorInterface() {
+        return visitorInterface;
     }
 
     public BuildableRepository getRepository() {
