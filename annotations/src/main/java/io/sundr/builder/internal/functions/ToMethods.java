@@ -23,6 +23,7 @@ import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.utils.StringUtils;
 
+import javax.lang.model.element.Modifier;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -58,6 +59,7 @@ public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
                 }, ", ");
                 
                 result.add(new JavaMethodBuilder()
+                        .addToModifiers(Modifier.PUBLIC)
                         .withReturnType(T)
                         .withArguments(constructor.getArguments())
                         .withName(ownName)
