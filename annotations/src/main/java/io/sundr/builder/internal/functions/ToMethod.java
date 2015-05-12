@@ -78,7 +78,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String propertyName = property.getName();
                 String builderClass = builder.getSimpleName();
-                return "this." + propertyName + "= " + propertyName + "!= null ? new " + builderClass + "(" + propertyName + ") : new " + builderClass + "();_visitables.add(this." + propertyName + "); return (T) this;";
+                return "if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return (T) this;";
             }
             return "this." + property.getName() + "=" + property.getName() + "; return (T) this;";
         }
