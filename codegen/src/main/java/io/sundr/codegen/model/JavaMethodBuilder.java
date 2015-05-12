@@ -20,7 +20,7 @@ import io.sundr.builder.Builder;
 
 public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> implements Builder<JavaMethod> {
 
-    private final JavaMethodFluent<?> fluent;
+    JavaMethodFluent<?> fluent;
 
     public JavaMethodBuilder() {
         this.fluent = this;
@@ -30,18 +30,36 @@ public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> imple
         this.fluent = fluent;
     }
 
-    public JavaMethodBuilder(JavaMethod instance) {
-        this();
-        withName(instance.getName());
-        withReturnType(instance.getReturnType());
-        withArguments(instance.getArguments());
-        withExceptions(instance.getExceptions());
-        withAttributes(instance.getAttributes());
+    public JavaMethodBuilder(JavaMethodFluent<?> fluent, JavaMethod instance) {
+        this.fluent = fluent;
+        fluent.withModifiers(instance.getModifiers());
+        fluent.withTypeParameters(instance.getTypeParameters());
+        fluent.withName(instance.getName());
+        fluent.withReturnType(instance.getReturnType());
+        fluent.withArguments(instance.getArguments());
+        fluent.withExceptions(instance.getExceptions());
+        fluent.withAttributes(instance.getAttributes());
     }
 
-    public JavaMethod build() {
-        return new JavaMethod(fluent.getModifiers(), fluent.getTypeParameters(), fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes());
+    public JavaMethodBuilder(JavaMethod instance) {
+        this.fluent = this;
+        this.withModifiers(instance.getModifiers());
+        this.withTypeParameters(instance.getTypeParameters());
+        this.withName(instance.getName());
+        this.withReturnType(instance.getReturnType());
+        this.withArguments(instance.getArguments());
+        this.withExceptions(instance.getExceptions());
+        this.withAttributes(instance.getAttributes());
+    }
 
+    public EditableJavaMethod build() {
+        EditableJavaMethod buildable = new EditableJavaMethod(fluent.getModifiers(), fluent.getTypeParameters(), fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes());
+        validate(buildable);
+        return buildable;
+
+    }
+
+    private <T> void validate(T item) {
     }
 
 

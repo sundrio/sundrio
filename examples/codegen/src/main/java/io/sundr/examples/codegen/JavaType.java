@@ -16,8 +16,10 @@
 
 package io.sundr.examples.codegen;
 
+import io.sundr.Function;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.Type;
+import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +54,7 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the fully qualified name of the type.
+     *
      * @return
      */
     public String getFullyQualifiedName() {
@@ -64,6 +67,7 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the simple name of the type.
+     *
      * @return
      */
     public String getSimpleName() {
@@ -72,6 +76,7 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the simple name of the type.
+     *
      * @return
      */
     public String getSimpleName(String suffix) {
@@ -80,12 +85,16 @@ public class JavaType extends AttributeSupport implements Type {
         sb.append(suffix);
         if (genericTypes.length > 0) {
             sb.append("<");
-            for (int i = 0; i < genericTypes.length; i++) {
-                if (i != 0) {
-                    sb.append(",");
+            sb.append(StringUtils.join(genericTypes, new Function<JavaType, String>() {
+                @Override
+                public String apply(JavaType item) {
+                    if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
+                        return item.getSimpleName() + " extends " + item.getSuperClass().getSimpleName();
+                    } else {
+                        return item.getSimpleName();
+                    }
                 }
-                sb.append(genericTypes[i].getSimpleName());
-            }
+            }, ", "));
             sb.append(">");
         }
         if (isArray()) {
@@ -102,6 +111,7 @@ public class JavaType extends AttributeSupport implements Type {
     public JavaKind getKind() {
         return kind;
     }
+
     @Override
     public String getPackageName() {
         return packageName;
@@ -111,11 +121,12 @@ public class JavaType extends AttributeSupport implements Type {
     public String getClassName() {
         return className;
     }
+
     @Override
     public boolean isArray() {
         return array;
     }
-    
+
     @Override
     public boolean isCollection() {
         return collection;
@@ -130,7 +141,7 @@ public class JavaType extends AttributeSupport implements Type {
     public JavaType getDefaultImplementation() {
         return defaultImplementation;
     }
-    
+
     @Override
     public JavaType getSuperClass() {
         return superClass;
@@ -157,6 +168,21 @@ public class JavaType extends AttributeSupport implements Type {
             return false;
 
         return true;
+    }
+
+    public boolean isAssignable(JavaType o) {
+        if (this == o || this.equals(o)) {
+            return true;
+        }
+
+        if (packageName == null && "java.lang".equals(o.packageName) && className.toLowerCase().equals(o.className.toLowerCase())) {
+            return true;
+        }
+        if (o.packageName == null && "java.lang".equals(packageName) && className.toLowerCase().equals(o.className.toLowerCase())) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override

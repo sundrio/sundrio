@@ -20,7 +20,7 @@ import io.sundr.builder.Builder;
 
 public class JavaClazzBuilder extends JavaClazzFluent<JavaClazzBuilder> implements Builder<JavaClazz> {
 
-    private final JavaClazzFluent<?> fluent;
+    JavaClazzFluent<?> fluent;
 
     public JavaClazzBuilder() {
         this.fluent = this;
@@ -30,20 +30,36 @@ public class JavaClazzBuilder extends JavaClazzFluent<JavaClazzBuilder> implemen
         this.fluent = fluent;
     }
 
-    public JavaClazzBuilder(JavaClazz instance) {
-        this();
-        withType(instance.getType());
-        withConstructors(instance.getConstructors());
-        withMethods(instance.getMethods());
-        withFields(instance.getFields());
-        withImports(instance.getImports());
-        withAttributes(instance.getAttributes());
-        withNested(instance.getNested());
+    public JavaClazzBuilder(JavaClazzFluent<?> fluent, JavaClazz instance) {
+        this.fluent = fluent;
+        fluent.withType(instance.getType());
+        fluent.withConstructors(instance.getConstructors());
+        fluent.withMethods(instance.getMethods());
+        fluent.withFields(instance.getFields());
+        fluent.withImports(instance.getImports());
+        fluent.withAttributes(instance.getAttributes());
+        fluent.withNested(instance.getNested());
     }
 
-    public JavaClazz build() {
-        return new JavaClazz(fluent.getType(), fluent.getConstructors(), fluent.getMethods(), fluent.getFields(), fluent.getImports(), fluent.getAttributes(), fluent.getNested());
+    public JavaClazzBuilder(JavaClazz instance) {
+        this.fluent = this;
+        this.withType(instance.getType());
+        this.withConstructors(instance.getConstructors());
+        this.withMethods(instance.getMethods());
+        this.withFields(instance.getFields());
+        this.withImports(instance.getImports());
+        this.withAttributes(instance.getAttributes());
+        this.withNested(instance.getNested());
+    }
 
+    public EditableJavaClazz build() {
+        EditableJavaClazz buildable = new EditableJavaClazz(fluent.getType(), fluent.getConstructors(), fluent.getMethods(), fluent.getFields(), fluent.getImports(), fluent.getAttributes(), fluent.getNested());
+        validate(buildable);
+        return buildable;
+
+    }
+
+    private <T> void validate(T item) {
     }
 
 

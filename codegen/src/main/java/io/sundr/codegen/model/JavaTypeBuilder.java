@@ -20,7 +20,7 @@ import io.sundr.builder.Builder;
 
 public class JavaTypeBuilder extends JavaTypeFluent<JavaTypeBuilder> implements Builder<JavaType> {
 
-    private final JavaTypeFluent<?> fluent;
+    JavaTypeFluent<?> fluent;
 
     public JavaTypeBuilder() {
         this.fluent = this;
@@ -30,24 +30,46 @@ public class JavaTypeBuilder extends JavaTypeFluent<JavaTypeBuilder> implements 
         this.fluent = fluent;
     }
 
+    public JavaTypeBuilder(JavaTypeFluent<?> fluent, JavaType instance) {
+        this.fluent = fluent;
+        fluent.withKind(instance.getKind());
+        fluent.withPackageName(instance.getPackageName());
+        fluent.withClassName(instance.getClassName());
+        fluent.withArray(instance.isArray());
+        fluent.withCollection(instance.isCollection());
+        fluent.withConcrete(instance.isConcrete());
+        fluent.withDefaultImplementation(instance.getDefaultImplementation());
+        fluent.withSuperClass(instance.getSuperClass());
+        fluent.withInterfaces(instance.getInterfaces());
+        fluent.withGenericTypes(instance.getGenericTypes());
+        fluent.withAttributes(instance.getAttributes());
+    }
+
     public JavaTypeBuilder(JavaType instance) {
-        this();
-        withKind(instance.getKind());
-        withPackageName(instance.getPackageName());
-        withClassName(instance.getClassName());
-        withArray(instance.isArray());
-        withCollection(instance.isCollection());
-        withConcrete(instance.isConcrete());
-        withDefaultImplementation(instance.getDefaultImplementation());
-        withSuperClass(instance.getSuperClass());
-        withInterfaces(instance.getInterfaces());
-        withGenericTypes(instance.getGenericTypes());
-        withAttributes(instance.getAttributes());
+        this.fluent = this;
+        this.withKind(instance.getKind());
+        this.withPackageName(instance.getPackageName());
+        this.withClassName(instance.getClassName());
+        this.withArray(instance.isArray());
+        this.withCollection(instance.isCollection());
+        this.withConcrete(instance.isConcrete());
+        this.withDefaultImplementation(instance.getDefaultImplementation());
+        this.withSuperClass(instance.getSuperClass());
+        this.withInterfaces(instance.getInterfaces());
+        this.withGenericTypes(instance.getGenericTypes());
+        this.withAttributes(instance.getAttributes());
     }
 
-    public JavaType build() {
-        return new JavaType(fluent.getKind(), fluent.getPackageName(), fluent.getClassName(), fluent.isArray(), fluent.isCollection(), fluent.isConcrete(), fluent.getDefaultImplementation(), fluent.getSuperClass(), fluent.getInterfaces(), fluent.getGenericTypes(), fluent.getAttributes());
+    public EditableJavaType build() {
+        EditableJavaType buildable = new EditableJavaType(fluent.getKind(), fluent.getPackageName(), fluent.getClassName(), fluent.isArray(), fluent.isCollection(), fluent.isConcrete(), fluent.getDefaultImplementation(), fluent.getSuperClass(), fluent.getInterfaces(), fluent.getGenericTypes(), fluent.getAttributes());
+        validate(buildable);
+        return buildable;
 
     }
+
+    private <T> void validate(T item) {
+    }
+
+
 }
     

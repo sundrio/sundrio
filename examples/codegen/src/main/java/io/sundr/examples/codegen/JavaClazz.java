@@ -18,6 +18,7 @@ package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.Clazz;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +75,13 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
         tmp.addAll(getReferencedTypes());
 
         for (JavaType t : tmp) {
-            if (t.getPackageName() != null && !t.getPackageName().equals(getType().getPackageName()) && !t.getPackageName().equals("java.lang")) {
+            if (t.getClassName().equals(getType().getClassName())) {
+                continue;
+            } else if (t.getPackageName() == null) {
+                continue;
+            } else if (t.getPackageName().equals("java.lang")) {
+                continue;
+            } else if (!t.getPackageName().equals(getType().getPackageName())) {
                 result.add(t);
             }
         }

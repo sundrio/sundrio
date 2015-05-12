@@ -27,21 +27,15 @@ import java.util.Set;
 
 public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
 
-    private Set<Modifier> modifiers = new LinkedHashSet<>();
-    private Set<JavaType> typeParameters = new LinkedHashSet<>();
-    private String name;
-    private JavaType returnType;
-    private List<JavaProperty> arguments = new ArrayList();
-    private Set<JavaType> exceptions = new LinkedHashSet();
+    Set<Modifier> modifiers = new LinkedHashSet();
+    Set<JavaTypeBuilder> typeParameters = new LinkedHashSet();
+    String name;
+    JavaTypeBuilder returnType;
+    List<JavaPropertyBuilder> arguments = new ArrayList();
+    Set<JavaTypeBuilder> exceptions = new LinkedHashSet();
 
     public T addToModifiers(Modifier item) {
-        this.modifiers.add(item);
-        return (T) this;
-    }
-
-    public T withModifiers(Set<Modifier> modifiers) {
-        this.modifiers.clear();
-        for (Modifier item : modifiers) {
+        if (item != null) {
             this.modifiers.add(item);
         }
         return (T) this;
@@ -51,21 +45,41 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
         return this.modifiers;
     }
 
-    public T addToTypeParameters(JavaType item) {
-        this.typeParameters.add(item);
+    public T withModifiers(Set<Modifier> modifiers) {
+        this.modifiers.clear();
+        if (modifiers != null) {
+            for (Modifier item : modifiers) {
+                this.addToModifiers(item);
+            }
+        }
         return (T) this;
     }
 
-    public T withTypeParameters(Set<JavaType> typeParameters) {
-        this.typeParameters.clear();
-        for (JavaType item : typeParameters) {
-            this.typeParameters.add(item);
+    public T addToTypeParameters(JavaType item) {
+        if (item != null) {
+            JavaTypeBuilder builder = new JavaTypeBuilder(item);
+            _visitables.add(builder);
+            this.typeParameters.add(builder);
         }
         return (T) this;
     }
 
     public Set<JavaType> getTypeParameters() {
-        return this.typeParameters;
+        return build(typeParameters);
+    }
+
+    public T withTypeParameters(Set<JavaType> typeParameters) {
+        this.typeParameters.clear();
+        if (typeParameters != null) {
+            for (JavaType item : typeParameters) {
+                this.addToTypeParameters(item);
+            }
+        }
+        return (T) this;
+    }
+
+    public TypeParametersNested<T> addNewTypeParameter() {
+        return new TypeParametersNested<T>();
     }
 
     public String getName() {
@@ -78,33 +92,14 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
     }
 
     public JavaType getReturnType() {
-        return this.returnType;
+        return this.returnType != null ? this.returnType.build() : null;
     }
 
     public T withReturnType(JavaType returnType) {
-        this.returnType = returnType;
-        return (T) this;
-    }
-
-    public T withArguments(JavaProperty[] arguments) {
-        this.arguments.clear();
-        for (JavaProperty item : arguments) {
-            this.arguments.add(item);
+        if (returnType != null) {
+            this.returnType = new JavaTypeBuilder(returnType);
+            _visitables.add(this.returnType);
         }
-        return (T) this;
-    }
-
-    public JavaProperty[] getArguments() {
-        return this.arguments.toArray(new JavaProperty[arguments.size()]);
-    }
-
-    public Set<JavaType> getExceptions() {
-        return this.exceptions;
-    }
-
-    public T withExceptions(Set<JavaType> exceptions) {
-        this.exceptions.clear();
-        this.exceptions.addAll(exceptions);
         return (T) this;
     }
 
@@ -112,8 +107,30 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
         return new ReturnTypeNested<T>();
     }
 
+    public T withArguments(JavaProperty[] arguments) {
+        this.arguments.clear();
+        if (arguments != null) {
+            for (JavaProperty item : arguments) {
+                this.addToArguments(item);
+            }
+        }
+        return (T) this;
+    }
+
+    public JavaProperty[] getArguments() {
+        List<JavaProperty> result = new ArrayList<>();
+        for (JavaPropertyBuilder builder : arguments) {
+            result.add(builder.build());
+        }
+        return result.toArray(new JavaProperty[result.size()]);
+    }
+
     public T addToArguments(JavaProperty item) {
-        this.arguments.add(item);
+        if (item != null) {
+            JavaPropertyBuilder builder = new JavaPropertyBuilder(item);
+            _visitables.add(builder);
+            this.arguments.add(builder);
+        }
         return (T) this;
     }
 
@@ -122,7 +139,25 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
     }
 
     public T addToExceptions(JavaType item) {
-        this.exceptions.add(item);
+        if (item != null) {
+            JavaTypeBuilder builder = new JavaTypeBuilder(item);
+            _visitables.add(builder);
+            this.exceptions.add(builder);
+        }
+        return (T) this;
+    }
+
+    public Set<JavaType> getExceptions() {
+        return build(exceptions);
+    }
+
+    public T withExceptions(Set<JavaType> exceptions) {
+        this.exceptions.clear();
+        if (exceptions != null) {
+            for (JavaType item : exceptions) {
+                this.addToExceptions(item);
+            }
+        }
         return (T) this;
     }
 
@@ -130,10 +165,26 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
         return new ExceptionsNested<T>();
     }
 
-    public class ReturnTypeNested<N> extends JavaTypeFluent<ReturnTypeNested<N>> implements Nested<N> {
+    public class TypeParametersNested<N> extends JavaTypeFluent<TypeParametersNested<N>> implements Nested<N> {
+
+        private final JavaTypeBuilder builder = new JavaTypeBuilder(this);
+
+        public N endTypeParameter() {
+            return and();
+        }
 
         public N and() {
-            return (N) withReturnType(new JavaTypeBuilder(this).build());
+            return (N) JavaMethodFluent.this.addToTypeParameters(builder.build());
+        }
+
+    }
+
+    public class ReturnTypeNested<N> extends JavaTypeFluent<ReturnTypeNested<N>> implements Nested<N> {
+
+        private final JavaTypeBuilder builder = new JavaTypeBuilder(this);
+
+        public N and() {
+            return (N) JavaMethodFluent.this.withReturnType(builder.build());
         }
 
         public N endReturnType() {
@@ -144,24 +195,28 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
 
     public class ArgumentsNested<N> extends JavaPropertyFluent<ArgumentsNested<N>> implements Nested<N> {
 
-        public N and() {
-            return (N) addToArguments(new JavaPropertyBuilder(this).build());
-        }
+        private final JavaPropertyBuilder builder = new JavaPropertyBuilder(this);
 
         public N endArgument() {
             return and();
+        }
+
+        public N and() {
+            return (N) JavaMethodFluent.this.addToArguments(builder.build());
         }
 
     }
 
     public class ExceptionsNested<N> extends JavaTypeFluent<ExceptionsNested<N>> implements Nested<N> {
 
+        private final JavaTypeBuilder builder = new JavaTypeBuilder(this);
+
         public N endException() {
             return and();
         }
 
         public N and() {
-            return (N) addToExceptions(new JavaTypeBuilder(this).build());
+            return (N) JavaMethodFluent.this.addToExceptions(builder.build());
         }
 
     }

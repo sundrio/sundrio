@@ -26,16 +26,16 @@ import java.util.Set;
 
 public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
 
-    private JavaKind kind;
-    private String packageName;
-    private String className;
-    private boolean array;
-    private boolean collection;
-    private boolean concrete;
-    private JavaType defaultImplementation;
-    private JavaType superClass;
-    private Set<JavaType> interfaces = new LinkedHashSet();
-    private List<JavaType> genericTypes = new ArrayList();
+    JavaKind kind;
+    String packageName;
+    String className;
+    boolean array;
+    boolean collection;
+    boolean concrete;
+    JavaTypeBuilder defaultImplementation;
+    JavaTypeBuilder superClass;
+    Set<JavaTypeBuilder> interfaces = new LinkedHashSet();
+    List<JavaTypeBuilder> genericTypes = new ArrayList();
 
     public JavaKind getKind() {
         return this.kind;
@@ -92,55 +92,57 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
     }
 
     public JavaType getDefaultImplementation() {
-        return this.defaultImplementation;
+        return this.defaultImplementation != null ? this.defaultImplementation.build() : null;
     }
 
     public T withDefaultImplementation(JavaType defaultImplementation) {
-        this.defaultImplementation = defaultImplementation;
-        return (T) this;
-    }
-
-    public JavaType getSuperClass() {
-        return this.superClass;
-    }
-
-    public T withSuperClass(JavaType superClass) {
-        this.superClass = superClass;
-        return (T) this;
-    }
-
-    public Set<JavaType> getInterfaces() {
-        return this.interfaces;
-    }
-
-    public T withInterfaces(Set<JavaType> interfaces) {
-        this.interfaces.clear();
-        this.interfaces.addAll(interfaces);
-        return (T) this;
-    }
-
-    public T withGenericTypes(JavaType[] genericTypes) {
-        this.genericTypes.clear();
-        for (JavaType item : genericTypes) {
-            this.genericTypes.add(item);
+        if (defaultImplementation != null) {
+            this.defaultImplementation = new JavaTypeBuilder(defaultImplementation);
+            _visitables.add(this.defaultImplementation);
         }
         return (T) this;
-    }
-
-    public JavaType[] getGenericTypes() {
-        return this.genericTypes.toArray(new JavaType[genericTypes.size()]);
     }
 
     public DefaultImplementationNested<T> withNewDefaultImplementation() {
         return new DefaultImplementationNested<T>();
     }
 
-    public SuperClassNested<T> withNewSuperClas() {
+    public JavaType getSuperClass() {
+        return this.superClass != null ? this.superClass.build() : null;
+    }
+
+    public T withSuperClass(JavaType superClass) {
+        if (superClass != null) {
+            this.superClass = new JavaTypeBuilder(superClass);
+            _visitables.add(this.superClass);
+        }
+        return (T) this;
+    }
+
+    public SuperClassNested<T> withNewSuperClass() {
         return new SuperClassNested<T>();
     }
 
     public T addToInterfaces(JavaType item) {
-        this.interfaces.add(item);
+        if (item != null) {
+            JavaTypeBuilder builder = new JavaTypeBuilder(item);
+            _visitables.add(builder);
+            this.interfaces.add(builder);
+        }
+        return (T) this;
+    }
+
+    public Set<JavaType> getInterfaces() {
+        return build(interfaces);
+    }
+
+    public T withInterfaces(Set<JavaType> interfaces) {
+        this.interfaces.clear();
+        if (interfaces != null) {
+            for (JavaType item : interfaces) {
+                this.addToInterfaces(item);
+            }
+        }
         return (T) this;
     }
 
@@ -148,8 +150,30 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
         return new InterfacesNested<T>();
     }
 
+    public T withGenericTypes(JavaType[] genericTypes) {
+        this.genericTypes.clear();
+        if (genericTypes != null) {
+            for (JavaType item : genericTypes) {
+                this.addToGenericTypes(item);
+            }
+        }
+        return (T) this;
+    }
+
+    public JavaType[] getGenericTypes() {
+        List<JavaType> result = new ArrayList<>();
+        for (JavaTypeBuilder builder : genericTypes) {
+            result.add(builder.build());
+        }
+        return result.toArray(new JavaType[result.size()]);
+    }
+
     public T addToGenericTypes(JavaType item) {
-        this.genericTypes.add(item);
+        if (item != null) {
+            JavaTypeBuilder builder = new JavaTypeBuilder(item);
+            _visitables.add(builder);
+            this.genericTypes.add(builder);
+        }
         return (T) this;
     }
 
@@ -159,23 +183,27 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
 
     public class DefaultImplementationNested<N> extends JavaTypeFluent<DefaultImplementationNested<N>> implements Nested<N> {
 
+        private final JavaTypeBuilder builder = new JavaTypeBuilder(this);
+
         public N endDefaultImplementation() {
             return and();
         }
 
         public N and() {
-            return (N) withDefaultImplementation(new JavaTypeBuilder(this).build());
+            return (N) JavaTypeFluent.this.withDefaultImplementation(builder.build());
         }
 
     }
 
     public class SuperClassNested<N> extends JavaTypeFluent<SuperClassNested<N>> implements Nested<N> {
 
+        private final JavaTypeBuilder builder = new JavaTypeBuilder(this);
+
         public N and() {
-            return (N) withSuperClass(new JavaTypeBuilder(this).build());
+            return (N) JavaTypeFluent.this.withSuperClass(builder.build());
         }
 
-        public N endSuperClas() {
+        public N endSuperClass() {
             return and();
         }
 
@@ -183,25 +211,31 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
 
     public class InterfacesNested<N> extends JavaTypeFluent<InterfacesNested<N>> implements Nested<N> {
 
-        public N endInterface() {
-            return and();
-        }
+        private final JavaTypeBuilder builder = new JavaTypeBuilder(this);
 
         public N and() {
-            return (N) addToInterfaces(new JavaTypeBuilder(this).build());
+            return (N) JavaTypeFluent.this.addToInterfaces(builder.build());
+        }
+
+        public N endInterface() {
+            return and();
         }
 
     }
 
     public class GenericTypesNested<N> extends JavaTypeFluent<GenericTypesNested<N>> implements Nested<N> {
 
+        private final JavaTypeBuilder builder = new JavaTypeBuilder(this);
+
+        public N and() {
+            return (N) JavaTypeFluent.this.addToGenericTypes(builder.build());
+        }
+
         public N endGenericType() {
             return and();
         }
 
-        public N and() {
-            return (N) addToGenericTypes(new JavaTypeBuilder(this).build());
-        }
-
     }
+
+
 }

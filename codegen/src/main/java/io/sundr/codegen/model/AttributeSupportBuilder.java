@@ -20,7 +20,7 @@ import io.sundr.builder.Builder;
 
 public class AttributeSupportBuilder extends AttributeSupportFluent<AttributeSupportBuilder> implements Builder<AttributeSupport> {
 
-    private final AttributeSupportFluent<?> fluent;
+    AttributeSupportFluent<?> fluent;
 
     public AttributeSupportBuilder() {
         this.fluent = this;
@@ -30,14 +30,24 @@ public class AttributeSupportBuilder extends AttributeSupportFluent<AttributeSup
         this.fluent = fluent;
     }
 
-    public AttributeSupportBuilder(AttributeSupport instance) {
-        this();
-        withAttributes(instance.getAttributes());
+    public AttributeSupportBuilder(AttributeSupportFluent<?> fluent, AttributeSupport instance) {
+        this.fluent = fluent;
+        fluent.withAttributes(instance.getAttributes());
     }
 
-    public AttributeSupport build() {
-        return new AttributeSupport(fluent.getAttributes());
+    public AttributeSupportBuilder(AttributeSupport instance) {
+        this.fluent = this;
+        this.withAttributes(instance.getAttributes());
+    }
 
+    public EditableAttributeSupport build() {
+        EditableAttributeSupport buildable = new EditableAttributeSupport(fluent.getAttributes());
+        validate(buildable);
+        return buildable;
+
+    }
+
+    private <T> void validate(T item) {
     }
 
 

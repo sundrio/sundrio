@@ -16,14 +16,22 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Fluent;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AttributeSupportFluent<T extends AttributeSupportFluent<T>> implements Fluent<T> {
+public class AttributeSupportFluent<T extends AttributeSupportFluent<T>> extends BaseFluent<T> implements Fluent<T> {
 
-    private Map<String, Object> attributes = new HashMap();
+    Map<String, Object> attributes = new HashMap();
+
+    public T addToAttributes(String key, Object value) {
+        if (key != null && value != null) {
+            this.attributes.put(key, value);
+        }
+        return (T) this;
+    }
 
     public Map<String, Object> getAttributes() {
         return this.attributes;
@@ -31,12 +39,9 @@ public class AttributeSupportFluent<T extends AttributeSupportFluent<T>> impleme
 
     public T withAttributes(Map<String, Object> attributes) {
         this.attributes.clear();
-        this.attributes.putAll(attributes);
-        return (T) this;
-    }
-
-    public T addToAttributes(String key, Object value) {
-        this.attributes.put(key, value);
+        if (attributes != null) {
+            this.attributes.putAll(attributes);
+        }
         return (T) this;
     }
 

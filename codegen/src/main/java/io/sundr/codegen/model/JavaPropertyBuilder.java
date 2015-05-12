@@ -20,7 +20,7 @@ import io.sundr.builder.Builder;
 
 public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder> implements Builder<JavaProperty> {
 
-    private final JavaPropertyFluent<?> fluent;
+    JavaPropertyFluent<?> fluent;
 
     public JavaPropertyBuilder() {
         this.fluent = this;
@@ -30,17 +30,34 @@ public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder>
         this.fluent = fluent;
     }
 
+    public JavaPropertyBuilder(JavaPropertyFluent<?> fluent, JavaProperty instance) {
+        this.fluent = fluent;
+        fluent.withModifiers(instance.getModifiers());
+        fluent.withType(instance.getType());
+        fluent.withName(instance.getName());
+        fluent.withArray(instance.isArray());
+        fluent.withAttributes(instance.getAttributes());
+    }
+
     public JavaPropertyBuilder(JavaProperty instance) {
-        this();
-        withType(instance.getType());
-        withName(instance.getName());
-        withAttributes(instance.getAttributes());
-        withArray(instance.isArray());
+        this.fluent = this;
+        this.withModifiers(instance.getModifiers());
+        this.withType(instance.getType());
+        this.withName(instance.getName());
+        this.withArray(instance.isArray());
+        this.withAttributes(instance.getAttributes());
     }
 
-    public JavaProperty build() {
-        return new JavaProperty(fluent.getModifiers(), fluent.getType(), fluent.getName(), fluent.isArray(), fluent.getAttributes());
+    public EditableJavaProperty build() {
+        EditableJavaProperty buildable = new EditableJavaProperty(fluent.getModifiers(), fluent.getType(), fluent.getName(), fluent.isArray(), fluent.getAttributes());
+        validate(buildable);
+        return buildable;
 
     }
+
+    private <T> void validate(T item) {
+    }
+
+
 }
     

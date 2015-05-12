@@ -36,18 +36,17 @@ public class JavaMethod extends AttributeSupport implements Method<JavaType, Jav
     public JavaMethod(Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
         super(attributes);
         this.modifiers = modifiers;
+        this.typeParameters = typeParameters;
         this.name = name;
         this.returnType = returnType;
         this.arguments = arguments;
         this.exceptions = exceptions;
-        this.typeParameters = typeParameters;
     }
 
     public Set<Modifier> getModifiers() {
         return modifiers;
     }
 
-    @Override
     public Set<JavaType> getTypeParameters() {
         return typeParameters;
     }
