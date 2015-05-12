@@ -28,6 +28,7 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import javax.lang.model.element.Modifier;
 
 import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.T;
@@ -36,6 +37,7 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.loadResource;
 import static io.sundr.codegen.utils.StringUtils.singularize;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.functions.TypeAs.*;
@@ -125,12 +127,18 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
+            JavaType type = property.getType();
+            JavaType builderType = SHALLOW_BUILDER.apply(type);
+
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
-                    .addToAttributes(BODY, "return this." + property.getName() + ".toArray(new " + property.getType().getClassName() + "[" + property.getName() + ".size()]);")
+                    .addToAttributes(BODY, String.format(loadResource(ARRAY_GETTER_SNIPPET), type.getClassName(),
+                            builderType.getClassName(),
+                            property.getName(),
+                            type.getClassName()))
                     .build();
         }
     },

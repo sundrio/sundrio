@@ -70,5 +70,6 @@ public class Constants {
     public static final String ACCEPT_VISITOR_SNIPPET = "snippets/accept-visitor.txt";
     public static final String BUILD_LIST_SNIPPET = "snippets/build-list.txt";
     public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";
+    public static final String ARRAY_GETTER_SNIPPET = "snippets/array-getter.txt";
 
 }
