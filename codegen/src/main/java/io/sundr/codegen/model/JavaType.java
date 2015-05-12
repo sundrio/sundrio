@@ -24,13 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class JavaType extends AttributeSupport implements Type {
-    
-    private static final String IS_ARRAY = "IS_ARRAY";
-    private static final String IS_COLLECTION = "IS_COLLECTION";
-    private static final String IS_CONCRETE = "IS_CONCRETE";
-    private static final String DEFAULT_IMPLEMENTATION = "DEFAULT_IMPLEMENTATION";
-    
-    
+
     private final JavaKind kind;
     private final String packageName;
     private final String className;
