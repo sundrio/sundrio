@@ -31,7 +31,9 @@ public enum JavaMethodToReferences implements Function<JavaMethod, Set<JavaType>
     @Override
     public Set<JavaType> apply(JavaMethod item) {
         Set<JavaType> result = new HashSet<>();
-        result.add(item.getReturnType());
+        if (item.getReturnType() != null) {
+            result.add(item.getReturnType());
+        }
 
         for (JavaType t : item.getExceptions()) {
             result.add(t);

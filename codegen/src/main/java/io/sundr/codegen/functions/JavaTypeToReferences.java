@@ -32,7 +32,9 @@ public enum  JavaTypeToReferences implements Function<JavaType, Set<JavaType>> {
         if (item != null) {
             result.add(item);
 
-            result.addAll(apply(item.getSuperClass()));
+            if (item.getSuperClass() != null) {
+                result.addAll(apply(item.getSuperClass()));
+            }
 
             for (JavaType t : item.getInterfaces()) {
                 result.addAll(apply(t));
