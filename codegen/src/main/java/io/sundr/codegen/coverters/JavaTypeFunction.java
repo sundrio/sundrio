@@ -21,6 +21,8 @@ import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
@@ -55,6 +57,8 @@ public class JavaTypeFunction implements Function<String, JavaType> {
         String packageName = null;
         String className = null;
         JavaType superClass = null;
+        JavaKind kind = JavaKind.CLASS;
+        boolean concrete = false;
         Set<JavaType> interfaces = new LinkedHashSet<>();
         List<JavaType> genericTypes = new ArrayList<>();
 
@@ -66,7 +70,16 @@ public class JavaTypeFunction implements Function<String, JavaType> {
         TypeElement typeElement = elements.getTypeElement(getFullyQualifiedName(fullName));
         if (typeElement == null) {
             className = fullName;
+
         } else {
+            if (typeElement.getKind() == ElementKind.INTERFACE) {
+                kind = JavaKind.INTERFACE;
+                concrete = false;
+            } else if (typeElement.getKind() == ElementKind.CLASS) {
+                kind = JavaKind.CLASS;
+                concrete = typeElement.getModifiers().contains(Modifier.ABSTRACT);
+            }
+
             for (TypeMirror interfaceType : typeElement.getInterfaces()) {
                 String interfaceName = interfaceType.toString();
                 if (!visited.contains(interfaceName)) {
@@ -111,11 +124,11 @@ public class JavaTypeFunction implements Function<String, JavaType> {
         }
 
         JavaType type = new JavaTypeBuilder()
-                .withKind(JavaKind.CLASS)
+                .withKind(kind)
                 .withPackageName(packageName)
                 .withClassName(className)
                 .withArray(isArray)
-                .withConcrete(defaultImplementation == null)
+                .withConcrete(concrete)
                 .withCollection(collection)
                 .withDefaultImplementation(defaultImplementation)
                 .withInterfaces(interfaces)
