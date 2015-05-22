@@ -128,7 +128,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             JavaType type = property.getType();
-            JavaType builderType = SHALLOW_BUILDER.apply(type);
+            JavaType builderType = VISITABLE_BUILDER.apply(type);
 
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
@@ -136,7 +136,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
                     .addToAttributes(BODY, String.format(loadResource(ARRAY_GETTER_SNIPPET), type.getClassName(),
-                            builderType.getClassName(),
+                            builderType.getSimpleName(),
                             property.getName(),
                             type.getClassName()))
                     .build();

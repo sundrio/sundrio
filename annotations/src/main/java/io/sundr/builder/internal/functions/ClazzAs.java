@@ -79,7 +79,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
 
-                    JavaType builderType = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.BUILDER).apply(toAdd.getType());
+                    JavaType builderType = TypeAs.VISITABLE_BUILDER.apply(toAdd.getType());
                     if (toAdd.getType().isCollection()) {
                         builderType = typeGenericOf(toAdd.getType(), builderType);
                     }
@@ -204,7 +204,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 JavaMethod edit = new JavaMethodBuilder()
                         .withReturnType(builderType)
                         .withName("edit")
-                        .addToAttributes(BODY, "return new "+builderType.getSimpleName()+ "(this);")
+                        .addToAttributes(BODY, "return new " + builderType.getSimpleName() + "(this);")
                         .build();
 
                 methods.add(edit);

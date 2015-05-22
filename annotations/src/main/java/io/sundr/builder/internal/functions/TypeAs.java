@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import static io.sundr.builder.Constants.Q;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
@@ -134,6 +135,14 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .build();
         }
 
+    }, VISITABLE_BUILDER {
+        @Override
+        public JavaType apply(JavaType item) {
+            JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
+            return new JavaTypeBuilder(BuilderContextManager.getContext().getVisitableBuilderInterface().getType())
+                    .withGenericTypes(new JavaType[]{baseType, Q})
+                    .build();
+        }
     },
 
     LIST_OF {
