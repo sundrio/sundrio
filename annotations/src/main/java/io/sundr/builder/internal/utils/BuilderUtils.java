@@ -17,15 +17,23 @@
 package io.sundr.builder.internal.utils;
 
 
+import io.sundr.builder.internal.BuildableRepository;
+import io.sundr.builder.internal.BuilderContext;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.PropertyAs;
+import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 
+import javax.lang.model.element.TypeElement;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.*;
@@ -101,6 +109,98 @@ public class BuilderUtils {
             return (Boolean) item.getAttributes().get(BUILDABLE);
         }
         return false;
+    }
+
+    /**
+     * Find all buildable ancestor equivalents of a property.
+     * @param property
+     * @return
+     */
+    public static Set<JavaProperty> getPropertyBuildableAncestors(JavaProperty property) {
+        Set<JavaProperty> result = new LinkedHashSet<>();
+        JavaType baseType = property.getType();
+
+        if (baseType.isCollection()) {
+            JavaType candidate = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
+            for (JavaType ancestor : BuilderUtils.getBuildableAncestors(candidate)) {
+                JavaType collectionType = new JavaTypeBuilder(baseType).withGenericTypes(new JavaType[]{ancestor}).build();
+                String propertyName = ancestor.getSimpleName() + property.getNameCapitalized();
+                result.add(new JavaPropertyBuilder(property)
+                        .withName(propertyName)
+                        .withType(collectionType)
+                        .addToAttributes(ANCESTOR_OF, property)
+                        .build());
+            }
+        } else {
+            for (JavaType ancestor : BuilderUtils.getBuildableAncestors(baseType)) {
+                String propertyName = ancestor.getSimpleName() + property.getNameCapitalized();
+                result.add(new JavaPropertyBuilder(property)
+                        .withName(propertyName)
+                        .withType(ancestor)
+                        .addToAttributes(ANCESTOR_OF, property)
+                        .build());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Finds all the ancestors of a type that are buildable.
+     * @param item  The type.
+     * @return
+     */
+    public static Set<JavaType> getBuildableAncestors(JavaType item) {
+        Set<JavaType> result = new LinkedHashSet<>();
+        BuilderContext ctx = BuilderContextManager.getContext();
+        BuildableRepository repository = ctx.getRepository();
+        for (TypeElement element : repository.getBuildables()) {
+            JavaType type = ctx.getToType().apply(element.toString());
+            if (isAncestorOf(type, item)) {
+                result.add(type);
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * Checks if type has any ancestors that are "buildable"
+     * @param item  The type.
+     * @return      true if a buildable ancestor is found.
+     */
+    public static boolean hasBuildableAncestors(JavaType item) {
+        BuilderContext ctx = BuilderContextManager.getContext();
+        BuildableRepository repository = ctx.getRepository();
+        for (TypeElement element : repository.getBuildables()) {
+            JavaType type = ctx.getToType().apply(element.toString());
+            if (isAncestorOf(type, item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a type is an ancestor of an other type
+     * @param item          The base type.
+     * @param candidate     The candidate type.
+     * @return              true if candidate is an ancestor of base type.
+     */
+    public static boolean isAncestorOf(JavaType item, JavaType candidate) {
+        if (item == null || candidate == null) {
+            return false;
+        } else if (item.equals(candidate)) {
+            return true;
+        } else if (isAncestorOf(item.getSuperClass(), candidate)) {
+            return true;
+        } else {
+            for (JavaType interfaceType : item.getInterfaces()) {
+                if (isAncestorOf(interfaceType, candidate)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public static Set<JavaMethod> getInlineableConstructors(JavaProperty property) {
