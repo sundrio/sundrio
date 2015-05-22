@@ -26,7 +26,9 @@ public class BuildableRepository {
     private final Set<TypeElement> buildables = new LinkedHashSet<>();
 
     public void register(TypeElement buildable) {
-        buildables.add(buildable);
+        if (buildable != null) {
+            buildables.add(buildable);
+        }
     }
 
     public Set<TypeElement> getBuildables() {
