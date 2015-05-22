@@ -31,10 +31,12 @@ public enum JavaMethodToReferences implements Function<JavaMethod, Set<JavaType>
     @Override
     public Set<JavaType> apply(JavaMethod item) {
         Set<JavaType> result = new HashSet<>();
-        result.addAll(JavaTypeToReferences.FUNCTION.apply(item.getReturnType()));
+        result.add(item.getReturnType());
+
         for (JavaType t : item.getExceptions()) {
-            result.addAll(JavaTypeToReferences.FUNCTION.apply(t));
+            result.add(t);
         }
+
         for (JavaProperty p : item.getArguments()) {
             result.addAll(JavaPropertyToReferences.FUNCTION.apply(p));
         }

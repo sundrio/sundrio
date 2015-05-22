@@ -20,6 +20,7 @@ import io.sundr.Function;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public enum JavaPropertyToReferences implements Function<JavaProperty, Set<JavaType>> {
@@ -28,6 +29,17 @@ public enum JavaPropertyToReferences implements Function<JavaProperty, Set<JavaT
 
     @Override
     public Set<JavaType> apply(JavaProperty item) {
-        return JavaTypeToReferences.FUNCTION.apply(item.getType());
+        Set<JavaType> result = new LinkedHashSet<>();
+        result.add(item.getType());
+        for (JavaType generic : item.getType().getGenericTypes()) {
+            result.add(generic);
+        }
+
+        if (item.getType().getDefaultImplementation() != null) {
+            result.add(item.getType().getDefaultImplementation());
+        }
+
+
+        return result;
     }
 }
