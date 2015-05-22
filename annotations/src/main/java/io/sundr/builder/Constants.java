@@ -36,7 +36,7 @@ public class Constants {
 
     public static final String BUILDABLE = "BUILDABLE";
     public static final String MEMBER_OF = "MEMBER_OF";
-    public static final String ANCESTOR_OF = "ANCESTOR_OF";
+    public static final String DESCENDANT_OF = "DESCENDANT_OF";
     public static final String BODY = "BODY";
 
     public static final JavaType B = newGeneric("B");
@@ -45,6 +45,7 @@ public class Constants {
     public static final JavaType V = newGeneric("V");
     public static final JavaType VOID = new JavaTypeBuilder().withClassName("void").build();
     public static final JavaType Q = newGeneric("?");
+    public static final JavaType CLASS = ClassToJavaType.FUNCTION.apply(Class.class);
     public static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);
     public static final JavaType MAP = ClassToJavaType.FUNCTION.apply(Map.class);
     public static final JavaType LINKED_HASH_MAP = ClassToJavaType.FUNCTION.apply(LinkedHashMap.class);
@@ -71,6 +72,8 @@ public class Constants {
 
     public static final String ACCEPT_VISITOR_SNIPPET = "snippets/accept-visitor.txt";
     public static final String BUILD_LIST_SNIPPET = "snippets/build-list.txt";
+    public static final String AGGREGATE_SET_SNIPPET = "snippets/aggregate-set.txt";
+    public static final String AGGREGATE_LIST_SNIPPET = "snippets/aggregate-list.txt";
     public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";
     public static final String ARRAY_GETTER_SNIPPET = "snippets/array-getter.txt";
 

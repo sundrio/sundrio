@@ -34,6 +34,7 @@ import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
+import static io.sundr.builder.internal.utils.BuilderUtils.getPropertyBuildableAncestors;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
@@ -74,7 +75,11 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                if (isBuildable(toAdd) && !isMap(toAdd.getType())) {
+                Set<JavaProperty> descendants = getPropertyBuildableAncestors(toAdd);
+
+                if (isMap(toAdd.getType())) {
+                    properties.add(toAdd);
+                } else if (isBuildable(toAdd)) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
@@ -84,11 +89,30 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                         builderType = typeGenericOf(toAdd.getType(), builderType);
                     }
 
-                    toAdd = new JavaPropertyBuilder(toAdd).withType(builderType).build();
+                    properties.add(new JavaPropertyBuilder(toAdd).withType(builderType).build());
+                } else if (descendants.size() > 0 && toAdd.getType().isCollection()) {
+                    properties.add(toAdd);
 
+                    for (JavaProperty descendant : descendants) {
+                        if (descendant.getType().isCollection()) {
+                            methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
+                        }
+                        methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
+                        methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
+                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
+
+                        JavaType builderType = TypeAs.VISITABLE_BUILDER.apply(descendant.getType());
+                        if (descendant.getType().isCollection()) {
+                            builderType = typeGenericOf(descendant.getType(), builderType);
+                        }
+
+                        properties.add(new JavaPropertyBuilder(descendant).withType(builderType).build());
+
+                    }
+
+                } else {
+                    properties.add(toAdd);
                 }
-
-                properties.add(toAdd);
             }
 
             return new JavaClazzBuilder(item)

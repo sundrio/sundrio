@@ -41,6 +41,24 @@ public class BaseFluent<F extends BaseFluent<F>> implements Fluent<F>, Visitable
         return result;
     }
 
+    public static <T> ArrayList<T> aggregate(List<? extends T> ...lists) {
+        ArrayList<T> result = new ArrayList<>();
+
+        for (List<? extends T> list : lists) {
+            result.addAll(list);
+        }
+        return result;
+    }
+
+    public static <T> LinkedHashSet<T> aggregate(Set<? extends T> ...sets) {
+        LinkedHashSet<T> result = new LinkedHashSet<>();
+
+        for (Set<? extends T> set : sets) {
+            result.addAll(set);
+        }
+        return result;
+    }
+
     @Override
     public F accept(Visitor visitor) {
         for (Visitable visitable : _visitables) {

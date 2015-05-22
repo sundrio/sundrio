@@ -45,6 +45,10 @@ public final class StringUtils {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    public static String deCaptializeFirst(String str) {
+        return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+
     public static String singularize(String str) {
         //TODO: Apparently this needs a lot of work.
         if (str.endsWith("ies")) {

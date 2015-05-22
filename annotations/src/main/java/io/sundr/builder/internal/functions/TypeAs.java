@@ -139,6 +139,9 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         @Override
         public JavaType apply(JavaType item) {
             JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
+         //   if (!baseType.isConcrete()) {
+         //       baseType = typeExtends(Q, baseType);
+          //  }
             return new JavaTypeBuilder(BuilderContextManager.getContext().getVisitableBuilderInterface().getType())
                     .withGenericTypes(new JavaType[]{baseType, Q})
                     .build();

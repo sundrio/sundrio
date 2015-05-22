@@ -1,0 +1,6 @@
+LinkedHashSet<T> result = new LinkedHashSet<>();
+
+for (Set<? extends T> set : sets) {
+    result.addAll(set);
+}
+return result;

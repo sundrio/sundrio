@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.utils;
 
 
+import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -36,7 +37,11 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.*;
+import static io.sundr.builder.Constants.DESCENDANT_OF;
+import static io.sundr.builder.Constants.LIST;
+import static io.sundr.builder.Constants.MAP;
+import static io.sundr.builder.Constants.SET;
+import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 
 public class BuilderUtils {
 
@@ -112,7 +117,7 @@ public class BuilderUtils {
     }
 
     /**
-     * Find all buildable ancestor equivalents of a property.
+     * Find all buildable descendant equivalents of a property.
      * @param property
      * @return
      */
@@ -122,22 +127,24 @@ public class BuilderUtils {
 
         if (baseType.isCollection()) {
             JavaType candidate = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
-            for (JavaType ancestor : BuilderUtils.getBuildableAncestors(candidate)) {
-                JavaType collectionType = new JavaTypeBuilder(baseType).withGenericTypes(new JavaType[]{ancestor}).build();
-                String propertyName = ancestor.getSimpleName() + property.getNameCapitalized();
+            for (JavaType descendant : BuilderUtils.getBuildableDescendants(candidate)) {
+                JavaType collectionType = new JavaTypeBuilder(baseType).withGenericTypes(new JavaType[]{descendant}).build();
+                String propertyName = deCaptializeFirst(descendant.getSimpleName()) + property.getNameCapitalized();
                 result.add(new JavaPropertyBuilder(property)
                         .withName(propertyName)
                         .withType(collectionType)
-                        .addToAttributes(ANCESTOR_OF, property)
+                        .addToAttributes(DESCENDANT_OF, property)
+                        .addToAttributes(BUILDABLE, true)
                         .build());
             }
         } else {
-            for (JavaType ancestor : BuilderUtils.getBuildableAncestors(baseType)) {
-                String propertyName = ancestor.getSimpleName() + property.getNameCapitalized();
+            for (JavaType descendant : BuilderUtils.getBuildableDescendants(baseType)) {
+                String propertyName = descendant.getSimpleName() + property.getNameCapitalized();
                 result.add(new JavaPropertyBuilder(property)
                         .withName(propertyName)
-                        .withType(ancestor)
-                        .addToAttributes(ANCESTOR_OF, property)
+                        .withType(descendant)
+                        .addToAttributes(DESCENDANT_OF, property)
+                        .addToAttributes(BUILDABLE, true)
                         .build());
             }
         }
@@ -145,17 +152,21 @@ public class BuilderUtils {
     }
 
     /**
-     * Finds all the ancestors of a type that are buildable.
+     * Finds all the descendants of a type that are buildable.
      * @param item  The type.
      * @return
      */
-    public static Set<JavaType> getBuildableAncestors(JavaType item) {
+    public static Set<JavaType> getBuildableDescendants(JavaType item) {
+        if (item.getFullyQualifiedName().equals(Constants.OBJECT.getFullyQualifiedName())) {
+            return new LinkedHashSet<>();
+        }
+
         Set<JavaType> result = new LinkedHashSet<>();
         BuilderContext ctx = BuilderContextManager.getContext();
         BuildableRepository repository = ctx.getRepository();
         for (TypeElement element : repository.getBuildables()) {
             JavaType type = ctx.getToType().apply(element.toString());
-            if (isAncestorOf(type, item)) {
+            if (isDescendant(type, item)) {
                 result.add(type);
             }
         }
@@ -164,16 +175,19 @@ public class BuilderUtils {
 
 
     /**
-     * Checks if type has any ancestors that are "buildable"
+     * Checks if type has any descendants that are "buildable"
      * @param item  The type.
      * @return      true if a buildable ancestor is found.
      */
-    public static boolean hasBuildableAncestors(JavaType item) {
+    public static boolean hasBuildableDescendants(JavaType item) {
+        if (item.getFullyQualifiedName().equals(Constants.OBJECT.getFullyQualifiedName())) {
+            return false;
+        }
         BuilderContext ctx = BuilderContextManager.getContext();
         BuildableRepository repository = ctx.getRepository();
         for (TypeElement element : repository.getBuildables()) {
             JavaType type = ctx.getToType().apply(element.toString());
-            if (isAncestorOf(type, item)) {
+            if (isDescendant(type, item)) {
                 return true;
             }
         }
@@ -181,21 +195,21 @@ public class BuilderUtils {
     }
 
     /**
-     * Checks if a type is an ancestor of an other type
+     * Checks if a type is an descendant of an other type
      * @param item          The base type.
      * @param candidate     The candidate type.
-     * @return              true if candidate is an ancestor of base type.
+     * @return              true if candidate is a descendant of base type.
      */
-    public static boolean isAncestorOf(JavaType item, JavaType candidate) {
+    public static boolean isDescendant(JavaType item, JavaType candidate) {
         if (item == null || candidate == null) {
             return false;
         } else if (item.equals(candidate)) {
             return true;
-        } else if (isAncestorOf(item.getSuperClass(), candidate)) {
+        } else if (isDescendant(item.getSuperClass(), candidate)) {
             return true;
         } else {
             for (JavaType interfaceType : item.getInterfaces()) {
-                if (isAncestorOf(interfaceType, candidate)) {
+                if (isDescendant(interfaceType, candidate)) {
                     return true;
                 }
             }

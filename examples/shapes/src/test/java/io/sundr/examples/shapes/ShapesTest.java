@@ -47,15 +47,16 @@ public class ShapesTest {
         Assert.assertEquals(20, circle3.getRadius());
     }
 
+
     @Test
     public void testVisitor() {
         Canvas canvas = new CanvasBuilder()
-                .addNewCircle()
+                .addNewCircleShape()
                 .withX(0)
                 .withY(0)
                 .withRadius(10)
                 .and()
-                .addNewSquare()
+                .addNewSquareShape()
                 .withY(10)
                 .withY(20)
                 .withHeight(30)
@@ -73,7 +74,7 @@ public class ShapesTest {
         }).build();
 
 
-        Assert.assertEquals(110, canvas.getCircles().get(0).getRadius());
+        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
 
     }
 
