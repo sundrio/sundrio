@@ -103,7 +103,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .withClassName(item.getClassName() + "Builder")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(fluent)
-                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getBuilderInterface().getType(), item))))
+                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getVisitableBuilderInterface().getType(), item, builder))))
                     .build();
 
         }
