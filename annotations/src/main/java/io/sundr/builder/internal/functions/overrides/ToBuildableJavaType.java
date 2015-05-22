@@ -38,12 +38,15 @@ public class ToBuildableJavaType implements Function<String, JavaType> {
     
     public ToBuildableJavaType(Elements elements) {
         this.elements = elements;
-        delegate = new JavaTypeFunction(elements, true);
+        delegate = new JavaTypeFunction(elements);
     }
 
     @Override
     public JavaType apply(String fullName) {
         JavaType type = delegate.apply(fullName);
+        if (type == null) {
+            return null;
+        }
         TypeElement typeElement = elements.getTypeElement(fullName);
         boolean isBuildable = false;
         if (fullName.endsWith("[]")) {

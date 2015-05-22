@@ -23,6 +23,7 @@ import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.utils.ModelUtils;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -59,7 +60,7 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
     public JavaClazz apply(TypeElement classElement) {
         //Check SuperClass
         TypeMirror superClass = classElement.getSuperclass();
-        JavaType superClassType = toJavaType.apply(superClass.toString());
+        JavaType superClassType = superClass != null && !ModelUtils.NONE.equals(superClass) ? toJavaType.apply(superClass.toString()) : null;
         List<JavaType> genericTypes = new ArrayList<>();
         for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
             JavaType genericType = toJavaType.apply(typeParameter.toString());

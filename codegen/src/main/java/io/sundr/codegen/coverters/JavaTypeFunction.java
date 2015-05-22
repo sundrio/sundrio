@@ -31,41 +31,57 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.codegen.utils.ModelUtils.NONE;
+import static io.sundr.codegen.utils.ModelUtils.OBJECT;
 import static io.sundr.codegen.utils.ModelUtils.getFullyQualifiedName;
 import static io.sundr.codegen.utils.ModelUtils.splitTypes;
 
 public class JavaTypeFunction implements Function<String, JavaType> {
 
     private final Elements elements;
-    private final boolean deep;
-    private final JavaTypeFunction shallow;
 
-    public JavaTypeFunction(Elements elements, boolean deep) {
+    public JavaTypeFunction(Elements elements) {
         this.elements = elements;
-        this.deep = deep;
-        this.shallow = deep ? new JavaTypeFunction(elements, false) : this;
     }
 
     @Override
     public JavaType apply(String fullName) {
+        return apply(fullName, new LinkedHashSet<String>());
+    }
+
+
+    public JavaType apply(String fullName,  Set<String> visited) {
         boolean isArray = false;
         String packageName = null;
         String className = null;
-        List<JavaType> interfaces = new ArrayList<>();
+        JavaType superClass = null;
+        Set<JavaType> interfaces = new LinkedHashSet<>();
         List<JavaType> genericTypes = new ArrayList<>();
 
+        if (fullName.equals(NONE)) {
+            return null;
+        }
+
+        visited.add(fullName);
         TypeElement typeElement = elements.getTypeElement(getFullyQualifiedName(fullName));
         if (typeElement == null) {
             className = fullName;
         } else {
             for (TypeMirror interfaceType : typeElement.getInterfaces()) {
-                if (deep) {
-                    interfaces.add(shallow.apply(interfaceType.toString()));
+                String interfaceName = interfaceType.toString();
+                if (!visited.contains(interfaceName)) {
+                    interfaces.add(apply(interfaceName, visited));
                 }
             }
 
             packageName = elements.getPackageOf(typeElement).toString();
             className = fullName.contains(packageName) ? fullName.substring(packageName.length() + 1) : fullName;
+            if (!OBJECT.equals(fullName) && typeElement.getSuperclass() != null) {
+                String superClassName = typeElement.getSuperclass().toString();
+                if (!visited.contains(superClassName)) {
+                    superClass = apply(superClassName, visited);
+                }
+            }
         }
 
         if (fullName.endsWith("[]")) {
@@ -75,7 +91,7 @@ public class JavaTypeFunction implements Function<String, JavaType> {
         if (className.contains("<")) {
             String genericTypeList = fullName.substring(fullName.indexOf('<') + 1, fullName.lastIndexOf('>'));
             for (String genericType : splitTypes(genericTypeList)) {
-                JavaType t = apply(genericType);
+                JavaType t = apply(genericType, visited);
                 genericTypes.add(t);
             }
             className = className.substring(0, className.indexOf('<'));
@@ -84,13 +100,13 @@ public class JavaTypeFunction implements Function<String, JavaType> {
         String qualifiedName = packageName + "." + className;
         boolean collection = false;
         if (qualifiedName.equals(Set.class.getCanonicalName())) {
-            defaultImplementation = apply(LinkedHashSet.class.getCanonicalName());
+            defaultImplementation = apply(LinkedHashSet.class.getCanonicalName(), visited);
             collection = true;
         } else if (qualifiedName.equals(List.class.getCanonicalName())) {
-            defaultImplementation = apply(ArrayList.class.getCanonicalName());
+            defaultImplementation = apply(ArrayList.class.getCanonicalName(), visited);
             collection = true;
         } else if (qualifiedName.equals(Map.class.getCanonicalName())) {
-            defaultImplementation = apply(HashMap.class.getCanonicalName());
+            defaultImplementation = apply(HashMap.class.getCanonicalName(), visited);
             collection = true;
         }
 
@@ -102,6 +118,8 @@ public class JavaTypeFunction implements Function<String, JavaType> {
                 .withConcrete(defaultImplementation == null)
                 .withCollection(collection)
                 .withDefaultImplementation(defaultImplementation)
+                .withInterfaces(interfaces)
+                .withSuperClass(superClass)
                 .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()])).build();
         return type;
     }

@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ModelUtils {
-    
+
+    public static final String NONE = "<none>";
+    public static final String OBJECT = "java.lang.Object";
+
     private ModelUtils(){
         //Utility Class
     }

@@ -46,7 +46,7 @@ public class DslProcessorContext {
 
     public DslProcessorContext(Elements elements, Types types) {
         this.elements = elements;
-        this.toType = new JavaTypeFunction(elements, true);
+        this.toType = new JavaTypeFunction(elements);
         this.toProperty = new JavaPropertyFunction(toType);
         this.toMethod = new JavaMethodFunction(toType, toProperty);
         this.dependencyManager = new DependencyManager(elements);
