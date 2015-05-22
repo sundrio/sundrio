@@ -36,6 +36,7 @@ public class Constants {
 
     public static final String BUILDABLE = "BUILDABLE";
     public static final String MEMBER_OF = "MEMBER_OF";
+    public static final String ANCESTOR_OF = "ANCESTOR_OF";
     public static final String BODY = "BODY";
 
     public static final JavaType B = newGeneric("B");
@@ -59,6 +60,7 @@ public class Constants {
     public static final JavaType EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), B);
     public static final JavaType VISITOR = typeGenericOf(ClassToJavaType.FUNCTION.apply(Visitor.class), V);
     public static final JavaType VISITABLE = ClassToJavaType.FUNCTION.apply(Visitable.class);
+    public static final JavaType VISITABLE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(VisitableBuilder.class), T, V);
 
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
     public static final String DEFAULT_CLASS_TEMPLATE_LOCATION = "templates/builder/class.vm";

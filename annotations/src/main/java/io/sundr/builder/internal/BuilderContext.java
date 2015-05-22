@@ -70,7 +70,8 @@ public class BuilderContext {
     private final JavaClazz builderInterface;
     private final JavaClazz nestedInterface;
     private final JavaClazz editableInterface;
-    private final JavaClazz visitableInteface;
+    private final JavaClazz visitableInterface;
+    private final JavaClazz visitableBuilderInterface;
     private final JavaClazz visitorInterface;
     private final String targetPackage;
     
@@ -107,16 +108,16 @@ public class BuilderContext {
 
         JavaType visitorBase = unwrapGeneric(visitorInterface.getType());
 
-        visitableInteface = new JavaClazzBuilder()
+        visitableInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
                 .withPackageName(targetPackage)
                 .withClassName(VISITABLE.getClassName())
-                .withGenericTypes(new JavaType[]{T})
+                .withGenericTypes(new JavaType[]{V})
                 .and()
                 .addNewMethod()
                 .addToModifiers(Modifier.PUBLIC)
-                .withReturnType(T)
+                .withReturnType(V)
                 .withName("accept")
                 .addNewArgument()
                 .withName("visitor")
@@ -125,7 +126,7 @@ public class BuilderContext {
                 .and()
                 .build();
 
-        JavaType visitableBase = unwrapGeneric(visitableInteface.getType());
+        JavaType visitableBase = unwrapGeneric(visitableInterface.getType());
         
         builderInterface = new JavaClazzBuilder()
                 .withNewType()
@@ -156,7 +157,7 @@ public class BuilderContext {
                 .withClassName(BASE_FLUENT.getClassName())
                 .withGenericTypes(BASE_FLUENT.getGenericTypes())
                 .addToInterfaces(fluentInterface.getType())
-                .addToInterfaces(typeGenericOf(visitableInteface.getType(),T))
+                .addToInterfaces(typeGenericOf(visitableInterface.getType(),T))
                 .and()
                 .addNewMethod()
                     .addToTypeParameters(T)
@@ -225,6 +226,17 @@ public class BuilderContext {
                 .withName("edit")
                 .and()
                 .build();
+
+        visitableBuilderInterface = new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.INTERFACE)
+                .withPackageName(targetPackage)
+                .withClassName(VISITABLE_BUILDER.getClassName())
+                .addToInterfaces(visitableInterface.getType())
+                .addToInterfaces(builderInterface.getType())
+                .withGenericTypes(VISITABLE_BUILDER.getGenericTypes())
+                .and()
+                .build();
     }
 
     public Elements getElements() {
@@ -255,8 +267,12 @@ public class BuilderContext {
         return editableInterface;
     }
 
-    public JavaClazz getVisitableInteface() {
-        return visitableInteface;
+    public JavaClazz getVisitableInterface() {
+        return visitableInterface;
+    }
+
+    public JavaClazz getVisitableBuilderInterface() {
+        return visitableBuilderInterface;
     }
 
     public JavaClazz getVisitorInterface() {
