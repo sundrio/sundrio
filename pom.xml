@@ -57,12 +57,16 @@
     </developers>
 
     <properties>
+        <aether.version>1.0.2.v20150114</aether.version>
         <hamcrest.version>1.3</hamcrest.version>
         <junit.version>4.12</junit.version>
+        <maven.version>3.2.5</maven.version>
+        <maven.plugin.annotations.version>3.2</maven.plugin.annotations.version>
         <sun.tools.version>1.7</sun.tools.version>
         <validation.api.version>1.1.0.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
 
+        <invoker.plugin.version>1.8</invoker.plugin.version>
         <release.plugin.version>2.5.1</release.plugin.version>
     </properties>
 
@@ -71,6 +75,7 @@
         <module>codegen</module>
         <module>annotations</module>
         <module>examples</module>
+        <module>maven-plugin</module>
     </modules>
     
     <build>
@@ -84,7 +89,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        
     </build>
 
     <dependencyManagement>

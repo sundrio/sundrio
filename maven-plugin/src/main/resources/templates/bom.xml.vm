@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${model.artifact.groupId}</groupId>
+    <artifactId>${model.artifact.artifactId}</artifactId>
+    <version>${model.artifact.version}</version>
+    <packaging>pom</packaging>
+
+    <dependencyManagement>
+        <dependencies>#foreach($a in $model.artifacts)
+
+            <dependency>
+                <groupId>${a.groupId}</groupId>
+                <artifactId>${a.artifactId}</artifactId>
+                <version>${a.version}</version>#if( $a.scope && $!a.scope != '' )
+
+                <scope>${a.scope}</scope>#end#if( $a.type && $!a.type != '' )
+
+                <type>${a.type}</type>#end#if( $a.classifier && $!a.classifier != '' )
+
+                <classifier>${a.classifier}</classifier>#end
+
+            </dependency>#end
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>
