@@ -35,12 +35,14 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.INSTALL)
+@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VERIFY)
 public class BomMojo extends AbstractSundrioMojo {
 
     private static final String BOM_TEMPLATE = "templates/bom.xml.vm";
+    private static final String BOM_NAME = "bom.xml";
+    private static final String POM_TYPE = "pom";
+    private static final String PLUGIN_TYPE = "maven-plugin";
 
     @Component
     private MavenProjectHelper projectHelper;
@@ -48,35 +50,37 @@ public class BomMojo extends AbstractSundrioMojo {
     @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
     private List<MavenProject> reactorProjects;
 
-    /**
-     * When building with multiple threads, reaching the last project doesn't have to mean that all projects are ready
-     * to be deployed
-     */
-    private static final AtomicBoolean FIRST = new AtomicBoolean(true);
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        boolean isFirst = FIRST.compareAndSet(true, false);
-        if (isFirst) {
+        if (getProject().isExecutionRoot()) {
             File outputDir = new File(getProject().getBuild().getOutputDirectory());
-            File generatedBom = new File(outputDir, "bom.xml");
+            File generatedBom = new File(outputDir, BOM_NAME);
             if (!outputDir.exists() && !outputDir.mkdirs()) {
                 throw new MojoFailureException("Failed to create output dir for bom:" + outputDir.getAbsolutePath());
             }
             try (FileWriter writer = new FileWriter(generatedBom)) {
-                Set<Artifact> artifacts = new LinkedHashSet<>();
+                Set<Artifact> archives = new LinkedHashSet<>();
+                Set<Artifact> plugins = new LinkedHashSet<>();
+                Set<Artifact> poms = new LinkedHashSet<>();
+
                 for (MavenProject module : reactorProjects) {
-                    artifacts.add(module.getArtifact());
+                    Artifact artifact = module.getArtifact();
+                    if (PLUGIN_TYPE.equals(artifact.getType())) {
+                        plugins.add(artifact);
+                    } else if (POM_TYPE.equals(artifact.getType())) {
+                        poms.add(artifact);
+                    } else {
+                        archives.add(artifact);
+                    }
                 }
                 MavenProject rootProject = getProject();
                 Artifact rootArtifact = rootProject.getArtifact();
-                BomModel model = new BomModel(rootArtifact, artifacts);
+                BomModel model = new BomModel(rootArtifact, archives, poms, plugins);
                 CodeGenerator<BomModel> generator = new CodeGenerator<>(model, writer, BOM_TEMPLATE, Collections.<Class<? extends Directive>>emptySet());
                 getLog().info("Generating BOM for model:" + model);
                 generator.generate();
                 getLog().info("Attaching BOM");
                 projectHelper.attachArtifact(rootProject, generatedBom, "bom");
-
             } catch (IOException e) {
                 throw new MojoFailureException("Failed to generate bom.");
             }

@@ -23,19 +23,31 @@ import java.util.Set;
 public class BomModel {
 
     private final Artifact artifact;
-    private final Set<Artifact> artifacts;
+    private final Set<Artifact> archives;
+    private final Set<Artifact> poms;
+    private final Set<Artifact> plugins;
 
-    public BomModel(Artifact artifact, Set<Artifact> artifacts) {
+    public BomModel(Artifact artifact, Set<Artifact> archives, Set<Artifact> poms, Set<Artifact> plugins) {
         this.artifact = artifact;
-        this.artifacts = artifacts;
+        this.archives = archives;
+        this.poms = poms;
+        this.plugins = plugins;
     }
 
     public Artifact getArtifact() {
         return artifact;
     }
 
-    public Set<Artifact> getArtifacts() {
-        return artifacts;
+    public Set<Artifact> getArchives() {
+        return archives;
+    }
+
+    public Set<Artifact> getPoms() {
+        return poms;
+    }
+
+    public Set<Artifact> getPlugins() {
+        return plugins;
     }
 
     @Override

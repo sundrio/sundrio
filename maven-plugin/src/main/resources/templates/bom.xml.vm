@@ -9,14 +9,14 @@
     <packaging>pom</packaging>
 
     <dependencyManagement>
-        <dependencies>#foreach($a in $model.artifacts)
+        <dependencies>#foreach($a in $model.archives)
 
             <dependency>
                 <groupId>${a.groupId}</groupId>
                 <artifactId>${a.artifactId}</artifactId>
                 <version>${a.version}</version>#if( $a.scope && $!a.scope != '' )
 
-                <scope>${a.scope}</scope>#end#if( $a.type && $!a.type != '' )
+                <scope>${a.scope}</scope>#end#if( $a.type && $!a.type != '' && $!a.type != 'jar' && $!a.type != 'bundle')
 
                 <type>${a.type}</type>#end#if( $a.classifier && $!a.classifier != '' )
 
@@ -27,4 +27,19 @@
         </dependencies>
     </dependencyManagement>
 
+    #if (!$model.plugins.isEmpty())
+
+    <build>
+        <pluginManagement>#foreach($p in $model.plugins)
+
+            <plugin>
+                <groupId>${p.groupId}</groupId>
+                <artifactId>${p.artifactId}</artifactId>
+                <version>${p.version}</version>
+            </plugin>#end
+
+        </pluginManagement>
+    </build>
+
+    #end
 </project>
