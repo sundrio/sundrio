@@ -19,14 +19,14 @@
     <parent>
         <artifactId>sundr-pom</artifactId>
         <groupId>io.sundr</groupId>
-        <version>0.0.15</version>
+        <version>0.0.16-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.sundr</groupId>
     <artifactId>sundr-core</artifactId>
     <name>Sundrio :: Core</name>
-    <version>0.0.15</version>
+    <version>0.0.16-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <build>
