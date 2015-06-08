@@ -4,7 +4,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 
-File outputDir = new File( basedir, "target/classes");
+File outputDir = new File( basedir, "target/classes/bom" );
 File pom = new File( outputDir, "bom.xml" );
 
 MavenXpp3Reader mavenReader = new MavenXpp3Reader();
@@ -13,4 +13,6 @@ Model model = mavenReader.read(fileReader);
 model.setPomFile(pom);
 MavenProject project = new MavenProject(model);
 
-return project.getDependencyManagement().getDependencies().size() == 3;
+File deployedBomDir = new File( basedir, "../../repository/test/bom-test-bom" );
+
+return deployedBomDir.exists() && project.getDependencyManagement().getDependencies().size() == 2;

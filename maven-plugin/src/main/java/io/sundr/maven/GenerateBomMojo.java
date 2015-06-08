@@ -20,12 +20,10 @@ import io.sundr.codegen.generator.CodeGenerator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
 import org.apache.velocity.runtime.directive.Directive;
 
 import java.io.File;
@@ -36,32 +34,34 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VERIFY)
-public class BomMojo extends AbstractSundrioMojo {
+@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+public class GenerateBomMojo extends AbstractSundrioMojo {
 
     private static final String BOM_TEMPLATE = "templates/bom.xml.vm";
+    private static final String BOM_DIR = "bom";
     private static final String BOM_NAME = "bom.xml";
     private static final String POM_TYPE = "pom";
     private static final String PLUGIN_TYPE = "maven-plugin";
 
-    @Component
-    private MavenProjectHelper projectHelper;
-
-    @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
+    @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = false)
     private List<MavenProject> reactorProjects;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (getProject().isExecutionRoot()) {
             File outputDir = new File(getProject().getBuild().getOutputDirectory());
-            File generatedBom = new File(outputDir, BOM_NAME);
-            if (!outputDir.exists() && !outputDir.mkdirs()) {
-                throw new MojoFailureException("Failed to create output dir for bom:" + outputDir.getAbsolutePath());
+            File bomDir = new File(outputDir, BOM_DIR);
+            File generatedBom = new File(bomDir, BOM_NAME);
+
+            if (!bomDir.exists() && !bomDir.mkdirs()) {
+                throw new MojoFailureException("Failed to create output dir for bom:" + bomDir.getAbsolutePath());
             }
-            try (FileWriter writer = new FileWriter(generatedBom)) {
-                Set<Artifact> archives = new LinkedHashSet<>();
-                Set<Artifact> plugins = new LinkedHashSet<>();
-                Set<Artifact> poms = new LinkedHashSet<>();
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter(generatedBom);
+                Set<Artifact> archives = new LinkedHashSet<Artifact>();
+                Set<Artifact> plugins = new LinkedHashSet<Artifact>();
+                Set<Artifact> poms = new LinkedHashSet<Artifact>();
 
                 for (MavenProject module : reactorProjects) {
                     Artifact artifact = module.getArtifact();
@@ -76,30 +76,18 @@ public class BomMojo extends AbstractSundrioMojo {
                 MavenProject rootProject = getProject();
                 Artifact rootArtifact = rootProject.getArtifact();
                 BomModel model = new BomModel(rootArtifact, archives, poms, plugins);
-                CodeGenerator<BomModel> generator = new CodeGenerator<>(model, writer, BOM_TEMPLATE, Collections.<Class<? extends Directive>>emptySet());
+                CodeGenerator<BomModel> generator = new CodeGenerator<BomModel>(model, writer, BOM_TEMPLATE, Collections.<Class<? extends Directive>>emptySet());
                 getLog().info("Generating BOM for model:" + model);
                 generator.generate();
-                getLog().info("Attaching BOM");
-                projectHelper.attachArtifact(rootProject, generatedBom, "bom");
             } catch (IOException e) {
                 throw new MojoFailureException("Failed to generate bom.");
+            } finally {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    throw new MojoExecutionException("Failed to close the generated bom writer", e);
+                }
             }
         }
-    }
-
-    public MavenProjectHelper getProjectHelper() {
-        return projectHelper;
-    }
-
-    public void setProjectHelper(MavenProjectHelper projectHelper) {
-        this.projectHelper = projectHelper;
-    }
-
-    public List<MavenProject> getReactorProjects() {
-        return reactorProjects;
-    }
-
-    public void setReactorProjects(List<MavenProject> reactorProjects) {
-        this.reactorProjects = reactorProjects;
     }
 }

@@ -16,17 +16,170 @@
 
 package io.sundr.maven;
 
+import com.google.common.base.Strings;
+import io.sundr.codegen.utils.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.InvocationResult;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class AbstractSundrioMojo extends AbstractMojo {
 
+    static final String BOM_TEMPLATE = "templates/bom.xml.vm";
+    static final String BOM_DIR = "bom";
+    static final String BOM_NAME = "bom.xml";
+    static final String POM_TYPE = "pom";
+    static final String PLUGIN_TYPE = "maven-plugin";
+
+    static final String URL = "url";
+    static final Pattern ALT_REPO_PATTERN = Pattern.compile("[^ ]*::[^ ]*::(?<url>[^ ]*)");
+
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
+
+
+    // this is required for the deploy phase, but end user may just use a install phase only, so let required = false
+    @Parameter(defaultValue = "${project.distributionManagementArtifactRepository}", readonly = true, required = false)
+    private ArtifactRepository deploymentRepository;
+
+    @Parameter(defaultValue = "${altDeploymentRepository}", readonly = true, required = false)
+    private String altDeploymentRepository;
+
+    @Component
+    private ArtifactHandler artifactHandler;
 
     public MavenProject getProject() {
         return project;
     }
 
+    MavenProject readBomProject(File pomFile) throws IOException {
+        MavenXpp3Reader mavenReader = new MavenXpp3Reader();
+        FileReader fileReader = null;
+        try {
+            fileReader = new FileReader(pomFile);
+            Model model = mavenReader.read(fileReader);
+            model.setPomFile(pomFile);
+            MavenProject project = new MavenProject(model);
+            project.setFile(pomFile);
+            project.setArtifact(createArtifact(pomFile, model.getGroupId(), model.getArtifactId(), model.getVersion(), "compile", model.getPackaging(), ""));
+            return project;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (fileReader != null) {
+                fileReader.close();
+            }
+        }
+    }
+
+    Artifact createArtifact(File file, String groupId, String artifactId, String version, String scope, String type, String classifier) {
+        DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, scope, version, type, classifier, artifactHandler);
+        artifact.setFile(file);
+        artifact.setResolved(true);
+        return artifact;
+    }
+
+
+    void install(MavenProject project) throws MojoExecutionException {
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setBaseDirectory(project.getBasedir());
+        request.setPomFile(project.getFile());
+        request.setGoals(Collections.singletonList("install:install-file"));
+        request.setRecursive(false);
+        request.setInteractive(false);
+
+        Properties props = new Properties();
+        props.setProperty("file", project.getFile().getAbsolutePath());
+        props.setProperty("groupId", project.getGroupId());
+        props.setProperty("artifactId", project.getArtifactId());
+        props.setProperty("version", project.getVersion());
+        props.setProperty("classifier", "");
+        props.setProperty("packaging", project.getPackaging());
+        request.setProperties(props);
+
+        Invoker invoker = new DefaultInvoker();
+        try {
+            InvocationResult result = invoker.execute(request);
+            if (result.getExitCode() != 0) {
+                throw new IllegalStateException("Error invoking Maven goal install:install-file");
+            }
+        } catch (MavenInvocationException e) {
+            throw new MojoExecutionException("Error invoking Maven goal install:install-file", e);
+        }
+    }
+
+    void deploy(MavenProject project) throws MojoExecutionException {
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setBaseDirectory(project.getBasedir());
+        request.setPomFile(project.getFile());
+        request.setGoals(Collections.singletonList("deploy:deploy-file"));
+        request.setRecursive(false);
+        request.setInteractive(false);
+        request.setProperties(getProject().getProperties());
+
+        Properties props = new Properties();
+        props.setProperty("file", project.getFile().getAbsolutePath());
+        props.setProperty("groupId", project.getGroupId());
+        props.setProperty("artifactId", project.getArtifactId());
+        props.setProperty("version", project.getVersion());
+        props.setProperty("classifier", "");
+        props.setProperty("packaging", project.getPackaging());
+        props.setProperty("url", getDeployUrl());
+        request.setProperties(props);
+
+        Invoker invoker = new DefaultInvoker();
+        try {
+            InvocationResult result = invoker.execute(request);
+            if (result.getExitCode() != 0) {
+                throw new IllegalStateException("Error invoking Maven goal deploy:deploy-file");
+            }
+        } catch (MavenInvocationException e) {
+            throw new MojoExecutionException("Error invoking Maven goal deploy:deploy-file", e);
+        }
+    }
+
+    private String getDeployUrl() {
+        String altRepoUrl = getAltDeploymentRepositoryUrl();
+        if (!StringUtils.isNullOrEmpty(altRepoUrl)) {
+            return altRepoUrl;
+        } else if (deploymentRepository != null) {
+            return deploymentRepository.getUrl();
+        } else {
+            throw new IllegalStateException("Neither distribution management, nor altDeploymentRepository have been configured.");
+        }
+    }
+
+    private String getAltDeploymentRepositoryUrl() {
+        if (Strings.isNullOrEmpty(altDeploymentRepository)) {
+            return null;
+        } else {
+            Matcher m = ALT_REPO_PATTERN.matcher(altDeploymentRepository);
+            if (m.matches()) {
+                return m.group(URL);
+            } else {
+                throw new IllegalArgumentException("Parameter: altDeploymentRepository doesn't match the required pattern. Expected (id::layout::url), found: "+altDeploymentRepository);
+            }
+        }
+    }
 }

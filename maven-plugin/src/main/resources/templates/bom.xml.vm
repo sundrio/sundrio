@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${model.artifact.groupId}</groupId>
-    <artifactId>${model.artifact.artifactId}</artifactId>
+    <artifactId>${model.artifact.artifactId}-bom</artifactId>
     <version>${model.artifact.version}</version>
     <packaging>pom</packaging>
 
@@ -30,14 +30,16 @@
     #if (!$model.plugins.isEmpty())
 
     <build>
-        <pluginManagement>#foreach($p in $model.plugins)
+        <pluginManagement>
+            <plugins>#foreach($p in $model.plugins)
 
-            <plugin>
-                <groupId>${p.groupId}</groupId>
-                <artifactId>${p.artifactId}</artifactId>
-                <version>${p.version}</version>
-            </plugin>#end
+                <plugin>
+                    <groupId>${p.groupId}</groupId>
+                    <artifactId>${p.artifactId}</artifactId>
+                    <version>${p.version}</version>
+                </plugin>#end
 
+            </plugins>
         </pluginManagement>
     </build>
 

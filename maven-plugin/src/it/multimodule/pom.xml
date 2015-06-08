@@ -7,7 +7,7 @@
     <groupId>test</groupId>
     <artifactId>bom-test</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.14-SNAPSHOT</version>
+    <version>0.0.15-SNAPSHOT</version>
 
     <modules>
         <module>module1</module>
@@ -19,11 +19,25 @@
             <plugin>
                 <groupId>io.sundr</groupId>
                 <artifactId>sundr-maven-plugin</artifactId>
-
+                <version>0.0.15-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate-bom</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>install-bom</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>install-bom</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>deploy-bom</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-bom</goal>
                         </goals>
                     </execution>
                 </executions>
