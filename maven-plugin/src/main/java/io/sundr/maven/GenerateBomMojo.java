@@ -37,12 +37,6 @@ import java.util.Set;
 @Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class GenerateBomMojo extends AbstractSundrioMojo {
 
-    private static final String BOM_TEMPLATE = "templates/bom.xml.vm";
-    private static final String BOM_DIR = "bom";
-    private static final String BOM_NAME = "bom.xml";
-    private static final String POM_TYPE = "pom";
-    private static final String PLUGIN_TYPE = "maven-plugin";
-
     @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = false)
     private List<MavenProject> reactorProjects;
 

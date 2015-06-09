@@ -23,6 +23,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -39,7 +40,9 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,8 +55,21 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
     static final String POM_TYPE = "pom";
     static final String PLUGIN_TYPE = "maven-plugin";
 
-    static final String URL = "url";
-    static final Pattern ALT_REPO_PATTERN = Pattern.compile("[^ ]*::[^ ]*::(?<url>[^ ]*)");
+
+    static final String INSTALL_FILE_GOAL = "install:install-file";
+    static final String DEPLOY_FILE_GOAL = "deploy:deploy-file";
+
+    static final String FILE = "file";
+    static final String GROUP_ID = "groupId";
+    static final String ARTIFACT_ID = "artifactId";
+    static final String VERSION = "version";
+    static final String CLASSIFIER = "classifier";
+    static final String PACKAGING = "packaging";
+    static final String REPO_ID = "repositoryId";
+    static final String REPO_URL = "url";
+    static final String GENERATE_POM = "generatePom";
+
+    static final Pattern ALT_REPO_PATTERN = Pattern.compile("(?<repositoryId>[^ ]*)::[^ ]*::(?<url>[^ ]*)");
 
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
@@ -105,17 +121,18 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setBaseDirectory(project.getBasedir());
         request.setPomFile(project.getFile());
-        request.setGoals(Collections.singletonList("install:install-file"));
+        request.setGoals(Collections.singletonList(INSTALL_FILE_GOAL));
         request.setRecursive(false);
         request.setInteractive(false);
+        request.setProfiles(getActiveProfileIds(project));
 
         Properties props = new Properties();
-        props.setProperty("file", project.getFile().getAbsolutePath());
-        props.setProperty("groupId", project.getGroupId());
-        props.setProperty("artifactId", project.getArtifactId());
-        props.setProperty("version", project.getVersion());
-        props.setProperty("classifier", "");
-        props.setProperty("packaging", project.getPackaging());
+        props.setProperty(FILE, project.getFile().getAbsolutePath());
+        props.setProperty(GROUP_ID, project.getGroupId());
+        props.setProperty(ARTIFACT_ID, project.getArtifactId());
+        props.setProperty(VERSION, project.getVersion());
+        props.setProperty(CLASSIFIER, "");
+        props.setProperty(PACKAGING, project.getPackaging());
         request.setProperties(props);
 
         Invoker invoker = new DefaultInvoker();
@@ -133,19 +150,22 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setBaseDirectory(project.getBasedir());
         request.setPomFile(project.getFile());
-        request.setGoals(Collections.singletonList("deploy:deploy-file"));
+        request.setGoals(Collections.singletonList(DEPLOY_FILE_GOAL));
         request.setRecursive(false);
         request.setInteractive(false);
-        request.setProperties(getProject().getProperties());
+        request.setProfiles(getActiveProfileIds(project));
 
         Properties props = new Properties();
-        props.setProperty("file", project.getFile().getAbsolutePath());
-        props.setProperty("groupId", project.getGroupId());
-        props.setProperty("artifactId", project.getArtifactId());
-        props.setProperty("version", project.getVersion());
-        props.setProperty("classifier", "");
-        props.setProperty("packaging", project.getPackaging());
-        props.setProperty("url", getDeployUrl());
+        props.setProperty(FILE, project.getFile().getAbsolutePath());
+        props.setProperty(GROUP_ID, project.getGroupId());
+        props.setProperty(ARTIFACT_ID, project.getArtifactId());
+        props.setProperty(VERSION, project.getVersion());
+        props.setProperty(CLASSIFIER, "");
+        props.setProperty(PACKAGING, project.getPackaging());
+
+        props.setProperty(REPO_URL, getDeployUrl());
+        props.setProperty(REPO_ID, getRepositoryId());
+        props.setProperty(GENERATE_POM, "false");
         request.setProperties(props);
 
         Invoker invoker = new DefaultInvoker();
@@ -156,6 +176,29 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
             }
         } catch (MavenInvocationException e) {
             throw new MojoExecutionException("Error invoking Maven goal deploy:deploy-file", e);
+        }
+    }
+
+    private List<String> getActiveProfileIds(MavenProject project) {
+        List<String> result = new ArrayList<String>();
+        for (Profile profile : project.getActiveProfiles()) {
+            String id = profile.getId();
+            if (!Strings.isNullOrEmpty(id)) {
+                result.add(id);
+            }
+        }
+        return result;
+    }
+
+    private String getRepositoryId() {
+        String altRepoId = getAltDeploymentRepositoryId();
+        if (!StringUtils.isNullOrEmpty(altRepoId)) {
+            return altRepoId;
+        } else if (deploymentRepository != null) {
+            return deploymentRepository.getId();
+        } else {
+            throw new IllegalStateException("Neither distribution management, nor altDeploymentRepository have been configured.");
+
         }
     }
 
@@ -176,9 +219,22 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
         } else {
             Matcher m = ALT_REPO_PATTERN.matcher(altDeploymentRepository);
             if (m.matches()) {
-                return m.group(URL);
+                return m.group(REPO_URL);
             } else {
-                throw new IllegalArgumentException("Parameter: altDeploymentRepository doesn't match the required pattern. Expected (id::layout::url), found: "+altDeploymentRepository);
+                throw new IllegalArgumentException("Parameter: altDeploymentRepository doesn't match the required pattern. Expected (id::layout::url), found: " + altDeploymentRepository);
+            }
+        }
+    }
+
+    private String getAltDeploymentRepositoryId() {
+        if (Strings.isNullOrEmpty(altDeploymentRepository)) {
+            return null;
+        } else {
+            Matcher m = ALT_REPO_PATTERN.matcher(altDeploymentRepository);
+            if (m.matches()) {
+                return m.group(REPO_ID);
+            } else {
+                throw new IllegalArgumentException("Parameter: altDeploymentRepository doesn't match the required pattern. Expected (id::layout::url), found: " + altDeploymentRepository);
             }
         }
     }
