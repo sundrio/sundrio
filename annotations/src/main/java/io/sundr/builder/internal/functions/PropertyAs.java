@@ -22,6 +22,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
+import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
@@ -33,6 +34,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
@@ -53,23 +55,45 @@ public final class PropertyAs {
     public static final Function<JavaProperty, JavaClazz> NESTED_CLASS = new Function<JavaProperty, JavaClazz>() {
         @Override
         public JavaClazz apply(JavaProperty item) {
+            JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+            JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
+
             JavaType nestedType = NESTED_TYPE.apply(item);
+            JavaType nestedUnwrapped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[0]).build();
+
             Set<JavaMethod> nestedMethods = new HashSet<>();
             nestedMethods.add(ToMethod.AND.apply(item));
             nestedMethods.add(ToMethod.END.apply(item));
 
             Set<JavaProperty> properties = new HashSet<>();
+            Set<JavaMethod> constructors = new HashSet<>();
             
             JavaType memberOf = (JavaType) item.getAttributes().get(MEMBER_OF);
-
             properties.add(new JavaPropertyBuilder()
                     .withName("builder")
-                    .withType(TypeAs.SHALLOW_BUILDER.apply(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType()))).build());
+                    .withType(builderType).build());
+
+            constructors.add(new JavaMethodBuilder()
+                    .withName("")
+                    .withReturnType(nestedUnwrapped)
+                    .addNewArgument()
+                        .withName("item")
+                        .withType(baseType)
+                    .endArgument()
+                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(item);")
+                    .build());
+
+            constructors.add(new JavaMethodBuilder()
+                    .withName("")
+                    .withReturnType(nestedUnwrapped)
+                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this);")
+                    .build());
 
             return new JavaClazzBuilder()
                     .withType(nestedType)
                     .withFields(properties)
                     .withMethods(nestedMethods)
+                    .withConstructors(constructors)
                     .addToAttributes(MEMBER_OF, memberOf)
                     .build();
         }

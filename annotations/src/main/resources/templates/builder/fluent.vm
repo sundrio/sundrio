@@ -21,7 +21,13 @@ import $i.fullyQualifiedName;
     #class ($n)
 
     #foreach($f in $n.fields)
-    private final ${f.type.simpleName} ${f.name} = new ${f.type.simpleName}(this);
+    private final ${f.type.simpleName} ${f.name};
+    #end
+
+    #foreach($c in $n.constructors)
+        #method ($c)
+        ${c.attributes.get("BODY")}
+        #end
     #end
 
     #foreach($m in $n.methods)
