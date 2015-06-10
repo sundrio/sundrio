@@ -80,7 +80,7 @@ public final class PropertyAs {
                         .withName("item")
                         .withType(baseType)
                     .endArgument()
-                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(item);")
+                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this, item);")
                     .build());
 
             constructors.add(new JavaMethodBuilder()
