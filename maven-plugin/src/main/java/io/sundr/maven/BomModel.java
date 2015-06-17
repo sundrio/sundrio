@@ -17,25 +17,26 @@
 package io.sundr.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.MavenProject;
 
 import java.util.Set;
 
 public class BomModel {
 
-    private final Artifact artifact;
+    private final MavenProject project;
     private final Set<Artifact> archives;
     private final Set<Artifact> poms;
     private final Set<Artifact> plugins;
 
-    public BomModel(Artifact artifact, Set<Artifact> archives, Set<Artifact> poms, Set<Artifact> plugins) {
-        this.artifact = artifact;
+    public BomModel(MavenProject project, Set<Artifact> archives, Set<Artifact> poms, Set<Artifact> plugins) {
+        this.project = project;
         this.archives = archives;
         this.poms = poms;
         this.plugins = plugins;
     }
 
-    public Artifact getArtifact() {
-        return artifact;
+    public MavenProject getProject() {
+        return project;
     }
 
     public Set<Artifact> getArchives() {
@@ -52,6 +53,6 @@ public class BomModel {
 
     @Override
     public String toString() {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
+        return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
     }
 }

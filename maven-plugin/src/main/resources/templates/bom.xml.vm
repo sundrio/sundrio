@@ -3,10 +3,56 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>${model.artifact.groupId}</groupId>
-    <artifactId>${model.artifact.artifactId}-bom</artifactId>
-    <version>${model.artifact.version}</version>
+    <groupId>${model.project.groupId}</groupId>
+    <artifactId>${model.project.artifactId}-bom</artifactId>
+    <version>${model.project.version}</version>
+    <name>${model.project.name}. Bom</name>
     <packaging>pom</packaging>
+    <description>Bill of material</description>
+    #if ($model.project.url)
+
+    <url>${model.project.url}</url>#end
+    #if ($model.project.licenses && !$model.licenses.isEmpty())
+
+    <licenses>#foreach($l in $model.project.licenses)
+
+        <license>
+            <name>${l.name}</name>
+            <url>${l.url}</url>
+            <distribution>${l.distribution}</distribution>
+        </license>#end
+
+    </licenses>
+    #end
+
+    #if ($model.project.scm)
+
+    <scm>
+        <connection>${model.project.scm.connection}</connection>
+        <developerConnection>${model.project.scm.developerConnection}</developerConnection>
+        <url>${model.project.scm.connection}</url>
+        <tag>${model.project.scm.tag}</tag>
+    </scm>
+    #end
+
+    #if ($model.project.developers && !$model.project.developers.isEmpty())
+    <developers>#foreach($d in $model.project.developers)
+
+        <developer>
+            <id>${d.id}</id>
+            <name>${d.name}</name>#if($d.email)
+
+            <email>${d.email}</email>#end#if($d.url)
+
+            <url>${d.url}</url>#end#if($d.organization)
+
+            <organization>${d.organization}</organization>#end#if($d.organizationUrl)
+
+            <organizationUrl>${d.organizationUrl}</organizationUrl>#end
+
+        </developer>#end
+
+    </developers>#end
 
     <dependencyManagement>
         <dependencies>#foreach($a in $model.archives)

@@ -7,7 +7,32 @@
     <groupId>test</groupId>
     <artifactId>bom-test</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.15-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
+
+    <description>Test Project</description>
+    <url>https://github.com/sundrio/test-project</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git://github.com/sundrio/sundrio-test.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/sundrio/sundrio-test.git</developerConnection>
+        <url>http://github.com/sundrio/sundrio-test</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>iocanel</id>
+            <name>Ioannis Canellos</name>
+            <email>iocanel@gmail.com</email>
+            <url>http://iocanel.blogspot.com</url>
+        </developer>
+    </developers>
 
     <modules>
         <module>module1</module>
@@ -19,7 +44,7 @@
             <plugin>
                 <groupId>io.sundr</groupId>
                 <artifactId>sundr-maven-plugin</artifactId>
-                <version>0.0.15-SNAPSHOT</version>
+                <version>@pom.version@</version>
                 <executions>
                     <execution>
                         <goals>
