@@ -72,6 +72,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 CodeGenerator<BomModel> generator = new CodeGenerator<BomModel>(model, writer, BOM_TEMPLATE, Collections.<Class<? extends Directive>>emptySet());
                 getLog().info("Generating BOM for model:" + model);
                 generator.generate();
+                alsoMake(readBomProject(generatedBom));
             } catch (IOException e) {
                 throw new MojoFailureException("Failed to generate bom.");
             } finally {

@@ -16,16 +16,17 @@
 
 package io.sundr.maven;
 
-import com.google.common.base.Strings;
 import io.sundr.codegen.utils.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Profile;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -40,12 +41,7 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class AbstractSundrioMojo extends AbstractMojo {
 
@@ -55,24 +51,14 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
     static final String POM_TYPE = "pom";
     static final String PLUGIN_TYPE = "maven-plugin";
 
-
-    static final String INSTALL_FILE_GOAL = "install:install-file";
-    static final String DEPLOY_FILE_GOAL = "deploy:deploy-file";
-
-    static final String FILE = "file";
-    static final String GROUP_ID = "groupId";
-    static final String ARTIFACT_ID = "artifactId";
-    static final String VERSION = "version";
-    static final String CLASSIFIER = "classifier";
-    static final String PACKAGING = "packaging";
-    static final String REPO_ID = "repositoryId";
-    static final String REPO_URL = "url";
-    static final String GENERATE_POM = "generatePom";
-
-    static final Pattern ALT_REPO_PATTERN = Pattern.compile("(?<repositoryId>[^ ]*)::[^ ]*::(?<url>[^ ]*)");
-
     @Parameter(defaultValue = "${project}", readonly = true)
     private MavenProject project;
+
+    @Parameter( defaultValue = "${session}", readonly = true )
+    private MavenSession session;
+
+    @Parameter( defaultValue = "${mojoExecution}", readonly = true )
+    private MojoExecution mojo;
 
 
     // this is required for the deploy phase, but end user may just use a install phase only, so let required = false
@@ -116,126 +102,25 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
         return artifact;
     }
 
+    void alsoMake(MavenProject project) throws MojoExecutionException {
+        MavenExecutionRequest executionRequest = session.getRequest();
 
-    void install(MavenProject project) throws MojoExecutionException {
         InvocationRequest request = new DefaultInvocationRequest();
         request.setBaseDirectory(project.getBasedir());
         request.setPomFile(project.getFile());
-        request.setGoals(Collections.singletonList(INSTALL_FILE_GOAL));
+        request.setGoals(executionRequest.getGoals());
         request.setRecursive(false);
         request.setInteractive(false);
-        request.setProfiles(getActiveProfileIds(project));
-
-        Properties props = new Properties();
-        props.setProperty(FILE, project.getFile().getAbsolutePath());
-        props.setProperty(GROUP_ID, project.getGroupId());
-        props.setProperty(ARTIFACT_ID, project.getArtifactId());
-        props.setProperty(VERSION, project.getVersion());
-        props.setProperty(CLASSIFIER, "");
-        props.setProperty(PACKAGING, project.getPackaging());
-        request.setProperties(props);
-
+        request.setProfiles(executionRequest.getActiveProfiles());
+        request.setProperties(executionRequest.getUserProperties());
         Invoker invoker = new DefaultInvoker();
         try {
             InvocationResult result = invoker.execute(request);
             if (result.getExitCode() != 0) {
-                throw new IllegalStateException("Error invoking Maven goal install:install-file");
+                throw new IllegalStateException("Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]", result.getExecutionException());
             }
         } catch (MavenInvocationException e) {
-            throw new MojoExecutionException("Error invoking Maven goal install:install-file", e);
-        }
-    }
-
-    void deploy(MavenProject project) throws MojoExecutionException {
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setBaseDirectory(project.getBasedir());
-        request.setPomFile(project.getFile());
-        request.setGoals(Collections.singletonList(DEPLOY_FILE_GOAL));
-        request.setRecursive(false);
-        request.setInteractive(false);
-        request.setProfiles(getActiveProfileIds(project));
-
-        Properties props = new Properties();
-        props.setProperty(FILE, project.getFile().getAbsolutePath());
-        props.setProperty(GROUP_ID, project.getGroupId());
-        props.setProperty(ARTIFACT_ID, project.getArtifactId());
-        props.setProperty(VERSION, project.getVersion());
-        props.setProperty(CLASSIFIER, "");
-        props.setProperty(PACKAGING, project.getPackaging());
-
-        props.setProperty(REPO_URL, getDeployUrl());
-        props.setProperty(REPO_ID, getRepositoryId());
-        props.setProperty(GENERATE_POM, "false");
-        request.setProperties(props);
-
-        Invoker invoker = new DefaultInvoker();
-        try {
-            InvocationResult result = invoker.execute(request);
-            if (result.getExitCode() != 0) {
-                throw new IllegalStateException("Error invoking Maven goal deploy:deploy-file");
-            }
-        } catch (MavenInvocationException e) {
-            throw new MojoExecutionException("Error invoking Maven goal deploy:deploy-file", e);
-        }
-    }
-
-    private List<String> getActiveProfileIds(MavenProject project) {
-        List<String> result = new ArrayList<String>();
-        for (Profile profile : project.getActiveProfiles()) {
-            String id = profile.getId();
-            if (!Strings.isNullOrEmpty(id)) {
-                result.add(id);
-            }
-        }
-        return result;
-    }
-
-    private String getRepositoryId() {
-        String altRepoId = getAltDeploymentRepositoryId();
-        if (!StringUtils.isNullOrEmpty(altRepoId)) {
-            return altRepoId;
-        } else if (deploymentRepository != null) {
-            return deploymentRepository.getId();
-        } else {
-            throw new IllegalStateException("Neither distribution management, nor altDeploymentRepository have been configured.");
-
-        }
-    }
-
-    private String getDeployUrl() {
-        String altRepoUrl = getAltDeploymentRepositoryUrl();
-        if (!StringUtils.isNullOrEmpty(altRepoUrl)) {
-            return altRepoUrl;
-        } else if (deploymentRepository != null) {
-            return deploymentRepository.getUrl();
-        } else {
-            throw new IllegalStateException("Neither distribution management, nor altDeploymentRepository have been configured.");
-        }
-    }
-
-    private String getAltDeploymentRepositoryUrl() {
-        if (Strings.isNullOrEmpty(altDeploymentRepository)) {
-            return null;
-        } else {
-            Matcher m = ALT_REPO_PATTERN.matcher(altDeploymentRepository);
-            if (m.matches()) {
-                return m.group(REPO_URL);
-            } else {
-                throw new IllegalArgumentException("Parameter: altDeploymentRepository doesn't match the required pattern. Expected (id::layout::url), found: " + altDeploymentRepository);
-            }
-        }
-    }
-
-    private String getAltDeploymentRepositoryId() {
-        if (Strings.isNullOrEmpty(altDeploymentRepository)) {
-            return null;
-        } else {
-            Matcher m = ALT_REPO_PATTERN.matcher(altDeploymentRepository);
-            if (m.matches()) {
-                return m.group(REPO_ID);
-            } else {
-                throw new IllegalArgumentException("Parameter: altDeploymentRepository doesn't match the required pattern. Expected (id::layout::url), found: " + altDeploymentRepository);
-            }
+            throw new IllegalStateException("Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]", e);
         }
     }
 }
