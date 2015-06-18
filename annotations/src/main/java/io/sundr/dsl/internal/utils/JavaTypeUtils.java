@@ -81,8 +81,8 @@ public final class JavaTypeUtils {
         Boolean isTerminal = executableElement.getAnnotation(Terminal.class) != null
                 || !isVoid(executableElement);
 
-        Set<String> transitions = new LinkedHashSet<>();
-        Set<String> keywords = new LinkedHashSet<>();
+        Set<String> transitions = new LinkedHashSet<String>();
+        Set<String> keywords = new LinkedHashSet<String>();
         for (AnnotationMirror annotationMirror : context.getToTransitionAnnotations().apply(executableElement)) {
             transitions.addAll(context.getToTransitionClassName().apply(annotationMirror));
         }
@@ -123,7 +123,7 @@ public final class JavaTypeUtils {
                     .addToAttributes(TRANSITIONS, isTerminal ? Collections.emptySet() : transitions)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                     .addToAttributes(USE_PREVIOUS_TRANSITIONS, usePreviousTransitions)
-                    .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<>(Arrays.asList(returnType)) : Collections.emptySet())
+                    .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
                     .addToAttributes(METHOD_NAME, methodName)
                 .endType()
                 .addToMethods(targetMethod)
@@ -139,7 +139,7 @@ public final class JavaTypeUtils {
      * @return                  A set of {@link io.sundr.codegen.model.JavaClazz} that describes the interfaces.
      */
     public static Set<JavaClazz> executablesToInterfaces(DslProcessorContext context, Collection<ExecutableElement> elements) {
-        Map<String, JavaClazz> byName = new LinkedHashMap<>();
+        Map<String, JavaClazz> byName = new LinkedHashMap<String, JavaClazz>();
         for (ExecutableElement current : elements) {
             JavaClazz clazz = executableToInterface(context, current);
             String name = clazz.getType().getFullyQualifiedName();
@@ -150,13 +150,13 @@ public final class JavaTypeUtils {
                 byName.put(name, clazz);
             }
         }
-        return new LinkedHashSet<>(byName.values());
+        return new LinkedHashSet<JavaClazz>(byName.values());
     }
 
 
 
     public static final Set<JavaType> getTerminatingTypes(JavaType type) {
-        Set<JavaType> result = new LinkedHashSet<>();
+        Set<JavaType> result = new LinkedHashSet<JavaType>();
         if (type.getAttributes().containsKey(TERMINATING_TYPES)) {
             result.addAll((Collection<JavaType>) type.getAttributes().get(TERMINATING_TYPES));
         }
@@ -169,7 +169,7 @@ public final class JavaTypeUtils {
     }
 
     public static Set<JavaType> extractInterfaces(Set<JavaType> types) {
-        Set<JavaType> result = new LinkedHashSet<>();
+        Set<JavaType> result = new LinkedHashSet<JavaType>();
         for (JavaType type : types) {
             result.addAll(extractInterfaces(type));
         }
@@ -177,7 +177,7 @@ public final class JavaTypeUtils {
     }
 
     public static Set<JavaType> extractInterfaces(JavaType type) {
-        Set<JavaType> result = new LinkedHashSet<>();
+        Set<JavaType> result = new LinkedHashSet<JavaType>();
         if (type.getInterfaces().isEmpty()) {
             result.add(type);
         } else {

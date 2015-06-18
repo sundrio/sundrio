@@ -51,10 +51,10 @@ import static io.sundr.builder.Constants.VISITABLE;
 import static io.sundr.builder.Constants.VISITOR;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.Constants.*;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
-import static io.sundr.codegen.utils.StringUtils.loadResource;
 
 public class BuilderContext {
 
@@ -168,7 +168,7 @@ public class BuilderContext {
                         .withType(typeGenericOf(LIST, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
                         .withName("list")
                     .endArgument()
-                .addToAttributes(BODY, loadResource(BUILD_LIST_SNIPPET))
+                .addToAttributes(BODY, loadResourceQuietly(BUILD_LIST_SNIPPET))
                 .and()
                 .addNewMethod()
                     .addToTypeParameters(T)
@@ -179,7 +179,7 @@ public class BuilderContext {
                             .withType(typeGenericOf(LINKED_HASH_SET, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
                             .withName("set")
                         .endArgument()
-                    .addToAttributes(BODY, loadResource(BUILD_SET_SNIPPET))
+                    .addToAttributes(BODY, loadResourceQuietly(BUILD_SET_SNIPPET))
                 .and()
                 .addNewMethod()
                     .addToTypeParameters(T)
@@ -190,7 +190,7 @@ public class BuilderContext {
                         .withType(typeGenericOf(LIST, typeExtends(Q, T)))
                         .withName("...lists")
                     .endArgument()
-                    .addToAttributes(BODY, loadResource(AGGREGATE_LIST_SNIPPET))
+                    .addToAttributes(BODY, loadResourceQuietly(AGGREGATE_LIST_SNIPPET))
                 .and()
                 .addNewMethod()
                     .addToTypeParameters(T)
@@ -201,7 +201,7 @@ public class BuilderContext {
                 .withType(typeGenericOf(SET, typeExtends(Q, T)))
                         .withName("...sets")
                     .endArgument()
-                    .addToAttributes(BODY, loadResource(AGGREGATE_SET_SNIPPET))
+                    .addToAttributes(BODY, loadResourceQuietly(AGGREGATE_SET_SNIPPET))
                 .and()
                 .addNewMethod()
                     .addToModifiers(Modifier.PUBLIC)
@@ -211,7 +211,7 @@ public class BuilderContext {
                         .withType(visitorBase)
                         .withName("visitor")
                     .endArgument()
-                .addToAttributes(BODY, loadResource(ACCEPT_VISITOR_SNIPPET))
+                .addToAttributes(BODY, loadResourceQuietly(ACCEPT_VISITOR_SNIPPET))
                 .and()
                 .addNewField()
                     .addToModifiers(Modifier.PUBLIC)

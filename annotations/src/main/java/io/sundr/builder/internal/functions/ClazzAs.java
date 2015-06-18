@@ -47,14 +47,14 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     FLUENT {
         @Override
         public JavaClazz apply(JavaClazz item) {
-            Set<JavaMethod> methods = new LinkedHashSet<>();
-            Set<JavaClazz> nestedClazzes = new LinkedHashSet<>();
-            Set<JavaProperty> properties = new LinkedHashSet<>();
+            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
+            Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
+            Set<JavaProperty> properties = new LinkedHashSet<JavaProperty>();
 
             JavaType fluentType = TypeAs.FLUENT.apply(item.getType());
             for (JavaProperty property : item.getFields()) {
                 JavaProperty toAdd = property;
-                boolean buildable = (boolean) property.getType().getAttributes().get(BUILDABLE);
+                boolean buildable = (Boolean) property.getType().getAttributes().get(BUILDABLE);
                 if (property.isArray()) {
                     JavaProperty asList = arrayAsList(property, buildable);
                     methods.add(ToMethod.WITH_ARRAY.apply(property));
@@ -132,9 +132,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         public JavaClazz apply(JavaClazz item) {
             JavaType builderType = TypeAs.BUILDER.apply(item.getType());
             JavaType fluent = TypeAs.GENERIC_FLUENT.apply(item.getType());
-            Set<JavaMethod> constructors = new LinkedHashSet<>();
-            Set<JavaMethod> methods = new LinkedHashSet<>();
-            Set<JavaProperty> fields = new LinkedHashSet<>();
+            Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
+            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
+            Set<JavaProperty> fields = new LinkedHashSet<JavaProperty>();
 
             JavaProperty fluentProperty = new JavaPropertyBuilder().withType(fluent).withName("fluent").build();
             fields.add(fluentProperty);
@@ -198,7 +198,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         @Override
         public JavaClazz apply(JavaClazz item) {
             JavaClazz builder = BUILDER.apply(item);
-            Set<JavaMethod> methods = new LinkedHashSet<>();
+            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
             for (JavaMethod m : builder.getMethods()) {
                 if (m.getName().equals("build")) {
 
@@ -223,8 +223,8 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 JavaType editableType = TypeAs.EDITABLE.apply(type);
                 JavaType builderType = TypeAs.BUILDER.apply(type);
 
-                Set<JavaMethod> constructors = new LinkedHashSet<>();
-                Set<JavaMethod> methods = new LinkedHashSet<>();
+                Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
+                Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
 
                 for (JavaMethod constructor : item.getConstructors()) {
                     constructors.add(superConstructorOf(constructor, editableType));

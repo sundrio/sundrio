@@ -26,6 +26,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
+import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
 
@@ -81,7 +82,7 @@ public class CodeGenerator<M> {
         return directives;
     }
 
-    public void generate() {
+    public void generate() throws IOException {
         GeneratorUtils.generate(context, writer, template);
     }
 }

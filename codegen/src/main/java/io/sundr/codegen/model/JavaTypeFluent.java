@@ -161,7 +161,7 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
     }
 
     public JavaType[] getGenericTypes() {
-        List<JavaType> result = new ArrayList<>();
+        List<JavaType> result = new ArrayList<JavaType>();
         for (JavaTypeBuilder builder : genericTypes) {
             result.add(builder.build());
         }

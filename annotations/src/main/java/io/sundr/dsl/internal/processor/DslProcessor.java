@@ -61,7 +61,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     TypeElement typeElement = (TypeElement) element;
                     TargetName targetName = element.getAnnotation(TargetName.class);
                     String targetInterface = targetName.value();
-                    Set<JavaClazz> interfacesToGenerate = new LinkedHashSet<>();
+                    Set<JavaClazz> interfacesToGenerate = new LinkedHashSet<JavaClazz>();
 
                     Collection<ExecutableElement> sorted = context.getDependencyManager().sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
                     //1st step generate generic interface for all types.
@@ -73,7 +73,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     }
 
                     //2nd step create dependency graph.
-                    Set<JavaMethod> methods = new LinkedHashSet<>();
+                    Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
                     Set<Node<JavaClazz>> graph = createGraph(genericInterfaces);
                     for (Node<JavaClazz> root : graph) {
                         JavaClazz current = root.getItem();

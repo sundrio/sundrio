@@ -45,9 +45,9 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
 
     @Override
     public JavaClazz apply(Collection<JavaClazz> alternatives) {
-        Set<JavaType> genericTypes = new LinkedHashSet<>();
-        Set<JavaType> interfaces = new LinkedHashSet<>();
-        Set<JavaType> terminatingTypes = new LinkedHashSet<>();
+        Set<JavaType> genericTypes = new LinkedHashSet<JavaType>();
+        Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
+        Set<JavaType> terminatingTypes = new LinkedHashSet<JavaType>();
 
         JavaClazz fallback = null;
         for (JavaClazz alternative : alternatives) {
@@ -105,7 +105,7 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
 
 
     private static boolean canBeExcluded(JavaClazz candidate, Iterable<JavaClazz> provided) {
-        Set<JavaType> allOther = new LinkedHashSet<>();
+        Set<JavaType> allOther = new LinkedHashSet<JavaType>();
         for (JavaClazz c : provided) {
             if (!c.equals(candidate)) {
                 allOther.addAll(JavaTypeUtils.extractInterfaces(c.getType()));

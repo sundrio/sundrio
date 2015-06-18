@@ -29,7 +29,7 @@ public enum JavaPropertyToReferences implements Function<JavaProperty, Set<JavaT
 
     @Override
     public Set<JavaType> apply(JavaProperty item) {
-        Set<JavaType> result = new LinkedHashSet<>();
+        Set<JavaType> result = new LinkedHashSet<JavaType>();
         result.add(item.getType());
         for (JavaType generic : item.getType().getGenericTypes()) {
             result.add(generic);

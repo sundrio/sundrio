@@ -67,8 +67,8 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
 
     @Override
     public Set<JavaType> getImports() {
-        Set<JavaType> result = new CopyOnWriteArraySet<>();
-        Set<JavaType> tmp = new CopyOnWriteArraySet<>();
+        Set<JavaType> result = new CopyOnWriteArraySet<JavaType>();
+        Set<JavaType> tmp = new CopyOnWriteArraySet<JavaType>();
         tmp.addAll(this.imports);
         tmp.addAll(getReferencedTypes());
 

@@ -61,7 +61,7 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
         //Check SuperClass
         TypeMirror superClass = classElement.getSuperclass();
         JavaType superClassType = superClass != null && !ModelUtils.NONE.equals(superClass) ? toJavaType.apply(superClass.toString()) : null;
-        List<JavaType> genericTypes = new ArrayList<>();
+        List<JavaType> genericTypes = new ArrayList<JavaType>();
         for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
             JavaType genericType = toJavaType.apply(typeParameter.toString());
             genericTypes.add(genericType);
@@ -83,7 +83,7 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
             builder.addToFields(toJavaProperty.apply(variableElement));
         }
 
-        Set<ExecutableElement> allMethods = new LinkedHashSet<>();
+        Set<ExecutableElement> allMethods = new LinkedHashSet<ExecutableElement>();
         allMethods.addAll(ElementFilter.methodsIn(classElement.getEnclosedElements()));
         allMethods.addAll(getInheritedMethods(classElement));
 
@@ -94,7 +94,7 @@ public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
     }
 
     public Set<ExecutableElement> getInheritedMethods(TypeElement typeElement) {
-        Set<ExecutableElement> result = new LinkedHashSet<>();
+        Set<ExecutableElement> result = new LinkedHashSet<ExecutableElement>();
         if (typeElement != null) {
             for (ExecutableElement method : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
                 if (!method.getModifiers().contains(Modifier.PRIVATE)) {

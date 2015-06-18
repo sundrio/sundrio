@@ -59,8 +59,8 @@ public class JavaTypeFunction implements Function<String, JavaType> {
         JavaType superClass = null;
         JavaKind kind = JavaKind.CLASS;
         boolean concrete = false;
-        Set<JavaType> interfaces = new LinkedHashSet<>();
-        List<JavaType> genericTypes = new ArrayList<>();
+        Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
+        List<JavaType> genericTypes = new ArrayList<JavaType>();
 
         if (fullName.equals(NONE)) {
             return null;

@@ -28,7 +28,7 @@ public enum  JavaTypeToReferences implements Function<JavaType, Set<JavaType>> {
     
     @Override
     public Set<JavaType> apply(JavaType item) {
-        Set<JavaType> result = new HashSet<>();
+        Set<JavaType> result = new HashSet<JavaType>();
         if (item != null) {
             result.add(item);
 

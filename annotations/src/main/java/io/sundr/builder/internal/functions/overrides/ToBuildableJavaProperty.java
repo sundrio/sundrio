@@ -39,8 +39,8 @@ public class ToBuildableJavaProperty implements Function<VariableElement, JavaPr
     public JavaProperty apply(VariableElement variableElement) {
         JavaProperty property = delegate.apply(variableElement);
         boolean isBuildable = property.getType().getAttributes().containsKey(BUILDABLE) ?
-                (boolean) property.getType().getAttributes().get(BUILDABLE) : false;
-        Map<String, Object> attributes = new HashMap<>(property.getAttributes());
+                (Boolean) property.getType().getAttributes().get(BUILDABLE) : false;
+        Map<String, Object> attributes = new HashMap<String, Object>(property.getAttributes());
         attributes.put(BUILDABLE, isBuildable);
         return new JavaPropertyBuilder(property).withAttributes(attributes).build();
     }

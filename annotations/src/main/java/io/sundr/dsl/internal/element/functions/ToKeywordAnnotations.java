@@ -36,7 +36,7 @@ public class ToKeywordAnnotations implements Function<ExecutableElement, Set<Ann
     }
 
     public Set<AnnotationMirror> apply(ExecutableElement element) {
-        Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<>();
+        Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<AnnotationMirror>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
 
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {

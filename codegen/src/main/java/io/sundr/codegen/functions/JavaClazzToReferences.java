@@ -31,7 +31,7 @@ public enum JavaClazzToReferences implements Function<JavaClazz, Set<JavaType>> 
 
     @Override
     public Set<JavaType> apply(JavaClazz item) {
-        Set<JavaType> result = new HashSet<>();
+        Set<JavaType> result = new HashSet<JavaType>();
 
         result.addAll(JavaTypeToReferences.FUNCTION.apply(item.getType()));
 

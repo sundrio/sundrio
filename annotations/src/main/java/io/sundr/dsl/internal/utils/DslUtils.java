@@ -37,7 +37,7 @@ public final class DslUtils {
 
     public static JavaClazz createRootInterface(Node<JavaClazz> current, Set<JavaClazz> intermediate) {
         JavaClazz rootInterface = null;
-        Set<JavaType> interfaces = new LinkedHashSet<>();
+        Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
         for (Node<JavaClazz> child : current.getTransitions()) {
             JavaClazz transitionInterface = createTransitionInterface(child, intermediate);
             interfaces.add(transitionInterface.getType());
@@ -66,7 +66,7 @@ public final class DslUtils {
             return transition;
         } else {
             JavaClazz clazz = current.getItem();
-            Set<JavaClazz> toCombine = new LinkedHashSet<>();
+            Set<JavaClazz> toCombine = new LinkedHashSet<JavaClazz>();
 
             for (Node<JavaClazz> v : current.getTransitions()) {
                 toCombine.add(createTransitionInterface(v, intermediate));

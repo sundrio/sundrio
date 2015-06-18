@@ -122,7 +122,7 @@ public class BuilderUtils {
      * @return
      */
     public static Set<JavaProperty> getPropertyBuildableAncestors(JavaProperty property) {
-        Set<JavaProperty> result = new LinkedHashSet<>();
+        Set<JavaProperty> result = new LinkedHashSet<JavaProperty>();
         JavaType baseType = property.getType();
 
         if (baseType.isCollection()) {
@@ -158,10 +158,10 @@ public class BuilderUtils {
      */
     public static Set<JavaType> getBuildableDescendants(JavaType item) {
         if (item.getFullyQualifiedName().equals(Constants.OBJECT.getFullyQualifiedName())) {
-            return new LinkedHashSet<>();
+            return new LinkedHashSet<JavaType>();
         }
 
-        Set<JavaType> result = new LinkedHashSet<>();
+        Set<JavaType> result = new LinkedHashSet<JavaType>();
         BuilderContext ctx = BuilderContextManager.getContext();
         BuildableRepository repository = ctx.getRepository();
         for (TypeElement element : repository.getBuildables()) {
@@ -218,7 +218,7 @@ public class BuilderUtils {
     }
 
     public static Set<JavaMethod> getInlineableConstructors(JavaProperty property) {
-        Set<JavaMethod> result = new HashSet<>();
+        Set<JavaMethod> result = new HashSet<JavaMethod>();
         JavaClazz clazz = PropertyAs.CLASS.apply(property);
         for (JavaMethod candidate : clazz.getConstructors()) {
             if (isInlineable(candidate)) {

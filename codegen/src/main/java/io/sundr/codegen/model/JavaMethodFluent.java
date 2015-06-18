@@ -118,7 +118,7 @@ public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSu
     }
 
     public JavaProperty[] getArguments() {
-        List<JavaProperty> result = new ArrayList<>();
+        List<JavaProperty> result = new ArrayList<JavaProperty>();
         for (JavaPropertyBuilder builder : arguments) {
             result.add(builder.build());
         }

@@ -34,19 +34,19 @@ public class BuilderGeneratorTest {
 
         JavaClazz javaClazz = new JavaClazzBuilder()
                 .withNewType()
-                    .withClassName("Circle")
-                    .withPackageName("my.Test")
-                    .endType()
+                .withClassName("Circle")
+                .withPackageName("my.Test")
+                .endType()
                 .addNewConstructor()
-                    .addNewArgument()
-                        .withName("w")
-                        .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
-                        .endArgument()
-                    .addNewArgument()
-                        .withName("w")
-                        .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
-                        .endArgument()
-                    .endConstructor()
+                .addNewArgument()
+                .withName("w")
+                .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
+                .endArgument()
+                .addNewArgument()
+                .withName("w")
+                .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
+                .endArgument()
+                .endConstructor()
                 .build();
 
         File tmp = new File("/tmp");
@@ -54,9 +54,11 @@ public class BuilderGeneratorTest {
         generate(javaClazz, tmp, "CircleBuilder.java", Constants.DEFAULT_BUILDER_TEMPLATE_LOCATION);
 
     }
-    
-    private static void generate(JavaClazz model, File dir, String name, String templateResource) {
-        try (FileWriter fluentWriter = new FileWriter(new File(dir, name))) {
+
+    private static void generate(JavaClazz model, File dir, String name, String templateResource) throws IOException {
+        FileWriter fluentWriter = null;
+        try {
+            fluentWriter = new FileWriter(new File(dir, name));
             new CodeGeneratorBuilder<JavaClazz>()
                     .withModel(model)
                     .withWriter(fluentWriter)
@@ -64,6 +66,10 @@ public class BuilderGeneratorTest {
                     .build().generate();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (fluentWriter != null) {
+                fluentWriter.close();
+            }
         }
     }
 }

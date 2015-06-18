@@ -83,7 +83,7 @@ public final class ModelUtils {
 
     public static List<String> splitTypes(String fullName) {
         String name = fullName;//.replace(" ", "");
-        List<String> result = new ArrayList<>();
+        List<String> result = new ArrayList<String>();
         int openBrackets = 0;
         int lastIndex = 0;
         for (int i = 0; i < name.length(); i++) {
@@ -117,7 +117,7 @@ public final class ModelUtils {
     }
 
     public static <A extends Annotation, E extends Element> List<E> filterByAnnotation(List<E> elements, Class<A> annotation) {
-        List<E> result = new ArrayList<>();
+        List<E> result = new ArrayList<E>();
         for (E executableElement : elements) {
             if (executableElement.getAnnotation(annotation) != null) {
                 result.add(executableElement);

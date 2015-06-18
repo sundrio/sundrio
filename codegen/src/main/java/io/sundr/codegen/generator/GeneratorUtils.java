@@ -32,24 +32,25 @@ public final class GeneratorUtils {
     }
 
 
-    static void generate(VelocityContext context, Writer writer, Template template) {
-        try (
-                BufferedWriter bufferedWriter = new BufferedWriter(writer)
-        ) {
+    static void generate(VelocityContext context, Writer writer, Template template) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(writer);
+        try {
             template.merge(context, bufferedWriter);
             writer.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            bufferedWriter.close();
         }
     }
 
-    static void generate(VelocityContext context, File dir, String fileName, Template template) {
-        try (
-                FileWriter fw = new FileWriter(new File(dir, fileName));
-        ) {
+    static void generate(VelocityContext context, File dir, String fileName, Template template) throws IOException {
+        FileWriter fw = null;
+        try  {
+            fw = new FileWriter(new File(dir, fileName));
             generate(context, fw, template);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } finally {
+            fw.close();
         }
     }
 }

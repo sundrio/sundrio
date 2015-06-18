@@ -37,7 +37,7 @@ public class ToTransitionAnnotations implements Function<ExecutableElement, Set<
     }
 
     public Set<AnnotationMirror> apply(ExecutableElement element) {
-        Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<>();
+        Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<AnnotationMirror>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(ANNOTATED_TRANSITION)) {
                 annotationMirrors.add(mirror);

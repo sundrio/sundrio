@@ -23,10 +23,10 @@ import java.util.Set;
 
 public class BaseFluent<F extends BaseFluent<F>> implements Fluent<F>, Visitable<F> {
 
-    public final List<Visitable> _visitables = new ArrayList<>();
+    public final List<Visitable> _visitables = new ArrayList<Visitable>();
 
     public static <T> ArrayList<T> build(List<? extends Builder<T>> list) {
-        ArrayList<T> result = new ArrayList<>();
+        ArrayList<T> result = new ArrayList<T>();
         for (Builder<T> builder : list) {
             result.add(builder.build());
         }
@@ -34,7 +34,7 @@ public class BaseFluent<F extends BaseFluent<F>> implements Fluent<F>, Visitable
     }
 
     public static <T> LinkedHashSet<T> build(Set<? extends Builder<T>> list) {
-        LinkedHashSet<T> result = new LinkedHashSet<>();
+        LinkedHashSet<T> result = new LinkedHashSet<T>();
         for (Builder<T> builder : list) {
             result.add(builder.build());
         }
@@ -42,7 +42,7 @@ public class BaseFluent<F extends BaseFluent<F>> implements Fluent<F>, Visitable
     }
 
     public static <T> ArrayList<T> aggregate(List<? extends T> ...lists) {
-        ArrayList<T> result = new ArrayList<>();
+        ArrayList<T> result = new ArrayList<T>();
 
         for (List<? extends T> list : lists) {
             result.addAll(list);
@@ -51,7 +51,7 @@ public class BaseFluent<F extends BaseFluent<F>> implements Fluent<F>, Visitable
     }
 
     public static <T> LinkedHashSet<T> aggregate(Set<? extends T> ...sets) {
-        LinkedHashSet<T> result = new LinkedHashSet<>();
+        LinkedHashSet<T> result = new LinkedHashSet<T>();
 
         for (Set<? extends T> set : sets) {
             result.addAll(set);

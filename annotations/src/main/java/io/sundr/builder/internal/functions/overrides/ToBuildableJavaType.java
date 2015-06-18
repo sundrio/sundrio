@@ -29,6 +29,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ToBuildableJavaType implements Function<String, JavaType> {
 
@@ -59,7 +60,7 @@ public class ToBuildableJavaType implements Function<String, JavaType> {
         } else {
             isBuildable = isBuildable(typeElement);
         }
-        Map<String, Object> attributes = new HashMap<>(type.getAttributes());
+        Map<String, Object> attributes = new HashMap<String, Object>(type.getAttributes());
         attributes.put(BUILDABLE, isBuildable);
         
         return new JavaTypeBuilder(type).withAttributes(attributes).build();

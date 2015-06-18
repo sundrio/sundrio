@@ -93,17 +93,33 @@ public final class StringUtils {
         return sb.toString();
     }
 
-    public static String loadResource(String resourceName) {
-        try (InputStream is = StringUtils.class.getClassLoader().getResourceAsStream(resourceName);
-             BufferedReader in = new BufferedReader(new InputStreamReader(is))) {
+    public static final String loadResourceQuietly(String resourceName) {
+        try {
+            return loadResource(resourceName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String loadResource(String resourceName) throws IOException {
+        InputStream is = null;
+        BufferedReader in = null;
+        try  {
+            is = StringUtils.class.getClassLoader().getResourceAsStream(resourceName);
+            in = new BufferedReader(new InputStreamReader(is));
             String line = null;
             StringBuffer sb = new StringBuffer();
             while ((line = in.readLine()) != null) {
                 sb.append(line);
             }
             return sb.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (is != null) {
+                is.close();
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         public JavaType apply(JavaType item) {
             BuilderContext ctx = BuilderContextManager.getContext();
             JavaType fluent = SHALLOW_FLUENT.apply(item);
-            List<JavaType> generics = new ArrayList<>();
+            List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
@@ -64,7 +64,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     },
     SHALLOW_FLUENT {
         public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<>();
+            List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
@@ -77,7 +77,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     },
     GENERIC_FLUENT {
         public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<>();
+            List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
@@ -91,7 +91,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     BUILDER {
         @Override
         public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<>();
+            List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
@@ -111,7 +111,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     }, EDITABLE {
         @Override
         public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<>();
+            List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
@@ -125,7 +125,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         }
     }, SHALLOW_BUILDER {
         public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<>();
+            List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }

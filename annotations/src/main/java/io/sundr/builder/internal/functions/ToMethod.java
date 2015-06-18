@@ -44,7 +44,7 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.codegen.utils.StringUtils.loadResource;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.StringUtils.singularize;
 
 
@@ -159,7 +159,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
-                    .addToAttributes(BODY, String.format(loadResource(ARRAY_GETTER_SNIPPET), type.getClassName(),
+                    .addToAttributes(BODY, String.format(ARRAY_GETTER_TEXT, type.getClassName(),
                             builderType.getSimpleName(),
                             property.getName(),
                             type.getClassName()))
@@ -338,4 +338,6 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
         }
     };
+
+    private static final String ARRAY_GETTER_TEXT = loadResourceQuietly(ARRAY_GETTER_SNIPPET);
 }

@@ -61,12 +61,12 @@ public final class PropertyAs {
             JavaType nestedType = NESTED_TYPE.apply(item);
             JavaType nestedUnwrapped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[0]).build();
 
-            Set<JavaMethod> nestedMethods = new HashSet<>();
+            Set<JavaMethod> nestedMethods = new HashSet<JavaMethod>();
             nestedMethods.add(ToMethod.AND.apply(item));
             nestedMethods.add(ToMethod.END.apply(item));
 
-            Set<JavaProperty> properties = new HashSet<>();
-            Set<JavaMethod> constructors = new HashSet<>();
+            Set<JavaProperty> properties = new HashSet<JavaProperty>();
+            Set<JavaMethod> constructors = new HashSet<JavaMethod>();
             
             JavaType memberOf = (JavaType) item.getAttributes().get(MEMBER_OF);
             properties.add(new JavaPropertyBuilder()

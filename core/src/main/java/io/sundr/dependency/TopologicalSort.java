@@ -30,8 +30,8 @@ public class TopologicalSort<T> {
     }
 
     public Set<T> sort(Iterable<T> items) {
-        Set<T> sorted = new LinkedHashSet<>();
-        Set<T> visited = new LinkedHashSet<>();
+        Set<T> sorted = new LinkedHashSet<T>();
+        Set<T> visited = new LinkedHashSet<T>();
         for (T e : items) {
             visit(e, visited, sorted);
         }

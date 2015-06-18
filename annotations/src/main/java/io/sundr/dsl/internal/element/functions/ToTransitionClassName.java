@@ -37,7 +37,7 @@ public class ToTransitionClassName implements Function<AnnotationMirror, List<St
     }
 
     public List<String> apply(AnnotationMirror annotationMirror) {
-        List<String> classNames = new ArrayList<>();
+        List<String> classNames = new ArrayList<String>();
         if (annotationMirror.getAnnotationType().asElement().equals(ANNOTATED_TRANSITION)) {
             Object value = annotationMirror.getElementValues().get(ANNOTATION_VALUE).getValue();
             if (value instanceof String) {

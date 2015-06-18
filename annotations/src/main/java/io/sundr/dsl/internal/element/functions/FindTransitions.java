@@ -53,7 +53,7 @@ public class FindTransitions implements Function<ExecutableElement, Set<Executab
     }
 
     public Set<ExecutableElement> apply(ExecutableElement element) {
-        Set<ExecutableElement> result = new LinkedHashSet<>();
+        Set<ExecutableElement> result = new LinkedHashSet<ExecutableElement>();
         TypeElement classElement = ModelUtils.getClassElement(element);
         Set<AnnotationMirror> annotationTransition = TO_TRANSITION_ANNOTATIONS.apply(element);
 
@@ -76,7 +76,7 @@ public class FindTransitions implements Function<ExecutableElement, Set<Executab
     }
 
     private Set<ExecutableElement> findMethodsAnnotatedWithClassName(TypeElement classElement, String className) {
-        Set<ExecutableElement> result = new LinkedHashSet<>();
+        Set<ExecutableElement> result = new LinkedHashSet<ExecutableElement>();
         TypeElement annotationType = elements.getTypeElement(className);
         for (ExecutableElement methodElement : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
             if (getAnnotationMirror(methodElement, annotationType) != null) {

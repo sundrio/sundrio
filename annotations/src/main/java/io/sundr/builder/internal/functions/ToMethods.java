@@ -39,7 +39,7 @@ public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
         @Override
         public Set<JavaMethod> apply(JavaProperty property) {
 
-            Set<JavaMethod> result = new LinkedHashSet<>();
+            Set<JavaMethod> result = new LinkedHashSet<JavaMethod>();
             JavaClazz clazz = PropertyAs.CLASS.apply(property);
             
             for (JavaMethod constructor : getInlineableConstructors(property)) {

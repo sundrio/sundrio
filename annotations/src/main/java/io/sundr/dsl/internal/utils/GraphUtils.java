@@ -36,7 +36,7 @@ public final class GraphUtils {
     }
 
     public static Set<Node<JavaClazz>> createGraph(Set<JavaClazz> clazzes) {
-        Set<Node<JavaClazz>> nodes = new LinkedHashSet<>();
+        Set<Node<JavaClazz>> nodes = new LinkedHashSet<Node<JavaClazz>>();
         for (JavaClazz clazz : clazzes) {
             if (isEntryPoint(clazz)) {
                 nodes.add(createGraph(clazz, new LinkedHashSet<String>(), clazzes, new LinkedHashSet<JavaType>()));
@@ -48,8 +48,8 @@ public final class GraphUtils {
 
     public static Node<JavaClazz> createGraph(JavaClazz root, Set<String> previous, Set<JavaClazz> all, Set<JavaType> visited) {
         Boolean usePrevious = JavaTypeUtils.usePreviousTransitions(root);
-        Set<JavaClazz> next = new LinkedHashSet<>();
-        Set<JavaType> visitedPath = new LinkedHashSet<>(visited);
+        Set<JavaClazz> next = new LinkedHashSet<JavaClazz>();
+        Set<JavaType> visitedPath = new LinkedHashSet<JavaType>(visited);
         Set<String> transitions = usePrevious ? previous : (Set<String>) root.getType().getAttributes().get(TRANSITIONS);
 
         if (!JavaTypeUtils.isTerminal(root)) {
@@ -67,8 +67,8 @@ public final class GraphUtils {
             visitedPath.add(root.getType());
         }
 
-        Set<Node<JavaClazz>> nextVertices = new LinkedHashSet<>();
-        Set<JavaType> levelInterfaces = new LinkedHashSet<>();
+        Set<Node<JavaClazz>> nextVertices = new LinkedHashSet<Node<JavaClazz>>();
+        Set<JavaType> levelInterfaces = new LinkedHashSet<JavaType>();
         levelInterfaces.addAll(visitedPath);
 
         for (JavaClazz c : next) {
@@ -77,11 +77,11 @@ public final class GraphUtils {
             levelInterfaces.addAll(subGraph.getItem().getType().getInterfaces());
             nextVertices.add(subGraph);
         }
-        return new Node<>(root, nextVertices);
+        return new Node<JavaClazz>(root, nextVertices);
     }
 
     private static Set<JavaClazz> exclusion(Set<JavaClazz> one, Set<JavaType> excluded) {
-        Set<JavaClazz> result = new LinkedHashSet<>();
+        Set<JavaClazz> result = new LinkedHashSet<JavaClazz>();
         for (JavaClazz item : one) {
             if (!excluded.contains(item.getType()) || isTerminal(item) || isCardinalityMultiple(item)) {
                 result.add(item);
