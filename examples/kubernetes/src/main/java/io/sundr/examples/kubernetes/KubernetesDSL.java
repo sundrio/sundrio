@@ -26,6 +26,9 @@ import io.sundr.examples.kubernetes.annotations.CommonOption;
 import io.sundr.examples.kubernetes.annotations.PodOption;
 import io.sundr.examples.kubernetes.annotations.ReplicationControllerOption;
 import io.sundr.examples.kubernetes.annotations.ServiceOption;
+import io.sundr.examples.kubernetes.domain.PodList;
+import io.sundr.examples.kubernetes.domain.ReplicationControllerList;
+import io.sundr.examples.kubernetes.domain.ServiceList;
 
 import java.util.List;
 
@@ -51,8 +54,16 @@ public interface KubernetesDSL {
     void delete();
 
     @Terminal
-    @CommonOption
-    Object[] list();
+    @ServiceOption
+    ServiceList listServices();
+
+    @Terminal
+    @PodOption
+    PodList listPods();
+
+    @Terminal
+    @PodOption
+    ReplicationControllerList listReplicationControllers();
 
     @Terminal
     @CommonOption
