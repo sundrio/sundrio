@@ -34,5 +34,6 @@
         <module>codegen</module>
         <module>curator</module>
         <module>validation</module>
+        <module>kubernetes</module>
     </modules>
 </project>
