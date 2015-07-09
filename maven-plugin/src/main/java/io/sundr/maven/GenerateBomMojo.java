@@ -42,7 +42,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (getProject().isExecutionRoot()) {
+        if (getProject().isExecutionRoot() && !getProject().getModules().isEmpty()) {
             File outputDir = new File(getProject().getBuild().getOutputDirectory());
             File bomDir = new File(outputDir, BOM_DIR);
             File generatedBom = new File(bomDir, BOM_NAME);
