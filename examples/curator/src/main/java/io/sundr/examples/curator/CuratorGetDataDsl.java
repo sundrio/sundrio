@@ -20,7 +20,7 @@ import io.sundr.dsl.annotations.AnnotationTransition;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.Previous;
-import io.sundr.dsl.annotations.TargetName;
+import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.examples.curator.annotations.BackgroundOption;
 import io.sundr.examples.curator.annotations.CommonOption;
@@ -31,7 +31,7 @@ import io.sundr.examples.curator.annotations.WatchOption;
 import io.sundr.examples.curator.annotations.WithMembersOption;
 
 @Dsl
-@TargetName("CuratorFramework")
+@InterfaceName("CuratorFramework")
 public interface CuratorGetDataDsl {
 
     @EntryPoint
@@ -43,77 +43,77 @@ public interface CuratorGetDataDsl {
     void setData();
 
     @EntryPoint
-    @TargetName("ReConfigBuilder")
+    @InterfaceName("ReConfigBuilder")
     @AnnotationTransition({JoinOption.class, LeaveOption.class, WithMembersOption.class})
     void reconfig();
 
     @EntryPoint
-    @TargetName("GetConfigBuilder")
+    @InterfaceName("GetConfigBuilder")
     @AnnotationTransition(ConfigOption.class)
     void config();
 
-    @TargetName("Leavable")
+    @InterfaceName("Leavable")
     @LeaveOption
     @AnnotationTransition(ReconfigOption.class)
     void leaving(String... server);
 
-    @TargetName("Joinable")
+    @InterfaceName("Joinable")
     @JoinOption
     @AnnotationTransition(ReconfigOption.class)
     void joining(String... server);
 
-    @TargetName("Memberable")
+    @InterfaceName("Memberable")
     @WithMembersOption
     @AnnotationTransition(ReconfigOption.class)
     void withMembers(String... server);
     
     @CommonOption
     @Previous
-    @TargetName("Backgroundable")
+    @InterfaceName("Backgroundable")
     void inBackground(boolean flag);
 
-    @TargetName("Backgroundable")
+    @InterfaceName("Backgroundable")
     @BackgroundOption
     @Previous
     void inBackground();
 
-    @TargetName("Backgroundable")
+    @InterfaceName("Backgroundable")
     @BackgroundOption
     @Previous
     void inBackground(Object context);
 
     @WatchOption
     @Previous
-    @TargetName("Watchable")
+    @InterfaceName("Watchable")
     void watched();
     
     @Previous
     @ReconfigOption
     @ConfigOption
-    @TargetName("Statable")
+    @InterfaceName("Statable")
     void storingStatIn(String stat);
 
 
     @Previous
     @ReconfigOption
     @ConfigOption
-    @TargetName("Configurable")
+    @InterfaceName("Configurable")
     void fromConfig(Long config);
     
     @Terminal
     @ReconfigOption
     @ConfigOption
-    @TargetName("Ensemblable")
+    @InterfaceName("Ensemblable")
     byte[] forEnsemble();
 
     @Terminal
     @GetDataOption
-    @TargetName("Pathable")
+    @InterfaceName("Pathable")
     String forPath(String path);
 
     @Terminal
     @SetDataOption
-    @TargetName("PathAndBytesable")
+    @InterfaceName("PathAndBytesable")
     void forPath(String path, byte[] bytes);
 
 

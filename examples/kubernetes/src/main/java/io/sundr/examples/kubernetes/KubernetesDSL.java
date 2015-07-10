@@ -19,23 +19,24 @@ package io.sundr.examples.kubernetes;
 import io.sundr.dsl.annotations.AnnotationTransition;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
+import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.Previous;
-import io.sundr.dsl.annotations.TargetName;
+import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.examples.kubernetes.annotations.CommonOption;
 import io.sundr.examples.kubernetes.annotations.PodOption;
 import io.sundr.examples.kubernetes.annotations.ReplicationControllerOption;
 import io.sundr.examples.kubernetes.annotations.ServiceOption;
+import io.sundr.examples.kubernetes.domain.Pod;
 import io.sundr.examples.kubernetes.domain.PodList;
+import io.sundr.examples.kubernetes.domain.ReplicationController;
 import io.sundr.examples.kubernetes.domain.ReplicationControllerList;
+import io.sundr.examples.kubernetes.domain.Service;
 import io.sundr.examples.kubernetes.domain.ServiceList;
 
-import java.util.List;
-
 @Dsl
-@TargetName("Kubernetes")
+@InterfaceName("Kubernetes")
 public interface KubernetesDSL {
-
 
     @EntryPoint
     @AnnotationTransition({CommonOption.class, PodOption.class})
@@ -55,23 +56,61 @@ public interface KubernetesDSL {
 
     @Terminal
     @ServiceOption
+    @MethodName("list")
+    @InterfaceName("ServiceListable")
     ServiceList listServices();
 
     @Terminal
     @PodOption
+    @MethodName("list")
+    @InterfaceName("PodListable")
     PodList listPods();
 
     @Terminal
-    @PodOption
+    @ReplicationControllerOption
+    @MethodName("list")
+    @InterfaceName("ReplicationControllerListable")
     ReplicationControllerList listReplicationControllers();
 
     @Terminal
-    @CommonOption
-    Object get();
+    @PodOption
+    @MethodName("get")
+    @InterfaceName("PodGettable")
+    Pod getPod();
 
     @Terminal
+    @ReplicationControllerOption
+    @MethodName("get")
+    @InterfaceName("ReplicationControllerGettable")
+    ReplicationController getReplicationController();
+
+    @Terminal
+    @ServiceOption
+    @MethodName("get")
+    @InterfaceName("ServiceGettable")
+    Service getService();
+
+    @Terminal
+    @PodOption
+    @MethodName("create")
+    @InterfaceName("PodCreator")
+    void createPod(Pod pod);
+
+    @Terminal
+    @ReplicationControllerOption
+    @MethodName("create")
+    @InterfaceName("ReplicationControllerCreator")
+    void createReplicationController(ReplicationController replicationController);
+
+    @Terminal
+    @ServiceOption
+    @MethodName("create")
+    @InterfaceName("ServiceCreator")
+    void createService(Service service);
+
     @CommonOption
-    void create();
+    @Previous
+    void withName(String name);
 
     //Common Options
     @CommonOption
@@ -80,7 +119,8 @@ public interface KubernetesDSL {
 
     @CommonOption
     @Previous
-    void withName(String name);
+    void inNamespace(String namespace);
+
 }
 
 

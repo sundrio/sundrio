@@ -16,7 +16,6 @@
 
 package io.sundr.dsl.internal.utils;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
@@ -25,9 +24,10 @@ import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.EntryPoint;
+import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.Multiple;
 import io.sundr.dsl.annotations.Previous;
-import io.sundr.dsl.annotations.TargetName;
+import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.dsl.internal.processor.DslProcessorContext;
 import io.sundr.dsl.internal.type.functions.Generics;
@@ -74,7 +74,6 @@ public final class JavaTypeUtils {
      */
     public static JavaClazz executableToInterface(DslProcessorContext context, ExecutableElement executableElement) {
         //Do generate the interface
-        String methodName = executableElement.getSimpleName().toString();
         Boolean multiple = executableElement.getAnnotation(Multiple.class) != null;
         Boolean usePreviousTransitions = executableElement.getAnnotation(Previous.class) != null;
         Boolean isEntryPoint = executableElement.getAnnotation(EntryPoint.class) != null;
@@ -100,12 +99,17 @@ public final class JavaTypeUtils {
             returnType = TRANSPARENT;
         }
 
+        InterfaceName targetInterfaceName = executableElement.getAnnotation(InterfaceName.class);
+        MethodName tagetMethodName = executableElement.getAnnotation(MethodName.class);
+
+        String methodName = tagetMethodName != null ? tagetMethodName.value() : executableElement.getSimpleName().toString();
+
         JavaType genericType = Generics.MAP.apply(returnType);
 
         JavaMethod sourceMethod = context.getToMethod().apply(executableElement);
-        JavaMethod targetMethod = new JavaMethodBuilder(sourceMethod).withReturnType(genericType).build();
+        JavaMethod targetMethod = new JavaMethodBuilder(sourceMethod).withReturnType(genericType).withName(methodName).build();
 
-        TargetName targetInterfaceName = executableElement.getAnnotation(TargetName.class);
+
         String interfaceName = targetInterfaceName != null ?
                 targetInterfaceName.value() :
                 toInterfaceName(targetMethod.getName());

@@ -23,7 +23,7 @@ import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
-import io.sundr.dsl.annotations.TargetName;
+import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -59,8 +59,8 @@ public class DslProcessor extends JavaGeneratingProcessor {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 if (element instanceof TypeElement) {
                     TypeElement typeElement = (TypeElement) element;
-                    TargetName targetName = element.getAnnotation(TargetName.class);
-                    String targetInterface = targetName.value();
+                    InterfaceName interfaceName = element.getAnnotation(InterfaceName.class);
+                    String targetInterface = interfaceName.value();
                     Set<JavaClazz> interfacesToGenerate = new LinkedHashSet<JavaClazz>();
 
                     Collection<ExecutableElement> sorted = context.getDependencyManager().sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
