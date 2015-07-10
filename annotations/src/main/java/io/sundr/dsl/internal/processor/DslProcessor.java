@@ -77,8 +77,9 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     Set<Node<JavaClazz>> graph = createGraph(genericInterfaces);
                     for (Node<JavaClazz> root : graph) {
                         JavaClazz current = root.getItem();
-                        methods.add(new JavaMethodBuilder().withName((String) current.getType().getAttributes().get(METHOD_NAME))
-                                .withReturnType(current.getType()).build());
+                        for (JavaMethod m : current.getMethods()) {
+                            methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
+                        }
                         interfacesToGenerate.add(createRootInterface(root, interfacesToGenerate));
                     }
 

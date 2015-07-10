@@ -146,7 +146,8 @@ public final class JavaTypeUtils {
         Map<String, JavaClazz> byName = new LinkedHashMap<String, JavaClazz>();
         for (ExecutableElement current : elements) {
             JavaClazz clazz = executableToInterface(context, current);
-            String name = clazz.getType().getFullyQualifiedName();
+            InterfaceName interfaceName = current.getAnnotation(InterfaceName.class);
+            String name = interfaceName != null ? clazz.getType().getPackageName() + "." + interfaceName.value() : clazz.getType().getFullyQualifiedName();
             if (byName.containsKey(name)) {
                 JavaClazz other = byName.remove(name);
                 byName.put(name, Merge.CLASSES.apply(new JavaClazz[]{other, clazz}));
