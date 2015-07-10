@@ -37,7 +37,7 @@ public class SetDataInterfaceImpl implements SetDataInterface {
     }
 
     @Override
-    public Void forPath(String path, byte bytes) {
+    public Void forPath(String path, byte[] bytes) {
         return null;
     }
 
