@@ -23,10 +23,10 @@ import java.util.Set;
 
 public class TopologicalSort<T> {
 
-    private final Function<T, Set<T>> collectDepenedencies;
+    private final Function<T, Set<T>> collectDependencies;
 
-    public TopologicalSort(Function<T, Set<T>> collectDepenedencies) {
-        this.collectDepenedencies = collectDepenedencies;
+    public TopologicalSort(Function<T, Set<T>> collectDependencies) {
+        this.collectDependencies = collectDependencies;
     }
 
     public Set<T> sort(Iterable<T> items) {
@@ -43,13 +43,13 @@ public class TopologicalSort<T> {
         if (!visited.add(item)) {
             return;
         }
-        for (T t : collectDepenedencies.apply(item)) {
+        for (T t : collectDependencies.apply(item)) {
             visit(t, visited, sorted);
         }
         sorted.add(item);
     }
     
     public Set<T> collectDependencies(T item) {
-        return collectDepenedencies.apply(item);
+        return collectDependencies.apply(item);
     }
 }
