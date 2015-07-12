@@ -16,7 +16,7 @@
 
 package io.sundr.examples.curator.annotations;
 
-import io.sundr.dsl.annotations.AnnotationTransition;
+import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Keyword;
 
 import java.lang.annotation.ElementType;
@@ -27,6 +27,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Keyword
-@AnnotationTransition(BackgroundOption.class)
+@Any(BackgroundOption.class)
 public @interface BackgroundOption {
 }

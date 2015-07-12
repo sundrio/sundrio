@@ -17,7 +17,7 @@
 package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
-import io.sundr.dsl.annotations.AnnotationTransition;
+import io.sundr.dsl.annotations.Any;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -32,7 +32,7 @@ public class ToTransitionClassName implements Function<AnnotationMirror, List<St
     private final Element ANNOTATION_VALUE;
 
     public ToTransitionClassName(Elements elements) {
-        ANNOTATED_TRANSITION = elements.getTypeElement(AnnotationTransition.class.getCanonicalName());
+        ANNOTATED_TRANSITION = elements.getTypeElement(Any.class.getCanonicalName());
         ANNOTATION_VALUE = ANNOTATED_TRANSITION.getEnclosedElements().get(0);
     }
 

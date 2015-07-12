@@ -16,7 +16,7 @@
 
 package io.sundr.examples.curator;
 
-import io.sundr.dsl.annotations.AnnotationTransition;
+import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.Previous;
@@ -35,36 +35,36 @@ import io.sundr.examples.curator.annotations.WithMembersOption;
 public interface CuratorGetDataDsl {
 
     @EntryPoint
-    @AnnotationTransition({CommonOption.class, WatchOption.class, BackgroundOption.class, GetDataOption.class})
+    @Any({CommonOption.class, WatchOption.class, BackgroundOption.class, GetDataOption.class})
     void getData();
 
     @EntryPoint
-    @AnnotationTransition({CommonOption.class, BackgroundOption.class, SetDataOption.class})
+    @Any({CommonOption.class, BackgroundOption.class, SetDataOption.class})
     void setData();
 
     @EntryPoint
     @InterfaceName("ReConfigBuilder")
-    @AnnotationTransition({JoinOption.class, LeaveOption.class, WithMembersOption.class})
+    @Any({JoinOption.class, LeaveOption.class, WithMembersOption.class})
     void reconfig();
 
     @EntryPoint
     @InterfaceName("GetConfigBuilder")
-    @AnnotationTransition(ConfigOption.class)
+    @Any(ConfigOption.class)
     void config();
 
     @InterfaceName("Leavable")
     @LeaveOption
-    @AnnotationTransition(ReconfigOption.class)
+    @Any(ReconfigOption.class)
     void leaving(String... server);
 
     @InterfaceName("Joinable")
     @JoinOption
-    @AnnotationTransition(ReconfigOption.class)
+    @Any(ReconfigOption.class)
     void joining(String... server);
 
     @InterfaceName("Memberable")
     @WithMembersOption
-    @AnnotationTransition(ReconfigOption.class)
+    @Any(ReconfigOption.class)
     void withMembers(String... server);
     
     @CommonOption

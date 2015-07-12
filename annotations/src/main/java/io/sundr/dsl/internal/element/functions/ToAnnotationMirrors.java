@@ -17,7 +17,6 @@
 package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
-import io.sundr.dsl.annotations.AnnotationTransition;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;

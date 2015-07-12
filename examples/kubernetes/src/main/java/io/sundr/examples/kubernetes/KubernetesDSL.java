@@ -16,7 +16,7 @@
 
 package io.sundr.examples.kubernetes;
 
-import io.sundr.dsl.annotations.AnnotationTransition;
+import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.MethodName;
@@ -39,15 +39,15 @@ import io.sundr.examples.kubernetes.domain.ServiceList;
 public interface KubernetesDSL {
 
     @EntryPoint
-    @AnnotationTransition({CommonOption.class, PodOption.class})
+    @Any({CommonOption.class, PodOption.class})
     void pod();
 
     @EntryPoint
-    @AnnotationTransition({CommonOption.class, ReplicationControllerOption.class})
+    @Any({CommonOption.class, ReplicationControllerOption.class})
     void replicationController();
 
     @EntryPoint
-    @AnnotationTransition({CommonOption.class, ServiceOption.class})
+    @Any({CommonOption.class, ServiceOption.class})
     void service();
 
     @Terminal

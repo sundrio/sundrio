@@ -16,7 +16,6 @@
 
 package io.sundr.examples.curator;
 
-import io.sundr.dsl.annotations.AnnotationTransition;
 import io.sundr.dsl.annotations.Keyword;
 
 import java.lang.annotation.ElementType;

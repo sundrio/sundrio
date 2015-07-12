@@ -17,12 +17,8 @@
 package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
-import io.sundr.dsl.annotations.AnnotationTransition;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.util.Elements;
 
 public class ToKeywordClassName implements Function<AnnotationMirror, String> {
 
