@@ -58,7 +58,7 @@ public class Constants {
     public static final JavaType FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     public static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(BaseFluent.class), T);
     public static final JavaType NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
-    public static final JavaType EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), B);
+    public static final JavaType EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), T);
     public static final JavaType VISITOR = typeGenericOf(ClassToJavaType.FUNCTION.apply(Visitor.class), V);
     public static final JavaType VISITABLE = ClassToJavaType.FUNCTION.apply(Visitable.class);
     public static final JavaType VISITABLE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(VisitableBuilder.class), T, V);

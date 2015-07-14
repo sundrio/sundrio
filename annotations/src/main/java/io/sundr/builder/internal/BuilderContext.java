@@ -244,7 +244,7 @@ public class BuilderContext {
                 .withGenericTypes(EDITABLE.getGenericTypes())
                 .and()
                 .addNewMethod()
-                .withReturnType(B)
+                .withReturnType(T)
                 .withName("edit")
                 .and()
                 .build();
