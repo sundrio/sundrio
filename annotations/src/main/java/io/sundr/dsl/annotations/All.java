@@ -14,17 +14,16 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor;
+package io.sundr.dsl.annotations;
 
-import io.sundr.dependency.TopologicalSort;
-import io.sundr.dsl.internal.element.functions.FindTransitions;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.util.Elements;
-
-public class DependencyManager extends TopologicalSort<ExecutableElement> {
-    
-    public DependencyManager(Elements elements) {
-        super(new FindTransitions(elements));
-    }
+@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.SOURCE)
+public @interface All {
+    Class<? extends Annotation>[] value();
 }

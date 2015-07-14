@@ -26,7 +26,6 @@ import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.Multiple;
-import io.sundr.dsl.annotations.Previous;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.dsl.internal.processor.DslProcessorContext;
@@ -40,10 +39,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.dsl.internal.Constants.EXCLUSIVE;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
@@ -53,10 +54,10 @@ import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
+import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
+import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
-import static io.sundr.dsl.internal.Constants.TRANSITIONS;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
-import static io.sundr.dsl.internal.Constants.USE_PREVIOUS_TRANSITIONS;
 import static io.sundr.dsl.internal.Constants.VOID;
 
 public final class JavaTypeUtils {
@@ -75,15 +76,29 @@ public final class JavaTypeUtils {
     public static JavaClazz executableToInterface(DslProcessorContext context, ExecutableElement executableElement) {
         //Do generate the interface
         Boolean multiple = executableElement.getAnnotation(Multiple.class) != null;
-        Boolean usePreviousTransitions = executableElement.getAnnotation(Previous.class) != null;
         Boolean isEntryPoint = executableElement.getAnnotation(EntryPoint.class) != null;
         Boolean isTerminal = executableElement.getAnnotation(Terminal.class) != null
                 || !isVoid(executableElement);
 
-        Set<String> transitions = new LinkedHashSet<String>();
+        Set<String> requiresAll = new LinkedHashSet<String>();
+        Set<String> requiresAny = new LinkedHashSet<String>();
+        Set<String> exclusive = new LinkedHashSet<String>();
+
         Set<String> keywords = new LinkedHashSet<String>();
-        for (AnnotationMirror annotationMirror : context.getToTransitionAnnotations().apply(executableElement)) {
-            transitions.addAll(context.getToTransitionClassName().apply(annotationMirror));
+
+        for (AnnotationMirror annotationMirror : context.getToAnyAnnotations().apply(executableElement)) {
+            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
+            requiresAny.addAll(names != null ? names : Collections.<String>emptyList());
+        }
+
+        for (AnnotationMirror annotationMirror : context.getToAllAnnotations().apply(executableElement)) {
+            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
+            requiresAll.addAll(names != null ? names : Collections.<String>emptyList());
+        }
+
+        for (AnnotationMirror annotationMirror : context.getToExclusiveAnnotations().apply(executableElement)) {
+            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
+            exclusive.addAll(names != null ? names : Collections.<String>emptyList());
         }
 
         for (AnnotationMirror annotationMirror : context.getToKeywordAnnotations().apply(executableElement)) {
@@ -123,10 +138,12 @@ public final class JavaTypeUtils {
                     .addToAttributes(ORIGINAL_RETURN_TYPE, returnType)
                     .addToAttributes(IS_ENTRYPOINT, isEntryPoint)
                     .addToAttributes(IS_TERMINAL, isTerminal)
+                    .addToAttributes(IS_GENERIC, Boolean.FALSE)
                     .addToAttributes(KEYWORDS, keywords)
-                    .addToAttributes(TRANSITIONS, isTerminal ? Collections.emptySet() : transitions)
+                    .addToAttributes(REQUIRES_ALL, requiresAll)
+                    .addToAttributes(REQUIRES_ANY, requiresAny)
+                    .addToAttributes(EXCLUSIVE,  exclusive)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
-                    .addToAttributes(USE_PREVIOUS_TRANSITIONS, usePreviousTransitions)
                     .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
                     .addToAttributes(METHOD_NAME, methodName)
                 .endType()
@@ -230,11 +247,5 @@ public final class JavaTypeUtils {
         return type.getAttributes().containsKey(IS_GENERIC)
                 && (type.getAttributes().get(IS_GENERIC) instanceof Boolean)
                 && (Boolean) type.getAttributes().get(IS_GENERIC);
-    }
-
-    public static boolean usePreviousTransitions(JavaClazz clazz) {
-        return clazz.getType().getAttributes().containsKey(USE_PREVIOUS_TRANSITIONS)
-                && (clazz.getType().getAttributes().get(USE_PREVIOUS_TRANSITIONS) instanceof Boolean)
-                && (Boolean) clazz.getType().getAttributes().get(USE_PREVIOUS_TRANSITIONS);
     }
 }

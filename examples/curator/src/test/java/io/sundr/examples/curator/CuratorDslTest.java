@@ -16,16 +16,12 @@
 
 package io.sundr.examples.curator;
 
-import io.sundr.examples.curator.CuratorFramework;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class CuratorDslTest {
 
     @Test
     public void testGeneratedCode() {
-
 
     }
 

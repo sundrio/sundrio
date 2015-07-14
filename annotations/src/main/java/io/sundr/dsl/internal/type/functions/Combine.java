@@ -26,7 +26,13 @@ import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
@@ -36,7 +42,6 @@ import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.getTerminatingTypes;
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.isGeneric;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.toInterfaceName;
 
 public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
@@ -45,6 +50,11 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
 
     @Override
     public JavaClazz apply(Collection<JavaClazz> alternatives) {
+        String key = createKey(alternatives);
+        if (combinations.containsKey(key)) {
+            return combinations.get(key);
+        }
+
         Set<JavaType> genericTypes = new LinkedHashSet<JavaType>();
         Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
         Set<JavaType> terminatingTypes = new LinkedHashSet<JavaType>();
@@ -55,9 +65,7 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
                 interfaces.add(alternative.getType());
                 terminatingTypes.addAll(getTerminatingTypes(alternative.getType()));
                 for (JavaType candidate : alternative.getType().getGenericTypes()) {
-                    if (isGeneric(candidate)) {
-                        genericTypes.add(candidate);
-                    }
+                    genericTypes.addAll(getGenericReferences(candidate));
                 }
             } else {
                 if (fallback == null) {
@@ -71,15 +79,12 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
             interfaces.add(fallback.getType());
             terminatingTypes.addAll(getTerminatingTypes(fallback.getType()));
             for (JavaType candidate : fallback.getType().getGenericTypes()) {
-                if (isGeneric(candidate)) {
-                    genericTypes.add(candidate);
-                }
+                genericTypes.addAll(getGenericReferences(candidate));
             }
         }
-
         String className = classNameOf(interfaces);
 
-        return new JavaClazzBuilder()
+        JavaClazz combination = new JavaClazzBuilder()
                 .withNewType()
                     .withKind(JavaKind.INTERFACE)
                     .withClassName(className)
@@ -92,13 +97,25 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
                     .addToAttributes(IS_COMPOSITE, false)
                 .endType()
                 .build();
+
+        combinations.put(key, combination);
+        return combination;
     }
 
     private static final String classNameOf(Set<JavaType> types) {
-        return toInterfaceName(StringUtils.join(types, new Function<JavaType, String>() {
+        final Function<JavaType, String> toString = new Function<JavaType, String>() {
             @Override
             public String apply(JavaType item) {
                 return stripSuffix(item.getClassName());
+            }
+        };
+
+        final String prefix = StringUtils.getPrefix(types, toString);
+
+        return  toInterfaceName(prefix + StringUtils.join(types, new Function<JavaType, String>() {
+            @Override
+            public String apply(JavaType item) {
+                return stripSuffix(item.getClassName()).substring(prefix.length());
             }
         }, "Or"));
     }
@@ -121,10 +138,40 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
         return true;
     }
 
+    private Set<JavaType> getGenericReferences(JavaType type) {
+        Set<JavaType> result = new LinkedHashSet<JavaType>();
+        if (JavaTypeUtils.isGeneric(type)) {
+            result.add(type);
+        } else {
+            for (JavaType t : type.getGenericTypes()) {
+                result.addAll(getGenericReferences(t));
+            }
+        }
+        return result;
+    }
+
     public static final String stripSuffix(String str) {
         if (str.endsWith(INTERFACE_SUFFIX)) {
             return str.substring(0, str.length() - INTERFACE_SUFFIX.length());
         }
         return str;
     }
+
+    private static String createKey(Collection<JavaClazz> alternatives) {
+        List<JavaClazz> clazzes = new LinkedList<JavaClazz>(alternatives);
+        Collections.sort(clazzes, new Comparator<JavaClazz>() {
+            @Override
+            public int compare(JavaClazz left, JavaClazz right) {
+                return left.getType().getFullyQualifiedName().compareTo(right.getType().getFullyQualifiedName());
+            }
+        });
+        return StringUtils.join(clazzes, new Function<JavaClazz, String>() {
+            @Override
+            public String apply(JavaClazz item) {
+                return item.getType().getSimpleName();
+            }
+        }, "#");
+    }
+
+    private static Map<String, JavaClazz> combinations = new HashMap<String, JavaClazz>();
 }

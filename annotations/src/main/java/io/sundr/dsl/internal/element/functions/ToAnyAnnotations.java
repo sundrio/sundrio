@@ -26,12 +26,12 @@ import javax.lang.model.util.Elements;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToTransitionAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
+public class ToAnyAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
 
     private final TypeElement ANY;
 
 
-    public ToTransitionAnnotations(Elements elements) {
+    public ToAnyAnnotations(Elements elements) {
         ANY = elements.getTypeElement(Any.class.getCanonicalName());
     }
 

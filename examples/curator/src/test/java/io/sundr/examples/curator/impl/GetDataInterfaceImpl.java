@@ -17,12 +17,15 @@
 package io.sundr.examples.curator.impl;
 
 
-import io.sundr.examples.curator.BackgroundableOrPathableInterface;
 import io.sundr.examples.curator.GetDataInterface;
-import io.sundr.examples.curator.Pathable;
+import io.sundr.examples.curator.PathableOrAndBytesableInterface;
+import io.sundr.examples.curator.StatableOrPathableOrPathAndBytesableInterface;
+import io.sundr.examples.curator.WatchableOrStatableOrPathableOrPathAndBytesableInterface;
 
-public class GetDataInterfaceImpl implements GetDataInterface, BackgroundableOrPathableInterface<String> {
-
+public class GetDataInterfaceImpl implements GetDataInterface,
+        WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void>,
+        StatableOrPathableOrPathAndBytesableInterface<String, Void>,
+        PathableOrAndBytesableInterface<String, Void> {
 
     static {
         new GetDataInterfaceImpl().watched().forPath("somePath");
@@ -32,28 +35,41 @@ public class GetDataInterfaceImpl implements GetDataInterface, BackgroundableOrP
         new GetDataInterfaceImpl().inBackground().forPath("somePath");
     }
 
-    @Override
-    public Pathable<String> inBackground(boolean flag) {
-        return this;
-    }
-
-    @Override
-    public Pathable<String> inBackground(Object context) {
-        return this;
-    }
-
-    @Override
-    public Pathable<String> inBackground() {
-        return this;
-    }
 
     @Override
     public String forPath(String path) {
         return "";
     }
 
+
+
     @Override
-    public BackgroundableOrPathableInterface<String> watched() {
+    public Void forPath(String path, byte[] bytes) {
+        return null;
+    }
+
+    @Override
+    public PathableOrAndBytesableInterface<String, Void> storingStatIn(String stat) {
+        return this;
+    }
+
+    @Override
+    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void> inBackground(boolean flag) {
+        return this;
+    }
+
+    @Override
+    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void> inBackground() {
+        return this;
+    }
+
+    @Override
+    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void> inBackground(Object context) {
+        return this;
+    }
+
+    @Override
+    public StatableOrPathableOrPathAndBytesableInterface<String, Void> watched() {
         return this;
     }
 }

@@ -24,6 +24,7 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.dsl.internal.processor.Node;
 import io.sundr.dsl.internal.type.functions.Combine;
 import io.sundr.dsl.internal.type.functions.Generics;
+import io.sundr.dsl.internal.type.functions.Generify;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -71,7 +72,8 @@ public final class DslUtils {
             for (Node<JavaClazz> v : current.getTransitions()) {
                 toCombine.add(createTransitionInterface(v, intermediate));
             }
-            JavaClazz combined = Combine.FUNCTION.apply(toCombine);
+
+            JavaClazz combined = Combine.FUNCTION.apply(Generify.FUNCTION.apply(toCombine));
             intermediate.addAll(toCombine);
             
             if (JavaTypeUtils.isCardinalityMultiple(clazz)) {
@@ -93,4 +95,5 @@ public final class DslUtils {
                 .build();
 
     }
+
 }

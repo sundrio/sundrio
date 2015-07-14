@@ -16,29 +16,48 @@
 
 package io.sundr.examples.curator.impl;
 
-import io.sundr.examples.curator.PathAndBytesable;
+import io.sundr.examples.curator.PathableOrAndBytesableInterface;
 import io.sundr.examples.curator.SetDataInterface;
+import io.sundr.examples.curator.StatableOrPathableOrPathAndBytesableInterface;
+import io.sundr.examples.curator.WatchableOrStatableOrPathableOrPathAndBytesableInterface;
 
-public class SetDataInterfaceImpl implements SetDataInterface {
+public class SetDataInterfaceImpl implements SetDataInterface, WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void>,
+        PathableOrAndBytesableInterface<String, Void>,
+        StatableOrPathableOrPathAndBytesableInterface<String, Void>{
     
     @Override
-    public PathAndBytesable<Void> inBackground(boolean flag) {
+    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void> inBackground(boolean flag) {
         return this;
     }
 
     @Override
-    public PathAndBytesable<Void> inBackground(Object context) {
+    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void>  inBackground(Object context) {
         return this;
     }
 
     @Override
-    public PathAndBytesable<Void> inBackground() {
+    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void>  inBackground() {
         return this;
     }
 
     @Override
     public Void forPath(String path, byte[] bytes) {
         return null;
+    }
+
+    @Override
+    public String forPath(String path) {
+        return "";
+    }
+
+    @Override
+    public PathableOrAndBytesableInterface<String, Void> storingStatIn(String stat) {
+        return this;
+    }
+
+    @Override
+    public StatableOrPathableOrPathAndBytesableInterface<String, Void> watched() {
+        return this;
     }
 
 

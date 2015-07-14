@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.kubernetes.annotations;
+package io.sundr.examples.curator.annotations;
 
 import io.sundr.dsl.annotations.Keyword;
 
@@ -26,5 +26,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Keyword
-public @interface PodOption {
+public @interface StatOption {
 }

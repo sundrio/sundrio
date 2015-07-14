@@ -26,5 +26,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Keyword
-public @interface PodOption {
+public @interface NamespaceOption {
 }

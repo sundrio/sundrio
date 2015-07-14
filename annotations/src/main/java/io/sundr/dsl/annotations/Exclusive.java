@@ -14,17 +14,16 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.kubernetes.annotations;
+package io.sundr.dsl.annotations;
 
-import io.sundr.dsl.annotations.Keyword;
-
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-@Keyword
-public @interface PodOption {
+public @interface Exclusive {
+    Class<? extends Annotation>[] value();
 }

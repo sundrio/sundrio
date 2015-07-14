@@ -93,6 +93,40 @@ public final class StringUtils {
         return sb.toString();
     }
 
+    public static <T> String getPrefix(Iterable<T> items, Function<T, String> function) {
+        int length = 0;
+        String prefix = "";
+        String current = "";
+
+        while (true) {
+            boolean first = true;
+            for (T item : items) {
+                String currnetItem = function.apply(item);
+                if (first) {
+                    first = false;
+                    if (currnetItem.length() > length) {
+                        current = currnetItem.substring(0, length);
+                    } else {
+                        return prefix;
+                    }
+                } else if (!currnetItem.startsWith(current)) {
+                    return prefix;
+                }
+            }
+            length++;
+            prefix = current;
+        }
+    }
+
+    public static String getPrefix(Iterable<String> items) {
+        return getPrefix(items, new Function<String, String>() {
+            @Override
+            public String apply(String item) {
+                return item;
+            }
+        });
+    }
+
     public static final String loadResourceQuietly(String resourceName) {
         try {
             return loadResource(resourceName);

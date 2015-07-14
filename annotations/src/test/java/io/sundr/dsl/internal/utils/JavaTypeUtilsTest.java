@@ -98,7 +98,7 @@ public class JavaTypeUtilsTest {
         Assert.assertNotNull(combined);
 
         String T = Generics.MAP.apply(TRANSPARENT).getClassName();
-        assertThat(combined.getType().getClassName(), equalTo("MethodAOrMethodBInterface"));
+        assertThat(combined.getType().getClassName(), equalTo("MethodAOrBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
         assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo(T));
@@ -119,7 +119,7 @@ public class JavaTypeUtilsTest {
         JavaClazz combined = Combine.FUNCTION.apply(Arrays.asList(leftClazz, rightClazz));
         Assert.assertNotNull(combined);
 
-        assertThat(combined.getType().getClassName(), equalTo("MethodAOrMethodBInterface"));
+        assertThat(combined.getType().getClassName(), equalTo("MethodAOrBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
         assertThat(combined.getType().getGenericTypes()[0].toString(), equalTo("T"));
@@ -140,7 +140,7 @@ public class JavaTypeUtilsTest {
         JavaClazz combined = Combine.FUNCTION.apply(Arrays.asList(leftClazz, rightClazz));
         Assert.assertNotNull(combined);
 
-        assertThat(combined.getType().getClassName(), equalTo("MethodAOrMethodBInterface"));
+        assertThat(combined.getType().getClassName(), equalTo("MethodAOrBInterface"));
         assertThat(combined.getType().getPackageName(), equalTo(getClass().getPackage().getName()));
         assertThat(combined.getType().getGenericTypes().length, is(1));
         assertThat(combined.getType().getInterfaces().size(), is(2));

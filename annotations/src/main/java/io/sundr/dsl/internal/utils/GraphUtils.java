@@ -20,11 +20,15 @@ import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.dsl.internal.processor.Node;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
+import static io.sundr.dsl.internal.Constants.EXCLUSIVE;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
-import static io.sundr.dsl.internal.Constants.TRANSITIONS;
+import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
+import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
@@ -39,43 +43,38 @@ public final class GraphUtils {
         Set<Node<JavaClazz>> nodes = new LinkedHashSet<Node<JavaClazz>>();
         for (JavaClazz clazz : clazzes) {
             if (isEntryPoint(clazz)) {
-                nodes.add(createGraph(clazz, new LinkedHashSet<String>(), clazzes, new LinkedHashSet<JavaType>()));
+                nodes.add(createGraph(clazz, clazzes, new LinkedHashSet<JavaType>(), new LinkedHashSet<JavaType>()));
 
             }
         }
         return nodes;
     }
 
-    public static Node<JavaClazz> createGraph(JavaClazz root, Set<String> previous, Set<JavaClazz> all, Set<JavaType> visited) {
-        Boolean usePrevious = JavaTypeUtils.usePreviousTransitions(root);
+    public static Node<JavaClazz> createGraph(JavaClazz root, Set<JavaClazz> all, Set<JavaType> path, Set<JavaType> visited) {
         Set<JavaClazz> next = new LinkedHashSet<JavaClazz>();
-        Set<JavaType> visitedPath = new LinkedHashSet<JavaType>(visited);
-        Set<String> transitions = usePrevious ? previous : (Set<String>) root.getType().getAttributes().get(TRANSITIONS);
+        Set<JavaType> currentPath = new LinkedHashSet<JavaType>(path);
 
         if (!JavaTypeUtils.isTerminal(root)) {
+            currentPath.add(root.getType());
             for (JavaClazz candidate : exclusion(all, visited)) {
-                if (!JavaTypeUtils.isEntryPoint(candidate)) {
-                    Set<String> keywords = (Set<String>) candidate.getType().getAttributes().get(KEYWORDS);
-                    for (String keyword : keywords) {
-                        if (transitions.contains(keyword)) {
-                            next.add(candidate);
-                        }
-                    }
+                if (!JavaTypeUtils.isEntryPoint(candidate) && isSatisfied(candidate, currentPath)) {
+                    next.add(candidate);
                 }
             }
             next.remove(root);
-            visitedPath.add(root.getType());
         }
 
         Set<Node<JavaClazz>> nextVertices = new LinkedHashSet<Node<JavaClazz>>();
         Set<JavaType> levelInterfaces = new LinkedHashSet<JavaType>();
-        levelInterfaces.addAll(visitedPath);
+        levelInterfaces.addAll(visited);
 
         for (JavaClazz c : next) {
-            Node<JavaClazz> subGraph = createGraph(c, usePrevious ? previous : transitions, all, levelInterfaces);
+            Node<JavaClazz> subGraph = createGraph(c, all, currentPath, levelInterfaces);
             levelInterfaces.add(subGraph.getItem().getType());
             levelInterfaces.addAll(subGraph.getItem().getType().getInterfaces());
-            nextVertices.add(subGraph);
+            if (subGraph.getTransitions().size() > 0 || JavaTypeUtils.isTerminal(subGraph.getItem())) {
+                nextVertices.add(subGraph);
+            }
         }
         return new Node<JavaClazz>(root, nextVertices);
     }
@@ -86,6 +85,52 @@ public final class GraphUtils {
             if (!excluded.contains(item.getType()) || isTerminal(item) || isCardinalityMultiple(item)) {
                 result.add(item);
             }
+        }
+        return result;
+    }
+
+
+    private static boolean isSatisfied(JavaClazz candidate, Set<JavaType> visited) {
+        Set<String> visitedKeywords = getKeywords(visited);
+
+        Boolean multiple = (Boolean) candidate.getType().getAttributes().get(CARDINALITY_MULTIPLE);
+        Set<String> requiresAll = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ALL);
+        Set<String> requiresAny = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ANY);
+        Set<String> exclusive = (Set<String>) candidate.getType().getAttributes().get(EXCLUSIVE);
+
+        //Eliminate circles if not supported
+        if (!multiple && visited.contains(candidate.getType())) {
+            return false;
+        }
+
+        //Check if path contains exclusive keywords
+        for (String e : exclusive) {
+            if (visitedKeywords.contains(e)) {
+                return false;
+            }
+        }
+
+        //Check if "All" requirements are meet
+        for (String a : requiresAll) {
+            if (!visitedKeywords.contains(a)) {
+                return false;
+            }
+        }
+
+        for (String a : requiresAny) {
+            if (visitedKeywords.contains(a)) {
+                return true;
+            }
+        }
+
+        return requiresAny.isEmpty();
+    }
+
+    private static Set<String> getKeywords(Set<JavaType> types) {
+        Set<String> result = new LinkedHashSet<String>();
+        for (JavaType type : types) {
+            Set<String> keywords = (Set<String>) type.getAttributes().get(KEYWORDS);
+            result.addAll(keywords != null ? keywords : Collections.<String>emptySet());
         }
         return result;
     }

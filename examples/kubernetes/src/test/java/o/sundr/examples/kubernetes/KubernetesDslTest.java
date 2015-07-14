@@ -17,25 +17,62 @@
 package o.sundr.examples.kubernetes;
 
 import io.sundr.examples.kubernetes.Kubernetes;
+import io.sundr.examples.kubernetes.domain.Pod;
 import io.sundr.examples.kubernetes.domain.PodList;
+import io.sundr.examples.kubernetes.domain.ReplicationController;
 import io.sundr.examples.kubernetes.domain.ReplicationControllerList;
 import io.sundr.examples.kubernetes.domain.Service;
 import io.sundr.examples.kubernetes.domain.ServiceList;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class KubernetesDslTest {
 
-    public void testDsl() {
-        Kubernetes kubernetes = null;
-        PodList podList = kubernetes.pod().withLabel("key", "value").list();
-        ServiceList serviceList = kubernetes.service().withLabel("key", "value").list();
-        ReplicationControllerList replicationControllerList = kubernetes.replicationController().inNamespace("namespace").withLabel("key", "value").list();
+    private Kubernetes kubernetes = null;
 
-        kubernetes.replicationController().inNamespace("namespace").withName("myController").get();
 
-        kubernetes.pod().inNamespace("namespace").withName("myPod").get();
+    @Ignore
+    @Test
+    public void testPodDSL() {
+        kubernetes.pod().inNamespace("default").list();
+        kubernetes.pod().withLabel("key", "value").inNamespace("default").list();
+        kubernetes.pod().withName("name").inNamespace("namespace").list();
+        kubernetes.pod().withName("name").inNamespace("namespace").get();
+        kubernetes.pod().withName("name").inNamespace("namespace").delete();
+        kubernetes.pod().withName("name").inNamespace("namespace").create(new Pod());
 
-        kubernetes.service().inNamespace("namespace").withName("myService").get();
+        //can't do
+        //kubernetes.pod().inNamespace("namespace").create(null);
+        //kubernetes.pod().inNamespace("namespace").delete();
+    }
 
-        kubernetes.service().inNamespace("namespace").withName("myService").create(new Service());
+    @Ignore
+    @Test
+    public void testServiceDSL() {
+        kubernetes.service().inNamespace("default").list();
+        kubernetes.service().withLabel("key", "value").inNamespace("default").list();
+        kubernetes.service().withName("name").inNamespace("namespace").list();
+        kubernetes.service().withName("name").inNamespace("namespace").get();
+        kubernetes.service().withName("name").inNamespace("namespace").delete();
+        kubernetes.service().withName("name").inNamespace("namespace").create(new Service());
+
+        //can't do
+        //kubernetes.service().inNamespace("namespace").create(null);
+        //kubernetes.service().inNamespace("namespace").delete();
+    }
+
+    @Ignore
+    @Test
+    public void testReplicationControllerDSL() {
+        kubernetes.replicationController().inNamespace("default").list();
+        kubernetes.replicationController().withLabel("key", "value").inNamespace("default").list();
+        kubernetes.replicationController().withName("name").inNamespace("namespace").list();
+        kubernetes.replicationController().withName("name").inNamespace("namespace").get();
+        kubernetes.replicationController().withName("name").inNamespace("namespace").delete();
+        kubernetes.replicationController().withName("name").inNamespace("namespace").create(new ReplicationController());
+
+        //can't do
+        //kubernetes.replicationController().inNamespace("namespace").create(null);
+        //kubernetes.replicationController().inNamespace("namespace").delete();
     }
 }

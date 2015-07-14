@@ -39,10 +39,9 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.dsl.internal.Constants.METHOD_NAME;
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.executablesToInterfaces;
 import static io.sundr.dsl.internal.utils.DslUtils.createRootInterface;
-import static io.sundr.dsl.internal.utils.GraphUtils.*;
+import static io.sundr.dsl.internal.utils.GraphUtils.createGraph;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.executablesToInterfaces;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {
@@ -63,7 +62,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     String targetInterface = interfaceName.value();
                     Set<JavaClazz> interfacesToGenerate = new LinkedHashSet<JavaClazz>();
 
-                    Collection<ExecutableElement> sorted = context.getDependencyManager().sort(ElementFilter.methodsIn(typeElement.getEnclosedElements()));
+                    Collection<ExecutableElement> sorted = ElementFilter.methodsIn(typeElement.getEnclosedElements());
                     //1st step generate generic interface for all types.
                     Set<JavaClazz> genericInterfaces = executablesToInterfaces(context, sorted);
                     for (JavaClazz clazz : genericInterfaces) {
@@ -105,6 +104,4 @@ public class DslProcessor extends JavaGeneratingProcessor {
         }
         return true;
     }
-
-
 }

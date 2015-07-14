@@ -16,7 +16,6 @@
 
 package io.sundr.examples.kubernetes.annotations;
 
-import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Keyword;
 
 import java.lang.annotation.ElementType;
@@ -27,6 +26,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 @Keyword
-@Any(ReplicationControllerOption.class)
 public @interface ReplicationControllerOption {
 }

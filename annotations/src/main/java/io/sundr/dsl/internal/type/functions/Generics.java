@@ -61,7 +61,11 @@ public enum Generics implements Function<JavaType, JavaType> {
             Set<JavaType> generics = new LinkedHashSet<JavaType>();
 
             if (GENERIC_MAPPINGS.containsValue(type)) {
-                return UNMAP.apply(type);
+                JavaType unmapped = UNMAP.apply(type);
+                if (!unmapped.equals(type)) {
+                    return UNWRAP.apply(unmapped);
+                }
+                return unmapped;
             } else {
                 for (JavaType iface : type.getInterfaces()) {
                     interfaces.add(UNWRAP.apply(iface));
@@ -77,7 +81,7 @@ public enum Generics implements Function<JavaType, JavaType> {
         }
     };
 
-    private static final String[] GENERIC_NAMES = {"X", "Y", "Z"};
+    private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"};
     private static final Map<JavaType, JavaType> GENERIC_MAPPINGS = new HashMap<JavaType, JavaType>();
     private static int counter = 0;
 
@@ -86,5 +90,4 @@ public enum Generics implements Function<JavaType, JavaType> {
         GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withClassName("V").addToAttributes(IS_GENERIC, true).build());
         GENERIC_MAPPINGS.put(TRANSPARENT, TRANSPARENT);
     }
-
 }

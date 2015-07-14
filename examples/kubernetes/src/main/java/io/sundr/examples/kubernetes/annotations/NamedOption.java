@@ -14,18 +14,17 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.annotations;
+package io.sundr.examples.kubernetes.annotations;
+
+import io.sundr.dsl.annotations.Keyword;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * An annotation to specify that this method, should inherit transition rules from the previous method in the chain.
- */
-@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Previous {
-
+@Keyword
+public @interface NamedOption {
 }

@@ -16,14 +16,16 @@
 
 package io.sundr.examples.kubernetes;
 
+import io.sundr.dsl.annotations.All;
 import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.MethodName;
-import io.sundr.dsl.annotations.Previous;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Terminal;
-import io.sundr.examples.kubernetes.annotations.CommonOption;
+import io.sundr.examples.kubernetes.annotations.FilterOption;
+import io.sundr.examples.kubernetes.annotations.NamedOption;
+import io.sundr.examples.kubernetes.annotations.NamespaceOption;
 import io.sundr.examples.kubernetes.annotations.PodOption;
 import io.sundr.examples.kubernetes.annotations.ReplicationControllerOption;
 import io.sundr.examples.kubernetes.annotations.ServiceOption;
@@ -39,86 +41,100 @@ import io.sundr.examples.kubernetes.domain.ServiceList;
 public interface KubernetesDSL {
 
     @EntryPoint
-    @Any({CommonOption.class, PodOption.class})
+    @PodOption
     void pod();
 
     @EntryPoint
-    @Any({CommonOption.class, ReplicationControllerOption.class})
+    @ReplicationControllerOption
     void replicationController();
 
     @EntryPoint
-    @Any({CommonOption.class, ServiceOption.class})
+    @ServiceOption
     void service();
 
     @Terminal
-    @CommonOption
-    void delete();
+    @MethodName("delete")
+    @InterfaceName("PodDeleteable")
+    @All({PodOption.class, NamedOption.class, NamespaceOption.class})
+    void deletePod();
 
     @Terminal
-    @ServiceOption
+    @MethodName("delete")
+    @InterfaceName("ServiceDeletable")
+    @All({ServiceOption.class, NamedOption.class, NamespaceOption.class})
+    void deleteService();
+
+    @Terminal
+    @MethodName("delete")
+    @InterfaceName("ReplicationControllerDeletable")
+    @All({ReplicationControllerOption.class, NamedOption.class, NamespaceOption.class})
+    void deleteReplicationController();
+
+    @Terminal
     @MethodName("list")
     @InterfaceName("ServiceListable")
+    @All({ServiceOption.class, NamespaceOption.class})
     ServiceList listServices();
 
     @Terminal
-    @PodOption
     @MethodName("list")
     @InterfaceName("PodListable")
+    @All({PodOption.class, NamespaceOption.class})
     PodList listPods();
 
     @Terminal
-    @ReplicationControllerOption
     @MethodName("list")
     @InterfaceName("ReplicationControllerListable")
+    @All({ReplicationControllerOption.class, NamespaceOption.class})
     ReplicationControllerList listReplicationControllers();
 
     @Terminal
-    @PodOption
     @MethodName("get")
     @InterfaceName("PodGettable")
+    @All({PodOption.class, NamedOption.class, NamespaceOption.class})
     Pod getPod();
 
     @Terminal
-    @ReplicationControllerOption
     @MethodName("get")
     @InterfaceName("ReplicationControllerGettable")
+    @All({ReplicationControllerOption.class, NamedOption.class, NamespaceOption.class})
     ReplicationController getReplicationController();
 
     @Terminal
-    @ServiceOption
     @MethodName("get")
     @InterfaceName("ServiceGettable")
+    @All({ServiceOption.class, NamedOption.class, NamespaceOption.class})
     Service getService();
 
     @Terminal
-    @PodOption
     @MethodName("create")
     @InterfaceName("PodCreator")
+    @All({PodOption.class, NamedOption.class, NamespaceOption.class})
     void createPod(Pod pod);
 
     @Terminal
-    @ReplicationControllerOption
     @MethodName("create")
     @InterfaceName("ReplicationControllerCreator")
+    @All({ReplicationControllerOption.class, NamedOption.class, NamespaceOption.class})
     void createReplicationController(ReplicationController replicationController);
 
     @Terminal
-    @ServiceOption
     @MethodName("create")
     @InterfaceName("ServiceCreator")
+    @All({ServiceOption.class, NamedOption.class, NamespaceOption.class})
     void createService(Service service);
 
-    @CommonOption
-    @Previous
+    @NamedOption
+    @InterfaceName("Nameable")
     void withName(String name);
 
     //Common Options
-    @CommonOption
-    @Previous
+    @FilterOption
+    @InterfaceName("Labelable")
     void withLabel(String key, String value);
 
-    @CommonOption
-    @Previous
+    @NamespaceOption
+    @InterfaceName("Namespaceable")
     void inNamespace(String namespace);
 
 }

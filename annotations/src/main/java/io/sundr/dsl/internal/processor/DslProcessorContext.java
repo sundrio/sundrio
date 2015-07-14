@@ -17,15 +17,16 @@
 package io.sundr.dsl.internal.processor;
 
 import io.sundr.Function;
-import io.sundr.codegen.coverters.JavaClazzFunction;
 import io.sundr.codegen.coverters.JavaMethodFunction;
 import io.sundr.codegen.coverters.JavaPropertyFunction;
 import io.sundr.codegen.coverters.JavaTypeFunction;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.dsl.internal.element.functions.ToAllAnnotations;
+import io.sundr.dsl.internal.element.functions.ToExclusiveAnnotations;
 import io.sundr.dsl.internal.element.functions.ToKeywordAnnotations;
 import io.sundr.dsl.internal.element.functions.ToKeywordClassName;
-import io.sundr.dsl.internal.element.functions.ToTransitionAnnotations;
+import io.sundr.dsl.internal.element.functions.ToAnyAnnotations;
 import io.sundr.dsl.internal.element.functions.ToTransitionClassName;
 
 import javax.lang.model.element.VariableElement;
@@ -38,8 +39,9 @@ public class DslProcessorContext {
     private final Function<String, JavaType> toType;
     private final Function<VariableElement, JavaProperty> toProperty;
     private final JavaMethodFunction toMethod;
-    private final DependencyManager dependencyManager;
-    private final ToTransitionAnnotations toTransitionAnnotations;
+    private final ToAnyAnnotations toAnyAnnotations;
+    private final ToAllAnnotations toAllAnnotations;
+    private final ToExclusiveAnnotations toExclusiveAnnotations;
     private final ToKeywordAnnotations toKeywordAnnotations;
     private final ToTransitionClassName toTransitionClassName;
     private final ToKeywordClassName toKeywordClassName;
@@ -49,8 +51,9 @@ public class DslProcessorContext {
         this.toType = new JavaTypeFunction(elements);
         this.toProperty = new JavaPropertyFunction(toType);
         this.toMethod = new JavaMethodFunction(toType, toProperty);
-        this.dependencyManager = new DependencyManager(elements);
-        this.toTransitionAnnotations = new ToTransitionAnnotations(elements);
+        this.toAnyAnnotations = new ToAnyAnnotations(elements);
+        this.toAllAnnotations = new ToAllAnnotations(elements);
+        this.toExclusiveAnnotations = new ToExclusiveAnnotations(elements);
         toTransitionClassName = new ToTransitionClassName(elements);
         toKeywordAnnotations = new ToKeywordAnnotations(elements);
         toKeywordClassName = new ToKeywordClassName();
@@ -64,19 +67,22 @@ public class DslProcessorContext {
         return toType;
     }
 
-
     public JavaMethodFunction getToMethod() {
         return toMethod;
     }
 
-
-    public DependencyManager getDependencyManager() {
-        return dependencyManager;
+    public ToAnyAnnotations getToAnyAnnotations() {
+        return toAnyAnnotations;
     }
 
-    public ToTransitionAnnotations getToTransitionAnnotations() {
-        return toTransitionAnnotations;
+    public ToAllAnnotations getToAllAnnotations() {
+        return toAllAnnotations;
     }
+
+    public ToExclusiveAnnotations getToExclusiveAnnotations() {
+        return toExclusiveAnnotations;
+    }
+
     public ToTransitionClassName getToTransitionClassName() {
         return toTransitionClassName;
     }

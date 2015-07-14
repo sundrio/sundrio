@@ -22,9 +22,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * An annotation to define transitions from the current method to any method annotated with the specified types.
- */
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Any {
