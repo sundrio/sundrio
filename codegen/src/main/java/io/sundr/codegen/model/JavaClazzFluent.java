@@ -47,8 +47,8 @@ public class JavaClazzFluent<T extends JavaClazzFluent<T>> extends AttributeSupp
         return new TypeNested<T>();
     }
 
-    public T addToMethods(JavaMethod item) {
-        if (item != null) {
+    public T addToMethods(JavaMethod ...items) {
+        for (JavaMethod item : items) {
             JavaMethodBuilder builder = new JavaMethodBuilder(item);
             _visitables.add(builder);
             this.methods.add(builder);

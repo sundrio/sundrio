@@ -78,4 +78,34 @@ public class ShapesTest {
 
     }
 
+    @Test
+    public void testAddToWithVisitors() {
+        Canvas canvas = new CanvasBuilder()
+                .addToShapes(new CircleBuilder()
+                        .withX(0)
+                        .withY(0)
+                        .withRadius(10)
+                        .build())
+                .addToShapes(new SquareBuilder()
+                        .withY(10)
+                        .withY(20)
+                        .withHeight(30)
+                        .build())
+                .build();
+
+        canvas = new CanvasBuilder(canvas).accept(new Visitor() {
+            @Override
+            public void visit(Object element) {
+                if (element instanceof CircleBuilder) {
+                    CircleBuilder builder = (CircleBuilder) element;
+                    builder.withRadius(100 + builder.getRadius());
+                }
+            }
+        }).build();
+
+
+        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(1)).getRadius());
+
+    }
+
 }

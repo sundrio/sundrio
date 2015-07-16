@@ -17,9 +17,12 @@
 package io.sundr.codegen.directives;
 
 import io.sundr.Function;
+import io.sundr.builder.Visitor;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
@@ -87,7 +90,7 @@ public class MethodDirective extends Directive {
                     .append(" ")
                     .append(method.getName())
                     .append("(")
-                    .append(join(method.getArguments(), JavaPropertyToString.INSTANCE, ", "))
+                    .append(methodArguments(method.getArguments()))
                     .append(")");
 
             writeExceptions(writer, method);
@@ -104,8 +107,31 @@ public class MethodDirective extends Directive {
         if (method.getExceptions().size() > 0) {
             writer.append(" throws ").append(join(method.getExceptions(), ""));
         }
-
     }
+
+    private String methodArguments(JavaProperty[] arguments) {
+        if (arguments.length == 0) {
+            return "";
+        } else {
+            int lastIndex = arguments.length - 1;
+            if (arguments[lastIndex].isArray()) {
+                JavaProperty[] pre = new JavaProperty[arguments.length -1];
+                System.arraycopy(arguments, 0, pre, 0, arguments.length -1);
+                JavaProperty varArg = new JavaPropertyBuilder(arguments[lastIndex]).accept(new Visitor() {
+                    @Override
+                    public void visit(Object element) {
+                        if (element instanceof JavaTypeBuilder) {
+                            ((JavaTypeBuilder)element).withArray(false);
+                        }
+                    }
+                }).build();
+                return join(pre, JavaPropertyToString.INSTANCE, ", ") + VarArgPropertyToString.INSTANCE.apply(varArg);
+            } else {
+                return join(arguments, JavaPropertyToString.INSTANCE, ", ");
+            }
+        }
+    }
+
     //Enum Singleton
     private enum ModifierToString implements Function<Modifier, String> {
         INSTANCE;
@@ -134,6 +160,19 @@ public class MethodDirective extends Directive {
             StringBuilder sb = new StringBuilder();
             sb.append(join(item.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
             sb.append(item.getType().getSimpleName()).append(" ").append(item.getName());
+            return sb.toString();
+        }
+    }
+
+    private enum VarArgPropertyToString implements Function<JavaProperty, String> {
+        INSTANCE;
+
+        @Override
+        public String apply(JavaProperty item) {
+            StringBuilder sb = new StringBuilder();
+            String propertyType = item.getType().getSimpleName();
+            sb.append(join(item.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
+            sb.append(propertyType).append(" ...").append(item.getName());
             return sb.toString();
         }
     }

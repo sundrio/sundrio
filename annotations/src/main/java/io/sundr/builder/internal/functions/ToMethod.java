@@ -181,9 +181,10 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
     },
     ADD_TO_COLLECTION {
         @Override
-        public JavaMethod apply(JavaProperty property) {
+        public JavaMethod apply(final JavaProperty property) {
             JavaProperty item = new JavaPropertyBuilder(property)
-                    .withName("item")
+                    .withName("items")
+                    .withArray(true)
                     .withType(TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()))
                     .build();
 
@@ -193,9 +194,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String builderClass = builder.getSimpleName();
-                body = "if (item != null) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
+                body = "for ("+ item.getType().getSimpleName()+" item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
             } else if (descendants.size() > 0) {
-                body = StringUtils.join(descendants, new Function<JavaProperty, String>() {
+                body = "for (" + item.getType().getSimpleName() + " item : items) {" +StringUtils.join(descendants, new Function<JavaProperty, String>() {
                     @Override
                     public String apply(JavaProperty item) {
                         JavaType t = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
@@ -204,9 +205,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     }
                 }, " else ");
 
-                body += "return (T)this;";
+                body += "} return (T)this;";
             } else {
-                body = "if (item != null) {this." + property.getName() + ".add(item);} return (T)this;";
+                body = "for ("+ item.getType().getSimpleName()+" item : items) {this." + property.getName() + ".add(item);} return (T)this;";
             }
 
             return new JavaMethodBuilder()
