@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
@@ -26,6 +27,7 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
+import javax.lang.model.element.Modifier;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -141,7 +143,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             JavaMethod emptyConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
-                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(new "+item.getType().getClassName()+"());" : "this.fluent = this;")
+                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(new " + item.getType().getClassName() + "());" : "this.fluent = this;")
                     .build();
 
             JavaMethod fluentConstructor = new JavaMethodBuilder()
@@ -150,7 +152,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withType(fluent)
                     .withName("fluent")
                     .and()
-                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(fluent, new "+item.getType().getClassName()+"());" : "this.fluent = fluent;")
+                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(fluent, new " + item.getType().getClassName() + "());" : "this.fluent = fluent;")
                     .build();
 
             JavaMethod instanceAndFluentCosntructor = new JavaMethodBuilder()
@@ -217,34 +219,86 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
         }
     }, EDITABLE {
-            @Override
-            public JavaClazz apply(JavaClazz item) {
-                JavaType type = item.getType();
-                JavaType editableType = TypeAs.EDITABLE.apply(type);
-                JavaType builderType = TypeAs.BUILDER.apply(type);
+        @Override
+        public JavaClazz apply(JavaClazz item) {
+            JavaType type = item.getType();
+            JavaType editableType = TypeAs.EDITABLE.apply(type);
+            JavaType builderType = TypeAs.BUILDER.apply(type);
 
-                Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
-                Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
+            Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
+            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
 
-                for (JavaMethod constructor : item.getConstructors()) {
-                    constructors.add(superConstructorOf(constructor, editableType));
-                }
-
-                JavaMethod edit = new JavaMethodBuilder()
-                        .withReturnType(builderType)
-                        .withName("edit")
-                        .addToAttributes(BODY, "return new " + builderType.getSimpleName() + "(this);")
-                        .build();
-
-                methods.add(edit);
-
-                return new JavaClazzBuilder()
-                        .withType(editableType)
-                        .withConstructors(constructors)
-                        .withMethods(methods)
-                        .build();
+            for (JavaMethod constructor : item.getConstructors()) {
+                constructors.add(superConstructorOf(constructor, editableType));
             }
-        };
+
+            JavaMethod edit = new JavaMethodBuilder()
+                    .withReturnType(builderType)
+                    .withName("edit")
+                    .addToAttributes(BODY, "return new " + builderType.getSimpleName() + "(this);")
+                    .build();
+
+            methods.add(edit);
+
+            return new JavaClazzBuilder()
+                    .withType(editableType)
+                    .withConstructors(constructors)
+                    .withMethods(methods)
+                    .build();
+        }
+    }, UPDATEABLE {
+        @Override
+        public JavaClazz apply(JavaClazz item) {
+            JavaType type = item.getType();
+            JavaType updateableType = TypeAs.UPDATEABLE.apply(type);
+
+            JavaProperty builderProperty = new JavaPropertyBuilder()
+                    .withType(TypeAs.BUILDER.apply(item.getType()))
+                    .withName("builder")
+                    .addToModifiers(Modifier.PRIVATE)
+                    .addToModifiers(Modifier.FINAL)
+                    .build();
+
+            JavaProperty visitorProperty = new JavaPropertyBuilder()
+                    .withType(typeGenericOf(BuilderContextManager.getContext().getVisitorInterface().getType(), item.getType()))
+                    .withName("visitor")
+                    .addToModifiers(Modifier.PRIVATE)
+                    .addToModifiers(Modifier.FINAL)
+                    .build();
+
+
+            JavaMethod update = new JavaMethodBuilder()
+                    .withReturnType(item.getType())
+                    .withName("update")
+                    .addToAttributes(BODY, item.getType().getSimpleName() + " item = builder.build();visitor.visit(item);return item;")
+                    .addToModifiers(Modifier.PUBLIC)
+                    .build();
+
+            JavaMethod constructor = new JavaMethodBuilder()
+                    .withReturnType(updateableType)
+                    .withName("")
+                    .addNewArgument()
+                        .withName("builder")
+                        .withType(builderProperty.getType())
+                    .and()
+                    .addNewArgument()
+                        .withName("visitor")
+                        .withType(visitorProperty.getType())
+                    .and()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .addToAttributes(BODY,"this.builder=builder;this.visitor=visitor;")
+                    .build();
+
+
+            return new JavaClazzBuilder()
+                    .withType(updateableType)
+                    .addToConstructors(constructor)
+                    .addToFields(builderProperty)
+                    .addToFields(visitorProperty)
+                    .addToMethods(update)
+                    .build();
+        }
+    };
 
 
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
@@ -285,7 +339,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     }
 
     private static JavaMethod superConstructorOf(JavaMethod constructor, JavaType constructorType) {
-       return new JavaMethodBuilder(constructor)
+        return new JavaMethodBuilder(constructor)
                 .withReturnType(constructorType)
                 .addToAttributes(BODY, "super(" + StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
                     @Override

@@ -54,6 +54,9 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 generateFromClazz(context.getEditableInterface(),
                         Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
                 );
+                generateFromClazz(context.getUpdateableInterface(),
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
             } catch (Exception e) {
                 //
             }

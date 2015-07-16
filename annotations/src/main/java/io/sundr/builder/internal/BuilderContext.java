@@ -34,7 +34,6 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
 import static io.sundr.builder.Constants.ARRAY_LIST;
-import static io.sundr.builder.Constants.B;
 import static io.sundr.builder.Constants.BASE_FLUENT;
 import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.BUILDER;
@@ -73,6 +72,7 @@ public class BuilderContext {
     private final JavaClazz visitableInterface;
     private final JavaClazz visitableBuilderInterface;
     private final JavaClazz visitorInterface;
+    private final JavaClazz updateableInterface;
     private final String targetPackage;
     
     private final BuildableRepository repository;
@@ -259,6 +259,19 @@ public class BuilderContext {
                 .withGenericTypes(VISITABLE_BUILDER.getGenericTypes())
                 .and()
                 .build();
+
+        updateableInterface = new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.INTERFACE)
+                .withPackageName(targetPackage)
+                .withClassName(UPDATEABLE.getClassName())
+                .withGenericTypes(UPDATEABLE.getGenericTypes())
+                .and()
+                .addNewMethod()
+                .withReturnType(T)
+                .withName("update")
+                .and()
+                .build();
     }
 
     public Elements getElements() {
@@ -299,6 +312,10 @@ public class BuilderContext {
 
     public JavaClazz getVisitorInterface() {
         return visitorInterface;
+    }
+
+    public JavaClazz getUpdateableInterface() {
+        return updateableInterface;
     }
 
     public BuildableRepository getRepository() {

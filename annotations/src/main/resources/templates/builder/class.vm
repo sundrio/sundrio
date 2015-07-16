@@ -11,6 +11,12 @@ import $i.fullyQualifiedName;
     #field ($f)
 #end
 
+#foreach ($c in ${model.constructors})
+    #method ($c)
+    ${c.attributes.get("BODY")}
+#end
+#end
+
 #foreach($m in $model.methods)
     #method ($m)
     ${m.attributes.get("BODY")}
