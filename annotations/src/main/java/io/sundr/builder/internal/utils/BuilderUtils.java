@@ -18,11 +18,13 @@ package io.sundr.builder.internal.utils;
 
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.PropertyAs;
 import io.sundr.builder.internal.functions.TypeAs;
+import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
@@ -33,6 +35,7 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -245,6 +248,13 @@ public class BuilderUtils {
         return true;
     }
 
+    public static JavaType getInlineType(BuilderContext context, Inline inline) {
+        try {
+            return ClassToJavaType.FUNCTION.apply(inline.type());
+        } catch (MirroredTypeException e) {
+            return context.getToType().apply(e.getTypeMirror().toString());
+        }
+    }
 
     public static boolean isMap(JavaType type) {
         return type.equals(MAP) || type.getInterfaces().contains(MAP);

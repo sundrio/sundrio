@@ -123,7 +123,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     .build();
 
         }
-    }, SHALLOW_UPDATEABLE {
+    }, SHALLOW_INLINEABLE {
         @Override
         public JavaType apply(JavaType item) {
             List<JavaType> generics = new ArrayList<JavaType>();
@@ -131,11 +131,10 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                 generics.add(generic);
             }
             return new JavaTypeBuilder(item)
-                    .withClassName("Updateable" + item.getClassName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .build();
         }
-    }, UPDATEABLE {
+    }, INLINEABLE {
         @Override
         public JavaType apply(JavaType item) {
             JavaType fluent = SHALLOW_FLUENT.apply(item);
@@ -144,10 +143,8 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                 generics.add(generic);
             }
             return new JavaTypeBuilder(item)
-                    .withClassName("Updateable" + item.getClassName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .withSuperClass(typeGenericOf(fluent, SHALLOW_UPDATEABLE.apply(item)))
-                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getUpdateableInterface().getType(), item))))
+                    .withSuperClass(typeGenericOf(fluent, SHALLOW_INLINEABLE.apply(item)))
                     .build();
 
         }

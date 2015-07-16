@@ -14,21 +14,9 @@
  *    limitations under the License.
  */
 
-package io.sundr.builder.annotations;
+package io.sundr.examples.shapes;
 
-import io.sundr.builder.Constants;
+public interface Createable<T> {
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.CONSTRUCTOR)
-@Retention(RetentionPolicy.SOURCE)
-public @interface Buildable {
-
-    boolean editableEnabled() default true;
-    boolean validationEnabled() default false;
-    String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
-    Inline[] inline() default {};
+    T create();
 }

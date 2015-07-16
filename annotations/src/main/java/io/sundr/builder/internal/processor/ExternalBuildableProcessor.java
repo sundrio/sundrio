@@ -17,10 +17,18 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.Inlineable;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.ExternalBuildables;
+import io.sundr.builder.annotations.Inline;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
+import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -30,7 +38,11 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
+
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
 public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
@@ -61,7 +73,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                                 .printMessage(Diagnostic.Kind.WARNING, "Type:" + name + " doesn't exists. Ignoring...");
                         continue;
                     }
-                    JavaClazz clazz = BuilderContextManager.getContext().getToClazz().apply(ModelUtils.getClassElement(typeElement));
+                    BuilderContext ctx = BuilderContextManager.getContext();
+                    JavaClazz clazz = ctx.getToClazz().apply(ModelUtils.getClassElement(typeElement));
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),
@@ -78,8 +91,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                                     selectBuilderTemplate(generated.validationEnabled()));
                         }
 
-                        if (generated.updateableEnabled()) {
-                            generateFromClazz(ClazzAs.UPDATEABLE.apply(clazz),
+
+                        for (final Inline inline : generated.inline()) {
+                            generateFromClazz(inlineableOf(ctx, clazz, inline),
                                     Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
                         }
                     } catch (IOException e) {

@@ -16,19 +16,10 @@
 
 package io.sundr.builder.annotations;
 
-import io.sundr.builder.Constants;
+public @interface Inline {
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.CONSTRUCTOR)
-@Retention(RetentionPolicy.SOURCE)
-public @interface Buildable {
-
-    boolean editableEnabled() default true;
-    boolean validationEnabled() default false;
-    String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
-    Inline[] inline() default {};
+    String value();
+    String prefix() default "";
+    String suffix() default "";
+    Class type();
 }

@@ -17,9 +17,24 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.functions.ClazzAs;
+import io.sundr.builder.internal.functions.TypeAs;
+import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.model.JavaMethod;
+import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
@@ -54,9 +69,6 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 generateFromClazz(context.getEditableInterface(),
                         Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
                 );
-                generateFromClazz(context.getUpdateableInterface(),
-                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
-                );
             } catch (Exception e) {
                 //
             }
@@ -74,5 +86,29 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         } else {
             return Constants.DEFAULT_BUILDER_TEMPLATE_LOCATION;
         }
+    }
+
+
+    JavaClazz inlineableOf(BuilderContext ctx, JavaClazz clazz, Inline inline) {
+        JavaClazz base = ClazzAs.INLINEABLE.apply(clazz);
+        JavaType baseInterface = typeGenericOf(BuilderUtils.getInlineType(ctx, inline), clazz.getType());
+        JavaMethod method = new JavaMethodBuilder(base.getMethods().iterator().next()).withName(inline.value()).build();
+
+        JavaType fluent = TypeAs.SHALLOW_FLUENT.apply(clazz.getType());
+        JavaType shallowInlineType = new JavaTypeBuilder(base.getType())
+                .withClassName(inline.prefix() + base.getType().getClassName() + inline.suffix())
+                .addToInterfaces(baseInterface)
+                .build();
+
+        JavaType inlineType = new JavaTypeBuilder(shallowInlineType)
+                .withSuperClass(typeGenericOf(fluent, shallowInlineType))
+                .build();
+
+        JavaMethod constructor = new JavaMethodBuilder(base.getConstructors().iterator().next()).withReturnType(inlineType).build();
+        return new JavaClazzBuilder(base)
+                .withType(inlineType)
+                .withConstructors(new HashSet<JavaMethod>(Arrays.asList(constructor)))
+                .withMethods(new HashSet<JavaMethod>(Arrays.asList(method)))
+                .build();
     }
 }

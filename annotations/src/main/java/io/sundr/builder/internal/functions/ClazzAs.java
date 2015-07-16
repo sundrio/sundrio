@@ -246,11 +246,11 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withMethods(methods)
                     .build();
         }
-    }, UPDATEABLE {
+    }, INLINEABLE {
         @Override
         public JavaClazz apply(JavaClazz item) {
             JavaType type = item.getType();
-            JavaType updateableType = TypeAs.UPDATEABLE.apply(type);
+            JavaType updateableType = TypeAs.INLINEABLE.apply(type);
 
             JavaProperty builderProperty = new JavaPropertyBuilder()
                     .withType(TypeAs.BUILDER.apply(item.getType()))
@@ -299,7 +299,6 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .build();
         }
     };
-
 
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
         return new JavaPropertyBuilder(property)

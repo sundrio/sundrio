@@ -17,11 +17,22 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.Inlineable;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
+import io.sundr.builder.internal.functions.TypeAs;
+import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.model.JavaMethod;
+import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -29,9 +40,17 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
 public class BuildableProcessor extends AbstractBuilderProcessor {
@@ -73,8 +92,8 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                                     selectBuilderTemplate(buildable.validationEnabled()));
                         }
 
-                        if (buildable.updateableEnabled()) {
-                            generateFromClazz(ClazzAs.UPDATEABLE.apply(clazz),
+                        for (final Inline inline : buildable.inline()) {
+                            generateFromClazz(inlineableOf(ctx, clazz, inline),
                                     Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
                         }
                     } catch (IOException e) {
@@ -85,4 +104,5 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         }
         return true;
     }
+
 }

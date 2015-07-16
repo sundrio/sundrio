@@ -17,6 +17,7 @@
 package io.sundr.builder.internal;
 
 import io.sundr.builder.Builder;
+import io.sundr.builder.annotations.Inline;
 
 import javax.lang.model.util.Elements;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,8 +32,8 @@ public class BuilderContextManager {
         return ctx;
     }
 
-    public static BuilderContext create(Elements elements, String packageName) {
-        BuilderContext ctx = new BuilderContext(elements, packageName);
+    public static BuilderContext create(Elements elements, String packageName, Inline...inlineables) {
+        BuilderContext ctx = new BuilderContext(elements, packageName, inlineables);
         if (context.compareAndSet(null, ctx)) {
             return ctx;
         } else {

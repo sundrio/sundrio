@@ -17,6 +17,7 @@
 package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.Inline;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,10 @@ public class Canvas {
 
     private final List<Shape> shapes;
 
-    @Buildable
+    @Buildable(inline = {
+            @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+            @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+    })
     public Canvas(List<Shape> shapes) {
         this.shapes = Collections.unmodifiableList(shapes);
     }

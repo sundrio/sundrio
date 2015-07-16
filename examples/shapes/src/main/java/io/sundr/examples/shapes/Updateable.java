@@ -14,12 +14,8 @@
  *    limitations under the License.
  */
 
-package io.sundr.builder;
+package io.sundr.examples.shapes;
 
-/**
- * An interface that describes an Updateable object.
- * @param <T>
- */
 public interface Updateable<T> {
 
     T update();

@@ -17,6 +17,7 @@
 package io.sundr.builder.internal;
 
 import io.sundr.Function;
+import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
 import io.sundr.codegen.coverters.JavaClazzFunction;
@@ -72,14 +73,15 @@ public class BuilderContext {
     private final JavaClazz visitableInterface;
     private final JavaClazz visitableBuilderInterface;
     private final JavaClazz visitorInterface;
-    private final JavaClazz updateableInterface;
+    private final JavaClazz inlineableBase;
     private final String targetPackage;
-    
+    private final Inline[] inlineables;
     private final BuildableRepository repository;
 
-    public BuilderContext(Elements elements, String targetPackage) {
+    public BuilderContext(Elements elements, String targetPackage, Inline... inlineables) {
         this.elements = elements;
         this.targetPackage = targetPackage;
+        this.inlineables = inlineables;
 
         toType = new ToBuildableJavaType(elements);
         toProperty = new ToBuildableJavaProperty(toType);
@@ -260,16 +262,16 @@ public class BuilderContext {
                 .and()
                 .build();
 
-        updateableInterface = new JavaClazzBuilder()
+        inlineableBase = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
                 .withPackageName(targetPackage)
-                .withClassName(UPDATEABLE.getClassName())
-                .withGenericTypes(UPDATEABLE.getGenericTypes())
+                .withClassName(INLINEABLE.getClassName())
+                .withGenericTypes(INLINEABLE.getGenericTypes())
                 .and()
                 .addNewMethod()
                 .withReturnType(T)
-                .withName("update")
+                .withName("inline")
                 .and()
                 .build();
     }
@@ -314,8 +316,27 @@ public class BuilderContext {
         return visitorInterface;
     }
 
-    public JavaClazz getUpdateableInterface() {
-        return updateableInterface;
+    public JavaClazz getInlineableBase() {
+        return inlineableBase;
+    }
+
+    public JavaClazz getInlineableInterface(Inline inline) {
+        return new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.INTERFACE)
+                .withPackageName(targetPackage)
+                .withClassName(inline.prefix() + INLINEABLE.getClassName() + inline.suffix())
+                .withGenericTypes(INLINEABLE.getGenericTypes())
+                .and()
+                .addNewMethod()
+                .withReturnType(T)
+                .withName(inline.value())
+                .and()
+                .build();
+    }
+
+    public Inline[] getInlineables() {
+        return inlineables;
     }
 
     public BuildableRepository getRepository() {
