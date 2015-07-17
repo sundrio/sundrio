@@ -251,6 +251,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         @Override
         public JavaClazz apply(JavaClazz item) {
             JavaType type = item.getType();
+            JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(item.getType());
             JavaType updateableType = TypeAs.INLINEABLE.apply(type);
 
             JavaProperty builderProperty = new JavaPropertyBuilder()
@@ -279,15 +280,15 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withReturnType(updateableType)
                     .withName("")
                     .addNewArgument()
-                        .withName("builder")
-                        .withType(builderProperty.getType())
+                        .withName("item")
+                        .withType(item.getType())
                     .and()
                     .addNewArgument()
                         .withName("visitor")
                         .withType(visitorProperty.getType())
                     .and()
                     .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY,"this.builder=builder;this.visitor=visitor;")
+                    .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this, item);this.visitor=visitor;")
                     .build();
 
 
