@@ -276,7 +276,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .addToModifiers(Modifier.PUBLIC)
                     .build();
 
-            JavaMethod constructor = new JavaMethodBuilder()
+            JavaMethod constructor1 = new JavaMethodBuilder()
                     .withReturnType(updateableType)
                     .withName("")
                     .addNewArgument()
@@ -292,9 +292,22 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .build();
 
 
+            JavaMethod constructor2 = new JavaMethodBuilder()
+                    .withReturnType(updateableType)
+                    .withName("")
+                    .addNewArgument()
+                    .withName("visitor")
+                    .withType(visitorProperty.getType())
+                    .and()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this);this.visitor=visitor;")
+                    .build();
+
+
             return new JavaClazzBuilder()
                     .withType(updateableType)
-                    .addToConstructors(constructor)
+                    .addToConstructors(constructor1)
+                    .addToConstructors(constructor2)
                     .addToFields(builderProperty)
                     .addToFields(visitorProperty)
                     .addToMethods(update)

@@ -33,6 +33,8 @@ import io.sundr.codegen.processor.JavaGeneratingProcessor;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
@@ -104,10 +106,14 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .withSuperClass(typeGenericOf(fluent, shallowInlineType))
                 .build();
 
-        JavaMethod constructor = new JavaMethodBuilder(base.getConstructors().iterator().next()).withReturnType(inlineType).build();
+        Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
+        for (JavaMethod constructor : base.getConstructors()) {
+            constructors.add(new JavaMethodBuilder(constructor).withReturnType(inlineType).build());
+        }
+
         return new JavaClazzBuilder(base)
                 .withType(inlineType)
-                .withConstructors(new HashSet<JavaMethod>(Arrays.asList(constructor)))
+                .withConstructors(constructors)
                 .withMethods(new HashSet<JavaMethod>(Arrays.asList(method)))
                 .build();
     }
