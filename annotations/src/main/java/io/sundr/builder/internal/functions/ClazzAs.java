@@ -67,6 +67,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
+                    methods.add(ToMethod.WITH_ARRAY.apply(property));
                 } else if (isMap(property.getType())) {
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));

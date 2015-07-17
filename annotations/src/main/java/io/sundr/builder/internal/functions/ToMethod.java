@@ -35,6 +35,7 @@ import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
@@ -92,14 +93,21 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             String methodName = "with" + property.getNameCapitalized();
-            JavaType unwraped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getType());
+            JavaType unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getType());
             String addToMethodName = "addTo" + property.getNameCapitalized();
+
+            JavaProperty arrayProperty = new JavaPropertyBuilder(property)
+                    .withType(new JavaTypeBuilder(unwraped)
+                            .withArray(true)
+                            .build())
+                    .withArray(true)
+                    .build();
 
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
-                    .withArguments(new JavaProperty[]{property})
+                    .withArguments(new JavaProperty[]{arrayProperty})
                     .addToAttributes(BODY, "this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (T) this;")
                     .build();
         }
