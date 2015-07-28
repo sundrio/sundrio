@@ -101,6 +101,12 @@ public interface KubernetesDSL {
     ReplicationController getReplicationController();
 
     @Terminal
+    @MethodName("scale")
+    @InterfaceName("ReplicationControllerScalable")
+    @All({ReplicationControllerOption.class, NamedOption.class, NamespaceOption.class})
+    void scale(int replicaCount);
+
+    @Terminal
     @MethodName("get")
     @InterfaceName("ServiceGettable")
     @All({ServiceOption.class, NamedOption.class, NamespaceOption.class})
