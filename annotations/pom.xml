@@ -28,7 +28,7 @@
     <groupId>io.sundr</groupId>
     <artifactId>sundr-annotations</artifactId>
     <packaging>jar</packaging>
-    <name>Sundrio :: Annottions</name>
+    <name>Sundrio :: Annotations</name>
 
     <build>
         <plugins>
