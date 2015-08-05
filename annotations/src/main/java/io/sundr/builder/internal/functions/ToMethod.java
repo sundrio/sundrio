@@ -227,6 +227,46 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
         }
     },
+    REMOVE_FROM_COLLECTION {
+        @Override
+        public JavaMethod apply(final JavaProperty property) {
+            JavaProperty item = new JavaPropertyBuilder(property)
+                    .withName("items")
+                    .withArray(true)
+                    .withType(TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()))
+                    .build();
+
+            String methodName = "removeFrom" + property.getNameCapitalized();
+            String body = "";
+            Set<JavaProperty> descendants = getPropertyBuildableAncestors(property);
+            if (isBuildable(property)) {
+                JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
+                String builderClass = builder.getSimpleName();
+                body = "for (" + item.getType().getSimpleName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (T)this;";
+            } else if (descendants.size() > 0) {
+                body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
+                    @Override
+                    public String apply(JavaProperty item) {
+                        JavaType t = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+                        String removeFromMethodName = "removeFrom" + captializeFirst(item.getName());
+                        return "if (item instanceof " + t.getSimpleName() + "){" + removeFromMethodName + "((" + t.getSimpleName() + ")item);}\n";
+                    }
+                }, " else ");
+
+                body += "} return (T)this;";
+            } else {
+                body = "for (" + item.getType().getSimpleName() + " item : items) {this." + property.getName() + ".remove(item);} return (T)this;";
+            }
+
+            return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withName(methodName)
+                    .withReturnType(T)
+                    .withArguments(new JavaProperty[]{item})
+                    .addToAttributes(BODY, body)
+                    .build();
+        }
+    },
     ADD_TO_MAP {
         @Override
         public JavaMethod apply(JavaProperty property) {
@@ -243,6 +283,22 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withReturnType(T)
                     .withArguments(new JavaProperty[]{keyProperty, valueProperty})
                     .addToAttributes(BODY, "if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return (T)this;")
+                    .build();
+        }
+    },  REMOVE_FROM_MAP {
+        @Override
+        public JavaMethod apply(JavaProperty property) {
+            JavaType mapType = property.getType();
+            JavaType keyType = mapType.getGenericTypes()[0];
+
+            JavaProperty keyProperty = new JavaPropertyBuilder().withName("key").withType(keyType).build();
+            String methodName = "removeFrom" + property.getNameCapitalized();
+            return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withName(methodName)
+                    .withReturnType(T)
+                    .withArguments(new JavaProperty[]{keyProperty})
+                    .addToAttributes(BODY, "if(key != null) {this." + property.getName() + ".remove(key);} return (T)this;")
                     .build();
         }
     }, WITH_NEW_NESTED {

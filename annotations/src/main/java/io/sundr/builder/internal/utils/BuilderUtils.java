@@ -256,6 +256,15 @@ public class BuilderUtils {
         }
     }
 
+    public static boolean isPrimitive(JavaType type) {
+        for (JavaType t :Constants.PRIMITIVE_TYPES) {
+            if (type.getSimpleName().equals(t.getSimpleName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isMap(JavaType type) {
         return type.equals(MAP) || type.getInterfaces().contains(MAP);
     }

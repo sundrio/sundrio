@@ -17,7 +17,10 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
@@ -28,7 +31,9 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
 import javax.lang.model.element.Modifier;
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
@@ -62,14 +67,17 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH_ARRAY.apply(property));
                     methods.add(ToMethod.GETTER_ARRAY.apply(property));
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
+                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
                     toAdd = asList;
                 } else if (isSet(property.getType()) || isList(property.getType())) {
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
+                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(property));
                 } else if (isMap(property.getType())) {
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
+                    methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
@@ -103,6 +111,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     for (JavaProperty descendant : descendants) {
                         if (descendant.getType().isCollection()) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
+                            methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
@@ -122,6 +131,16 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     properties.add(toAdd);
                 }
             }
+
+            JavaMethod equals = new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withReturnType(ClassToJavaType.FUNCTION.apply(boolean.class))
+                    .addNewArgument().withName("o").withType(Constants.OBJECT).endArgument()
+                    .withName("equals")
+                    .addToAttributes(BODY, toEquals(fluentType, properties))
+                    .build();
+
+            methods.add(equals);
 
             return new JavaClazzBuilder(item)
                     .withType(fluentType)
@@ -188,6 +207,15 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .build();
 
             methods.add(build);
+
+            JavaMethod equals = new JavaMethodBuilder()
+                    .withReturnType(ClassToJavaType.FUNCTION.apply(boolean.class))
+                    .addNewArgument().withName("o").withType(Constants.OBJECT).endArgument()
+                    .withName("equals")
+                    .addToAttributes(BODY, toEquals(builderType, fields))
+                    .build();
+
+            methods.add(equals);
 
             return new JavaClazzBuilder(item)
                     .withType(builderType)
@@ -349,6 +377,36 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         sb.append(");\n");
         sb.append("validate(buildable);\n");
         sb.append("return buildable;\n");
+        return sb.toString();
+    }
+
+
+    private static String toEquals(JavaType type, Collection<JavaProperty> properties) {
+        String simpleName = type.getClassName();
+        JavaType superClass = type.getSuperClass();
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        sb.append("if (this == o) return true;").append("\n");
+        sb.append("if (o == null || getClass() != o.getClass()) return false;").append("\n");
+        //If base fluent is the superclass just skip.
+        if (!Constants.BASE_FLUENT.getClassName().equals(superClass.getClassName())) {
+            sb.append("if (!super.equals(o)) return false;").append("\n");
+        }
+        sb.append(simpleName).append(" that = (").append(simpleName).append(") o;").append("\n");
+        for (JavaProperty property : properties) {
+            String name = property.getName();
+            if (BuilderUtils.isPrimitive(property.getType())) {
+                sb.append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").append("\n");
+            } else if (BuilderUtils.isDescendant(type, property.getType())) {
+                sb.append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
+                        .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n");
+            } else {
+                sb.append("if (").append(name).append(" != null ? !").append(name).append(".equals(that.").append(name).append(") :")
+                        .append("that.").append(name).append(" != null) return false;").append("\n");
+            }
+        }
+
+        sb.append("return true;").append("\n");
         return sb.toString();
     }
 
