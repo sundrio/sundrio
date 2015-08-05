@@ -28,10 +28,11 @@ import io.sundr.codegen.utils.StringUtils;
 import javax.lang.model.element.Modifier;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
+import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
@@ -160,17 +161,16 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             JavaType type = property.getType();
-            JavaType builderType = VISITABLE_BUILDER.apply(type);
+            Boolean isBuildable = isBuildable(type);
+            JavaType targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
+            String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,type.getClassName(), targetType.getSimpleName(), property.getName(), type.getClassName());
 
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(property.getType())
                     .withArguments(new JavaProperty[]{})
-                    .addToAttributes(BODY, String.format(ARRAY_GETTER_TEXT, type.getClassName(),
-                            builderType.getSimpleName(),
-                            property.getName(),
-                            type.getClassName()))
+                    .addToAttributes(BODY, body)
                     .build();
         }
     },
@@ -202,9 +202,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String builderClass = builder.getSimpleName();
-                body = "for ("+ item.getType().getSimpleName()+" item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
+                body = "for (" + item.getType().getSimpleName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
             } else if (descendants.size() > 0) {
-                body = "for (" + item.getType().getSimpleName() + " item : items) {" +StringUtils.join(descendants, new Function<JavaProperty, String>() {
+                body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
                     @Override
                     public String apply(JavaProperty item) {
                         JavaType t = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
@@ -215,7 +215,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
                 body += "} return (T)this;";
             } else {
-                body = "for ("+ item.getType().getSimpleName()+" item : items) {this." + property.getName() + ".add(item);} return (T)this;";
+                body = "for (" + item.getType().getSimpleName() + " item : items) {this." + property.getName() + ".add(item);} return (T)this;";
             }
 
             return new JavaMethodBuilder()
@@ -348,5 +348,6 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         }
     };
 
-    private static final String ARRAY_GETTER_TEXT = loadResourceQuietly(ARRAY_GETTER_SNIPPET);
+    private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
+    private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
 }

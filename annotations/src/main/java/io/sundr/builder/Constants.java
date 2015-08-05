@@ -76,6 +76,7 @@ public class Constants {
     public static final String AGGREGATE_SET_SNIPPET = "snippets/aggregate-set.txt";
     public static final String AGGREGATE_LIST_SNIPPET = "snippets/aggregate-list.txt";
     public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";
-    public static final String ARRAY_GETTER_SNIPPET = "snippets/array-getter.txt";
+    public static final String SIMPLE_ARRAY_GETTER_SNIPPET = "snippets/simple-array-getter.txt";
+    public static final String BUILDABLE_ARRAY_GETTER_SNIPPET = "snippets/buildable-array-getter.txt";
 
 }

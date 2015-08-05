@@ -1,0 +1,5 @@
+List<%s> result = new ArrayList<>();
+for (%s item : %s) {
+    result.add(item);
+}
+return result.toArray(new %s[result.size()]);
