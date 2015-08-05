@@ -19,16 +19,17 @@ package io.sundr.examples.shapes;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
 
+@Buildable(inline = {
+        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+})
 public class Circle implements Shape{
 
     private final int x;
     private final int y;
     private final int radius;
 
-    @Buildable(inline = {
-            @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-            @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
-    })
+
     public Circle(int x, int y, int radius) {
         this.x = x;
         this.y = y;

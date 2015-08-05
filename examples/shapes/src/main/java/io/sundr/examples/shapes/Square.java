@@ -19,16 +19,16 @@ package io.sundr.examples.shapes;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
 
+@Buildable(inline = {
+        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+})
 public class Square implements Rectangle {
 
     private final int x;
     private final int y;
     private final int height;
 
-    @Buildable(inline = {
-            @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-            @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
-    })
     public Square(int x, int y, int height) {
         this.x = x;
         this.y = y;

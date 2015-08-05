@@ -45,9 +45,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
                 BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
-                if (element instanceof ExecutableElement) {
-                    ctx.getRepository().register(ModelUtils.getClassElement(element));
-                }
+                ctx.getRepository().register(ModelUtils.getClassElement(element));
             }
         }
 

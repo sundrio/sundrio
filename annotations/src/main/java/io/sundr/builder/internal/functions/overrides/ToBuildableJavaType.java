@@ -68,6 +68,9 @@ public class ToBuildableJavaType implements Function<String, JavaType> {
 
     private boolean isBuildable(TypeElement typeElement) {
         if (typeElement != null) {
+            if (typeElement.getAnnotation(Buildable.class) != null) {
+                return true;
+            }
             for (Element el : typeElement.getEnclosedElements()) {
                 if (el.getAnnotation(Buildable.class) != null) {
                     return true;
