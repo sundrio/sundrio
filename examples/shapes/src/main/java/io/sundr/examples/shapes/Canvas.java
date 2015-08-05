@@ -23,14 +23,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Buildable(inline = {
+        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+})
 public class Canvas {
 
     private final List<Shape> shapes;
 
-    @Buildable(inline = {
-            @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-            @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
-    })
     public Canvas(List<Shape> shapes) {
         this.shapes = Collections.unmodifiableList(shapes);
     }
