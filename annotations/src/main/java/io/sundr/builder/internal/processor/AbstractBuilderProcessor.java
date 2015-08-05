@@ -42,7 +42,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
     void generateLocalDependenciesIfNeeded() {
         BuilderContext context = BuilderContextManager.getContext();
-        if (!Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getTargetPackage())) {
+        if (context.getGenerateBuilderPackage() && !Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getBuilderPackage())) {
             try {
                 generateFromClazz(context.getVisitableInterface(),
                         Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION

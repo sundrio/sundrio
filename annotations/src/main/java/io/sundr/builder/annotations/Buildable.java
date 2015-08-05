@@ -29,6 +29,7 @@ public @interface Buildable {
 
     boolean editableEnabled() default true;
     boolean validationEnabled() default false;
+    boolean generateBuilderPackage() default false;
     String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
     Inline[] inline() default {};
 }

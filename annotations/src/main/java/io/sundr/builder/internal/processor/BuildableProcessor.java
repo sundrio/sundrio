@@ -44,7 +44,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
-                BuilderContext ctx = BuilderContextManager.create(elements, buildable.builderPackage());
+                BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
                 if (element instanceof ExecutableElement) {
                     ctx.getRepository().register(ModelUtils.getClassElement(element));
                 }
@@ -54,7 +54,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
-                BuilderContext ctx = BuilderContextManager.create(elements, buildable.builderPackage());
+                BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
                 JavaClazz clazz = ctx.getToClazz().apply(ModelUtils.getClassElement(element));
                 generateLocalDependenciesIfNeeded();
                 try {

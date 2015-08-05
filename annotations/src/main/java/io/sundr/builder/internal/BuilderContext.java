@@ -74,13 +74,15 @@ public class BuilderContext {
     private final JavaClazz visitableBuilderInterface;
     private final JavaClazz visitorInterface;
     private final JavaClazz inlineableBase;
-    private final String targetPackage;
+    private final Boolean generateBuilderPackage;
+    private final String builderPackage;
     private final Inline[] inlineables;
     private final BuildableRepository repository;
 
-    public BuilderContext(Elements elements, String targetPackage, Inline... inlineables) {
+    public BuilderContext(Elements elements, Boolean generateBuilderPackage, String builderPackage, Inline... inlineables) {
         this.elements = elements;
-        this.targetPackage = targetPackage;
+        this.generateBuilderPackage = generateBuilderPackage;
+        this.builderPackage = builderPackage;
         this.inlineables = inlineables;
 
         toType = new ToBuildableJavaType(elements);
@@ -93,7 +95,7 @@ public class BuilderContext {
         visitorInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(VISITOR.getClassName())
                 .withGenericTypes(VISITOR.getGenericTypes())
                 .and()
@@ -113,7 +115,7 @@ public class BuilderContext {
         visitableInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(VISITABLE.getClassName())
                 .withGenericTypes(new JavaType[]{V})
                 .and()
@@ -132,7 +134,7 @@ public class BuilderContext {
         
         builderInterface = new JavaClazzBuilder()
                 .withNewType()
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withKind(JavaKind.INTERFACE)
                 .withClassName(BUILDER.getClassName())
                 .withGenericTypes(BUILDER.getGenericTypes())
@@ -146,7 +148,7 @@ public class BuilderContext {
         fluentInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(FLUENT.getClassName())
                 .withGenericTypes(FLUENT.getGenericTypes())
                 .and()
@@ -155,7 +157,7 @@ public class BuilderContext {
         baseFluentClass = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.CLASS)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(BASE_FLUENT.getClassName())
                 .withGenericTypes(BASE_FLUENT.getGenericTypes())
                 .addToInterfaces(fluentInterface.getType())
@@ -228,7 +230,7 @@ public class BuilderContext {
         nestedInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(NESTED.getClassName())
                 .withGenericTypes(NESTED.getGenericTypes())
                 .and()
@@ -241,7 +243,7 @@ public class BuilderContext {
         editableInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(EDITABLE.getClassName())
                 .withGenericTypes(EDITABLE.getGenericTypes())
                 .and()
@@ -254,7 +256,7 @@ public class BuilderContext {
         visitableBuilderInterface = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(VISITABLE_BUILDER.getClassName())
                 .addToInterfaces(visitableInterface.getType())
                 .addToInterfaces(builderInterface.getType())
@@ -265,7 +267,7 @@ public class BuilderContext {
         inlineableBase = new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(INLINEABLE.getClassName())
                 .withGenericTypes(INLINEABLE.getGenericTypes())
                 .and()
@@ -280,8 +282,12 @@ public class BuilderContext {
         return elements;
     }
 
-    public String getTargetPackage() {
-        return targetPackage;
+    public Boolean getGenerateBuilderPackage() {
+        return generateBuilderPackage;
+    }
+
+    public String getBuilderPackage() {
+        return builderPackage;
     }
 
     public JavaClazz getBaseFluentClass() {
@@ -324,7 +330,7 @@ public class BuilderContext {
         return new JavaClazzBuilder()
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
-                .withPackageName(targetPackage)
+                .withPackageName(builderPackage)
                 .withClassName(inline.prefix() + INLINEABLE.getClassName() + inline.suffix())
                 .withGenericTypes(INLINEABLE.getGenericTypes())
                 .and()

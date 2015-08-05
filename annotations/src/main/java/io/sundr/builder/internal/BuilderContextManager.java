@@ -27,23 +27,26 @@ public class BuilderContextManager {
     private static final AtomicReference<BuilderContext> context = new AtomicReference<BuilderContext>();
 
     public static BuilderContext create(Elements elements) {
-        BuilderContext ctx = new BuilderContext(elements, Builder.class.getPackage().getName());
+        BuilderContext ctx = new BuilderContext(elements, false, Builder.class.getPackage().getName());
         context.set(ctx);
         return ctx;
     }
 
-    public static BuilderContext create(Elements elements, String packageName, Inline...inlineables) {
-        BuilderContext ctx = new BuilderContext(elements, packageName, inlineables);
+    public static BuilderContext create(Elements elements, Boolean generateBuilderPackage, String packageName, Inline...inlineables) {
+        BuilderContext ctx = new BuilderContext(elements, generateBuilderPackage, packageName, inlineables);
         if (context.compareAndSet(null, ctx)) {
             return ctx;
         } else {
             BuilderContext existing = context.get();
-            if (packageName.equals(existing.getTargetPackage())) {
+            if (!packageName.equals(existing.getBuilderPackage())) {
+                throw new IllegalStateException("Cannot use different builder package names in a single project. Used:"
+                        + packageName + " but package:"
+                        + existing.getGenerateBuilderPackage() + " already exists.");
+            } else if (!generateBuilderPackage.equals(existing.getGenerateBuilderPackage())) {
+                throw new IllegalStateException("Cannot use different values for generate builder package in a single project.");
+            } else {
                 return existing;
             }
-            throw new IllegalStateException("Cannot use different target package names in a single project. Used:"
-                    + packageName + " but package:"
-                    + existing.getTargetPackage() + " already exists.");
         }
     }
 

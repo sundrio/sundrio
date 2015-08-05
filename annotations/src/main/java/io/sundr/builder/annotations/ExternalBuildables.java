@@ -29,6 +29,7 @@ public @interface ExternalBuildables {
 
     boolean editableEnabled() default true;
     boolean validationEnabled() default false;
+    boolean generateBuilderPackage() default false;
     String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
     String[] value() default {};
     Inline[] inline() default {};
