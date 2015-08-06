@@ -18,12 +18,16 @@ package io.sundr.builder.internal.utils;
 
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.BuildableReference;
+import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.PropertyAs;
 import io.sundr.builder.internal.functions.TypeAs;
+import io.sundr.codegen.Type;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
@@ -254,6 +258,30 @@ public class BuilderUtils {
         } catch (MirroredTypeException e) {
             return context.getToType().apply(e.getTypeMirror().toString());
         }
+    }
+
+    public static Set<TypeElement> getBuildableReferences(BuilderContext context, Buildable buildable) {
+        Set<TypeElement> result = new LinkedHashSet<TypeElement>();
+        for (BuildableReference ref : buildable.refs()) {
+            try {
+                result.add(context.getElements().getTypeElement(ref.value().getCanonicalName()));
+            } catch (MirroredTypeException e) {
+                result.add(context.getElements().getTypeElement(e.getTypeMirror().toString()));
+            }
+        }
+        return result;
+    }
+
+    public static Set<TypeElement> getBuildableReferences(BuilderContext context, ExternalBuildables buildable) {
+        Set<TypeElement> result = new LinkedHashSet<TypeElement>();
+        for (BuildableReference ref : buildable.refs()) {
+            try {
+                result.add(context.getElements().getTypeElement(ref.value().getCanonicalName()));
+            } catch (MirroredTypeException e) {
+                result.add(context.getElements().getTypeElement(e.getTypeMirror().toString()));
+            }
+        }
+        return result;
     }
 
     public static boolean isPrimitive(JavaType type) {

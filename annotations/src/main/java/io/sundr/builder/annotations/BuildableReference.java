@@ -16,21 +16,7 @@
 
 package io.sundr.builder.annotations;
 
-import io.sundr.builder.Constants;
+public @interface BuildableReference {
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target({ElementType.CONSTRUCTOR, ElementType.TYPE})
-@Retention(RetentionPolicy.SOURCE)
-public @interface Buildable {
-
-    boolean editableEnabled() default true;
-    boolean validationEnabled() default false;
-    boolean generateBuilderPackage() default false;
-    String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
-    BuildableReference[] refs() default {};
-    Inline[] inline() default {};
+    Class value();
 }

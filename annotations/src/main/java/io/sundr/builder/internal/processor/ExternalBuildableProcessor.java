@@ -24,6 +24,7 @@ import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
+import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
@@ -54,10 +55,13 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
-                BuilderContextManager.create(elements, generated.generateBuilderPackage(), generated.builderPackage());
+                BuilderContext ctx = BuilderContextManager.create(elements, generated.generateBuilderPackage(), generated.builderPackage());
                 for (String name : generated.value()) {
                     TypeElement typeElement = elements.getTypeElement(name);
-                    BuilderContextManager.getContext().getRepository().register(typeElement);
+                    ctx.getRepository().register(typeElement);
+                }
+                for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
+                    ctx.getRepository().register(ModelUtils.getClassElement(ref));
                 }
             }
         }

@@ -18,10 +18,12 @@ package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.BuildableReference;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
+import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.utils.ModelUtils;
 
@@ -46,6 +48,9 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                 Buildable buildable = element.getAnnotation(Buildable.class);
                 BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
                 ctx.getRepository().register(ModelUtils.getClassElement(element));
+                for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
+                    ctx.getRepository().register(ModelUtils.getClassElement(ref));
+                }
             }
         }
 

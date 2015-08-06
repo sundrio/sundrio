@@ -31,6 +31,7 @@ public @interface ExternalBuildables {
     boolean validationEnabled() default false;
     boolean generateBuilderPackage() default false;
     String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
+    BuildableReference[] refs() default {};
     String[] value() default {};
     Inline[] inline() default {};
 }
