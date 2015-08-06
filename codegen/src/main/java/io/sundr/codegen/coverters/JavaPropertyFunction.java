@@ -22,6 +22,7 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 
 public class JavaPropertyFunction implements Function<VariableElement, JavaProperty> {
@@ -33,7 +34,7 @@ public class JavaPropertyFunction implements Function<VariableElement, JavaPrope
     }
 
     @Override
-    public JavaProperty apply(VariableElement variableElement) {
+    public JavaProperty apply(final VariableElement variableElement) {
         String name = variableElement.getSimpleName().toString();
         boolean isArray = variableElement.asType().toString().endsWith("[]");
         JavaType type = new JavaTypeBuilder(toType.apply(variableElement.asType().toString())).withArray(isArray).build();
@@ -41,6 +42,7 @@ public class JavaPropertyFunction implements Function<VariableElement, JavaPrope
                 .withName(name)
                 .withType(type)
                 .withArray(isArray)
+                .withModifiers(variableElement.getModifiers())
                 .build();
     }
 
