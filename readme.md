@@ -140,6 +140,31 @@ public class Demo {
 }
 ```
 
+### Editable Builders
+
+By default the objects created by the builder are *editable*. This
+means that the created object automatically implement a method
+`edit()` which, if called, returns a new builder initialized with the
+data of the current object.
+
+Consider for example the `Circle` object then you can use the
+following code to easily create a modified clone of it:
+
+```java
+Circle circle = new CircleBuilder()
+                      .withX(10)
+                      .withY(10)
+                      .withRadius(100)
+                      .build();
+
+// Create a new CircleBuilder with edit(), set props and the build
+Circle clone = ((Editable) circle).edit().withRadius(120).build();
+```
+
+You can disable this behaviour by using `@Buildable(editableEnabled =
+false)` 
+
+
 ### Eliminating runtime dependencies
 
 In case you need to avoid having any kind of runtime dependency to
