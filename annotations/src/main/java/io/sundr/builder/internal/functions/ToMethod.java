@@ -26,7 +26,9 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 
 import javax.lang.model.element.Modifier;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
@@ -120,7 +122,14 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             String methodName = prefix + property.getNameCapitalized();
             String body = null;
 
-            Set<JavaProperty> descendants = getPropertyBuildableAncestors(property);
+            TreeSet<JavaProperty> descendants = new TreeSet<JavaProperty>(new Comparator<JavaProperty>() {
+                @Override
+                public int compare(JavaProperty left, JavaProperty right) {
+                    return left.getName().compareTo(right.getName());
+                }
+            });
+            descendants.addAll(getPropertyBuildableAncestors(property));
+
             if (isMap(property.getType())) {
                 body = "return this." + property.getName() + ";";
             } else if (isBuildable(property)) {

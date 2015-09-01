@@ -74,7 +74,7 @@ public class ShapesTest {
         }).build();
 
 
-        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(1)).getRadius());
+        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
 
     }
 
@@ -104,7 +104,7 @@ public class ShapesTest {
         }).build();
 
 
-        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(1)).getRadius());
+        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class ShapesTest {
                 .build();
 
 
-        Circle circle = (Circle) canvas.getShapes().get(1);
+        Circle circle = (Circle) canvas.getShapes().get(0);
         canvas = new CanvasBuilder(canvas).removeFromShapes(circle).build();
 
         canvas = new CanvasBuilder(canvas).accept(new Visitor() {
