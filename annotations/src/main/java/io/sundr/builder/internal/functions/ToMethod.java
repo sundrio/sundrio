@@ -131,7 +131,6 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 }
             } else if (descendants.size() > 0) {
                 if (isList(property.getType()) || isSet(property.getType())) {
-                    JavaType type = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
                     String names = StringUtils.join(descendants, new Function<JavaProperty, String>() {
                         @Override
                         public String apply(JavaProperty item) {
