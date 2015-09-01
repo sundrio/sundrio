@@ -17,7 +17,7 @@
 package io.sundr.builder.internal.functions.overrides;
 
 import io.sundr.Function;
-import io.sundr.codegen.coverters.JavaPropertyFunction;
+import io.sundr.codegen.converters.JavaPropertyFunction;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;

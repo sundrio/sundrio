@@ -17,9 +17,9 @@
 package io.sundr.dsl.internal.processor;
 
 import io.sundr.Function;
-import io.sundr.codegen.coverters.JavaMethodFunction;
-import io.sundr.codegen.coverters.JavaPropertyFunction;
-import io.sundr.codegen.coverters.JavaTypeFunction;
+import io.sundr.codegen.converters.JavaMethodFunction;
+import io.sundr.codegen.converters.JavaPropertyFunction;
+import io.sundr.codegen.converters.JavaTypeFunction;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.dsl.internal.element.functions.ToAllAnnotations;
