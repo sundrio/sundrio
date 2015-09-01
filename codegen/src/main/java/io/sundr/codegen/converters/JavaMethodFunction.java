@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.coverters;
+package io.sundr.codegen.converters;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaMethod;

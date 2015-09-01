@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.coverters;
+package io.sundr.codegen.converters;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaProperty;
@@ -22,7 +22,6 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 
 public class JavaPropertyFunction implements Function<VariableElement, JavaProperty> {
