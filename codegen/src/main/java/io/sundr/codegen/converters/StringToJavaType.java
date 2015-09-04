@@ -38,11 +38,11 @@ import static io.sundr.codegen.utils.ModelUtils.OBJECT;
 import static io.sundr.codegen.utils.ModelUtils.getFullyQualifiedName;
 import static io.sundr.codegen.utils.ModelUtils.splitTypes;
 
-public class JavaTypeFunction implements Function<String, JavaType> {
+public class StringToJavaType implements Function<String, JavaType> {
 
     private final Elements elements;
 
-    public JavaTypeFunction(Elements elements) {
+    public StringToJavaType(Elements elements) {
         this.elements = elements;
     }
 

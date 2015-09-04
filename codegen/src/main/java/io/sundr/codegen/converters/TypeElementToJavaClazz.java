@@ -42,14 +42,14 @@ import java.util.Set;
 import static io.sundr.codegen.utils.ModelUtils.getClassName;
 import static io.sundr.codegen.utils.ModelUtils.getPackageName;
 
-public class JavaClazzFunction implements Function<TypeElement, JavaClazz> {
+public class TypeElementToJavaClazz implements Function<TypeElement, JavaClazz> {
 
     private final Elements elements;
     private final Function<String, JavaType> toJavaType;
     private final Function<ExecutableElement, JavaMethod> toJavaMethod;
     private final Function<VariableElement, JavaProperty> toJavaProperty;
 
-    public JavaClazzFunction(Elements elements, Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
+    public TypeElementToJavaClazz(Elements elements, Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
         this.elements = elements;
         this.toJavaType = toJavaType;
         this.toJavaMethod = toJavaMethod;

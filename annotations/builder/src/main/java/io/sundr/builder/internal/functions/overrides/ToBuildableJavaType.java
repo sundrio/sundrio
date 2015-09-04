@@ -19,7 +19,7 @@ package io.sundr.builder.internal.functions.overrides;
 import io.sundr.Function;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.converters.JavaTypeFunction;
+import io.sundr.codegen.converters.StringToJavaType;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
@@ -37,7 +37,7 @@ public class ToBuildableJavaType implements Function<String, JavaType> {
     
     public ToBuildableJavaType(Elements elements) {
         this.elements = elements;
-        delegate = new JavaTypeFunction(elements);
+        delegate = new StringToJavaType(elements);
     }
 
     @Override

@@ -35,8 +35,6 @@ import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Set;
 
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
-
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
 public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
     @Override
@@ -70,7 +68,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                         continue;
                     }
                     BuilderContext ctx = BuilderContextManager.getContext();
-                    JavaClazz clazz = ctx.getToClazz().apply(ModelUtils.getClassElement(typeElement));
+                    JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(ModelUtils.getClassElement(typeElement));
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.FLUENT.apply(clazz),

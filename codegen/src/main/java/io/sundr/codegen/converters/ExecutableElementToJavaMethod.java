@@ -26,12 +26,12 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-public class JavaMethodFunction implements Function<ExecutableElement, JavaMethod> {
+public class ExecutableElementToJavaMethod implements Function<ExecutableElement, JavaMethod> {
 
     private final Function<String, JavaType> toJavaType;
     private final Function<VariableElement, JavaProperty> toJavaProperty;
 
-    public JavaMethodFunction(Function<String, JavaType> toJavaType, Function<VariableElement, JavaProperty> toJavaProperty) {
+    public ExecutableElementToJavaMethod(Function<String, JavaType> toJavaType, Function<VariableElement, JavaProperty> toJavaProperty) {
         this.toJavaType = toJavaType;
         this.toJavaProperty = toJavaProperty;
     }

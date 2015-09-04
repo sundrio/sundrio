@@ -48,7 +48,7 @@ public final class PropertyAs {
             Elements elements = context.getElements();
             JavaType type = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
             TypeElement typeElement = elements.getTypeElement(type.getFullyQualifiedName());
-            return BuilderContextManager.getContext().getToClazz().apply(typeElement);
+            return BuilderContextManager.getContext().getTypeElementToJavaClazz().apply(typeElement);
         }
     };
 

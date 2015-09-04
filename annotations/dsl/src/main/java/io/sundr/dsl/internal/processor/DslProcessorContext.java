@@ -17,9 +17,9 @@
 package io.sundr.dsl.internal.processor;
 
 import io.sundr.Function;
-import io.sundr.codegen.converters.JavaMethodFunction;
-import io.sundr.codegen.converters.JavaPropertyFunction;
-import io.sundr.codegen.converters.JavaTypeFunction;
+import io.sundr.codegen.converters.ExecutableElementToJavaMethod;
+import io.sundr.codegen.converters.VariableElementToJavaProperty;
+import io.sundr.codegen.converters.StringToJavaType;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.dsl.internal.element.functions.ToAllAnnotations;
@@ -38,7 +38,7 @@ public class DslProcessorContext {
     private final Elements elements;
     private final Function<String, JavaType> toType;
     private final Function<VariableElement, JavaProperty> toProperty;
-    private final JavaMethodFunction toMethod;
+    private final ExecutableElementToJavaMethod toMethod;
     private final ToAnyAnnotations toAnyAnnotations;
     private final ToAllAnnotations toAllAnnotations;
     private final ToExclusiveAnnotations toExclusiveAnnotations;
@@ -48,9 +48,9 @@ public class DslProcessorContext {
 
     public DslProcessorContext(Elements elements, Types types) {
         this.elements = elements;
-        this.toType = new JavaTypeFunction(elements);
-        this.toProperty = new JavaPropertyFunction(toType);
-        this.toMethod = new JavaMethodFunction(toType, toProperty);
+        this.toType = new StringToJavaType(elements);
+        this.toProperty = new VariableElementToJavaProperty(toType);
+        this.toMethod = new ExecutableElementToJavaMethod(toType, toProperty);
         this.toAnyAnnotations = new ToAnyAnnotations(elements);
         this.toAllAnnotations = new ToAllAnnotations(elements);
         this.toExclusiveAnnotations = new ToExclusiveAnnotations(elements);
@@ -67,7 +67,7 @@ public class DslProcessorContext {
         return toType;
     }
 
-    public JavaMethodFunction getToMethod() {
+    public ExecutableElementToJavaMethod getToMethod() {
         return toMethod;
     }
 

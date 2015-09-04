@@ -56,7 +56,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
                 BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
-                JavaClazz clazz = ctx.getToClazz().apply(ModelUtils.getClassElement(element));
+                JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(ModelUtils.getClassElement(element));
                 generateLocalDependenciesIfNeeded();
                 try {
                     generateFromClazz(ClazzAs.FLUENT.apply(clazz),

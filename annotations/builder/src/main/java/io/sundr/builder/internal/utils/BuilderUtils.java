@@ -171,7 +171,7 @@ public class BuilderUtils {
         BuilderContext ctx = BuilderContextManager.getContext();
         BuildableRepository repository = ctx.getRepository();
         for (TypeElement element : repository.getBuildables()) {
-            JavaType type = ctx.getToType().apply(element.toString());
+            JavaType type = ctx.getStringJavaTypeFunction().apply(element.toString());
             if (isDescendant(type, item)) {
                 result.add(type);
             }
@@ -192,7 +192,7 @@ public class BuilderUtils {
         BuilderContext ctx = BuilderContextManager.getContext();
         BuildableRepository repository = ctx.getRepository();
         for (TypeElement element : repository.getBuildables()) {
-            JavaType type = ctx.getToType().apply(element.toString());
+            JavaType type = ctx.getStringJavaTypeFunction().apply(element.toString());
             if (isDescendant(type, item)) {
                 return true;
             }
@@ -255,7 +255,7 @@ public class BuilderUtils {
         try {
             return ClassToJavaType.FUNCTION.apply(inline.type());
         } catch (MirroredTypeException e) {
-            return context.getToType().apply(e.getTypeMirror().toString());
+            return context.getStringJavaTypeFunction().apply(e.getTypeMirror().toString());
         }
     }
 

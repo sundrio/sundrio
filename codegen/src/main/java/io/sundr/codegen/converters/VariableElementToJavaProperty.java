@@ -24,11 +24,11 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 
 import javax.lang.model.element.VariableElement;
 
-public class JavaPropertyFunction implements Function<VariableElement, JavaProperty> {
+public class VariableElementToJavaProperty implements Function<VariableElement, JavaProperty> {
 
     private final Function<String, JavaType> toType;
 
-    public JavaPropertyFunction(Function<String, JavaType> toType) {
+    public VariableElementToJavaProperty(Function<String, JavaType> toType) {
         this.toType = toType;
     }
 

@@ -20,17 +20,20 @@ import io.sundr.Function;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
-import io.sundr.codegen.converters.JavaClazzFunction;
-import io.sundr.codegen.converters.JavaMethodFunction;
+import io.sundr.codegen.converters.TypeElementToJavaClazz;
+import io.sundr.codegen.converters.ExecutableElementToJavaMethod;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
+import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
 
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
 
@@ -60,10 +63,10 @@ public class BuilderContext {
 
     private final Elements elements;
             
-    private final Function<String, JavaType> toType;
-    private final Function<VariableElement, JavaProperty> toProperty;
-    private final JavaMethodFunction toMethod;
-    private final JavaClazzFunction toClazz;
+    private final Function<String, JavaType> stringJavaTypeFunction;
+    private final Function<VariableElement, JavaProperty> variableElementJavaPropertyFunction;
+    private final Function<ExecutableElement, JavaMethod> executableElementToJavaMethod;
+    private final Function<TypeElement, JavaClazz> typeElementToJavaClazz;
 
     private final JavaClazz baseFluentClass;
     private final JavaClazz fluentInterface;
@@ -85,10 +88,10 @@ public class BuilderContext {
         this.builderPackage = builderPackage;
         this.inlineables = inlineables;
 
-        toType = new ToBuildableJavaType(elements);
-        toProperty = new ToBuildableJavaProperty(toType);
-        toMethod = new JavaMethodFunction(toType, toProperty);
-        toClazz = new JavaClazzFunction(elements, toType, toMethod, toProperty);
+        stringJavaTypeFunction = new ToBuildableJavaType(elements);
+        variableElementJavaPropertyFunction = new ToBuildableJavaProperty(stringJavaTypeFunction);
+        executableElementToJavaMethod = new ExecutableElementToJavaMethod(stringJavaTypeFunction, variableElementJavaPropertyFunction);
+        typeElementToJavaClazz = new TypeElementToJavaClazz(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction);
         
         repository = new BuildableRepository();
 
@@ -349,19 +352,19 @@ public class BuilderContext {
         return repository;
     }
 
-    public Function<String, JavaType> getToType() {
-        return toType;
+    public Function<String, JavaType> getStringJavaTypeFunction() {
+        return stringJavaTypeFunction;
     }
 
-    public Function<VariableElement, JavaProperty> getToProperty() {
-        return toProperty;
+    public Function<VariableElement, JavaProperty> getVariableElementJavaPropertyFunction() {
+        return variableElementJavaPropertyFunction;
     }
 
-    public JavaMethodFunction getToMethod() {
-        return toMethod;
+    public Function<ExecutableElement, JavaMethod> getExecutableElementToJavaMethod() {
+        return executableElementToJavaMethod;
     }
 
-    public JavaClazzFunction getToClazz() {
-        return toClazz;
+    public Function<TypeElement, JavaClazz> getTypeElementToJavaClazz() {
+        return typeElementToJavaClazz;
     }
 }
