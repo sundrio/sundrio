@@ -50,7 +50,7 @@
         </dependency>
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-annotations</artifactId>
+            <artifactId>dsl-annotations</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -15,47 +15,32 @@
      limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>sundr-pom</artifactId>
+        <artifactId>annotations</artifactId>
         <groupId>io.sundr</groupId>
         <version>0.0.26-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr.examples</groupId>
-    <artifactId>shapes</artifactId>
-    <name>Sundrio :: Examples :: Shapes</name>
-
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <groupId>io.sundr</groupId>
+    <artifactId>dsl-annotations</artifactId>
+    <name>Sundrio :: Annotations :: DSL</name>
 
     <dependencies>
-        <dependency>
-            <groupId>io.sundr</groupId>
-            <artifactId>sundr-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>io.sundr</groupId>
             <artifactId>builder-annotations</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
         </dependency>
+
     </dependencies>
+
 </project>

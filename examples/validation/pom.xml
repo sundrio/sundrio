@@ -51,7 +51,7 @@
         
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-annotations</artifactId>
+            <artifactId>builder-annotations</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -74,9 +74,9 @@
     <modules>
         <module>core</module>
         <module>codegen</module>
-        <module>annotations</module>
         <module>examples</module>
         <module>maven-plugin</module>
+        <module>annotations</module>
     </modules>
     
     <build>
