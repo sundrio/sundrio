@@ -1,6 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+    #if ($model.project.parent)
+
+    <parent>
+        <groupId>${model.project.parent.groupId}</groupId>
+        <artifactId>${model.project.parent.artifactId}</artifactId>
+        <version>${model.project.parent.version}</version>
+    </parent>
+    #end
+
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${model.project.groupId}</groupId>
@@ -72,7 +81,6 @@
 
         </dependencies>
     </dependencyManagement>
-
     #if (!$model.plugins.isEmpty())
 
     <build>
@@ -88,6 +96,41 @@
             </plugins>
         </pluginManagement>
     </build>
-
     #end
+
+    <distributionManagement>
+        #if ($model.project.distributionManagement.downloadUrl)
+
+        <downloadUrl>${model.project.distributionManagement.downloadUrl}</downloadUrl>
+        #end
+        #if ($model.project.distributionManagement.relocation)
+
+            <relocation>${model.project.distributionManagement.relocation}</relocation>
+        #end
+        #if ($model.project.distributionManagement.downloadUrl)
+
+            <downloadUrl>${model.project.distributionManagement.downloadUrl}</downloadUrl>
+        #end
+        #if ($model.project.distributionManagement.repository)
+
+        <repository>
+            <id>${model.project.distributionManagement.repository.id}</id>
+            <name>${model.project.distributionManagement.repository.name}</name>
+            <layout>${model.project.distributionManagement.repository.layout}</layout>
+            <url>${model.project.distributionManagement.repository.url}</url>
+        </repository>
+        #end
+        #if ($model.project.distributionManagement.snapshotRepository)
+
+         <snapshotRepository>
+             <id>${model.project.distributionManagement.snapshotRepository.id}</id>
+             <name>${model.project.distributionManagement.snapshotRepository.name}</name>
+             <layout>${model.project.distributionManagement.snapshotRepository.layout}</layout>
+             <url>${model.project.distributionManagement.snapshotRepository.url}</url>
+         </snapshotRepository>
+        #end
+
+    </distributionManagement>
+
+
 </project>

@@ -68,7 +68,9 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                     }
                 }
                 MavenProject rootProject = getProject();
+
                 BomModel model = new BomModel(rootProject, archives, poms, plugins);
+
                 CodeGenerator<BomModel> generator = new CodeGenerator<BomModel>(model, writer, BOM_TEMPLATE, Collections.<Class<? extends Directive>>emptySet());
                 getLog().info("Generating BOM for model:" + model);
                 generator.generate();
