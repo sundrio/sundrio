@@ -12,5 +12,12 @@
     <groupId>test</groupId>
     <artifactId>module1</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-core</artifactId>
+            <version>@pom.version@</version>
+        </dependency>
+    </dependencies>
 
 </project>

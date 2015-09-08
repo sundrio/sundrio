@@ -13,9 +13,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${model.project.groupId}</groupId>
-    <artifactId>${model.project.artifactId}-bom</artifactId>
+    <artifactId>${model.project.artifactId}</artifactId>
     <version>${model.project.version}</version>
-    <name>${model.project.name}. Bom</name>
+    <name>${model.project.name}</name>
     <packaging>pom</packaging>
     <description>Bill of material</description>
     #if ($model.project.url)

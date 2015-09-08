@@ -1,18 +1,54 @@
 import java.io.*;
 import java.lang.*;
+import java.util.*;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 
-File outputDir = new File( basedir, "target/classes/bom" );
-File pom = new File( outputDir, "bom.xml" );
+Set findDependencies ( String artifactId ) {
+    Set result = new HashSet();
 
-MavenXpp3Reader mavenReader = new MavenXpp3Reader();
-FileReader fileReader = new FileReader(pom);
-Model model = mavenReader.read(fileReader);
-model.setPomFile(pom);
-MavenProject project = new MavenProject(model);
+    File outputDir = new File( basedir, "target/classes/" + artifactId  );
+    File pom = new File( outputDir, "bom.xml" );
 
-File deployedBomDir = new File( basedir, "../../repository/test/bom-test-bom" );
+    MavenXpp3Reader mavenReader = new MavenXpp3Reader();
+    FileReader fileReader = new FileReader(pom);
+    Model model = mavenReader.read(fileReader);
+    model.setPomFile(pom);
+    MavenProject project = new MavenProject(model);
 
-return deployedBomDir.exists() && project.getDependencyManagement().getDependencies().size() == 2;
+    for(Dependency dep : project.getDependencyManagement().getDependencies()) {
+        result.add(dep.getGroupId() + ":" + dep.getArtifactId());
+    }
+
+    return result;
+}
+
+boolean deployed(String artifactId ) {
+    File deployedBomDir = new File( basedir, "../../repository/test/" + artifactId );
+    return deployedBomDir.exists();
+}
+
+
+boolean deployed1 = deployed("bom-test-1");
+boolean deployed2 = deployed("bom-test-2");
+boolean deployed3 = deployed("bom-test-3");
+boolean deployed4 = deployed("bom-test-4");
+boolean deployed5 = deployed("bom-test-5");
+boolean deployed6 = deployed("bom-test-6");
+
+Set deps1 = findDependencies("bom-test-1");
+Set deps2 = findDependencies("bom-test-2");
+Set deps3 = findDependencies("bom-test-3");
+Set deps4 = findDependencies("bom-test-4");
+Set deps5 = findDependencies("bom-test-5");
+Set deps6 = findDependencies("bom-test-6");
+
+
+return deployed1 && deps1.size() == 1 && deps1.contains("test:module1") &&
+    deployed2 && deps2.size() == 1 && deps2.contains("test:module2") &&
+    deployed3 && deps3.size() == 1 && deps3.contains("test:module2") &&
+    deployed4 && deps4.size() == 1 && deps4.contains("test:module1") &&
+    deployed5 && deps5.size() == 2 && deps5.contains("test:module2") && deps5.contains("test:module1") &&
+    deployed6 && deps6.size() == 3 && deps6.contains("test:module2") && deps6.contains("test:module1") && deps6.contains("io.sundr:sundr-core");

@@ -60,7 +60,6 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
     @Parameter( defaultValue = "${mojoExecution}", readonly = true )
     private MojoExecution mojo;
 
-
     // this is required for the deploy phase, but end user may just use a install phase only, so let required = false
     @Parameter(defaultValue = "${project.distributionManagementArtifactRepository}", readonly = true, required = false)
     private ArtifactRepository deploymentRepository;

@@ -45,6 +45,69 @@
                 <groupId>io.sundr</groupId>
                 <artifactId>sundr-maven-plugin</artifactId>
                 <version>@pom.version@</version>
+                <configuration>
+                    <boms>
+                        <bom>
+                            <artifactId>bom-test-1</artifactId>
+                            <name>Test Project :: Bom 1</name>
+                            <modules>
+                                <includes>
+                                    <include>*:module1</include>
+                                </includes>
+                            </modules>
+                        </bom>
+                        <bom>
+                            <artifactId>bom-test-2</artifactId>
+                            <name>Test Project :: Bom 2</name>
+                            <modules>
+                                <includes>
+                                    <include>*:module2</include>
+                                </includes>
+                            </modules>
+                        </bom>
+                        <bom>
+                            <artifactId>bom-test-3</artifactId>
+                            <name>Test Project :: Bom 3</name>
+                            <modules>
+                                <excludes>
+                                    <exclude>*:module1</exclude>
+                                </excludes>
+                            </modules>
+                        </bom>
+                        <bom>
+                            <artifactId>bom-test-4</artifactId>
+                            <name>Test Project :: Bom 4</name>
+                            <modules>
+                                <excludes>
+                                    <exclude>*:module2</exclude>
+                                </excludes>
+                            </modules>
+                        </bom>
+                        <bom>
+                            <artifactId>bom-test-5</artifactId>
+                            <name>Test Project :: Bom 5</name>
+                            <modules>
+                                <excludes>
+                                    <exclude>*:module5</exclude>
+                                </excludes>
+                            </modules>
+                        </bom>
+                        <bom>
+                            <artifactId>bom-test-6</artifactId>
+                            <name>Test Project :: Bom 6</name>
+                            <modules>
+                                <excludes>
+                                    <exclude>*:module6</exclude>
+                                </excludes>
+                            </modules>
+                            <dependencies>
+                                <includes>
+                                    <include>io.sundr:*</include>
+                                </includes>
+                            </dependencies>
+                        </bom>
+                    </boms>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
