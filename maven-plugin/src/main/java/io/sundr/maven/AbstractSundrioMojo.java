@@ -41,13 +41,10 @@ import org.apache.maven.shared.invoker.MavenInvocationException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Properties;
 
 public abstract class AbstractSundrioMojo extends AbstractMojo {
 
-    static final String BOM_TEMPLATE = "templates/bom.xml.vm";
-    static final String BOM_DIR = "bom";
-    static final String BOM_NAME = "bom.xml";
+    static final String BOM_NAME = "pom.xml";
     static final String POM_TYPE = "pom";
     static final String PLUGIN_TYPE = "maven-plugin";
 

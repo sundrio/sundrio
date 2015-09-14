@@ -6,18 +6,20 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 
-Set findDependencies ( String artifactId ) {
-    Set result = new HashSet();
-
+MavenProject readProject( String artifactId ) {
     File outputDir = new File( basedir, "target/classes/" + artifactId  );
-    File pom = new File( outputDir, "bom.xml" );
+    File pom = new File( outputDir, "pom.xml" );
 
     MavenXpp3Reader mavenReader = new MavenXpp3Reader();
     FileReader fileReader = new FileReader(pom);
     Model model = mavenReader.read(fileReader);
     model.setPomFile(pom);
-    MavenProject project = new MavenProject(model);
+    return new MavenProject(model);
+}
 
+Set findDependencies ( String artifactId ) {
+    Set result = new HashSet();
+    MavenProject project = readProject(artifactId);
     for(Dependency dep : project.getDependencyManagement().getDependencies()) {
         result.add(dep.getGroupId() + ":" + dep.getArtifactId());
     }
@@ -25,18 +27,30 @@ Set findDependencies ( String artifactId ) {
     return result;
 }
 
-boolean deployed(String artifactId ) {
+boolean isDeployed(String artifactId ) {
     File deployedBomDir = new File( basedir, "../../repository/test/" + artifactId );
     return deployedBomDir.exists();
 }
 
+boolean hasParent(String artifactId ) {
+    MavenProject project = readProject(artifactId);
+    return project.getModel().getParent() != null;
+}
 
-boolean deployed1 = deployed("bom-test-1");
-boolean deployed2 = deployed("bom-test-2");
-boolean deployed3 = deployed("bom-test-3");
-boolean deployed4 = deployed("bom-test-4");
-boolean deployed5 = deployed("bom-test-5");
-boolean deployed6 = deployed("bom-test-6");
+
+boolean deployed1 = isDeployed("bom-test-1");
+boolean deployed2 = isDeployed("bom-test-2");
+boolean deployed3 = isDeployed("bom-test-3");
+boolean deployed4 = isDeployed("bom-test-4");
+boolean deployed5 = isDeployed("bom-test-5");
+boolean deployed6 = isDeployed("bom-test-6");
+
+boolean parent1 = hasParent("bom-test-1");
+boolean parent2 = hasParent("bom-test-2");
+boolean parent3 = hasParent("bom-test-3");
+boolean parent4 = hasParent("bom-test-4");
+boolean parent5 = hasParent("bom-test-5");
+boolean parent6 = hasParent("bom-test-6");
 
 Set deps1 = findDependencies("bom-test-1");
 Set deps2 = findDependencies("bom-test-2");
@@ -46,9 +60,9 @@ Set deps5 = findDependencies("bom-test-5");
 Set deps6 = findDependencies("bom-test-6");
 
 
-return deployed1 && deps1.size() == 1 && deps1.contains("test:module1") &&
-    deployed2 && deps2.size() == 1 && deps2.contains("test:module2") &&
-    deployed3 && deps3.size() == 1 && deps3.contains("test:module2") &&
-    deployed4 && deps4.size() == 1 && deps4.contains("test:module1") &&
-    deployed5 && deps5.size() == 2 && deps5.contains("test:module2") && deps5.contains("test:module1") &&
-    deployed6 && deps6.size() == 3 && deps6.contains("test:module2") && deps6.contains("test:module1") && deps6.contains("io.sundr:sundr-core");
+return deployed1 && parent1 && deps1.size() == 1 && deps1.contains("test:module1") &&
+      deployed2 && parent2 && deps2.size() == 1 && deps2.contains("test:module2") &&
+      deployed3 && parent3 && deps3.size() == 1 && deps3.contains("test:module2") &&
+      deployed4 && parent4 && deps4.size() == 1 && deps4.contains("test:module1") &&
+      deployed5 && parent5 && deps5.size() == 2 && deps5.contains("test:module2") && deps5.contains("test:module1") &&
+      deployed6 && parent6 && deps6.size() == 3 && deps6.contains("test:module2") && deps6.contains("test:module1") && deps6.contains("io.sundr:sundr-core");
