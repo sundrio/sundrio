@@ -60,9 +60,9 @@ Set deps5 = findDependencies("bom-test-5");
 Set deps6 = findDependencies("bom-test-6");
 
 
-return deployed1 && parent1 && deps1.size() == 1 && deps1.contains("test:module1") &&
-      deployed2 && parent2 && deps2.size() == 1 && deps2.contains("test:module2") &&
-      deployed3 && parent3 && deps3.size() == 1 && deps3.contains("test:module2") &&
-      deployed4 && parent4 && deps4.size() == 1 && deps4.contains("test:module1") &&
-      deployed5 && parent5 && deps5.size() == 2 && deps5.contains("test:module2") && deps5.contains("test:module1") &&
-      deployed6 && parent6 && deps6.size() == 3 && deps6.contains("test:module2") && deps6.contains("test:module1") && deps6.contains("io.sundr:sundr-core");
+return deployed1 && !parent1 && deps1.size() == 1 && deps1.contains("test:module1") &&
+      deployed2 && !parent2 && deps2.size() == 1 && deps2.contains("test:module2") &&
+      deployed3 && !parent3 && deps3.size() == 1 && deps3.contains("test:module2") &&
+      deployed4 && !parent4 && deps4.size() == 1 && deps4.contains("test:module1") &&
+      deployed5 && !parent5 && deps5.size() == 2 && deps5.contains("test:module2") && deps5.contains("test:module1") &&
+      deployed6 && !parent6 && deps6.size() == 3 && deps6.contains("test:module2") && deps6.contains("test:module1") && deps6.contains("io.sundr:sundr-core");

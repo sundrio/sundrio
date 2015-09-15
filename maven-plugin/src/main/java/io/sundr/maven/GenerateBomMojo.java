@@ -226,7 +226,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
             getLog().info("Generating BOM: " + artifactId);
             MavenXpp3Writer mavenWritter = new MavenXpp3Writer();
-            mavenWritter.write(writer, bomProject.getModel());
+            mavenWritter.write(writer, cleanUp(bomProject).getModel());
             return bomProject;
         } catch (Exception e) {
             throw new MojoFailureException("Failed to generate bom.");
@@ -298,6 +298,38 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 result.add(String.format(ARTIFACT_FORMAT, groupId, artifactId, version, type, classifier));
             }
         }
+        return result;
+    }
+
+    private static MavenProject cleanUp(MavenProject p) {
+        MavenProject result = new MavenProject();
+
+        result.setModelVersion(p.getModelVersion());
+        result.setGroupId(p.getGroupId());
+        result.setArtifactId(p.getArtifactId());
+        result.setVersion(p.getVersion());
+        result.setPackaging(p.getPackaging());
+        result.setName(p.getName());
+        result.setDescription(p.getDescription());
+
+        result.setDevelopers(p.getDevelopers());
+        result.setLicenses(p.getLicenses());
+        result.setScm(p.getScm());
+
+        result.getModel().setDependencyManagement(p.getModel().getDependencyManagement());
+
+        if (p.getModel().getBuild() != null &&
+                p.getModel().getBuild().getPluginManagement() != null &&
+                !p.getModel().getBuild().getPluginManagement().getPluginsAsMap().isEmpty()) {
+            result.getModel().setBuild(new Build());
+            result.getModel().getBuild().setPluginManagement(p.getModel().getBuild().getPluginManagement());
+        }
+
+        result.setArtifact(p.getArtifact());
+
+        result.setParent(null);
+        result.getModel().setParent(null);
+        result.getModel().setBuild(null);
         return result;
     }
 
