@@ -47,6 +47,7 @@
                     </pomIncludes>
                     <postBuildHookScript>verify</postBuildHookScript>
                     <goals>
+                        <goal>clean</goal>
                         <goal>install</goal>
                         <goal>deploy</goal>
                     </goals>

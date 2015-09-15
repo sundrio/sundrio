@@ -55,7 +55,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VERIFY)
+@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
 public class GenerateBomMojo extends AbstractSundrioMojo {
 
     private final String ARTIFACT_FORMAT = "%s:%s:%s:%s:%s";
@@ -159,6 +159,8 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             MavenProject rootProject = getProject();
             MavenProject bomProject = new MavenProject(rootProject);
 
+            //we want to avoid recursive "generate-bom".
+            bomProject.setExecutionRoot(false);
             bomProject.setFile(generatedBom);
             bomProject.getModel().setPomFile(generatedBom);
             bomProject.setModelVersion(rootProject.getModelVersion());
@@ -184,6 +186,11 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             bomProject.setDevelopers(rootProject.getDevelopers());
             bomProject.setDistributionManagement(rootProject.getDistributionManagement());
             bomProject.getModel().setProfiles(rootProject.getModel().getProfiles());
+
+            //We want to avoid having the generated stuff wiped.
+            bomProject.getProperties().put("clean.skip", "true");
+            bomProject.getModel().getBuild().setDirectory(bomDir.getAbsolutePath());
+            bomProject.getModel().getBuild().setOutputDirectory(new File(bomDir,"target").getAbsolutePath());
 
             bomProject.getModel().setDependencyManagement(new DependencyManagement());
             for (Artifact artifact : archives) {
