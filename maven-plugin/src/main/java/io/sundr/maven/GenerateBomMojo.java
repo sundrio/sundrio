@@ -17,18 +17,35 @@
 package io.sundr.maven;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleNotFoundException;
+import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
+import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
+import org.apache.maven.lifecycle.internal.ProjectIndex;
+import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
+import org.apache.maven.lifecycle.internal.ReactorContext;
+import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -39,21 +56,35 @@ import org.codehaus.plexus.util.SelectorUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VERIFY)
 public class GenerateBomMojo extends AbstractSundrioMojo {
 
     private final String ARTIFACT_FORMAT = "%s:%s:%s:%s:%s";
     private final Pattern ARTIFACT_PATTERN = Pattern.compile("(?<groupId>[^:]+):(?<artifactId>[^:]+)(:(?<version>[^:]+))?(:(?<type>[^:]+))?(:(?<classifier>[^:]+))?");
 
+    private static final AtomicInteger READYPROJECTSCOUTNER = new AtomicInteger();
+
+    private static final List<MavenProject> GENERATED_BOMS = Collections.synchronizedList(new ArrayList<MavenProject>());
+    private static final Set<String> GENERATED_ARTIFACT_IDS = Collections.synchronizedSet(new HashSet<String>());
+
     @Component
     private ArtifactResolver artifactResolver;
+
+    @Component
+    private LifecycleModuleBuilder builder;
+
+    @Component
+    private LifecycleTaskSegmentCalculator segmentCalculator;
 
     /**
      * Location of the localRepository repository.
@@ -77,18 +108,35 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (getProject().isExecutionRoot() && !getProject().getModules().isEmpty()) {
-
             if (boms == null || boms.length == 0) {
-                generateBom(getProject().getArtifactId() + "-bom", getProject().getName() + " Bom", new ArtifactSet(), new ArtifactSet());
+                String artifactId = getProject().getArtifactId() + "-bom";
+                if (GENERATED_ARTIFACT_IDS.add(artifactId)) {
+                    GENERATED_BOMS.add(generateBom(artifactId, getProject().getName() + " Bom", new ArtifactSet(), new ArtifactSet()));
+                }
             } else {
                 for (BomConfig cfg : boms) {
-                    generateBom(cfg.getArtifactId(), cfg.getName(), cfg.getModules(), cfg.getDependencies());
+                    if (GENERATED_ARTIFACT_IDS.add(cfg.getArtifactId())) {
+                        GENERATED_BOMS.add(generateBom(cfg.getArtifactId(), cfg.getName(), cfg.getModules(), cfg.getDependencies()));
+                    }
+                }
+            }
+        }
+
+        boolean projectsReady = READYPROJECTSCOUTNER.incrementAndGet() == reactorProjects.size() + 1;
+        if (projectsReady) {
+            synchronized (GENERATED_BOMS) {
+                while (!GENERATED_BOMS.isEmpty()) {
+                    try {
+                        build(getSession().clone(), GENERATED_BOMS.remove(0));
+                    } catch (Throwable t) {
+                        throw new MojoExecutionException("Failed to build generated bom.", t);
+                    }
                 }
             }
         }
     }
 
-    private void generateBom(String artifactId, String name, ArtifactSet moduleSet, ArtifactSet dependencySet) throws MojoFailureException, MojoExecutionException {
+    private MavenProject generateBom(String artifactId, String name, ArtifactSet moduleSet, ArtifactSet dependencySet) throws MojoFailureException, MojoExecutionException {
         File outputDir = new File(getProject().getBuild().getOutputDirectory());
         File bomDir = new File(outputDir, artifactId);
         File generatedBom = new File(bomDir, BOM_NAME);
@@ -135,9 +183,16 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             }
 
             MavenProject rootProject = getProject();
-            MavenProject bomProject = new MavenProject();
+            MavenProject bomProject = new MavenProject(rootProject);
 
+            bomProject.setFile(generatedBom);
+            bomProject.getModel().setPomFile(generatedBom);
             bomProject.setModelVersion(rootProject.getModelVersion());
+
+            bomProject.setArtifact(new DefaultArtifact(rootProject.getGroupId(),
+                    artifactId, rootProject.getVersion(), rootProject.getArtifact().getScope(),
+                    rootProject.getArtifact().getType(),rootProject.getArtifact().getClassifier(),
+                    rootProject.getArtifact().getArtifactHandler()));
 
 
             bomProject.setParent(rootProject.getParent());
@@ -169,12 +224,11 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 }
             }
 
-            getLog().info("Generating BOM...");
+            getLog().info("Generating BOM: " + artifactId);
             MavenXpp3Writer mavenWritter = new MavenXpp3Writer();
             mavenWritter.write(writer, bomProject.getModel());
-
-            alsoMake(readBomProject(generatedBom));
-        } catch (IOException e) {
+            return bomProject;
+        } catch (Exception e) {
             throw new MojoFailureException("Failed to generate bom.");
         } finally {
             try {
@@ -184,6 +238,18 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             }
         }
     }
+
+    private void build(MavenSession session, MavenProject project) throws LifecycleNotFoundException, LifecyclePhaseNotFoundException, PluginNotFoundException, MojoNotFoundException, InvalidPluginDescriptorException, PluginDescriptorParsingException, NoPluginFoundForPrefixException, PluginVersionResolutionException, PluginResolutionException {
+        session.getProjects().add(project);
+        ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
+        ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(session.getProjectDependencyGraph());
+        ReactorContext reactorContext = new ReactorContext(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(), reactorBuildStatus);
+        List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);
+        for (TaskSegment segment : segments) {
+            builder.buildProject(session, reactorContext, project, segment);
+        }
+    }
+
 
     private Set<Artifact> getDependencies(Artifact artifact) {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();

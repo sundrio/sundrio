@@ -71,6 +71,10 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
         return project;
     }
 
+    public MavenSession getSession() {
+        return session;
+    }
+
     MavenProject readBomProject(File pomFile) throws IOException {
         MavenXpp3Reader mavenReader = new MavenXpp3Reader();
         FileReader fileReader = null;
@@ -92,13 +96,13 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
     }
 
     Artifact createArtifact(File file, String groupId, String artifactId, String version, String scope, String type, String classifier) {
-        DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, scope, version, type, classifier, artifactHandler);
+        DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, version, scope, type, classifier, artifactHandler);
         artifact.setFile(file);
         artifact.setResolved(true);
         return artifact;
     }
 
-    void alsoMake(MavenProject project) throws MojoExecutionException {
+    void backGroundBuild(MavenProject project) throws MojoExecutionException {
         MavenExecutionRequest executionRequest = session.getRequest();
 
         InvocationRequest request = new DefaultInvocationRequest();
@@ -107,6 +111,7 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
         request.setGoals(executionRequest.getGoals());
         request.setRecursive(false);
         request.setInteractive(false);
+
         request.setProfiles(executionRequest.getActiveProfiles());
         request.setProperties(executionRequest.getUserProperties());
         Invoker invoker = new DefaultInvoker();
