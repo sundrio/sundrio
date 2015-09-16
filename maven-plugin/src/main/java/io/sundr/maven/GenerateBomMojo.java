@@ -63,7 +63,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     private final String ARTIFACT_FORMAT = "%s:%s:%s:%s:%s";
     private final Pattern ARTIFACT_PATTERN = Pattern.compile("(?<groupId>[^:]+):(?<artifactId>[^:]+)(:(?<version>[^:]+))?(:(?<type>[^:]+))?(:(?<classifier>[^:]+))?");
 
-
     private static final Set<String> GENERATED_ARTIFACT_IDS = Collections.synchronizedSet(new HashSet<String>());
 
     @Component
@@ -103,21 +102,22 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             if (boms == null || boms.length == 0) {
                 String artifactId = getProject().getArtifactId() + "-bom";
                 if (GENERATED_ARTIFACT_IDS.add(artifactId)) {
-                    build(getSession().clone(), generateBom(artifactId, getProject().getName() + " Bom", new ArtifactSet(), new ArtifactSet()), new GoalSet());
+                    BomConfig cfg = new BomConfig(artifactId, getProject().getName() + " Bom", " Generated bom");
+                    build(getSession().clone(), generateBom(cfg), cfg.getGoals());
                 }
             } else {
                 for (BomConfig cfg : boms) {
                     if (GENERATED_ARTIFACT_IDS.add(cfg.getArtifactId())) {
-                        build(getSession().clone(), generateBom(cfg.getArtifactId(), cfg.getName(), cfg.getModules(), cfg.getDependencies()), cfg.getGoals());
+                        build(getSession().clone(), generateBom(cfg), cfg.getGoals());
                     }
                 }
             }
         }
     }
 
-    private MavenProject generateBom(String artifactId, String name, ArtifactSet moduleSet, ArtifactSet dependencySet) throws MojoFailureException, MojoExecutionException {
+    private MavenProject generateBom(BomConfig config) throws MojoFailureException, MojoExecutionException {
         File outputDir = new File(getProject().getBuild().getOutputDirectory());
-        File bomDir = new File(outputDir, artifactId);
+        File bomDir = new File(outputDir, config.getArtifactId());
         File generatedBom = new File(bomDir, BOM_NAME);
 
         if (!bomDir.exists() && !bomDir.mkdirs()) {
@@ -130,20 +130,14 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             Set<Artifact> plugins = new LinkedHashSet<Artifact>();
             Set<Artifact> poms = new LinkedHashSet<Artifact>();
 
-            Set<String> moduleIncludes = moduleSet != null ? moduleSet.getIncludes() : new HashSet<String>();
-            Set<String> moduleExcludes = moduleSet != null ? moduleSet.getExcludes() : new HashSet<String>();
 
-            Set<String> depIncludes = dependencySet != null ? dependencySet.getIncludes() : new HashSet<String>();
-            Set<String> depExcludes = dependencySet != null ? dependencySet.getExcludes() : new HashSet<String>();
-
-            if (moduleIncludes == null || moduleIncludes.isEmpty()) {
-                moduleIncludes = new HashSet<String>();
-                moduleIncludes.add("*:*");
+            if (config.getModules().getIncludes().isEmpty()) {
+                config.getModules().getIncludes().add("*:*");
             }
 
             for (MavenProject module : reactorProjects) {
                 Artifact artifact = module.getArtifact();
-                if (matches(artifact, moduleIncludes) && !matches(artifact, moduleExcludes)) {
+                if (matches(artifact, config.getModules().getIncludes()) && !matches(artifact, config.getModules().getExcludes())) {
                     if (PLUGIN_TYPE.equals(artifact.getType())) {
                         plugins.add(artifact);
                     } else if (POM_TYPE.equals(artifact.getType())) {
@@ -154,7 +148,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
                     //Check artifacts
                     for (Artifact a : getDependencies(module.getArtifact())) {
-                        if (matches(a, depIncludes) && !matches(a, depExcludes)) {
+                        if (matches(a, config.getDependencies().getIncludes()) && !matches(a, config.getDependencies().getExcludes())) {
                             archives.add(a);
                         }
                     }
@@ -171,7 +165,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             bomProject.setModelVersion(rootProject.getModelVersion());
 
             bomProject.setArtifact(new DefaultArtifact(rootProject.getGroupId(),
-                    artifactId, rootProject.getVersion(), rootProject.getArtifact().getScope(),
+                    config.getArtifactId(), rootProject.getVersion(), rootProject.getArtifact().getScope(),
                     rootProject.getArtifact().getType(), rootProject.getArtifact().getClassifier(),
                     rootProject.getArtifact().getArtifactHandler()));
 
@@ -180,10 +174,11 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             bomProject.getModel().setParent(rootProject.getModel().getParent());
 
             bomProject.setGroupId(rootProject.getGroupId());
-            bomProject.setArtifactId(artifactId);
+            bomProject.setArtifactId(config.getArtifactId());
             bomProject.setVersion(rootProject.getVersion());
             bomProject.setPackaging("pom");
-            bomProject.setName(name);
+            bomProject.setName(config.getName());
+            bomProject.setDescription(config.getDescription());
 
             bomProject.setUrl(rootProject.getUrl());
             bomProject.setLicenses(rootProject.getLicenses());
@@ -210,7 +205,8 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 }
             }
 
-            getLog().info("Generating BOM: " + artifactId);
+
+            getLog().info("Generating BOM: " + config.getArtifactId());
             MavenXpp3Writer mavenWritter = new MavenXpp3Writer();
             //We cleanup the project a little bit, as we don't need all that stuff in the generated content.
             mavenWritter.write(writer, cleanUp(bomProject).getModel());

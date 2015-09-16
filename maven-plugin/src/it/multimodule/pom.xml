@@ -62,6 +62,10 @@
                                     <include>*:module1</include>
                                 </includes>
                             </modules>
+                            <properties>
+                                <key1>value1</key1>
+                                <key2>value2</key2>
+                            </properties>
                         </bom>
                         <bom>
                             <artifactId>bom-test-2</artifactId>

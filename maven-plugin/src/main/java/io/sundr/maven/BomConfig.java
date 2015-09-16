@@ -16,13 +16,26 @@
 
 package io.sundr.maven;
 
+import java.util.Properties;
+
 public class BomConfig {
 
     private String artifactId;
     private String name;
+    private String description = "Generated Bom";
     private ArtifactSet modules = new ArtifactSet();
     private ArtifactSet dependencies = new ArtifactSet();
     private GoalSet goals = new GoalSet();
+
+    private Properties properties = new Properties();
+
+    public BomConfig() {
+    }
+
+    public BomConfig(String artifactId, String name, String description) {
+        this.artifactId = artifactId;
+        this.name = name;
+    }
 
     public String getArtifactId() {
         return artifactId;
@@ -30,6 +43,10 @@ public class BomConfig {
 
     public String getName() {
         return name;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public ArtifactSet getModules() {
@@ -42,5 +59,9 @@ public class BomConfig {
 
     public GoalSet getGoals() {
         return goals;
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 }
