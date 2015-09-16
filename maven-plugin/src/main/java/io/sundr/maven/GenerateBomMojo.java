@@ -303,6 +303,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         result.setPackaging(p.getPackaging());
         result.setName(p.getName());
         result.setDescription(p.getDescription());
+        result.setUrl(p.getUrl());
 
         result.setDevelopers(p.getDevelopers());
         result.setLicenses(p.getLicenses());
