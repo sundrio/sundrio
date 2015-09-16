@@ -16,31 +16,19 @@
 
 package io.sundr.maven;
 
-public class BomConfig {
+import java.util.HashSet;
+import java.util.Set;
 
-    private String artifactId;
-    private String name;
-    private ArtifactSet modules = new ArtifactSet();
-    private ArtifactSet dependencies = new ArtifactSet();
-    private GoalSet goals = new GoalSet();
+public class GoalSet {
 
-    public String getArtifactId() {
-        return artifactId;
+    private Set<String> includes = new HashSet<String>();
+    private Set<String> excludes = new HashSet<String>();
+
+    public Set<String> getIncludes() {
+        return includes;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public ArtifactSet getModules() {
-        return modules;
-    }
-
-    public ArtifactSet getDependencies() {
-        return dependencies;
-    }
-
-    public GoalSet getGoals() {
-        return goals;
+    public Set<String> getExcludes() {
+        return excludes;
     }
 }

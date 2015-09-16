@@ -16,12 +16,13 @@
 
 package io.sundr.maven;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class ArtifactSet {
 
-    private Set<String> includes;
-    private Set<String> excludes;
+    private Set<String> includes = new HashSet<String>();
+    private Set<String> excludes = new HashSet<String>();
 
     public Set<String> getIncludes() {
         return includes;

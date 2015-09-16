@@ -98,6 +98,12 @@
                                     <exclude>*:module5</exclude>
                                 </excludes>
                             </modules>
+                            <goals>
+                                <includes>
+                                    <include>clean</include>
+                                    <include>install</include>
+                                </includes>
+                            </goals>
                         </bom>
                         <bom>
                             <artifactId>bom-test-6</artifactId>
@@ -112,6 +118,11 @@
                                     <include>io.sundr:*</include>
                                 </includes>
                             </dependencies>
+                            <goals>
+                                <excludes>
+                                    <exclude>deploy</exclude>
+                                </excludes>
+                            </goals>
                         </bom>
                     </boms>
                 </configuration>

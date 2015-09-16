@@ -47,11 +47,14 @@ import org.codehaus.plexus.util.SelectorUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,12 +105,12 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             if (boms == null || boms.length == 0) {
                 String artifactId = getProject().getArtifactId() + "-bom";
                 if (GENERATED_ARTIFACT_IDS.add(artifactId)) {
-                    build(getSession().clone(), generateBom(artifactId, getProject().getName() + " Bom", new ArtifactSet(), new ArtifactSet()));
+                    build(getSession().clone(), generateBom(artifactId, getProject().getName() + " Bom", new ArtifactSet(), new ArtifactSet()), new GoalSet());
                 }
             } else {
                 for (BomConfig cfg : boms) {
                     if (GENERATED_ARTIFACT_IDS.add(cfg.getArtifactId())) {
-                        build(getSession().clone(), generateBom(cfg.getArtifactId(), cfg.getName(), cfg.getModules(), cfg.getDependencies()));
+                        build(getSession().clone(), generateBom(cfg.getArtifactId(), cfg.getName(), cfg.getModules(), cfg.getDependencies()), cfg.getGoals());
                     }
                 }
             }
@@ -194,7 +197,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             //We want to avoid having the generated stuff wiped.
             bomProject.getProperties().put("clean.skip", "true");
             bomProject.getModel().getBuild().setDirectory(bomDir.getAbsolutePath());
-            bomProject.getModel().getBuild().setOutputDirectory(new File(bomDir,"target").getAbsolutePath());
+            bomProject.getModel().getBuild().setOutputDirectory(new File(bomDir, "target").getAbsolutePath());
 
             bomProject.getModel().setDependencyManagement(new DependencyManagement());
             for (Artifact artifact : archives) {
@@ -225,7 +228,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         }
     }
 
-    private void build(MavenSession session, MavenProject project) throws MojoExecutionException {
+    private void build(MavenSession session, MavenProject project, GoalSet goals) throws MojoExecutionException {
         final List<MavenProject> projects = Arrays.asList(project);
         session.setProjects(projects);
         ProjectIndex projectIndex = new ProjectIndex(projects);
@@ -234,7 +237,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(), reactorBuildStatus, builder);
             List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);
             for (TaskSegment segment : segments) {
-                builder.buildProject(session, reactorContext, project, segment);
+                builder.buildProject(session, reactorContext, project, filterSegment(segment, goals));
             }
         } catch (Throwable t) {
             throw new MojoExecutionException("Error building generated bom:" + project.getArtifactId(), t);
@@ -341,6 +344,44 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         plugin.setArtifactId(artifact.getArtifactId());
         plugin.setVersion(artifact.getVersion());
         return plugin;
+    }
 
+    private TaskSegment filterSegment(TaskSegment segment, GoalSet goals) {
+        List<Object> filtered = new ArrayList<Object>();
+
+        Set<String> includes = goals.getIncludes();
+        Set<String> excludes = goals.getExcludes();
+
+        for (Object obj : segment.getTasks()) {
+            String name = getTaskName(obj);
+
+            if (!excludes.contains(name) && (includes.contains(name) || includes.isEmpty())) {
+                filtered.add(obj);
+            }
+        }
+        return new TaskSegment(segment.isAggregating(), filtered.toArray());
+    }
+
+    private static String getTaskName(Object task) {
+        try {
+            try {
+                Field field = task.getClass().getDeclaredField("pluginGoal");
+                field.setAccessible(true);
+                return (String) field.get(task);
+            } catch (NoSuchFieldException e) {
+                //ignore and try next field...
+            }
+
+            try {
+                Field field = task.getClass().getDeclaredField("lifecyclePhase");
+                field.setAccessible(true);
+                return (String) field.get(task);
+            } catch (NoSuchFieldException e) {
+                //ignore and try next field...
+            }
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
+        }
     }
 }
