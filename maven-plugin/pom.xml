@@ -38,10 +38,10 @@
                     <debug>false</debug>
                     <projectsDirectory>src/it</projectsDirectory>
                     <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-                    <!-- Opts for debuging-->
-                    <mavenOpts>-Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -DaltDeploymentRepository=test-repo::default::file://${project.build.directory}/repository</mavenOpts>
-                    <!-- Plain Opts
-                    <mavenOpts>-DaltDeploymentRepository=test-repo::default::file://${project.build.directory}/repository</mavenOpts>-->
+                    <!-- Opts for debuging
+                    <mavenOpts>-Xnoagent -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000 -DaltDeploymentRepository=test-repo::default::file://${project.build.directory}/repository</mavenOpts> -->
+                    <!-- Plain Opts -->
+                    <mavenOpts>-DaltDeploymentRepository=test-repo::default::file://${project.build.directory}/repository</mavenOpts>
                     <pomIncludes>
                         <pomInclude>*/pom.xml</pomInclude>
                     </pomIncludes>
