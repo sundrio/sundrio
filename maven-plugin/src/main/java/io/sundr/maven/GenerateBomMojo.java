@@ -47,9 +47,6 @@ import org.codehaus.plexus.util.SelectorUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -232,7 +229,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
         ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(session.getProjectDependencyGraph());
         try {
-            ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(), reactorBuildStatus, getMemento(builder));
+            ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(), reactorBuildStatus, builder);
             List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);
             for (TaskSegment segment : segments) {
                 builder.buildProject(session, reactorContext, project, segment);
@@ -343,15 +340,5 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         plugin.setVersion(artifact.getVersion());
         return plugin;
 
-    }
-
-
-    private Object getMemento(LifecycleModuleBuilder source) throws Exception {
-        Field sessionScopeFiled = source.getClass().getDeclaredField("sessionScope");
-        sessionScopeFiled.setAccessible(true);
-        Object sessionScope = sessionScopeFiled.get(source);
-        Method mementoMethod = sessionScope.getClass().getDeclaredMethod("memento");
-        mementoMethod.setAccessible(true);
-        return mementoMethod.invoke(sessionScope);
     }
 }

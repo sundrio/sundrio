@@ -17,11 +17,14 @@
 package io.sundr.maven;
 
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ReactorContextFactory {
 
@@ -35,14 +38,14 @@ public class ReactorContextFactory {
         this.version = version;
     }
 
-    public ReactorContext create(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader, ReactorBuildStatus status, Object memento) {
+    public ReactorContext create(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader, ReactorBuildStatus status, LifecycleModuleBuilder builder) {
         ReactorContext context = null;
         if (VERSION_3_0_0.compareTo(version) < 0) {
             throw new UnsupportedOperationException("ReactorContext is not supported in maven version:" + version);
         } else if (VERSION_3_3_0.compareTo(version) < 0) {
             context = create_3_2_x(result, index, classLoader, status);
         } else {
-            context = create_3_3_x(result, index, classLoader, status, memento);
+            context = create_3_3_x(result, index, classLoader, status, builder);
         }
 
         if (context == null) {
@@ -62,12 +65,21 @@ public class ReactorContextFactory {
         }
     }
 
-    private static ReactorContext create_3_3_x(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader, ReactorBuildStatus status, Object memento) {
+    private static ReactorContext create_3_3_x(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader, ReactorBuildStatus status, LifecycleModuleBuilder builder) {
         try {
             Constructor<ReactorContext> constructor = (Constructor<ReactorContext>) ReactorContext.class.getDeclaredConstructors()[0];
-            return constructor.newInstance(result, index, classLoader, status, memento);
+            return constructor.newInstance(result, index, classLoader, status, getMemento(builder));
         } catch (Throwable t) {
             throw new RuntimeException("Could not create ReactorContext.", t);
         }
+    }
+
+    private static Object getMemento(LifecycleModuleBuilder source) throws Exception {
+        Field sessionScopeFiled = source.getClass().getDeclaredField("sessionScope");
+        sessionScopeFiled.setAccessible(true);
+        Object sessionScope = sessionScopeFiled.get(source);
+        Method mementoMethod = sessionScope.getClass().getDeclaredMethod("memento");
+        mementoMethod.setAccessible(true);
+        return mementoMethod.invoke(sessionScope);
     }
 }
