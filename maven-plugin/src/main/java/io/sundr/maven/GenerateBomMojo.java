@@ -47,14 +47,12 @@ import org.codehaus.plexus.util.SelectorUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -346,42 +344,19 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         return plugin;
     }
 
-    private TaskSegment filterSegment(TaskSegment segment, GoalSet goals) {
+    private static TaskSegment filterSegment(TaskSegment segment, GoalSet goals) {
         List<Object> filtered = new ArrayList<Object>();
 
         Set<String> includes = goals.getIncludes();
         Set<String> excludes = goals.getExcludes();
 
         for (Object obj : segment.getTasks()) {
-            String name = getTaskName(obj);
+            String name = Reflections.readAnyField(obj, "pluginGoal", "lifecyclePhase");
 
             if (!excludes.contains(name) && (includes.contains(name) || includes.isEmpty())) {
                 filtered.add(obj);
             }
         }
         return new TaskSegment(segment.isAggregating(), filtered.toArray());
-    }
-
-    private static String getTaskName(Object task) {
-        try {
-            try {
-                Field field = task.getClass().getDeclaredField("pluginGoal");
-                field.setAccessible(true);
-                return (String) field.get(task);
-            } catch (NoSuchFieldException e) {
-                //ignore and try next field...
-            }
-
-            try {
-                Field field = task.getClass().getDeclaredField("lifecyclePhase");
-                field.setAccessible(true);
-                return (String) field.get(task);
-            } catch (NoSuchFieldException e) {
-                //ignore and try next field...
-            }
-            return null;
-        } catch (IllegalAccessException e) {
-            return null;
-        }
     }
 }

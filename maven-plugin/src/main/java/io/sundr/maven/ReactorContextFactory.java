@@ -23,8 +23,6 @@ import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 public class ReactorContextFactory {
 
@@ -68,18 +66,10 @@ public class ReactorContextFactory {
     private static ReactorContext create_3_3_x(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader, ReactorBuildStatus status, LifecycleModuleBuilder builder) {
         try {
             Constructor<ReactorContext> constructor = (Constructor<ReactorContext>) ReactorContext.class.getDeclaredConstructors()[0];
-            return constructor.newInstance(result, index, classLoader, status, getMemento(builder));
+            return constructor.newInstance(result, index, classLoader, status, Reflections.getMemento(builder));
         } catch (Throwable t) {
             throw new RuntimeException("Could not create ReactorContext.", t);
         }
     }
 
-    private static Object getMemento(LifecycleModuleBuilder source) throws Exception {
-        Field sessionScopeFiled = source.getClass().getDeclaredField("sessionScope");
-        sessionScopeFiled.setAccessible(true);
-        Object sessionScope = sessionScopeFiled.get(source);
-        Method mementoMethod = sessionScope.getClass().getDeclaredMethod("memento");
-        mementoMethod.setAccessible(true);
-        return mementoMethod.invoke(sessionScope);
-    }
 }
