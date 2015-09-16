@@ -75,7 +75,7 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
         return session;
     }
 
-    MavenProject readBomProject(File pomFile) throws IOException {
+    MavenProject readProject(File pomFile) throws IOException {
         MavenXpp3Reader mavenReader = new MavenXpp3Reader();
         FileReader fileReader = null;
         try {

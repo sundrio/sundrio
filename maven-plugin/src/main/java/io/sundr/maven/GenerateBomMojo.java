@@ -47,6 +47,7 @@ import org.codehaus.plexus.util.SelectorUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -160,7 +161,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             }
 
             MavenProject rootProject = getProject();
-            MavenProject bomProject = new MavenProject(rootProject);
+            MavenProject bomProject = rootProject.clone();
 
             //we want to avoid recursive "generate-bom".
             bomProject.setExecutionRoot(false);
@@ -225,10 +226,11 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     }
 
     private void build(MavenSession session, MavenProject project) throws MojoExecutionException {
-        session.getProjects().add(project);
-        ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
-        ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(session.getProjectDependencyGraph());
+        final List<MavenProject> projects = Arrays.asList(project);
+        session.setProjects(projects);
+        ProjectIndex projectIndex = new ProjectIndex(projects);
         try {
+            ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(new BomDependencyGraph(project));
             ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(), reactorBuildStatus, builder);
             List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);
             for (TaskSegment segment : segments) {
