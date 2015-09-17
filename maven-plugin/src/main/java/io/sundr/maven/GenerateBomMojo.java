@@ -205,6 +205,10 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 }
             }
 
+            for (String key : config.getProperties().stringPropertyNames()) {
+                bomProject.getProperties().put(key, config.getProperties().getProperty(key));
+            }
+
 
             getLog().info("Generating BOM: " + config.getArtifactId());
             MavenXpp3Writer mavenWritter = new MavenXpp3Writer();
