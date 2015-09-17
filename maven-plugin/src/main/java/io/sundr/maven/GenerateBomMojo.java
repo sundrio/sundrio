@@ -50,7 +50,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -59,7 +58,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VALIDATE)
 public class GenerateBomMojo extends AbstractSundrioMojo {
 
     private final String ARTIFACT_FORMAT = "%s:%s:%s:%s:%s";
@@ -275,11 +274,11 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
 
     private void build(MavenSession session, MavenProject project, GoalSet goals) throws MojoExecutionException {
-        final List<MavenProject> projects = Arrays.asList(project);
-        session.setProjects(projects);
-        ProjectIndex projectIndex = new ProjectIndex(projects);
+        //final List<MavenProject> projects = Arrays.asList(getProject(), project);
+        session.getProjects().add(project);
+        ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
         try {
-            ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(new BomDependencyGraph(project));
+            ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(new BomDependencyGraph(session.getProjects()));
             ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(), reactorBuildStatus, builder);
             List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);
             for (TaskSegment segment : segments) {
@@ -341,38 +340,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         return result;
     }
 
-    private static MavenProject cleanUp(MavenProject p) {
-        MavenProject result = new MavenProject();
-
-        result.setModelVersion(p.getModelVersion());
-        result.setGroupId(p.getGroupId());
-        result.setArtifactId(p.getArtifactId());
-        result.setVersion(p.getVersion());
-        result.setPackaging(p.getPackaging());
-        result.setName(p.getName());
-        result.setDescription(p.getDescription());
-        result.setUrl(p.getUrl());
-
-        result.setDevelopers(p.getDevelopers());
-        result.setLicenses(p.getLicenses());
-        result.setScm(p.getScm());
-
-        result.getModel().setDependencyManagement(p.getModel().getDependencyManagement());
-
-        if (p.getModel().getBuild() != null &&
-                p.getModel().getBuild().getPluginManagement() != null &&
-                !p.getModel().getBuild().getPluginManagement().getPluginsAsMap().isEmpty()) {
-            result.getModel().setBuild(new Build());
-            result.getModel().getBuild().setPluginManagement(p.getModel().getBuild().getPluginManagement());
-        }
-
-        result.setArtifact(p.getArtifact());
-
-        result.setParent(null);
-        result.getModel().setParent(null);
-        result.getModel().setBuild(null);
-        return result;
-    }
 
     private static Dependency toDependency(Artifact artifact) {
         Dependency dependency = new Dependency();

@@ -25,15 +25,19 @@ import java.util.List;
 
 public class BomDependencyGraph implements ProjectDependencyGraph {
 
-    private final MavenProject project;
+    private final List<MavenProject> projects;
 
     public BomDependencyGraph(MavenProject project) {
-        this.project = project;
+        this.projects = Arrays.asList(project);
+    }
+
+    public BomDependencyGraph(List<MavenProject> projects) {
+        this.projects = projects;
     }
 
     @Override
     public List<MavenProject> getSortedProjects() {
-        return Arrays.asList(project);
+        return projects;
     }
 
     @Override
