@@ -53,6 +53,7 @@
                 <artifactId>sundr-maven-plugin</artifactId>
                 <version>@pom.version@</version>
                 <configuration>
+                    <bomTemplateUrl>file://${project.basedir}/custom.xml.vm</bomTemplateUrl>
                     <boms>
                         <bom>
                             <artifactId>bom-test-1</artifactId>

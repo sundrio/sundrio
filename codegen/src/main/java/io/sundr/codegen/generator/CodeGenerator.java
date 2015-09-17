@@ -24,47 +24,60 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.directive.Directive;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
+import org.apache.velocity.runtime.resource.util.StringResourceRepository;
+import org.apache.velocity.runtime.resource.util.StringResourceRepositoryImpl;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
 import java.util.Set;
 
+import static io.sundr.codegen.utils.StringUtils.loadResource;
+
 public class CodeGenerator<M> {
-    
+
     private final VelocityContext context;
     private final Writer writer;
     private final M model;
     private final String templateResource;
+    private final URL templateUrl;
     private final Template template;
     private final Set<Class<? extends Directive>> directives;
 
-    public CodeGenerator(M model, Writer writer, String templateResource, Set<Class<? extends Directive>> directives) {
-        this.model = model;
-        this.writer = writer;
-        this.templateResource = templateResource;
-        this.context = new VelocityContext();
-        this.directives = directives;
-        
+    public CodeGenerator(M model, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives) {
         VelocityEngine engine = new VelocityEngine();
-        engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-        engine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 
+        engine.setProperty(RuntimeConstants.RESOURCE_LOADER, "string");
+        engine.setProperty("string.resource.loader.class", StringResourceLoader.class.getName());
         engine.init();
-        
+
+        StringResourceRepository repo = StringResourceLoader.getRepository();
+        try {
+            repo.putStringResource("template", templateUrl != null ? loadResource(templateUrl) : loadResource(templateResource));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to read template.", e);
+        }
+
         //Load standard directives
         engine.loadDirective(ClassDirective.class.getCanonicalName());
         engine.loadDirective(MethodDirective.class.getCanonicalName());
         engine.loadDirective(FieldDirective.class.getCanonicalName());
 
-        for (Class<? extends Directive> directive :directives){
+        for (Class<? extends Directive> directive : directives) {
             engine.loadDirective(directive.getCanonicalName());
         }
 
-        this.template = engine.getTemplate(templateResource);
+        this.model = model;
+        this.writer = writer;
+        this.templateResource = templateResource;
+        this.templateUrl = templateUrl;
+        this.context = new VelocityContext();
+        this.directives = directives;
+        this.template = engine.getTemplate("template");
         this.context.put("model", model);
     }
-    
+
 
     public Writer getWriter() {
         return writer;
@@ -78,11 +91,19 @@ public class CodeGenerator<M> {
         return templateResource;
     }
 
+    public URL getTemplateUrl() {
+        return templateUrl;
+    }
+
+    public Template getTemplate() {
+        return template;
+    }
+
     public Set<Class<? extends Directive>> getDirectives() {
         return directives;
     }
 
     public void generate() throws IOException {
-        GeneratorUtils.generate(context, writer, template);
+        GeneratorUtils.generate(context, writer, getTemplate());
     }
 }

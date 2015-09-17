@@ -16,6 +16,7 @@
 
 package io.sundr.maven;
 
+import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -32,9 +33,9 @@ import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -47,6 +48,7 @@ import org.codehaus.plexus.util.SelectorUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -95,6 +97,12 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
     @Parameter(defaultValue = "${maven.version}")
     private String mavenVersion;
+
+    @Parameter(defaultValue = "${bom.template.resource}")
+    private String bomTemplateResouce = "templates/bom.xml.vm";
+
+    @Parameter(defaultValue = "${bom.template.url}")
+    private URL bomTemplateUrl;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -154,67 +162,15 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                     }
                 }
             }
-
-            MavenProject rootProject = getProject();
-            MavenProject bomProject = rootProject.clone();
-
-            //we want to avoid recursive "generate-bom".
-            bomProject.setExecutionRoot(false);
-            bomProject.setFile(generatedBom);
-            bomProject.getModel().setPomFile(generatedBom);
-            bomProject.setModelVersion(rootProject.getModelVersion());
-
-            bomProject.setArtifact(new DefaultArtifact(rootProject.getGroupId(),
-                    config.getArtifactId(), rootProject.getVersion(), rootProject.getArtifact().getScope(),
-                    rootProject.getArtifact().getType(), rootProject.getArtifact().getClassifier(),
-                    rootProject.getArtifact().getArtifactHandler()));
-
-
-            bomProject.setParent(rootProject.getParent());
-            bomProject.getModel().setParent(rootProject.getModel().getParent());
-
-            bomProject.setGroupId(rootProject.getGroupId());
-            bomProject.setArtifactId(config.getArtifactId());
-            bomProject.setVersion(rootProject.getVersion());
-            bomProject.setPackaging("pom");
-            bomProject.setName(config.getName());
-            bomProject.setDescription(config.getDescription());
-
-            bomProject.setUrl(rootProject.getUrl());
-            bomProject.setLicenses(rootProject.getLicenses());
-            bomProject.setScm(rootProject.getScm());
-            bomProject.setDevelopers(rootProject.getDevelopers());
-            bomProject.setDistributionManagement(rootProject.getDistributionManagement());
-            bomProject.getModel().setProfiles(rootProject.getModel().getProfiles());
-
-            //We want to avoid having the generated stuff wiped.
-            bomProject.getProperties().put("clean.skip", "true");
-            bomProject.getModel().getBuild().setDirectory(bomDir.getAbsolutePath());
-            bomProject.getModel().getBuild().setOutputDirectory(new File(bomDir, "target").getAbsolutePath());
-
-            bomProject.getModel().setDependencyManagement(new DependencyManagement());
-            for (Artifact artifact : archives) {
-                bomProject.getDependencyManagement().addDependency(toDependency(artifact));
-            }
-
-            if (!plugins.isEmpty()) {
-                bomProject.getModel().setBuild(new Build());
-                bomProject.getModel().getBuild().setPluginManagement(new PluginManagement());
-                for (Artifact artifact : plugins) {
-                    bomProject.getPluginManagement().addPlugin(toPlugin(artifact));
-                }
-            }
-
-            for (String key : config.getProperties().stringPropertyNames()) {
-                bomProject.getProperties().put(key, config.getProperties().getProperty(key));
-            }
-
-
             getLog().info("Generating BOM: " + config.getArtifactId());
-            MavenXpp3Writer mavenWritter = new MavenXpp3Writer();
-            //We cleanup the project a little bit, as we don't need all that stuff in the generated content.
-            mavenWritter.write(writer, cleanUp(bomProject).getModel());
-            return bomProject;
+            new CodeGeneratorBuilder<Model>()
+                    .withWriter(writer)
+                    .withModel(toGenerate(getProject(), config, archives, plugins).getModel())
+                    .withTemplateResource(bomTemplateResouce)
+                    .withTemplateUrl(bomTemplateUrl)
+                    .build().generate();
+
+            return toBuild(getProject(), config);
         } catch (Exception e) {
             throw new MojoFailureException("Failed to generate bom.");
         } finally {
@@ -225,6 +181,98 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             }
         }
     }
+
+    /**
+     * Returns the model of the {@link org.apache.maven.project.MavenProject} to generate.
+     * This is a trimmed down version and contains just the stuff that need to go into the bom.
+     * @param project       The source {@link org.apache.maven.project.MavenProject}.
+     * @param config        The {@link io.sundr.maven.BomConfig}.
+     * @return              The build {@link org.apache.maven.project.MavenProject}.
+     */
+    private static MavenProject toGenerate(MavenProject project, BomConfig config, Set<Artifact> dependencies, Set<Artifact> plugins) {
+        MavenProject toGenerate = project.clone();
+        toGenerate.setGroupId(project.getGroupId());
+        toGenerate.setArtifactId(config.getArtifactId());
+        toGenerate.setVersion(project.getVersion());
+        toGenerate.setPackaging("pom");
+        toGenerate.setName(config.getName());
+        toGenerate.setDescription(config.getDescription());
+
+        toGenerate.setUrl(project.getUrl());
+        toGenerate.setLicenses(project.getLicenses());
+        toGenerate.setScm(project.getScm());
+        toGenerate.setDevelopers(project.getDevelopers());
+
+        toGenerate.getModel().setDependencyManagement(new DependencyManagement());
+        for (Artifact artifact : dependencies) {
+            toGenerate.getDependencyManagement().addDependency(toDependency(artifact));
+        }
+
+        toGenerate.getModel().setBuild(new Build());
+        if (!plugins.isEmpty()) {
+            toGenerate.getModel().setBuild(new Build());
+            toGenerate.getModel().getBuild().setPluginManagement(new PluginManagement());
+            for (Artifact artifact : plugins) {
+                toGenerate.getPluginManagement().addPlugin(toPlugin(artifact));
+            }
+        }
+
+        return toGenerate;
+    }
+
+    /**
+     * Returns the generated {@link org.apache.maven.project.MavenProject} to build.
+     * This version of the project contains all the stuff needed for building (parents, profiles, properties etc).
+     * @param project       The source {@link org.apache.maven.project.MavenProject}.
+     * @param config        The {@link io.sundr.maven.BomConfig}.
+     * @return              The build {@link org.apache.maven.project.MavenProject}.
+     */
+    private static MavenProject toBuild(MavenProject project, BomConfig config) {
+        File outputDir = new File(project.getBuild().getOutputDirectory());
+        File bomDir = new File(outputDir, config.getArtifactId());
+        File generatedBom = new File(bomDir, BOM_NAME);
+
+        MavenProject toBuild = project.clone();
+        //we want to avoid recursive "generate-bom".
+        toBuild.setExecutionRoot(false);
+        toBuild.setFile(generatedBom);
+        toBuild.getModel().setPomFile(generatedBom);
+        toBuild.setModelVersion(project.getModelVersion());
+
+        toBuild.setArtifact(new DefaultArtifact(project.getGroupId(),
+                config.getArtifactId(), project.getVersion(), project.getArtifact().getScope(),
+                project.getArtifact().getType(), project.getArtifact().getClassifier(),
+                project.getArtifact().getArtifactHandler()));
+
+
+        toBuild.setParent(project.getParent());
+        toBuild.getModel().setParent(project.getModel().getParent());
+
+        toBuild.setGroupId(project.getGroupId());
+        toBuild.setArtifactId(config.getArtifactId());
+        toBuild.setVersion(project.getVersion());
+        toBuild.setPackaging("pom");
+        toBuild.setName(config.getName());
+        toBuild.setDescription(config.getDescription());
+
+        toBuild.setUrl(project.getUrl());
+        toBuild.setLicenses(project.getLicenses());
+        toBuild.setScm(project.getScm());
+        toBuild.setDevelopers(project.getDevelopers());
+        toBuild.setDistributionManagement(project.getDistributionManagement());
+        toBuild.getModel().setProfiles(project.getModel().getProfiles());
+
+        //We want to avoid having the generated stuff wiped.
+        toBuild.getProperties().put("clean.skip", "true");
+        toBuild.getModel().getBuild().setDirectory(bomDir.getAbsolutePath());
+        toBuild.getModel().getBuild().setOutputDirectory(new File(bomDir, "target").getAbsolutePath());
+        for (String key : config.getProperties().stringPropertyNames()) {
+            toBuild.getProperties().put(key, config.getProperties().getProperty(key));
+        }
+        return toBuild;
+    }
+
+
 
     private void build(MavenSession session, MavenProject project, GoalSet goals) throws MojoExecutionException {
         final List<MavenProject> projects = Arrays.asList(project);

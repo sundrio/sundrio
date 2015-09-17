@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 
 public final class StringUtils {
 
@@ -31,8 +32,8 @@ public final class StringUtils {
             return String.valueOf(item);
         }
     }
-    
-    
+
+
     private StringUtils() {
         //Utility Class
     }
@@ -62,8 +63,8 @@ public final class StringUtils {
     public static <T> String join(Iterable<T> items, String delimiter) {
         return join(items, new ToString<T>(), delimiter);
     }
-    
-    public static <T> String join(Iterable<T> items, Function<T, String> function,String delimiter) {
+
+    public static <T> String join(Iterable<T> items, Function<T, String> function, String delimiter) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (T item : items) {
@@ -79,7 +80,7 @@ public final class StringUtils {
     public static <T> String join(T[] items, String delimiter) {
         return join(items, new ToString<T>(), delimiter);
     }
-    
+
     public static <T> String join(T[] items, Function<T, String> function, String delimiter) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
@@ -138,13 +139,43 @@ public final class StringUtils {
     public static String loadResource(String resourceName) throws IOException {
         InputStream is = null;
         BufferedReader in = null;
-        try  {
+        try {
             is = StringUtils.class.getClassLoader().getResourceAsStream(resourceName);
             in = new BufferedReader(new InputStreamReader(is));
             String line = null;
             StringBuffer sb = new StringBuffer();
             while ((line = in.readLine()) != null) {
-                sb.append(line);
+                sb.append(line).append("\n");
+            }
+            return sb.toString();
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+            if (is != null) {
+                is.close();
+            }
+        }
+    }
+
+    public static final String loadResourceQuietly(URL resourceUrl) {
+        try {
+            return loadResource(resourceUrl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String loadResource(URL resourceUrl) throws IOException {
+        InputStream is = null;
+        BufferedReader in = null;
+        try {
+            is = resourceUrl.openStream();
+            in = new BufferedReader(new InputStreamReader(is));
+            String line = null;
+            StringBuffer sb = new StringBuffer();
+            while ((line = in.readLine()) != null) {
+                sb.append(line).append("\n");
             }
             return sb.toString();
         } finally {

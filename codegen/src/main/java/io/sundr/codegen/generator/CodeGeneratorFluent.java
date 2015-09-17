@@ -22,6 +22,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import java.io.Writer;
+import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -82,16 +83,18 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
         return this.templateResource;
     }
 
-    private Template template;
 
-    public T withTemplate(Template template) {
-        this.template = template;
+    private URL templateUrl;
+
+    public T withTemplateUrl(URL templateUrl) {
+        this.templateUrl = templateUrl;
         return (T) this;
     }
 
-    public Template getTemplate() {
-        return this.template;
+    public URL getTemplateUrl() {
+        return this.templateUrl;
     }
+
 
     private Set<Class<? extends org.apache.velocity.runtime.directive.Directive>> directives = new LinkedHashSet();
 
