@@ -51,9 +51,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,18 +109,31 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (getProject().isExecutionRoot() && !getProject().getModules().isEmpty()) {
+            List<MavenProject> updated = new LinkedList<MavenProject>();
+
+            Map<BomConfig, MavenProject> generated = new HashMap<BomConfig, MavenProject>();
+            updated.add(getProject());
             if (boms == null || boms.length == 0) {
                 String artifactId = getProject().getArtifactId() + "-bom";
                 if (GENERATED_ARTIFACT_IDS.add(artifactId)) {
                     BomConfig cfg = new BomConfig(artifactId, getProject().getName() + " Bom", " Generated bom");
-                    build(getSession().clone(), generateBom(cfg), cfg.getGoals());
+                    MavenProject bomProject = generateBom(cfg);
+                    generated.put(cfg, bomProject);
+                    updated.add(bomProject);
                 }
             } else {
                 for (BomConfig cfg : boms) {
                     if (GENERATED_ARTIFACT_IDS.add(cfg.getArtifactId())) {
-                        build(getSession().clone(), generateBom(cfg), cfg.getGoals());
+                        MavenProject bomProject = generateBom(cfg);
+                        generated.put(cfg, bomProject);
+                        updated.add(bomProject);
                     }
                 }
+            }
+
+            updated.addAll(getAllButCurrent());
+            for (Map.Entry<BomConfig, MavenProject> entry : generated.entrySet()) {
+                build(getSession().clone(), entry.getValue(), updated, entry.getKey().getGoals());
             }
         }
     }
@@ -136,7 +152,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             Set<Artifact> archives = new LinkedHashSet<Artifact>();
             Set<Artifact> plugins = new LinkedHashSet<Artifact>();
             Set<Artifact> poms = new LinkedHashSet<Artifact>();
-
 
             if (config.getModules().getIncludes().isEmpty()) {
                 config.getModules().getIncludes().add("*:*");
@@ -184,9 +199,10 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     /**
      * Returns the model of the {@link org.apache.maven.project.MavenProject} to generate.
      * This is a trimmed down version and contains just the stuff that need to go into the bom.
-     * @param project       The source {@link org.apache.maven.project.MavenProject}.
-     * @param config        The {@link io.sundr.maven.BomConfig}.
-     * @return              The build {@link org.apache.maven.project.MavenProject}.
+     *
+     * @param project The source {@link org.apache.maven.project.MavenProject}.
+     * @param config  The {@link io.sundr.maven.BomConfig}.
+     * @return The build {@link org.apache.maven.project.MavenProject}.
      */
     private static MavenProject toGenerate(MavenProject project, BomConfig config, Set<Artifact> dependencies, Set<Artifact> plugins) {
         MavenProject toGenerate = project.clone();
@@ -222,9 +238,10 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     /**
      * Returns the generated {@link org.apache.maven.project.MavenProject} to build.
      * This version of the project contains all the stuff needed for building (parents, profiles, properties etc).
-     * @param project       The source {@link org.apache.maven.project.MavenProject}.
-     * @param config        The {@link io.sundr.maven.BomConfig}.
-     * @return              The build {@link org.apache.maven.project.MavenProject}.
+     *
+     * @param project The source {@link org.apache.maven.project.MavenProject}.
+     * @param config  The {@link io.sundr.maven.BomConfig}.
+     * @return The build {@link org.apache.maven.project.MavenProject}.
      */
     private static MavenProject toBuild(MavenProject project, BomConfig config) {
         File outputDir = new File(project.getBuild().getOutputDirectory());
@@ -271,11 +288,14 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         return toBuild;
     }
 
+    private List<MavenProject> getAllButCurrent() {
+        List<MavenProject> result = new LinkedList<MavenProject>(getSession().getProjects());
+        result.remove(getSession().getCurrentProject());
+        return result;
+    }
 
-
-    private void build(MavenSession session, MavenProject project, GoalSet goals) throws MojoExecutionException {
-        //final List<MavenProject> projects = Arrays.asList(getProject(), project);
-        session.getProjects().add(project);
+    private void build(MavenSession session, MavenProject project, List<MavenProject> allProjects, GoalSet goals) throws MojoExecutionException {
+        session.setProjects(allProjects);
         ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
         try {
             ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(new BomDependencyGraph(session.getProjects()));
