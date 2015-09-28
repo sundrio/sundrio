@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.utils;
 
 
+import io.sundr.SundrException;
 import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.BuildableReference;
@@ -68,7 +69,7 @@ public class BuilderUtils {
                 return method;
             }
         }
-        return null;
+        throw new SundrException("No getter found for property: " + property.getName() +" on class: " + clazz.getType().getFullyQualifiedName());
     }
 
 
