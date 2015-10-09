@@ -16,6 +16,7 @@
 
 package io.sundr.builder;
 
+import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
@@ -45,6 +46,7 @@ public class Constants {
     public static final JavaType V = newGeneric("V");
     public static final JavaType VOID = new JavaTypeBuilder().withClassName("void").build();
     public static final JavaType Q = newGeneric("?");
+    public static final JavaType BUILDABLE_ANNOTATION = ClassToJavaType.FUNCTION.apply(Buildable.class);
     public static final JavaType CLASS = ClassToJavaType.FUNCTION.apply(Class.class);
     public static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);
     public static final JavaType MAP = ClassToJavaType.FUNCTION.apply(Map.class);

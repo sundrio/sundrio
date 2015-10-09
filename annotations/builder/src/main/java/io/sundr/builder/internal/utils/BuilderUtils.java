@@ -55,6 +55,14 @@ public class BuilderUtils {
     public static final String BUILDABLE = "BUILDABLE";
 
     public static JavaMethod findBuildableConstructor(JavaClazz clazz) {
+        //1st pass go for annotated method
+        for (JavaMethod candidate : clazz.getConstructors()) {
+            if (candidate.getAnnotations().contains(Constants.BUILDABLE_ANNOTATION)) {
+                return candidate;
+            }
+        }
+
+        //2nd pass go for the first non-empty constructor
         for (JavaMethod candidate : clazz.getConstructors()) {
             if (candidate.getArguments().length != 0) {
                 return candidate;

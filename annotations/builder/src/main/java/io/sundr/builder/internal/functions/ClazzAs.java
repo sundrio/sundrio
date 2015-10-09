@@ -360,7 +360,11 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         sb.append("this.fluent = " + fluent + "; ");
         for (JavaProperty property : constructor.getArguments()) {
             JavaMethod getter = findGetter(clazz, property);
-            sb.append(fluent).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
+            if (getter != null) {
+                sb.append(fluent).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
+            } else {
+                throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
+            }
         }
         return sb.toString();
     }
