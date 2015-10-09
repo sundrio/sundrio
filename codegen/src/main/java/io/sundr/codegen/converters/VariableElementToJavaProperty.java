@@ -22,7 +22,11 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.VariableElement;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class VariableElementToJavaProperty implements Function<VariableElement, JavaProperty> {
 
@@ -37,10 +41,17 @@ public class VariableElementToJavaProperty implements Function<VariableElement, 
         String name = variableElement.getSimpleName().toString();
         boolean isArray = variableElement.asType().toString().endsWith("[]");
         JavaType type = new JavaTypeBuilder(toType.apply(variableElement.asType().toString())).withArray(isArray).build();
+
+        Set<JavaType> annotations = new LinkedHashSet<JavaType>();
+        for (AnnotationMirror annotationMirror : variableElement.getAnnotationMirrors()) {
+            JavaType annotationType = toType.apply(annotationMirror.getAnnotationType().toString());
+            annotations.add(annotationType);
+        }
         return new JavaPropertyBuilder()
                 .withName(name)
                 .withType(type)
                 .withArray(isArray)
+                .withAnnotations(annotations)
                 .withModifiers(variableElement.getModifiers())
                 .build();
     }

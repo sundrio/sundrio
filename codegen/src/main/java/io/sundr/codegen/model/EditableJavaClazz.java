@@ -24,8 +24,8 @@ import java.util.Set;
 public class EditableJavaClazz extends JavaClazz implements Editable<JavaClazzBuilder> {
 
 
-    public EditableJavaClazz(JavaType type, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
-        super(type, constructors, methods, fields, imports, attributes, nested);
+    public EditableJavaClazz(JavaType type, Set<JavaType> annotations, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
+        super(type, annotations, constructors, methods, fields, imports, attributes, nested);
     }
 
     public JavaClazzBuilder edit() {

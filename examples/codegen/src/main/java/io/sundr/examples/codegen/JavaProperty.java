@@ -25,14 +25,16 @@ import java.util.Set;
 
 public class JavaProperty extends AttributeSupport implements Property<JavaType> {
 
+    private final Set<JavaType> annotations;
     private final Set<Modifier> modifiers;
     private final JavaType type;
     private final String name;
     private final boolean array;
 
     @Buildable
-    public JavaProperty(Set<Modifier> modifiers, JavaType type, String name, boolean array, Map<String, Object> attributes) {
+    public JavaProperty(Set<JavaType> annotations, Set<Modifier> modifiers, JavaType type, String name, boolean array, Map<String, Object> attributes) {
         super(attributes);
+        this.annotations = annotations;
         this.type = type;
         this.name = name;
         this.modifiers = modifiers;
@@ -56,6 +58,10 @@ public class JavaProperty extends AttributeSupport implements Property<JavaType>
             sb.append(name.substring(1));
         }
         return sb.toString();
+    }
+
+    public Set<JavaType> getAnnotations() {
+        return annotations;
     }
 
     public Set<Modifier> getModifiers() {

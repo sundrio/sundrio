@@ -25,8 +25,8 @@ import java.util.Set;
 public class EditableJavaMethod extends JavaMethod implements Editable<JavaMethodBuilder> {
 
 
-    public EditableJavaMethod(Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
-        super(modifiers, typeParameters, name, returnType, arguments, exceptions, attributes);
+    public EditableJavaMethod(Set<JavaType> annotations, Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
+        super(annotations, modifiers, typeParameters, name, returnType, arguments, exceptions, attributes);
     }
 
     public JavaMethodBuilder edit() {

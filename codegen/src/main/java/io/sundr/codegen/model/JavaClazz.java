@@ -26,15 +26,17 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaProperty> {
 
     private final JavaType type;
+    private final Set<JavaType> annotations;
     private final Set<JavaMethod> methods;
     private final Set<JavaMethod> constructors;
     private final Set<JavaProperty> fields;
     private final Set<JavaType> imports;
     private final Set<JavaClazz> nested;
 
-    public JavaClazz(JavaType type, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
+    public JavaClazz(JavaType type, Set<JavaType> annotations, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
         super(attributes);
         this.type = type;
+        this.annotations = annotations;
         this.methods = methods;
         this.constructors = constructors;
         this.fields = fields;
@@ -44,6 +46,10 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
 
     private Set<JavaType> getReferencedTypes() {
         return JavaClazzToReferences.FUNCTION.apply(this);
+    }
+
+    public Set<JavaType> getAnnotations() {
+        return annotations;
     }
 
     public Set<JavaMethod> getConstructors() {

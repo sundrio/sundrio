@@ -20,11 +20,13 @@ import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.Method;
 
 import javax.lang.model.element.Modifier;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
 public class JavaMethod extends AttributeSupport implements Method<JavaType, JavaProperty> {
 
+    private final Set<JavaType> annotations;
     private final Set<Modifier> modifiers;
     private final Set<JavaType> typeParameters;
     private final String name;
@@ -33,14 +35,19 @@ public class JavaMethod extends AttributeSupport implements Method<JavaType, Jav
     private final Set<JavaType> exceptions;
 
     @Buildable
-    public JavaMethod(Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
+    public JavaMethod(Set<JavaType> annotations, Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
         super(attributes);
+        this.annotations = annotations;
         this.modifiers = modifiers;
         this.typeParameters = typeParameters;
         this.name = name;
         this.returnType = returnType;
         this.arguments = arguments;
         this.exceptions = exceptions;
+    }
+
+    public Set<JavaType> getAnnotations() {
+        return annotations;
     }
 
     public Set<Modifier> getModifiers() {
@@ -69,4 +76,25 @@ public class JavaMethod extends AttributeSupport implements Method<JavaType, Jav
     public Set<JavaType> getExceptions() {
         return exceptions;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JavaMethod that = (JavaMethod) o;
+
+        if (!Arrays.equals(arguments, that.arguments)) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (arguments != null ? Arrays.hashCode(arguments) : 0);
+        return result;
+    }
+
 }

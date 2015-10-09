@@ -16,51 +16,43 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Builder;
+import io.sundr.builder.VisitableBuilder;
 
-public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> implements Builder<JavaMethod> {
+public class JavaMethodBuilder extends JavaMethodFluent<JavaMethodBuilder> implements VisitableBuilder<JavaMethod,JavaMethodBuilder>{
 
-    JavaMethodFluent<?> fluent;
+     JavaMethodFluent<?> fluent;
 
-    public JavaMethodBuilder() {
+    public JavaMethodBuilder(){
         this.fluent = this;
     }
-
-    public JavaMethodBuilder(JavaMethodFluent<?> fluent) {
+    public JavaMethodBuilder( JavaMethodFluent<?> fluent ){
         this.fluent = fluent;
     }
-
-    public JavaMethodBuilder(JavaMethodFluent<?> fluent, JavaMethod instance) {
-        this.fluent = fluent;
-        fluent.withModifiers(instance.getModifiers());
-        fluent.withTypeParameters(instance.getTypeParameters());
-        fluent.withName(instance.getName());
-        fluent.withReturnType(instance.getReturnType());
-        fluent.withArguments(instance.getArguments());
-        fluent.withExceptions(instance.getExceptions());
-        fluent.withAttributes(instance.getAttributes());
+    public JavaMethodBuilder( JavaMethodFluent<?> fluent , JavaMethod instance ){
+        this.fluent = fluent; fluent.withAnnotations(instance.getAnnotations()); fluent.withModifiers(instance.getModifiers()); fluent.withTypeParameters(instance.getTypeParameters()); fluent.withName(instance.getName()); fluent.withReturnType(instance.getReturnType()); fluent.withArguments(instance.getArguments()); fluent.withExceptions(instance.getExceptions()); fluent.withAttributes(instance.getAttributes()); 
+    }
+    public JavaMethodBuilder( JavaMethod instance ){
+        this.fluent = this; this.withAnnotations(instance.getAnnotations()); this.withModifiers(instance.getModifiers()); this.withTypeParameters(instance.getTypeParameters()); this.withName(instance.getName()); this.withReturnType(instance.getReturnType()); this.withArguments(instance.getArguments()); this.withExceptions(instance.getExceptions()); this.withAttributes(instance.getAttributes()); 
     }
 
-    public JavaMethodBuilder(JavaMethod instance) {
-        this.fluent = this;
-        this.withModifiers(instance.getModifiers());
-        this.withTypeParameters(instance.getTypeParameters());
-        this.withName(instance.getName());
-        this.withReturnType(instance.getReturnType());
-        this.withArguments(instance.getArguments());
-        this.withExceptions(instance.getExceptions());
-        this.withAttributes(instance.getAttributes());
-    }
+public EditableJavaMethod build(){
+    EditableJavaMethod buildable = new EditableJavaMethod(fluent.getAnnotations(),fluent.getModifiers(),fluent.getTypeParameters(),fluent.getName(),fluent.getReturnType(),fluent.getArguments(),fluent.getExceptions(),fluent.getAttributes());
+validate(buildable);
+return buildable;
 
-    public EditableJavaMethod build() {
-        EditableJavaMethod buildable = new EditableJavaMethod(fluent.getModifiers(), fluent.getTypeParameters(), fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.getExceptions(), fluent.getAttributes());
-        validate(buildable);
-        return buildable;
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+JavaMethodBuilder that = (JavaMethodBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    }
+}
 
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }

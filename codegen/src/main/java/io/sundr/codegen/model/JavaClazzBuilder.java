@@ -16,51 +16,43 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Builder;
+import io.sundr.builder.VisitableBuilder;
 
-public class JavaClazzBuilder extends JavaClazzFluent<JavaClazzBuilder> implements Builder<JavaClazz> {
+public class JavaClazzBuilder extends JavaClazzFluent<JavaClazzBuilder> implements VisitableBuilder<JavaClazz,JavaClazzBuilder>{
 
-    JavaClazzFluent<?> fluent;
+     JavaClazzFluent<?> fluent;
 
-    public JavaClazzBuilder() {
+    public JavaClazzBuilder(){
         this.fluent = this;
     }
-
-    public JavaClazzBuilder(JavaClazzFluent<?> fluent) {
+    public JavaClazzBuilder( JavaClazzFluent<?> fluent ){
         this.fluent = fluent;
     }
-
-    public JavaClazzBuilder(JavaClazzFluent<?> fluent, JavaClazz instance) {
-        this.fluent = fluent;
-        fluent.withType(instance.getType());
-        fluent.withConstructors(instance.getConstructors());
-        fluent.withMethods(instance.getMethods());
-        fluent.withFields(instance.getFields());
-        fluent.withImports(instance.getImports());
-        fluent.withAttributes(instance.getAttributes());
-        fluent.withNested(instance.getNested());
+    public JavaClazzBuilder( JavaClazzFluent<?> fluent , JavaClazz instance ){
+        this.fluent = fluent; fluent.withType(instance.getType()); fluent.withAnnotations(instance.getAnnotations()); fluent.withConstructors(instance.getConstructors()); fluent.withMethods(instance.getMethods()); fluent.withFields(instance.getFields()); fluent.withImports(instance.getImports()); fluent.withAttributes(instance.getAttributes()); fluent.withNested(instance.getNested()); 
+    }
+    public JavaClazzBuilder( JavaClazz instance ){
+        this.fluent = this; this.withType(instance.getType()); this.withAnnotations(instance.getAnnotations()); this.withConstructors(instance.getConstructors()); this.withMethods(instance.getMethods()); this.withFields(instance.getFields()); this.withImports(instance.getImports()); this.withAttributes(instance.getAttributes()); this.withNested(instance.getNested()); 
     }
 
-    public JavaClazzBuilder(JavaClazz instance) {
-        this.fluent = this;
-        this.withType(instance.getType());
-        this.withConstructors(instance.getConstructors());
-        this.withMethods(instance.getMethods());
-        this.withFields(instance.getFields());
-        this.withImports(instance.getImports());
-        this.withAttributes(instance.getAttributes());
-        this.withNested(instance.getNested());
-    }
+public EditableJavaClazz build(){
+    EditableJavaClazz buildable = new EditableJavaClazz(fluent.getType(),fluent.getAnnotations(),fluent.getConstructors(),fluent.getMethods(),fluent.getFields(),fluent.getImports(),fluent.getAttributes(),fluent.getNested());
+validate(buildable);
+return buildable;
 
-    public EditableJavaClazz build() {
-        EditableJavaClazz buildable = new EditableJavaClazz(fluent.getType(), fluent.getConstructors(), fluent.getMethods(), fluent.getFields(), fluent.getImports(), fluent.getAttributes(), fluent.getNested());
-        validate(buildable);
-        return buildable;
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+JavaClazzBuilder that = (JavaClazzBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    }
+}
 
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }

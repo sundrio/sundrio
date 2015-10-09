@@ -25,8 +25,8 @@ import java.util.Set;
 public class EditableJavaProperty extends JavaProperty implements Editable<JavaPropertyBuilder> {
 
 
-    public EditableJavaProperty(Set<Modifier> modifiers, JavaType type, String name, boolean array, Map<String, Object> attributes) {
-        super(modifiers, type, name, array, attributes);
+    public EditableJavaProperty(Set<JavaType> annotations, Set<Modifier> modifiers, JavaType type, String name, boolean array, Map<String, Object> attributes) {
+        super(annotations, modifiers, type, name, array, attributes);
     }
 
     public JavaPropertyBuilder edit() {

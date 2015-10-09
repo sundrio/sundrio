@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class JavaType extends AttributeSupport implements Type {
-
     private final JavaKind kind;
     private final String packageName;
     private final String className;
@@ -54,7 +53,6 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the fully qualified name of the type.
-     *
      * @return
      */
     public String getFullyQualifiedName() {
@@ -67,7 +65,6 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the simple name of the type.
-     *
      * @return
      */
     public String getSimpleName() {
@@ -76,7 +73,6 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the simple name of the type.
-     *
      * @return
      */
     public String getSimpleName(String suffix) {
@@ -111,7 +107,6 @@ public class JavaType extends AttributeSupport implements Type {
     public JavaKind getKind() {
         return kind;
     }
-
     @Override
     public String getPackageName() {
         return packageName;
@@ -121,7 +116,6 @@ public class JavaType extends AttributeSupport implements Type {
     public String getClassName() {
         return className;
     }
-
     @Override
     public boolean isArray() {
         return array;
@@ -178,7 +172,7 @@ public class JavaType extends AttributeSupport implements Type {
         if (packageName == null && "java.lang".equals(o.packageName) && className.toLowerCase().equals(o.className.toLowerCase())) {
             return true;
         }
-        if (o.packageName == null && "java.lang".equals(packageName) && className.toLowerCase().equals(o.className.toLowerCase())) {
+        if (o.packageName == null &&  "java.lang".equals(packageName) && className.toLowerCase().equals(o.className.toLowerCase())) {
             return true;
         }
 

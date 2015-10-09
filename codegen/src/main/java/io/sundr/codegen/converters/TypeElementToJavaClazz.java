@@ -25,6 +25,7 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -34,6 +35,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -89,6 +91,11 @@ public class TypeElementToJavaClazz implements Function<TypeElement, JavaClazz> 
 
         for (ExecutableElement method : allMethods) {
             builder.addToMethods(toJavaMethod.apply(method));
+        }
+
+        for (AnnotationMirror annotationMirror : classElement.getAnnotationMirrors()) {
+            JavaType annotationType = toJavaType.apply(annotationMirror.getAnnotationType().toString());
+            builder.addToAnnotations(annotationType);
         }
         return builder.build();
     }

@@ -21,16 +21,16 @@ import io.sundr.builder.Editable;
 import java.util.Map;
 import java.util.Set;
 
-public class EditableJavaType extends JavaType implements Editable<JavaTypeBuilder> {
+public class EditableJavaType extends JavaType implements Editable<JavaTypeBuilder>{
 
 
-    public EditableJavaType(JavaKind kind, String packageName, String className, boolean array, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
-        super(kind, packageName, className, array, collection, concrete, defaultImplementation, superClass, interfaces, genericTypes, attributes);
-    }
+public EditableJavaType( JavaKind kind , String packageName , String className , boolean array , boolean collection , boolean concrete , JavaType defaultImplementation , JavaType superClass , Set<JavaType> interfaces , JavaType[] genericTypes , Map<String, Object> attributes ){
+    super(kind, packageName, className, array, collection, concrete, defaultImplementation, superClass, interfaces, genericTypes, attributes);
+}
 
-    public JavaTypeBuilder edit() {
-        return new JavaTypeBuilder(this);
-    }
+public JavaTypeBuilder edit(){
+    return new JavaTypeBuilder(this);
+}
 
 
 }

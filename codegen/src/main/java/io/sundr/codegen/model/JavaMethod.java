@@ -25,6 +25,7 @@ import java.util.Set;
 
 public class JavaMethod extends AttributeSupport implements Method<JavaType, JavaProperty> {
 
+    private final Set<JavaType> annotations;
     private final Set<Modifier> modifiers;
     private final Set<JavaType> typeParameters;
     private final String name;
@@ -32,14 +33,19 @@ public class JavaMethod extends AttributeSupport implements Method<JavaType, Jav
     private final JavaProperty[] arguments;
     private final Set<JavaType> exceptions;
 
-    public JavaMethod(Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
+    public JavaMethod(Set<JavaType> annotations, Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
         super(attributes);
+        this.annotations = annotations;
         this.modifiers = modifiers;
         this.typeParameters = typeParameters;
         this.name = name;
         this.returnType = returnType;
         this.arguments = arguments;
         this.exceptions = exceptions;
+    }
+
+    public Set<JavaType> getAnnotations() {
+        return annotations;
     }
 
     public Set<Modifier> getModifiers() {

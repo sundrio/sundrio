@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaProperty> {
 
     private final JavaType type;
+    private final Set<JavaMethod> annotations;
     private final Set<JavaMethod> methods;
     private final Set<JavaMethod> constructors;
     private final Set<JavaProperty> fields;
@@ -34,14 +35,19 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
     private final Set<JavaClazz> nested;
 
     @Buildable
-    public JavaClazz(JavaType type, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
+    public JavaClazz(JavaType type, Set<JavaMethod> annotations, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
         super(attributes);
         this.type = type;
+        this.annotations = annotations;
         this.methods = methods;
         this.constructors = constructors;
         this.fields = fields;
         this.imports = imports;
         this.nested = nested;
+    }
+
+    public Set<JavaMethod> getAnnotations() {
+        return annotations;
     }
 
     private Set<JavaType> getReferencedTypes() {
@@ -69,8 +75,8 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
 
     @Override
     public Set<JavaType> getImports() {
-        Set<JavaType> result = new CopyOnWriteArraySet<>();
-        Set<JavaType> tmp = new CopyOnWriteArraySet<>();
+        Set<JavaType> result = new CopyOnWriteArraySet<JavaType>();
+        Set<JavaType> tmp = new CopyOnWriteArraySet<JavaType>();
         tmp.addAll(this.imports);
         tmp.addAll(getReferencedTypes());
 
