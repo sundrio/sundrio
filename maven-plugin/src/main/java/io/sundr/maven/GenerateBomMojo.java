@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
@@ -157,6 +158,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 config.getModules().getIncludes().add("*:*");
             }
 
+            Set<Artifact> allDependencies = getDependencies(getSessionDependencies());
             for (MavenProject module : reactorProjects) {
                 Artifact artifact = module.getArtifact();
                 if (matches(artifact, config.getModules().getIncludes()) && !matches(artifact, config.getModules().getExcludes())) {
@@ -169,7 +171,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                     }
 
                     //Check artifacts
-                    for (Artifact a : getDependencies(module.getArtifact())) {
+                    for (Artifact a : allDependencies) {
                         if (matches(a, config.getDependencies().getIncludes()) && !matches(a, config.getDependencies().getExcludes())) {
                             archives.add(a);
                         }
@@ -309,10 +311,53 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         }
     }
 
+    /**
+     * Returns all the session/reactor artifacts topologically sorted.
+     * @return
+     */
+    private Set<Artifact> getSessionArtifacts() {
+        Set<Artifact> result = new LinkedHashSet<Artifact>();
+        for (MavenProject p : getSession().getProjectDependencyGraph().getSortedProjects()) {
+            result.add(p.getArtifact());
+        }
+        return result;
+    }
 
-    private Set<Artifact> getDependencies(Artifact artifact) {
+    /**
+     * Returns all dependency artifacts in all modules, excluding all reactor artifacts (including attached).
+     * @return
+     */
+    private Set<Artifact> getSessionDependencies() {
+        Set<Artifact> all = getSessionArtifacts();
+        Set<Artifact> result = new LinkedHashSet<Artifact>();
+        for (MavenProject p : getSession().getProjectDependencyGraph().getSortedProjects()) {
+            for (Dependency dependency : p.getDependencies()) {
+                boolean isSessionArtifact = false;
+                for (Artifact a : all) {
+                    if (a.getGroupId().equals(dependency.getGroupId()) &&
+                            a.getArtifactId().equals(dependency.getArtifactId()) &&
+                            a.getVersion().equals(dependency.getVersion())) {
+                        isSessionArtifact = true;
+                        break;
+                    }
+                }
+                if (!isSessionArtifact) {
+                    result.add(toArtifact(dependency));
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Resolves dependencies.
+     * @param dependencies
+     * @return
+     */
+    private Set<Artifact> getDependencies(final Set<Artifact> dependencies) {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
-        request.setArtifact(artifact);
+        request.setArtifact(getProject().getArtifact());
+        request.setArtifactDependencies(dependencies);
         request.setLocalRepository(localRepository);
         request.setRemoteRepositories(remoteRepositories);
         request.setResolveTransitively(true);
@@ -358,6 +403,11 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             }
         }
         return result;
+    }
+
+
+    private Artifact toArtifact(Dependency dependency) {
+        return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getScope(), dependency.getType(), dependency.getClassifier(), getArtifactHandler());
     }
 
 
