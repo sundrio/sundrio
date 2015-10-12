@@ -101,7 +101,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     private String mavenVersion;
 
     @Parameter(defaultValue = "${bom.template.resource}")
-    private String bomTemplateResouce = "templates/bom.xml.vm";
+    private String bomTemplateResource = "templates/bom.xml.vm";
 
     @Parameter(defaultValue = "${bom.template.url}")
     private URL bomTemplateUrl;
@@ -180,7 +180,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             new CodeGeneratorBuilder<Model>()
                     .withWriter(writer)
                     .withModel(toGenerate(getProject(), config, archives, plugins).getModel())
-                    .withTemplateResource(bomTemplateResouce)
+                    .withTemplateResource(bomTemplateResource)
                     .withTemplateUrl(bomTemplateUrl)
                     .build().generate();
 
