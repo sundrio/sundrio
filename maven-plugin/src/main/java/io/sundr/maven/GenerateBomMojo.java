@@ -17,13 +17,13 @@
 package io.sundr.maven;
 
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
+import io.sundr.maven.filter.Filters;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
@@ -44,7 +44,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.SelectorUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -59,14 +58,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VALIDATE)
 public class GenerateBomMojo extends AbstractSundrioMojo {
 
-    private final String ARTIFACT_FORMAT = "%s:%s:%s:%s:%s";
-    private final Pattern ARTIFACT_PATTERN = Pattern.compile("(?<groupId>[^:]+):(?<artifactId>[^:]+)(:(?<version>[^:]+))?(:(?<type>[^:]+))?(:(?<classifier>[^:]+))?");
 
     private static final Set<String> GENERATED_ARTIFACT_IDS = Collections.synchronizedSet(new HashSet<String>());
 
@@ -90,7 +85,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
      */
     @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
     protected List<ArtifactRepository> remoteRepositories;
-
 
     @Parameter
     private BomConfig[] boms;
@@ -158,26 +152,20 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 config.getModules().getIncludes().add("*:*");
             }
 
-            Set<Artifact> allDependencies = getDependencies(getSessionDependencies());
-            for (MavenProject module : reactorProjects) {
-                Artifact artifact = module.getArtifact();
-                if (matches(artifact, config.getModules().getIncludes()) && !matches(artifact, config.getModules().getExcludes())) {
-                    if (PLUGIN_TYPE.equals(artifact.getType())) {
-                        plugins.add(artifact);
-                    } else if (POM_TYPE.equals(artifact.getType())) {
-                        poms.add(artifact);
-                    } else {
-                        archives.add(artifact);
-                    }
+            Set<Artifact> dependencies = Filters.filter(getDependencies(getSessionDependencies()), Filters.createArtifactFilter(config));
+            Set<Artifact> reactorArtifacts = Filters.filter(getReactorArtifacts(), Filters.createModulesFilter(config));
 
-                    //Check artifacts
-                    for (Artifact a : allDependencies) {
-                        if (matches(a, config.getDependencies().getIncludes()) && !matches(a, config.getDependencies().getExcludes())) {
-                            archives.add(a);
-                        }
-                    }
+            for (Artifact artifact : reactorArtifacts) {
+                if (PLUGIN_TYPE.equals(artifact.getType())) {
+                    plugins.add(artifact);
+                } else if (POM_TYPE.equals(artifact.getType())) {
+                    poms.add(artifact);
+                } else {
+                    archives.add(artifact);
                 }
             }
+
+            archives.addAll(dependencies);
             getLog().info("Generating BOM: " + config.getArtifactId());
             new CodeGeneratorBuilder<Model>()
                     .withWriter(writer)
@@ -196,6 +184,14 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 throw new MojoExecutionException("Failed to close the generated bom writer", e);
             }
         }
+    }
+
+    private Set<Artifact> getReactorArtifacts() {
+        Set<Artifact> reactorArtifacts = new LinkedHashSet<Artifact>();
+        for (MavenProject project : reactorProjects) {
+            reactorArtifacts.add(project.getArtifact());
+        }
+        return reactorArtifacts;
     }
 
     /**
@@ -313,6 +309,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
     /**
      * Returns all the session/reactor artifacts topologically sorted.
+     *
      * @return
      */
     private Set<Artifact> getSessionArtifacts() {
@@ -325,6 +322,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
     /**
      * Returns all dependency artifacts in all modules, excluding all reactor artifacts (including attached).
+     *
      * @return
      */
     private Set<Artifact> getSessionDependencies() {
@@ -351,6 +349,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
     /**
      * Resolves dependencies.
+     *
      * @param dependencies
      * @return
      */
@@ -364,47 +363,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         ArtifactResolutionResult result = artifactResolver.resolve(request);
         return result.getArtifacts();
     }
-
-    private boolean matches(Artifact artifact, Set<String> set) {
-        Set<String> expanded = expand(set);
-        String coords = String.format(ARTIFACT_FORMAT, artifact.getGroupId(),
-                artifact.getArtifactId(),
-                artifact.getVersion(),
-                artifact.getType(),
-                artifact.getClassifier());
-
-        for (String e : expanded) {
-            if (SelectorUtils.match(e, coords)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Set<String> expand(Set<String> set) {
-        Set<String> result = new HashSet<String>();
-        if (set != null) {
-            for (String exclusion : set) {
-                Matcher m = ARTIFACT_PATTERN.matcher(exclusion);
-                if (!m.matches()) {
-                    throw new IllegalArgumentException("Pattern: " + exclusion + " doesn't the required format.");
-                }
-                String groupId = m.group("groupId");
-                String artifactId = m.group("artifactId");
-                String version = m.group("version");
-                String type = m.group("type");
-                String classifier = m.group("classifier");
-
-                version = version != null ? version : "*";
-                type = type != null ? type : "*";
-                classifier = classifier != null ? classifier : "*";
-
-                result.add(String.format(ARTIFACT_FORMAT, groupId, artifactId, version, type, classifier));
-            }
-        }
-        return result;
-    }
-
 
     private Artifact toArtifact(Dependency dependency) {
         return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getScope(), dependency.getType(), dependency.getClassifier(), getArtifactHandler());

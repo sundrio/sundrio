@@ -26,6 +26,8 @@ public class BomConfig {
     private ArtifactSet modules = new ArtifactSet();
     private ArtifactSet dependencies = new ArtifactSet();
     private GoalSet goals = new GoalSet();
+    private boolean ignoreScope = true;
+    private boolean excludeOptional = true;
 
     private Properties properties = new Properties();
 
@@ -63,5 +65,13 @@ public class BomConfig {
 
     public Properties getProperties() {
         return properties;
+    }
+
+    public boolean isIgnoreScope() {
+        return ignoreScope;
+    }
+
+    public boolean isExcludeOptional() {
+        return excludeOptional;
     }
 }
