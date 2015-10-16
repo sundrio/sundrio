@@ -18,6 +18,7 @@ package io.sundr.maven.filter;
 
 import io.sundr.maven.BomConfig;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -26,9 +27,10 @@ import java.util.Set;
 
 public class Filters {
 
-    public static ArtifactFilter createArtifactFilter(BomConfig config) {
+    public static ArtifactFilter createArtifactFilter(MavenSession session, BomConfig config) {
         final List<ArtifactFilter> filters = new LinkedList<ArtifactFilter>();
         filters.add(new SystemFilter());
+        filters.add(new SessionArtifactFilter(session, false));
         filters.add(new IncludesFilter(config.getDependencies().getIncludes()));
         filters.add(new ExcludesFilter(config.getDependencies().getExcludes()));
 
@@ -40,7 +42,6 @@ public class Filters {
         }
         return new CompositeFilter(filters);
     }
-
 
     public static ArtifactFilter createModulesFilter(BomConfig config) {
         final List<ArtifactFilter> filters = new LinkedList<ArtifactFilter>();

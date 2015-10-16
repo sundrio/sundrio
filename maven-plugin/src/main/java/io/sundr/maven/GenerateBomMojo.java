@@ -152,7 +152,13 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 config.getModules().getIncludes().add("*:*");
             }
 
-            Set<Artifact> dependencies = Filters.filter(getDependencies(getSessionDependencies()), Filters.createArtifactFilter(config));
+            //We add first project management and unwrapped boms. (we don't resolve those).
+            Set<Artifact> allDependencies = getProjectManagementDependencies();
+
+            //Resolve and add all other dependencies
+            allDependencies.addAll(getDependencies(getProjectDependencies()));
+
+            Set<Artifact> dependencies = Filters.filter(allDependencies, Filters.createArtifactFilter(getSession(), config));
             Set<Artifact> reactorArtifacts = Filters.filter(getReactorArtifacts(), Filters.createModulesFilter(config));
 
             for (Artifact artifact : reactorArtifacts) {
@@ -325,23 +331,28 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
      *
      * @return
      */
-    private Set<Artifact> getSessionDependencies() {
+    private Set<Artifact> getProjectDependencies() {
         Set<Artifact> all = getSessionArtifacts();
         Set<Artifact> result = new LinkedHashSet<Artifact>();
         for (MavenProject p : getSession().getProjectDependencyGraph().getSortedProjects()) {
             for (Dependency dependency : p.getDependencies()) {
-                boolean isSessionArtifact = false;
-                for (Artifact a : all) {
-                    if (a.getGroupId().equals(dependency.getGroupId()) &&
-                            a.getArtifactId().equals(dependency.getArtifactId()) &&
-                            a.getVersion().equals(dependency.getVersion())) {
-                        isSessionArtifact = true;
-                        break;
-                    }
-                }
-                if (!isSessionArtifact) {
-                    result.add(toArtifact(dependency));
-                }
+                result.add(toArtifact(dependency));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns all dependencies defined in dependency management of the root pom.
+     *
+     * @return
+     */
+    private Set<Artifact> getProjectManagementDependencies() {
+        Set<Artifact> result = new LinkedHashSet<Artifact>();
+        DependencyManagement dependencyManagement =  getProject().getDependencyManagement();
+        if (dependencyManagement != null) {
+            for (Dependency dependency : dependencyManagement.getDependencies()) {
+                result.add(toArtifact(dependency));
             }
         }
         return result;
@@ -359,6 +370,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         request.setArtifactDependencies(dependencies);
         request.setLocalRepository(localRepository);
         request.setRemoteRepositories(remoteRepositories);
+        request.setManagedVersionMap(getProject().getManagedVersionMap());
         request.setResolveTransitively(true);
         ArtifactResolutionResult result = artifactResolver.resolve(request);
         return result.getArtifacts();
@@ -368,16 +380,16 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getScope(), dependency.getType(), dependency.getClassifier(), getArtifactHandler());
     }
 
-
     private static Dependency toDependency(Artifact artifact) {
         Dependency dependency = new Dependency();
         dependency.setGroupId(artifact.getGroupId());
         dependency.setArtifactId(artifact.getArtifactId());
         dependency.setVersion(artifact.getVersion());
+        dependency.setType(artifact.getType());
         dependency.setScope(artifact.getScope());
+        dependency.setClassifier(artifact.getClassifier());
         dependency.setOptional(artifact.isOptional());
         return dependency;
-
     }
 
     private static Plugin toPlugin(Artifact artifact) {
