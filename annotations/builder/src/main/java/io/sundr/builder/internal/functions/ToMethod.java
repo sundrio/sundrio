@@ -313,8 +313,10 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             //We need to repackage because we are nesting under this class.
-            JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
+            JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+            JavaType nestedTypeImpl = PropertyAs.NESTED_TYPE.apply(property);
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
+            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(new JavaType[]{T}).build();
             String prefix = property.getType().isCollection() ? "addNew" : "withNew";
             String methodName = prefix + captializeFirst(property.getType().isCollection()
                     ? singularize(property.getName())
@@ -324,7 +326,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .addToModifiers(Modifier.PUBLIC)
                     .withReturnType(rewraped)
                     .withName(methodName)
-                    .addToAttributes(BODY, "return new " + rewraped.getSimpleName() + "();")
+                    .addToAttributes(BODY, "return new " + rewrapedImpl.getSimpleName() + "();")
                     .build();
 
         }
@@ -332,11 +334,13 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         @Override
         public JavaMethod apply(JavaProperty property) {
             JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
-            JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
-            //JavaType nestedUnwrapped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[0]).build();
+            JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+            JavaType nestedTypeImpl = PropertyAs.NESTED_TYPE.apply(property);
 
             //We need to repackage because we are nesting under this class.
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
+            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(new JavaType[]{T}).build();
+
             String prefix = property.getType().isCollection() ? "addNew" : "withNew";
             String suffix = "Like";
             String methodName = prefix + captializeFirst(property.getType().isCollection()
@@ -351,14 +355,14 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName("item")
                     .withType(baseType)
                     .endArgument()
-                    .addToAttributes(BODY, "return new " + rewraped.getSimpleName() + "(item);")
+                    .addToAttributes(BODY, "return new " + rewrapedImpl.getSimpleName() + "(item);")
                     .build();
 
         }
     }, EDIT_NESTED {
         @Override
         public JavaMethod apply(JavaProperty property) {
-            JavaType nestedType = PropertyAs.NESTED_TYPE.apply(property);
+            JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             //We need to repackage because we are nesting under this class.
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
             String prefix = "edit";

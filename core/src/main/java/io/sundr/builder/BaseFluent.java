@@ -21,7 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class BaseFluent<F extends BaseFluent<F>> implements Fluent<F>, Visitable<F> {
+public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> {
 
     public final List<Visitable> _visitables = new ArrayList<Visitable>();
 

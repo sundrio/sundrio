@@ -1,0 +1,22 @@
+package ${model.type.packageName};
+
+#foreach($i in $model.imports)
+import $i.fullyQualifiedName;
+#end
+
+#class ($model)
+
+
+#foreach($m in $model.methods)
+    #method ($m)#end
+#end
+
+#foreach($n in $model.nested)
+    #class ($n)
+    #foreach($m in $n.methods)
+        #method ($m)#end
+    #end
+    #end
+
+#end
+#end

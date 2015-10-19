@@ -51,14 +51,82 @@ import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
-    FLUENT {
+    FLUENT_INTERFACE {
+        @Override
+        public JavaClazz apply(JavaClazz item) {
+            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
+            Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
+            JavaType fluentType = TypeAs.FLUENT_INTERFACE.apply(item.getType());
+            for (JavaProperty property : item.getFields()) {
+                if (property.getModifiers().contains(Modifier.STATIC)) {
+                    continue;
+                }
+                JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();
+                boolean buildable = (Boolean) toAdd.getType().getAttributes().get(BUILDABLE);
+                if (toAdd.isArray()) {
+                    JavaProperty asList = arrayAsList(toAdd, buildable);
+                    methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
+                    methods.add(ToMethod.GETTER_ARRAY.apply(toAdd));
+                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
+                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
+                    toAdd = asList;
+                } else if (isSet(toAdd.getType()) || isList(toAdd.getType())) {
+                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
+                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
+                    methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
+                } else if (isMap(toAdd.getType())) {
+                    methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
+                    methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
+                } else {
+                    toAdd = new JavaPropertyBuilder(toAdd).addToAttributes(BUILDABLE, buildable).build();
+                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.add(ToMethod.WITH.apply(toAdd));
+                }
+
+                Set<JavaProperty> descendants = getPropertyBuildableAncestors(toAdd);
+
+                if (isMap(toAdd.getType())) {
+                    //
+                } else if (isBuildable(toAdd)) {
+                    methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
+                    methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
+                    if (!toAdd.getType().isCollection() && !toAdd.isArray()) {
+                        methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
+                    }
+                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
+                    nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
+                } else if (descendants.size() > 0 && toAdd.getType().isCollection()) {
+                    for (JavaProperty descendant : descendants) {
+                        if (descendant.getType().isCollection()) {
+                            methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
+                            methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                        }
+                        methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
+                        methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
+                        methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
+                        nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new JavaPropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
+                    }
+                }
+            }
+
+            return new JavaClazzBuilder(item)
+                    .withType(fluentType)
+                    .withNested(nestedClazzes)
+                    .withMethods(methods)
+                    .build();
+        }
+    }, FLUENT_IMPL {
         @Override
         public JavaClazz apply(JavaClazz item) {
             Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
             Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
             Set<JavaProperty> properties = new LinkedHashSet<JavaProperty>();
 
-            JavaType fluentType = TypeAs.FLUENT.apply(item.getType());
+            JavaType fluentType = TypeAs.FLUENT_IMPL.apply(item.getType());
             for (JavaProperty property : item.getFields()) {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
                     continue;

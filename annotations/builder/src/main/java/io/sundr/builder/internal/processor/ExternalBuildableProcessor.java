@@ -71,8 +71,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(ModelUtils.getClassElement(typeElement));
                     generateLocalDependenciesIfNeeded();
                     try {
-                        generateFromClazz(ClazzAs.FLUENT.apply(clazz),
-                                Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+                        generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(clazz),
+                                Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
 
                         if (generated.editableEnabled()) {
                             generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(clazz),

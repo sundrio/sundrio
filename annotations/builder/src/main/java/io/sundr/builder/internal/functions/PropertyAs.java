@@ -21,6 +21,7 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
@@ -99,8 +100,78 @@ public final class PropertyAs {
         }
     };
 
+    public static final Function<JavaProperty, JavaClazz> NESTED_INTERFACE = new Function<JavaProperty, JavaClazz>() {
+        @Override
+        public JavaClazz apply(JavaProperty item) {
+            JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+            JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
+
+            JavaType nestedType = NESTED_INTERFACE_TYPE.apply(item);
+            JavaType nestedUnwrapped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[0]).build();
+
+            Set<JavaMethod> nestedMethods = new HashSet<JavaMethod>();
+            nestedMethods.add(ToMethod.AND.apply(item));
+            nestedMethods.add(ToMethod.END.apply(item));
+
+            Set<JavaProperty> properties = new HashSet<JavaProperty>();
+            Set<JavaMethod> constructors = new HashSet<JavaMethod>();
+
+            JavaType memberOf = (JavaType) item.getAttributes().get(MEMBER_OF);
+            properties.add(new JavaPropertyBuilder()
+                    .withName("builder")
+                    .withType(builderType).build());
+
+            constructors.add(new JavaMethodBuilder()
+                    .withName("")
+                    .withReturnType(nestedUnwrapped)
+                    .addNewArgument()
+                    .withName("item")
+                    .withType(baseType)
+                    .endArgument()
+                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this, item);")
+                    .build());
+
+            constructors.add(new JavaMethodBuilder()
+                    .withName("")
+                    .withReturnType(nestedUnwrapped)
+                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this);")
+                    .build());
+
+            return new JavaClazzBuilder()
+                    .withType(nestedType)
+                    .withFields(properties)
+                    .withMethods(nestedMethods)
+                    .withConstructors(constructors)
+                    .addToAttributes(MEMBER_OF, memberOf)
+                    .build();
+        }
+    };
+
 
     public static final Function<JavaProperty, JavaType> NESTED_TYPE = new Function<JavaProperty, JavaType>() {
+        @Override
+        public JavaType apply(JavaProperty item) {
+            JavaType nested = SHALLOW_NESTED_TYPE.apply(item);
+            //Not a typical fluent
+            JavaType fluent = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+            JavaType nestedInterfaceType = NESTED_INTERFACE_TYPE.apply(item);
+            JavaType superClassFluent = new JavaTypeBuilder(fluent)
+                    .withClassName(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType()) + "FluentImpl")
+                    .withInterfaces(nestedInterfaceType)
+                    .withGenericTypes(new JavaType[]{nested})
+                    .build();
+
+            return new JavaTypeBuilder(nested)
+                    .withClassName(nested.getClassName()+"Impl")
+                    .withGenericTypes(new JavaType[]{N})
+                    .withSuperClass(superClassFluent)
+                    .withInterfaces(nestedInterfaceType)
+                    .build();
+        }
+
+    };
+
+    public static final Function<JavaProperty, JavaType> NESTED_INTERFACE_TYPE = new Function<JavaProperty, JavaType>() {
         @Override
         public JavaType apply(JavaProperty item) {
             JavaType nested = SHALLOW_NESTED_TYPE.apply(item);
@@ -112,9 +183,10 @@ public final class PropertyAs {
                     .build();
 
             return new JavaTypeBuilder(nested)
+                    .withKind(JavaKind.INTERFACE)
                     .withGenericTypes(new JavaType[]{N})
                     .withSuperClass(superClassFluent)
-                    .withInterfaces(new HashSet(Arrays.asList(BuilderContextManager.getContext().getNestedInterface().getType())))
+                    .withInterfaces(BuilderContextManager.getContext().getNestedInterface().getType(), superClassFluent)
                     .build();
         }
 

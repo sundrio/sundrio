@@ -68,7 +68,8 @@ public class Constants {
 
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
     public static final String DEFAULT_CLASS_TEMPLATE_LOCATION = "templates/builder/class.vm";
-    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluent.vm";
+    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluentinterface.vm";
+    public static final String DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION = "templates/builder/fluentimpl.vm";
     public static final String DEFAULT_EDITABLE_TEMPLATE_LOCATION = "templates/builder/editable.vm";
     public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
     public static final String VALIDATING_BUILDER_TEMPLATE_LOCATION = "templates/builder/validating-builder.vm";

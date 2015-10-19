@@ -20,6 +20,7 @@ import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
@@ -27,16 +28,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.sundr.builder.Constants.Q;
+import static io.sundr.builder.Constants.T;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 
 public enum TypeAs implements Function<JavaType, JavaType> {
 
-
-    FLUENT {
+    FLUENT_INTERFACE {
         @Override
         public JavaType apply(JavaType item) {
             BuilderContext ctx = BuilderContextManager.getContext();
@@ -52,12 +54,42 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     SHALLOW_FLUENT.apply(item.getSuperClass()) :
                     ctx.getBaseFluentClass().getType();
 
+            Set<JavaType> interfaceTypes = new HashSet<JavaType>();
+            interfaceTypes.add(superClass);
+            interfaceTypes.add(ctx.getFluentInterface().getType());
+            interfaceTypes.remove(ctx.getBaseFluentClass().getType());
+
             return new JavaTypeBuilder(item)
+                    .withKind(JavaKind.INTERFACE)
                     .withClassName(item.getClassName() + "Fluent")
                     .withPackageName(item.getPackageName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withInterfaces(interfaceTypes)
+                    .build();
+        }
+
+    }, FLUENT_IMPL {
+        @Override
+        public JavaType apply(JavaType item) {
+            BuilderContext ctx = BuilderContextManager.getContext();
+            JavaType fluent = SHALLOW_FLUENT.apply(item);
+            List<JavaType> generics = new ArrayList<JavaType>();
+            for (JavaType generic : item.getGenericTypes()) {
+                generics.add(generic);
+            }
+            JavaType generic = typeExtends(Constants.T, fluent);
+            generics.add(generic);
+
+            JavaType superClass = isBuildable(item.getSuperClass()) ?
+                    typeGenericOf(FLUENT_IMPL.apply(item.getSuperClass()),T) :
+                    ctx.getBaseFluentClass().getType();
+
+            return new JavaTypeBuilder(item)
+                    .withClassName(item.getClassName() + "FluentImpl")
+                    .withPackageName(item.getPackageName())
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClass)
-                    .withInterfaces(new HashSet(Arrays.asList(ctx.getFluentInterface().getType())))
+                    .withInterfaces(SHALLOW_FLUENT.apply(item))
                     .build();
         }
 
@@ -97,7 +129,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             }
             JavaType builder = SHALLOW_BUILDER.apply(item);
             generics.add(builder);
-            JavaType fluent = typeGenericOf(SHALLOW_FLUENT.apply(item), generics.toArray(new JavaType[generics.size()]));
+            JavaType fluent = typeGenericOf(FLUENT_IMPL.apply(item), generics.toArray(new JavaType[generics.size()]));
             generics.remove(builder);
 
             return new JavaTypeBuilder(item)
@@ -137,7 +169,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     }, INLINEABLE {
         @Override
         public JavaType apply(JavaType item) {
-            JavaType fluent = SHALLOW_FLUENT.apply(item);
+            JavaType fluent = FLUENT_IMPL.apply(item);
             List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);

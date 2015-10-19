@@ -96,7 +96,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         JavaType baseInterface = typeGenericOf(BuilderUtils.getInlineType(ctx, inline), clazz.getType());
         JavaMethod method = new JavaMethodBuilder(base.getMethods().iterator().next()).withName(inline.value()).build();
 
-        JavaType fluent = TypeAs.SHALLOW_FLUENT.apply(clazz.getType());
+        JavaType fluent = TypeAs.FLUENT_IMPL.apply(clazz.getType());
         JavaType shallowInlineType = new JavaTypeBuilder(base.getType())
                 .withClassName(inline.prefix() + base.getType().getClassName() + inline.suffix())
                 .addToInterfaces(baseInterface)

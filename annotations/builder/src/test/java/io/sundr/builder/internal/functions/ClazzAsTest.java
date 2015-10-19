@@ -47,7 +47,7 @@ public class ClazzAsTest {
                     .withGenericTypes(new JavaType[]{})
                 .endType().build();
         
-        JavaClazz result = ClazzAs.FLUENT.apply(clazz);
+        JavaClazz result = ClazzAs.FLUENT_IMPL.apply(clazz);
         System.out.println(JavaTypeToString.INSTANCE.apply(result.getType()));
     }
 
