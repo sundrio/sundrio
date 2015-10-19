@@ -96,14 +96,17 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         JavaType baseInterface = typeGenericOf(BuilderUtils.getInlineType(ctx, inline), clazz.getType());
         JavaMethod method = new JavaMethodBuilder(base.getMethods().iterator().next()).withName(inline.value()).build();
 
-        JavaType fluent = TypeAs.FLUENT_IMPL.apply(clazz.getType());
+        JavaType fluentImpl = TypeAs.FLUENT_IMPL.apply(clazz.getType());
+        JavaType fluentInterface = TypeAs.FLUENT_INTERFACE.apply(clazz.getType());
+
         JavaType shallowInlineType = new JavaTypeBuilder(base.getType())
                 .withClassName(inline.prefix() + base.getType().getClassName() + inline.suffix())
                 .addToInterfaces(baseInterface)
                 .build();
 
         JavaType inlineType = new JavaTypeBuilder(shallowInlineType)
-                .withSuperClass(typeGenericOf(fluent, shallowInlineType))
+                .withSuperClass(typeGenericOf(fluentImpl, shallowInlineType))
+                .addToInterfaces(typeGenericOf(fluentInterface, shallowInlineType))
                 .build();
 
         Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
