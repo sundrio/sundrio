@@ -78,7 +78,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                 } else if (isMap(toAdd.getType())) {
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
+                    methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
+                    methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
@@ -148,7 +150,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                 } else if (isMap(toAdd.getType())) {
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
+                    methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
+                    methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {

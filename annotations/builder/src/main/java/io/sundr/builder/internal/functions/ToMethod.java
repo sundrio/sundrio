@@ -275,6 +275,21 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
         }
     },
+    ADD_MAP_TO_MAP {
+        @Override
+        public JavaMethod apply(JavaProperty property) {
+            JavaType mapType = property.getType();
+            JavaProperty mapProperty = new JavaPropertyBuilder().withName("map").withType(mapType).build();
+            String methodName = "addTo" + property.getNameCapitalized();
+            return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withName(methodName)
+                    .withReturnType(T)
+                    .withArguments(mapProperty)
+                    .addToAttributes(BODY, "if(map != null) { this." + property.getName() + ".putAll(map);} return (T)this;")
+                    .build();
+        }
+    },
     ADD_TO_MAP {
         @Override
         public JavaMethod apply(JavaProperty property) {
@@ -293,7 +308,21 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .addToAttributes(BODY, "if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return (T)this;")
                     .build();
         }
-    },  REMOVE_FROM_MAP {
+    }, REMOVE_MAP_FROM_MAP {
+        @Override
+        public JavaMethod apply(JavaProperty property) {
+            JavaType mapType = property.getType();
+            JavaProperty mapProperty = new JavaPropertyBuilder().withName("map").withType(mapType).build();
+            String methodName = "removeFrom" + property.getNameCapitalized();
+            return new JavaMethodBuilder()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withName(methodName)
+                    .withReturnType(T)
+                    .withArguments(mapProperty)
+                    .addToAttributes(BODY, "if(map != null) { for(Object key : map.keySet()) {this." + property.getName() + ".remove(key);}} return (T)this;")
+                    .build();
+        }
+    }, REMOVE_FROM_MAP {
         @Override
         public JavaMethod apply(JavaProperty property) {
             JavaType mapType = property.getType();
