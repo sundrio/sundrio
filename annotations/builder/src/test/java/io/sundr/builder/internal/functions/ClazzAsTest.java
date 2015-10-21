@@ -19,12 +19,16 @@ package io.sundr.builder.internal.functions;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.util.Context;
 import io.sundr.Function;
+import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
+import io.sundr.codegen.model.JavaMethod;
+import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
 import org.junit.Test;
 
 import javax.lang.model.util.Elements;
@@ -39,13 +43,21 @@ public class ClazzAsTest {
 
     @Test
     public void testToFluent() {
-
-        JavaClazz clazz = new JavaClazzBuilder()
-                .withNewType()
-                    .withClassName("MyClass")
+        JavaType type = new JavaTypeBuilder()
+                .withClassName("MyClass")
                     .withPackageName(getClass().getPackage().getName())
                     .withGenericTypes(new JavaType[]{})
-                .endType().build();
+                .build();
+
+        JavaMethod constructor = new JavaMethodBuilder()
+                .withReturnType(type)
+                .withAnnotations(Constants.BUILDABLE_ANNOTATION)
+                .build();
+
+        JavaClazz clazz = new JavaClazzBuilder()
+                .withType(type)
+                .withConstructors(constructor)
+                .build();
         
         JavaClazz result = ClazzAs.FLUENT_IMPL.apply(clazz);
         System.out.println(JavaTypeToString.INSTANCE.apply(result.getType()));

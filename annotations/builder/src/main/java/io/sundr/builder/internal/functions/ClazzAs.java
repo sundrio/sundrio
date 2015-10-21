@@ -124,11 +124,28 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     }, FLUENT_IMPL {
         @Override
         public JavaClazz apply(JavaClazz item) {
+            Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
             Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
             Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
             Set<JavaProperty> properties = new LinkedHashSet<JavaProperty>();
-
             JavaType fluentType = TypeAs.FLUENT_IMPL.apply(item.getType());
+
+            JavaMethod emptyConstructor = new JavaMethodBuilder()
+                    .withReturnType(fluentType)
+                    .addToAttributes(BODY, "")
+                    .build();
+
+            JavaMethod instanceConstructor = new JavaMethodBuilder()
+                    .withReturnType(fluentType)
+                    .addNewArgument()
+                    .withType(item.getType())
+                    .withName("instance").and()
+                    .addToAttributes(BODY, toInstanceConstructorBody(item, ""))
+                    .build();
+
+            constructors.add(emptyConstructor);
+            constructors.add(instanceConstructor);
+
             for (JavaProperty property : item.getFields()) {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
                     continue;
@@ -219,6 +236,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             return new JavaClazzBuilder(item)
                     .withType(fluentType)
+                    .withConstructors(constructors)
                     .withFields(properties)
                     .withNested(nestedClazzes)
                     .withMethods(methods)
@@ -429,11 +447,19 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     private static String toInstanceConstructorBody(JavaClazz clazz, String fluent) {
         JavaMethod constructor = findBuildableConstructor(clazz);
         StringBuilder sb = new StringBuilder();
-        sb.append("this.fluent = " + fluent + "; ");
+        String ref = fluent;
+
+        //We may use a reference to fluent or we may use directly "this". So we need to check.
+        if (fluent != null && !fluent.isEmpty()) {
+            sb.append("this.fluent = " + fluent + "; ");
+        } else {
+            ref = "this";
+        }
+
         for (JavaProperty property : constructor.getArguments()) {
             JavaMethod getter = findGetter(clazz, property);
             if (getter != null) {
-                sb.append(fluent).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
+                sb.append(ref).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
             } else {
                 throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
             }

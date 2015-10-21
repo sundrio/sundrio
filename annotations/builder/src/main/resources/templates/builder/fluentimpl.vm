@@ -10,6 +10,11 @@ import $i.fullyQualifiedName;
     #field ($f)
 #end
 
+#foreach ($c in ${model.constructors})
+public ${c.returnType.className}(#foreach ($a in ${c.arguments}) ${a.type.simpleName} ${a.name} #if( $foreach.hasNext ),#end#end){
+    ${c.attributes.get("BODY")}
+}
+#end
 
 #foreach($m in $model.methods)
     #method ($m)
