@@ -41,19 +41,19 @@ public class JavaProperty extends AttributeSupport implements Property<JavaType>
 
     public String getNameCapitalized() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name.substring(0,1).toUpperCase());
-        sb.append(name.substring(1));
+        sb.append(name.replaceAll("_", "").substring(0,1).toUpperCase());
+        sb.append(name.replaceAll("_", "").substring(1));
         return sb.toString();
     }
 
     public String getNameCapitalizedSingular() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name.substring(0,1).toUpperCase());
+        sb.append(name.replaceAll("_", "").substring(0, 1).toUpperCase());
         //TODO: We need to do something better here.
-        if (name.endsWith("s")) {
-            sb.append(name.substring(1, name.length() - 1));
+        if (name.replaceAll("_", "").endsWith("s")) {
+            sb.append(name.replaceAll("_", "").substring(1, name.length() - 1));
         } else {
-            sb.append(name.substring(1));
+            sb.append(name.replaceAll("_", "").substring(1));
         }
         return sb.toString();
     }
