@@ -138,51 +138,46 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         File bomDir = new File(outputDir, config.getArtifactId());
         File generatedBom = new File(bomDir, BOM_NAME);
 
+
         if (!bomDir.exists() && !bomDir.mkdirs()) {
             throw new MojoFailureException("Failed to create output dir for bom:" + bomDir.getAbsolutePath());
         }
+        preProccessConfig(config);
         FileWriter writer = null;
         try {
             writer = new FileWriter(generatedBom);
-            Set<Artifact> archives = new LinkedHashSet<Artifact>();
+            Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
             Set<Artifact> plugins = new LinkedHashSet<Artifact>();
-            Set<Artifact> poms = new LinkedHashSet<Artifact>();
 
-            if (config.getModules().getIncludes().isEmpty()) {
-                config.getModules().getIncludes().add("*:*");
-            }
+            Set<Artifact> ownModules = Filters.filter(getReactorArtifacts(), Filters.createModulesFilter(config));
 
             //We add first project management and unwrapped boms. (we don't resolve those).
-            Set<Artifact> allDependencies = getProjectManagementDependencies();
+            Set<Artifact> dependencyManagementArtifacts =  config.isInheritDependencyManagement() ? getProjectDependencyManagement() : new LinkedHashSet<Artifact>();
+            Set<Artifact> pluginManagementArtifacts = config.isInheritPluginManagement() ? getProjectPluginManagement() : new LinkedHashSet<Artifact>();
 
-            //Resolve and add all other dependencies
-            allDependencies.addAll(getDependencies(getProjectDependencies()));
+            Set<Artifact> allDependencies = new LinkedHashSet<Artifact>(dependencyManagementArtifacts);
+            allDependencies.addAll(getDependencies(getProjectDependencies())); //We resolve transitives here....
 
-            Set<Artifact> dependencies = Filters.filter(allDependencies, Filters.createArtifactFilter(getSession(), config));
-            Set<Artifact> reactorArtifacts = Filters.filter(getReactorArtifacts(), Filters.createModulesFilter(config));
+            //Populate dependencies
+            dependencies.addAll(ownModules);
+            dependencies.addAll(Filters.filter(allDependencies, Filters.createDependencyFilter(getSession(), config)));
 
-            for (Artifact artifact : reactorArtifacts) {
-                if (PLUGIN_TYPE.equals(artifact.getType())) {
-                    plugins.add(artifact);
-                } else if (POM_TYPE.equals(artifact.getType())) {
-                    poms.add(artifact);
-                } else {
-                    archives.add(artifact);
-                }
-            }
+            //Populate plugins
+            plugins.addAll(Filters.filter(ownModules, Filters.MAVEN_PLUGIN_FILTER));
+            plugins.addAll(Filters.filter(pluginManagementArtifacts, Filters.createPluginFilter(getSession(), config)));
 
-            archives.addAll(dependencies);
             getLog().info("Generating BOM: " + config.getArtifactId());
             new CodeGeneratorBuilder<Model>()
                     .withWriter(writer)
-                    .withModel(toGenerate(getProject(), config, archives, plugins).getModel())
+                    .withModel(toGenerate(getProject(), config, dependencies, plugins).getModel())
                     .withTemplateResource(bomTemplateResource)
                     .withTemplateUrl(bomTemplateUrl)
                     .build().generate();
 
             return toBuild(getProject(), config);
+
         } catch (Exception e) {
-            throw new MojoFailureException("Failed to generate bom.");
+            throw new MojoFailureException("Failed to generate bom.", e);
         } finally {
             try {
                 writer.close();
@@ -347,12 +342,28 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
      *
      * @return
      */
-    private Set<Artifact> getProjectManagementDependencies() {
+    private Set<Artifact> getProjectDependencyManagement() {
         Set<Artifact> result = new LinkedHashSet<Artifact>();
         DependencyManagement dependencyManagement =  getProject().getDependencyManagement();
         if (dependencyManagement != null) {
             for (Dependency dependency : dependencyManagement.getDependencies()) {
                 result.add(toArtifact(dependency));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Returns all dependencies defined in dependency management of the root pom.
+     *
+     * @return
+     */
+    private Set<Artifact> getProjectPluginManagement() {
+        Set<Artifact> result = new LinkedHashSet<Artifact>();
+        PluginManagement pluginManagement =  getProject().getPluginManagement();
+        if (pluginManagement != null) {
+            for (Plugin plugin : pluginManagement.getPlugins()) {
+                result.add(toArtifact(plugin));
             }
         }
         return result;
@@ -378,6 +389,10 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
     private Artifact toArtifact(Dependency dependency) {
         return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getScope(), dependency.getType(), dependency.getClassifier(), getArtifactHandler());
+    }
+
+    private Artifact toArtifact(Plugin plugin) {
+        return new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, Constants.MAVEN_PLUGIN_TYPE, null, getArtifactHandler());
     }
 
     private static Dependency toDependency(Artifact artifact) {
@@ -414,5 +429,12 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             }
         }
         return new TaskSegment(segment.isAggregating(), filtered.toArray());
+    }
+
+
+    private static void preProccessConfig(BomConfig config) {
+        if (config.getModules().getIncludes().isEmpty()) {
+            config.getModules().getIncludes().add("*:*");
+        }
     }
 }

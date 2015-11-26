@@ -27,7 +27,10 @@ import java.util.Set;
 
 public class Filters {
 
-    public static ArtifactFilter createArtifactFilter(MavenSession session, BomConfig config) {
+    public static final ArtifactFilter MAVEN_PLUGIN_FILTER = new MavenPluginFilter();
+    public static final ArtifactFilter EXCLUDE_POM_FILTER = new IncludePomsFilter(false);
+
+    public static ArtifactFilter createDependencyFilter(MavenSession session, BomConfig config) {
         final List<ArtifactFilter> filters = new LinkedList<ArtifactFilter>();
         filters.add(new SystemFilter());
         filters.add(new SessionArtifactFilter(session, false));
@@ -46,6 +49,7 @@ public class Filters {
     public static ArtifactFilter createModulesFilter(BomConfig config) {
         final List<ArtifactFilter> filters = new LinkedList<ArtifactFilter>();
         filters.add(new SystemFilter());
+        filters.add(EXCLUDE_POM_FILTER);
         filters.add(new IncludesFilter(config.getModules().getIncludes()));
         filters.add(new ExcludesFilter(config.getModules().getExcludes()));
 
@@ -55,6 +59,15 @@ public class Filters {
         if (config.isIgnoreScope()) {
             filters.add(new ScopeFilter());
         }
+        return new CompositeFilter(filters);
+    }
+
+
+    public static ArtifactFilter createPluginFilter(MavenSession session, BomConfig config) {
+        final List<ArtifactFilter> filters = new LinkedList<ArtifactFilter>();
+        filters.add(MAVEN_PLUGIN_FILTER);
+        filters.add(new IncludesFilter(config.getPlugins().getIncludes()));
+        filters.add(new ExcludesFilter(config.getPlugins().getExcludes()));
         return new CompositeFilter(filters);
     }
 

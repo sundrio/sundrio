@@ -25,9 +25,13 @@ public class BomConfig {
     private String description = "Generated Bom";
     private ArtifactSet modules = new ArtifactSet();
     private ArtifactSet dependencies = new ArtifactSet();
+    private ArtifactSet plugins = new ArtifactSet();
     private GoalSet goals = new GoalSet();
     private boolean ignoreScope = true;
     private boolean excludeOptional = true;
+
+    private boolean inheritDependencyManagement;
+    private boolean inheritPluginManagement;
 
     private Properties properties = new Properties();
 
@@ -59,6 +63,10 @@ public class BomConfig {
         return dependencies;
     }
 
+    public ArtifactSet getPlugins() {
+        return plugins;
+    }
+
     public GoalSet getGoals() {
         return goals;
     }
@@ -73,5 +81,13 @@ public class BomConfig {
 
     public boolean isExcludeOptional() {
         return excludeOptional;
+    }
+
+    public boolean isInheritDependencyManagement() {
+        return inheritDependencyManagement;
+    }
+
+    public boolean isInheritPluginManagement() {
+        return inheritPluginManagement;
     }
 }
