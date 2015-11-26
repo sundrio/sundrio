@@ -25,6 +25,8 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.dsl.internal.processor.DslProcessorContext;
 import io.sundr.dsl.internal.type.functions.Combine;
 import io.sundr.dsl.internal.type.functions.Generics;
+import io.sundr.dsl.internal.utils.JavaTypeUtils;
+import org.hamcrest.CoreMatchers;
 import utils.matchers.TypeNamed;
 import org.junit.Assert;
 import org.junit.Test;
