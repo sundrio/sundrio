@@ -1,5 +1,9 @@
 for (Visitable v : _visitables) {
     v.accept(visitor);
 }
-visitor.visit(this);
+try {
+    visitor.visit(this);
+} catch (ClassCastException e) {
+    //ignore
+}
 return (T) this;
