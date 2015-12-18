@@ -64,7 +64,11 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         for (Visitable visitable : _visitables) {
             visitable.accept(visitor);
         }
-        visitor.visit(this);
+        try {
+            visitor.visit(this);
+        } catch (ClassCastException e) {
+            //ignore
+        }
         return (F) this;
     }
 }

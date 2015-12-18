@@ -75,7 +75,32 @@ public class ShapesTest {
 
 
         Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
+    }
 
+    @Test
+    public void testTypedVisitor() {
+        Canvas canvas = new CanvasBuilder()
+                .addNewCircleShape()
+                .withX(0)
+                .withY(0)
+                .withRadius(10)
+                .and()
+                .addNewSquareShape()
+                .withY(10)
+                .withY(20)
+                .withHeight(30)
+                .and()
+                .build();
+
+        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder>() {
+            @Override
+            public void visit(CircleBuilder element) {
+                element.withRadius(100 + element.getRadius());
+            }
+        }).build();
+
+
+        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
     }
 
     @Test
