@@ -30,11 +30,8 @@ public enum JavaPropertyToReferences implements Function<JavaProperty, Set<JavaT
     @Override
     public Set<JavaType> apply(JavaProperty item) {
         Set<JavaType> result = new LinkedHashSet<JavaType>();
-        result.add(item.getType());
-        for (JavaType generic : item.getType().getGenericTypes()) {
-            result.add(generic);
-        }
 
+        result.addAll(JavaTypeToReferences.FUNCTION.apply(item.getType()));
         if (item.getType().getDefaultImplementation() != null) {
             result.add(item.getType().getDefaultImplementation());
         }
