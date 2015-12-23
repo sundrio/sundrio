@@ -32,18 +32,18 @@ public class ToTransitionClassName implements Function<AnnotationMirror, List<St
 
     private final TypeElement ANY;
     private final TypeElement ALL;
-    private final TypeElement EXCLUSIVE;
+    private final TypeElement NONE;
     private final Element ANY_VALUE;
     private final Element ALL_VALUE;
-    private final Element EXCLUSIVE_VALUE;
+    private final Element NONE_VALUE;
 
     public ToTransitionClassName(Elements elements) {
         ANY = elements.getTypeElement(Any.class.getCanonicalName());
         ALL = elements.getTypeElement(All.class.getCanonicalName());
-        EXCLUSIVE = elements.getTypeElement(None.class.getCanonicalName());
+        NONE = elements.getTypeElement(None.class.getCanonicalName());
         ANY_VALUE = ANY.getEnclosedElements().get(0);
         ALL_VALUE = ALL.getEnclosedElements().get(0);
-        EXCLUSIVE_VALUE = EXCLUSIVE.getEnclosedElements().get(0);
+        NONE_VALUE = NONE.getEnclosedElements().get(0);
     }
 
     public List<String> apply(AnnotationMirror annotationMirror) {
@@ -72,8 +72,8 @@ public class ToTransitionClassName implements Function<AnnotationMirror, List<St
                 }
             }
             return classNames;
-        } else if (annotationMirror.getAnnotationType().asElement().equals(EXCLUSIVE)) {
-            Object value = annotationMirror.getElementValues().get(EXCLUSIVE_VALUE).getValue();
+        } else if (annotationMirror.getAnnotationType().asElement().equals(NONE)) {
+            Object value = annotationMirror.getElementValues().get(NONE_VALUE).getValue();
             if (value instanceof String) {
                 classNames.add(removeSuffix((String) value));
             } else if (value instanceof List) {

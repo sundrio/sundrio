@@ -19,7 +19,7 @@ package io.sundr.examples.curator;
 import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
-import io.sundr.dsl.annotations.Exclusive;
+import io.sundr.dsl.annotations.None;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.examples.curator.annotations.BackgroundOption;
@@ -55,19 +55,19 @@ public interface CuratorGetDataDsl {
     @InterfaceName("Leavable")
     @LeaveOption
     @Any(ReconfigOption.class)
-    @Exclusive({WithMembersOption.class})
+    @None({WithMembersOption.class})
     void leaving(String... server);
 
     @InterfaceName("Joinable")
     @JoinOption
     @Any(ReconfigOption.class)
-    @Exclusive(WithMembersOption.class)
+    @None(WithMembersOption.class)
     void joining(String... server);
 
     @InterfaceName("Memberable")
     @WithMembersOption
     @Any(ReconfigOption.class)
-    @Exclusive({JoinOption.class, LeaveOption.class})
+    @None({JoinOption.class, LeaveOption.class})
     void withMembers(String... server);
     
     @BackgroundOption
