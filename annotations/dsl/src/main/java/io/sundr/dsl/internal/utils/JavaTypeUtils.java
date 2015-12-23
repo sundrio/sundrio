@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.dsl.internal.Constants.EXCLUSIVE;
+import static io.sundr.dsl.internal.Constants.NONE;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
@@ -82,7 +82,7 @@ public final class JavaTypeUtils {
 
         Set<String> requiresAll = new LinkedHashSet<String>();
         Set<String> requiresAny = new LinkedHashSet<String>();
-        Set<String> exclusive = new LinkedHashSet<String>();
+        Set<String> noneOf = new LinkedHashSet<String>();
 
         Set<String> keywords = new LinkedHashSet<String>();
 
@@ -96,9 +96,9 @@ public final class JavaTypeUtils {
             requiresAll.addAll(names != null ? names : Collections.<String>emptyList());
         }
 
-        for (AnnotationMirror annotationMirror : context.getToExclusiveAnnotations().apply(executableElement)) {
+        for (AnnotationMirror annotationMirror : context.getToNoneAnnotations().apply(executableElement)) {
             List<String> names = context.getToTransitionClassName().apply(annotationMirror);
-            exclusive.addAll(names != null ? names : Collections.<String>emptyList());
+            noneOf.addAll(names != null ? names : Collections.<String>emptyList());
         }
 
         for (AnnotationMirror annotationMirror : context.getToKeywordAnnotations().apply(executableElement)) {
@@ -142,7 +142,7 @@ public final class JavaTypeUtils {
                     .addToAttributes(KEYWORDS, keywords)
                     .addToAttributes(REQUIRES_ALL, requiresAll)
                     .addToAttributes(REQUIRES_ANY, requiresAny)
-                    .addToAttributes(EXCLUSIVE,  exclusive)
+                    .addToAttributes(NONE,  noneOf)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                     .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
                     .addToAttributes(METHOD_NAME, methodName)

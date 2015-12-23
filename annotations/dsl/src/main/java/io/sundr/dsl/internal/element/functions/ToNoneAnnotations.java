@@ -17,7 +17,7 @@
 package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
-import io.sundr.dsl.annotations.Exclusive;
+import io.sundr.dsl.annotations.None;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
@@ -26,24 +26,24 @@ import javax.lang.model.util.Elements;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToExclusiveAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
+public class ToNoneAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
 
-    private final TypeElement EXCLUSIVE;
+    private final TypeElement NONE;
 
 
-    public ToExclusiveAnnotations(Elements elements) {
-        EXCLUSIVE = elements.getTypeElement(Exclusive.class.getCanonicalName());
+    public ToNoneAnnotations(Elements elements) {
+        NONE = elements.getTypeElement(None.class.getCanonicalName());
     }
 
     public Set<AnnotationMirror> apply(ExecutableElement element) {
         Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<AnnotationMirror>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
-            if (mirror.getAnnotationType().asElement().equals(EXCLUSIVE)) {
+            if (mirror.getAnnotationType().asElement().equals(NONE)) {
                 annotationMirrors.add(mirror);
             }
             //Also look for use on custom annotations
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(EXCLUSIVE)) {
+                if (innerMirror.getAnnotationType().asElement().equals(NONE)) {
                     annotationMirrors.add(innerMirror);
                 }
             }

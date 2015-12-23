@@ -25,7 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
-import static io.sundr.dsl.internal.Constants.EXCLUSIVE;
+import static io.sundr.dsl.internal.Constants.NONE;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
@@ -96,7 +96,7 @@ public final class GraphUtils {
         Boolean multiple = (Boolean) candidate.getType().getAttributes().get(CARDINALITY_MULTIPLE);
         Set<String> requiresAll = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ALL);
         Set<String> requiresAny = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ANY);
-        Set<String> exclusive = (Set<String>) candidate.getType().getAttributes().get(EXCLUSIVE);
+        Set<String> exclusive = (Set<String>) candidate.getType().getAttributes().get(NONE);
 
         //Eliminate circles if not supported
         if (!multiple && visited.contains(candidate.getType())) {

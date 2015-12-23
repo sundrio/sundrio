@@ -75,10 +75,14 @@ public final class DslUtils {
 
             JavaClazz combined = Combine.FUNCTION.apply(Generify.FUNCTION.apply(toCombine));
             intermediate.addAll(toCombine);
-            
             if (JavaTypeUtils.isCardinalityMultiple(clazz)) {
                 JavaClazz selfRef = transition(clazz, combined);
-                return transition(clazz, Combine.FUNCTION.apply(Arrays.asList(combined, selfRef)));
+                Set<JavaClazz> toReCombine = new LinkedHashSet<JavaClazz>(toCombine);
+                toReCombine.add(selfRef);
+                JavaClazz reCombined = Combine.FUNCTION.apply(toReCombine);
+                intermediate.add(reCombined);
+                intermediate.add(combined);
+                return transition(clazz, reCombined);
             } else {
                 intermediate.add(combined);
                 return transition(clazz, combined);
@@ -88,7 +92,7 @@ public final class DslUtils {
 
     public static JavaClazz transition(JavaClazz from, JavaClazz to) {
         JavaType transitionInterface = new JavaTypeBuilder(from.getType())
-                .withGenericTypes(new JavaType[]{to.getType()}).build();
+                .withGenericTypes(to.getType()).build();
 
         return new JavaClazzBuilder(from)
                 .withType(transitionInterface)

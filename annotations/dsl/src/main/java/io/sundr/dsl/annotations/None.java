@@ -24,6 +24,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
-public @interface Exclusive {
+public @interface None {
     Class<? extends Annotation>[] value();
 }

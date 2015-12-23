@@ -19,7 +19,7 @@ package io.sundr.dsl.internal.element.functions;
 import io.sundr.Function;
 import io.sundr.dsl.annotations.All;
 import io.sundr.dsl.annotations.Any;
-import io.sundr.dsl.annotations.Exclusive;
+import io.sundr.dsl.annotations.None;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -40,7 +40,7 @@ public class ToTransitionClassName implements Function<AnnotationMirror, List<St
     public ToTransitionClassName(Elements elements) {
         ANY = elements.getTypeElement(Any.class.getCanonicalName());
         ALL = elements.getTypeElement(All.class.getCanonicalName());
-        EXCLUSIVE = elements.getTypeElement(Exclusive.class.getCanonicalName());
+        EXCLUSIVE = elements.getTypeElement(None.class.getCanonicalName());
         ANY_VALUE = ANY.getEnclosedElements().get(0);
         ALL_VALUE = ALL.getEnclosedElements().get(0);
         EXCLUSIVE_VALUE = EXCLUSIVE.getEnclosedElements().get(0);

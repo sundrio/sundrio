@@ -23,7 +23,7 @@ import io.sundr.codegen.converters.StringToJavaType;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.dsl.internal.element.functions.ToAllAnnotations;
-import io.sundr.dsl.internal.element.functions.ToExclusiveAnnotations;
+import io.sundr.dsl.internal.element.functions.ToNoneAnnotations;
 import io.sundr.dsl.internal.element.functions.ToKeywordAnnotations;
 import io.sundr.dsl.internal.element.functions.ToKeywordClassName;
 import io.sundr.dsl.internal.element.functions.ToAnyAnnotations;
@@ -41,7 +41,7 @@ public class DslProcessorContext {
     private final ExecutableElementToJavaMethod toMethod;
     private final ToAnyAnnotations toAnyAnnotations;
     private final ToAllAnnotations toAllAnnotations;
-    private final ToExclusiveAnnotations toExclusiveAnnotations;
+    private final ToNoneAnnotations toNoneAnnotations;
     private final ToKeywordAnnotations toKeywordAnnotations;
     private final ToTransitionClassName toTransitionClassName;
     private final ToKeywordClassName toKeywordClassName;
@@ -53,7 +53,7 @@ public class DslProcessorContext {
         this.toMethod = new ExecutableElementToJavaMethod(toType, toProperty);
         this.toAnyAnnotations = new ToAnyAnnotations(elements);
         this.toAllAnnotations = new ToAllAnnotations(elements);
-        this.toExclusiveAnnotations = new ToExclusiveAnnotations(elements);
+        this.toNoneAnnotations = new ToNoneAnnotations(elements);
         toTransitionClassName = new ToTransitionClassName(elements);
         toKeywordAnnotations = new ToKeywordAnnotations(elements);
         toKeywordClassName = new ToKeywordClassName();
@@ -79,8 +79,8 @@ public class DslProcessorContext {
         return toAllAnnotations;
     }
 
-    public ToExclusiveAnnotations getToExclusiveAnnotations() {
-        return toExclusiveAnnotations;
+    public ToNoneAnnotations getToNoneAnnotations() {
+        return toNoneAnnotations;
     }
 
     public ToTransitionClassName getToTransitionClassName() {
