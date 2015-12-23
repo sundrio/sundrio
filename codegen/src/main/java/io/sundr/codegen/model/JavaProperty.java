@@ -79,4 +79,25 @@ public class JavaProperty extends AttributeSupport implements Property<JavaType>
     public boolean isArray() {
         return array;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JavaProperty that = (JavaProperty) o;
+
+        if (array != that.array) return false;
+        if (type != null ? !type.equals(that.type) : that.type != null) return false;
+        return !(name != null ? !name.equals(that.name) : that.name != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (array ? 1 : 0);
+        return result;
+    }
 }
