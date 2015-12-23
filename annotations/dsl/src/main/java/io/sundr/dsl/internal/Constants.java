@@ -37,5 +37,6 @@ public final class Constants {
 
     public static final String REQUIRES_ALL = "REQUIRES_ALL";
     public static final String REQUIRES_ANY = "REQUIRES_ANY";
-    public static final String NONE = "NONE";
+    public static final String REQUIRES_NONE = "REQUIRES_NONE";
+    public static final String REQUIRES_ONLY = "REQUIRES_ONLY";
 }

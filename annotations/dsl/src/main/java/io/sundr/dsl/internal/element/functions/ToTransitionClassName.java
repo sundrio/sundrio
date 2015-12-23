@@ -20,6 +20,7 @@ import io.sundr.Function;
 import io.sundr.dsl.annotations.All;
 import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.None;
+import io.sundr.dsl.annotations.Only;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -33,60 +34,50 @@ public class ToTransitionClassName implements Function<AnnotationMirror, List<St
     private final TypeElement ANY;
     private final TypeElement ALL;
     private final TypeElement NONE;
+    private final TypeElement ONLY;
+
     private final Element ANY_VALUE;
     private final Element ALL_VALUE;
     private final Element NONE_VALUE;
+    private final Element ONLY_VALUE;
 
     public ToTransitionClassName(Elements elements) {
         ANY = elements.getTypeElement(Any.class.getCanonicalName());
         ALL = elements.getTypeElement(All.class.getCanonicalName());
         NONE = elements.getTypeElement(None.class.getCanonicalName());
+        ONLY = elements.getTypeElement(Only.class.getCanonicalName());
+
         ANY_VALUE = ANY.getEnclosedElements().get(0);
         ALL_VALUE = ALL.getEnclosedElements().get(0);
         NONE_VALUE = NONE.getEnclosedElements().get(0);
+        ONLY_VALUE = ONLY.getEnclosedElements().get(0);
     }
 
     public List<String> apply(AnnotationMirror annotationMirror) {
-        List<String> classNames = new ArrayList<String>();
         if (annotationMirror.getAnnotationType().asElement().equals(ANY)) {
-            Object value = annotationMirror.getElementValues().get(ANY_VALUE).getValue();
-            if (value instanceof String) {
-                classNames.add(removeSuffix((String) value));
-            } else if (value instanceof List) {
-                List list = (List) value;
-                for (Object item : list) {
-                    String str = String.valueOf(item);
-                    classNames.add(removeSuffix(str));
-                }
-            }
-            return classNames;
+            return toClassNames(annotationMirror.getElementValues().get(ANY_VALUE).getValue());
         } else if (annotationMirror.getAnnotationType().asElement().equals(ALL)) {
-            Object value = annotationMirror.getElementValues().get(ALL_VALUE).getValue();
-            if (value instanceof String) {
-                classNames.add(removeSuffix((String) value));
-            } else if (value instanceof List) {
-                List list = (List) value;
-                for (Object item : list) {
-                    String str = String.valueOf(item);
-                    classNames.add(removeSuffix(str));
-                }
-            }
-            return classNames;
+            return toClassNames(annotationMirror.getElementValues().get(ALL_VALUE).getValue());
         } else if (annotationMirror.getAnnotationType().asElement().equals(NONE)) {
-            Object value = annotationMirror.getElementValues().get(NONE_VALUE).getValue();
-            if (value instanceof String) {
-                classNames.add(removeSuffix((String) value));
-            } else if (value instanceof List) {
-                List list = (List) value;
-                for (Object item : list) {
-                    String str = String.valueOf(item);
-                    classNames.add(removeSuffix(str));
-                }
-            }
-            return classNames;
+            return toClassNames(annotationMirror.getElementValues().get(NONE_VALUE).getValue());
+        } else if (annotationMirror.getAnnotationType().asElement().equals(ONLY)) {
+            return toClassNames(annotationMirror.getElementValues().get(ONLY_VALUE).getValue());
         }
-
         return null;
+    }
+
+    private static <T> List<String> toClassNames(T value) {
+        List<String> classNames = new ArrayList<String>();
+        if (value instanceof String) {
+            classNames.add(removeSuffix((String) value));
+        } else if (value instanceof List) {
+            List list = (List) value;
+            for (Object item : list) {
+                String str = String.valueOf(item);
+                classNames.add(removeSuffix(str));
+            }
+        }
+        return classNames;
     }
 
     private static String removeSuffix(String str) {

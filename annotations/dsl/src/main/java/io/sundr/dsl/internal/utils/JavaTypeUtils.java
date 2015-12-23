@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.dsl.internal.Constants.NONE;
+import static io.sundr.dsl.internal.Constants.REQUIRES_NONE;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
@@ -56,6 +56,7 @@ import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
+import static io.sundr.dsl.internal.Constants.REQUIRES_ONLY;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.VOID;
@@ -82,7 +83,8 @@ public final class JavaTypeUtils {
 
         Set<String> requiresAll = new LinkedHashSet<String>();
         Set<String> requiresAny = new LinkedHashSet<String>();
-        Set<String> noneOf = new LinkedHashSet<String>();
+        Set<String> requiresNoneOf = new LinkedHashSet<String>();
+        Set<String> requiresOnly = new LinkedHashSet<String>();
 
         Set<String> keywords = new LinkedHashSet<String>();
 
@@ -98,7 +100,12 @@ public final class JavaTypeUtils {
 
         for (AnnotationMirror annotationMirror : context.getToNoneAnnotations().apply(executableElement)) {
             List<String> names = context.getToTransitionClassName().apply(annotationMirror);
-            noneOf.addAll(names != null ? names : Collections.<String>emptyList());
+            requiresNoneOf.addAll(names != null ? names : Collections.<String>emptyList());
+        }
+
+        for (AnnotationMirror annotationMirror : context.getToOnlyAnnotations().apply(executableElement)) {
+            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
+            requiresOnly.addAll(names != null ? names : Collections.<String>emptyList());
         }
 
         for (AnnotationMirror annotationMirror : context.getToKeywordAnnotations().apply(executableElement)) {
@@ -142,7 +149,8 @@ public final class JavaTypeUtils {
                     .addToAttributes(KEYWORDS, keywords)
                     .addToAttributes(REQUIRES_ALL, requiresAll)
                     .addToAttributes(REQUIRES_ANY, requiresAny)
-                    .addToAttributes(NONE,  noneOf)
+                    .addToAttributes(REQUIRES_NONE,  requiresNoneOf)
+                    .addToAttributes(REQUIRES_ONLY, requiresOnly)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                     .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
                     .addToAttributes(METHOD_NAME, methodName)

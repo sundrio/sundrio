@@ -27,6 +27,7 @@ import io.sundr.dsl.internal.element.functions.ToNoneAnnotations;
 import io.sundr.dsl.internal.element.functions.ToKeywordAnnotations;
 import io.sundr.dsl.internal.element.functions.ToKeywordClassName;
 import io.sundr.dsl.internal.element.functions.ToAnyAnnotations;
+import io.sundr.dsl.internal.element.functions.ToOnlyAnnotations;
 import io.sundr.dsl.internal.element.functions.ToTransitionClassName;
 
 import javax.lang.model.element.VariableElement;
@@ -42,6 +43,7 @@ public class DslProcessorContext {
     private final ToAnyAnnotations toAnyAnnotations;
     private final ToAllAnnotations toAllAnnotations;
     private final ToNoneAnnotations toNoneAnnotations;
+    private final ToOnlyAnnotations toOnlyAnnotations;
     private final ToKeywordAnnotations toKeywordAnnotations;
     private final ToTransitionClassName toTransitionClassName;
     private final ToKeywordClassName toKeywordClassName;
@@ -54,6 +56,7 @@ public class DslProcessorContext {
         this.toAnyAnnotations = new ToAnyAnnotations(elements);
         this.toAllAnnotations = new ToAllAnnotations(elements);
         this.toNoneAnnotations = new ToNoneAnnotations(elements);
+        this.toOnlyAnnotations = new ToOnlyAnnotations(elements);
         toTransitionClassName = new ToTransitionClassName(elements);
         toKeywordAnnotations = new ToKeywordAnnotations(elements);
         toKeywordClassName = new ToKeywordClassName();
@@ -81,6 +84,10 @@ public class DslProcessorContext {
 
     public ToNoneAnnotations getToNoneAnnotations() {
         return toNoneAnnotations;
+    }
+
+    public ToOnlyAnnotations getToOnlyAnnotations() {
+        return toOnlyAnnotations;
     }
 
     public ToTransitionClassName getToTransitionClassName() {

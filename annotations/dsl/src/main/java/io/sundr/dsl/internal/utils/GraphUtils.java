@@ -25,13 +25,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
-import static io.sundr.dsl.internal.Constants.NONE;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
+import static io.sundr.dsl.internal.Constants.REQUIRES_NONE;
+import static io.sundr.dsl.internal.Constants.REQUIRES_ONLY;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
 
 public final class GraphUtils {
 
@@ -94,17 +95,26 @@ public final class GraphUtils {
         Set<String> visitedKeywords = getKeywords(visited);
 
         Boolean multiple = (Boolean) candidate.getType().getAttributes().get(CARDINALITY_MULTIPLE);
+        Set<String> keywords = (Set<String>) candidate.getType().getAttributes().get(KEYWORDS);
         Set<String> requiresAll = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ALL);
         Set<String> requiresAny = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ANY);
-        Set<String> exclusive = (Set<String>) candidate.getType().getAttributes().get(NONE);
+        Set<String> requiresNone = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_NONE);
+        Set<String> requiresOnly = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ONLY);
 
         //Eliminate circles if not supported
         if (!multiple && visited.contains(candidate.getType())) {
             return false;
         }
 
-        //Check if path contains exclusive keywords
-        for (String e : exclusive) {
+        //Check if the candidate is not present in requires only.
+        for (String keyword : visitedKeywords) {
+            if (!requiresOnly.isEmpty() && !requiresOnly.contains(keyword)) {
+                return false;
+            }
+        }
+
+        //Check if path contains requiresNone keywords
+        for (String e : requiresNone) {
             if (visitedKeywords.contains(e)) {
                 return false;
             }
