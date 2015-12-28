@@ -20,6 +20,7 @@ import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.model.JavaClazz;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.PackageElement;
 import javax.tools.JavaFileObject;
@@ -38,7 +39,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
             generateFromClazz(model, processingEnv
                     .getFiler()
                     .createSourceFile(model.getType().getFullyQualifiedName()), resourceName);
-        } catch (Exception e) {
+        } catch (FilerException e) {
             //TODO: Need to avoid dublicate interfaces here.
         }
     }
