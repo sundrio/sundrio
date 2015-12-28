@@ -21,6 +21,7 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 
 public final class Constants {
 
+    public static final String[] REMOVABLE_PREFIXES = {"With"};
     public static final String INTERFACE_SUFFIX = "Interface";
     public static final String ORIGINAL_RETURN_TYPE = "ORIGINAL_RETURN_TYPE";
     public static final String TERMINATING_TYPES = "TERMINATING_TYPES";

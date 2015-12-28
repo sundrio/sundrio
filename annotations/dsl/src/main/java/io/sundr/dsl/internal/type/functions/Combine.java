@@ -39,6 +39,7 @@ import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
+import static io.sundr.dsl.internal.Constants.REMOVABLE_PREFIXES;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.getTerminatingTypes;
@@ -115,7 +116,7 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
         return  toInterfaceName(prefix + StringUtils.join(types, new Function<JavaType, String>() {
             @Override
             public String apply(JavaType item) {
-                return stripSuffix(item.getClassName()).substring(prefix.length());
+                return stripPrefix(stripSuffix(item.getClassName())).substring(prefix.length());
             }
         }, "Or"));
     }
@@ -148,6 +149,15 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
             }
         }
         return result;
+    }
+
+    public static final String stripPrefix(String str) {
+        for (String prefix : REMOVABLE_PREFIXES) {
+            if (str.startsWith(prefix)) {
+                return str.substring(prefix.length());
+            }
+        }
+        return str;
     }
 
     public static final String stripSuffix(String str) {
