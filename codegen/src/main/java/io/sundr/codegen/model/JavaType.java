@@ -20,6 +20,7 @@ import io.sundr.Function;
 import io.sundr.codegen.Type;
 import io.sundr.codegen.utils.StringUtils;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -149,19 +150,6 @@ public class JavaType extends AttributeSupport implements Type {
         return genericTypes;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        JavaType javaType = (JavaType) o;
-
-        if (className != null ? !className.equals(javaType.className) : javaType.className != null) return false;
-        if (packageName != null ? !packageName.equals(javaType.packageName) : javaType.packageName != null)
-            return false;
-
-        return true;
-    }
 
     public boolean isAssignable(JavaType o) {
         if (this == o || this.equals(o)) {
@@ -179,9 +167,24 @@ public class JavaType extends AttributeSupport implements Type {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JavaType type = (JavaType) o;
+
+        if (packageName != null ? !packageName.equals(type.packageName) : type.packageName != null) return false;
+        if (className != null ? !className.equals(type.className) : type.className != null) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        return Arrays.equals(genericTypes, type.genericTypes);
+
+    }
+
+    @Override
     public int hashCode() {
         int result = packageName != null ? packageName.hashCode() : 0;
         result = 31 * result + (className != null ? className.hashCode() : 0);
+        result = 31 * result + (genericTypes != null ? Arrays.hashCode(genericTypes) : 0);
         return result;
     }
 

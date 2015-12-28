@@ -49,6 +49,7 @@ import static io.sundr.builder.Constants.LIST;
 import static io.sundr.builder.Constants.MAP;
 import static io.sundr.builder.Constants.SET;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
+import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 
 public class BuilderUtils {
 
@@ -218,7 +219,7 @@ public class BuilderUtils {
     public static boolean isDescendant(JavaType item, JavaType candidate) {
         if (item == null || candidate == null) {
             return false;
-        } else if (item.equals(candidate)) {
+        } else if (item.getFullyQualifiedName().equals(candidate.getFullyQualifiedName())) {
             return true;
         } else if (isDescendant(item.getSuperClass(), candidate)) {
             return true;
@@ -302,14 +303,41 @@ public class BuilderUtils {
     }
 
     public static boolean isMap(JavaType type) {
-        return type.equals(MAP) || type.getInterfaces().contains(MAP);
+        if (unwrapGeneric(type).equals(unwrapGeneric(MAP))) {
+            return true;
+        }
+        for (JavaType i : type.getInterfaces()) {
+            //prevent infinite loop
+            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isMap(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isList(JavaType type) {
-        return type.equals(LIST) || type.getInterfaces().contains(LIST);
+        if (unwrapGeneric(type).equals(unwrapGeneric(LIST))) {
+            return true;
+        }
+        for (JavaType i : type.getInterfaces()) {
+            //prevent infinite loop
+            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isList(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isSet(JavaType type) {
-        return type.equals(SET) || type.getInterfaces().contains(SET);
+        if (unwrapGeneric(type).equals(unwrapGeneric(SET))) {
+            return true;
+        }
+        for (JavaType i : type.getInterfaces()) {
+            //prevent infinite loop
+            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isSet(i)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

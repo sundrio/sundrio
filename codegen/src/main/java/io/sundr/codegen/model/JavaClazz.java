@@ -100,4 +100,20 @@ public class JavaClazz extends AttributeSupport implements Clazz<JavaType, JavaP
     public String toString() {
         return type.getClassName();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JavaClazz javaClazz = (JavaClazz) o;
+
+        return !(type != null ? !type.equals(javaClazz.type) : javaClazz.type != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return type != null ? type.hashCode() : 0;
+    }
 }

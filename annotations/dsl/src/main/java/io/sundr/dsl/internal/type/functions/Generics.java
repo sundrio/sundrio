@@ -47,44 +47,72 @@ public enum Generics implements Function<JavaType, JavaType> {
 
     }, UNMAP {
         public JavaType apply(JavaType item) {
-            for (Map.Entry<JavaType, JavaType> enty : GENERIC_MAPPINGS.entrySet()) {
-                JavaType value = enty.getValue();
-                if (value.equals(item)) {
-                    return enty.getKey();
-                }
+            if (containsValue(GENERIC_MAPPINGS, item)) {
+                return getKeyForValue(GENERIC_MAPPINGS, item);
+            } else {
+                return item;
             }
-            return item;
         }
     }, UNWRAP {
         public JavaType apply(JavaType type) {
-            Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
-            Set<JavaType> generics = new LinkedHashSet<JavaType>();
-
-            if (GENERIC_MAPPINGS.containsValue(type)) {
-                JavaType unmapped = UNMAP.apply(type);
-                if (!unmapped.equals(type)) {
-                    return UNWRAP.apply(unmapped);
-                }
-                return unmapped;
-            } else {
-                for (JavaType iface : type.getInterfaces()) {
-                    interfaces.add(UNWRAP.apply(iface));
-                }
-                for (JavaType generic : type.getGenericTypes()) {
-                    generics.add(UNWRAP.apply(generic));
-                }
-                return new JavaTypeBuilder(type)
-                        .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                        .withInterfaces(interfaces)
-                        .build();
-            }
+           return unwrap(type, new LinkedHashSet<String>());
         }
     };
 
-    private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"};
+    private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"};
     private static final Map<JavaType, JavaType> GENERIC_MAPPINGS = new HashMap<JavaType, JavaType>();
     private static int counter = 0;
 
+    private static JavaType unwrap(JavaType type, Set<String> visited) {
+        //Try to detect circles...
+        Set<String> path = new LinkedHashSet<String>(visited);
+        path.add(type.getFullyQualifiedName());
+        //We use containsValue that is not using equals, but getFullyQualifiedName instead.
+        //This is needed to prevent possible infinite loops
+        if (containsValue(GENERIC_MAPPINGS, type)) {
+            JavaType unmapped = UNMAP.apply(type);
+            if (!unmapped.equals(type) && !path.contains(unmapped)) {
+                return unwrap(unmapped, path);
+            }
+            return unmapped;
+        } else {
+            Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
+            Set<JavaType> generics = new LinkedHashSet<JavaType>();
+
+            for (JavaType iface : type.getInterfaces()) {
+                if (!path.contains(iface.getFullyQualifiedName())) {
+                    interfaces.add(unwrap(iface, path));
+                }
+            }
+            for (JavaType generic : type.getGenericTypes()) {
+                if (!path.contains(generic.getFullyQualifiedName())) {
+                    generics.add(unwrap(generic, path));
+                }
+            }
+            return new JavaTypeBuilder(type)
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withInterfaces(interfaces)
+                    .build();
+        }
+    }
+
+    private static boolean containsValue(Map<JavaType, JavaType> map, JavaType value) {
+        for (Map.Entry<JavaType,JavaType> entry : map.entrySet()) {
+            if (value.getFullyQualifiedName().equals(entry.getValue().getFullyQualifiedName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static JavaType getKeyForValue(Map<JavaType, JavaType> map, JavaType value) {
+        for (Map.Entry<JavaType,JavaType> entry : map.entrySet()) {
+            if (value.getFullyQualifiedName().equals(entry.getValue().getFullyQualifiedName())) {
+                return entry.getKey();
+            }
+        }
+        throw new IllegalStateException("Key not found for value:" + value.getFullyQualifiedName());
+    }
     
     static {
         GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withClassName("V").addToAttributes(IS_GENERIC, true).build());
