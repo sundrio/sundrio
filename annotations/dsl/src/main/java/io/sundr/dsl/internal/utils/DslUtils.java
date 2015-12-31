@@ -76,10 +76,17 @@ public final class DslUtils {
             JavaClazz combined = Combine.FUNCTION.apply(Generify.FUNCTION.apply(toCombine));
             intermediate.addAll(toCombine);
             if (JavaTypeUtils.isCardinalityMultiple(clazz)) {
+                //1st pass create the self ref
                 JavaClazz selfRef = transition(clazz, combined);
                 Set<JavaClazz> toReCombine = new LinkedHashSet<JavaClazz>(toCombine);
                 toReCombine.add(selfRef);
                 JavaClazz reCombined = Combine.FUNCTION.apply(toReCombine);
+
+                //2nd pass recreate the combination
+                selfRef =  transition(clazz, reCombined);
+                toReCombine = new LinkedHashSet<JavaClazz>(toCombine);
+                toReCombine.add(selfRef);
+                reCombined = Combine.FUNCTION.apply(toReCombine);
                 intermediate.add(reCombined);
                 intermediate.add(combined);
                 return transition(clazz, reCombined);
@@ -100,4 +107,12 @@ public final class DslUtils {
 
     }
 
+    public static boolean isExtendedBy(JavaType candidate, JavaType target) {
+        for (JavaType type : target.getInterfaces()) {
+            if (type.getFullyQualifiedName().equals(candidate.getFullyQualifiedName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
