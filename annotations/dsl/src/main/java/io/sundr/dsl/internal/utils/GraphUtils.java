@@ -29,6 +29,7 @@ import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
 import static io.sundr.dsl.internal.Constants.REQUIRES_NONE;
+import static io.sundr.dsl.internal.Constants.REQUIRES_NONE_OF;
 import static io.sundr.dsl.internal.Constants.REQUIRES_ONLY;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
@@ -98,8 +99,13 @@ public final class GraphUtils {
         Set<String> keywords = (Set<String>) candidate.getType().getAttributes().get(KEYWORDS);
         Set<String> requiresAll = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ALL);
         Set<String> requiresAny = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ANY);
-        Set<String> requiresNone = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_NONE);
+        Set<String> requiresNoneOf = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_NONE_OF);
         Set<String> requiresOnly = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ONLY);
+        Boolean requiresNone = (Boolean) candidate.getType().getAttributes().get(REQUIRES_NONE);
+
+        if (requiresNone && !visitedKeywords.isEmpty()) {
+            return false;
+        }
 
         //Eliminate circles if not supported
         if (!multiple && visited.contains(candidate.getType())) {
@@ -113,8 +119,8 @@ public final class GraphUtils {
             }
         }
 
-        //Check if path contains requiresNone keywords
-        for (String e : requiresNone) {
+        //Check if path contains requiresNoneOf keywords
+        for (String e : requiresNoneOf) {
             if (visitedKeywords.contains(e)) {
                 return false;
             }

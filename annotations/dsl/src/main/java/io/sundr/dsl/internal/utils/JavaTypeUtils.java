@@ -45,6 +45,7 @@ import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.dsl.internal.Constants.REQUIRES_NONE;
+import static io.sundr.dsl.internal.Constants.REQUIRES_NONE_OF;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
@@ -85,6 +86,7 @@ public final class JavaTypeUtils {
         Set<String> requiresAny = new LinkedHashSet<String>();
         Set<String> requiresNoneOf = new LinkedHashSet<String>();
         Set<String> requiresOnly = new LinkedHashSet<String>();
+        Boolean requiresNone = false;
 
         Set<String> keywords = new LinkedHashSet<String>();
 
@@ -106,6 +108,7 @@ public final class JavaTypeUtils {
         for (AnnotationMirror annotationMirror : context.getToOnlyAnnotations().apply(executableElement)) {
             List<String> names = context.getToTransitionClassName().apply(annotationMirror);
             requiresOnly.addAll(names != null ? names : Collections.<String>emptyList());
+            requiresNone = requiresOnly.isEmpty();
         }
 
         for (AnnotationMirror annotationMirror : context.getToKeywordAnnotations().apply(executableElement)) {
@@ -149,7 +152,8 @@ public final class JavaTypeUtils {
                     .addToAttributes(KEYWORDS, keywords)
                     .addToAttributes(REQUIRES_ALL, requiresAll)
                     .addToAttributes(REQUIRES_ANY, requiresAny)
-                    .addToAttributes(REQUIRES_NONE,  requiresNoneOf)
+                    .addToAttributes(REQUIRES_NONE, requiresNone)
+                    .addToAttributes(REQUIRES_NONE_OF, requiresNoneOf)
                     .addToAttributes(REQUIRES_ONLY, requiresOnly)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                     .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
