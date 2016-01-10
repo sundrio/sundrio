@@ -24,6 +24,7 @@ import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.InterfaceName;
+import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import javax.annotation.processing.RoundEnvironment;
@@ -76,10 +77,20 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     Set<Node<JavaClazz>> graph = createGraph(genericInterfaces);
                     for (Node<JavaClazz> root : graph) {
                         JavaClazz current = root.getItem();
-                        for (JavaMethod m : current.getMethods()) {
-                            methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
+
+                        //If there are not transitions don't generate root interface.
+                        //Just add the method with the direct return type.
+                        if (root.getTransitions().isEmpty()) {
+                            for (JavaMethod m : current.getMethods()) {
+                                methods.add(new JavaMethodBuilder(m).withReturnType(Generics.UNWRAP.apply(m.getReturnType())).build());
+                            }
+                        } else {
+                            for (JavaMethod m : current.getMethods()) {
+                                methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
+                            }
+
+                            interfacesToGenerate.add(createRootInterface(root, interfacesToGenerate));
                         }
-                        interfacesToGenerate.add(createRootInterface(root, interfacesToGenerate));
                     }
 
                     //Do generate the DSL interface
