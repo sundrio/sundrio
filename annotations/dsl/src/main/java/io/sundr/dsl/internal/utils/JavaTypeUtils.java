@@ -27,13 +27,18 @@ import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.Multiple;
 import io.sundr.dsl.annotations.InterfaceName;
+import io.sundr.dsl.annotations.Or;
 import io.sundr.dsl.annotations.Terminal;
+import io.sundr.dsl.internal.element.functions.filter.AndTransitionFilter;
+import io.sundr.dsl.internal.element.functions.filter.OrTransitionFilter;
+import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import io.sundr.dsl.internal.processor.DslProcessorContext;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.type.functions.Merge;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,8 +49,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.dsl.internal.Constants.REQUIRES_NONE;
-import static io.sundr.dsl.internal.Constants.REQUIRES_NONE_OF;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
@@ -55,12 +58,10 @@ import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
-import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
-import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
-import static io.sundr.dsl.internal.Constants.REQUIRES_ONLY;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.VOID;
+import static io.sundr.dsl.internal.Constants.FILTER;
 
 public final class JavaTypeUtils {
 
@@ -82,34 +83,17 @@ public final class JavaTypeUtils {
         Boolean isTerminal = executableElement.getAnnotation(Terminal.class) != null
                 || !isVoid(executableElement);
 
-        Set<String> requiresAll = new LinkedHashSet<String>();
-        Set<String> requiresAny = new LinkedHashSet<String>();
-        Set<String> requiresNoneOf = new LinkedHashSet<String>();
-        Set<String> requiresOnly = new LinkedHashSet<String>();
-        Boolean requiresNone = false;
-
         Set<String> keywords = new LinkedHashSet<String>();
+        Set<TransitionFilter> filters = new LinkedHashSet<TransitionFilter>();
 
-        for (AnnotationMirror annotationMirror : context.getToAnyAnnotations().apply(executableElement)) {
-            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
-            requiresAny.addAll(names != null ? names : Collections.<String>emptyList());
-        }
+        filters.add(context.getToRequiresAll().apply(executableElement));
+        filters.add(context.getToRequiresAny().apply(executableElement));
+        filters.add(context.getToRequiresOnly().apply(executableElement));
+        filters.add(context.getToRequiresNoneOf().apply(executableElement));
 
-        for (AnnotationMirror annotationMirror : context.getToAllAnnotations().apply(executableElement)) {
-            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
-            requiresAll.addAll(names != null ? names : Collections.<String>emptyList());
-        }
-
-        for (AnnotationMirror annotationMirror : context.getToNoneAnnotations().apply(executableElement)) {
-            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
-            requiresNoneOf.addAll(names != null ? names : Collections.<String>emptyList());
-        }
-
-        for (AnnotationMirror annotationMirror : context.getToOnlyAnnotations().apply(executableElement)) {
-            List<String> names = context.getToTransitionClassName().apply(annotationMirror);
-            requiresOnly.addAll(names != null ? names : Collections.<String>emptyList());
-            requiresNone = requiresOnly.isEmpty();
-        }
+        TransitionFilter filter = executableElement.getAnnotation(Or.class) != null
+                ? new OrTransitionFilter(filters)
+                : new AndTransitionFilter(filters);
 
         for (AnnotationMirror annotationMirror : context.getToKeywordAnnotations().apply(executableElement)) {
             keywords.add(context.getToKeywordClassName().apply(annotationMirror));
@@ -150,11 +134,7 @@ public final class JavaTypeUtils {
                     .addToAttributes(IS_TERMINAL, isTerminal)
                     .addToAttributes(IS_GENERIC, Boolean.FALSE)
                     .addToAttributes(KEYWORDS, keywords)
-                    .addToAttributes(REQUIRES_ALL, requiresAll)
-                    .addToAttributes(REQUIRES_ANY, requiresAny)
-                    .addToAttributes(REQUIRES_NONE, requiresNone)
-                    .addToAttributes(REQUIRES_NONE_OF, requiresNoneOf)
-                    .addToAttributes(REQUIRES_ONLY, requiresOnly)
+                    .addToAttributes(FILTER, filter)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                     .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
                     .addToAttributes(METHOD_NAME, methodName)
@@ -259,5 +239,28 @@ public final class JavaTypeUtils {
         return type.getAttributes().containsKey(IS_GENERIC)
                 && (type.getAttributes().get(IS_GENERIC) instanceof Boolean)
                 && (Boolean) type.getAttributes().get(IS_GENERIC);
+    }
+
+
+    public static <T> List<String> toClassNames(T value) {
+        List<String> classNames = new ArrayList<String>();
+        if (value instanceof String) {
+            classNames.add(removeSuffix((String) value));
+        } else if (value instanceof List) {
+            List list = (List) value;
+            for (Object item : list) {
+                String str = String.valueOf(item);
+                classNames.add(removeSuffix(str));
+            }
+        }
+        return classNames;
+    }
+
+    private static String removeSuffix(String str) {
+        if (str.endsWith(".class")) {
+            return str.substring(0, str.length() - 6);
+        } else {
+            return str;
+        }
     }
 }

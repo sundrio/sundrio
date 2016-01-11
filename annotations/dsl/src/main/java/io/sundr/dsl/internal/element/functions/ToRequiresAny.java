@@ -18,36 +18,40 @@ package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
 import io.sundr.dsl.annotations.Any;
+import io.sundr.dsl.internal.element.functions.filter.RequiresAnyFilter;
+import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
+import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToAnyAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
+public class ToRequiresAny implements Function<Element, TransitionFilter> {
 
     private final TypeElement ANY;
+    private final Element ANY_VALUE;
 
-
-    public ToAnyAnnotations(Elements elements) {
+    public ToRequiresAny(Elements elements) {
         ANY = elements.getTypeElement(Any.class.getCanonicalName());
+        ANY_VALUE = ANY.getEnclosedElements().get(0);
     }
 
-    public Set<AnnotationMirror> apply(ExecutableElement element) {
-        Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<AnnotationMirror>();
+    public TransitionFilter apply(Element element) {
+        Set<String> keywords = new LinkedHashSet<String>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(ANY)) {
-                annotationMirrors.add(mirror);
+                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(ANY_VALUE).getValue()));
             }
             //Also look for use on custom annotations
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
                 if (innerMirror.getAnnotationType().asElement().equals(ANY)) {
-                    annotationMirrors.add(innerMirror);
+                    keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(ANY_VALUE).getValue()));
                 }
             }
         }
-        return annotationMirrors;
+        return new RequiresAnyFilter(keywords);
     }
 }

@@ -20,13 +20,14 @@ import io.sundr.Function;
 import io.sundr.dsl.annotations.Keyword;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToKeywordAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
+public class ToKeywordAnnotations implements Function<Element, Set<AnnotationMirror>> {
 
     private final TypeElement ANNOTATED_TRANSITION;
 
@@ -35,7 +36,7 @@ public class ToKeywordAnnotations implements Function<ExecutableElement, Set<Ann
         ANNOTATED_TRANSITION = elements.getTypeElement(Keyword.class.getCanonicalName());
     }
 
-    public Set<AnnotationMirror> apply(ExecutableElement element) {
+    public Set<AnnotationMirror> apply(Element element) {
         Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<AnnotationMirror>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
 

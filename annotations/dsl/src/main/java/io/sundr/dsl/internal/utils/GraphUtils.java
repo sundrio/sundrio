@@ -18,19 +18,16 @@ package io.sundr.dsl.internal.utils;
 
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import io.sundr.dsl.internal.processor.Node;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
+import static io.sundr.dsl.internal.Constants.FILTER;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
-import static io.sundr.dsl.internal.Constants.REQUIRES_ALL;
-import static io.sundr.dsl.internal.Constants.REQUIRES_ANY;
-import static io.sundr.dsl.internal.Constants.REQUIRES_NONE;
-import static io.sundr.dsl.internal.Constants.REQUIRES_NONE_OF;
-import static io.sundr.dsl.internal.Constants.REQUIRES_ONLY;
+import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
@@ -94,55 +91,17 @@ public final class GraphUtils {
 
     private static boolean isSatisfied(JavaClazz candidate, Set<JavaType> visited) {
         Set<String> visitedKeywords = getKeywords(visited);
-
+        TransitionFilter filter = (TransitionFilter) candidate.getType().getAttributes().get(FILTER);
         Boolean multiple = (Boolean) candidate.getType().getAttributes().get(CARDINALITY_MULTIPLE);
-        Set<String> keywords = (Set<String>) candidate.getType().getAttributes().get(KEYWORDS);
-        Set<String> requiresAll = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ALL);
-        Set<String> requiresAny = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ANY);
-        Set<String> requiresNoneOf = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_NONE_OF);
-        Set<String> requiresOnly = (Set<String>) candidate.getType().getAttributes().get(REQUIRES_ONLY);
-        Boolean requiresNone = (Boolean) candidate.getType().getAttributes().get(REQUIRES_NONE);
 
-        if (requiresNone && !visitedKeywords.isEmpty()) {
-            return false;
-        }
-
-        //Eliminate circles if not supported
+        //Eliminate circles if not explicitly specified
         if (!multiple && visited.contains(candidate.getType())) {
             return false;
         }
-
-        //Check if the candidate is not present in requires only.
-        for (String keyword : visitedKeywords) {
-            if (!requiresOnly.isEmpty() && !requiresOnly.contains(keyword)) {
-                return false;
-            }
-        }
-
-        //Check if path contains requiresNoneOf keywords
-        for (String e : requiresNoneOf) {
-            if (visitedKeywords.contains(e)) {
-                return false;
-            }
-        }
-
-        //Check if "All" requirements are meet
-        for (String a : requiresAll) {
-            if (!visitedKeywords.contains(a)) {
-                return false;
-            }
-        }
-
-        for (String a : requiresAny) {
-            if (visitedKeywords.contains(a)) {
-                return true;
-            }
-        }
-
-        return requiresAny.isEmpty();
+        return filter.apply(visitedKeywords);
     }
 
-    private static Set<String> getKeywords(Set<JavaType> types) {
+    public static Set<String> getKeywords(Set<JavaType> types) {
         Set<String> result = new LinkedHashSet<String>();
         for (JavaType type : types) {
             Set<String> keywords = (Set<String>) type.getAttributes().get(KEYWORDS);

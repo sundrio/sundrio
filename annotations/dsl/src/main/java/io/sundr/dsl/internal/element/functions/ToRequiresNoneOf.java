@@ -9,7 +9,7 @@
  *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    WITHOUT WARRANTIES OR CONDITIONS OF NONE KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
@@ -18,36 +18,40 @@ package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
 import io.sundr.dsl.annotations.None;
+import io.sundr.dsl.internal.element.functions.filter.RequiresNoneOfFilter;
+import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
+import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToNoneAnnotations implements Function<ExecutableElement, Set<AnnotationMirror>> {
+public class ToRequiresNoneOf implements Function<Element, TransitionFilter> {
 
     private final TypeElement NONE;
+    private final Element NONE_VALUE;
 
-
-    public ToNoneAnnotations(Elements elements) {
+    public ToRequiresNoneOf(Elements elements) {
         NONE = elements.getTypeElement(None.class.getCanonicalName());
+        NONE_VALUE = NONE.getEnclosedElements().get(0);
     }
 
-    public Set<AnnotationMirror> apply(ExecutableElement element) {
-        Set<AnnotationMirror> annotationMirrors = new LinkedHashSet<AnnotationMirror>();
+    public TransitionFilter apply(Element element) {
+        Set<String> keywords = new LinkedHashSet<String>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(NONE)) {
-                annotationMirrors.add(mirror);
+                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(NONE_VALUE).getValue()));
             }
             //Also look for use on custom annotations
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
                 if (innerMirror.getAnnotationType().asElement().equals(NONE)) {
-                    annotationMirrors.add(innerMirror);
+                    keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(NONE_VALUE).getValue()));
                 }
             }
         }
-        return annotationMirrors;
+        return new RequiresNoneOfFilter(keywords);
     }
 }

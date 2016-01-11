@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.annotations;
+package io.sundr.dsl.internal.element.functions.filter;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Set;
 
-@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.SOURCE)
-public @interface Only {
-    Class<? extends Annotation>[] value();
-    boolean orNone() default false;
+/**
+ * Function that determines if a set of visited keywords contains ALL of the specified requirements.
+ */
+public class RequiresNoneFilter implements TransitionFilter {
+
+
+    public Boolean apply(Set<String> path) {
+        return path.isEmpty();
+    }
 }

@@ -22,13 +22,12 @@ import io.sundr.codegen.converters.VariableElementToJavaProperty;
 import io.sundr.codegen.converters.StringToJavaType;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.dsl.internal.element.functions.ToAllAnnotations;
-import io.sundr.dsl.internal.element.functions.ToNoneAnnotations;
+import io.sundr.dsl.internal.element.functions.ToRequiresAll;
+import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
 import io.sundr.dsl.internal.element.functions.ToKeywordAnnotations;
 import io.sundr.dsl.internal.element.functions.ToKeywordClassName;
-import io.sundr.dsl.internal.element.functions.ToAnyAnnotations;
-import io.sundr.dsl.internal.element.functions.ToOnlyAnnotations;
-import io.sundr.dsl.internal.element.functions.ToTransitionClassName;
+import io.sundr.dsl.internal.element.functions.ToRequiresAny;
+import io.sundr.dsl.internal.element.functions.ToRequiresOnly;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -40,12 +39,11 @@ public class DslProcessorContext {
     private final Function<String, JavaType> toType;
     private final Function<VariableElement, JavaProperty> toProperty;
     private final ExecutableElementToJavaMethod toMethod;
-    private final ToAnyAnnotations toAnyAnnotations;
-    private final ToAllAnnotations toAllAnnotations;
-    private final ToNoneAnnotations toNoneAnnotations;
-    private final ToOnlyAnnotations toOnlyAnnotations;
+    private final ToRequiresAny toRequiresAny;
+    private final ToRequiresAll toRequiresAll;
+    private final ToRequiresNoneOf toRequiresNoneOf;
+    private final ToRequiresOnly toRequiresOnly;
     private final ToKeywordAnnotations toKeywordAnnotations;
-    private final ToTransitionClassName toTransitionClassName;
     private final ToKeywordClassName toKeywordClassName;
 
     public DslProcessorContext(Elements elements, Types types) {
@@ -53,11 +51,10 @@ public class DslProcessorContext {
         this.toType = new StringToJavaType(elements);
         this.toProperty = new VariableElementToJavaProperty(toType);
         this.toMethod = new ExecutableElementToJavaMethod(toType, toProperty);
-        this.toAnyAnnotations = new ToAnyAnnotations(elements);
-        this.toAllAnnotations = new ToAllAnnotations(elements);
-        this.toNoneAnnotations = new ToNoneAnnotations(elements);
-        this.toOnlyAnnotations = new ToOnlyAnnotations(elements);
-        toTransitionClassName = new ToTransitionClassName(elements);
+        this.toRequiresAny = new ToRequiresAny(elements);
+        this.toRequiresAll = new ToRequiresAll(elements);
+        this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
+        this.toRequiresOnly = new ToRequiresOnly(elements);
         toKeywordAnnotations = new ToKeywordAnnotations(elements);
         toKeywordClassName = new ToKeywordClassName();
     }
@@ -74,24 +71,20 @@ public class DslProcessorContext {
         return toMethod;
     }
 
-    public ToAnyAnnotations getToAnyAnnotations() {
-        return toAnyAnnotations;
+    public ToRequiresAny getToRequiresAny() {
+        return toRequiresAny;
     }
 
-    public ToAllAnnotations getToAllAnnotations() {
-        return toAllAnnotations;
+    public ToRequiresAll getToRequiresAll() {
+        return toRequiresAll;
     }
 
-    public ToNoneAnnotations getToNoneAnnotations() {
-        return toNoneAnnotations;
+    public ToRequiresNoneOf getToRequiresNoneOf() {
+        return toRequiresNoneOf;
     }
 
-    public ToOnlyAnnotations getToOnlyAnnotations() {
-        return toOnlyAnnotations;
-    }
-
-    public ToTransitionClassName getToTransitionClassName() {
-        return toTransitionClassName;
+    public ToRequiresOnly getToRequiresOnly() {
+        return toRequiresOnly;
     }
 
     public ToKeywordAnnotations getToKeywordAnnotations() {
