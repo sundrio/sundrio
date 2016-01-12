@@ -32,23 +32,37 @@ import java.util.Set;
 public class ToRequiresAny implements Function<Element, TransitionFilter> {
 
     private final TypeElement ANY;
-    private final Element ANY_VALUE;
+    private final Element CLASSES_VALUE;
+    private final Element KEYWORDS_VALUE;
 
     public ToRequiresAny(Elements elements) {
         ANY = elements.getTypeElement(Any.class.getCanonicalName());
-        ANY_VALUE = ANY.getEnclosedElements().get(0);
+        CLASSES_VALUE = ANY.getEnclosedElements().get(0);
+        KEYWORDS_VALUE = ANY.getEnclosedElements().get(1);
     }
 
     public TransitionFilter apply(Element element) {
         Set<String> keywords = new LinkedHashSet<String>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(ANY)) {
-                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(ANY_VALUE).getValue()));
+                if (mirror.getElementValues().containsKey(CLASSES_VALUE)) {
+                    keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(CLASSES_VALUE).getValue()));
+                }
+
+                if (mirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
+                    keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
+                }
             }
             //Also look for use on custom annotations
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
                 if (innerMirror.getAnnotationType().asElement().equals(ANY)) {
-                    keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(ANY_VALUE).getValue()));
+                    if (innerMirror.getElementValues().containsKey(CLASSES_VALUE)) {
+                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(CLASSES_VALUE).getValue()));
+                    }
+
+                    if (innerMirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
+                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
+                    }
                 }
             }
         }

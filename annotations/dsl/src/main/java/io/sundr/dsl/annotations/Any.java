@@ -25,5 +25,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
 public @interface Any {
-    Class<? extends Annotation>[] value();
+    Class<? extends Annotation>[] value() default {};
+    String[] keywords() default {};
 }

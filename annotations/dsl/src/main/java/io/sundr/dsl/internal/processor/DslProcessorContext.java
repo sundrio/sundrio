@@ -18,15 +18,14 @@ package io.sundr.dsl.internal.processor;
 
 import io.sundr.Function;
 import io.sundr.codegen.converters.ExecutableElementToJavaMethod;
-import io.sundr.codegen.converters.VariableElementToJavaProperty;
 import io.sundr.codegen.converters.StringToJavaType;
+import io.sundr.codegen.converters.VariableElementToJavaProperty;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.dsl.internal.element.functions.ToKeywords;
 import io.sundr.dsl.internal.element.functions.ToRequiresAll;
-import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
-import io.sundr.dsl.internal.element.functions.ToKeywordAnnotations;
-import io.sundr.dsl.internal.element.functions.ToKeywordClassName;
 import io.sundr.dsl.internal.element.functions.ToRequiresAny;
+import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
 import io.sundr.dsl.internal.element.functions.ToRequiresOnly;
 
 import javax.lang.model.element.VariableElement;
@@ -43,8 +42,7 @@ public class DslProcessorContext {
     private final ToRequiresAll toRequiresAll;
     private final ToRequiresNoneOf toRequiresNoneOf;
     private final ToRequiresOnly toRequiresOnly;
-    private final ToKeywordAnnotations toKeywordAnnotations;
-    private final ToKeywordClassName toKeywordClassName;
+    private final ToKeywords toKeywords;
 
     public DslProcessorContext(Elements elements, Types types) {
         this.elements = elements;
@@ -55,8 +53,7 @@ public class DslProcessorContext {
         this.toRequiresAll = new ToRequiresAll(elements);
         this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
         this.toRequiresOnly = new ToRequiresOnly(elements);
-        toKeywordAnnotations = new ToKeywordAnnotations(elements);
-        toKeywordClassName = new ToKeywordClassName();
+        this.toKeywords = new ToKeywords(elements);
     }
 
     public Elements getElements() {
@@ -87,11 +84,7 @@ public class DslProcessorContext {
         return toRequiresOnly;
     }
 
-    public ToKeywordAnnotations getToKeywordAnnotations() {
-        return toKeywordAnnotations;
-    }
-
-    public ToKeywordClassName getToKeywordClassName() {
-        return toKeywordClassName;
+    public ToKeywords getToKeywords() {
+        return toKeywords;
     }
 }

@@ -32,13 +32,15 @@ import java.util.Set;
 public class ToRequiresOnly implements Function<Element, TransitionFilter> {
 
     private final TypeElement ONLY;
-    private final Element ONLY_VALUE;
+    private final Element CLASSES_VALUE;
+    private final Element KEYWORDS_VALUE;
     private final Element OR_NONE_VALUE;
 
     public ToRequiresOnly(Elements elements) {
         ONLY = elements.getTypeElement(Only.class.getCanonicalName());
-        ONLY_VALUE = ONLY.getEnclosedElements().get(0);
-        OR_NONE_VALUE = ONLY.getEnclosedElements().get(1);
+        CLASSES_VALUE = ONLY.getEnclosedElements().get(0);
+        KEYWORDS_VALUE = ONLY.getEnclosedElements().get(1);
+        OR_NONE_VALUE = ONLY.getEnclosedElements().get(2);
     }
 
     public TransitionFilter apply(Element element) {
@@ -49,7 +51,10 @@ public class ToRequiresOnly implements Function<Element, TransitionFilter> {
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(ONLY)) {
                 explicit = true;
-                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(ONLY_VALUE).getValue()));
+                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(CLASSES_VALUE).getValue()));
+                if (mirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
+                    keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
+                }
                 if (mirror.getElementValues().containsKey(OR_NONE_VALUE)) {
                     orNone = (Boolean) mirror.getElementValues().get(OR_NONE_VALUE).getValue();
                 }
@@ -57,7 +62,15 @@ public class ToRequiresOnly implements Function<Element, TransitionFilter> {
             //Also look for use on custom annotations
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
                 if (innerMirror.getAnnotationType().asElement().equals(ONLY)) {
-                    keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(ONLY_VALUE).getValue()));
+
+                    if (innerMirror.getElementValues().containsKey(CLASSES_VALUE)) {
+                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(CLASSES_VALUE).getValue()));
+                    }
+
+                    if (innerMirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
+                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
+                    }
+
                     if (innerMirror.getElementValues().containsKey(OR_NONE_VALUE)) {
                         orNone = (Boolean) innerMirror.getElementValues().get(OR_NONE_VALUE).getValue();
                     }

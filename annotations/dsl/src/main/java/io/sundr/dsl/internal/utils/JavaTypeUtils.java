@@ -36,7 +36,6 @@ import io.sundr.dsl.internal.processor.DslProcessorContext;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.type.functions.Merge;
 
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,8 +94,8 @@ public final class JavaTypeUtils {
                 ? new OrTransitionFilter(filters)
                 : new AndTransitionFilter(filters);
 
-        for (AnnotationMirror annotationMirror : context.getToKeywordAnnotations().apply(executableElement)) {
-            keywords.add(context.getToKeywordClassName().apply(annotationMirror));
+        for (String keyword : context.getToKeywords().apply(executableElement)) {
+            keywords.add(keyword);
         }
 
         JavaType returnType = null;

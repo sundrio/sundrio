@@ -19,96 +19,88 @@ package io.sundr.examples.curator;
 import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
-import io.sundr.dsl.annotations.None;
 import io.sundr.dsl.annotations.InterfaceName;
+import io.sundr.dsl.annotations.Keyword;
+import io.sundr.dsl.annotations.None;
 import io.sundr.dsl.annotations.Terminal;
-import io.sundr.examples.curator.annotations.BackgroundOption;
-import io.sundr.examples.curator.annotations.ConfigOption;
-import io.sundr.examples.curator.annotations.JoinOption;
-import io.sundr.examples.curator.annotations.LeaveOption;
-import io.sundr.examples.curator.annotations.StatOption;
-import io.sundr.examples.curator.annotations.WatchOption;
-import io.sundr.examples.curator.annotations.WithMembersOption;
 
 @Dsl
 @InterfaceName("CuratorFramework")
 public interface CuratorGetDataDsl {
 
     @EntryPoint
-    @GetDataOption
+    @Keyword("GetDataOption")
     void getData();
 
     @EntryPoint
-    @SetDataOption
+    @Keyword("SetDataOption")
     void setData();
 
     @EntryPoint
     @InterfaceName("ReConfigBuilder")
-    @ReconfigOption
+    @Keyword("ReconfigOption")
     void reconfig();
 
     @EntryPoint
     @InterfaceName("GetConfigBuilder")
-    @ConfigOption
+    @Keyword("ReconfigOption")
     void config();
 
     @InterfaceName("Leavable")
-    @LeaveOption
-    @Any(ReconfigOption.class)
-    @None({WithMembersOption.class})
+    @Any(keywords = "ReconfigOption")
+    @None(keywords = "WithMembersOption")
+    @Keyword("LeaveOption")
     void leaving(String... server);
 
     @InterfaceName("Joinable")
-    @JoinOption
-    @Any(ReconfigOption.class)
-    @None(WithMembersOption.class)
+    @Keyword("JoinOption")
+    @Any(keywords = "ReconfigOption")
+    @None(keywords = "WithMembersOption")
     void joining(String... server);
 
     @InterfaceName("Memberable")
-    @WithMembersOption
-    @Any(ReconfigOption.class)
-    @None({JoinOption.class, LeaveOption.class})
+    @Keyword("WithMembersOption")
+    @Any(keywords = "ReconfigOption")
+    @None(keywords = {"JoinOption", "LeaveOption"})
     void withMembers(String... server);
     
-    @BackgroundOption
+    @Keyword("BackgroundOption")
     @InterfaceName("Backgroundable")
     void inBackground(boolean flag);
 
     @InterfaceName("Backgroundable")
-    @BackgroundOption
+    @Keyword("BackgroundOption")
     void inBackground();
 
     @InterfaceName("Backgroundable")
-    @BackgroundOption
+    @Keyword("BackgroundOption")
     void inBackground(Object context);
 
-    @WatchOption
+    @Keyword("WatchOption")
     @InterfaceName("Watchable")
     void watched();
 
-    @StatOption
-    @Any({SetDataOption.class, GetDataOption.class})
+    @Keyword("StatOption")
+    @Any(keywords = {"SetDataOption", "GetDataOption"})
     @InterfaceName("Statable")
     void storingStatIn(String stat);
 
-    @Any(ConfigOption.class)
+    @Any(keywords = "ConfigOption")
     @InterfaceName("Configurable")
     void fromConfig(Long config);
     
     @Terminal
     @InterfaceName("Ensemblable")
-    @Any({ReconfigOption.class, ConfigOption.class})
+    @Any(keywords = {"ReconfigOption", "ConfigOption"})
     byte[] forEnsemble();
 
     @Terminal
     @InterfaceName("Pathable")
-    @Any({GetDataOption.class, SetDataOption.class})
+    @Any(keywords = {"GetDataOption", "SetDataOption"})
     String forPath(String path);
 
     @Terminal
     @InterfaceName("PathAndBytesable")
-    @Any({GetDataOption.class, SetDataOption.class})
+    @Any(keywords = {"GetDataOption", "SetDataOption"})
     void forPath(String path, byte[] bytes);
-
-
 }
