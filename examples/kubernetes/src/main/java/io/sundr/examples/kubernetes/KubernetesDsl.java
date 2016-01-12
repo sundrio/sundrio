@@ -38,7 +38,7 @@ import io.sundr.examples.kubernetes.domain.ServiceList;
 
 @Dsl
 @InterfaceName("Kubernetes")
-public interface KubernetesDSL {
+public interface KubernetesDsl {
 
     @EntryPoint
     @PodOption

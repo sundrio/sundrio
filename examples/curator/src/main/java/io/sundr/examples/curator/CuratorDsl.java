@@ -26,7 +26,7 @@ import io.sundr.dsl.annotations.Terminal;
 
 @Dsl
 @InterfaceName("CuratorFramework")
-public interface CuratorGetDataDsl {
+public interface CuratorDsl {
 
     @EntryPoint
     @Keyword("GetDataOption")
