@@ -18,7 +18,6 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.Constants;
-import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
@@ -366,72 +365,6 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withType(editableType)
                     .withConstructors(constructors)
                     .withMethods(methods)
-                    .build();
-        }
-    }, INLINEABLE {
-        @Override
-        public JavaClazz apply(JavaClazz item) {
-            JavaType type = item.getType();
-            JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(item.getType());
-            JavaType updateableType = TypeAs.INLINEABLE.apply(type);
-
-            JavaProperty builderProperty = new JavaPropertyBuilder()
-                    .withType(TypeAs.BUILDER.apply(item.getType()))
-                    .withName("builder")
-                    .addToModifiers(Modifier.PRIVATE)
-                    .addToModifiers(Modifier.FINAL)
-                    .build();
-
-            JavaProperty visitorProperty = new JavaPropertyBuilder()
-                    .withType(typeGenericOf(BuilderContextManager.getContext().getVisitorInterface().getType(), item.getType()))
-                    .withName("visitor")
-                    .addToModifiers(Modifier.PRIVATE)
-                    .addToModifiers(Modifier.FINAL)
-                    .build();
-
-
-            JavaMethod update = new JavaMethodBuilder()
-                    .withReturnType(item.getType())
-                    .withName("update")
-                    .addToAttributes(BODY, item.getType().getSimpleName() + " item = builder.build();visitor.visit(item);return item;")
-                    .addToModifiers(Modifier.PUBLIC)
-                    .build();
-
-            JavaMethod constructor1 = new JavaMethodBuilder()
-                    .withReturnType(updateableType)
-                    .withName("")
-                    .addNewArgument()
-                        .withName("item")
-                        .withType(item.getType())
-                    .and()
-                    .addNewArgument()
-                        .withName("visitor")
-                        .withType(visitorProperty.getType())
-                    .and()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this, item);this.visitor=visitor;")
-                    .build();
-
-
-            JavaMethod constructor2 = new JavaMethodBuilder()
-                    .withReturnType(updateableType)
-                    .withName("")
-                    .addNewArgument()
-                    .withName("visitor")
-                    .withType(visitorProperty.getType())
-                    .and()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this);this.visitor=visitor;")
-                    .build();
-
-
-            return new JavaClazzBuilder()
-                    .withType(updateableType)
-                    .addToConstructors(constructor1)
-                    .addToConstructors(constructor2)
-                    .addToFields(builderProperty)
-                    .addToFields(visitorProperty)
-                    .addToMethods(update)
                     .build();
         }
     };

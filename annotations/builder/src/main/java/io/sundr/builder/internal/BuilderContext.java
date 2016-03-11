@@ -76,6 +76,7 @@ public class BuilderContext {
     private final JavaClazz visitableInterface;
     private final JavaClazz visitableBuilderInterface;
     private final JavaClazz visitorInterface;
+    private final JavaClazz functionInterface;
     private final JavaClazz inlineableBase;
     private final Boolean generateBuilderPackage;
     private final String builderPackage;
@@ -109,6 +110,24 @@ public class BuilderContext {
                 .addNewArgument()
                 .withName("item")
                 .withType(V)
+                .endArgument()
+                .and()
+                .build();
+
+        functionInterface = new JavaClazzBuilder()
+                .withNewType()
+                .withKind(JavaKind.INTERFACE)
+                .withPackageName(builderPackage)
+                .withClassName(FUNCTION.getClassName())
+                .withGenericTypes(FUNCTION.getGenericTypes())
+                .and()
+                .addNewMethod()
+                .addToModifiers(Modifier.PUBLIC)
+                .withReturnType(O)
+                .withName("apply")
+                .addNewArgument()
+                .withName("item")
+                .withType(I)
                 .endArgument()
                 .and()
                 .build();
@@ -301,6 +320,10 @@ public class BuilderContext {
         return fluentInterface;
     }
 
+    public JavaClazz getFunctionInterface() {
+        return functionInterface;
+    }
+
     public JavaClazz getBuilderInterface() {
         return builderInterface;
     }
@@ -334,7 +357,7 @@ public class BuilderContext {
                 .withNewType()
                 .withKind(JavaKind.INTERFACE)
                 .withPackageName(builderPackage)
-                .withClassName(inline.prefix() + INLINEABLE.getClassName() + inline.suffix())
+                .withClassName(inline.prefix() + (!inline.name().isEmpty() ? inline.name() : INLINEABLE.getClassName()) + inline.suffix())
                 .withGenericTypes(INLINEABLE.getGenericTypes())
                 .and()
                 .addNewMethod()
