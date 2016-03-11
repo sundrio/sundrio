@@ -16,10 +16,41 @@
 
 package io.sundr.builder.annotations;
 
+/**
+ * Annotation to mark that a {@link Builder} wrapper should be generated, for inlining the builder into a DSL.
+ */
 public @interface Inline {
 
+    /**
+     * The name of the inline build method.
+     * @return
+     */
     String value();
+
+    /**
+     * @return The prefix of the Inlinable.
+     */
     String prefix() default "";
+
+
+    /**
+     * @return The name of the Inline builder.
+     */
+    String name() default "";
+
+    /**
+     * The suffix of the inlinable.
+     * @return
+     */
     String suffix() default "";
+
+    /**
+     * @return The type of the item to build "inline"
+     */
     Class type();
+
+    /**
+     * @return The return type of the "inline" method.
+     */
+    Class returnType() default Void.class;
 }

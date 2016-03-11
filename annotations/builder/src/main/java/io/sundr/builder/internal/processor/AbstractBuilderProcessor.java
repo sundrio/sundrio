@@ -20,22 +20,26 @@ import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import javax.lang.model.element.Modifier;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.BOXED_VOID;
+import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
@@ -71,6 +75,10 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 generateFromClazz(context.getEditableInterface(),
                         Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
                 );
+
+                generateFromClazz(context.getFunctionInterface(),
+                        Constants.DEFAULT_INTERFACE_TEMPLATE_LOCATION
+                );
             } catch (Exception e) {
                 //
             }
@@ -92,15 +100,46 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
 
     JavaClazz inlineableOf(BuilderContext ctx, JavaClazz clazz, Inline inline) {
-        JavaClazz base = ClazzAs.INLINEABLE.apply(clazz);
-        JavaType baseInterface = typeGenericOf(BuilderUtils.getInlineType(ctx, inline), clazz.getType());
-        JavaMethod method = new JavaMethodBuilder(base.getMethods().iterator().next()).withName(inline.value()).build();
+        Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
+        JavaType type = clazz.getType();
+        JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(type);
+        JavaType inlineableType = TypeAs.INLINEABLE.apply(type);
 
+        if (!inline.name().isEmpty()) {
+            inlineableType = new JavaTypeBuilder(inlineableType).withClassName(inline.name()).build();
+        }
+
+        JavaType returnType = BuilderUtils.getInlineReturnType(ctx, inline);
+        if (returnType.equals(BOXED_VOID)) {
+            returnType =clazz.getType();
+        }
+
+        JavaType functionType = typeGenericOf(ctx.getFunctionInterface().getType(), clazz.getType(), returnType);
+
+        JavaProperty builderProperty = new JavaPropertyBuilder()
+                .withType(TypeAs.BUILDER.apply(type))
+                .withName("builder")
+                .addToModifiers(Modifier.PRIVATE)
+                .addToModifiers(Modifier.FINAL)
+                .build();
+
+        JavaProperty functionProperty = new JavaPropertyBuilder()
+                .withType(functionType)
+                .withName("function")
+                .addToModifiers(Modifier.PRIVATE)
+                .addToModifiers(Modifier.FINAL)
+                .build();
+
+        if (returnType.equals(Constants.BOXED_VOID)) {
+            returnType = clazz.getType();
+        }
+
+        JavaType baseInterface = typeGenericOf(BuilderUtils.getInlineType(ctx, inline), returnType);
         JavaType fluentImpl = TypeAs.FLUENT_IMPL.apply(clazz.getType());
         JavaType fluentInterface = TypeAs.FLUENT_INTERFACE.apply(clazz.getType());
 
-        JavaType shallowInlineType = new JavaTypeBuilder(base.getType())
-                .withClassName(inline.prefix() + base.getType().getClassName() + inline.suffix())
+        JavaType shallowInlineType = new JavaTypeBuilder(inlineableType)
+                .withClassName(inline.prefix() + inlineableType.getClassName() + inline.suffix())
                 .addToInterfaces(baseInterface)
                 .build();
 
@@ -109,15 +148,71 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .addToInterfaces(typeGenericOf(fluentInterface, shallowInlineType))
                 .build();
 
-        Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
-        for (JavaMethod constructor : base.getConstructors()) {
-            constructors.add(new JavaMethodBuilder(constructor).withReturnType(inlineType).build());
+        JavaMethod inlineMethod = new JavaMethodBuilder()
+                .withReturnType(returnType)
+                .withName(inline.value())
+                .addToAttributes(BODY, " return function.apply(builder.build());")
+                .addToModifiers(Modifier.PUBLIC)
+                .build();
+
+
+        constructors.add(new JavaMethodBuilder()
+                .withReturnType(inlineType)
+                .withName("")
+                .addNewArgument()
+                    .withName("function")
+                    .withType(functionType)
+                .and()
+                .addToModifiers(Modifier.PUBLIC)
+                .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this);this.function=function;")
+                .build());
+
+        constructors.add(new JavaMethodBuilder()
+                .withReturnType(inlineType)
+                .withName("")
+                .addNewArgument()
+                .withName("item")
+                .withType(type)
+                .and()
+                .addNewArgument()
+                .withName("function")
+                .withType(functionType)
+                .and()
+                .addToModifiers(Modifier.PUBLIC)
+                .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this, item);this.function=function;")
+                .build());
+
+        if (clazz.getType().equals(returnType)) {
+            constructors.add(new JavaMethodBuilder()
+                    .withReturnType(inlineType)
+                    .withName("")
+                    .addNewArgument()
+                    .withName("function")
+                    .withType(functionType)
+                    .and()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .addToAttributes(BODY, "this.builder=new " + builderType.getSimpleName() + "(this);this.function=new " + String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName()) + ";")
+                    .build());
+
+            constructors.add(new JavaMethodBuilder()
+                    .withReturnType(inlineType)
+                    .withName("")
+                    .addNewArgument()
+                    .withName("item")
+                    .withType(type)
+                    .and()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .addToAttributes(BODY, "this.builder=new " + builderType.getSimpleName() + "(this, item);this.function=new " + String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName()) + ";")
+                    .build());
         }
 
-        return new JavaClazzBuilder(base)
+        return new JavaClazzBuilder()
                 .withType(inlineType)
                 .withConstructors(constructors)
-                .withMethods(new HashSet<JavaMethod>(Arrays.asList(method)))
+                .addToFields(builderProperty, functionProperty)
+                .addToMethods(inlineMethod)
                 .build();
     }
+
+    private static final String EMPTY_FUNCTION_TEXT = loadResourceQuietly(EMPTY_FUNCTION_SNIPPET);
 }

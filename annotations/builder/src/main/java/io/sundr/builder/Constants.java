@@ -40,6 +40,8 @@ public class Constants {
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
     public static final String BODY = "BODY";
 
+    public static final JavaType I = newGeneric("I");
+    public static final JavaType O = newGeneric("O");
     public static final JavaType B = newGeneric("B");
     public static final JavaType T = newGeneric("T");
     public static final JavaType N = newGeneric("N");
@@ -57,14 +59,16 @@ public class Constants {
     public static final JavaType LINKED_HASH_SET = ClassToJavaType.FUNCTION.apply(LinkedHashSet.class);
 
     public static final JavaType BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
-    public static final JavaType FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
     public static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(BaseFluent.class), T);
-    public static final JavaType NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
     public static final JavaType EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), T);
+    public static final JavaType FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
+    public static final JavaType FUNCTION = typeGenericOf(ClassToJavaType.FUNCTION.apply(Function.class), I, O);
     public static final JavaType INLINEABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Inlineable.class), T);
+    public static final JavaType NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
     public static final JavaType VISITOR = typeGenericOf(ClassToJavaType.FUNCTION.apply(Visitor.class), V);
     public static final JavaType VISITABLE = ClassToJavaType.FUNCTION.apply(Visitable.class);
     public static final JavaType VISITABLE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(VisitableBuilder.class), T, V);
+    public static final JavaType BOXED_VOID = ClassToJavaType.FUNCTION.apply(Void.class);
 
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
     public static final String DEFAULT_CLASS_TEMPLATE_LOCATION = "templates/builder/class.vm";
@@ -81,6 +85,7 @@ public class Constants {
     public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";
     public static final String SIMPLE_ARRAY_GETTER_SNIPPET = "snippets/simple-array-getter.txt";
     public static final String BUILDABLE_ARRAY_GETTER_SNIPPET = "snippets/buildable-array-getter.txt";
+    public static final String EMPTY_FUNCTION_SNIPPET = "snippets/empty-function.txt";
 
     public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
     public static JavaType[] PRIMITIVE_TYPES =

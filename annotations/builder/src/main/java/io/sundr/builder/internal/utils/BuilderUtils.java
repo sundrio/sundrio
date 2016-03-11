@@ -269,6 +269,14 @@ public class BuilderUtils {
         }
     }
 
+    public static JavaType getInlineReturnType(BuilderContext context, Inline inline) {
+        try {
+            return ClassToJavaType.FUNCTION.apply(inline.returnType());
+        } catch (MirroredTypeException e) {
+            return context.getStringJavaTypeFunction().apply(e.getTypeMirror().toString());
+        }
+    }
+
     public static Set<TypeElement> getBuildableReferences(BuilderContext context, Buildable buildable) {
         Set<TypeElement> result = new LinkedHashSet<TypeElement>();
         for (BuildableReference ref : buildable.refs()) {
