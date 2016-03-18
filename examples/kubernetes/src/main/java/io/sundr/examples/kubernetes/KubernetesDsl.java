@@ -17,9 +17,11 @@
 package io.sundr.examples.kubernetes;
 
 import io.sundr.dsl.annotations.All;
-import io.sundr.dsl.annotations.Any;
+import io.sundr.dsl.annotations.Begin;
 import io.sundr.dsl.annotations.Dsl;
+import io.sundr.dsl.annotations.End;
 import io.sundr.dsl.annotations.EntryPoint;
+import io.sundr.dsl.annotations.Keyword;
 import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Terminal;
@@ -137,7 +139,16 @@ public interface KubernetesDsl {
     //Common Options
     @FilterOption
     @InterfaceName("Labelable")
-    void withLabel(String key, String value);
+    @Begin("Label")
+    void withNewLabel();
+
+    @Keyword({"Label", "HasKey"})
+    @All(keywords = "Label")
+    void withKey(String key);
+
+    @End("Label")
+    @All(keywords = {"Label","HasKey"})
+    void withValue(String key);
 
     @NamespaceOption
     @InterfaceName("Namespaceable")
