@@ -40,5 +40,8 @@ public final class Constants {
 
     public static final String FILTER = "FILTER";
 
+    public static final String INTERMEDIATE_CLASSES = "INTERMEDIATE_CLASSES";
+    public static final String SCOPE_CLASSES = "SCOPE_CLASSES";
+
 
 }

@@ -41,8 +41,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.utils.DslUtils.createRootInterface;
-import static io.sundr.dsl.internal.utils.GraphUtils.createGraph;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.executablesToInterfaces;
+import static io.sundr.dsl.internal.Constants.INTERMEDIATE_CLASSES;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {
@@ -66,7 +66,8 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     Collection<ExecutableElement> sorted = ElementFilter.methodsIn(typeElement.getEnclosedElements());
                     //1st step generate generic interface for all types.
                     Set<JavaClazz> genericInterfaces = executablesToInterfaces(context, sorted);
-                    for (JavaClazz clazz : genericInterfaces) {
+                    Set<JavaClazz> genericAndScopeInterfaces = context.getToScopes().apply(genericInterfaces);
+                    for (JavaClazz clazz : genericAndScopeInterfaces) {
                         if (!JavaTypeUtils.isEntryPoint(clazz)) {
                             interfacesToGenerate.add(clazz);
                         }
@@ -74,7 +75,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     //2nd step create dependency graph.
                     Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
-                    Set<Node<JavaClazz>> graph = createGraph(genericInterfaces);
+                    Set<Node<JavaClazz>> graph = context.getToNodes().apply(genericAndScopeInterfaces);
                     for (Node<JavaClazz> root : graph) {
                         JavaClazz current = root.getItem();
 
@@ -89,7 +90,8 @@ public class DslProcessor extends JavaGeneratingProcessor {
                                 methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
                             }
 
-                            interfacesToGenerate.add(createRootInterface(root, interfacesToGenerate));
+                            JavaClazz rootInterface = createRootInterface(root);
+                            addWithIntermediate(interfacesToGenerate, rootInterface);
                         }
                     }
 
@@ -105,7 +107,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     try {
                         for (JavaClazz clazz : interfacesToGenerate) {
-                            generateFromClazz(clazz, DEFAULT_TEMPLATE_LOCATION);
+                            generateWithIntermediate(clazz);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -114,5 +116,29 @@ public class DslProcessor extends JavaGeneratingProcessor {
             }
         }
         return true;
+    }
+
+    private void addWithIntermediate(Set<JavaClazz> existing, JavaClazz clazz) {
+        Set<JavaClazz> intermediateClasses = (Set<JavaClazz>) clazz.getAttributes().get(INTERMEDIATE_CLASSES);
+        if (intermediateClasses != null) {
+            for (JavaClazz intermediate : intermediateClasses) {
+                addWithIntermediate(existing, intermediate);
+            }
+        }
+        existing.add(clazz);
+    }
+
+    private void generateWithIntermediate(JavaClazz clazz) throws IOException {
+        Set<JavaClazz> intermediateClasses = (Set<JavaClazz>) clazz.getAttributes().get(INTERMEDIATE_CLASSES);
+        if (intermediateClasses != null && intermediateClasses.isEmpty()) {
+            for (JavaClazz intermediate : intermediateClasses) {
+                generateWithIntermediate(intermediate);
+            }
+        }
+        try {
+            generateFromClazz(clazz, DEFAULT_TEMPLATE_LOCATION);
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
     }
 }

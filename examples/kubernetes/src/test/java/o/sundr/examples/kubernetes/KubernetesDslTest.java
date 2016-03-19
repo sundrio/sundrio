@@ -34,9 +34,10 @@ public class KubernetesDslTest {
     @Ignore
     @Test
     public void testPodDSL() {
-        kubernetes.pod().inNamespace("default").list();
-        kubernetes.pod().withNewLabel().withKey("key").withValue("value").inNamespace("default").list();
-        kubernetes.pod().withName("name").inNamespace("namespace").list();
+
+        kubernetes.pod().inNamespace("default")
+                .withNewLabel().withKey("key1").withValue("value1")
+                .withNewLabel().withKey("key2").withValue("value2").list();
         kubernetes.pod().withName("name").inNamespace("namespace").get();
         kubernetes.pod().withName("name").inNamespace("namespace").delete();
         kubernetes.pod().withName("name").inNamespace("namespace").create(new Pod());
@@ -49,12 +50,10 @@ public class KubernetesDslTest {
     @Ignore
     @Test
     public void testServiceDSL() {
-        kubernetes.service().inNamespace("default").list();
-        kubernetes.service().withNewLabel().withKey("key").withValue("value").inNamespace("default").list();
-        kubernetes.service().withNewLabel()
-                .withKey("mykey")
-                .withValue("sdasda");
-        kubernetes.service().withName("name").inNamespace("namespace").list();
+        kubernetes.service().inNamespace("default")
+                .withNewLabel().withKey("key1").withValue("value1")
+                .withNewLabel().withKey("key2").withValue("value2").list();
+
         kubernetes.service().withName("name").inNamespace("namespace").get();
         kubernetes.service().withName("name").inNamespace("namespace").delete();
         kubernetes.service().withName("name").inNamespace("namespace").create(new Service());
@@ -68,11 +67,14 @@ public class KubernetesDslTest {
     @Test
     public void testReplicationControllerDSL() {
         kubernetes.replicationController().inNamespace("default").list();
-        kubernetes.replicationController().withNewLabel().withKey("key").withValue("value").inNamespace("default").list();
-        kubernetes.replicationController().withName("name").inNamespace("namespace").list();
+        kubernetes.replicationController().inNamespace("default")
+                .withNewLabel().withKey("key1").withValue("value1")
+                .withNewLabel().withKey("key2").withValue("value2").list();
+
         kubernetes.replicationController().withName("name").inNamespace("namespace").get();
         kubernetes.replicationController().withName("name").inNamespace("namespace").delete();
         kubernetes.replicationController().withName("name").inNamespace("namespace").create(new ReplicationController());
+
 
         //can't do
         //kubernetes.replicationController().inNamespace("namespace").create(null);

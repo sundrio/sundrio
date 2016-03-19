@@ -27,6 +27,10 @@ import io.sundr.dsl.internal.element.functions.ToRequiresAll;
 import io.sundr.dsl.internal.element.functions.ToRequiresAny;
 import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
 import io.sundr.dsl.internal.element.functions.ToRequiresOnly;
+import io.sundr.dsl.internal.processor.functions.ToNext;
+import io.sundr.dsl.internal.processor.functions.ToNode;
+import io.sundr.dsl.internal.processor.functions.ToNodes;
+import io.sundr.dsl.internal.processor.functions.ToScopes;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -43,6 +47,10 @@ public class DslProcessorContext {
     private final ToRequiresNoneOf toRequiresNoneOf;
     private final ToRequiresOnly toRequiresOnly;
     private final ToKeywords toKeywords;
+    private final ToNext toNext;
+    private final ToNode toNode;
+    private final ToNodes toNodes;
+    private final ToScopes toScopes;
 
     public DslProcessorContext(Elements elements, Types types) {
         this.elements = elements;
@@ -54,6 +62,10 @@ public class DslProcessorContext {
         this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
         this.toRequiresOnly = new ToRequiresOnly(elements);
         this.toKeywords = new ToKeywords(elements);
+        this.toNext = new ToNext();
+        this.toNode = new ToNode(toNext);
+        this.toNodes = new ToNodes(toNode);
+        this.toScopes = new ToScopes(toNode);
     }
 
     public Elements getElements() {
@@ -86,5 +98,21 @@ public class DslProcessorContext {
 
     public ToKeywords getToKeywords() {
         return toKeywords;
+    }
+
+    public ToNext getToNext() {
+        return toNext;
+    }
+
+    public ToNode getToNode() {
+        return toNode;
+    }
+
+    public ToNodes getToNodes() {
+        return toNodes;
+    }
+
+    public ToScopes getToScopes() {
+        return toScopes;
     }
 }

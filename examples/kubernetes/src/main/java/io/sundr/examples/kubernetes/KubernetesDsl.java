@@ -24,6 +24,7 @@ import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.Keyword;
 import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.InterfaceName;
+import io.sundr.dsl.annotations.None;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.examples.kubernetes.annotations.FilterOption;
 import io.sundr.examples.kubernetes.annotations.NamedOption;
@@ -76,18 +77,21 @@ public interface KubernetesDsl {
     @MethodName("list")
     @InterfaceName("ServiceListable")
     @All({ServiceOption.class, NamespaceOption.class})
+    @None(NamedOption.class)
     ServiceList listServices();
 
     @Terminal
     @MethodName("list")
     @InterfaceName("PodListable")
     @All({PodOption.class, NamespaceOption.class})
+    @None(NamedOption.class)
     PodList listPods();
 
     @Terminal
     @MethodName("list")
     @InterfaceName("ReplicationControllerListable")
     @All({ReplicationControllerOption.class, NamespaceOption.class})
+    @None(NamedOption.class)
     ReplicationControllerList listReplicationControllers();
 
     @Terminal
@@ -139,6 +143,7 @@ public interface KubernetesDsl {
     //Common Options
     @FilterOption
     @InterfaceName("Labelable")
+    @None(NamedOption.class)
     @Begin("Label")
     void withNewLabel();
 

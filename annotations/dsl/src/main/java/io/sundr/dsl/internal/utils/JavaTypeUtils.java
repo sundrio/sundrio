@@ -245,6 +245,22 @@ public final class JavaTypeUtils {
                 && (Boolean) clazz.getType().getAttributes().get(IS_TERMINAL);
     }
 
+    public static boolean isBeginScope(JavaClazz clazz) {
+        return isBeginScope(clazz.getType());
+    }
+
+    public static boolean isBeginScope(JavaType type) {
+        return type.getAttributes().containsKey(BEGIN_SCOPE);
+    }
+
+    public static boolean isEndScope(JavaClazz clazz) {
+        return isEndScope(clazz.getType());
+    }
+
+    public static boolean isEndScope(JavaType type) {
+        return type.getAttributes().containsKey(END_SCOPE);
+    }
+
     public static boolean isCardinalityMultiple(JavaClazz clazz) {
         return clazz.getType().getAttributes().containsKey(CARDINALITY_MULTIPLE)
                 && (clazz.getType().getAttributes().get(CARDINALITY_MULTIPLE) instanceof Boolean)

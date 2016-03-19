@@ -18,9 +18,6 @@ package io.sundr.dsl.internal.utils;
 
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.dsl.internal.element.functions.filter.AndTransitionFilter;
-import io.sundr.dsl.internal.element.functions.filter.RequiresAllFilter;
-import io.sundr.dsl.internal.element.functions.filter.RequiresAnyFilter;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import io.sundr.dsl.internal.processor.Node;
 
@@ -40,7 +37,9 @@ import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.END_SCOPE;
 import static io.sundr.dsl.internal.Constants.FILTER;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.isBeginScope;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
+import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEndScope;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
 
@@ -57,9 +56,10 @@ public final class GraphUtils {
      */
     public static Set<Node<JavaClazz>> createGraph(Set<JavaClazz> clazzes) {
         Set<Node<JavaClazz>> nodes = new LinkedHashSet<Node<JavaClazz>>();
+        Set<JavaClazz> all = new LinkedHashSet(clazzes);
         for (JavaClazz clazz : clazzes) {
             if (isEntryPoint(clazz)) {
-                nodes.add(createGraph(clazz, clazzes, new ArrayList<JavaType>(), new ArrayList<JavaType>()));
+                nodes.add(createGraph(clazz, all, new ArrayList<JavaType>(), new ArrayList<JavaType>()));
             }
         }
         return nodes;
@@ -69,7 +69,49 @@ public final class GraphUtils {
         Set<JavaClazz> next = new LinkedHashSet<JavaClazz>();
         List<JavaType> currentPath = new ArrayList<JavaType>(path);
 
-        if (!isTerminal(root)) {
+        if (isTerminal(root)) {
+            //do nothing
+        } else if
+             //(false) {
+                (isBeginScope(root) || !getScopes(path).isEmpty()) {
+            Set<JavaClazz> scopeNext = new LinkedHashSet<JavaClazz>();
+            List<JavaType> scopeVisited = new ArrayList<JavaType>();
+            List<JavaType> scopePath = new ArrayList<JavaType>();
+
+            if (isBeginScope(root)) {
+                scopePath.add(root.getType());
+                scopeVisited.add(root.getType());
+            } else {
+                scopeVisited.addAll(currentPath);
+                scopeVisited.add(root.getType());
+                scopePath.addAll(currentPath);
+                scopePath.add(root.getType());
+            }
+
+            if (!isEndScope(root)) {
+                for (JavaClazz candidate : exclusion(all, scopeVisited)) {
+                    if (!isEntryPoint(candidate) && isSatisfied(candidate, scopeVisited)) {
+                        scopeNext.add(candidate);
+                    }
+                }
+            }
+
+            if (!scopeNext.isEmpty()) {
+                Node<JavaClazz> node = createNode(root, scopeNext, all, scopePath);
+
+                if (isBeginScope(root)) {
+                    //Substitute root, with the scope node.
+                    //We also need to remove all scope types from the all pool.
+                    all.remove(root);
+                    for (Node scopeTransition : node.getTransitions()) {
+                        all.remove(scopeTransition.getItem());
+                    }
+                    return createNode(DslUtils.createRootInterface(node), new LinkedHashSet<JavaClazz>(), new LinkedHashSet<JavaClazz>(), new ArrayList<JavaType>());
+                } else {
+                    return node;
+                }
+            }
+        }  else {
             currentPath.add(root.getType());
             for (JavaClazz candidate : exclusion(all, visited)) {
                 if (!isEntryPoint(candidate) && isSatisfied(candidate, currentPath)) {
@@ -79,22 +121,39 @@ public final class GraphUtils {
             next.remove(root);
         }
 
+        return createNode(root, next, all, currentPath);
+    }
+
+
+    /**
+     * Creates a {@link Node} that defines DSL transitions from the current interface to the next.
+     * @param current   The specified current {@link JavaClazz}.
+     * @param next      The list of {@link JavaClazz} that are allowed as direct transitions.
+     * @param all       All available {@link JavaClazz} instances.
+     * @param path      The path from the graph root to the current {@link JavaClazz}.
+     * @return
+     */
+    private static Node<JavaClazz> createNode(JavaClazz current, Set<JavaClazz> next, Set<JavaClazz> all, List<JavaType> path) {
         Set<Node<JavaClazz>> nextVertices = new LinkedHashSet<Node<JavaClazz>>();
-        List<JavaType> levelInterfaces = new ArrayList<JavaType>();
-        levelInterfaces.addAll(visited);
+        //visited and path are the same only in the first iterration. see bellow:
+        List<JavaType> visited = new ArrayList<JavaType>();
+        visited.addAll(path);
 
         for (JavaClazz c : next) {
-            Node<JavaClazz> subGraph = createGraph(c, all, currentPath, levelInterfaces);
-            levelInterfaces.add(subGraph.getItem().getType());
-            levelInterfaces.addAll(subGraph.getItem().getType().getInterfaces());
-            if (subGraph.getTransitions().size() > 0 || isTerminal(subGraph.getItem())) {
+            Node<JavaClazz> subGraph = createGraph(c, all, path, visited);
+            //Let's keep track of types used so far in the loop so that we avoid using the same types, in different branches of the tree:
+            //This is required so that we avoid extending the same generic interface with different parameters.
+            visited.add(subGraph.getItem().getType());
+            visited.addAll(subGraph.getItem().getType().getInterfaces());
+            if (subGraph.getTransitions().size() > 0 || isTerminal(subGraph.getItem()) || isEndScope(subGraph.getItem())) {
                 nextVertices.add(subGraph);
             }
         }
-        return new Node<JavaClazz>(root, nextVertices);
+        return new Node<JavaClazz>(current, nextVertices);
     }
 
-    private static Set<JavaClazz> exclusion(Set<JavaClazz> one, Collection<JavaType> excluded) {
+
+    public static Set<JavaClazz> exclusion(Set<JavaClazz> one, Collection<JavaType> excluded) {
         Set<JavaClazz> result = new LinkedHashSet<JavaClazz>();
         for (JavaClazz item : one) {
             if (!excluded.contains(item.getType()) || isTerminal(item) || isCardinalityMultiple(item)) {
@@ -104,10 +163,10 @@ public final class GraphUtils {
         return result;
     }
 
-    private static boolean isSatisfied(JavaClazz candidate, List<JavaType> visited) {
+    public static boolean isSatisfied(JavaClazz candidate, List<JavaType> path) {
         Set<String> keywordsAndScopes = new LinkedHashSet<String>();
-        Set<String> visitedKeywords = getKeywords(visited);
-        Deque<String> activeScopes = getScopes(visited);
+        Set<String> visitedKeywords = getKeywords(path);
+        Deque<String> activeScopes = getScopes(path);
         keywordsAndScopes.addAll(visitedKeywords);
         keywordsAndScopes.addAll(activeScopes);
 
@@ -120,7 +179,7 @@ public final class GraphUtils {
         }
 
         //Eliminate circles if not explicitly specified
-        if (!multiple && visited.contains(candidate.getType())) {
+        if (!multiple && path.contains(candidate.getType())) {
             return false;
         }
         return filter.apply(visitedKeywords);
