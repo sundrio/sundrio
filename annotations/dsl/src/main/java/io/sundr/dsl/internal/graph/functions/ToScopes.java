@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor.functions;
+package io.sundr.dsl.internal.graph.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.Visitor;
@@ -22,8 +22,10 @@ import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
-import io.sundr.dsl.internal.processor.Node;
+import io.sundr.dsl.internal.graph.NodeContext;
+import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.utils.DslUtils;
+import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -32,6 +34,7 @@ import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.END_SCOPE;
 import static io.sundr.dsl.internal.Constants.INTERMEDIATE_CLASSES;
+import static io.sundr.dsl.internal.Constants.SCOPE_SUFFIX;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isBeginScope;
 
 public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
@@ -47,8 +50,24 @@ public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
         Set<JavaClazz> all = new LinkedHashSet(clazzes);
         for (JavaClazz clazz : clazzes) {
             if (isBeginScope(clazz)) {
+
+                Boolean multiple = JavaTypeUtils.isCardinalityMultiple(clazz);
+                JavaClazz current;
+
+                if (multiple) {
+                    current = new JavaClazzBuilder(clazz)
+                            .editType()
+                                .addToAttributes(CARDINALITY_MULTIPLE, false)
+                            .endType()
+                    .build();
+                    all.remove(clazz);
+                    all.add(current);
+                } else {
+                    current = clazz;
+                }
+
                 Node node = toGraph.apply(NodeContext.builder()
-                        .withItem(clazz)
+                        .withItem(current)
                         .withAll(all)
                         .build());
 
@@ -59,9 +78,9 @@ public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
                 scopeInterface = new JavaClazzBuilder()
                                         .withNewTypeLike(clazz.getType())
                                             .withPackageName(scopeInterfaceType.getPackageName())
-                                            .withClassName(scopeInterfaceType.getClassName()+"Scope")
+                                            .withClassName(scopeInterfaceType.getClassName()+SCOPE_SUFFIX)
                                             .withInterfaces(scopeInterfaceType)
-                                            .addToAttributes(CARDINALITY_MULTIPLE, true)
+                                            .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                                         .endType()
                                 .addToAttributes(INTERMEDIATE_CLASSES, scopeClasses)
                                 .accept(new Visitor<JavaTypeBuilder>() {

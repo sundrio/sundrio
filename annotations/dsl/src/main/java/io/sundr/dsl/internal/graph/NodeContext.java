@@ -14,11 +14,10 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor.functions;
+package io.sundr.dsl.internal.graph;
 
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.dsl.internal.utils.DslUtils;
 import io.sundr.dsl.internal.utils.GraphUtils;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 

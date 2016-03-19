@@ -14,22 +14,23 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor.functions;
+package io.sundr.dsl.internal.graph.functions;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
-import io.sundr.dsl.internal.processor.Node;
+import io.sundr.dsl.internal.graph.NodeContext;
+import io.sundr.dsl.internal.graph.Node;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 
-public class ToNodes implements Function<Set<JavaClazz>, Set<Node<JavaClazz>>> {
+public class ToGraph implements Function<Set<JavaClazz>, Set<Node<JavaClazz>>> {
 
     private final Function<NodeContext, Node<JavaClazz>> toGraph;
 
-    public ToNodes(Function<NodeContext, Node<JavaClazz>> toGraph) {
+    public ToGraph(Function<NodeContext, Node<JavaClazz>> toGraph) {
         this.toGraph = toGraph;
     }
 

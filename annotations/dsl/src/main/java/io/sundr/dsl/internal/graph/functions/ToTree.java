@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package io.sundr.dsl.internal.processor.functions;
+package io.sundr.dsl.internal.graph.functions;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.dsl.internal.processor.Node;
+import io.sundr.dsl.internal.graph.NodeContext;
+import io.sundr.dsl.internal.graph.Node;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -27,19 +27,19 @@ import java.util.Set;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEndScope;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
 
-public class ToNode implements Function<NodeContext, Node<JavaClazz>> {
+public class ToTree implements Function<NodeContext, Node<JavaClazz>> {
 
     private final Function<NodeContext, Set<JavaClazz>> toNext;
-    private final Function<NodeContext, Node<JavaClazz>> toGraph;
+    private final Function<NodeContext, Node<JavaClazz>> toTree;
 
-    public ToNode(Function<NodeContext, Set<JavaClazz>> toNext) {
+    public ToTree(Function<NodeContext, Set<JavaClazz>> toNext) {
         this.toNext = toNext;
-        this.toGraph = this;
+        this.toTree = this;
     }
 
-    public ToNode(Function<NodeContext, Set<JavaClazz>> toNext, Function<NodeContext, Node<JavaClazz>> toGraph) {
+    public ToTree(Function<NodeContext, Set<JavaClazz>> toNext, Function<NodeContext, Node<JavaClazz>> toTree) {
         this.toNext = toNext;
-        this.toGraph = toGraph;
+        this.toTree = toTree;
     }
 
     public Node<JavaClazz> apply(NodeContext ctx) {
@@ -48,7 +48,7 @@ public class ToNode implements Function<NodeContext, Node<JavaClazz>> {
         Set<JavaClazz> visited = new LinkedHashSet<JavaClazz>(ctx.getVisited());
         for (JavaClazz next : toNext.apply(ctx)) {
             NodeContext nextContext = ctx.contextOfChild(next).addToVisited(visited).build();
-            Node<JavaClazz> subGraph = toGraph.apply(nextContext);
+            Node<JavaClazz> subGraph = toTree.apply(nextContext);
             //Let's keep track of types used so far in the loop so that we avoid using the same types, in different branches of the tree:
             //This is required so that we avoid extending the same generic interface with different parameters.
             visited.add(subGraph.getItem());

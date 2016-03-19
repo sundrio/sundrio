@@ -24,6 +24,7 @@ import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.Keyword;
 import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.InterfaceName;
+import io.sundr.dsl.annotations.Multiple;
 import io.sundr.dsl.annotations.None;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.examples.kubernetes.annotations.FilterOption;
@@ -145,6 +146,7 @@ public interface KubernetesDsl {
     @InterfaceName("Labelable")
     @None(NamedOption.class)
     @Begin("Label")
+    @Multiple
     void withNewLabel();
 
     @Keyword({"Label", "HasKey"})

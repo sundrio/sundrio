@@ -21,7 +21,7 @@ import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
-import io.sundr.dsl.internal.processor.Node;
+import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.type.functions.Combine;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.type.functions.Generify;
@@ -86,12 +86,14 @@ public final class DslUtils {
                     : Combine.FUNCTION.apply(Generify.FUNCTION.apply(toCombine));
 
             intermediate.addAll(toCombine);
+            intermediate.add(nextClazz);
             if (JavaTypeUtils.isCardinalityMultiple(clazz)) {
                 //1st pass create the self ref
                 JavaClazz selfRef = transition(clazz, nextClazz);
                 Set<JavaClazz> toReCombine = new LinkedHashSet<JavaClazz>(toCombine);
                 toReCombine.add(selfRef);
                 JavaClazz reCombined = Combine.FUNCTION.apply(toReCombine);
+                intermediate.add(reCombined);
 
                 //2nd pass recreate the combination
                 selfRef =  transition(clazz, reCombined);
@@ -100,7 +102,7 @@ public final class DslUtils {
                 reCombined = Combine.FUNCTION.apply(toReCombine);
                 intermediate.add(reCombined);
                 intermediate.add(nextClazz);
-                return transition(clazz, reCombined);
+                return addIntermediate(transition(clazz, reCombined),intermediate);
             } else {
                 intermediate.add(nextClazz);
                 return addIntermediate(transition(clazz, nextClazz), intermediate);

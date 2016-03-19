@@ -24,6 +24,7 @@ import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.InterfaceName;
+import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
@@ -75,7 +76,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
                     //2nd step create dependency graph.
                     Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
-                    Set<Node<JavaClazz>> graph = context.getToNodes().apply(genericAndScopeInterfaces);
+                    Set<Node<JavaClazz>> graph = context.getToGraph().apply(genericAndScopeInterfaces);
                     for (Node<JavaClazz> root : graph) {
                         JavaClazz current = root.getItem();
 
@@ -130,7 +131,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
     private void generateWithIntermediate(JavaClazz clazz) throws IOException {
         Set<JavaClazz> intermediateClasses = (Set<JavaClazz>) clazz.getAttributes().get(INTERMEDIATE_CLASSES);
-        if (intermediateClasses != null && intermediateClasses.isEmpty()) {
+        if (intermediateClasses != null) {
             for (JavaClazz intermediate : intermediateClasses) {
                 generateWithIntermediate(intermediate);
             }
