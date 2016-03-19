@@ -41,9 +41,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.dsl.internal.utils.DslUtils.createRootInterface;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.executablesToInterfaces;
-import static io.sundr.dsl.internal.Constants.INTERMEDIATE_CLASSES;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {
@@ -91,8 +89,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                                 methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
                             }
 
-                            JavaClazz rootInterface = createRootInterface(root);
-                            addWithIntermediate(interfacesToGenerate, rootInterface);
+                            interfacesToGenerate.add(context.getToRoot().apply(root));
                         }
                     }
 
@@ -106,9 +103,11 @@ public class DslProcessor extends JavaGeneratingProcessor {
                             .withMethods(methods)
                             .build());
 
+                    interfacesToGenerate.addAll(context.getRepository().getInterfacesToGenerate());
+
                     try {
                         for (JavaClazz clazz : interfacesToGenerate) {
-                            generateWithIntermediate(clazz);
+                            generateFromClazz(clazz, DEFAULT_TEMPLATE_LOCATION);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -117,29 +116,5 @@ public class DslProcessor extends JavaGeneratingProcessor {
             }
         }
         return true;
-    }
-
-    private void addWithIntermediate(Set<JavaClazz> existing, JavaClazz clazz) {
-        Set<JavaClazz> intermediateClasses = (Set<JavaClazz>) clazz.getAttributes().get(INTERMEDIATE_CLASSES);
-        if (intermediateClasses != null) {
-            for (JavaClazz intermediate : intermediateClasses) {
-                addWithIntermediate(existing, intermediate);
-            }
-        }
-        existing.add(clazz);
-    }
-
-    private void generateWithIntermediate(JavaClazz clazz) throws IOException {
-        Set<JavaClazz> intermediateClasses = (Set<JavaClazz>) clazz.getAttributes().get(INTERMEDIATE_CLASSES);
-        if (intermediateClasses != null) {
-            for (JavaClazz intermediate : intermediateClasses) {
-                generateWithIntermediate(intermediate);
-            }
-        }
-        try {
-            generateFromClazz(clazz, DEFAULT_TEMPLATE_LOCATION);
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-        }
     }
 }

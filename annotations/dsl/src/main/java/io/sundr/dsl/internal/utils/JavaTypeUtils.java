@@ -57,6 +57,7 @@ import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
 import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
+import static io.sundr.dsl.internal.Constants.IS_TRANSITION;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
@@ -243,6 +244,12 @@ public final class JavaTypeUtils {
         return clazz.getType().getAttributes().containsKey(IS_TERMINAL)
                 && (clazz.getType().getAttributes().get(IS_TERMINAL) instanceof Boolean)
                 && (Boolean) clazz.getType().getAttributes().get(IS_TERMINAL);
+    }
+
+    public static boolean isTransition(JavaClazz clazz) {
+        return clazz.getType().getAttributes().containsKey(IS_TRANSITION)
+                && (clazz.getType().getAttributes().get(IS_TRANSITION) instanceof Boolean)
+                && (Boolean) clazz.getType().getAttributes().get(IS_TRANSITION);
     }
 
     public static boolean isBeginScope(JavaClazz clazz) {

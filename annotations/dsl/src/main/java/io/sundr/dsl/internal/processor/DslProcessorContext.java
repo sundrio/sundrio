@@ -28,6 +28,8 @@ import io.sundr.dsl.internal.element.functions.ToRequiresAny;
 import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
 import io.sundr.dsl.internal.element.functions.ToRequiresOnly;
 import io.sundr.dsl.internal.graph.functions.ToNext;
+import io.sundr.dsl.internal.graph.functions.ToRoot;
+import io.sundr.dsl.internal.graph.functions.ToTransition;
 import io.sundr.dsl.internal.graph.functions.ToTree;
 import io.sundr.dsl.internal.graph.functions.ToGraph;
 import io.sundr.dsl.internal.graph.functions.ToScopes;
@@ -50,7 +52,13 @@ public class DslProcessorContext {
     private final ToNext toNext;
     private final ToTree toTree;
     private final ToGraph toGraph;
+
+    private final ToRoot toRoot;
+    private final ToTransition toTranstion;
+
     private final ToScopes toScopes;
+
+    private final DslRepository repository = new DslRepository();
 
     public DslProcessorContext(Elements elements, Types types) {
         this.elements = elements;
@@ -65,7 +73,9 @@ public class DslProcessorContext {
         this.toNext = new ToNext();
         this.toTree = new ToTree(toNext);
         this.toGraph = new ToGraph(toTree);
-        this.toScopes = new ToScopes(toTree);
+        this.toTranstion = new ToTransition(repository);
+        this.toRoot = new ToRoot(repository, toTranstion);
+        this.toScopes = new ToScopes(repository, toTranstion, toTree);
     }
 
     public Elements getElements() {
@@ -112,7 +122,19 @@ public class DslProcessorContext {
         return toGraph;
     }
 
+    public ToRoot getToRoot() {
+        return toRoot;
+    }
+
+    public ToTransition getToTranstion() {
+        return toTranstion;
+    }
+
     public ToScopes getToScopes() {
         return toScopes;
+    }
+
+    public DslRepository getRepository() {
+        return repository;
     }
 }

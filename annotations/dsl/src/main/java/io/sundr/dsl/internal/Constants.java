@@ -32,6 +32,7 @@ public final class Constants {
     public static final String BEGIN_SCOPE = "BEGIN_SCOPE";
     public static final String END_SCOPE = "END_SCOPE";
     public static final String IS_COMPOSITE = "IS_COMPOSITE";
+    public static final String IS_TRANSITION = "IS_TRANSITION";
     public static final String CARDINALITY_MULTIPLE = "CARDINALITY_MULTIPLE";
     public static final String METHOD_NAME = "METHOD_NAME";
 
@@ -39,8 +40,6 @@ public final class Constants {
     public static final JavaType TRANSPARENT = new JavaTypeBuilder().withClassName("T").addToAttributes(IS_GENERIC, true).build();
 
     public static final String FILTER = "FILTER";
-
-    public static final String INTERMEDIATE_CLASSES = "INTERMEDIATE_CLASSES";
 
     public static final String SCOPE_SUFFIX = "Scope";
 }

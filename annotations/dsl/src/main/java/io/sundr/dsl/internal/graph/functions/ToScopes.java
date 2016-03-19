@@ -24,7 +24,7 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.graph.Node;
-import io.sundr.dsl.internal.utils.DslUtils;
+import io.sundr.dsl.internal.processor.DslRepository;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import java.util.LinkedHashSet;
@@ -33,15 +33,18 @@ import java.util.Set;
 import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.END_SCOPE;
-import static io.sundr.dsl.internal.Constants.INTERMEDIATE_CLASSES;
 import static io.sundr.dsl.internal.Constants.SCOPE_SUFFIX;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isBeginScope;
 
 public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
 
+    private final DslRepository repository;
+    private final Function<Node<JavaClazz>, JavaClazz> nodeToTransition;
     private final Function<NodeContext, Node<JavaClazz>> toGraph;
 
-    public ToScopes(Function<NodeContext, Node<JavaClazz>> toGraph) {
+    public ToScopes(DslRepository repository, Function<Node<JavaClazz>, JavaClazz> nodeToTransition, Function<NodeContext, Node<JavaClazz>> toGraph) {
+        this.repository = repository;
+        this.nodeToTransition = nodeToTransition;
         this.toGraph = toGraph;
     }
 
@@ -72,7 +75,8 @@ public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
                         .build());
 
                 Set<JavaClazz> scopeClasses = scopeClasses(node);
-                JavaClazz scopeInterface = DslUtils.createTransitionInterface(node);
+                repository.register(scopeClasses);
+                JavaClazz scopeInterface = nodeToTransition.apply(node);
                 JavaType scopeInterfaceType = scopeInterface.getType();
 
                 scopeInterface = new JavaClazzBuilder()
@@ -82,7 +86,6 @@ public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
                                             .withInterfaces(scopeInterfaceType)
                                             .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                                         .endType()
-                                .addToAttributes(INTERMEDIATE_CLASSES, scopeClasses)
                                 .accept(new Visitor<JavaTypeBuilder>() {
                                     public void visit(JavaTypeBuilder element) {
                                         element.getAttributes().remove(BEGIN_SCOPE);
@@ -90,6 +93,8 @@ public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
                                     }
                                 })
                                 .build();
+
+
                 result.removeAll(scopeClasses);
                 result.add(scopeInterface);
             }
