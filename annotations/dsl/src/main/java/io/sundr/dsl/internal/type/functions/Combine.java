@@ -117,7 +117,12 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
         return  toInterfaceName(prefix + compact(StringUtils.join(types, new Function<JavaType, String>() {
             @Override
             public String apply(JavaType item) {
-                return stripPrefix(stripSuffix(item.getClassName())).substring(prefix.length());
+                String str = stripPrefix(stripSuffix(item.getClassName()));
+                if (str.length() > prefix.length()) {
+                    return str.substring(prefix.length());
+                } else {
+                    return str;
+                }
             }
         }, "")));
     }

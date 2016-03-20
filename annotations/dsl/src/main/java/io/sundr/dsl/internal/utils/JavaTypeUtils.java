@@ -103,6 +103,9 @@ public final class JavaTypeUtils {
             keywords.add(keyword);
         }
 
+        //Let's add the name of the method as a keyword to make things simpler
+        keywords.add(executableElement.getSimpleName().toString()+"()");
+
         JavaType returnType = null;
         if (isTerminal(executableElement)) {
             returnType = isVoid(executableElement) ?

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,15 +14,12 @@
  *    limitations under the License.
  */
 
-package o.sundr.examples.kubernetes;
+package io.sundr.examples.kubernetes;
 
 import io.sundr.examples.kubernetes.Kubernetes;
 import io.sundr.examples.kubernetes.domain.Pod;
-import io.sundr.examples.kubernetes.domain.PodList;
 import io.sundr.examples.kubernetes.domain.ReplicationController;
-import io.sundr.examples.kubernetes.domain.ReplicationControllerList;
 import io.sundr.examples.kubernetes.domain.Service;
-import io.sundr.examples.kubernetes.domain.ServiceList;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -38,9 +35,9 @@ public class KubernetesDslTest {
         kubernetes.pod().inNamespace("default")
                 .withNewLabel().withKey("key1").withValue("value1")
                 .withNewLabel().withKey("key2").withValue("value2").list();
-        kubernetes.pod().withName("name").inNamespace("namespace").get();
-        kubernetes.pod().withName("name").inNamespace("namespace").delete();
-        kubernetes.pod().withName("name").inNamespace("namespace").create(new Pod());
+        kubernetes.pod().inNamespace("namespace").withName("name").get();
+        kubernetes.pod().inNamespace("namespace").withName("name").delete();
+        kubernetes.pod().inNamespace("namespace").withName("name").create(new Pod());
 
         //can't do
         //kubernetes.pod().inNamespace("namespace").create(null);
@@ -54,9 +51,9 @@ public class KubernetesDslTest {
                 .withNewLabel().withKey("key1").withValue("value1")
                 .withNewLabel().withKey("key2").withValue("value2").list();
 
-        kubernetes.service().withName("name").inNamespace("namespace").get();
-        kubernetes.service().withName("name").inNamespace("namespace").delete();
-        kubernetes.service().withName("name").inNamespace("namespace").create(new Service());
+        kubernetes.service().inNamespace("namespace").withName("name").get();
+        kubernetes.service().inNamespace("namespace").withName("name").delete();
+        kubernetes.service().inNamespace("namespace").withName("name").create(new Service());
 
         //can't do
         //kubernetes.service().inNamespace("namespace").create(null);
@@ -67,13 +64,14 @@ public class KubernetesDslTest {
     @Test
     public void testReplicationControllerDSL() {
         kubernetes.replicationController().inNamespace("default").list();
+
         kubernetes.replicationController().inNamespace("default")
                 .withNewLabel().withKey("key1").withValue("value1")
                 .withNewLabel().withKey("key2").withValue("value2").list();
 
-        kubernetes.replicationController().withName("name").inNamespace("namespace").get();
-        kubernetes.replicationController().withName("name").inNamespace("namespace").delete();
-        kubernetes.replicationController().withName("name").inNamespace("namespace").create(new ReplicationController());
+        kubernetes.replicationController().inNamespace("namespace").withName("name").get();
+        kubernetes.replicationController().inNamespace("namespace").withName("name").delete();
+        kubernetes.replicationController().inNamespace("namespace").withName("name").create(new ReplicationController());
 
 
         //can't do

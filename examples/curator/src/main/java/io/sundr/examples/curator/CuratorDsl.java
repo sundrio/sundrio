@@ -29,78 +29,66 @@ import io.sundr.dsl.annotations.Terminal;
 public interface CuratorDsl {
 
     @EntryPoint
-    @Keyword("GetDataOption")
     void getData();
 
     @EntryPoint
-    @Keyword("SetDataOption")
     void setData();
 
     @EntryPoint
     @InterfaceName("ReConfigBuilder")
-    @Keyword("ReconfigOption")
     void reconfig();
 
     @EntryPoint
     @InterfaceName("GetConfigBuilder")
-    @Keyword("ReconfigOption")
     void config();
 
     @InterfaceName("Leavable")
-    @Any(keywords = "ReconfigOption")
-    @None(keywords = "WithMembersOption")
-    @Keyword("LeaveOption")
+    @Any(keywords = "reconfig()")
+    @None(keywords = "withMembers()")
     void leaving(String... server);
 
     @InterfaceName("Joinable")
-    @Keyword("JoinOption")
-    @Any(keywords = "ReconfigOption")
-    @None(keywords = "WithMembersOption")
+    @Any(keywords = "reconfig()")
+    @None(keywords = "withMembers()")
     void joining(String... server);
 
     @InterfaceName("Memberable")
-    @Keyword("WithMembersOption")
-    @Any(keywords = "ReconfigOption")
-    @None(keywords = {"JoinOption", "LeaveOption"})
+    @Any(keywords = "reconfig()")
+    @None(keywords = {"joining()", "leaving()"})
     void withMembers(String... server);
-    
-    @Keyword("BackgroundOption")
+
     @InterfaceName("Backgroundable")
     void inBackground(boolean flag);
 
     @InterfaceName("Backgroundable")
-    @Keyword("BackgroundOption")
     void inBackground();
 
     @InterfaceName("Backgroundable")
-    @Keyword("BackgroundOption")
     void inBackground(Object context);
 
-    @Keyword("WatchOption")
     @InterfaceName("Watchable")
     void watched();
 
-    @Keyword("StatOption")
-    @Any(keywords = {"SetDataOption", "GetDataOption"})
+    @Any(keywords = {"getData()", "setData()"})
     @InterfaceName("Statable")
     void storingStatIn(String stat);
 
-    @Any(keywords = "ConfigOption")
+    @Any(keywords = "config()")
     @InterfaceName("Configurable")
     void fromConfig(Long config);
     
     @Terminal
     @InterfaceName("Ensemblable")
-    @Any(keywords = {"ReconfigOption", "ConfigOption"})
+    @Any(keywords = {"reconfig()", "config()"})
     byte[] forEnsemble();
 
     @Terminal
     @InterfaceName("Pathable")
-    @Any(keywords = {"GetDataOption", "SetDataOption"})
+    @Any(keywords = {"getData()", "setData()"})
     String forPath(String path);
 
     @Terminal
     @InterfaceName("PathAndBytesable")
-    @Any(keywords = {"GetDataOption", "SetDataOption"})
+    @Any(keywords = {"getData()", "setData()"})
     void forPath(String path, byte[] bytes);
 }
