@@ -25,7 +25,7 @@ public class Node<T> {
     private final T item;
     private final Set<Node<T>> transitions;
 
-    public Node(T item, Set<Node<T>> transitions) {
+    Node(T item, Set<Node<T>> transitions) {
         this.item = item;
         this.transitions = transitions;
     }

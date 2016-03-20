@@ -27,12 +27,15 @@ import io.sundr.dsl.internal.element.functions.ToRequiresAll;
 import io.sundr.dsl.internal.element.functions.ToRequiresAny;
 import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
 import io.sundr.dsl.internal.element.functions.ToRequiresOnly;
+import io.sundr.dsl.internal.graph.NodeRepository;
 import io.sundr.dsl.internal.graph.functions.ToNext;
+import io.sundr.dsl.internal.graph.functions.ToUncyclic;
 import io.sundr.dsl.internal.graph.functions.ToRoot;
 import io.sundr.dsl.internal.graph.functions.ToTransition;
 import io.sundr.dsl.internal.graph.functions.ToTree;
 import io.sundr.dsl.internal.graph.functions.ToGraph;
-import io.sundr.dsl.internal.graph.functions.ToScopes;
+import io.sundr.dsl.internal.graph.functions.ToScope;
+import io.sundr.dsl.internal.graph.functions.ToUnwrapped;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -51,14 +54,18 @@ public class DslProcessorContext {
     private final ToKeywords toKeywords;
     private final ToNext toNext;
     private final ToTree toTree;
+    private final ToTransition toTranstion;
     private final ToGraph toGraph;
+    private final ToUncyclic toUncyclic;
+    private final ToUnwrapped toUnwrapped;
 
     private final ToRoot toRoot;
-    private final ToTransition toTranstion;
+    private final ToScope toScope;
 
-    private final ToScopes toScopes;
 
-    private final DslRepository repository = new DslRepository();
+
+    private final ClassRepository classRepository = new ClassRepository();
+    private final NodeRepository nodeRepository = new NodeRepository();
 
     public DslProcessorContext(Elements elements, Types types) {
         this.elements = elements;
@@ -71,11 +78,13 @@ public class DslProcessorContext {
         this.toRequiresOnly = new ToRequiresOnly(elements);
         this.toKeywords = new ToKeywords(elements);
         this.toNext = new ToNext();
-        this.toTree = new ToTree(toNext);
+        this.toTree = new ToTree(toNext, nodeRepository);
         this.toGraph = new ToGraph(toTree);
-        this.toTranstion = new ToTransition(repository);
-        this.toRoot = new ToRoot(repository, toTranstion);
-        this.toScopes = new ToScopes(repository, toTranstion, toTree);
+        this.toTranstion = new ToTransition(classRepository);
+        this.toRoot = new ToRoot(classRepository, toTranstion);
+        this.toScope = new ToScope(classRepository, toTranstion, toTree);
+        this.toUncyclic = new ToUncyclic();
+        this.toUnwrapped = new ToUnwrapped(nodeRepository);
     }
 
     public Elements getElements() {
@@ -130,11 +139,23 @@ public class DslProcessorContext {
         return toTranstion;
     }
 
-    public ToScopes getToScopes() {
-        return toScopes;
+    public ToScope getToScope() {
+        return toScope;
     }
 
-    public DslRepository getRepository() {
-        return repository;
+    public ToUncyclic getToUncyclic() {
+        return toUncyclic;
+    }
+
+    public ToUnwrapped getToUnwrapped() {
+        return toUnwrapped;
+    }
+
+    public ClassRepository getClassRepository() {
+        return classRepository;
+    }
+
+    public NodeRepository getNodeRepository() {
+        return nodeRepository;
     }
 }

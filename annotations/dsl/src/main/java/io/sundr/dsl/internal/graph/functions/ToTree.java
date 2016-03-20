@@ -20,8 +20,13 @@ import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.graph.Node;
+import io.sundr.dsl.internal.graph.NodeRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEndScope;
@@ -31,32 +36,64 @@ public class ToTree implements Function<NodeContext, Node<JavaClazz>> {
 
     private final Function<NodeContext, Set<JavaClazz>> toNext;
     private final Function<NodeContext, Node<JavaClazz>> toTree;
+    private final NodeRepository nodeRepository;
 
-    public ToTree(Function<NodeContext, Set<JavaClazz>> toNext) {
+    public ToTree(Function<NodeContext, Set<JavaClazz>> toNext, NodeRepository nodeRepository) {
         this.toNext = toNext;
+        this.nodeRepository = nodeRepository;
         this.toTree = this;
     }
 
-    public ToTree(Function<NodeContext, Set<JavaClazz>> toNext, Function<NodeContext, Node<JavaClazz>> toTree) {
+    public ToTree(Function<NodeContext, Set<JavaClazz>> toNext, Function<NodeContext, Node<JavaClazz>> toTree, NodeRepository nodeRepository) {
         this.toNext = toNext;
         this.toTree = toTree;
+        this.nodeRepository = nodeRepository;
     }
 
     public Node<JavaClazz> apply(NodeContext ctx) {
         Set<Node<JavaClazz>> nextVertices = new LinkedHashSet<Node<JavaClazz>>();
+
         //visited and path are the same only in the first iteration. see bellow:
         Set<JavaClazz> visited = new LinkedHashSet<JavaClazz>(ctx.getVisited());
-        for (JavaClazz next : toNext.apply(ctx)) {
-            NodeContext nextContext = ctx.contextOfChild(next).addToVisited(visited).build();
+        List<JavaClazz> nextCandidates = new ArrayList<JavaClazz>(toNext.apply(ctx));
+        Collections.sort(nextCandidates, new CandidateComparator(ctx));
+
+        for (JavaClazz next : nextCandidates) {
+            NodeContext nextContext = ctx.contextOfChild(next)
+                    .addToVisited(visited)
+                    .addToVisited(next)
+                    .build();
+
             Node<JavaClazz> subGraph = toTree.apply(nextContext);
             //Let's keep track of types used so far in the loop so that we avoid using the same types, in different branches of the tree:
             //This is required so that we avoid extending the same generic interface with different parameters.
             visited.add(subGraph.getItem());
-
             if (subGraph.getTransitions().size() > 0 || isTerminal(subGraph.getItem()) || isEndScope(subGraph.getItem())) {
                 nextVertices.add(subGraph);
             }
         }
-        return new Node<JavaClazz>(ctx.getItem(), nextVertices);
+        return nodeRepository.getOrCreateNode(ctx.getItem(), nextVertices);
+    }
+
+    private class CandidateComparator implements Comparator<JavaClazz> {
+
+        private final NodeContext nodeContext;
+
+        private CandidateComparator(NodeContext nodeContext) {
+            this.nodeContext = nodeContext;
+        }
+
+        public int compare(JavaClazz left, JavaClazz right) {
+            Set<JavaClazz> leftSet = toNext.apply(nodeContext.contextOfChild(left).addToVisited(left).build());
+            Set<JavaClazz> rightSet = toNext.apply(nodeContext.contextOfChild(right).addToVisited(right).build());
+            if (leftSet.contains(right) && rightSet.contains(left)) {
+                return 0;
+            } else if (leftSet.contains(right)) {
+                return -1;
+            } else if (rightSet.contains(left)) {
+                return 1;
+            }
+            return 0;
+        }
     }
 }

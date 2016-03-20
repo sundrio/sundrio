@@ -44,7 +44,6 @@ import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.executableToInterface;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isVoid;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -99,7 +98,7 @@ public class JavaTypeUtilsTest {
         Assert.assertNotNull(combined);
 
         String T = Generics.MAP.apply(TRANSPARENT).getClassName();
-        Assert.assertThat(combined.getType().getClassName(), CoreMatchers.equalTo("MethodAOrBInterface"));
+        Assert.assertThat(combined.getType().getClassName(), CoreMatchers.equalTo("MethodABInterface"));
         Assert.assertThat(combined.getType().getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
         Assert.assertThat(combined.getType().getGenericTypes().length, CoreMatchers.is(1));
         Assert.assertThat(combined.getType().getGenericTypes()[0].toString(), CoreMatchers.equalTo(T));
@@ -120,7 +119,7 @@ public class JavaTypeUtilsTest {
         JavaClazz combined = Combine.FUNCTION.apply(Arrays.asList(leftClazz, rightClazz));
         Assert.assertNotNull(combined);
 
-        Assert.assertThat(combined.getType().getClassName(), CoreMatchers.equalTo("MethodAOrBInterface"));
+        Assert.assertThat(combined.getType().getClassName(), CoreMatchers.equalTo("MethodABInterface"));
         Assert.assertThat(combined.getType().getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
         Assert.assertThat(combined.getType().getGenericTypes().length, CoreMatchers.is(1));
         Assert.assertThat(combined.getType().getGenericTypes()[0].toString(), CoreMatchers.equalTo("T"));
@@ -141,7 +140,7 @@ public class JavaTypeUtilsTest {
         JavaClazz combined = Combine.FUNCTION.apply(Arrays.asList(leftClazz, rightClazz));
         Assert.assertNotNull(combined);
 
-        Assert.assertThat(combined.getType().getClassName(), CoreMatchers.equalTo("MethodAOrBInterface"));
+        Assert.assertThat(combined.getType().getClassName(), CoreMatchers.equalTo("MethodABInterface"));
         Assert.assertThat(combined.getType().getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
         Assert.assertThat(combined.getType().getGenericTypes().length, CoreMatchers.is(1));
         Assert.assertThat(combined.getType().getInterfaces().size(), CoreMatchers.is(2));

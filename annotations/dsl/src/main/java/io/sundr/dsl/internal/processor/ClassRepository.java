@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DslRepository {
+public class ClassRepository {
 
     private final Map<String, JavaClazz> map = new HashMap<String, JavaClazz>();
 

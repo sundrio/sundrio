@@ -19,10 +19,8 @@ package io.sundr.dsl.internal.graph.functions;
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.dsl.internal.graph.Node;
-import io.sundr.dsl.internal.processor.DslRepository;
+import io.sundr.dsl.internal.processor.ClassRepository;
 import io.sundr.dsl.internal.type.functions.Combine;
 import io.sundr.dsl.internal.type.functions.Generify;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
@@ -34,9 +32,9 @@ import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTransition;
 
 public class ToTransition implements Function<Node<JavaClazz>, JavaClazz> {
 
-    private final DslRepository repository;
+    private final ClassRepository repository;
 
-    public ToTransition(DslRepository repository) {
+    public ToTransition(ClassRepository repository) {
         this.repository = repository;
     }
 

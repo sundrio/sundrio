@@ -68,9 +68,12 @@ public final class GraphUtils {
         if (!activeScopes.isEmpty() && !keywords.contains(activeScopes.getLast())) {
             return false;
         }
-
-        //Eliminate circles if not explicitly specified
+        int lastIndex = path.lastIndexOf(candidate.getType());
         if (!multiple && path.contains(candidate.getType())) {
+            //Eliminate circles if not explicitly specified
+            return false;
+        } else if (multiple && lastIndex > 0 && lastIndex < path.size() - 1) {
+            //We only accept repetition of the last element. Other wise we can end up in infinite loops
             return false;
         }
         return filter.apply(visitedKeywords);
@@ -84,7 +87,6 @@ public final class GraphUtils {
         }
         return result;
     }
-
 
     public static LinkedList<String> getScopes(Collection<JavaType> types) {
         Stack<String> stack = new Stack<String>();

@@ -26,12 +26,16 @@ import java.util.Set;
 
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 
+/**
+ * {@link Function} that accepts a set of {@link JavaClazz} and creates a the transition graph.
+ * The graph is structured as a set of Trees (tree-like to be more accurate as there might be circles).
+ */
 public class ToGraph implements Function<Set<JavaClazz>, Set<Node<JavaClazz>>> {
 
-    private final Function<NodeContext, Node<JavaClazz>> toGraph;
+    private final Function<NodeContext, Node<JavaClazz>> toTree;
 
-    public ToGraph(Function<NodeContext, Node<JavaClazz>> toGraph) {
-        this.toGraph = toGraph;
+    public ToGraph(Function<NodeContext, Node<JavaClazz>> toTree) {
+        this.toTree = toTree;
     }
 
     public Set<Node<JavaClazz>> apply(Set<JavaClazz> clazzes) {
@@ -39,7 +43,7 @@ public class ToGraph implements Function<Set<JavaClazz>, Set<Node<JavaClazz>>> {
         Set<JavaClazz> all = new LinkedHashSet(clazzes);
         for (JavaClazz clazz : clazzes) {
             if (isEntryPoint(clazz)) {
-                nodes.add(toGraph.apply(NodeContext.builder()
+                nodes.add(toTree.apply(NodeContext.builder()
                         .withItem(clazz)
                         .withAll(all)
                         .build()));

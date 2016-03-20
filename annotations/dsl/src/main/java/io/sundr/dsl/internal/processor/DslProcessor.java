@@ -21,10 +21,12 @@ import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.internal.graph.Node;
+import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
@@ -65,7 +67,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     Collection<ExecutableElement> sorted = ElementFilter.methodsIn(typeElement.getEnclosedElements());
                     //1st step generate generic interface for all types.
                     Set<JavaClazz> genericInterfaces = executablesToInterfaces(context, sorted);
-                    Set<JavaClazz> genericAndScopeInterfaces = context.getToScopes().apply(genericInterfaces);
+                    Set<JavaClazz> genericAndScopeInterfaces = context.getToScope().apply(genericInterfaces);
                     for (JavaClazz clazz : genericAndScopeInterfaces) {
                         if (!JavaTypeUtils.isEntryPoint(clazz)) {
                             interfacesToGenerate.add(clazz);
@@ -75,12 +77,15 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     //2nd step create dependency graph.
                     Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
                     Set<Node<JavaClazz>> graph = context.getToGraph().apply(genericAndScopeInterfaces);
+
                     for (Node<JavaClazz> root : graph) {
-                        JavaClazz current = root.getItem();
+                        Node<JavaClazz> uncyclic = context.getToUncyclic().apply(root);
+                        Node<JavaClazz> unwrapped = context.getToUnwrapped().apply(NodeContext.builder().withItem(uncyclic.getItem()).build());
+                        JavaClazz current = unwrapped.getItem();
 
                         //If there are not transitions don't generate root interface.
                         //Just add the method with the direct return type.
-                        if (root.getTransitions().isEmpty()) {
+                        if (unwrapped.getTransitions().isEmpty()) {
                             for (JavaMethod m : current.getMethods()) {
                                 methods.add(new JavaMethodBuilder(m).withReturnType(Generics.UNWRAP.apply(m.getReturnType())).build());
                             }
@@ -89,7 +94,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                                 methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
                             }
 
-                            interfacesToGenerate.add(context.getToRoot().apply(root));
+                            interfacesToGenerate.add(context.getToRoot().apply(unwrapped));
                         }
                     }
 
@@ -103,7 +108,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                             .withMethods(methods)
                             .build());
 
-                    interfacesToGenerate.addAll(context.getRepository().getInterfacesToGenerate());
+                    interfacesToGenerate.addAll(context.getClassRepository().getInterfacesToGenerate());
 
                     try {
                         for (JavaClazz clazz : interfacesToGenerate) {

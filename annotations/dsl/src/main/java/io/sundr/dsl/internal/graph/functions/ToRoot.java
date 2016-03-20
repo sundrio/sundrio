@@ -23,18 +23,21 @@ import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.dsl.internal.graph.Node;
-import io.sundr.dsl.internal.processor.DslRepository;
+import io.sundr.dsl.internal.processor.ClassRepository;
 import io.sundr.dsl.internal.type.functions.Generics;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * {@Function} that accepts a graph and creates a the root interface that represents the transitions for the graph.
+ */
 public class ToRoot implements Function<Node<JavaClazz>, JavaClazz> {
 
-    private final DslRepository repository;
+    private final ClassRepository repository;
     private final Function<Node<JavaClazz>, JavaClazz> nodeToTransition;
 
-    public ToRoot(DslRepository repository, Function<Node<JavaClazz>, JavaClazz> nodeToTransition) {
+    public ToRoot(ClassRepository repository, Function<Node<JavaClazz>, JavaClazz> nodeToTransition) {
         this.repository = repository;
         this.nodeToTransition = nodeToTransition;
     }

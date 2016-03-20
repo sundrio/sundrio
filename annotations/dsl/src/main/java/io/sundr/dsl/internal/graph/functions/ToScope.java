@@ -24,25 +24,31 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.graph.Node;
-import io.sundr.dsl.internal.processor.DslRepository;
+import io.sundr.dsl.internal.processor.ClassRepository;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.END_SCOPE;
+import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.SCOPE_SUFFIX;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isBeginScope;
 
-public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
+/**
+ * {@link Function} that detects scopes (paths marked by begin/end annotations) and replaces them by a single interface.
+ */
+public class ToScope implements Function<Set<JavaClazz>, Set<JavaClazz>> {
 
-    private final DslRepository repository;
+    private final ClassRepository repository;
     private final Function<Node<JavaClazz>, JavaClazz> nodeToTransition;
     private final Function<NodeContext, Node<JavaClazz>> toGraph;
 
-    public ToScopes(DslRepository repository, Function<Node<JavaClazz>, JavaClazz> nodeToTransition, Function<NodeContext, Node<JavaClazz>> toGraph) {
+    public ToScope(ClassRepository repository, Function<Node<JavaClazz>, JavaClazz> nodeToTransition, Function<NodeContext, Node<JavaClazz>> toGraph) {
         this.repository = repository;
         this.nodeToTransition = nodeToTransition;
         this.toGraph = toGraph;
@@ -85,6 +91,7 @@ public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
                                             .withClassName(scopeInterfaceType.getClassName()+SCOPE_SUFFIX)
                                             .withInterfaces(scopeInterfaceType)
                                             .addToAttributes(CARDINALITY_MULTIPLE, multiple)
+                                            .addToAttributes(KEYWORDS, scopeKeywords(scopeClasses))
                                         .endType()
                                 .accept(new Visitor<JavaTypeBuilder>() {
                                     public void visit(JavaTypeBuilder element) {
@@ -109,6 +116,15 @@ public class ToScopes implements Function<Set<JavaClazz>, Set<JavaClazz>> {
             result.addAll(scopeClasses(transition));
         }
 
+        return result;
+    }
+
+    public Set<String> scopeKeywords(Collection<JavaClazz> clazzes) {
+        Set<String> result = new LinkedHashSet<String>();
+        for (JavaClazz clazz : clazzes) {
+            Set<String> keywords = (Set<String>) clazz.getType().getAttributes().get(KEYWORDS);
+            result.addAll(keywords != null ? keywords : Collections.<String>emptySet());
+        }
         return result;
     }
 }

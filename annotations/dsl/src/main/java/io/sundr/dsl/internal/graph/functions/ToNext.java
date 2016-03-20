@@ -31,6 +31,9 @@ import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEndScope;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isEntryPoint;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
 
+/**
+ * {@Function} that accepts a {@link NodeContext} and finds which classes can follow next.
+ */
 public class ToNext implements Function<NodeContext, Set<JavaClazz>> {
 
     public Set<JavaClazz> apply(NodeContext context) {
