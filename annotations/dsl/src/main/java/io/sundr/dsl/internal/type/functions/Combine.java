@@ -111,16 +111,36 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
             }
         };
 
+
         final String prefix = StringUtils.getPrefix(types, toString);
 
-        return  toInterfaceName(prefix + StringUtils.join(types, new Function<JavaType, String>() {
+        return  toInterfaceName(prefix + compact(StringUtils.join(types, new Function<JavaType, String>() {
             @Override
             public String apply(JavaType item) {
-                return stripPrefix(stripSuffix(item.getClassName())).substring(prefix.length());
+                String str = stripPrefix(stripSuffix(item.getClassName()));
+                if (str.length() > prefix.length()) {
+                    return str.substring(prefix.length());
+                } else {
+                    return str;
+                }
             }
-        }, "Or"));
+        }, "")));
     }
 
+
+    /**
+     * Remove repeating strings that are appearing in the name.
+     * This is done by splitting words (camel case) and using each word once.
+     * @param name  The name to compact.
+     * @return      The compact name.
+     */
+    private static final String compact(String name) {
+        Set<String> parts = new LinkedHashSet<String>();
+        for (String part : name.split(SPLITTER_REGEX)) {
+            parts.add(part);
+        }
+        return StringUtils.join(parts,"");
+    }
 
     private static boolean canBeExcluded(JavaClazz candidate, Iterable<JavaClazz> provided) {
         Set<JavaType> allOther = new LinkedHashSet<JavaType>();
@@ -184,4 +204,6 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
     }
 
     private static Map<String, JavaClazz> combinations = new HashMap<String, JavaClazz>();
+
+    private static final String SPLITTER_REGEX = "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])";
 }

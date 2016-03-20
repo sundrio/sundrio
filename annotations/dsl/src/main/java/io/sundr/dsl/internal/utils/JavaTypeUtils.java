@@ -23,6 +23,8 @@ import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.ModelUtils;
+import io.sundr.dsl.annotations.Begin;
+import io.sundr.dsl.annotations.End;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.Multiple;
@@ -48,11 +50,14 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
+import static io.sundr.dsl.internal.Constants.END_SCOPE;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
 import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
+import static io.sundr.dsl.internal.Constants.IS_TRANSITION;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
@@ -98,6 +103,9 @@ public final class JavaTypeUtils {
             keywords.add(keyword);
         }
 
+        //Let's add the name of the method as a keyword to make things simpler
+        keywords.add(executableElement.getSimpleName().toString()+"()");
+
         JavaType returnType = null;
         if (isTerminal(executableElement)) {
             returnType = isVoid(executableElement) ?
@@ -109,8 +117,19 @@ public final class JavaTypeUtils {
 
         InterfaceName targetInterfaceName = executableElement.getAnnotation(InterfaceName.class);
         MethodName tagetMethodName = executableElement.getAnnotation(MethodName.class);
+        Begin begin = executableElement.getAnnotation(Begin.class);
+        End end = executableElement.getAnnotation(End.class);
 
+        if (begin != null) {
+            keywords.add(begin.value());
+        }
+        if (end != null) {
+            keywords.add(end.value());
+        }
         String methodName = tagetMethodName != null ? tagetMethodName.value() : executableElement.getSimpleName().toString();
+
+        String beginScope = begin != null ? begin.value() : null;
+        String endScope = end != null ? end.value() : null;
 
         JavaType genericType = Generics.MAP.apply(returnType);
 
@@ -133,6 +152,8 @@ public final class JavaTypeUtils {
                     .addToAttributes(IS_TERMINAL, isTerminal)
                     .addToAttributes(IS_GENERIC, Boolean.FALSE)
                     .addToAttributes(KEYWORDS, keywords)
+                    .addToAttributes(BEGIN_SCOPE, beginScope)
+                    .addToAttributes(END_SCOPE, endScope)
                     .addToAttributes(FILTER, filter)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                     .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
@@ -228,6 +249,28 @@ public final class JavaTypeUtils {
                 && (Boolean) clazz.getType().getAttributes().get(IS_TERMINAL);
     }
 
+    public static boolean isTransition(JavaClazz clazz) {
+        return clazz.getType().getAttributes().containsKey(IS_TRANSITION)
+                && (clazz.getType().getAttributes().get(IS_TRANSITION) instanceof Boolean)
+                && (Boolean) clazz.getType().getAttributes().get(IS_TRANSITION);
+    }
+
+    public static boolean isBeginScope(JavaClazz clazz) {
+        return isBeginScope(clazz.getType());
+    }
+
+    public static boolean isBeginScope(JavaType type) {
+        return type.getAttributes().containsKey(BEGIN_SCOPE);
+    }
+
+    public static boolean isEndScope(JavaClazz clazz) {
+        return isEndScope(clazz.getType());
+    }
+
+    public static boolean isEndScope(JavaType type) {
+        return type.getAttributes().containsKey(END_SCOPE);
+    }
+
     public static boolean isCardinalityMultiple(JavaClazz clazz) {
         return clazz.getType().getAttributes().containsKey(CARDINALITY_MULTIPLE)
                 && (clazz.getType().getAttributes().get(CARDINALITY_MULTIPLE) instanceof Boolean)
@@ -249,10 +292,30 @@ public final class JavaTypeUtils {
             List list = (List) value;
             for (Object item : list) {
                 String str = String.valueOf(item);
-                classNames.add(removeSuffix(str));
+                classNames.add(removeQuotes(removeSuffix(str)));
             }
         }
         return classNames;
+    }
+
+    private static String removeLeftQuote(String str) {
+        if (str.startsWith("\"")) {
+            return str.substring(1);
+        } else {
+            return str;
+        }
+    }
+
+    private static String removeRightQuote(String str) {
+        if (str.endsWith("\"")) {
+            return str.substring(0, str.length() - 1);
+        } else {
+            return str;
+        }
+    }
+
+    private static String removeQuotes(String str) {
+        return removeLeftQuote(removeRightQuote(str));
     }
 
     private static String removeSuffix(String str) {

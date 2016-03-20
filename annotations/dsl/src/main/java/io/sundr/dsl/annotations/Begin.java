@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.kubernetes.annotations;
-
-import io.sundr.dsl.annotations.Keyword;
+package io.sundr.dsl.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.METHOD)
+/**
+ * An annotation to specify that the current method or annotation acts as a keyword (transition candidate).
+ */
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.SOURCE)
-@Keyword
-public @interface PodOption {
+public @interface Begin {
+    String value();
 }

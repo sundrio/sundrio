@@ -16,27 +16,27 @@
 
 package io.sundr.examples.curator.impl;
 
-import io.sundr.examples.curator.PathableOrAndBytesableInterface;
+import io.sundr.examples.curator.PathableAndBytesableInterface;
 import io.sundr.examples.curator.SetDataInterface;
-import io.sundr.examples.curator.StatableOrPathableOrPathAndBytesableInterface;
-import io.sundr.examples.curator.WatchableOrStatableOrPathableOrPathAndBytesableInterface;
+import io.sundr.examples.curator.StatablePathablePathAndBytesableInterface;
+import io.sundr.examples.curator.WatchableStatablePathablePathAndBytesableInterface;
 
-public class SetDataInterfaceImpl implements SetDataInterface, WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void>,
-        PathableOrAndBytesableInterface<String, Void>,
-        StatableOrPathableOrPathAndBytesableInterface<String, Void>{
+public class SetDataInterfaceImpl implements SetDataInterface, WatchableStatablePathablePathAndBytesableInterface<String, Void>,
+        PathableAndBytesableInterface<String, Void>,
+        StatablePathablePathAndBytesableInterface<String, Void>{
     
     @Override
-    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void> inBackground(boolean flag) {
+    public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(boolean flag) {
         return this;
     }
 
     @Override
-    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void>  inBackground(Object context) {
+    public WatchableStatablePathablePathAndBytesableInterface<String, Void>  inBackground(Object context) {
         return this;
     }
 
     @Override
-    public WatchableOrStatableOrPathableOrPathAndBytesableInterface<String, Void>  inBackground() {
+    public WatchableStatablePathablePathAndBytesableInterface<String, Void>  inBackground() {
         return this;
     }
 
@@ -51,12 +51,12 @@ public class SetDataInterfaceImpl implements SetDataInterface, WatchableOrStatab
     }
 
     @Override
-    public PathableOrAndBytesableInterface<String, Void> storingStatIn(String stat) {
+    public PathableAndBytesableInterface<String, Void> storingStatIn(String stat) {
         return this;
     }
 
     @Override
-    public StatableOrPathableOrPathAndBytesableInterface<String, Void> watched() {
+    public StatablePathablePathAndBytesableInterface<String, Void> watched() {
         return this;
     }
 
