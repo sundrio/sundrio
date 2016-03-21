@@ -58,7 +58,9 @@ import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
 import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.IS_TRANSITION;
+import static io.sundr.dsl.internal.Constants.CLASSES;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
+import static io.sundr.dsl.internal.Constants.METHODS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
@@ -87,7 +89,9 @@ public final class JavaTypeUtils {
         Boolean isTerminal = executableElement.getAnnotation(Terminal.class) != null
                 || !isVoid(executableElement);
 
+        Set<String> classes = new LinkedHashSet<String>();
         Set<String> keywords = new LinkedHashSet<String>();
+        Set<String> methods = new LinkedHashSet<String>();
         Set<TransitionFilter> filters = new LinkedHashSet<TransitionFilter>();
 
         filters.add(context.getToRequiresAll().apply(executableElement));
@@ -99,12 +103,16 @@ public final class JavaTypeUtils {
                 ? new OrTransitionFilter(filters)
                 : new AndTransitionFilter(filters);
 
+        for (String clazz : context.getToClasses().apply(executableElement)) {
+            classes.add(clazz);
+        }
+
         for (String keyword : context.getToKeywords().apply(executableElement)) {
             keywords.add(keyword);
         }
 
         //Let's add the name of the method as a keyword to make things simpler
-        keywords.add(executableElement.getSimpleName().toString()+"()");
+        methods.add(executableElement.getSimpleName().toString());
 
         JavaType returnType = null;
         if (isTerminal(executableElement)) {
@@ -151,7 +159,9 @@ public final class JavaTypeUtils {
                     .addToAttributes(IS_ENTRYPOINT, isEntryPoint)
                     .addToAttributes(IS_TERMINAL, isTerminal)
                     .addToAttributes(IS_GENERIC, Boolean.FALSE)
+                    .addToAttributes(CLASSES, classes)
                     .addToAttributes(KEYWORDS, keywords)
+                    .addToAttributes(METHODS, methods)
                     .addToAttributes(BEGIN_SCOPE, beginScope)
                     .addToAttributes(END_SCOPE, endScope)
                     .addToAttributes(FILTER, filter)

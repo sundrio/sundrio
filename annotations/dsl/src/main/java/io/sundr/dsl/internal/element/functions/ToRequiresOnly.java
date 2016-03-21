@@ -16,67 +16,56 @@
 
 package io.sundr.dsl.internal.element.functions;
 
-import io.sundr.Function;
 import io.sundr.dsl.annotations.Only;
 import io.sundr.dsl.internal.element.functions.filter.RequiresOnlyFilter;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToRequiresOnly implements Function<Element, TransitionFilter> {
+public class ToRequiresOnly extends KeywordsAndMethodsToFilter {
 
-    private final TypeElement ONLY;
-    private final Element CLASSES_VALUE;
-    private final Element KEYWORDS_VALUE;
     private final Element OR_NONE_VALUE;
 
     public ToRequiresOnly(Elements elements) {
-        ONLY = elements.getTypeElement(Only.class.getCanonicalName());
-        CLASSES_VALUE = ONLY.getEnclosedElements().get(0);
-        KEYWORDS_VALUE = ONLY.getEnclosedElements().get(1);
-        OR_NONE_VALUE = ONLY.getEnclosedElements().get(2);
+        super(elements, Only.class.getCanonicalName());
+        OR_NONE_VALUE = ELEMENT.getEnclosedElements().get(3);
     }
 
     public TransitionFilter apply(Element element) {
+        Set<String> classes = new LinkedHashSet<String>();
         Set<String> keywords = new LinkedHashSet<String>();
+        Set<String> methods = new LinkedHashSet<String>();
         Boolean explicit = false;
         Boolean orNone = false;
 
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
-            if (mirror.getAnnotationType().asElement().equals(ONLY)) {
-                explicit = true;
-                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(CLASSES_VALUE).getValue()));
-                if (mirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
-                    keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
+                if (mirror.getAnnotationType().asElement().equals(ELEMENT)) {
+                    explicit = true;
+                    addToSet(mirror, CLASSES_VALUE, classes);
+                    addToSet(mirror, KEYWORDS_VALUE, keywords);
+                    addToSet(mirror, METHODS_VALUE, methods);
+                    orNone = getBoolean(mirror, OR_NONE_VALUE);
                 }
-                if (mirror.getElementValues().containsKey(OR_NONE_VALUE)) {
-                    orNone = (Boolean) mirror.getElementValues().get(OR_NONE_VALUE).getValue();
-                }
-            }
-            //Also look for use on custom annotations
-            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(ONLY)) {
 
-                    if (innerMirror.getElementValues().containsKey(CLASSES_VALUE)) {
-                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(CLASSES_VALUE).getValue()));
-                    }
-
-                    if (innerMirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
-                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
-                    }
-
-                    if (innerMirror.getElementValues().containsKey(OR_NONE_VALUE)) {
-                        orNone = (Boolean) innerMirror.getElementValues().get(OR_NONE_VALUE).getValue();
+                //Also look for use on custom annotations
+                for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
+                    if (innerMirror.getAnnotationType().asElement().equals(ELEMENT)) {
+                        addToSet(mirror, CLASSES_VALUE, classes);
+                        addToSet(mirror, KEYWORDS_VALUE, keywords);
+                        addToSet(mirror, METHODS_VALUE, methods);
+                        orNone = getBoolean(mirror, OR_NONE_VALUE);
                     }
                 }
-            }
         }
-        return new RequiresOnlyFilter(explicit, orNone, keywords);
+        return new RequiresOnlyFilter(classes, keywords, methods, explicit, orNone);
+    }
+
+    @Override
+    public TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods) {
+        return new RequiresOnlyFilter(classes, keywords, methods, false, false);
     }
 }

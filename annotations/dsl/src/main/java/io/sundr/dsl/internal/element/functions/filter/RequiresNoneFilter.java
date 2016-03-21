@@ -16,15 +16,27 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
+import io.sundr.codegen.model.JavaType;
+
+import java.util.Collection;
 import java.util.Set;
 
+import static io.sundr.dsl.internal.utils.GraphUtils.getClasses;
+import static io.sundr.dsl.internal.utils.GraphUtils.getKeywords;
+import static io.sundr.dsl.internal.utils.GraphUtils.getMethods;
+
 /**
- * Function that determines if a set of visited keywords contains ALL of the specified requirements.
+ * Function that determines if a set of visited keywords contains No Classes/Keywords/Methods.
  */
 public class RequiresNoneFilter implements TransitionFilter {
 
+    public Boolean apply(Collection<JavaType> items) {
+        Set<String> pathClasses = getClasses(items);
+        Set<String> pathKeywords = getKeywords(items);
+        Set<String> pathMethods = getMethods(items);
 
-    public Boolean apply(Set<String> path) {
-        return path.isEmpty();
+        return pathClasses.isEmpty() && pathKeywords.isEmpty() && pathMethods.isEmpty();
+
     }
+
 }

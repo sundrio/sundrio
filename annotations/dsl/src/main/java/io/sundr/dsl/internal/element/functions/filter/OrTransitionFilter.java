@@ -16,7 +16,10 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
+import io.sundr.codegen.model.JavaType;
+
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,9 +35,9 @@ public class OrTransitionFilter implements TransitionFilter {
         this.filters = new HashSet<TransitionFilter>(Arrays.asList(filters));
     }
 
-    public Boolean apply(Set<String> item) {
+    public Boolean apply(Collection<JavaType> items) {
         for (TransitionFilter filter : filters) {
-            if (filter.apply(item)) {
+            if (filter.apply(items)) {
                 return true;
             }
         }

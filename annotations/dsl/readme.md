@@ -24,11 +24,11 @@ The code below will generate a very simple DSL for crud operations:
         void query();
         
         @Multiple                               //Can occur multiple times
-        @All(keywords="query()")                //Requires "query()" method
+        @All(methods="query")                   //Requires "query()" method
         void filter(String key, String value);
         
         @Terminal
-        @All(keywords="query()")                 //Requires a method that provides: "Query" keyword
+        @All(methods="query")                   //Requires a method that provides: "Query" keyword
         List<Entity> list();
         
         @EntryPoint                             //Entry point
@@ -39,7 +39,7 @@ The code below will generate a very simple DSL for crud operations:
         Entity delete();                        //Code: Entity removed = crud.withName("someName").delete();
         
         @Terminal                               //Terminal method
-        @All(keywords="Named")                  //Requires: "Named" keyword
+        @All(Named.class)                       //Requires: "Named" keyword
         Entity update(Entity e);                //Code: Entity removed = crud.withName("someName").delete();
     }
 
@@ -72,25 +72,27 @@ A terminal method of the DSL.
 
 Can be used on any method to define that it provides one or more characteristics (e.g. "method is a list option").
 
-It can also be used to create custom annotations, that can be used to define aggregate rules (e.g. "requires the list keyword or any of delete or update keyword"). More details on that later.
+#### @Option
+
+Can be used to create custom annotations, that can be used to define aggregate rules (e.g. "requires the list keyword or any of delete or update keyword"). More details on that later.
 
 Note: all methods by will have at least the method name as a keyword. (e.g. "withName()")
 
 #### @All
 
-Can be used on any method to express it dependency on a group of keywords (as "requires all of the specified keywords"). 
+Can be used on any method to express it dependency on a group of keywords (as "requires all of the specified annotations, keywords, methods"). 
 
 #### @Any
 
-Can be used on any method to express it dependency on a group of keywords (as "requires any of the specified keywords").
+Can be used on any method to express it dependency on a group of keywords (as "requires any of the specified annotations, keywords, methods").
 
 #### @None
 
-Can be used on any method to express it dependency on a group of keywords (as "conflicts with all of the specified keywords").
+Can be used on any method to express it dependency on a group of keywords (as "conflicts with all of the specified annotations, keywords, methods").
 
 #### @Only
 
-Can be used on any method to express it dependency on a group of keywords (as "compatible only with the specified keywords").
+Can be used on any method to express it dependency on a group of keywords (as "compatible only with the specified annotations, keywords, methods").
 
 
 #### @Or
@@ -150,7 +152,7 @@ A scope is treated as a single interface (also is implemented like one) that has
         
         @Multiple                               //Can occur multiple times
         @Begin("Filter")                        //Begins a new scope
-        @All(keywords="query()")                //Requires "query()" method
+        @All(methods="query")                   //Requires "query()" method
         void withNewFilter();
         
         @All(keywords="Filter")                 //Can only be used inside the scope
@@ -160,15 +162,13 @@ A scope is treated as a single interface (also is implemented like one) that has
         void withValue(String key);
               
         @Terminal
-        @All(keywords="query()")                 //Requires a method that provides: "Query" keyword
+        @All(methods="query")                 //Requires a method that provides: "Query" keyword
         List<Entity> list();      
     }    
 
 
 Regardless of the style of prefernce (e.g. method names, keywords or annotations) on thing remain the same: "You define on each methods its requirements". In other words you always define what the previous steps should or should not be.
 There are times though tha
-
-
 
 The [Curator DSL Example](../examples/curator/src/main/java/io/sundr/examples/curator/CuratorDsl.java) is using the string style.
 

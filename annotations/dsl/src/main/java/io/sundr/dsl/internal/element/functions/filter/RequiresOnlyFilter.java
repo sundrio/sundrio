@@ -16,9 +16,14 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import io.sundr.codegen.model.JavaType;
+
+import java.util.Collection;
 import java.util.Set;
+
+import static io.sundr.dsl.internal.utils.GraphUtils.getClasses;
+import static io.sundr.dsl.internal.utils.GraphUtils.getKeywords;
+import static io.sundr.dsl.internal.utils.GraphUtils.getMethods;
 
 /**
  * Function that determines if a set of visited keywords contains ALL of the specified requirements.
@@ -27,36 +32,62 @@ public class RequiresOnlyFilter implements TransitionFilter {
 
     private final Boolean explicit;
     private final Boolean orNone;
+
+    private final Set<String> classes;
     private final Set<String> keywords;
+    private final Set<String> methods;
+
     private final TransitionFilter filter;
 
-    public RequiresOnlyFilter(Boolean explicit, Boolean orNone, Set<String> keywords) {
+    public RequiresOnlyFilter(Set<String> classes, Set<String> keywords, Set<String> methods, Boolean explicit, Boolean orNone) {
+        this.classes = classes;
+        this.keywords = keywords;
+        this.methods = methods;
         this.explicit = explicit;
         this.orNone = orNone;
-        this.keywords = keywords;
         this.filter = orNone
-                ? new OrTransitionFilter(new RequiresNoneOfFilter(), new RequiresAnyFilter(keywords))
-                : new RequiresAnyFilter(keywords);
+                ? new OrTransitionFilter(new RequiresNoneOfFilter(classes, keywords, methods), new RequiresAnyFilter(classes, keywords, methods))
+                : new RequiresAnyFilter(classes, keywords, methods);
     }
 
-    public RequiresOnlyFilter(Boolean explicit, Boolean orNone, String... keywords) {
-        this(explicit, orNone, new HashSet<String>(Arrays.asList(keywords)));
-    }
+    public Boolean apply(Collection<JavaType> items) {
+        Set<String> pathClasses = getClasses(items);
+        Set<String> pathKeywords = getKeywords(items);
+        Set<String> pathMethods = getMethods(items);
 
-    public Boolean apply(Set<String> path) {
-        if (!keywords.isEmpty()) {
+        if (!classes.isEmpty()) {
             //Check that there is nothing undefined in the path.
-            for (String keyword : path) {
-                if (!keywords.contains(keyword)) {
+            for (String c : pathClasses) {
+                if (!classes.contains(c)) {
                     return false;
                 }
             }
-            //Check that the requirements are met.
-            return filter.apply(path);
+        }
+
+        if (!keywords.isEmpty()) {
+            //Check that there is nothing undefined in the path.
+            for (String k : pathKeywords) {
+                if (!keywords.contains(k)) {
+                    return false;
+                }
+            }
+        }
+
+        if (!methods.isEmpty()) {
+            //Check that there is nothing undefined in the path.
+            for (String m : pathMethods) {
+                if (!methods.contains(m)) {
+                    return false;
+                }
+            }
+        }
+
+        if (!classes.isEmpty() || !keywords.isEmpty() || !methods.isEmpty()) {
+            return filter.apply(items);
         } else if (!explicit) {
             return true;
         } else {
-            return path.isEmpty();
+            return pathClasses.isEmpty() && pathKeywords.isEmpty() && pathMethods.isEmpty();
         }
     }
 }

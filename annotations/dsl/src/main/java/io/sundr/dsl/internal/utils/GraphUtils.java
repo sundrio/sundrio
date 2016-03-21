@@ -34,7 +34,9 @@ import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.END_SCOPE;
 import static io.sundr.dsl.internal.Constants.FILTER;
+import static io.sundr.dsl.internal.Constants.CLASSES;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
+import static io.sundr.dsl.internal.Constants.METHODS;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
 import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
 
@@ -76,7 +78,16 @@ public final class GraphUtils {
             //We only accept repetition of the last element. Other wise we can end up in infinite loops
             return false;
         }
-        return filter.apply(visitedKeywords);
+        return filter.apply(path);
+    }
+
+    public static Set<String> getClasses(Collection<JavaType> types) {
+        Set<String> result = new LinkedHashSet<String>();
+        for (JavaType type : types) {
+            Set<String> classes = (Set<String>) type.getAttributes().get(CLASSES);
+            result.addAll(classes != null ? classes : Collections.<String>emptySet());
+        }
+        return result;
     }
 
     public static Set<String> getKeywords(Collection<JavaType> types) {
@@ -84,6 +95,15 @@ public final class GraphUtils {
         for (JavaType type : types) {
             Set<String> keywords = (Set<String>) type.getAttributes().get(KEYWORDS);
             result.addAll(keywords != null ? keywords : Collections.<String>emptySet());
+        }
+        return result;
+    }
+
+    public static Set<String> getMethods(Collection<JavaType> types) {
+        Set<String> result = new LinkedHashSet<String>();
+        for (JavaType type : types) {
+            Set<String> methods = (Set<String>) type.getAttributes().get(METHODS);
+            result.addAll(methods != null ? methods : Collections.<String>emptySet());
         }
         return result;
     }

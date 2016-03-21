@@ -27,5 +27,6 @@ import java.lang.annotation.Target;
 public @interface Only {
     Class<? extends Annotation>[] value() default {};
     String[] keywords() default {};
+    String[] methods() default {};
     boolean orNone() default false;
 }

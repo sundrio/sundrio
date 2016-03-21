@@ -28,7 +28,9 @@ public final class Constants {
     public static final String IS_ENTRYPOINT = "IS_ENTRYPOINT";
     public static final String IS_TERMINAL = "IS_TERMINAL";
     public static final String IS_GENERIC = "IS_GENERIC";
+    public static final String CLASSES = "CLASSES";
     public static final String KEYWORDS = "KEYWORDS";
+    public static final String METHODS = "METHODS";
     public static final String BEGIN_SCOPE = "BEGIN_SCOPE";
     public static final String END_SCOPE = "END_SCOPE";
     public static final String IS_COMPOSITE = "IS_COMPOSITE";

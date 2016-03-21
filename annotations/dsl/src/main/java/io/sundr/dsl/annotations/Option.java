@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,8 +21,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+/**
+ * An annotation to specify that the current annotation is using for transition filtering.
+ */
+@Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.SOURCE)
-public @interface Transition {
-
+public @interface Option {
 }

@@ -16,57 +16,21 @@
 
 package io.sundr.dsl.internal.element.functions;
 
-import io.sundr.Function;
 import io.sundr.dsl.annotations.All;
 import io.sundr.dsl.internal.element.functions.filter.RequiresAllFilter;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
 
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToRequiresAll implements Function<Element, TransitionFilter> {
-
-    private final TypeElement ALL;
-    private final Element CLASSES_VALUE;
-    private final Element KEYWORDS_VALUE;
+public class ToRequiresAll extends KeywordsAndMethodsToFilter {
 
     public ToRequiresAll(Elements elements) {
-        ALL = elements.getTypeElement(All.class.getCanonicalName());
-        CLASSES_VALUE = ALL.getEnclosedElements().get(0);
-        KEYWORDS_VALUE = ALL.getEnclosedElements().get(1);
+        super(elements, All.class.getCanonicalName());
     }
 
-    public TransitionFilter apply(Element element) {
-        Set<String> keywords = new LinkedHashSet<String>();
-        for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
-            if (mirror.getAnnotationType().asElement().equals(ALL)) {
-                if (mirror.getElementValues().containsKey(CLASSES_VALUE)) {
-                    keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(CLASSES_VALUE).getValue()));
-                }
-
-                if (mirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
-                    keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
-                }
-            }
-
-            //Also look for use on custom annotations
-            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(ALL)) {
-                    if (innerMirror.getElementValues().containsKey(CLASSES_VALUE)) {
-                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(CLASSES_VALUE).getValue()));
-                    }
-
-                    if (innerMirror.getElementValues().containsKey(KEYWORDS_VALUE)) {
-                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(KEYWORDS_VALUE).getValue()));
-                    }
-                }
-            }
-        }
-        return new RequiresAllFilter(keywords);
+    @Override
+    public TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods) {
+        return new RequiresAllFilter(classes, keywords, methods);
     }
 }
