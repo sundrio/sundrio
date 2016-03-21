@@ -44,7 +44,7 @@ public class RequiresOnlyFilter implements TransitionFilter {
         this.methods = methods;
         this.explicit = explicit;
         this.filter = orNone
-                ? new OrTransitionFilter(new RequiresNoneOfFilter(classes, keywords, methods), new RequiresAnyFilter(classes, keywords, methods))
+                ? new OrTransitionFilter(new RequiresNoneFilter(), new RequiresAnyFilter(classes, keywords, methods))
                 : new RequiresAnyFilter(classes, keywords, methods);
     }
 

@@ -54,10 +54,10 @@ public class ToRequiresOnly extends KeywordsAndMethodsToFilter {
                 //Also look for use on custom annotations
                 for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
                     if (innerMirror.getAnnotationType().asElement().equals(ELEMENT)) {
-                        addToSet(mirror, CLASSES_VALUE, classes);
-                        addToSet(mirror, KEYWORDS_VALUE, keywords);
-                        addToSet(mirror, METHODS_VALUE, methods);
-                        orNone = getBoolean(mirror, OR_NONE_VALUE);
+                        addToSet(innerMirror, CLASSES_VALUE, classes);
+                        addToSet(innerMirror, KEYWORDS_VALUE, keywords);
+                        addToSet(innerMirror, METHODS_VALUE, methods);
+                        orNone = getBoolean(innerMirror, OR_NONE_VALUE);
                     }
                 }
         }

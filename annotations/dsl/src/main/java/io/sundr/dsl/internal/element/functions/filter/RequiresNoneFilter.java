@@ -35,7 +35,8 @@ public class RequiresNoneFilter implements TransitionFilter {
         Set<String> pathKeywords = getKeywords(items);
         Set<String> pathMethods = getMethods(items);
 
-        return pathClasses.isEmpty() && pathKeywords.isEmpty() && pathMethods.isEmpty();
+        //methods can't be empty as there will always be at least the entry point
+        return pathClasses.isEmpty() && pathKeywords.isEmpty() && pathMethods.size() < 2;
 
     }
 
