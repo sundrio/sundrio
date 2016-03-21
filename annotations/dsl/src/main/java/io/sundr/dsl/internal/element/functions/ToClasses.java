@@ -24,6 +24,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public class ToClasses implements Function<Element, Set<String>> {
     }
 
     public Set<String> apply(Element element) {
-        Set<String> classes = new LinkedHashSet<String>();
+        Set<String> classes = new HashSet<String>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
                 if (innerMirror.getAnnotationType().asElement().equals(OPTION)) {

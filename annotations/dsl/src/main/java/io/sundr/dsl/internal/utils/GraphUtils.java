@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.EmptyStackException;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,28 +83,34 @@ public final class GraphUtils {
     }
 
     public static Set<String> getClasses(Collection<JavaType> types) {
-        Set<String> result = new LinkedHashSet<String>();
+        Set<String> result = new HashSet<String>();
         for (JavaType type : types) {
             Set<String> classes = (Set<String>) type.getAttributes().get(CLASSES);
-            result.addAll(classes != null ? classes : Collections.<String>emptySet());
+            if (classes != null) {
+                result.addAll(classes);
+            }
         }
         return result;
     }
 
     public static Set<String> getKeywords(Collection<JavaType> types) {
-        Set<String> result = new LinkedHashSet<String>();
+        Set<String> result = new HashSet<String>();
         for (JavaType type : types) {
             Set<String> keywords = (Set<String>) type.getAttributes().get(KEYWORDS);
-            result.addAll(keywords != null ? keywords : Collections.<String>emptySet());
+            if (keywords != null) {
+                result.addAll(keywords);
+            }
         }
         return result;
     }
 
     public static Set<String> getMethods(Collection<JavaType> types) {
-        Set<String> result = new LinkedHashSet<String>();
+        Set<String> result = new HashSet<String>();
         for (JavaType type : types) {
             Set<String> methods = (Set<String>) type.getAttributes().get(METHODS);
-            result.addAll(methods != null ? methods : Collections.<String>emptySet());
+            if (methods != null) {
+                result.addAll(methods);
+            }
         }
         return result;
     }

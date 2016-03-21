@@ -18,21 +18,14 @@ package io.sundr.dsl.internal.element.functions.filter;
 
 import io.sundr.codegen.model.JavaType;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public class OrTransitionFilter implements TransitionFilter {
 
-    private final Set<TransitionFilter> filters;
-
-    public OrTransitionFilter(Set<TransitionFilter> filters) {
-        this.filters = filters;
-    }
+    private final TransitionFilter[] filters;
 
     public OrTransitionFilter(TransitionFilter... filters) {
-        this.filters = new HashSet<TransitionFilter>(Arrays.asList(filters));
+        this.filters = filters;
     }
 
     public Boolean apply(Collection<JavaType> items) {

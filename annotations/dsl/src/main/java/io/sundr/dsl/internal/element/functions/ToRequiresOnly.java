@@ -23,7 +23,7 @@ import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.Elements;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ToRequiresOnly extends KeywordsAndMethodsToFilter {
@@ -36,9 +36,9 @@ public class ToRequiresOnly extends KeywordsAndMethodsToFilter {
     }
 
     public TransitionFilter apply(Element element) {
-        Set<String> classes = new LinkedHashSet<String>();
-        Set<String> keywords = new LinkedHashSet<String>();
-        Set<String> methods = new LinkedHashSet<String>();
+        Set<String> classes = new HashSet<String>();
+        Set<String> keywords = new HashSet<String>();
+        Set<String> methods = new HashSet<String>();
         Boolean explicit = false;
         Boolean orNone = false;
 

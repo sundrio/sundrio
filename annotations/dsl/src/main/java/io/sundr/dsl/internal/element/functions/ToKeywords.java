@@ -24,6 +24,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -39,7 +40,7 @@ public class ToKeywords implements Function<Element, Set<String>> {
     }
 
     public Set<String> apply(Element element) {
-        Set<String> keywords = new LinkedHashSet<String>();
+        Set<String> keywords = new HashSet<String>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(KEYWORD)) {
                 keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(VALUE).getValue()));

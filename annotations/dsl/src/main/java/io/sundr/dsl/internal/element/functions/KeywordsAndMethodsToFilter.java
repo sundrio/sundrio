@@ -24,6 +24,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -44,9 +45,9 @@ public abstract class KeywordsAndMethodsToFilter implements Function<Element, Tr
     }
 
     public TransitionFilter apply(Element element) {
-        Set<String> classes = new LinkedHashSet<String>();
-        Set<String> keywords = new LinkedHashSet<String>();
-        Set<String> methods = new LinkedHashSet<String>();
+        Set<String> classes = new HashSet<String>();
+        Set<String> keywords = new HashSet<String>();
+        Set<String> methods = new HashSet<String>();
 
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(ELEMENT)) {
