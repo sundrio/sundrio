@@ -156,10 +156,10 @@ public class JavaType extends AttributeSupport implements Type {
             return true;
         }
 
-        if (packageName == null && "java.lang".equals(o.packageName) && className.toLowerCase().equals(o.className.toLowerCase())) {
+        if (packageName == null && "java.lang".equals(o.packageName) && className.equalsIgnoreCase(o.className)) {
             return true;
         }
-        if (o.packageName == null &&  "java.lang".equals(packageName) && className.toLowerCase().equals(o.className.toLowerCase())) {
+        if (o.packageName == null &&  "java.lang".equals(packageName) && className.equalsIgnoreCase(o.className)) {
             return true;
         }
 

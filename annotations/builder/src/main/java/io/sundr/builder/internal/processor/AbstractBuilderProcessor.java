@@ -38,6 +38,7 @@ import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.BOXED_VOID;
+import static io.sundr.builder.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
@@ -118,14 +119,14 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
         JavaProperty builderProperty = new JavaPropertyBuilder()
                 .withType(TypeAs.BUILDER.apply(type))
-                .withName("builder")
+                .withName(BUILDER)
                 .addToModifiers(Modifier.PRIVATE)
                 .addToModifiers(Modifier.FINAL)
                 .build();
 
         JavaProperty functionProperty = new JavaPropertyBuilder()
                 .withType(functionType)
-                .withName("function")
+                .withName(FUNCTION)
                 .addToModifiers(Modifier.PRIVATE)
                 .addToModifiers(Modifier.FINAL)
                 .build();
@@ -151,58 +152,58 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         JavaMethod inlineMethod = new JavaMethodBuilder()
                 .withReturnType(returnType)
                 .withName(inline.value())
-                .addToAttributes(BODY, " return function.apply(builder.build());")
+                .addToAttributes(BODY, BUILD_AND_APPLY_FUNCTION)
                 .addToModifiers(Modifier.PUBLIC)
                 .build();
 
 
         constructors.add(new JavaMethodBuilder()
                 .withReturnType(inlineType)
-                .withName("")
+                .withName(EMPTY)
                 .addNewArgument()
-                    .withName("function")
+                    .withName(FUNCTION)
                     .withType(functionType)
                 .and()
                 .addToModifiers(Modifier.PUBLIC)
-                .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this);this.function=function;")
+                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getSimpleName()))
                 .build());
 
         constructors.add(new JavaMethodBuilder()
                 .withReturnType(inlineType)
-                .withName("")
+                .withName(EMPTY)
                 .addNewArgument()
-                .withName("item")
+                .withName(ITEM)
                 .withType(type)
                 .and()
                 .addNewArgument()
-                .withName("function")
+                .withName(FUNCTION)
                 .withType(functionType)
                 .and()
                 .addToModifiers(Modifier.PUBLIC)
-                .addToAttributes(BODY, "this.builder=new "+builderType.getSimpleName()+"(this, item);this.function=function;")
+                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getSimpleName()))
                 .build());
 
         if (clazz.getType().equals(returnType)) {
             constructors.add(new JavaMethodBuilder()
                     .withReturnType(inlineType)
-                    .withName("")
+                    .withName(EMPTY)
                     .addNewArgument()
-                    .withName("function")
+                    .withName(FUNCTION)
                     .withType(functionType)
                     .and()
                     .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, "this.builder=new " + builderType.getSimpleName() + "(this);this.function=new " + String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName()) + ";")
+                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName())))
                     .build());
 
             constructors.add(new JavaMethodBuilder()
                     .withReturnType(inlineType)
-                    .withName("")
+                    .withName(EMPTY)
                     .addNewArgument()
-                    .withName("item")
+                    .withName(ITEM)
                     .withType(type)
                     .and()
                     .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, "this.builder=new " + builderType.getSimpleName() + "(this, item);this.function=new " + String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName()) + ";")
+                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName())))
                     .build());
         }
 
@@ -215,4 +216,14 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     }
 
     private static final String EMPTY_FUNCTION_TEXT = loadResourceQuietly(EMPTY_FUNCTION_SNIPPET);
+
+    private static final String BUILDER = "builder";
+    private static final String FUNCTION = "function";
+    private static final String ITEM = "item";
+
+    private static final String NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT = "this.builder=new %s(this, item);this.function=new %s;";
+    private static final String NEW_BULDER_AND_SET_FUNCTION_FORMAT = "this.builder=new %s(this);this.function=function;";
+    private static final String BUILD_AND_APPLY_FUNCTION = " return function.apply(builder.build());";
+
+
 }

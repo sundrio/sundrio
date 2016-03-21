@@ -83,8 +83,7 @@ public class NodeContext {
         }
 
         public NodeContext build() {
-            NodeContext nodeContext = new NodeContext(item, path, visited, all);
-            return nodeContext;
+            return new NodeContext(item, path, visited, all);
         }
     }
 

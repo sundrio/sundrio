@@ -31,7 +31,6 @@ import static io.sundr.dsl.internal.utils.GraphUtils.getMethods;
 public class RequiresOnlyFilter implements TransitionFilter {
 
     private final Boolean explicit;
-    private final Boolean orNone;
 
     private final Set<String> classes;
     private final Set<String> keywords;
@@ -44,7 +43,6 @@ public class RequiresOnlyFilter implements TransitionFilter {
         this.keywords = keywords;
         this.methods = methods;
         this.explicit = explicit;
-        this.orNone = orNone;
         this.filter = orNone
                 ? new OrTransitionFilter(new RequiresNoneOfFilter(classes, keywords, methods), new RequiresAnyFilter(classes, keywords, methods))
                 : new RequiresAnyFilter(classes, keywords, methods);

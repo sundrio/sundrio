@@ -35,10 +35,26 @@ import static io.sundr.codegen.utils.StringUtils.join;
 public class ClassDirective extends Directive {
 
     private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
+    private static final String MEMBER_OF = "MEMBER_OF";
+    private static final String EXTENDS = " extends ";
+    private static final String IMPLEMENTS = " implements ";
+    private static final String PUBLIC = "public ";
+    private static final String CLASS = "class";
+    private static final String SPACE = " ";
+    private static final String COMMA = ",";
+    private static final String NEWLINE = "\n";
+    private static final String BRACKETS_LR = "[]";
+
+    private static final String SQUIGGLE_L = "{";
+    private static final String SQUIGGLE_R = "}";
+
+    private static final String LT = "<";
+    private static final String GT = ">";
+
 
     @Override
     public String getName() {
-        return "class";
+        return CLASS;
     }
 
     @Override
@@ -80,39 +96,37 @@ public class ClassDirective extends Directive {
             JavaType type = clazz.getType();
             JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
 
-            writer.append("public ").append(kind.name().toLowerCase()).append(" ");
+            writer.append(PUBLIC).append(kind.name().toLowerCase()).append(SPACE);
             writer.append(toString.apply(type));
 
             writeExtends(writer, type, toString);
             writeImplements(writer, type, toString);
 
-            writer.append("{\n");
-            writer.append(block).append("\n}\n");
+            writer.append(SQUIGGLE_L).append(NEWLINE);
+            writer.append(block).append(NEWLINE).append(SQUIGGLE_R).append(NEWLINE);
         }
     }
 
     private void writeExtends(Writer writer, JavaType type, Function<JavaType, String> toString) throws IOException {
         if (type.getKind() != JavaKind.INTERFACE) {
             if (type.getSuperClass() != null && !OBJECT_TYPE.equals(type.getSuperClass())) {
-                writer.append(" extends ").append(toString.apply(type.getSuperClass()));
+                writer.append(EXTENDS).append(toString.apply(type.getSuperClass()));
             }
         } else {
             if (type.getInterfaces().size() > 0) {
-                writer.append(" extends ").append(join(type.getInterfaces(), toString, ", "));
+                writer.append(EXTENDS).append(join(type.getInterfaces(), toString, COMMA));
             }
         }
     }
 
     private void writeImplements(Writer writer, JavaType type, Function<JavaType, String> toString) throws IOException {
-        if (type.getKind() != JavaKind.INTERFACE) {
-            if (type.getInterfaces().size() > 0) {
-                writer.append(" implements ").append(join(type.getInterfaces(), toString, ", "));
+        if (type.getKind() != JavaKind.INTERFACE && type.getInterfaces().size() > 0) {
+                writer.append(IMPLEMENTS).append(join(type.getInterfaces(), toString, COMMA));
             }
-        }
     }
 
     private static JavaType getEnclosingType(JavaClazz clazz) {
-        Object obj = clazz.getAttributes().get("MEMBER_OF");
+        Object obj = clazz.getAttributes().get(MEMBER_OF);
         if (obj instanceof JavaType) {
             return (JavaType) obj;
         } else {
@@ -122,7 +136,7 @@ public class ClassDirective extends Directive {
 
 
     //Enum Singleton
-    private class JavaTypeToString implements Function<JavaType, String> {
+    private static class JavaTypeToString implements Function<JavaType, String> {
 
         private final JavaType enclosingType;
 
@@ -138,13 +152,13 @@ public class ClassDirective extends Directive {
                 sb.append(item.getFullyQualifiedName());
             } else sb.append(item.getClassName());
             if (item.isArray()) {
-                sb.append("[]");
+                sb.append(BRACKETS_LR);
             }
             if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
-                sb.append(" extends " + apply(item.getSuperClass()));
+                sb.append(EXTENDS).append(apply(item.getSuperClass()));
             }
             if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
-                sb.append("<").append(join(item.getGenericTypes(), this, ",")).append(">");
+                sb.append(LT).append(join(item.getGenericTypes(), this, COMMA)).append(GT);
             }
             return sb.toString();
         }
