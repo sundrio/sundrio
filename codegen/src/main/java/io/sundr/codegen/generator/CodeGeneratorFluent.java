@@ -17,7 +17,6 @@
 package io.sundr.codegen.generator;
 
 import io.sundr.builder.Fluent;
-import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
@@ -28,29 +27,22 @@ import java.util.Set;
 
 
 public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> implements Fluent<T> {
-    private VelocityEngine engine;
+    private CodeGeneratorContext context;
+    private M model;
+    private Writer writer;
+    private String templateResource;
+    private URL templateUrl;
+    private Set<Class<? extends org.apache.velocity.runtime.directive.Directive>> directives = new LinkedHashSet();
 
-    public T withEngine(VelocityEngine engine) {
-        this.engine = engine;
-        return (T) this;
-    }
 
-    public VelocityEngine getEngine() {
-        return this.engine;
-    }
-
-    private VelocityContext context;
-
-    public T withContext(VelocityContext context) {
+    public T withContext(CodeGeneratorContext context) {
         this.context = context;
         return (T) this;
     }
 
-    public VelocityContext getContext() {
+    public CodeGeneratorContext getContext() {
         return this.context;
     }
-
-    private Writer writer;
 
     public T withWriter(Writer writer) {
         this.writer = writer;
@@ -61,7 +53,7 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
         return this.writer;
     }
 
-    private M model;
+
 
     public T withModel(M model) {
         this.model = model;
@@ -72,7 +64,7 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
         return this.model;
     }
 
-    private String templateResource;
+
 
     public T withTemplateResource(String templateResource) {
         this.templateResource = templateResource;
@@ -84,7 +76,7 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
     }
 
 
-    private URL templateUrl;
+
 
     public T withTemplateUrl(URL templateUrl) {
         this.templateUrl = templateUrl;
@@ -95,8 +87,6 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
         return this.templateUrl;
     }
 
-
-    private Set<Class<? extends org.apache.velocity.runtime.directive.Directive>> directives = new LinkedHashSet();
 
     public T withDirectives(Set directives) {
         this.directives = directives;

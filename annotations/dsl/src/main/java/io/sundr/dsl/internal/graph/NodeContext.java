@@ -24,6 +24,7 @@ import io.sundr.dsl.internal.utils.JavaTypeUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class NodeContext {
     public static class Builder {
         private JavaClazz item;
         private List<JavaClazz> path = new ArrayList<JavaClazz>();
-        private Set<JavaClazz> visited = new LinkedHashSet<JavaClazz>();
+        private Set<JavaClazz> visited = new HashSet<JavaClazz>();
         private Set<JavaClazz> all = new LinkedHashSet<JavaClazz>();
 
         public Builder withItem(JavaClazz item) {
@@ -64,14 +65,14 @@ public class NodeContext {
         }
 
         public Builder addToVisited(JavaClazz clazz) {
-            Set<JavaClazz> newVisited = new LinkedHashSet<JavaClazz>(visited);
+            Set<JavaClazz> newVisited = new HashSet<JavaClazz>(visited);
             newVisited.add(clazz);
             this.visited = newVisited;
             return this;
         }
 
         public Builder addToVisited(Collection<JavaClazz> clazzes) {
-            Set<JavaClazz> newVisited = new LinkedHashSet<JavaClazz>(visited);
+            Set<JavaClazz> newVisited = new HashSet<JavaClazz>(visited);
             newVisited.addAll(clazzes);
             this.visited = newVisited;
             return this;
@@ -83,8 +84,7 @@ public class NodeContext {
         }
 
         public NodeContext build() {
-            NodeContext nodeContext = new NodeContext(item, path, visited, all);
-            return nodeContext;
+            return new NodeContext(item, path, visited, all);
         }
     }
 
@@ -120,7 +120,7 @@ public class NodeContext {
     }
 
     public Set<JavaType> getVisitedTypes() {
-        Set<JavaType> visitedTypes = new LinkedHashSet<JavaType>();
+        Set<JavaType> visitedTypes = new HashSet<JavaType>();
         for (JavaClazz c : visited) {
             visitedTypes.add(c.getType());
         }
@@ -138,19 +138,19 @@ public class NodeContext {
     public Builder but() {
         return builder().withItem(item)
                 .withPath(new ArrayList<JavaClazz>(path))
-                .withVisited(new LinkedHashSet<JavaClazz>(visited))
-                .withAll(new LinkedHashSet<JavaClazz>(all));
+                .withVisited(new HashSet<JavaClazz>(visited))
+                .withAll(new HashSet<JavaClazz>(all));
     }
 
     public Builder contextOfChild(JavaClazz child) {
         if (JavaTypeUtils.isBeginScope(child)) {
-            return builder().withItem(child).withAll(new LinkedHashSet<JavaClazz>(all));
+            return builder().withItem(child).withAll(new HashSet<JavaClazz>(all));
         }
 
         return but().withItem(child)
                 .withPath(new ArrayList<JavaClazz>(path))
                 .addToPath(item)
-                .withVisited(new LinkedHashSet<JavaClazz>(visited))
+                .withVisited(new HashSet<JavaClazz>(visited))
                 .addToVisited(item)
                 .withAll(new LinkedHashSet<JavaClazz>(all));
     }

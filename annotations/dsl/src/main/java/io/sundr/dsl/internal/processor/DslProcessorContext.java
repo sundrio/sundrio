@@ -22,6 +22,7 @@ import io.sundr.codegen.converters.StringToJavaType;
 import io.sundr.codegen.converters.VariableElementToJavaProperty;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.dsl.internal.element.functions.ToClasses;
 import io.sundr.dsl.internal.element.functions.ToKeywords;
 import io.sundr.dsl.internal.element.functions.ToRequiresAll;
 import io.sundr.dsl.internal.element.functions.ToRequiresAny;
@@ -52,6 +53,7 @@ public class DslProcessorContext {
     private final ToRequiresNoneOf toRequiresNoneOf;
     private final ToRequiresOnly toRequiresOnly;
     private final ToKeywords toKeywords;
+    private final ToClasses toClasses;
     private final ToNext toNext;
     private final ToTree toTree;
     private final ToTransition toTranstion;
@@ -77,6 +79,7 @@ public class DslProcessorContext {
         this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
         this.toRequiresOnly = new ToRequiresOnly(elements);
         this.toKeywords = new ToKeywords(elements);
+        this.toClasses = new ToClasses(elements);
         this.toNext = new ToNext();
         this.toTree = new ToTree(toNext, nodeRepository);
         this.toGraph = new ToGraph(toTree);
@@ -117,6 +120,10 @@ public class DslProcessorContext {
 
     public ToKeywords getToKeywords() {
         return toKeywords;
+    }
+
+    public ToClasses getToClasses() {
+        return toClasses;
     }
 
     public ToNext getToNext() {

@@ -32,6 +32,6 @@ public class CodeGeneratorBuilder<M> extends CodeGeneratorFluent<M, CodeGenerato
     }
     
     public CodeGenerator build() {
-       return new CodeGenerator( getModel(), getWriter(), getTemplateUrl(), getTemplateResource(), getDirectives() );
+       return new CodeGenerator(getContext(),  getModel(), getWriter(), getTemplateUrl(), getTemplateResource(), getDirectives() );
     }
 }

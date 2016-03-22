@@ -43,18 +43,18 @@ public interface CuratorDsl {
     void config();
 
     @InterfaceName("Leavable")
-    @Any(keywords = "reconfig()")
-    @None(keywords = "withMembers()")
+    @Any(methods = "reconfig")
+    @None(methods = "withMembers")
     void leaving(String... server);
 
     @InterfaceName("Joinable")
-    @Any(keywords = "reconfig()")
-    @None(keywords = "withMembers()")
+    @Any(methods = "reconfig")
+    @None(methods = "withMembers")
     void joining(String... server);
 
     @InterfaceName("Memberable")
-    @Any(keywords = "reconfig()")
-    @None(keywords = {"joining()", "leaving()"})
+    @Any(methods = "reconfig")
+    @None(methods = {"joining", "leaving"})
     void withMembers(String... server);
 
     @InterfaceName("Backgroundable")
@@ -69,26 +69,26 @@ public interface CuratorDsl {
     @InterfaceName("Watchable")
     void watched();
 
-    @Any(keywords = {"getData()", "setData()"})
+    @Any(methods = {"getData", "setData"})
     @InterfaceName("Statable")
     void storingStatIn(String stat);
 
-    @Any(keywords = "config()")
+    @Any(methods = "config")
     @InterfaceName("Configurable")
     void fromConfig(Long config);
     
     @Terminal
     @InterfaceName("Ensemblable")
-    @Any(keywords = {"reconfig()", "config()"})
+    @Any(methods = {"reconfig", "config"})
     byte[] forEnsemble();
 
     @Terminal
     @InterfaceName("Pathable")
-    @Any(keywords = {"getData()", "setData()"})
+    @Any(methods = {"getData", "setData"})
     String forPath(String path);
 
     @Terminal
     @InterfaceName("PathAndBytesable")
-    @Any(keywords = {"getData()", "setData()"})
+    @Any(methods = {"getData", "setData"})
     void forPath(String path, byte[] bytes);
 }

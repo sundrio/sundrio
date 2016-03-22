@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
 import io.sundr.dsl.annotations.Keyword;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
+import io.sundr.dsl.annotations.Option;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
@@ -28,36 +28,24 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ToKeywords implements Function<Element, Set<String>> {
+public class ToClasses implements Function<Element, Set<String>> {
 
-    private final TypeElement KEYWORD;
-    private final Element VALUE;
+    private final TypeElement OPTION;
 
-
-    public ToKeywords(Elements elements) {
-        KEYWORD = elements.getTypeElement(Keyword.class.getCanonicalName());
-        VALUE = KEYWORD.getEnclosedElements().get(0);
+    public ToClasses(Elements elements) {
+        OPTION = elements.getTypeElement(Option.class.getCanonicalName());
     }
 
     public Set<String> apply(Element element) {
-        Set<String> keywords = new HashSet<String>();
+        Set<String> classes = new HashSet<String>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
-            if (mirror.getAnnotationType().asElement().equals(KEYWORD)) {
-                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(VALUE).getValue()));
-            }
-
-
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(KEYWORD)) {
-                    if (innerMirror.getElementValues().containsKey(VALUE)) {
-                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(VALUE).getValue()));
-                    } else {
-                        keywords.addAll(JavaTypeUtils.toClassNames(mirror.getAnnotationType().asElement().toString()));
-                    }
+                if (innerMirror.getAnnotationType().asElement().equals(OPTION)) {
+                    classes.add(mirror.getAnnotationType().asElement().toString());
+                    continue;
                 }
             }
         }
-        return keywords;
+        return classes;
     }
-
 }

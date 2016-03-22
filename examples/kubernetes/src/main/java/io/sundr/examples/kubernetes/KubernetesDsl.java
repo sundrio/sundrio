@@ -48,91 +48,91 @@ public interface KubernetesDsl {
     @EntryPoint
     void service();
 
-    @Any(keywords = {"pod()", "replicationController()", "service()"})
+    @Any(methods = {"pod", "replicationController", "service"})
     void inNamespace(String namespace);
 
-    @Any(keywords = {"pod()", "replicationController()", "service()"})
+    @Any(methods = {"pod", "replicationController", "service"})
     void withName(String name);
 
     @Terminal
-    @Any(keywords = {"pod()", "replicationController()", "service()"})
-    @All(keywords = {"withName()", "inNamespace()"})
+    @Any(methods = {"pod", "replicationController", "service"})
+    @All(methods = {"withName", "inNamespace"})
     void delete();
 
     @Terminal
     @MethodName("list")
     @InterfaceName("ServiceListable")
-    @All(keywords = {"service()", "inNamespace()"})
-    @None(keywords = "withName()")
+    @All(methods = {"service", "inNamespace"})
+    @None(methods = "withName")
     ServiceList listServices();
 
     @Terminal
     @MethodName("list")
     @InterfaceName("PodListable")
-    @All(keywords = {"pod()", "inNamespace()"})
-    @None(keywords = "withName()")
+    @All(methods = {"pod", "inNamespace"})
+    @None(methods = "withName")
     PodList listPods();
 
     @Terminal
     @MethodName("list")
     @InterfaceName("ReplicationControllerListable")
-    @All(keywords = {"replicationController()", "inNamespace()"})
-    @None(keywords = "withName()")
+    @All(methods = {"replicationController", "inNamespace"})
+    @None(methods = "withName")
     ReplicationControllerList listReplicationControllers();
 
     @Terminal
     @MethodName("get")
     @InterfaceName("PodGettable")
-    @All(keywords = {"pod()", "withName()", "inNamespace()"})
+    @All(methods = {"pod", "withName", "inNamespace"})
     Pod getPod();
 
     @Terminal
     @MethodName("get")
     @InterfaceName("ReplicationControllerGettable")
-    @All(keywords = {"replicationController()", "withName()", "inNamespace()"})
+    @All(methods = {"replicationController", "withName", "inNamespace"})
     ReplicationController getReplicationController();
 
     @Terminal
-    @All(keywords = {"replicationController()", "withName()", "inNamespace()"})
+    @All(methods = {"replicationController", "withName", "inNamespace"})
     void scale(int replicaCount);
 
     @Terminal
     @MethodName("get")
     @InterfaceName("ServiceGettable")
-    @All(keywords = {"service()", "withName()", "inNamespace()"})
+    @All(methods = {"service", "withName", "inNamespace"})
     Service getService();
 
     @Terminal
     @MethodName("create")
     @InterfaceName("PodCreator")
-    @All(keywords = {"pod()", "withName()", "inNamespace()"})
+    @All(methods = {"pod", "withName", "inNamespace"})
     void createPod(Pod pod);
 
     @Terminal
     @MethodName("create")
     @InterfaceName("ReplicationControllerCreator")
-    @All(keywords = {"replicationController()", "withName()", "inNamespace()"})
+    @All(methods = {"replicationController", "withName", "inNamespace"})
     void createReplicationController(ReplicationController replicationController);
 
     @Terminal
     @MethodName("create")
     @InterfaceName("ServiceCreator")
-    @All(keywords = {"service()", "withName()", "inNamespace()"})
+    @All(methods = {"service", "withName", "inNamespace"})
     void createService(Service service);
 
 
     //Common Options
-    @None(keywords = "withName()")
+    @None(methods = "withName")
     @Begin("Label")
     @Multiple
     void withNewLabel();
 
-    @Keyword({"Label", "HasKey"})
+    @Keyword("Label")
     @All(keywords = "Label")
     void withKey(String key);
 
     @End("Label")
-    @All(keywords = {"Label","withKey()"})
+    @All(keywords = "Label", methods = "withKey")
     void withValue(String key);
 
 }

@@ -27,4 +27,5 @@ import java.lang.annotation.Target;
 public @interface None {
     Class<? extends Annotation>[] value() default {};
     String[] keywords() default {};
+    String[] methods() default {};
 }

@@ -26,9 +26,9 @@ import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.Begin;
 import io.sundr.dsl.annotations.End;
 import io.sundr.dsl.annotations.EntryPoint;
+import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.MethodName;
 import io.sundr.dsl.annotations.Multiple;
-import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.annotations.Or;
 import io.sundr.dsl.annotations.Terminal;
 import io.sundr.dsl.internal.element.functions.filter.AndTransitionFilter;
@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -51,7 +52,10 @@ import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
+import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
+import static io.sundr.dsl.internal.Constants.CLASSES;
 import static io.sundr.dsl.internal.Constants.END_SCOPE;
+import static io.sundr.dsl.internal.Constants.FILTER;
 import static io.sundr.dsl.internal.Constants.INTERFACE_SUFFIX;
 import static io.sundr.dsl.internal.Constants.IS_COMPOSITE;
 import static io.sundr.dsl.internal.Constants.IS_ENTRYPOINT;
@@ -59,13 +63,12 @@ import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.IS_TRANSITION;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
+import static io.sundr.dsl.internal.Constants.METHODS;
 import static io.sundr.dsl.internal.Constants.METHOD_NAME;
-import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.VOID;
-import static io.sundr.dsl.internal.Constants.FILTER;
 
 public final class JavaTypeUtils {
 
@@ -87,24 +90,24 @@ public final class JavaTypeUtils {
         Boolean isTerminal = executableElement.getAnnotation(Terminal.class) != null
                 || !isVoid(executableElement);
 
-        Set<String> keywords = new LinkedHashSet<String>();
-        Set<TransitionFilter> filters = new LinkedHashSet<TransitionFilter>();
-
-        filters.add(context.getToRequiresAll().apply(executableElement));
-        filters.add(context.getToRequiresAny().apply(executableElement));
-        filters.add(context.getToRequiresOnly().apply(executableElement));
-        filters.add(context.getToRequiresNoneOf().apply(executableElement));
+        Set<String> classes = new HashSet<String>();
+        Set<String> keywords = new HashSet<String>();
+        Set<String> methods = new HashSet<String>();
 
         TransitionFilter filter = executableElement.getAnnotation(Or.class) != null
-                ? new OrTransitionFilter(filters)
-                : new AndTransitionFilter(filters);
+                ? new OrTransitionFilter(context.getToRequiresAll().apply(executableElement), context.getToRequiresAny().apply(executableElement), context.getToRequiresOnly().apply(executableElement), context.getToRequiresNoneOf().apply(executableElement))
+                : new AndTransitionFilter(context.getToRequiresAll().apply(executableElement), context.getToRequiresAny().apply(executableElement), context.getToRequiresOnly().apply(executableElement), context.getToRequiresNoneOf().apply(executableElement));
+
+        for (String clazz : context.getToClasses().apply(executableElement)) {
+            classes.add(clazz);
+        }
 
         for (String keyword : context.getToKeywords().apply(executableElement)) {
             keywords.add(keyword);
         }
 
         //Let's add the name of the method as a keyword to make things simpler
-        keywords.add(executableElement.getSimpleName().toString()+"()");
+        methods.add(executableElement.getSimpleName().toString());
 
         JavaType returnType = null;
         if (isTerminal(executableElement)) {
@@ -151,7 +154,9 @@ public final class JavaTypeUtils {
                     .addToAttributes(IS_ENTRYPOINT, isEntryPoint)
                     .addToAttributes(IS_TERMINAL, isTerminal)
                     .addToAttributes(IS_GENERIC, Boolean.FALSE)
+                    .addToAttributes(CLASSES, classes)
                     .addToAttributes(KEYWORDS, keywords)
+                    .addToAttributes(METHODS, methods)
                     .addToAttributes(BEGIN_SCOPE, beginScope)
                     .addToAttributes(END_SCOPE, endScope)
                     .addToAttributes(FILTER, filter)

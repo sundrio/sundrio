@@ -39,6 +39,7 @@ public class Constants {
     public static final String MEMBER_OF = "MEMBER_OF";
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
     public static final String BODY = "BODY";
+    public static final String EMPTY = "";
 
     public static final JavaType I = newGeneric("I");
     public static final JavaType O = newGeneric("O");

@@ -16,31 +16,53 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import io.sundr.codegen.model.JavaType;
+
+import java.util.Collection;
 import java.util.Set;
+
+import static io.sundr.dsl.internal.utils.GraphUtils.getClasses;
+import static io.sundr.dsl.internal.utils.GraphUtils.getKeywords;
+import static io.sundr.dsl.internal.utils.GraphUtils.getMethods;
 
 /**
  * Function that determines if a set of visited keywords contains ALL of the specified requirements.
  */
 public class RequiresAnyFilter implements TransitionFilter {
 
+    private final Set<String> classes;
     private final Set<String> keywords;
+    private final Set<String> methods;
 
-    public RequiresAnyFilter(Set<String> keywords) {
+    public RequiresAnyFilter(Set<String> classes, Set<String> keywords, Set<String> methods) {
+        this.classes = classes;
         this.keywords = keywords;
+        this.methods = methods;
     }
 
-    public RequiresAnyFilter(String... keywords) {
-        this(new HashSet<String>(Arrays.asList(keywords)));
-    }
 
-    public Boolean apply(Set<String> path) {
-        for (String keyword : keywords) {
-            if (path.contains(keyword)) {
+    public Boolean apply(Collection<JavaType> items) {
+        Set<String> pathClasses = getClasses(items);
+        Set<String> pathKeywords = getKeywords(items);
+        Set<String> pathMethods = getMethods(items);
+
+        for (String c : classes) {
+            if (pathClasses.contains(c)) {
                 return true;
             }
         }
-        return keywords.isEmpty();
+
+        for (String k : keywords) {
+            if (pathKeywords.contains(k)) {
+                return true;
+            }
+        }
+
+        for (String m : methods) {
+            if (pathMethods.contains(m)) {
+                return true;
+            }
+        }
+        return classes.isEmpty() && keywords.isEmpty() && methods.isEmpty();
     }
 }
