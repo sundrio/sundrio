@@ -53,6 +53,7 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the fully qualified name of the type.
+     *
      * @return
      */
     public String getFullyQualifiedName() {
@@ -65,6 +66,7 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the simple name of the type.
+     *
      * @return
      */
     public String getSimpleName() {
@@ -73,6 +75,7 @@ public class JavaType extends AttributeSupport implements Type {
 
     /**
      * Returns the simple name of the type.
+     *
      * @return
      */
     public String getSimpleName(String suffix) {
@@ -87,7 +90,7 @@ public class JavaType extends AttributeSupport implements Type {
                     if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
                         return item.getSimpleName() + " extends " + item.getSuperClass().getSimpleName();
                     } else {
-                     return item.getSimpleName();
+                        return item.getSimpleName();
                     }
                 }
             }, ", "));
@@ -107,6 +110,7 @@ public class JavaType extends AttributeSupport implements Type {
     public JavaKind getKind() {
         return kind;
     }
+
     @Override
     public String getPackageName() {
         return packageName;
@@ -116,11 +120,12 @@ public class JavaType extends AttributeSupport implements Type {
     public String getClassName() {
         return className;
     }
+
     @Override
     public boolean isArray() {
         return array;
     }
-    
+
     @Override
     public boolean isCollection() {
         return collection;
@@ -135,7 +140,7 @@ public class JavaType extends AttributeSupport implements Type {
     public JavaType getDefaultImplementation() {
         return defaultImplementation;
     }
-    
+
     @Override
     public JavaType getSuperClass() {
         return superClass;
@@ -159,7 +164,7 @@ public class JavaType extends AttributeSupport implements Type {
         if (packageName == null && "java.lang".equals(o.packageName) && className.equalsIgnoreCase(o.className)) {
             return true;
         }
-        if (o.packageName == null &&  "java.lang".equals(packageName) && className.equalsIgnoreCase(o.className)) {
+        if (o.packageName == null && "java.lang".equals(packageName) && className.equalsIgnoreCase(o.className)) {
             return true;
         }
 
