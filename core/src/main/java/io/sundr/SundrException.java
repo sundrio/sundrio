@@ -36,9 +36,9 @@ public class SundrException extends RuntimeException {
 
     public RuntimeException launderThrowable(Throwable cause) {
         if (cause instanceof RuntimeException) {
-            return ((RuntimeException) cause);
+            return (RuntimeException) cause;
         } else if (cause instanceof Error) {
-            throw ((Error) cause);
+            throw (Error) cause;
         } else {
             throw new SundrException("An error has occurred.", cause);
         }
