@@ -142,10 +142,9 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         if (!bomDir.exists() && !bomDir.mkdirs()) {
             throw new MojoFailureException("Failed to create output dir for bom:" + bomDir.getAbsolutePath());
         }
-        preProccessConfig(config);
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(generatedBom);
+        preProccessConfig(config);        
+        try(FileWriter writer = new FileWriter(generatedBom)) {
+            
             Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
             Set<Artifact> plugins = new LinkedHashSet<Artifact>();
 
@@ -178,12 +177,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
         } catch (Exception e) {
             throw new MojoFailureException("Failed to generate bom.", e);
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException e) {
-                throw new MojoExecutionException("Failed to close the generated bom writer", e);
-            }
         }
     }
 

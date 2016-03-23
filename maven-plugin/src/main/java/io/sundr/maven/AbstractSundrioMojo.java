@@ -80,10 +80,8 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
     }
 
     MavenProject readProject(File pomFile) throws IOException {
-        MavenXpp3Reader mavenReader = new MavenXpp3Reader();
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(pomFile);
+        MavenXpp3Reader mavenReader = new MavenXpp3Reader();        
+        try(FileReader fileReader = new FileReader(pomFile)) {
             Model model = mavenReader.read(fileReader);
             model.setPomFile(pomFile);
             MavenProject project = new MavenProject(model);
@@ -92,10 +90,6 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
             return project;
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } finally {
-            if (fileReader != null) {
-                fileReader.close();
-            }
         }
     }
 
