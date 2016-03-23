@@ -17,6 +17,8 @@
 package io.sundr.maven;
 
 public class Constants {
+    
+    private Constants() {}
 
     public static final String POM_TYPE = "pom";
     public static final String MAVEN_PLUGIN_TYPE = "maven-plugin";

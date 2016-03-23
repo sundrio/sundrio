@@ -48,6 +48,8 @@ import static io.sundr.builder.Constants.SET;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 
 public class BuilderUtils {
+    
+    private BuilderUtils() {}
 
     public static final String BUILDABLE = "BUILDABLE";
 

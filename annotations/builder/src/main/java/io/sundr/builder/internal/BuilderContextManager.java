@@ -23,6 +23,8 @@ import javax.lang.model.util.Elements;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BuilderContextManager {
+    
+    private BuilderContextManager() {}
 
     private static final AtomicReference<BuilderContext> context = new AtomicReference<BuilderContext>();
 

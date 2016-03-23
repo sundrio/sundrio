@@ -27,6 +27,8 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import java.util.Arrays;
 
 public final class Merge {
+    
+    private Merge() {}
 
     public static final Function<JavaType[], JavaType> TYPES = new Function<JavaType[], JavaType>() {
         @Override
