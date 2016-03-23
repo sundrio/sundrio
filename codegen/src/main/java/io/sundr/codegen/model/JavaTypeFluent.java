@@ -100,6 +100,8 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
         if (defaultImplementation != null) {
             this.defaultImplementation = new JavaTypeBuilder(defaultImplementation);
             _visitables.add(this.defaultImplementation);
+        } else {
+            this.defaultImplementation = null;
         }
         return (T) this;
     }
@@ -124,6 +126,8 @@ public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSuppor
         if (superClass != null) {
             this.superClass = new JavaTypeBuilder(superClass);
             _visitables.add(this.superClass);
+        } else {
+            this.superClass = null;
         }
         return (T) this;
     }

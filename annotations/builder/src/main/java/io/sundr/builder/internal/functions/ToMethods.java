@@ -21,9 +21,11 @@ import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 
 import javax.lang.model.element.Modifier;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -33,6 +35,8 @@ import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstruc
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.singularize;
 
+import static io.sundr.builder.internal.functions.TypeAs.*;
+
 public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
 
    WITH_NESTED_INLINE {
@@ -41,7 +45,10 @@ public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
 
             Set<JavaMethod> result = new LinkedHashSet<JavaMethod>();
             JavaClazz clazz = PropertyAs.CLASS.apply(property);
-            
+            JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getType());
+
+            JavaType typeWithUnboundedGenerics = TypeAs.REMOVE_GENERICS_BOUNDS.apply(baseType);
+
             for (JavaMethod constructor : getInlineableConstructors(property)) {
                 String ownPrefix = property.getType().isCollection() ? "addNew" : "withNew";
                 String ownName = ownPrefix + captializeFirst(property.getType().isCollection()
@@ -63,7 +70,8 @@ public enum ToMethods implements Function<JavaProperty, Set<JavaMethod>> {
                         .withReturnType(T)
                         .withArguments(constructor.getArguments())
                         .withName(ownName)
-                        .addToAttributes(BODY, "return " + delegateName + "(new " + clazz.getType().getSimpleName() + "(" + args + "));")
+                        .withTypeParameters(baseType.getGenericTypes())
+                        .addToAttributes(BODY, "return " + delegateName + "(new " + typeWithUnboundedGenerics.getSimpleName() + "(" + args + "));")
                         .build());
             }
 

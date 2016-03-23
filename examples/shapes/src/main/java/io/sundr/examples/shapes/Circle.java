@@ -23,14 +23,13 @@ import io.sundr.builder.annotations.Inline;
         @Inline(type = Createable.class, value = "create", prefix = "Createable"),
         @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
 })
-public class Circle implements Shape{
+public class Circle<T extends Number> implements Shape {
 
     private final int x;
     private final int y;
-    private final int radius;
+    private final T radius;
 
-
-    public Circle(int x, int y, int radius) {
+    public Circle(int x, int y, T radius) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -44,7 +43,8 @@ public class Circle implements Shape{
         return y;
     }
 
-    public int getRadius() {
+    public T getRadius() {
         return radius;
     }
+
 }

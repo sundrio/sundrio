@@ -37,9 +37,12 @@ import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -78,7 +81,7 @@ public class BuilderUtils {
                 return method;
             }
         }
-        throw new SundrException("No getter found for property: " + property.getName() +" on class: " + clazz.getType().getFullyQualifiedName());
+        throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getType().getFullyQualifiedName());
     }
 
 
@@ -99,7 +102,8 @@ public class BuilderUtils {
 
     /**
      * Checks if there is a default constructor available.
-     * @param item  The clazz to check.
+     *
+     * @param item The clazz to check.
      * @return
      */
     public static boolean hasDefaultConstructor(JavaClazz item) {
@@ -134,6 +138,7 @@ public class BuilderUtils {
 
     /**
      * Find all buildable descendant equivalents of a property.
+     *
      * @param property
      * @return
      */
@@ -145,7 +150,7 @@ public class BuilderUtils {
             JavaType candidate = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
             for (JavaType descendant : BuilderUtils.getBuildableDescendants(candidate)) {
                 JavaType collectionType = new JavaTypeBuilder(baseType).withGenericTypes(new JavaType[]{descendant}).build();
-                String propertyName = deCaptializeFirst(descendant.getSimpleName()) + property.getNameCapitalized();
+                String propertyName = deCaptializeFirst(descendant.getClassName()) + property.getNameCapitalized();
                 result.add(new JavaPropertyBuilder(property)
                         .withName(propertyName)
                         .withType(collectionType)
@@ -169,7 +174,8 @@ public class BuilderUtils {
 
     /**
      * Finds all the descendants of a type that are buildable.
-     * @param item  The type.
+     *
+     * @param item The type.
      * @return
      */
     public static Set<JavaType> getBuildableDescendants(JavaType item) {
@@ -181,7 +187,8 @@ public class BuilderUtils {
         BuilderContext ctx = BuilderContextManager.getContext();
         BuildableRepository repository = ctx.getRepository();
         for (TypeElement element : repository.getBuildables()) {
-            JavaType type = ctx.getStringJavaTypeFunction().apply(element.toString());
+            JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(element);
+            JavaType type = clazz.getType();
             if (isDescendant(type, item)) {
                 result.add(type);
             }
@@ -192,8 +199,9 @@ public class BuilderUtils {
 
     /**
      * Checks if type has any descendants that are "buildable"
-     * @param item  The type.
-     * @return      true if a buildable ancestor is found.
+     *
+     * @param item The type.
+     * @return true if a buildable ancestor is found.
      */
     public static boolean hasBuildableDescendants(JavaType item) {
         if (item.getFullyQualifiedName().equals(Constants.OBJECT.getFullyQualifiedName())) {
@@ -212,9 +220,10 @@ public class BuilderUtils {
 
     /**
      * Checks if a type is an descendant of an other type
-     * @param item          The base type.
-     * @param candidate     The candidate type.
-     * @return              true if candidate is a descendant of base type.
+     *
+     * @param item      The base type.
+     * @param candidate The candidate type.
+     * @return true if candidate is a descendant of base type.
      */
     public static boolean isDescendant(JavaType item, JavaType candidate) {
         if (item == null || candidate == null) {
@@ -248,7 +257,7 @@ public class BuilderUtils {
         if (method.getArguments().length == 0 || method.getArguments().length > 5) {
             return false;
         }
-        
+
         for (JavaProperty argument : method.getArguments()) {
             if (StringUtils.isNullOrEmpty(argument.getType().getPackageName())) {
                 continue;
@@ -256,7 +265,7 @@ public class BuilderUtils {
                 continue;
             } else {
                 return false;
-            } 
+            }
         }
         return true;
     }
@@ -302,7 +311,7 @@ public class BuilderUtils {
     }
 
     public static boolean isPrimitive(JavaType type) {
-        for (JavaType t :Constants.PRIMITIVE_TYPES) {
+        for (JavaType t : Constants.PRIMITIVE_TYPES) {
             if (type.getSimpleName().equals(t.getSimpleName())) {
                 return true;
             }
@@ -348,4 +357,65 @@ public class BuilderUtils {
         }
         return false;
     }
+
+    public static JavaType getNextGeneric(JavaType type, Collection<JavaType> excluded) {
+        Set<String> skip = new HashSet<String>();
+        for (JavaType s : allGenericsOf(type)) {
+            skip.add(s.getClassName());
+        }
+
+        for (JavaType s : excluded) {
+            skip.add(s.getClassName());
+        }
+
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < GENERIC_NAMES.length; j++) {
+
+                String name = GENERIC_NAMES[j] + ((i > 0) ? String.valueOf(i) : "");
+                if (!skip.contains(name)) {
+                    return TypeUtils.newGeneric(name);
+                }
+            }
+        }
+        throw new IllegalStateException("Could not allocate generic parameter letter for: " + type.getFullyQualifiedName());
+    }
+
+    public static JavaType getNextGeneric(JavaType type, JavaType... excluded) {
+        return getNextGeneric(type, Arrays.asList(excluded));
+    }
+
+
+    public static Set<JavaType> allGenericsOf(JavaClazz clazz) {
+        Set<JavaType> result = new HashSet<JavaType>(allGenericsOf(clazz.getType()));
+
+        for (JavaProperty property : clazz.getFields()) {
+            result.addAll(allGenericsOf(property));
+        }
+
+        for (JavaMethod method : clazz.getMethods()) {
+            result.addAll(allGenericsOf(method));
+        }
+
+        return result;
+    }
+
+    public static Set<JavaType> allGenericsOf(JavaType type) {
+        return new HashSet<JavaType>(Arrays.asList(type.getGenericTypes()));
+    }
+
+    public static Collection<JavaType> allGenericsOf(JavaProperty property) {
+        return allGenericsOf(property.getType());
+    }
+
+    public static Collection<JavaType> allGenericsOf(JavaMethod method) {
+        Set<JavaType> result = new HashSet<JavaType>(allGenericsOf(method.getReturnType()));
+        for (JavaProperty property : method.getArguments()) {
+            result.addAll(allGenericsOf(property));
+
+        }
+        return result;
+    }
+
+    private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"};
+    private static int counter = 0;
 }

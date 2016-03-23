@@ -33,7 +33,9 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
@@ -103,7 +105,9 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     JavaClazz inlineableOf(BuilderContext ctx, JavaClazz clazz, Inline inline) {
         Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
         JavaType type = clazz.getType();
-        JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(type);
+
+        JavaType typeWithUnboundParameters =  TypeAs.REMOVE_GENERICS_BOUNDS.apply(clazz.getType());
+        JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(typeWithUnboundParameters);
         JavaType inlineableType = TypeAs.INLINEABLE.apply(type);
 
         if (!inline.name().isEmpty()) {
@@ -112,13 +116,13 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
         JavaType returnType = BuilderUtils.getInlineReturnType(ctx, inline);
         if (returnType.equals(BOXED_VOID)) {
-            returnType =clazz.getType();
+            returnType = typeWithUnboundParameters;
         }
 
-        JavaType functionType = typeGenericOf(ctx.getFunctionInterface().getType(), clazz.getType(), returnType);
+        JavaType functionType = typeGenericOf(ctx.getFunctionInterface().getType(), typeWithUnboundParameters, returnType);
 
         JavaProperty builderProperty = new JavaPropertyBuilder()
-                .withType(TypeAs.BUILDER.apply(type))
+                .withType(TypeAs.BUILDER.apply(typeWithUnboundParameters))
                 .withName(BUILDER)
                 .addToModifiers(Modifier.PRIVATE)
                 .addToModifiers(Modifier.FINAL)
@@ -141,12 +145,18 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
         JavaType shallowInlineType = new JavaTypeBuilder(inlineableType)
                 .withClassName(inline.prefix() + inlineableType.getClassName() + inline.suffix())
-                .addToInterfaces(baseInterface)
+                .withInterfaces(baseInterface)
                 .build();
 
+        List<JavaType> generics = new ArrayList<JavaType>();
+        for (JavaType generic : clazz.getType().getGenericTypes()) {
+            generics.add(generic);
+        }
+        generics.add(shallowInlineType);
+
         JavaType inlineType = new JavaTypeBuilder(shallowInlineType)
-                .withSuperClass(typeGenericOf(fluentImpl, shallowInlineType))
-                .addToInterfaces(typeGenericOf(fluentInterface, shallowInlineType))
+                .withSuperClass(TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(fluentImpl, generics.toArray(new JavaType[generics.size()]))))
+                .addToInterfaces(TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(fluentInterface, generics.toArray(new JavaType[generics.size()]))))
                 .build();
 
         JavaMethod inlineMethod = new JavaMethodBuilder()
@@ -158,7 +168,9 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
 
         constructors.add(new JavaMethodBuilder()
-                .withReturnType(inlineType)
+                .withNewReturnTypeLike(inlineType)
+                    .withGenericTypes()
+                .endReturnType()
                 .withName(EMPTY)
                 .addNewArgument()
                     .withName(FUNCTION)
@@ -169,11 +181,13 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .build());
 
         constructors.add(new JavaMethodBuilder()
-                .withReturnType(inlineType)
+                .withNewReturnTypeLike(inlineType)
+                    .withGenericTypes()
+                .endReturnType()
                 .withName(EMPTY)
                 .addNewArgument()
                 .withName(ITEM)
-                .withType(type)
+                .withType(typeWithUnboundParameters)
                 .and()
                 .addNewArgument()
                 .withName(FUNCTION)
@@ -185,25 +199,29 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
         if (clazz.getType().equals(returnType)) {
             constructors.add(new JavaMethodBuilder()
-                    .withReturnType(inlineType)
+                    .withNewReturnTypeLike(inlineType)
+                        .withGenericTypes()
+                    .endReturnType()
                     .withName(EMPTY)
                     .addNewArgument()
                     .withName(FUNCTION)
                     .withType(functionType)
                     .and()
                     .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName())))
+                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName())))
                     .build());
 
             constructors.add(new JavaMethodBuilder()
-                    .withReturnType(inlineType)
+                    .withNewReturnTypeLike(inlineType)
+                        .withGenericTypes()
+                    .endReturnType()
                     .withName(EMPTY)
                     .addNewArgument()
                     .withName(ITEM)
-                    .withType(type)
+                    .withType(typeWithUnboundParameters)
                     .and()
                     .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, type.getSimpleName(), type.getSimpleName(), type.getSimpleName(), type.getSimpleName())))
+                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName())))
                     .build());
         }
 

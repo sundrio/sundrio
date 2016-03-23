@@ -135,7 +135,6 @@ public class ClassDirective extends Directive {
     }
 
 
-    //Enum Singleton
     private static class JavaTypeToString implements Function<JavaType, String> {
 
         private final JavaType enclosingType;

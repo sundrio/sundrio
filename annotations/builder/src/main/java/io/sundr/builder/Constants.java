@@ -35,6 +35,7 @@ public class Constants {
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
+    public static final String REPLACEABLE = "REPLACEABLE";
     public static final String BUILDABLE = "BUILDABLE";
     public static final String MEMBER_OF = "MEMBER_OF";
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
@@ -44,7 +45,7 @@ public class Constants {
     public static final JavaType I = newGeneric("I");
     public static final JavaType O = newGeneric("O");
     public static final JavaType B = newGeneric("B");
-    public static final JavaType T = newGeneric("T");
+    public static final JavaType T = new JavaTypeBuilder(newGeneric("T")).addToAttributes(REPLACEABLE, Boolean.TRUE).build();
     public static final JavaType N = newGeneric("N");
     public static final JavaType V = newGeneric("V");
     public static final JavaType VOID = new JavaTypeBuilder().withClassName("void").build();

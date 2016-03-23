@@ -24,7 +24,7 @@ public class ShapesTest {
 
     @Test
     public void testCircleBuilder() {
-        Circle circle = new CircleBuilder().withX(0).withY(0).withRadius(10).build();
+        Circle circle = new CircleBuilder<Integer>().withX(0).withY(0).withRadius(10).build();
         Assert.assertEquals(0, circle.getX());
         Assert.assertEquals(0, circle.getY());
         Assert.assertEquals(10, circle.getRadius());
@@ -33,10 +33,10 @@ public class ShapesTest {
 
     @Test
     public void testCircleEdit() {
-        EditableCircle circle = new CircleBuilder().withX(0).withY(0).withRadius(10).build();
+        EditableCircle<Integer> circle = new CircleBuilder<Integer>().withX(0).withY(0).withRadius(10).build();
         Assert.assertEquals(0, circle.getX());
         Assert.assertEquals(0, circle.getY());
-        Assert.assertEquals(10, circle.getRadius());
+        Assert.assertEquals(10, (int) circle.getRadius());
         Circle circle2 = circle.edit().build();
         Assert.assertEquals(0, circle2.getX());
         Assert.assertEquals(0, circle2.getY());
@@ -51,11 +51,7 @@ public class ShapesTest {
     @Test
     public void testVisitor() {
         Canvas canvas = new CanvasBuilder()
-                .addNewCircleShape()
-                .withX(0)
-                .withY(0)
-                .withRadius(10)
-                .and()
+                .addNewCircleShape(0, 0, 10)
                 .addNewSquareShape()
                 .withY(10)
                 .withY(20)
@@ -63,13 +59,10 @@ public class ShapesTest {
                 .and()
                 .build();
 
-        canvas = new CanvasBuilder(canvas).accept(new Visitor() {
+        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
             @Override
-            public void visit(Object element) {
-                if (element instanceof CircleBuilder) {
-                    CircleBuilder builder = (CircleBuilder) element;
-                    builder.withRadius(100 + builder.getRadius());
-                }
+            public void visit(CircleBuilder<Integer> builder) {
+                builder.withRadius(100 + builder.getRadius());
             }
         }).build();
 
@@ -80,11 +73,7 @@ public class ShapesTest {
     @Test
     public void testTypedVisitor() {
         Canvas canvas = new CanvasBuilder()
-                .addNewCircleShape()
-                .withX(0)
-                .withY(0)
-                .withRadius(10)
-                .and()
+                .addNewCircleShape(0, 0, 10)
                 .addNewSquareShape()
                 .withY(10)
                 .withY(20)
@@ -92,10 +81,10 @@ public class ShapesTest {
                 .and()
                 .build();
 
-        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder>() {
+        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
             @Override
-            public void visit(CircleBuilder element) {
-                element.withRadius(100 + element.getRadius());
+            public void visit(CircleBuilder<Integer> builder) {
+                builder.withRadius(100 + builder.getRadius());
             }
         }).build();
 
@@ -106,7 +95,7 @@ public class ShapesTest {
     @Test
     public void testAddToWithVisitors() {
         Canvas canvas = new CanvasBuilder()
-                .addToShapes(new CircleBuilder()
+                .addToShapes(new CircleBuilder<Integer>()
                         .withX(0)
                         .withY(0)
                         .withRadius(10)
@@ -118,13 +107,10 @@ public class ShapesTest {
                         .build())
                 .build();
 
-        canvas = new CanvasBuilder(canvas).accept(new Visitor() {
+        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
             @Override
-            public void visit(Object element) {
-                if (element instanceof CircleBuilder) {
-                    CircleBuilder builder = (CircleBuilder) element;
-                    builder.withRadius(100 + builder.getRadius());
-                }
+            public void visit(CircleBuilder<Integer> builder) {
+                builder.withRadius(100 + builder.getRadius());
             }
         }).build();
 
@@ -135,7 +121,7 @@ public class ShapesTest {
     @Test
     public void testRemoveFrom() {
         Canvas canvas = new CanvasBuilder()
-                .addToShapes(new CircleBuilder()
+                .addToShapes(new CircleBuilder<Integer>()
                         .withX(0)
                         .withY(0)
                         .withRadius(10)
@@ -151,13 +137,10 @@ public class ShapesTest {
         Circle circle = (Circle) canvas.getShapes().get(0);
         canvas = new CanvasBuilder(canvas).removeFromShapes(circle).build();
 
-        canvas = new CanvasBuilder(canvas).accept(new Visitor() {
+        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
             @Override
-            public void visit(Object element) {
-                if (element instanceof CircleBuilder) {
-                    CircleBuilder builder = (CircleBuilder) element;
-                    builder.withRadius(100 + builder.getRadius());
-                }
+            public void visit(CircleBuilder<Integer> builder) {
+                builder.withRadius(100 + builder.getRadius());
             }
         }).build();
 

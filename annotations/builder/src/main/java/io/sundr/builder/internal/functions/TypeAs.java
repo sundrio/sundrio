@@ -18,8 +18,10 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.Constants;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
@@ -31,10 +33,10 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.Q;
-import static io.sundr.builder.Constants.T;
+import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 
 public enum TypeAs implements Function<JavaType, JavaType> {
 
@@ -47,17 +49,20 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            JavaType generic = typeExtends(Constants.T, fluent);
-            generics.add(generic);
+
+            JavaType generic = getNextGeneric(item, generics);
+            JavaType genericFluent = typeExtends(generic, fluent);
+            generics.add(genericFluent);
 
             JavaType superClass = isBuildable(item.getSuperClass()) ?
                     SHALLOW_FLUENT.apply(item.getSuperClass()) :
                     ctx.getBaseFluentClass().getType();
 
             Set<JavaType> interfaceTypes = new HashSet<JavaType>();
-            interfaceTypes.add(superClass);
-            interfaceTypes.add(ctx.getFluentInterface().getType());
-            interfaceTypes.remove(ctx.getBaseFluentClass().getType());
+            if (!superClass.getFullyQualifiedName().equals(ctx.getBaseFluentClass().getType().getFullyQualifiedName())) {
+                interfaceTypes.add(typeGenericOf(superClass, generic));
+            }
+            interfaceTypes.add(typeGenericOf(ctx.getFluentInterface().getType(), generic));
 
             return new JavaTypeBuilder(item)
                     .withKind(JavaKind.INTERFACE)
@@ -77,14 +82,17 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            JavaType generic = typeExtends(Constants.T, fluent);
-            generics.add(generic);
+
+            JavaType generic = getNextGeneric(item, generics);
+            JavaType genericFluent = typeExtends(generic, fluent);
+            generics.add(genericFluent);
 
             JavaType superClass = isBuildable(item.getSuperClass()) ?
-                    typeGenericOf(FLUENT_IMPL.apply(item.getSuperClass()),T) :
-                    ctx.getBaseFluentClass().getType();
+                    typeGenericOf(FLUENT_IMPL.apply(item.getSuperClass()), generic) :
+                    typeGenericOf(ctx.getBaseFluentClass().getType(), generic);
 
             return new JavaTypeBuilder(item)
+                    .withKind(JavaKind.CLASS)
                     .withClassName(item.getClassName() + "FluentImpl")
                     .withPackageName(item.getPackageName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
@@ -98,10 +106,11 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         public JavaType apply(JavaType item) {
             List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
-                generics.add(generic);
+                generics.add(REMOVE_SUPERCLASS.apply(generic));
             }
-            generics.add(Constants.T);
+            generics.add(BuilderUtils.getNextGeneric(item));
             return new JavaTypeBuilder(item)
+                    .withKind(JavaKind.INTERFACE)
                     .withClassName(item.getClassName() + "Fluent")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .build();
@@ -114,10 +123,10 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                 generics.add(generic);
             }
             generics.add(Q);
-            return new JavaTypeBuilder(item)
+            return REMOVE_GENERICS_BOUNDS.apply(new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .build();
+                    .build());
         }
     },
     BUILDER {
@@ -129,14 +138,17 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             }
             JavaType builder = SHALLOW_BUILDER.apply(item);
             generics.add(builder);
-            JavaType fluent = typeGenericOf(FLUENT_IMPL.apply(item), generics.toArray(new JavaType[generics.size()]));
+            JavaType fluent = TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(FLUENT_IMPL.apply(item), generics.toArray(new JavaType[generics.size()])));
             generics.remove(builder);
 
             return new JavaTypeBuilder(item)
+                    .withKind(JavaKind.CLASS)
                     .withClassName(item.getClassName() + "Builder")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(fluent)
-                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getVisitableBuilderInterface().getType(), item, builder))))
+                    .withInterfaces(new HashSet(Arrays.asList(
+                            TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(BuilderContextManager.getContext().getVisitableBuilderInterface().getType(), item, builder))
+                    )))
                     .build();
 
         }
@@ -148,10 +160,11 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                 generics.add(generic);
             }
             return new JavaTypeBuilder(item)
+                    .withKind(JavaKind.CLASS)
                     .withClassName("Editable" + item.getClassName())
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .withSuperClass(item)
-                    .withInterfaces(new HashSet(Arrays.asList(typeGenericOf(BuilderContextManager.getContext().getEditableInterface().getType(), SHALLOW_BUILDER.apply(item)))))
+                    .withSuperClass(REMOVE_GENERICS_BOUNDS.apply(item))
+                    .withInterfaces(new HashSet(Arrays.asList(REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(BuilderContextManager.getContext().getEditableInterface().getType(), SHALLOW_BUILDER.apply(item))))))
                     .build();
 
         }
@@ -186,19 +199,18 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             for (JavaType generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            return new JavaTypeBuilder(item)
+
+            return TypeAs.REMOVE_GENERICS_BOUNDS.apply(new JavaTypeBuilder(item)
                     .withClassName(item.getClassName() + "Builder")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .build();
+                    .build());
         }
 
     }, VISITABLE_BUILDER {
         @Override
         public JavaType apply(JavaType item) {
             JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
-         //   if (!baseType.isConcrete()) {
-         //       baseType = typeExtends(Q, baseType);
-          //  }
+            baseType = new JavaTypeBuilder(baseType).withGenericTypes().build();
             return new JavaTypeBuilder(BuilderContextManager.getContext().getVisitableBuilderInterface().getType())
                     .withGenericTypes(new JavaType[]{baseType, Q})
                     .build();
@@ -239,6 +251,28 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     }, UNWRAP_ARRAY_OF {
         public JavaType apply(JavaType type) {
             return new JavaTypeBuilder(type).withArray(false).build();
+        }
+    }, REMOVE_GENERICS {
+        public JavaType apply(JavaType type) {
+            return new JavaTypeBuilder(type).withGenericTypes().build();
+        }
+    }, REMOVE_GENERICS_BOUNDS {
+        public JavaType apply(JavaType type) {
+            return new JavaTypeBuilder(type).accept(new Visitor<JavaTypeBuilder>() {
+                public void visit(JavaTypeBuilder builder) {
+                    if (builder.getGenericTypes().length > 0) {
+                        List<JavaType> generics = new ArrayList<JavaType>();
+                        for (JavaType generic : builder.getGenericTypes()) {
+                            generics.add(REMOVE_SUPERCLASS.apply(generic));
+                        }
+                        builder.withGenericTypes(generics.toArray(new JavaType[generics.size()]));
+                    }
+                }
+            }).build();
+        }
+    },REMOVE_SUPERCLASS {
+        public JavaType apply(JavaType type) {
+            return new JavaTypeBuilder(type).withSuperClass(null).build();
         }
     };
 
