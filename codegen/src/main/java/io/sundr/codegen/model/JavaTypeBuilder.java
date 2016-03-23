@@ -41,6 +41,15 @@ validate(buildable);
 return buildable;
 
 }
+
+@Override
+public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fluent == null) ? 0 : fluent.hashCode());
+    return result;
+}
+
 public boolean equals( Object o ){
     
 if (this == o) return true;

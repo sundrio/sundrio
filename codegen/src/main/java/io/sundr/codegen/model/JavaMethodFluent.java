@@ -21,6 +21,7 @@ import io.sundr.builder.Nested;
 import io.sundr.builder.VisitableBuilder;
 
 import javax.lang.model.element.Modifier;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -152,20 +153,41 @@ return result.toArray(new JavaProperty[result.size()]);
     public ExceptionsNested<T> addNewExceptionLike( JavaType item){
     return new ExceptionsNested<T>(item);
     }
-    public boolean equals( Object o){
     
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-JavaMethodFluent that = (JavaMethodFluent) o;
-if (annotations != null ? !annotations.equals(that.annotations) :that.annotations != null) return false;
-if (modifiers != null ? !modifiers.equals(that.modifiers) :that.modifiers != null) return false;
-if (typeParameters != null ? !typeParameters.equals(that.typeParameters) :that.typeParameters != null) return false;
-if (name != null ? !name.equals(that.name) :that.name != null) return false;
-if (returnType != null ? !returnType.equals(that.returnType) :that.returnType != null) return false;
-if (arguments != null ? !arguments.equals(that.arguments) :that.arguments != null) return false;
-if (exceptions != null ? !exceptions.equals(that.exceptions) :that.exceptions != null) return false;
-return true;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((annotations == null) ? 0 : annotations.hashCode());
+        result = prime * result
+                + ((arguments == null) ? 0 : arguments.hashCode());
+        result = prime * result
+                + ((exceptions == null) ? 0 : exceptions.hashCode());
+        result = prime * result
+                + ((modifiers == null) ? 0 : modifiers.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result
+                + ((returnType == null) ? 0 : returnType.hashCode());
+        result = prime * result
+                + ((typeParameters == null) ? 0 : typeParameters.hashCode());
+        return result;
+    }
+    
+    public boolean equals( Object o){
+        
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        JavaMethodFluent that = (JavaMethodFluent) o;
+        if (annotations != null ? !annotations.equals(that.annotations) :that.annotations != null) return false;
+        if (modifiers != null ? !modifiers.equals(that.modifiers) :that.modifiers != null) return false;
+        if (typeParameters != null ? !typeParameters.equals(that.typeParameters) :that.typeParameters != null) return false;
+        if (name != null ? !name.equals(that.name) :that.name != null) return false;
+        if (returnType != null ? !returnType.equals(that.returnType) :that.returnType != null) return false;
+        if (arguments != null ? !arguments.equals(that.arguments) :that.arguments != null) return false;
+        if (exceptions != null ? !exceptions.equals(that.exceptions) :that.exceptions != null) return false;
+        return true;
 
     }
 

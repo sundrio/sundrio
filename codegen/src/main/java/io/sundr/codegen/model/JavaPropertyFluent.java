@@ -21,6 +21,7 @@ import io.sundr.builder.Nested;
 import io.sundr.builder.VisitableBuilder;
 
 import javax.lang.model.element.Modifier;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -91,18 +92,33 @@ public class JavaPropertyFluent<T extends JavaPropertyFluent<T>> extends Attribu
     public T withArray( boolean array){
     this.array=array; return (T) this;
     }
-    public boolean equals( Object o){
     
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-JavaPropertyFluent that = (JavaPropertyFluent) o;
-if (annotations != null ? !annotations.equals(that.annotations) :that.annotations != null) return false;
-if (modifiers != null ? !modifiers.equals(that.modifiers) :that.modifiers != null) return false;
-if (type != null ? !type.equals(that.type) :that.type != null) return false;
-if (name != null ? !name.equals(that.name) :that.name != null) return false;
-if (array != that.array) return false;
-return true;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((annotations == null) ? 0 : annotations.hashCode());
+        result = prime * result + (array ? 1231 : 1237);
+        result = prime * result
+                + ((modifiers == null) ? 0 : modifiers.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+    
+    public boolean equals( Object o){
+        
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        JavaPropertyFluent that = (JavaPropertyFluent) o;
+        if (annotations != null ? !annotations.equals(that.annotations) :that.annotations != null) return false;
+        if (modifiers != null ? !modifiers.equals(that.modifiers) :that.modifiers != null) return false;
+        if (type != null ? !type.equals(that.type) :that.type != null) return false;
+        if (name != null ? !name.equals(that.name) :that.name != null) return false;
+        if (array != that.array) return false;
+        return true;
 
     }
 

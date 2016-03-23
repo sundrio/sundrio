@@ -139,23 +139,49 @@ return result.toArray(new JavaType[result.size()]);
     public GenericTypesNested<T> addNewGenericTypeLike( JavaType item){
     return new GenericTypesNested<T>(item);
     }
-    public boolean equals( Object o){
     
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-JavaTypeFluent that = (JavaTypeFluent) o;
-if (kind != null ? !kind.equals(that.kind) :that.kind != null) return false;
-if (packageName != null ? !packageName.equals(that.packageName) :that.packageName != null) return false;
-if (className != null ? !className.equals(that.className) :that.className != null) return false;
-if (array != that.array) return false;
-if (collection != that.collection) return false;
-if (concrete != that.concrete) return false;
-if (defaultImplementation != null ? !defaultImplementation.equals(that.defaultImplementation) :that.defaultImplementation != null) return false;
-if (superClass != null ? !superClass.equals(that.superClass) :that.superClass != null) return false;
-if (interfaces != null ? !interfaces.equals(that.interfaces) :that.interfaces != null) return false;
-if (genericTypes != null ? !genericTypes.equals(that.genericTypes) :that.genericTypes != null) return false;
-return true;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (array ? 1231 : 1237);
+        result = prime * result
+                + ((className == null) ? 0 : className.hashCode());
+        result = prime * result + (collection ? 1231 : 1237);
+        result = prime * result + (concrete ? 1231 : 1237);
+        result = prime
+                * result
+                + ((defaultImplementation == null) ? 0 : defaultImplementation
+                        .hashCode());
+        result = prime * result
+                + ((genericTypes == null) ? 0 : genericTypes.hashCode());
+        result = prime * result
+                + ((interfaces == null) ? 0 : interfaces.hashCode());
+        result = prime * result + ((kind == null) ? 0 : kind.hashCode());
+        result = prime * result
+                + ((packageName == null) ? 0 : packageName.hashCode());
+        result = prime * result
+                + ((superClass == null) ? 0 : superClass.hashCode());
+        return result;
+    }
+    
+    public boolean equals( Object o){
+        
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        JavaTypeFluent that = (JavaTypeFluent) o;
+        if (kind != null ? !kind.equals(that.kind) :that.kind != null) return false;
+        if (packageName != null ? !packageName.equals(that.packageName) :that.packageName != null) return false;
+        if (className != null ? !className.equals(that.className) :that.className != null) return false;
+        if (array != that.array) return false;
+        if (collection != that.collection) return false;
+        if (concrete != that.concrete) return false;
+        if (defaultImplementation != null ? !defaultImplementation.equals(that.defaultImplementation) :that.defaultImplementation != null) return false;
+        if (superClass != null ? !superClass.equals(that.superClass) :that.superClass != null) return false;
+        if (interfaces != null ? !interfaces.equals(that.interfaces) :that.interfaces != null) return false;
+        if (genericTypes != null ? !genericTypes.equals(that.genericTypes) :that.genericTypes != null) return false;
+        return true;
 
     }
 

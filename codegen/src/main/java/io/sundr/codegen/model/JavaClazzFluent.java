@@ -168,20 +168,38 @@ public class JavaClazzFluent<T extends JavaClazzFluent<T>> extends AttributeSupp
     public NestedNested<T> addNewNestedLike( JavaClazz item){
     return new NestedNested<T>(item);
     }
-    public boolean equals( Object o){
+   
     
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-JavaClazzFluent that = (JavaClazzFluent) o;
-if (type != null ? !type.equals(that.type) :that.type != null) return false;
-if (annotations != null ? !annotations.equals(that.annotations) :that.annotations != null) return false;
-if (methods != null ? !methods.equals(that.methods) :that.methods != null) return false;
-if (constructors != null ? !constructors.equals(that.constructors) :that.constructors != null) return false;
-if (fields != null ? !fields.equals(that.fields) :that.fields != null) return false;
-if (imports != null ? !imports.equals(that.imports) :that.imports != null) return false;
-if (nested != null ? !nested.equals(that.nested) :that.nested != null) return false;
-return true;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((annotations == null) ? 0 : annotations.hashCode());
+        result = prime * result
+                + ((constructors == null) ? 0 : constructors.hashCode());
+        result = prime * result + ((fields == null) ? 0 : fields.hashCode());
+        result = prime * result + ((imports == null) ? 0 : imports.hashCode());
+        result = prime * result + ((methods == null) ? 0 : methods.hashCode());
+        result = prime * result + ((nested == null) ? 0 : nested.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+    
+    public boolean equals( Object o){
+        
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        JavaClazzFluent that = (JavaClazzFluent) o;
+        if (type != null ? !type.equals(that.type) :that.type != null) return false;
+        if (annotations != null ? !annotations.equals(that.annotations) :that.annotations != null) return false;
+        if (methods != null ? !methods.equals(that.methods) :that.methods != null) return false;
+        if (constructors != null ? !constructors.equals(that.constructors) :that.constructors != null) return false;
+        if (fields != null ? !fields.equals(that.fields) :that.fields != null) return false;
+        if (imports != null ? !imports.equals(that.imports) :that.imports != null) return false;
+        if (nested != null ? !nested.equals(that.nested) :that.nested != null) return false;
+        return true;
 
     }
 
