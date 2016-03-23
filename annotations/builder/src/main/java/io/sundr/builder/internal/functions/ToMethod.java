@@ -28,6 +28,7 @@ import io.sundr.codegen.utils.StringUtils;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -350,8 +351,10 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaType nestedTypeImpl = PropertyAs.NESTED_TYPE.apply(property);
 
             List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType ignore : baseType.getGenericTypes()) {
-                generics.add(Q);
+            Set<JavaType> typeParameters = new LinkedHashSet<JavaType>();
+            for (JavaType generic : baseType.getGenericTypes()) {
+                generics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+                typeParameters.add(generic);
             }
             generics.add(T);
             JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
@@ -364,6 +367,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
+                    .withTypeParameters(typeParameters)
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .addToAttributes(BODY, "return new " + rewrapedImpl.getClassName() + "();")
