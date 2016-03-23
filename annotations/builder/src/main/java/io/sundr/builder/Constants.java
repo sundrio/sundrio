@@ -88,8 +88,8 @@ public class Constants {
     public static final String BUILDABLE_ARRAY_GETTER_SNIPPET = "snippets/buildable-array-getter.txt";
     public static final String EMPTY_FUNCTION_SNIPPET = "snippets/empty-function.txt";
 
-    public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
-    public static JavaType[] PRIMITIVE_TYPES =
+    public static final Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
+    public static final JavaType[] PRIMITIVE_TYPES =
             {ClassToJavaType.FUNCTION.apply(boolean.class), ClassToJavaType.FUNCTION.apply(byte.class), ClassToJavaType.FUNCTION.apply(char.class),
                     ClassToJavaType.FUNCTION.apply(short.class), ClassToJavaType.FUNCTION.apply(int.class), ClassToJavaType.FUNCTION.apply(long.class),
                     ClassToJavaType.FUNCTION.apply(double.class), ClassToJavaType.FUNCTION.apply(float.class)};

@@ -327,7 +327,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
      * @return
      */
     private Set<Artifact> getProjectDependencies() {
-        Set<Artifact> all = getSessionArtifacts();
         Set<Artifact> result = new LinkedHashSet<Artifact>();
         for (MavenProject p : getSession().getProjectDependencyGraph().getSortedProjects()) {
             for (Dependency dependency : p.getDependencies()) {
