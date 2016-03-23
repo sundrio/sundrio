@@ -109,7 +109,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     }
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
-                } else if (descendants.size() > 0 && toAdd.getType().isCollection()) {
+                } else if (!descendants.isEmpty() && toAdd.getType().isCollection()) {
                     for (JavaProperty descendant : descendants) {
                         if (descendant.getType().isCollection()) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
@@ -224,7 +224,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     }
 
                     properties.add(new JavaPropertyBuilder(toAdd).withType(builderType).build());
-                } else if (descendants.size() > 0 && toAdd.getType().isCollection()) {
+                } else if (!descendants.isEmpty() && toAdd.getType().isCollection()) {
                     properties.add(toAdd);
 
                     for (JavaProperty descendant : descendants) {
