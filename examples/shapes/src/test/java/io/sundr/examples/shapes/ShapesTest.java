@@ -148,4 +148,22 @@ public class ShapesTest {
 
     }
 
-}
+
+    @Test
+    public void testMultiType() {
+        Canvas canvas = new CanvasBuilder()
+                .addNewCircleShape()
+                    .withX(10)
+                    .withY(10)
+                    .withRadius(10.5)
+                .and()
+                .addNewCircleShape(0, 0, 10)
+                .addNewSquareShape()
+                .withY(10)
+                .withY(20)
+                .withHeight(30)
+                .and()
+                .build();
+    }
+
+    }
