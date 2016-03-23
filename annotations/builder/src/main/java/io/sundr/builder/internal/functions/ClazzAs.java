@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.Constants;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
@@ -27,20 +28,25 @@ import io.sundr.codegen.model.JavaMethodBuilder;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.MEMBER_OF;
+import static io.sundr.builder.Constants.REPLACEABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
-import static io.sundr.builder.internal.utils.BuilderUtils.getPropertyBuildableAncestors;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
@@ -56,6 +62,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
             Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
             JavaType fluentType = TypeAs.FLUENT_INTERFACE.apply(item.getType());
+            //The generic letter is always the last
+            final JavaType genericTypeLetter = new JavaTypeBuilder(fluentType.getGenericTypes()[fluentType.getGenericTypes().length -1]).withInterfaces().withSuperClass(null).build();
+
             for (JavaProperty property : item.getFields()) {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
                     continue;
@@ -88,7 +97,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<JavaProperty> descendants = getPropertyBuildableAncestors(toAdd);
+                Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
 
                 if (isMap(toAdd.getType())) {
                     //
@@ -118,7 +127,24 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withType(fluentType)
                     .withNested(nestedClazzes)
                     .withMethods(methods)
-                    .build();
+                    //The return type of builder methods is always T, we need to fix that.
+                    .accept(new Visitor<JavaMethodBuilder>() {
+                        public void visit(JavaMethodBuilder builder) {
+                            if (builder.getReturnType().equals(Constants.T) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
+                                builder.withReturnType(genericTypeLetter);
+                            } else if (Arrays.asList(builder.getReturnType().getGenericTypes()).contains(Constants.T)) {
+                                List<JavaType> generics = new ArrayList<JavaType>();
+                                for (JavaType g : builder.getReturnType().getGenericTypes()) {
+                                    if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
+                                        generics.add(genericTypeLetter);
+                                    } else {
+                                        generics.add(g);
+                                    }
+                                }
+                                builder.editReturnType().withGenericTypes(generics.toArray(new JavaType[generics.size()])).endReturnType();
+                            }
+                        }
+                    }).build();
         }
     }, FLUENT_IMPL {
         @Override
@@ -127,7 +153,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
             Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
             Set<JavaProperty> properties = new LinkedHashSet<JavaProperty>();
-            JavaType fluentType = TypeAs.FLUENT_IMPL.apply(item.getType());
+            final JavaType fluentType = TypeAs.FLUENT_IMPL.apply(item.getType());
+            //The generic letter is always the last
+            final JavaType genericTypeLetter = new JavaTypeBuilder(fluentType.getGenericTypes()[fluentType.getGenericTypes().length -1]).withInterfaces().withSuperClass(null).build();
 
             JavaMethod emptyConstructor = new JavaMethodBuilder()
                     .withReturnType(fluentType)
@@ -137,7 +165,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             JavaMethod instanceConstructor = new JavaMethodBuilder()
                     .withReturnType(fluentType)
                     .addNewArgument()
-                    .withType(item.getType())
+                    .withType(TypeAs.REMOVE_GENERICS_BOUNDS.apply(item.getType()))
                     .withName("instance").and()
                     .addToAttributes(BODY, toInstanceConstructorBody(item, ""))
                     .build();
@@ -177,7 +205,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<JavaProperty> descendants = getPropertyBuildableAncestors(toAdd);
+                Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
 
                 if (isMap(toAdd.getType())) {
                     properties.add(toAdd);
@@ -239,12 +267,40 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withFields(properties)
                     .withNested(nestedClazzes)
                     .withMethods(methods)
-                    .build();
+                    //The return type of builder methods is always T, we need to fix that.
+                    .accept(new Visitor<JavaMethodBuilder>() {
+                        public void visit(JavaMethodBuilder builder) {
+                            if (builder.getReturnType().equals(Constants.T) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
+                                builder.withReturnType(genericTypeLetter);
+                                String body = (String) builder.getAttributes().get(BODY);
+                                if (body != null) {
+                                    body = body.replaceAll("\\(T\\)", "\\(" + genericTypeLetter.getClassName() + "\\)");
+                                    builder.getAttributes().put(BODY, body);
+                                }
+                            } else if (Arrays.asList(builder.getReturnType().getGenericTypes()).contains(Constants.T)) {
+                                List<JavaType> generics = new ArrayList<JavaType>();
+                                for (JavaType g : builder.getReturnType().getGenericTypes()) {
+                                    if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
+                                        generics.add(genericTypeLetter);
+                                    } else {
+                                        generics.add(g);
+                                    }
+                                }
+                                String body = (String) builder.getAttributes().get(BODY);
+                                if (body != null) {
+                                    body = body.replaceAll("<T>", "<" + genericTypeLetter.getClassName() + ">");
+                                    builder.getAttributes().put(BODY, body);
+                                }
+                                builder.editReturnType().withGenericTypes(generics.toArray(new JavaType[generics.size()])).endReturnType();
+                            }
+                        }
+                    }).build();
         }
     }, BUILDER {
         @Override
         public JavaClazz apply(JavaClazz item) {
             JavaType builderType = TypeAs.BUILDER.apply(item.getType());
+            JavaType instanceType = TypeAs.REMOVE_GENERICS_BOUNDS.apply(item.getType());
             JavaType fluent = TypeAs.GENERIC_FLUENT.apply(item.getType());
             Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
             Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
@@ -274,7 +330,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withName("fluent")
                     .and()
                     .addNewArgument()
-                    .withType(item.getType())
+                    .withType(instanceType)
                     .withName("instance").and()
                     .addToAttributes(BODY, toInstanceConstructorBody(item, "fluent"))
                     .build();
@@ -282,7 +338,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             JavaMethod instanceConstructor = new JavaMethodBuilder()
                     .withReturnType(builderType)
                     .addNewArgument()
-                    .withType(item.getType())
+                    .withType(instanceType)
                     .withName("instance").and()
                     .addToAttributes(BODY, toInstanceConstructorBody(item, "this"))
                     .build();
@@ -293,9 +349,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             constructors.add(instanceConstructor);
 
             JavaMethod build = new JavaMethodBuilder()
-                    .withReturnType(item.getType())
+                    .withReturnType(instanceType)
                     .withName("build")
-                    .addToAttributes(BODY, toBuild(item))
+                    .addToAttributes(BODY, toBuild(item, instanceType))
                     .build();
 
             methods.add(build);
@@ -325,10 +381,11 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             for (JavaMethod m : builder.getMethods()) {
                 if (m.getName().equals("build")) {
 
+                    JavaClazz editable = EDITABLE.apply(item);
                     methods.add(new JavaMethodBuilder()
                             .withReturnType(TypeAs.EDITABLE.apply(m.getReturnType()))
                             .withName("build")
-                            .addToAttributes(BODY, toBuild(EDITABLE.apply(item)))
+                            .addToAttributes(BODY, toBuild(editable, TypeAs.REMOVE_GENERICS_BOUNDS.apply(editable.getType())))
                             .build());
                 } else {
                     methods.add(m);
@@ -344,7 +401,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         public JavaClazz apply(JavaClazz item) {
             JavaType type = item.getType();
             JavaType editableType = TypeAs.EDITABLE.apply(type);
-            JavaType builderType = TypeAs.BUILDER.apply(type);
+            JavaType builderType = TypeAs.combine(TypeAs.BUILDER, TypeAs.REMOVE_GENERICS_BOUNDS).apply(type);
 
             Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
             Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
@@ -400,15 +457,21 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         return sb.toString();
     }
 
-    private static String toBuild(JavaClazz clazz) {
+    private static String toBuild(final JavaClazz clazz, final JavaType instanceType) {
         JavaMethod constructor = findBuildableConstructor(clazz);
         StringBuilder sb = new StringBuilder();
-        sb.append(clazz.getType().getSimpleName()).append(" buildable = new ").append(clazz.getType().getSimpleName()).append("(");
+        sb.append(instanceType.getSimpleName()).append(" buildable = new ").append(instanceType.getSimpleName()).append("(");
+        //TODO: Need to find a cleaner way to check when to cast generic types. Unfortunately, I can't get it working via JavaKind.
+        final Set<String> genericTypes = new HashSet<String>();
+        for (JavaType genericType : instanceType.getGenericTypes()) {
+            genericTypes.add(genericType.getFullyQualifiedName());
+        }
         sb.append(StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
             @Override
             public String apply(JavaProperty item) {
                 String prefix = item.getType().isBoolean() ? "is" : "get";
-                return "fluent." + prefix + item.getNameCapitalized() + "()";
+                String cast = genericTypes.contains(item.getType().getFullyQualifiedName()) ? "("+item.getType().getFullyQualifiedName()+")" : "";
+                return cast + "fluent." + prefix + item.getNameCapitalized() + "()";
             }
         }, ","));
 
@@ -435,7 +498,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             String name = property.getName();
             if (BuilderUtils.isPrimitive(property.getType())) {
                 sb.append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").append("\n");
-            } else if (BuilderUtils.isDescendant(type, property.getType())) {
+            } else if (Decendants.isDescendant(type, property.getType())) {
                 sb.append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
                         .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n");
             } else {

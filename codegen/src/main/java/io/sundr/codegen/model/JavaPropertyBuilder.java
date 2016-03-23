@@ -18,41 +18,59 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder> implements VisitableBuilder<JavaProperty,JavaPropertyBuilder>{
+public class JavaPropertyBuilder extends JavaPropertyFluent<JavaPropertyBuilder> implements VisitableBuilder<JavaProperty, JavaPropertyBuilder> {
 
-     JavaPropertyFluent<?> fluent;
+    JavaPropertyFluent<?> fluent;
 
-    public JavaPropertyBuilder(){
+    public JavaPropertyBuilder() {
         this.fluent = this;
     }
-    public JavaPropertyBuilder( JavaPropertyFluent<?> fluent ){
+
+    public JavaPropertyBuilder(JavaPropertyFluent<?> fluent) {
         this.fluent = fluent;
     }
-    public JavaPropertyBuilder( JavaPropertyFluent<?> fluent , JavaProperty instance ){
-        this.fluent = fluent; fluent.withAnnotations(instance.getAnnotations()); fluent.withModifiers(instance.getModifiers()); fluent.withType(instance.getType()); fluent.withName(instance.getName()); fluent.withArray(instance.isArray()); fluent.withAttributes(instance.getAttributes()); 
+
+    public JavaPropertyBuilder(JavaPropertyFluent<?> fluent, JavaProperty instance) {
+        this.fluent = fluent;
+        fluent.withAnnotations(instance.getAnnotations());
+        fluent.withModifiers(instance.getModifiers());
+        fluent.withType(instance.getType());
+        fluent.withName(instance.getName());
+        fluent.withArray(instance.isArray());
+        fluent.withAttributes(instance.getAttributes());
     }
-    public JavaPropertyBuilder( JavaProperty instance ){
-        this.fluent = this; this.withAnnotations(instance.getAnnotations()); this.withModifiers(instance.getModifiers()); this.withType(instance.getType()); this.withName(instance.getName()); this.withArray(instance.isArray()); this.withAttributes(instance.getAttributes()); 
+
+    public JavaPropertyBuilder(JavaProperty instance) {
+        this.fluent = this;
+        this.withAnnotations(instance.getAnnotations());
+        this.withModifiers(instance.getModifiers());
+        this.withType(instance.getType());
+        this.withName(instance.getName());
+        this.withArray(instance.isArray());
+        this.withAttributes(instance.getAttributes());
     }
 
-public EditableJavaProperty build(){
-    EditableJavaProperty buildable = new EditableJavaProperty(fluent.getAnnotations(),fluent.getModifiers(),fluent.getType(),fluent.getName(),fluent.isArray(),fluent.getAttributes());
-validate(buildable);
-return buildable;
+    public EditableJavaProperty build() {
+        EditableJavaProperty buildable = new EditableJavaProperty(fluent.getAnnotations(), fluent.getModifiers(), fluent.getType(), fluent.getName(), fluent.isArray(), fluent.getAttributes());
+        validate(buildable);
+        return buildable;
 
-}
-public boolean equals( Object o ){
-    
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-JavaPropertyBuilder that = (JavaPropertyBuilder) o;
-if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
-return true;
+    }
 
-}
+    public boolean equals(Object o) {
 
-private <T> void validate(T item) {}
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        JavaPropertyBuilder that = (JavaPropertyBuilder) o;
+        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
+            return false;
+        return true;
+
+    }
+
+    private <T> void validate(T item) {
+    }
 
 
 }

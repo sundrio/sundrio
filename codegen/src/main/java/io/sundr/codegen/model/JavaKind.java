@@ -16,8 +16,8 @@
 
 package io.sundr.codegen.model;
 
-public enum  JavaKind {
-    
+public enum JavaKind {
+
     GENERIC,
     CLASS,
     INTERFACE,

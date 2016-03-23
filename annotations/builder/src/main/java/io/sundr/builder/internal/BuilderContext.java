@@ -16,6 +16,7 @@
 
 package io.sundr.builder.internal;
 
+import io.sundr.CachingFunction;
 import io.sundr.Function;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
@@ -89,10 +90,10 @@ public class BuilderContext {
         this.builderPackage = builderPackage;
         this.inlineables = inlineables;
 
-        stringJavaTypeFunction = new ToBuildableJavaType(elements);
-        variableElementJavaPropertyFunction = new ToBuildableJavaProperty(stringJavaTypeFunction);
-        executableElementToJavaMethod = new ExecutableElementToJavaMethod(stringJavaTypeFunction, variableElementJavaPropertyFunction);
-        typeElementToJavaClazz = new TypeElementToJavaClazz(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction);
+        stringJavaTypeFunction = CachingFunction.wrap(new ToBuildableJavaType(elements));
+        variableElementJavaPropertyFunction = CachingFunction.wrap(new ToBuildableJavaProperty(stringJavaTypeFunction));
+        executableElementToJavaMethod = CachingFunction.wrap(new ExecutableElementToJavaMethod(stringJavaTypeFunction, variableElementJavaPropertyFunction));
+        typeElementToJavaClazz = CachingFunction.wrap(new TypeElementToJavaClazz(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction));
         
         repository = new BuildableRepository();
 

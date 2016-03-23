@@ -19,6 +19,7 @@ package io.sundr.codegen.converters;
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
@@ -64,16 +65,33 @@ public class TypeElementToJavaClazz implements Function<TypeElement, JavaClazz> 
         TypeMirror superClass = classElement.getSuperclass();
         JavaType superClassType = superClass != null && !ModelUtils.NONE.equals(superClass) ? toJavaType.apply(superClass.toString()) : null;
         List<JavaType> genericTypes = new ArrayList<JavaType>();
+        List<JavaType> interfaces = new ArrayList<JavaType>();
+        for (TypeMirror interfaceTypeMirrror : classElement.getInterfaces()) {
+            JavaType interfaceType = toJavaType.apply(interfaceTypeMirrror.toString());
+            interfaces.add(interfaceType);
+        }
+
         for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
-            JavaType genericType = toJavaType.apply(typeParameter.toString());
+
+            JavaType genericBound;
+            if (!typeParameter.getBounds().isEmpty()) {
+                TypeMirror bound = typeParameter.getBounds().get(0);
+                genericBound = toJavaType.apply(bound.toString());
+            } else {
+                genericBound = null;
+            }
+
+            JavaType genericType = new JavaTypeBuilder(toJavaType.apply(typeParameter.toString())).withSuperClass(genericBound).withKind(JavaKind.GENERIC).build();
             genericTypes.add(genericType);
         }
+
         JavaClazzBuilder builder = new JavaClazzBuilder()
                 .withType(new JavaTypeBuilder()
                         .withPackageName(getPackageName(classElement))
                         .withClassName(getClassName(classElement))
                         .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()]))
                         .withSuperClass(superClassType)
+                        .withInterfaces(interfaces.toArray(new JavaType[interfaces.size()]))
                         .build());
 
         for (ExecutableElement constructor : ElementFilter.constructorsIn(classElement.getEnclosedElements())) {

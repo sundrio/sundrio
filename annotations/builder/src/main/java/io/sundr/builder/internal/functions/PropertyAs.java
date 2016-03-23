@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.JavaClazz;
@@ -31,14 +32,19 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
+import static io.sundr.builder.internal.functions.TypeAs.*;
+import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 
 public final class PropertyAs {
 
@@ -60,6 +66,11 @@ public final class PropertyAs {
             JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
 
             JavaType nestedType = NESTED_TYPE.apply(item);
+            Set<JavaType> nestedInterfaces = new HashSet<JavaType>();
+            for (JavaType n : nestedType.getInterfaces()) {
+                nestedInterfaces.add(TypeAs.REMOVE_GENERICS_BOUNDS.apply(n));
+            }
+            nestedType = new JavaTypeBuilder(nestedType).withInterfaces(nestedInterfaces.toArray(new JavaType[nestedInterfaces.size()])).build();
             JavaType nestedUnwrapped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[0]).build();
 
             Set<JavaMethod> nestedMethods = new HashSet<JavaMethod>();
@@ -79,7 +90,7 @@ public final class PropertyAs {
                     .withReturnType(nestedUnwrapped)
                     .addNewArgument()
                         .withName("item")
-                        .withType(baseType)
+                        .withType(TypeAs.REMOVE_GENERICS_BOUNDS.apply(baseType))
                     .endArgument()
                     .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this, item);")
                     .build());
@@ -155,15 +166,25 @@ public final class PropertyAs {
             //Not a typical fluent
             JavaType fluent = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
             JavaType nestedInterfaceType = NESTED_INTERFACE_TYPE.apply(item);
+
+            List<JavaType> generics = new ArrayList<JavaType>();
+            List<JavaType> superClassGenerics = new ArrayList<JavaType>();
+            for (JavaType generic : fluent.getGenericTypes()) {
+                generics.add(generic);
+                superClassGenerics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+            }
+            superClassGenerics.add(nested);
+            generics.add(N);
+
             JavaType superClassFluent = new JavaTypeBuilder(fluent)
                     .withClassName(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType()) + "FluentImpl")
                     .withInterfaces(nestedInterfaceType)
-                    .withGenericTypes(new JavaType[]{nested})
+                    .withGenericTypes(superClassGenerics.toArray(new JavaType[superClassGenerics.size()]))
                     .build();
 
             return new JavaTypeBuilder(nested)
                     .withClassName(nested.getClassName()+"Impl")
-                    .withGenericTypes(new JavaType[]{N})
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClassFluent)
                     .withInterfaces(nestedInterfaceType)
                     .build();
@@ -177,14 +198,26 @@ public final class PropertyAs {
             JavaType nested = SHALLOW_NESTED_TYPE.apply(item);
             //Not a typical fluent
             JavaType fluent = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+
+            List<JavaType> generics = new ArrayList<JavaType>();
+            List<JavaType> superClassGenerics = new ArrayList<JavaType>();
+            for (JavaType generic : fluent.getGenericTypes()) {
+                generics.add(generic);
+                superClassGenerics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+            }
+            generics.add(N);
+            //We need to rid of the bounds: For example: Circle<T extends Number> implements Shape<T extends Shape>
+            //We only need To define T bounds once.
+            superClassGenerics.add(TypeAs.REMOVE_GENERICS_BOUNDS.apply(nested));
+
             JavaType superClassFluent = new JavaTypeBuilder(fluent)
                     .withClassName(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType()) + "Fluent")
-                    .withGenericTypes(new JavaType[]{nested})
+                    .withGenericTypes(superClassGenerics.toArray(new JavaType[superClassGenerics.size()]))
                     .build();
 
             return new JavaTypeBuilder(nested)
                     .withKind(JavaKind.INTERFACE)
-                    .withGenericTypes(new JavaType[]{N})
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClassFluent)
                     .withInterfaces(BuilderContextManager.getContext().getNestedInterface().getType(), superClassFluent)
                     .build();
@@ -194,9 +227,15 @@ public final class PropertyAs {
 
     public static final Function<JavaProperty, JavaType> SHALLOW_NESTED_TYPE = new Function<JavaProperty, JavaType>() {
         public JavaType apply(JavaProperty property) {
+            JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getType());
+            List<JavaType> generics = new ArrayList<JavaType>();
+            for (JavaType generic : baseType.getGenericTypes()) {
+                generics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+            }
+            generics.add(N);
             return new JavaTypeBuilder()
                     .withClassName(captializeFirst(property.getName() + "Nested"))
-                    .withGenericTypes(new JavaType[]{N})
+                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .build();
         }
     };

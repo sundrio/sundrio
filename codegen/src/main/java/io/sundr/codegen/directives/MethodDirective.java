@@ -147,7 +147,12 @@ public class MethodDirective extends Directive {
 
         @Override
         public String apply(JavaType item) {
-            return item.getSimpleName();
+            StringBuilder sb = new StringBuilder();
+            sb.append(item.getSimpleName());
+            if (item.getSuperClass() != null) {
+                sb.append(" extends ").append(item.getSuperClass().getClassName());
+            }
+            return sb.toString();
         }
     }
 

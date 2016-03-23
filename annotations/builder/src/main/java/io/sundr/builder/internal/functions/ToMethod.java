@@ -26,7 +26,9 @@ import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -34,15 +36,16 @@ import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
+import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
+import static io.sundr.builder.internal.functions.TypeAs.REMOVE_GENERICS;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
-import static io.sundr.builder.internal.utils.BuilderUtils.getPropertyBuildableAncestors;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
@@ -128,7 +131,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     return left.getName().compareTo(right.getName());
                 }
             });
-            descendants.addAll(getPropertyBuildableAncestors(property));
+            descendants.addAll(Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property));
 
             if (isMap(property.getType())) {
                 body = "return this." + property.getName() + ";";
@@ -201,23 +204,23 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaProperty item = new JavaPropertyBuilder(property)
                     .withName("items")
                     .withArray(true)
-                    .withType(TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()))
+                    .withType(TypeAs.combine(UNWRAP_COLLECTION_OF, REMOVE_GENERICS).apply(property.getType()))
                     .build();
 
             String methodName = "addTo" + property.getNameCapitalized();
             String body = "";
-            Set<JavaProperty> descendants = getPropertyBuildableAncestors(property);
+            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
-                String builderClass = builder.getSimpleName();
-                body = "for (" + item.getType().getSimpleName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
+                String builderClass = builder.getClassName();
+                body = "for (" + item.getType().getClassName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
             } else if (descendants.size() > 0) {
                 body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
                     @Override
                     public String apply(JavaProperty item) {
                         JavaType t = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
                         String addToMethodName = "addTo" + captializeFirst(item.getName());
-                        return "if (item instanceof " + t.getSimpleName() + "){" + addToMethodName + "((" + t.getSimpleName() + ")item);}\n";
+                        return "if (item instanceof " + t.getClassName() + "){" + addToMethodName + "((" + t.getClassName() + ")item);}\n";
                     }
                 }, " else ");
 
@@ -230,7 +233,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .addToModifiers(Modifier.PUBLIC)
                     .withName(methodName)
                     .withReturnType(T)
-                    .withArguments(new JavaProperty[]{item})
+                    .withArguments(item)
                     .addToAttributes(BODY, body)
                     .build();
         }
@@ -241,29 +244,29 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaProperty item = new JavaPropertyBuilder(property)
                     .withName("items")
                     .withArray(true)
-                    .withType(TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()))
+                    .withType(TypeAs.combine(UNWRAP_COLLECTION_OF, REMOVE_GENERICS).apply(property.getType()))
                     .build();
 
             String methodName = "removeFrom" + property.getNameCapitalized();
             String body = "";
-            Set<JavaProperty> descendants = getPropertyBuildableAncestors(property);
+            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
-                String builderClass = builder.getSimpleName();
-                body = "for (" + item.getType().getSimpleName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (T)this;";
+                String builderClass = builder.getClassName();
+                body = "for (" + item.getType().getClassName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (T)this;";
             } else if (descendants.size() > 0) {
                 body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
                     @Override
                     public String apply(JavaProperty item) {
                         JavaType t = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
                         String removeFromMethodName = "removeFrom" + captializeFirst(item.getName());
-                        return "if (item instanceof " + t.getSimpleName() + "){" + removeFromMethodName + "((" + t.getSimpleName() + ")item);}\n";
+                        return "if (item instanceof " + t.getClassName() + "){" + removeFromMethodName + "((" + t.getClassName() + ")item);}\n";
                     }
                 }, " else ");
 
                 body += "} return (T)this;";
             } else {
-                body = "for (" + item.getType().getSimpleName() + " item : items) {this." + property.getName() + ".remove(item);} return (T)this;";
+                body = "for (" + item.getType().getClassName() + " item : items) {this." + property.getName() + ".remove(item);} return (T)this;";
             }
 
             return new JavaMethodBuilder()
@@ -341,11 +344,19 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
     }, WITH_NEW_NESTED {
         @Override
         public JavaMethod apply(JavaProperty property) {
+            JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
             //We need to repackage because we are nesting under this class.
             JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             JavaType nestedTypeImpl = PropertyAs.NESTED_TYPE.apply(property);
-            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
-            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(new JavaType[]{T}).build();
+
+            List<JavaType> generics = new ArrayList<JavaType>();
+            for (JavaType ignore : baseType.getGenericTypes()) {
+                generics.add(Q);
+            }
+            generics.add(T);
+            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
+            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
+
             String prefix = property.getType().isCollection() ? "addNew" : "withNew";
             String methodName = prefix + captializeFirst(property.getType().isCollection()
                     ? singularize(property.getName())
@@ -355,7 +366,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .addToModifiers(Modifier.PUBLIC)
                     .withReturnType(rewraped)
                     .withName(methodName)
-                    .addToAttributes(BODY, "return new " + rewrapedImpl.getSimpleName() + "();")
+                    .addToAttributes(BODY, "return new " + rewrapedImpl.getClassName() + "();")
                     .build();
 
         }
@@ -366,9 +377,13 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             JavaType nestedTypeImpl = PropertyAs.NESTED_TYPE.apply(property);
 
-            //We need to repackage because we are nesting under this class.
-            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
-            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(new JavaType[]{T}).build();
+            List<JavaType> generics = new ArrayList<JavaType>();
+            for (JavaType ignore : baseType.getGenericTypes()) {
+                generics.add(Q);
+            }
+            generics.add(T);
+            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
+            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
 
             String prefix = property.getType().isCollection() ? "addNew" : "withNew";
             String suffix = "Like";
@@ -382,9 +397,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .withName(methodName)
                     .addNewArgument()
                     .withName("item")
-                    .withType(baseType)
+                    .withType(TypeAs.REMOVE_GENERICS.apply(baseType))
                     .endArgument()
-                    .addToAttributes(BODY, "return new " + rewrapedImpl.getSimpleName() + "(item);")
+                    .addToAttributes(BODY, "return new " + rewrapedImpl.getClassName() + "(item);")
                     .build();
 
         }
