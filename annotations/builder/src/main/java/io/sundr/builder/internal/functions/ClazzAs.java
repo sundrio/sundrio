@@ -47,7 +47,6 @@ import static io.sundr.builder.Constants.REPLACEABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
-import static io.sundr.builder.internal.utils.BuilderUtils.getPropertyBuildableAncestors;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
@@ -98,7 +97,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<JavaProperty> descendants = getPropertyBuildableAncestors(toAdd);
+                Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
 
                 if (isMap(toAdd.getType())) {
                     //
@@ -206,7 +205,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<JavaProperty> descendants = getPropertyBuildableAncestors(toAdd);
+                Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
 
                 if (isMap(toAdd.getType())) {
                     properties.add(toAdd);
@@ -499,7 +498,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             String name = property.getName();
             if (BuilderUtils.isPrimitive(property.getType())) {
                 sb.append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").append("\n");
-            } else if (BuilderUtils.isDescendant(type, property.getType())) {
+            } else if (Decendants.isDescendant(type, property.getType())) {
                 sb.append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
                         .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n");
             } else {

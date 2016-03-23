@@ -46,7 +46,6 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
-import static io.sundr.builder.internal.utils.BuilderUtils.getPropertyBuildableAncestors;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
@@ -132,7 +131,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     return left.getName().compareTo(right.getName());
                 }
             });
-            descendants.addAll(getPropertyBuildableAncestors(property));
+            descendants.addAll(Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property));
 
             if (isMap(property.getType())) {
                 body = "return this." + property.getName() + ";";
@@ -210,7 +209,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
             String methodName = "addTo" + property.getNameCapitalized();
             String body = "";
-            Set<JavaProperty> descendants = getPropertyBuildableAncestors(property);
+            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String builderClass = builder.getClassName();
@@ -250,7 +249,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
             String methodName = "removeFrom" + property.getNameCapitalized();
             String body = "";
-            Set<JavaProperty> descendants = getPropertyBuildableAncestors(property);
+            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String builderClass = builder.getClassName();

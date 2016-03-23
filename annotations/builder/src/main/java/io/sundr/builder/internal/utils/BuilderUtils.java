@@ -23,19 +23,14 @@ import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.BuildableReference;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
-import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
-import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.PropertyAs;
-import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.AttributeSupport;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -47,11 +42,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.LIST;
 import static io.sundr.builder.Constants.MAP;
 import static io.sundr.builder.Constants.SET;
-import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 
 public class BuilderUtils {
@@ -136,111 +129,6 @@ public class BuilderUtils {
         return false;
     }
 
-    /**
-     * Find all buildable descendant equivalents of a property.
-     *
-     * @param property
-     * @return
-     */
-    public static Set<JavaProperty> getPropertyBuildableAncestors(JavaProperty property) {
-        Set<JavaProperty> result = new LinkedHashSet<JavaProperty>();
-        JavaType baseType = property.getType();
-
-        if (baseType.isCollection()) {
-            JavaType candidate = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
-            for (JavaType descendant : BuilderUtils.getBuildableDescendants(candidate)) {
-                JavaType collectionType = new JavaTypeBuilder(baseType).withGenericTypes(new JavaType[]{descendant}).build();
-                String propertyName = deCaptializeFirst(descendant.getClassName()) + property.getNameCapitalized();
-                result.add(new JavaPropertyBuilder(property)
-                        .withName(propertyName)
-                        .withType(collectionType)
-                        .addToAttributes(DESCENDANT_OF, property)
-                        .addToAttributes(BUILDABLE, true)
-                        .build());
-            }
-        } else {
-            for (JavaType descendant : BuilderUtils.getBuildableDescendants(baseType)) {
-                String propertyName = descendant.getSimpleName() + property.getNameCapitalized();
-                result.add(new JavaPropertyBuilder(property)
-                        .withName(propertyName)
-                        .withType(descendant)
-                        .addToAttributes(DESCENDANT_OF, property)
-                        .addToAttributes(BUILDABLE, true)
-                        .build());
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Finds all the descendants of a type that are buildable.
-     *
-     * @param item The type.
-     * @return
-     */
-    public static Set<JavaType> getBuildableDescendants(JavaType item) {
-        if (item.getFullyQualifiedName().equals(Constants.OBJECT.getFullyQualifiedName())) {
-            return new LinkedHashSet<JavaType>();
-        }
-
-        Set<JavaType> result = new LinkedHashSet<JavaType>();
-        BuilderContext ctx = BuilderContextManager.getContext();
-        BuildableRepository repository = ctx.getRepository();
-        for (TypeElement element : repository.getBuildables()) {
-            JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(element);
-            JavaType type = clazz.getType();
-            if (isDescendant(type, item)) {
-                result.add(type);
-            }
-        }
-        return result;
-    }
-
-
-    /**
-     * Checks if type has any descendants that are "buildable"
-     *
-     * @param item The type.
-     * @return true if a buildable ancestor is found.
-     */
-    public static boolean hasBuildableDescendants(JavaType item) {
-        if (item.getFullyQualifiedName().equals(Constants.OBJECT.getFullyQualifiedName())) {
-            return false;
-        }
-        BuilderContext ctx = BuilderContextManager.getContext();
-        BuildableRepository repository = ctx.getRepository();
-        for (TypeElement element : repository.getBuildables()) {
-            JavaType type = ctx.getStringJavaTypeFunction().apply(element.toString());
-            if (isDescendant(type, item)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if a type is an descendant of an other type
-     *
-     * @param item      The base type.
-     * @param candidate The candidate type.
-     * @return true if candidate is a descendant of base type.
-     */
-    public static boolean isDescendant(JavaType item, JavaType candidate) {
-        if (item == null || candidate == null) {
-            return false;
-        } else if (item.getFullyQualifiedName().equals(candidate.getFullyQualifiedName())) {
-            return true;
-        } else if (isDescendant(item.getSuperClass(), candidate)) {
-            return true;
-        } else {
-            for (JavaType interfaceType : item.getInterfaces()) {
-                if (isDescendant(interfaceType, candidate)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
 
     public static Set<JavaMethod> getInlineableConstructors(JavaProperty property) {
         Set<JavaMethod> result = new HashSet<JavaMethod>();
