@@ -44,13 +44,9 @@ public final class GeneratorUtils {
         }
     }
 
-    static void generate(VelocityContext context, File dir, String fileName, Template template) throws IOException {
-        FileWriter fw = null;
-        try  {
-            fw = new FileWriter(new File(dir, fileName));
+    static void generate(VelocityContext context, File dir, String fileName, Template template) throws IOException {        
+        try(FileWriter fw = new FileWriter(new File(dir, fileName)))  {           
             generate(context, fw, template);
-        } finally {
-            fw.close();
         }
     }
 }

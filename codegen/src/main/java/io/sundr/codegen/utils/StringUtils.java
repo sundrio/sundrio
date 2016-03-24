@@ -137,24 +137,15 @@ public final class StringUtils {
     }
 
     public static String loadResource(String resourceName) throws IOException {
-        InputStream is = null;
-        BufferedReader in = null;
-        try {
-            is = StringUtils.class.getClassLoader().getResourceAsStream(resourceName);
-            in = new BufferedReader(new InputStreamReader(is));
+        try(BufferedReader in = new BufferedReader(new InputStreamReader(
+                StringUtils.class.getClassLoader().getResourceAsStream(resourceName)))) {
+            
             String line = null;
             StringBuffer sb = new StringBuffer();
             while ((line = in.readLine()) != null) {
                 sb.append(line).append("\n");
             }
             return sb.toString();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (is != null) {
-                is.close();
-            }
         }
     }
 
@@ -167,24 +158,13 @@ public final class StringUtils {
     }
 
     public static String loadResource(URL resourceUrl) throws IOException {
-        InputStream is = null;
-        BufferedReader in = null;
-        try {
-            is = resourceUrl.openStream();
-            in = new BufferedReader(new InputStreamReader(is));
+        try(BufferedReader in = new BufferedReader(new InputStreamReader(resourceUrl.openStream()))) {
             String line = null;
             StringBuffer sb = new StringBuffer();
             while ((line = in.readLine()) != null) {
                 sb.append(line).append("\n");
             }
             return sb.toString();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (is != null) {
-                is.close();
-            }
         }
     }
 }
