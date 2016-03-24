@@ -180,7 +180,9 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             throw new MojoFailureException("Failed to generate bom.", e);
         } finally {
             try {
-                writer.close();
+                if (writer != null) {
+                    writer.close();
+                }
             } catch (IOException e) {
                 throw new MojoExecutionException("Failed to close the generated bom writer", e);
             }

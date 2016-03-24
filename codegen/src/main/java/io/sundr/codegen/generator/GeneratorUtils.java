@@ -50,7 +50,9 @@ public final class GeneratorUtils {
             fw = new FileWriter(new File(dir, fileName));
             generate(context, fw, template);
         } finally {
-            fw.close();
+            if (fw != null) {
+                fw.close();
+            }
         }
     }
 }
