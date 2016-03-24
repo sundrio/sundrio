@@ -40,7 +40,7 @@ public class ToNext implements Function<NodeContext, Set<JavaClazz>> {
         Set<JavaClazz> result = new LinkedHashSet<JavaClazz>();
         Boolean inScope = !context.getActiveScopes().isEmpty();
 
-        if ((inScope && isEndScope(context.getItem()) || isTerminal(context.getItem()))) {
+        if (inScope && isEndScope(context.getItem()) || isTerminal(context.getItem())) {
           return result;
         }
 

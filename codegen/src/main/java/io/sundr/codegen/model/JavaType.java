@@ -103,8 +103,8 @@ public class JavaType extends AttributeSupport implements Type {
     }
 
     public boolean isBoolean() {
-        return (("boolean".equals(className)) ||
-                ("Boolean".equals(className)));
+        return ("boolean".equals(className)) ||
+               ("Boolean".equals(className));
     }
 
     public JavaKind getKind() {
