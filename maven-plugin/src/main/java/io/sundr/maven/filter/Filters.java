@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Set;
 
 public class Filters {
+    
+    private Filters() {}
 
     public static final ArtifactFilter MAVEN_PLUGIN_FILTER = new MavenPluginFilter();
     public static final ArtifactFilter EXCLUDE_POM_FILTER = new IncludePomsFilter(false);

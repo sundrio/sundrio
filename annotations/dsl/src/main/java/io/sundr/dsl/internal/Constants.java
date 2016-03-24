@@ -20,6 +20,8 @@ import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
 public final class Constants {
+    
+    private Constants() {}
 
     public static final String[] REMOVABLE_PREFIXES = {"With"};
     public static final String INTERFACE_SUFFIX = "Interface";

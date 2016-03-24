@@ -47,6 +47,8 @@ import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 
 public final class PropertyAs {
+    
+    private PropertyAs() {}
 
     public static final Function<JavaProperty, JavaClazz> CLASS = new Function<JavaProperty, JavaClazz>() {
         @Override

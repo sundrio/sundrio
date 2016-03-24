@@ -32,6 +32,8 @@ import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class Constants {
+    
+    private Constants() {}
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
