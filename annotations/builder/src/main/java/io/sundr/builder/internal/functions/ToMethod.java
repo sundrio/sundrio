@@ -142,7 +142,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 } else {
                     body = "return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;";
                 }
-            } else if (descendants.size() > 0) {
+            } else if (!descendants.isEmpty()) {
                 if (isList(property.getType()) || isSet(property.getType())) {
                     String names = StringUtils.join(descendants, new Function<JavaProperty, String>() {
                         @Override
@@ -215,7 +215,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String builderClass = builder.getClassName();
                 body = "for (" + item.getType().getClassName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
-            } else if (descendants.size() > 0) {
+            } else if (!descendants.isEmpty()) {
                 body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
                     @Override
                     public String apply(JavaProperty item) {
@@ -255,7 +255,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String builderClass = builder.getClassName();
                 body = "for (" + item.getType().getClassName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (T)this;";
-            } else if (descendants.size() > 0) {
+            } else if (!descendants.isEmpty()) {
                 body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
                     @Override
                     public String apply(JavaProperty item) {
