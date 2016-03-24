@@ -54,7 +54,7 @@ public class StringToJavaType implements Function<String, JavaType> {
     public JavaType apply(String fullName,  Set<String> visited) {
         boolean isArray = false;
         String packageName = null;
-        String className = null;
+        String className;
         JavaType superClass = null;
         JavaKind kind = JavaKind.CLASS;
         boolean concrete = false;

@@ -37,7 +37,7 @@ public class ReactorContextFactory {
     }
 
     public ReactorContext create(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader, ReactorBuildStatus status, LifecycleModuleBuilder builder) {
-        ReactorContext context = null;
+        ReactorContext context;
         if (VERSION_3_0_0.compareTo(version) < 0) {
             throw new UnsupportedOperationException("ReactorContext is not supported in maven version:" + version);
         } else if (VERSION_3_3_0.compareTo(version) < 0) {

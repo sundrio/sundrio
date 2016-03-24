@@ -124,7 +124,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         public JavaMethod apply(JavaProperty property) {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
-            String body = null;
+            String body;
 
             TreeSet<JavaProperty> descendants = new TreeSet<JavaProperty>(new Comparator<JavaProperty>() {
                 @Override
@@ -209,7 +209,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
 
             String methodName = "addTo" + property.getNameCapitalized();
-            String body = "";
+            String body;
             Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
@@ -249,8 +249,8 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     .build();
 
             String methodName = "removeFrom" + property.getNameCapitalized();
-            String body = "";
-            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);
+            String body;
+            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);            
             if (isBuildable(property)) {
                 JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
                 String builderClass = builder.getClassName();
