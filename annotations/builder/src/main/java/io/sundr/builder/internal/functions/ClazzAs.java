@@ -429,7 +429,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
     private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
         return new JavaPropertyBuilder(property)
                 .withArray(false)
-                .withType(TypeAs.ARRAY_AS_LIST.apply(property.getType()))
+                .withType(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(property.getType())))
                 .addToAttributes(BUILDABLE, buildable)
                 .build();
     }
