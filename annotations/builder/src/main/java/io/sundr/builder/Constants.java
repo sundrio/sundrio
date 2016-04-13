@@ -32,7 +32,7 @@ import static io.sundr.codegen.utils.TypeUtils.newGeneric;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class Constants {
-    
+
     private Constants() {}
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
@@ -91,11 +91,17 @@ public class Constants {
     public static final String BUILDABLE_ARRAY_GETTER_SNIPPET = "snippets/buildable-array-getter.txt";
     public static final String EMPTY_FUNCTION_SNIPPET = "snippets/empty-function.txt";
 
-    public static final Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
-    public static final JavaType[] PRIMITIVE_TYPES =
-            {ClassToJavaType.FUNCTION.apply(boolean.class), ClassToJavaType.FUNCTION.apply(byte.class), ClassToJavaType.FUNCTION.apply(char.class),
+    public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
+
+    public static JavaType[] PRIMITIVE_TYPES =
+            {ClassToJavaType.FUNCTION.apply(boolean.class),
+                    ClassToJavaType.FUNCTION.apply(byte.class), ClassToJavaType.FUNCTION.apply(char.class),
                     ClassToJavaType.FUNCTION.apply(short.class), ClassToJavaType.FUNCTION.apply(int.class), ClassToJavaType.FUNCTION.apply(long.class),
                     ClassToJavaType.FUNCTION.apply(double.class), ClassToJavaType.FUNCTION.apply(float.class)};
 
+    public static JavaType[] BOXED_PRIMITIVE_TYPES = {ClassToJavaType.FUNCTION.apply(Boolean.class),
+            ClassToJavaType.FUNCTION.apply(Byte.class), ClassToJavaType.FUNCTION.apply(Character.class),
+            ClassToJavaType.FUNCTION.apply(Short.class), ClassToJavaType.FUNCTION.apply(Integer.class), ClassToJavaType.FUNCTION.apply(Long.class),
+            ClassToJavaType.FUNCTION.apply(Double.class), ClassToJavaType.FUNCTION.apply(Float.class)};
 
 }

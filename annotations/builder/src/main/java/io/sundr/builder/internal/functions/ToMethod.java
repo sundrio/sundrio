@@ -175,7 +175,13 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             JavaType type = property.getType();
             Boolean isBuildable = isBuildable(type);
             JavaType targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
-            String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,type.getClassName(), targetType.getSimpleName(), property.getName(), type.getClassName());
+            String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,
+                    type.getClassName(),
+                    targetType.getSimpleName(),
+                    property.getName(),
+                    type.getClassName(),
+                    property.getName()
+            );
 
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)

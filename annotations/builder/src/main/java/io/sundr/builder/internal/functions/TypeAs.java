@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.Q;
+import static io.sundr.builder.Constants.PRIMITIVE_TYPES;
+import static io.sundr.builder.Constants.BOXED_PRIMITIVE_TYPES;
 import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
@@ -273,6 +275,18 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     },REMOVE_SUPERCLASS {
         public JavaType apply(JavaType type) {
             return new JavaTypeBuilder(type).withSuperClass(null).build();
+        }
+    }, BOXED_OF {
+        public JavaType apply(JavaType type) {
+            int index=0;
+            for (JavaType primitive : PRIMITIVE_TYPES) {
+                if (primitive.equals(type)) {
+                    return BOXED_PRIMITIVE_TYPES[index];
+                }
+                index++;
+            }
+            return type;
+
         }
     };
 
