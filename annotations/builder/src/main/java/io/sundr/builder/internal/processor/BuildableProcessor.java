@@ -29,6 +29,7 @@ import io.sundr.codegen.utils.ModelUtils;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.io.IOException;
@@ -54,10 +55,12 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
 
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+                boolean isAbstract = element.getModifiers().contains(Modifier.ABSTRACT);
                 Buildable buildable = element.getAnnotation(Buildable.class);
                 BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
                 JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(ModelUtils.getClassElement(element));
                 generateLocalDependenciesIfNeeded();
+
                 try {
                     generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(clazz),
                             Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
@@ -65,7 +68,9 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     generateFromClazz(ClazzAs.FLUENT_IMPL.apply(clazz),
                             Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
 
-                    if (buildable.editableEnabled()) {
+                    if (isAbstract) {
+                      //ignore and move along
+                    } else if (buildable.editableEnabled()) {
                         generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(clazz),
                                 selectBuilderTemplate(buildable.validationEnabled()));
 
