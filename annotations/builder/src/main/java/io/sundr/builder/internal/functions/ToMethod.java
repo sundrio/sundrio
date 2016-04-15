@@ -121,7 +121,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
 
     }, GETTER {
         @Override
-        public JavaMethod apply(JavaProperty property) {
+        public JavaMethod apply(final JavaProperty property) {
             String prefix = property.getType().isBoolean() ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             String body;
@@ -145,9 +145,10 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             } else if (!descendants.isEmpty()) {
                 if (isList(property.getType()) || isSet(property.getType())) {
                     String names = StringUtils.join(descendants, new Function<JavaProperty, String>() {
+                        String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()).getClassName();
                         @Override
                         public String apply(JavaProperty item) {
-                            return "build(" + item.getName() + ")";
+                            return "this.<" + className + ">build(" + item.getName() + ")";
                         }
                     }, ", ");
                     body = "return aggregate(" + names + ");";

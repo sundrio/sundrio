@@ -23,17 +23,12 @@ import io.sundr.builder.annotations.Inline;
         @Inline(type = Createable.class, value = "create", prefix = "Createable"),
         @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
 })
-public class Square implements Rectangle {
+public class Square extends AbstractShape implements Rectangle {
 
-    private final int x;
-    private final int y;
     private final int height;
 
-    private String notes;
-
     public Square(int x, int y, int height) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
         this.height = height;
     }
 
@@ -47,21 +42,4 @@ public class Square implements Rectangle {
         return height;
     }
 
-    @Override
-    public int getX() {
-        return x;
-    }
-
-    @Override
-    public int getY() {
-        return y;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
 }

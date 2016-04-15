@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,25 +17,33 @@
 package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.builder.annotations.Inline;
 
-@Buildable(inline = {
-        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
-})
-public class Circle<T extends Number> extends AbstractShape {
+@Buildable
+public abstract class AbstractShape implements Shape {
 
-    private final T radius;
-    private final Double area;
+    private final int x;
+    private final int y;
 
-    public Circle(int x, int y, T radius) {
-        super(x, y);
-        this.radius = radius;
-        this.area = Math.PI * Math.sqrt(radius.doubleValue());
+    private String notes;
+
+    public AbstractShape(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public T getRadius() {
-        return radius;
+    public int getX() {
+        return x;
     }
 
+    public int getY() {
+        return y;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 }
