@@ -24,6 +24,7 @@ import io.sundr.codegen.model.JavaType;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
@@ -55,6 +56,10 @@ public class ExecutableElementToJavaMethod implements Function<ExecutableElement
         for (AnnotationMirror annotationMirror :executableElement.getAnnotationMirrors()) {
             JavaType annotationType = toJavaType.apply(annotationMirror.getAnnotationType().toString());
             methodBuilder.addToAnnotations(annotationType);
+        }
+
+        for (Modifier modifier : executableElement.getModifiers()) {
+            methodBuilder.addToModifiers(modifier);
         }
         return methodBuilder.build();
     }
