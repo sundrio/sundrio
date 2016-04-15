@@ -50,7 +50,7 @@ public class Decendants {
             for (TypeElement element : repository.getBuildables()) {
                 JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(element);
                 JavaType type = clazz.getType();
-                if (isDescendant(type, item)) {
+                if (type.isConcrete() && isDescendant(type, item)) {
                     result.add(type);
                 }
             }

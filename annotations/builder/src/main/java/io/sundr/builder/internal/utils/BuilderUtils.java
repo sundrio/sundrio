@@ -47,6 +47,7 @@ import static io.sundr.builder.Constants.LIST;
 import static io.sundr.builder.Constants.MAP;
 import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.SET;
+import static io.sundr.codegen.utils.StringUtils.isNullOrEmpty;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 
 public class BuilderUtils {
@@ -86,6 +87,22 @@ public class BuilderUtils {
             if (isApplicableSetterOf(method, property)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+
+    public static boolean hasOrInheritsSetter(JavaClazz clazz, JavaProperty property) {
+        JavaClazz target = clazz;
+        //Iterate parent objects and check for properties with setters but not ctor arguments.
+        while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
+            for (JavaMethod method : target.getMethods()) {
+                if (isApplicableSetterOf(method, property)) {
+                    return true;
+                }
+            }
+            String superFQN = target.getType().getSuperClass().getFullyQualifiedName();
+            target = isNullOrEmpty(superFQN) ? null : BuilderContextManager.getContext().getStringToJavaClazz().apply(superFQN);
         }
         return false;
     }

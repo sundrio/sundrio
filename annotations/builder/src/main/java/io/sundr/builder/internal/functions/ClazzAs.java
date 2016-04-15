@@ -51,6 +51,7 @@ import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstruc
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasBuildableConstructorWithArgument;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
+import static io.sundr.builder.internal.utils.BuilderUtils.hasOrInheritsSetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasSetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
@@ -74,7 +75,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
                     continue;
                 }
-                if (!hasBuildableConstructorWithArgument(item, property) && !hasSetter(item, property) ) {
+                if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property) ) {
                     continue;
                 }
 
@@ -186,7 +187,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
                     continue;
                 }
-                if (!hasBuildableConstructorWithArgument(item, property) && !hasSetter(item, property) ) {
+                if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property) ) {
                     continue;
                 }
                 JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();
@@ -467,6 +468,21 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
             }
         }
+
+        JavaClazz target = clazz;
+        //Iterate parent objects and check for properties with setters but not ctor arguments.
+        while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
+            for (JavaProperty property : target.getFields()) {
+                if (!hasBuildableConstructorWithArgument(target, property) && hasSetter(target, property)) {
+                    String withName = "with" + property.getNameCapitalized();
+                    String getterName = BuilderUtils.findGetter(target, property).getName();
+                    sb.append(ref).append(".").append(withName).append("(instance.").append(getterName).append("());\n");
+                }
+            }
+            String superFQN = target.getType().getSuperClass().getFullyQualifiedName();
+            target = isNullOrEmpty(superFQN) ? null : BuilderContextManager.getContext().getStringToJavaClazz().apply(superFQN);
+        }
+
         return sb.toString();
     }
 
@@ -497,7 +513,8 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             for (JavaProperty property : target.getFields()) {
                 if (!hasBuildableConstructorWithArgument(target, property) && hasSetter(target, property)) {
                     String setterName = "set" + property.getNameCapitalized();
-                    sb.append("buildable.").append(setterName).append("(").append(property.getName()).append(");\n");
+                    String getterName = BuilderUtils.findGetter(target, property).getName();
+                    sb.append("buildable.").append(setterName).append("(fluent.").append(getterName).append("());\n");
                 }
             }
             String superFQN = target.getType().getSuperClass().getFullyQualifiedName();

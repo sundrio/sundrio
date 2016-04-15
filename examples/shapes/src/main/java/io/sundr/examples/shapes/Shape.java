@@ -20,4 +20,7 @@ public interface Shape {
 
     int getX();
     int getY();
+
+    String getNotes();
+    void setNotes(String notes);
 }

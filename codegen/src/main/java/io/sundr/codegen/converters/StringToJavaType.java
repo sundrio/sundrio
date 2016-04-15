@@ -76,7 +76,7 @@ public class StringToJavaType implements Function<String, JavaType> {
                 concrete = false;
             } else if (typeElement.getKind() == ElementKind.CLASS) {
                 kind = JavaKind.CLASS;
-                concrete = typeElement.getModifiers().contains(Modifier.ABSTRACT);
+                concrete = !typeElement.getModifiers().contains(Modifier.ABSTRACT);
             }
 
             for (TypeMirror interfaceType : typeElement.getInterfaces()) {

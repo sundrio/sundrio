@@ -25,9 +25,9 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
     public final List<Visitable> _visitables = new ArrayList<Visitable>();
 
-    public static <T> ArrayList<T> build(List<? extends Builder<T>> list) {
+    public static <T> ArrayList<T> build(List<? extends Builder<? extends T>> list) {
         ArrayList<T> result = new ArrayList<T>();
-        for (Builder<T> builder : list) {
+        for (Builder<? extends T> builder : list) {
             result.add(builder.build());
         }
         return result;

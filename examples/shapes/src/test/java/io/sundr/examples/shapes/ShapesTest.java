@@ -166,4 +166,27 @@ public class ShapesTest {
                 .build();
     }
 
+
+    @Test
+    public void testWithSuperClassSetters() {
+        Canvas canvas = new CanvasBuilder()
+                .addNewCircleShape()
+                .withX(10)
+                .withY(10)
+                .withRadius(10.5)
+                .withNotes("circle1")
+                .and()
+                .addNewSquareShape()
+                .withY(10)
+                .withY(20)
+                .withHeight(30)
+                .withNotes("square1")
+                .and()
+                .build();
+
+        Circle circle = (Circle) canvas.getShapes().get(0);
+        Assert.assertEquals("circle1", circle.getNotes());
+        Square square = (Square) canvas.getShapes().get(1);
+        Assert.assertEquals("square1", square.getNotes());
     }
+}
