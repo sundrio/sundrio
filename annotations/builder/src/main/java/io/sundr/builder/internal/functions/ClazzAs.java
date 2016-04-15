@@ -52,6 +52,7 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
@@ -69,6 +70,10 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
                     continue;
                 }
+                if (!hasSetter(item, property) && !hasBuildableConstructorWithArgument(item, property)) {
+                    continue;
+                }
+
                 JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();
                 boolean buildable = (Boolean) toAdd.getType().getAttributes().get(BUILDABLE);
                 if (toAdd.isArray()) {
@@ -175,6 +180,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             for (JavaProperty property : item.getFields()) {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
+                    continue;
+                }
+                if (!hasSetter(item, property) && !hasBuildableConstructorWithArgument(item, property)) {
                     continue;
                 }
                 JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();

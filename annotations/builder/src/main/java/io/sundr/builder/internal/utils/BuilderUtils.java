@@ -80,6 +80,24 @@ public class BuilderUtils {
     }
 
 
+    public static JavaMethod findSetter(JavaClazz clazz, JavaProperty property) {
+        for (JavaMethod method : clazz.getMethods()) {
+            if (isApplicableSetterOf(method, property)) {
+                return method;
+            }
+        }
+        throw new SundrException("No setter found for property: " + property.getName() + " on class: " + clazz.getType().getFullyQualifiedName());
+    }
+
+    public static boolean hasSetter(JavaClazz clazz, JavaProperty property) {
+        for (JavaMethod method : clazz.getMethods()) {
+            if (isApplicableSetterOf(method, property)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean isApplicableGetterOf(JavaMethod method, JavaProperty property) {
         if (!method.getReturnType().isAssignable(property.getType())) {
             return false;
@@ -93,6 +111,44 @@ public class BuilderUtils {
             return true;
         }
         return false;
+    }
+
+
+    private static boolean isApplicableSetterOf(JavaMethod method, JavaProperty property) {
+        if (method.getArguments().length != 1) {
+            return false;
+        } else if (!method.getArguments()[0].getType().equals(property.getType())) {
+            return false;
+        } else if (method.getName().endsWith("set" + property.getNameCapitalized())) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Checks if method has a specific argument.
+     * @param method        The method.
+     * @param property      The arguement.
+     * @return              True if matching argument if found.
+     */
+    public static boolean methodHasArgument(JavaMethod method, JavaProperty property) {
+        for (JavaProperty candidate : method.getArguments()) {
+            if (candidate.equals(property)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasBuildableConstructorWithArgument(JavaClazz clazz, JavaProperty property) {
+        JavaMethod constructor = findBuildableConstructor(clazz);
+        if (constructor == null) {
+            return false;
+        } else {
+            return methodHasArgument(constructor, property);
+        }
+
     }
 
     /**
@@ -115,6 +171,7 @@ public class BuilderUtils {
         }
         return false;
     }
+
 
     /**
      * Checks if {@link io.sundr.codegen.model.JavaType} has the BUILDABLE attribute set to true.
