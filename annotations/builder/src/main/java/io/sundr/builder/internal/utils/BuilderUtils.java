@@ -24,6 +24,7 @@ import io.sundr.builder.annotations.BuildableReference;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.PropertyAs;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.AttributeSupport;
@@ -44,6 +45,7 @@ import java.util.Set;
 
 import static io.sundr.builder.Constants.LIST;
 import static io.sundr.builder.Constants.MAP;
+import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.SET;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 
@@ -79,6 +81,14 @@ public class BuilderUtils {
         throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getType().getFullyQualifiedName());
     }
 
+    public static boolean hasSetter(JavaClazz clazz, JavaProperty property) {
+        for (JavaMethod method : clazz.getMethods()) {
+            if (isApplicableSetterOf(method, property)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static boolean isApplicableGetterOf(JavaMethod method, JavaProperty property) {
         if (!method.getReturnType().isAssignable(property.getType())) {
@@ -93,6 +103,44 @@ public class BuilderUtils {
             return true;
         }
         return false;
+    }
+
+
+    private static boolean isApplicableSetterOf(JavaMethod method, JavaProperty property) {
+        if (method.getArguments().length != 1) {
+            return false;
+        } else if (!method.getArguments()[0].getType().equals(property.getType())) {
+            return false;
+        } else if (method.getName().endsWith("set" + property.getNameCapitalized())) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Checks if method has a specific argument.
+     * @param method        The method.
+     * @param property      The arguement.
+     * @return              True if matching argument if found.
+     */
+    public static boolean methodHasArgument(JavaMethod method, JavaProperty property) {
+        for (JavaProperty candidate : method.getArguments()) {
+            if (candidate.equals(property)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasBuildableConstructorWithArgument(JavaClazz clazz, JavaProperty property) {
+        JavaMethod constructor = findBuildableConstructor(clazz);
+        if (constructor == null) {
+            return false;
+        } else {
+            return methodHasArgument(constructor, property);
+        }
+
     }
 
     /**
@@ -115,6 +163,7 @@ public class BuilderUtils {
         }
         return false;
     }
+
 
     /**
      * Checks if {@link io.sundr.codegen.model.JavaType} has the BUILDABLE attribute set to true.

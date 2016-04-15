@@ -19,6 +19,7 @@ package io.sundr.builder.internal.functions;
 import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaClazz;
@@ -43,15 +44,19 @@ import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.MEMBER_OF;
+import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.REPLACEABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
+import static io.sundr.builder.internal.utils.BuilderUtils.hasBuildableConstructorWithArgument;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
+import static io.sundr.builder.internal.utils.BuilderUtils.hasSetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.codegen.utils.StringUtils.isNullOrEmpty;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
@@ -69,6 +74,10 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
                     continue;
                 }
+                if (!hasBuildableConstructorWithArgument(item, property) && !hasSetter(item, property) ) {
+                    continue;
+                }
+
                 JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();
                 boolean buildable = (Boolean) toAdd.getType().getAttributes().get(BUILDABLE);
                 if (toAdd.isArray()) {
@@ -175,6 +184,9 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             for (JavaProperty property : item.getFields()) {
                 if (property.getModifiers().contains(Modifier.STATIC)) {
+                    continue;
+                }
+                if (!hasBuildableConstructorWithArgument(item, property) && !hasSetter(item, property) ) {
                     continue;
                 }
                 JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();
@@ -422,6 +434,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     .withType(editableType)
                     .withConstructors(constructors)
                     .withMethods(methods)
+                    .addToAttributes(BUILDABLE, true)
                     .build();
         }
     };
@@ -476,6 +489,21 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         }, ","));
 
         sb.append(");\n");
+
+        JavaClazz target = clazz;
+
+        //Iterate parent objects and check for properties with setters but not ctor arguments.
+        while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
+            for (JavaProperty property : target.getFields()) {
+                if (!hasBuildableConstructorWithArgument(target, property) && hasSetter(target, property)) {
+                    String setterName = "set" + property.getNameCapitalized();
+                    sb.append("buildable.").append(setterName).append("(").append(property.getName()).append(");\n");
+                }
+            }
+            String superFQN = target.getType().getSuperClass().getFullyQualifiedName();
+            target = isNullOrEmpty(superFQN) ? null : BuilderContextManager.getContext().getStringToJavaClazz().apply(superFQN);
+        }
+
         sb.append("validate(buildable);\n");
         sb.append("return buildable;\n");
         return sb.toString();

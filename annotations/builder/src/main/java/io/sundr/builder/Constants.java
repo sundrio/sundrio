@@ -38,7 +38,6 @@ public class Constants {
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
     public static final String REPLACEABLE = "REPLACEABLE";
-    public static final String BUILDABLE = "BUILDABLE";
     public static final String MEMBER_OF = "MEMBER_OF";
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
     public static final String BODY = "BODY";
