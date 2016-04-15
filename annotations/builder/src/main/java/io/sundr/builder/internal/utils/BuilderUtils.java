@@ -24,6 +24,7 @@ import io.sundr.builder.annotations.BuildableReference;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.PropertyAs;
 import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.AttributeSupport;
@@ -44,6 +45,7 @@ import java.util.Set;
 
 import static io.sundr.builder.Constants.LIST;
 import static io.sundr.builder.Constants.MAP;
+import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.SET;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 
@@ -77,16 +79,6 @@ public class BuilderUtils {
             }
         }
         throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getType().getFullyQualifiedName());
-    }
-
-
-    public static JavaMethod findSetter(JavaClazz clazz, JavaProperty property) {
-        for (JavaMethod method : clazz.getMethods()) {
-            if (isApplicableSetterOf(method, property)) {
-                return method;
-            }
-        }
-        throw new SundrException("No setter found for property: " + property.getName() + " on class: " + clazz.getType().getFullyQualifiedName());
     }
 
     public static boolean hasSetter(JavaClazz clazz, JavaProperty property) {

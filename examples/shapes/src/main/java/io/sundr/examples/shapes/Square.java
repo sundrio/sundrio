@@ -29,6 +29,8 @@ public class Square implements Rectangle {
     private final int y;
     private final int height;
 
+    private String notes;
+
     public Square(int x, int y, int height) {
         this.x = x;
         this.y = y;
@@ -53,5 +55,13 @@ public class Square implements Rectangle {
     @Override
     public int getY() {
         return y;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }

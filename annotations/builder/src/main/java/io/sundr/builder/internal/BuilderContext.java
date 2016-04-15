@@ -19,8 +19,10 @@ package io.sundr.builder.internal;
 import io.sundr.CachingFunction;
 import io.sundr.Function;
 import io.sundr.builder.annotations.Inline;
+import io.sundr.builder.internal.functions.overrides.ToBuildableJavaClazz;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
+import io.sundr.codegen.converters.StringToJavaClazz;
 import io.sundr.codegen.converters.TypeElementToJavaClazz;
 import io.sundr.codegen.converters.ExecutableElementToJavaMethod;
 import io.sundr.codegen.model.JavaClazz;
@@ -65,6 +67,7 @@ public class BuilderContext {
     private final Elements elements;
             
     private final Function<String, JavaType> stringJavaTypeFunction;
+    private final Function<String, JavaClazz> stringToJavaClazz;
     private final Function<VariableElement, JavaProperty> variableElementJavaPropertyFunction;
     private final Function<ExecutableElement, JavaMethod> executableElementToJavaMethod;
     private final Function<TypeElement, JavaClazz> typeElementToJavaClazz;
@@ -93,8 +96,9 @@ public class BuilderContext {
         stringJavaTypeFunction = CachingFunction.wrap(new ToBuildableJavaType(elements));
         variableElementJavaPropertyFunction = CachingFunction.wrap(new ToBuildableJavaProperty(stringJavaTypeFunction));
         executableElementToJavaMethod = CachingFunction.wrap(new ExecutableElementToJavaMethod(stringJavaTypeFunction, variableElementJavaPropertyFunction));
-        typeElementToJavaClazz = CachingFunction.wrap(new TypeElementToJavaClazz(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction));
-        
+        typeElementToJavaClazz = CachingFunction.wrap(new ToBuildableJavaClazz(new TypeElementToJavaClazz(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction)));
+        stringToJavaClazz = CachingFunction.wrap(new StringToJavaClazz(elements, typeElementToJavaClazz));
+
         repository = new BuildableRepository();
 
         visitorInterface = new JavaClazzBuilder()
@@ -390,5 +394,9 @@ public class BuilderContext {
 
     public Function<TypeElement, JavaClazz> getTypeElementToJavaClazz() {
         return typeElementToJavaClazz;
+    }
+
+    public Function<String, JavaClazz> getStringToJavaClazz() {
+        return stringToJavaClazz;
     }
 }

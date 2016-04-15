@@ -30,11 +30,13 @@ public class Circle<T extends Number> implements Shape {
     private final T radius;
     private final Double area;
 
+    private String notes;
+
     public Circle(int x, int y, T radius) {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.area =  Math.PI * Math.sqrt(radius.doubleValue());
+        this.area = Math.PI * Math.sqrt(radius.doubleValue());
     }
 
     public int getX() {
@@ -49,8 +51,11 @@ public class Circle<T extends Number> implements Shape {
         return radius;
     }
 
+    public String getNotes() {
+        return notes;
+    }
 
-    public Double getArea() {
-        return area;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 }
