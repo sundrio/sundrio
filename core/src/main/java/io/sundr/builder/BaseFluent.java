@@ -16,6 +16,7 @@
 
 package io.sundr.builder;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -59,15 +60,30 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         return result;
     }
 
+
+    private static <V, F> Boolean canVisit(V visitor, F fluent) {
+        for (Method method : visitor.getClass().getDeclaredMethods()) {
+            if (method.getParameterTypes().length != 1) {
+                continue;
+            }
+            Class visitorType = method.getParameterTypes()[0];
+            if (visitorType.isAssignableFrom(fluent.getClass())) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
     @Override
     public F accept(Visitor visitor) {
         for (Visitable visitable : _visitables) {
             visitable.accept(visitor);
         }
-        try {
+
+        if (canVisit(visitor, this)) {
             visitor.visit(this);
-        } catch (ClassCastException e) {
-            //ignore
         }
         return (F) this;
     }
