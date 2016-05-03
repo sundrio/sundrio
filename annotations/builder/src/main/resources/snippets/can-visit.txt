@@ -1,0 +1,13 @@
+
+for (java.lang.reflect.Method method : visitor.getClass().getDeclaredMethods()) {
+    if (method.getParameterTypes().length != 1) {
+        continue;
+    }
+    Class visitorType = method.getParameterTypes()[0];
+    if (visitorType.isAssignableFrom(fluent.getClass())) {
+        return true;
+    } else {
+        return false;
+    }
+}
+return false;

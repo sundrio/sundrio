@@ -43,6 +43,7 @@ public class Constants {
     public static final String BODY = "BODY";
     public static final String EMPTY = "";
 
+    public static final JavaType F = newGeneric("F");
     public static final JavaType I = newGeneric("I");
     public static final JavaType O = newGeneric("O");
     public static final JavaType B = newGeneric("B");
@@ -51,6 +52,7 @@ public class Constants {
     public static final JavaType V = newGeneric("V");
     public static final JavaType VOID = new JavaTypeBuilder().withClassName("void").build();
     public static final JavaType Q = newGeneric("?");
+    public static final JavaType BOOLEAN = ClassToJavaType.FUNCTION.apply(Boolean.class);
     public static final JavaType BUILDABLE_ANNOTATION = ClassToJavaType.FUNCTION.apply(Buildable.class);
     public static final JavaType CLASS = ClassToJavaType.FUNCTION.apply(Class.class);
     public static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);
@@ -83,6 +85,7 @@ public class Constants {
 
     public static final String ACCEPT_VISITOR_SNIPPET = "snippets/accept-visitor.txt";
     public static final String BUILD_LIST_SNIPPET = "snippets/build-list.txt";
+    public static final String CAN_VISIT_SNIPPET = "snippets/can-visit.txt";
     public static final String AGGREGATE_SET_SNIPPET = "snippets/aggregate-set.txt";
     public static final String AGGREGATE_LIST_SNIPPET = "snippets/aggregate-list.txt";
     public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";
