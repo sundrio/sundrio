@@ -17,8 +17,11 @@
 package io.sundr.codegen.functions;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
+
+import java.lang.reflect.Modifier;
 
 public enum ClassToJavaType implements Function<Class, JavaType> {
 
@@ -26,10 +29,12 @@ public enum ClassToJavaType implements Function<Class, JavaType> {
 
     @Override
     public JavaType apply(Class item) {
+        JavaKind kind = ClassToJavaKind.FUNCTION.apply(item);
         return new JavaTypeBuilder()
-                .withKind(ClassToJavaKind.FUNCTION.apply(item))
+                .withKind(kind)
                 .withClassName(item.getSimpleName())
                 .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
+                .withConcrete(kind == JavaKind.CLASS && Modifier.isAbstract(item.getModifiers()))
                 .build();
     }
 }

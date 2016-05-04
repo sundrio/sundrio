@@ -1,5 +1,8 @@
 
 for (java.lang.reflect.Method method : visitor.getClass().getDeclaredMethods()) {
+    if (visitor instanceof TypedVisitor) {
+        return ((TypedVisitor) visitor).getType().isAssignableFrom(fluent.getClass());
+    }
     if (method.getParameterTypes().length != 1) {
         continue;
     }

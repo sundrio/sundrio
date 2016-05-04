@@ -1,0 +1,1 @@
+return (Class<V>) getTypeArguments(TypedVisitor.class, getClass()).get(0);

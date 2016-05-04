@@ -21,6 +21,11 @@ import io.sundr.codegen.functions.ClassToJavaType;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -63,6 +68,12 @@ public class Constants {
     public static final JavaType SET = ClassToJavaType.FUNCTION.apply(Set.class);
     public static final JavaType LINKED_HASH_SET = ClassToJavaType.FUNCTION.apply(LinkedHashSet.class);
 
+    public static final JavaType ARRAY = ClassToJavaType.FUNCTION.apply(Array.class);
+    public static final JavaType TYPE = ClassToJavaType.FUNCTION.apply(Type.class);
+    public static final JavaType TYPE_VARIABLE = ClassToJavaType.FUNCTION.apply(TypeVariable.class);
+    public static final JavaType GENERIC_ARRAY_TYPE = ClassToJavaType.FUNCTION.apply(GenericArrayType.class);
+    public static final JavaType PARAMETERIZED_TYPE = ClassToJavaType.FUNCTION.apply(ParameterizedType.class);
+
     public static final JavaType BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
     public static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(BaseFluent.class), T);
     public static final JavaType EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), T);
@@ -71,6 +82,7 @@ public class Constants {
     public static final JavaType INLINEABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Inlineable.class), T);
     public static final JavaType NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
     public static final JavaType VISITOR = typeGenericOf(ClassToJavaType.FUNCTION.apply(Visitor.class), V);
+    public static final JavaType TYPED_VISITOR = typeGenericOf(ClassToJavaType.FUNCTION.apply(TypedVisitor.class), V);
     public static final JavaType VISITABLE = ClassToJavaType.FUNCTION.apply(Visitable.class);
     public static final JavaType VISITABLE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(VisitableBuilder.class), T, V);
     public static final JavaType BOXED_VOID = ClassToJavaType.FUNCTION.apply(Void.class);
@@ -86,6 +98,9 @@ public class Constants {
     public static final String ACCEPT_VISITOR_SNIPPET = "snippets/accept-visitor.txt";
     public static final String BUILD_LIST_SNIPPET = "snippets/build-list.txt";
     public static final String CAN_VISIT_SNIPPET = "snippets/can-visit.txt";
+    public static final String GET_TYPE_SNIPPET = "snippets/get-type.txt";
+    public static final String GET_CLASS_SNIPPET = "snippets/get-class.txt";
+    public static final String GET_TYPE_ARGUMENTS_SNIPPET = "snippets/get-type-arguments.txt";
     public static final String AGGREGATE_SET_SNIPPET = "snippets/aggregate-set.txt";
     public static final String AGGREGATE_LIST_SNIPPET = "snippets/aggregate-list.txt";
     public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";

@@ -185,6 +185,7 @@ public final class PropertyAs {
                     .build();
 
             return new JavaTypeBuilder(nested)
+                    .withConcrete(true)
                     .withClassName(nested.getClassName()+"Impl")
                     .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
                     .withSuperClass(superClassFluent)

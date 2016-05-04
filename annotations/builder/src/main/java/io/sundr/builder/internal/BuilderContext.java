@@ -80,6 +80,7 @@ public class BuilderContext {
     private final JavaClazz visitableInterface;
     private final JavaClazz visitableBuilderInterface;
     private final JavaClazz visitorInterface;
+    private final JavaClazz typedVisitorInterface;
     private final JavaClazz functionInterface;
     private final JavaClazz inlineableBase;
     private final Boolean generateBuilderPackage;
@@ -117,6 +118,47 @@ public class BuilderContext {
                 .withType(V)
                 .endArgument()
                 .and()
+                .build();
+
+        typedVisitorInterface = new JavaClazzBuilder()
+                .withNewTypeLike(TYPED_VISITOR)
+                    .withConcrete(false)
+                    .withKind(JavaKind.CLASS)
+                    .withPackageName(builderPackage)
+                    .withInterfaces(visitorInterface.getType())
+                .and()
+                .addNewMethod()
+                    .addToModifiers(Modifier.PUBLIC)
+                    .withReturnType(typeGenericOf(CLASS, V))
+                    .withName("getType")
+                    .addToAttributes(BODY, loadResourceQuietly(GET_TYPE_SNIPPET))
+                .and()
+                .addNewMethod()
+                    .addToModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .withReturnType(typeGenericOf(CLASS, Q))
+                    .withName("getClass")
+                    .addNewArgument()
+                        .withName("type")
+                        .withType(TYPE)
+                    .endArgument()
+                    .addToAttributes(BODY, loadResourceQuietly(GET_CLASS_SNIPPET))
+                .and()
+                .addNewMethod()
+                    .addToModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                    .addToTypeParameters(T)
+                    .withReturnType(typeGenericOf(LIST, typeGenericOf(CLASS, Q)))
+                    .withName("getTypeArguments")
+                    .addNewArgument()
+                        .withName("baseClass")
+                        .withType(typeGenericOf(CLASS, T))
+                    .endArgument()
+                    .addNewArgument()
+                        .withName("childClass")
+                        .withType(typeGenericOf(CLASS, typeExtends(Q,T)))
+                    .endArgument()
+                    .addToAttributes(BODY, loadResourceQuietly(GET_TYPE_ARGUMENTS_SNIPPET))
+                .and()
+                .addToImports(LIST, ARRAY_LIST, MAP, LINKED_HASH_MAP, ARRAY, TYPE, TYPE_VARIABLE, GENERIC_ARRAY_TYPE, PARAMETERIZED_TYPE)
                 .build();
 
         functionInterface = new JavaClazzBuilder()
@@ -366,6 +408,10 @@ public class BuilderContext {
 
     public JavaClazz getVisitorInterface() {
         return visitorInterface;
+    }
+
+    public JavaClazz getTypedVisitorInterface() {
+        return typedVisitorInterface;
     }
 
     public JavaClazz getInlineableBase() {
