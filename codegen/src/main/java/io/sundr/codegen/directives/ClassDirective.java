@@ -36,6 +36,7 @@ public class ClassDirective extends Directive {
 
     private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
     private static final String MEMBER_OF = "MEMBER_OF";
+    private static final String ABSTRACT = " abstract ";
     private static final String EXTENDS = " extends ";
     private static final String IMPLEMENTS = " implements ";
     private static final String PUBLIC = "public ";
@@ -96,7 +97,11 @@ public class ClassDirective extends Directive {
             JavaType type = clazz.getType();
             JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
 
-            writer.append(PUBLIC).append(kind.name().toLowerCase()).append(SPACE);
+            writer.append(PUBLIC);
+            if (kind == JavaKind.CLASS && !clazz.getType().isConcrete()) {
+                writer.append(ABSTRACT);
+            }
+            writer.append(kind.name().toLowerCase()).append(SPACE);
             writer.append(toString.apply(type));
 
             writeExtends(writer, type, toString);
