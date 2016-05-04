@@ -16,6 +16,7 @@
 
 package io.sundr.examples.shapes;
 
+import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.Visitor;
 import org.junit.Assert;
 import org.junit.Test;
@@ -108,6 +109,32 @@ public class ShapesTest {
                 .build();
 
         canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
+            @Override
+            public void visit(CircleBuilder<Integer> builder) {
+                builder.withRadius(100 + builder.getRadius());
+            }
+        }).build();
+
+
+        Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
+    }
+
+    @Test
+    public void testAddToWithTypedVisitors() {
+        Canvas canvas = new CanvasBuilder()
+                .addToShapes(new CircleBuilder<Integer>()
+                        .withX(0)
+                        .withY(0)
+                        .withRadius(10)
+                        .build())
+                .addToShapes(new SquareBuilder()
+                        .withY(10)
+                        .withY(20)
+                        .withHeight(30)
+                        .build())
+                .build();
+
+        canvas = new CanvasBuilder(canvas).accept(new TypedVisitor<CircleBuilder<Integer>>() {
             @Override
             public void visit(CircleBuilder<Integer> builder) {
                 builder.withRadius(100 + builder.getRadius());

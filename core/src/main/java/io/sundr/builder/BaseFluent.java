@@ -62,6 +62,10 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
 
     private static <V, F> Boolean canVisit(V visitor, F fluent) {
+        if (visitor instanceof TypedVisitor) {
+            return ((TypedVisitor) visitor).getType().isAssignableFrom(fluent.getClass());
+        }
+
         for (Method method : visitor.getClass().getDeclaredMethods()) {
             if (method.getParameterTypes().length != 1) {
                 continue;
