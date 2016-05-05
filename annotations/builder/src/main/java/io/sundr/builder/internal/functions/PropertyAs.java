@@ -173,7 +173,7 @@ public final class PropertyAs {
             List<JavaType> superClassGenerics = new ArrayList<JavaType>();
             for (JavaType generic : fluent.getGenericTypes()) {
                 generics.add(generic);
-                superClassGenerics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+                superClassGenerics.add(TypeAs.REMOVE_INTERFACES.apply(generic));
             }
             superClassGenerics.add(nested);
             generics.add(N);
@@ -206,7 +206,7 @@ public final class PropertyAs {
             List<JavaType> superClassGenerics = new ArrayList<JavaType>();
             for (JavaType generic : fluent.getGenericTypes()) {
                 generics.add(generic);
-                superClassGenerics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+                superClassGenerics.add(TypeAs.REMOVE_INTERFACES.apply(generic));
             }
             generics.add(N);
             //We need to rid of the bounds: For example: Circle<T extends Number> implements Shape<T extends Shape>
@@ -233,7 +233,7 @@ public final class PropertyAs {
             JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getType());
             List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : baseType.getGenericTypes()) {
-                generics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+                generics.add(TypeAs.REMOVE_INTERFACES.apply(generic));
             }
             generics.add(N);
             return new JavaTypeBuilder()

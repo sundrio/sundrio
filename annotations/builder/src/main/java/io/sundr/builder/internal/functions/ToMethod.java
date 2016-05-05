@@ -360,7 +360,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
             List<JavaType> generics = new ArrayList<JavaType>();
             Set<JavaType> typeParameters = new LinkedHashSet<JavaType>();
             for (JavaType generic : baseType.getGenericTypes()) {
-                generics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
+                generics.add(TypeAs.REMOVE_INTERFACES.apply(generic));
                 typeParameters.add(generic);
             }
             generics.add(T);

@@ -37,6 +37,22 @@ public class JavaType extends AttributeSupport implements Type {
     private final Set<JavaType> interfaces;
     private final JavaType[] genericTypes;
 
+    public static final Function<JavaType, String> TO_SIMPLE_NAME = new Function<JavaType, String>() {
+        public String apply(JavaType item) {
+            return item.getSimpleName();
+        }
+    };
+
+    public static final Function<JavaType, String> TO_NAME_WITH_BOUNDS = new Function<JavaType, String>() {
+        public String apply(JavaType item) {
+            if (item.getKind() == JavaKind.GENERIC && item.getInterfaces() != null && !item.getInterfaces().isEmpty()) {
+                return item.getSimpleName() + " extends " + StringUtils.join(item.getInterfaces(), TO_SIMPLE_NAME, ",");
+            } else {
+                return item.getSimpleName();
+            }
+        }
+    };
+
     public JavaType(JavaKind kind, String packageName, String className, boolean array, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
         super(attributes);
         this.kind = kind;
@@ -84,16 +100,7 @@ public class JavaType extends AttributeSupport implements Type {
         sb.append(suffix);
         if (genericTypes.length > 0) {
             sb.append("<");
-            sb.append(StringUtils.join(genericTypes, new Function<JavaType, String>() {
-                @Override
-                public String apply(JavaType item) {
-                    if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
-                        return item.getSimpleName() + " extends " + item.getSuperClass().getSimpleName();
-                    } else {
-                        return item.getSimpleName();
-                    }
-                }
-            }, ", "));
+            sb.append(StringUtils.join(genericTypes, TO_NAME_WITH_BOUNDS, ", "));
             sb.append(">");
         }
         if (isArray()) {

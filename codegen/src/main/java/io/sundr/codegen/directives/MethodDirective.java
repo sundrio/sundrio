@@ -18,6 +18,7 @@ package io.sundr.codegen.directives;
 
 import io.sundr.Function;
 import io.sundr.builder.Visitor;
+import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaMethod;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
@@ -38,6 +39,8 @@ import java.io.Writer;
 import static io.sundr.codegen.utils.StringUtils.join;
 
 public class MethodDirective extends Directive {
+
+    private static final String EXTENDS = " extends ";
 
     @Override
     public String getName() {
@@ -149,8 +152,8 @@ public class MethodDirective extends Directive {
         public String apply(JavaType item) {
             StringBuilder sb = new StringBuilder();
             sb.append(item.getSimpleName());
-            if (item.getSuperClass() != null) {
-                sb.append(" extends ").append(item.getSuperClass().getClassName());
+            if (item.getKind() == JavaKind.GENERIC && item.getInterfaces() != null && !item.getInterfaces().isEmpty()) {
+                sb.append(EXTENDS).append(StringUtils.join(item.getInterfaces(), JavaType.TO_SIMPLE_NAME, ","));
             }
             return sb.toString();
         }

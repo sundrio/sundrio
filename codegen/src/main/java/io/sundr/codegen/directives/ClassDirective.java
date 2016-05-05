@@ -20,6 +20,7 @@ import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaKind;
 import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.utils.StringUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
@@ -158,8 +159,8 @@ public class ClassDirective extends Directive {
             if (item.isArray()) {
                 sb.append(BRACKETS_LR);
             }
-            if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
-                sb.append(EXTENDS).append(apply(item.getSuperClass()));
+            if (item.getKind() == JavaKind.GENERIC && item.getInterfaces() != null && !item.getInterfaces().isEmpty()) {
+                sb.append(EXTENDS).append(StringUtils.join(item.getInterfaces(), JavaType.TO_SIMPLE_NAME, ","));
             }
             if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
                 sb.append(LT).append(join(item.getGenericTypes(), this, COMMA)).append(GT);

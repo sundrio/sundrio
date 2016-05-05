@@ -70,4 +70,17 @@ public final class TypeUtils {
                 .build();
     }
 
+    /**
+     * Sets one {@link io.sundr.codegen.model.JavaType} as an interface of an other.
+     *
+     * @param base       The base type.
+     * @param superClass The super type.
+     * @return
+     */
+    public static JavaType typeImplements(JavaType base, JavaType... superClass) {
+        return new JavaTypeBuilder(base)
+                .withInterfaces(superClass)
+                .build();
+    }
+
 }

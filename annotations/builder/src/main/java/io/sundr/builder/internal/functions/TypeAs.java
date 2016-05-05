@@ -39,6 +39,7 @@ import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+import static io.sundr.codegen.utils.TypeUtils.typeImplements;
 
 public enum TypeAs implements Function<JavaType, JavaType> {
 
@@ -53,7 +54,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             }
 
             JavaType generic = getNextGeneric(item, generics);
-            JavaType genericFluent = typeExtends(generic, fluent);
+            JavaType genericFluent = typeImplements(generic, fluent);
             generics.add(genericFluent);
 
             JavaType superClass = isBuildable(item.getSuperClass()) ?
@@ -86,7 +87,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
             }
 
             JavaType generic = getNextGeneric(item, generics);
-            JavaType genericFluent = typeExtends(generic, fluent);
+            JavaType genericFluent = typeImplements(generic, fluent);
             generics.add(genericFluent);
 
             JavaType superClass = isBuildable(item.getSuperClass()) ?
@@ -108,7 +109,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         public JavaType apply(JavaType item) {
             List<JavaType> generics = new ArrayList<JavaType>();
             for (JavaType generic : item.getGenericTypes()) {
-                generics.add(REMOVE_SUPERCLASS.apply(generic));
+                generics.add(REMOVE_INTERFACES.apply(generic));
             }
             generics.add(BuilderUtils.getNextGeneric(item));
             return new JavaTypeBuilder(item)
@@ -265,7 +266,7 @@ public enum TypeAs implements Function<JavaType, JavaType> {
                     if (builder.getGenericTypes().length > 0) {
                         List<JavaType> generics = new ArrayList<JavaType>();
                         for (JavaType generic : builder.getGenericTypes()) {
-                            generics.add(REMOVE_SUPERCLASS.apply(generic));
+                            generics.add(REMOVE_INTERFACES.apply(generic));
                         }
                         builder.withGenericTypes(generics.toArray(new JavaType[generics.size()]));
                     }
@@ -276,7 +277,11 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         public JavaType apply(JavaType type) {
             return new JavaTypeBuilder(type).withSuperClass(null).build();
         }
-    }, BOXED_OF {
+    }, REMOVE_INTERFACES {
+        public JavaType apply(JavaType type) {
+            return new JavaTypeBuilder(type).withInterfaces().build();
+        }
+    } , BOXED_OF {
         public JavaType apply(JavaType type) {
             int index=0;
             for (JavaType primitive : PRIMITIVE_TYPES) {

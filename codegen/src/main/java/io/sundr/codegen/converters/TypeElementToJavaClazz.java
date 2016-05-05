@@ -85,15 +85,13 @@ public class TypeElementToJavaClazz implements Function<TypeElement, JavaClazz> 
 
         for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
 
-            JavaType genericBound;
+            List<JavaType> genericBounds = new ArrayList<JavaType>();
             if (!typeParameter.getBounds().isEmpty()) {
                 TypeMirror bound = typeParameter.getBounds().get(0);
-                genericBound = toJavaType.apply(bound.toString());
-            } else {
-                genericBound = null;
+                genericBounds.add(toJavaType.apply(bound.toString()));
             }
 
-            JavaType genericType = new JavaTypeBuilder(toJavaType.apply(typeParameter.toString())).withSuperClass(genericBound).withKind(JavaKind.GENERIC).build();
+            JavaType genericType = new JavaTypeBuilder(toJavaType.apply(typeParameter.toString())).withInterfaces(genericBounds.toArray(new JavaType[genericBounds.size()])).withKind(JavaKind.GENERIC).build();
             genericTypes.add(genericType);
         }
 

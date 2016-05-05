@@ -60,6 +60,7 @@ import static io.sundr.builder.Constants.*;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+import static io.sundr.codegen.utils.TypeUtils.typeImplements;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 
 public class BuilderContext {
@@ -154,7 +155,7 @@ public class BuilderContext {
                     .endArgument()
                     .addNewArgument()
                         .withName("childClass")
-                        .withType(typeGenericOf(CLASS, typeExtends(Q,T)))
+                        .withType(typeGenericOf(CLASS, typeImplements(Q,T)))
                     .endArgument()
                     .addToAttributes(BODY, loadResourceQuietly(GET_TYPE_ARGUMENTS_SNIPPET))
                 .and()
@@ -238,7 +239,7 @@ public class BuilderContext {
                     .withName("build")
                     .withReturnType(typeGenericOf(ARRAY_LIST,T))
                     .addNewArgument()
-                        .withType(typeGenericOf(LIST, typeExtends(Q, typeGenericOf(builderInterface.getType(), typeExtends(Q,T)))))
+                        .withType(typeGenericOf(LIST, typeImplements(Q, typeGenericOf(builderInterface.getType(), typeImplements(Q,T)))))
                         .withName("list")
                     .endArgument()
                 .addToAttributes(BODY, loadResourceQuietly(BUILD_LIST_SNIPPET))
@@ -249,7 +250,7 @@ public class BuilderContext {
                         .withName("build")
                         .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
                         .addNewArgument()
-                            .withType(typeGenericOf(LINKED_HASH_SET, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
+                            .withType(typeGenericOf(LINKED_HASH_SET, typeImplements(Q, typeGenericOf(builderInterface.getType(), T))))
                             .withName("set")
                         .endArgument()
                     .addToAttributes(BODY, loadResourceQuietly(BUILD_SET_SNIPPET))
@@ -260,7 +261,7 @@ public class BuilderContext {
                     .withName("aggregate")
                     .withReturnType(typeGenericOf(ARRAY_LIST, T))
                     .addNewArgument()
-                        .withType(typeGenericOf(LIST, typeExtends(Q, T)))
+                        .withType(typeGenericOf(LIST, typeImplements(Q, T)))
                         .withName("...lists")
                     .endArgument()
                     .addToAttributes(BODY, loadResourceQuietly(AGGREGATE_LIST_SNIPPET))
@@ -271,7 +272,7 @@ public class BuilderContext {
                     .withName("aggregate")
                     .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
                     .addNewArgument()
-                .withType(typeGenericOf(SET, typeExtends(Q, T)))
+                    .withType(typeGenericOf(SET, typeImplements(Q, T)))
                         .withName("...sets")
                     .endArgument()
                     .addToAttributes(BODY, loadResourceQuietly(AGGREGATE_SET_SNIPPET))
