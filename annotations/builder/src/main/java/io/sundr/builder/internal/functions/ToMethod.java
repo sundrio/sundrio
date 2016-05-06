@@ -143,6 +143,7 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
                     body = "return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;";
                 }
             } else if (!descendants.isEmpty()) {
+                //TODO: This should also work for array types, so we should check....
                 if (isList(property.getType()) || isSet(property.getType())) {
                     String names = StringUtils.join(descendants, new Function<JavaProperty, String>() {
                         String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()).getClassName();

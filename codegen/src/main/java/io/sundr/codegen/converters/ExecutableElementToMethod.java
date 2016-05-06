@@ -17,6 +17,7 @@
 package io.sundr.codegen.converters;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
@@ -27,7 +28,11 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ExecutableElementToMethod implements Function<ExecutableElement, Method> {
 
@@ -55,14 +60,25 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
                     .withReturnType(toTypeRef.apply(executableElement.getReturnType()))
                     .addToArguments(toProperty.apply(variableElement));
 
+            Set<ClassRef> exceptionRefs = new LinkedHashSet<ClassRef>();
             for (TypeMirror thrownType : executableElement.getThrownTypes()) {
-                methodBuilder = methodBuilder.addToExceptions(toTypeRef.apply(thrownType));
+                if (thrownType instanceof ClassRef) {
+                    exceptionRefs.add((ClassRef)thrownType);
+                }
             }
+            methodBuilder = methodBuilder.withExceptions(exceptionRefs);
         }
+
+        Set<ClassRef> annotationRefs = new LinkedHashSet<ClassRef>();
         for (AnnotationMirror annotationMirror :executableElement.getAnnotationMirrors()) {
             TypeRef annotationType = toTypeRef.apply(annotationMirror.getAnnotationType());
-            methodBuilder.addToAnnotations(annotationType);
+            if (annotationType instanceof ClassRef) {
+                annotationRefs.add((ClassRef)annotationType);
+            }
+            methodBuilder.withAnnotations(annotationRefs);
         }
+
+
         return methodBuilder.build();
     }
 }

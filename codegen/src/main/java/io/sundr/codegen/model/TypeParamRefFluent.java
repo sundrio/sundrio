@@ -17,30 +17,10 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Fluent;
-import io.sundr.builder.Nested;
 
-public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends Fluent<A>, AttributeSupportFluent<A> {
+public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends Fluent<A>,AttributeSupportFluent<A>{
 
 
-    public String getName();
-
-    public A withName(String name);
-
-    public TypeParamDef getDefinition();
-
-    public A withDefinition(TypeParamDef definition);
-
-    public DefinitionNested<A> withNewDefinition();
-
-    public DefinitionNested<A> withNewDefinitionLike(TypeParamDef item);
-
-    public DefinitionNested<A> editDefinition();
-
-    public interface DefinitionNested<N> extends Nested<N>, TypeParamDefFluent<DefinitionNested<N>> {
-        public N endDefinition();
-
-        public N and();
-    }
-
+    public String getName();    public A withName(String name);
 
 }

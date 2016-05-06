@@ -17,8 +17,10 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,12 +30,12 @@ public class Method extends ModifierSupport {
     private final Set<ClassRef> annotations;
     private final Set<TypeParamDef> parameters;
     private final String name;
-    private final ClassRef returnType;
-    private final Property[] arguments;
+    private final TypeRef returnType;
+    private final List<Property> arguments;
     private final Set<ClassRef> exceptions;
     private final Block block;
 
-    public Method(Set<ClassRef> annotations, Set<TypeParamDef> parameters, String name, ClassRef returnType, Property[] arguments, Set<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
+    public Method(Set<ClassRef> annotations, Set<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, Set<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.parameters = parameters;
@@ -56,11 +58,11 @@ public class Method extends ModifierSupport {
         return name;
     }
 
-    public ClassRef getReturnType() {
+    public TypeRef getReturnType() {
         return returnType;
     }
 
-    public Property[] getArguments() {
+    public List<Property> getArguments() {
         return arguments;
     }
 
@@ -79,16 +81,52 @@ public class Method extends ModifierSupport {
 
         Method method = (Method) o;
 
-        if (!name.equals(method.name)) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(arguments, method.arguments);
+        if (parameters != null ? !parameters.equals(method.parameters) : method.parameters != null) return false;
+        if (name != null ? !name.equals(method.name) : method.name != null) return false;
+        return arguments != null ? arguments.equals(method.arguments) : method.arguments == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + Arrays.hashCode(arguments);
+        int result = parameters != null ? parameters.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
         return result;
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        if (isPublic()) {
+            sb.append("public ");
+        } else if (isProtected()) {
+            sb.append("protected ");
+        } else if (isPrivate()) {
+            sb.append("private ");
+        }
+
+        if (isSynchronized()) {
+            sb.append("synchronized ");
+        }
+
+        if (isStatic()) {
+            sb.append("static ");
+        }
+
+        if (isFinal()) {
+            sb.append("final ");
+        }
+
+        sb.append(returnType).append(" ");
+        sb.append(name);
+
+        sb.append("(");
+        StringUtils.join(arguments, "");
+        sb.append(")");
+
+        return sb.toString();
     }
 }

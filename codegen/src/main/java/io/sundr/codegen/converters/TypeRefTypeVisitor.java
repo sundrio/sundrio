@@ -17,9 +17,12 @@
 package io.sundr.codegen.converters;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.PrimitiveRefBuilder;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeRefBuilder;
+import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.model.VoidRefBuilder;
 
 import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.type.ArrayType;
@@ -34,69 +37,80 @@ import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.TypeVisitor;
 import javax.lang.model.type.UnionType;
 import javax.lang.model.type.WildcardType;
+import java.util.ArrayList;
+import java.util.List;
 
-public class TypeRefTypeVisitor implements TypeVisitor<TypeRefBuilder, Void > {
+public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
 
     private final Function<TypeVariable, TypeParamRef> toTypeParamRef;
 
     private ElementVisitor<TypeDefBuilder, Void> elementVisitor;
-    private TypeRefBuilder builder = new TypeRefBuilder();
 
     public TypeRefTypeVisitor(Function<TypeVariable, TypeParamRef> toTypeParamRef) {
         this.toTypeParamRef = toTypeParamRef;
     }
 
-    public TypeRefBuilder visit(TypeMirror t, Void aVoid) {
-        return builder;
+    public TypeRef visit(TypeMirror t, Integer dimension) {
+        return null;
     }
 
-    public TypeRefBuilder visit(TypeMirror t) {
-        return builder;
+    public TypeRef visit(TypeMirror t) {
+        return null;
     }
 
-    public TypeRefBuilder visitPrimitive(PrimitiveType t, Void aVoid) {
-        return builder.withNewDefinition().withName(t.toString()).endDefinition();
+    public TypeRef visitPrimitive(PrimitiveType t, Integer dimension) {
+        return new PrimitiveRefBuilder()
+                .withName(t.toString())
+                .withDimensions(dimension)
+                .build();
     }
 
-    public TypeRefBuilder visitNull(NullType t, Void aVoid) {
-        return builder;
+    public TypeRef visitNull(NullType t, Integer dimension) {
+        return null;
     }
 
-    public TypeRefBuilder visitArray(ArrayType t, Void aVoid) {
-        return builder.withDimensions(builder.getDimensions() + 1);
+    public TypeRef visitArray(ArrayType t, Integer dimension) {
+        return t.getComponentType().accept(this, dimension + 1);
     }
 
-    public TypeRefBuilder visitDeclared(DeclaredType t, Void aVoid) {
-        return builder.withDefinition(elementVisitor.visit(t.asElement()).build());
+    public TypeRef visitDeclared(DeclaredType t, Integer dimension) {
+        List<TypeRef> arguments = new ArrayList<TypeRef>();
+        for (TypeMirror typeMirror : t.getTypeArguments()) {
+            arguments.add(typeMirror.accept(this, dimension));
+        }
+        return new ClassRefBuilder()
+                .withDefinition(elementVisitor.visit(t.asElement()).build())
+                .withDimensions(dimension)
+                .withArguments(arguments.toArray(new TypeRef[arguments.size()]))
+                .build();
     }
 
-    public TypeRefBuilder visitError(ErrorType t, Void aVoid) {
-        return builder;
+    public TypeRef visitError(ErrorType t, Integer dimension) {
+        return new ClassRefBuilder().withDefinition(elementVisitor.visit(t.asElement()).build()).build();
     }
 
-    public TypeRefBuilder visitTypeVariable(TypeVariable t, Void aVoid) {
-        //TODO: We may need to revisit typeParamRef...
-        return builder.addToTypeParamRefArguments(toTypeParamRef.apply(t));
+    public TypeRef visitTypeVariable(TypeVariable t, Integer dimension) {
+        return toTypeParamRef.apply(t);
     }
 
-    public TypeRefBuilder visitWildcard(WildcardType t, Void aVoid) {
-        return builder;
+    public TypeRef visitWildcard(WildcardType t, Integer dimension) {
+        return null;
     }
 
-    public TypeRefBuilder visitExecutable(ExecutableType t, Void aVoid) {
-        return builder;
+    public TypeRef visitExecutable(ExecutableType t, Integer dimension) {
+        return null;
     }
 
-    public TypeRefBuilder visitNoType(NoType t, Void aVoid) {
-        return builder.withNewDefinition().withName(t.toString()).endDefinition();
+    public TypeRef visitNoType(NoType t, Integer dimension) {
+        return new VoidRefBuilder().build();
     }
 
-    public TypeRefBuilder visitUnknown(TypeMirror t, Void aVoid) {
-        return builder;
+    public TypeRef visitUnknown(TypeMirror t, Integer dimension) {
+        return null;
     }
 
-    public TypeRefBuilder visitUnion(UnionType t, Void aVoid) {
-        return builder;
+    public TypeRef visitUnion(UnionType t, Integer dimension) {
+        return null;
     }
 
     public ElementVisitor<TypeDefBuilder, Void> getElementVisitor() {

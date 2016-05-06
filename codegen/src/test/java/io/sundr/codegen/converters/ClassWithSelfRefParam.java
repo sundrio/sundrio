@@ -14,25 +14,17 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.codegen.converters;
 
-import io.sundr.builder.Editable;
+public class ClassWithSelfRefParam<T extends ClassWithSelfRefParam<T>> {
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+    private T value;
 
-public class EditableMethod extends Method implements Editable<MethodBuilder>{
+    public T getValue() {
+        return value;
+    }
 
-
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
-    super(annotations, parameters, name, returnType, arguments, exceptions, block, modifiers, attributes);
+    public void setValue(T value) {
+        this.value = value;
+    }
 }
-
-public MethodBuilder edit(){
-    return new MethodBuilder(this);
-}
-
-
-}
-    

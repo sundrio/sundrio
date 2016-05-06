@@ -18,23 +18,17 @@ package io.sundr.codegen.model;
 
 import java.util.Map;
 
-public class TypeParamRef extends AttributeSupport implements ParameterReference {
+public class TypeParamRef extends AttributeSupport implements TypeRef {
 
     private final String name;
-    private final TypeParamDef definition;
 
-    public TypeParamRef(String name, TypeParamDef definition, Map<String, Object> attributes) {
+    public TypeParamRef(String name, Map<String, Object> attributes) {
         super(attributes);
         this.name = name;
-        this.definition = definition;
     }
 
     public String getName() {
         return name;
-    }
-
-    public TypeParamDef getDefinition() {
-        return definition;
     }
 
     @Override
@@ -44,15 +38,17 @@ public class TypeParamRef extends AttributeSupport implements ParameterReference
 
         TypeParamRef that = (TypeParamRef) o;
 
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return definition != null ? definition.equals(that.definition) : that.definition == null;
+        return name != null ? name.equals(that.name) : that.name == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (definition != null ? definition.hashCode() : 0);
-        return result;
+        return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

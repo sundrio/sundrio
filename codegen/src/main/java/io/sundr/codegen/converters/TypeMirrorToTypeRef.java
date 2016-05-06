@@ -18,20 +18,19 @@ package io.sundr.codegen.converters;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.TypeRefBuilder;
 
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVisitor;
 
 public class TypeMirrorToTypeRef implements Function<TypeMirror, TypeRef> {
 
-    private final TypeVisitor<TypeRefBuilder, Void> visitor;
+    private final TypeVisitor<TypeRef, Integer> visitor;
 
-    public TypeMirrorToTypeRef(TypeVisitor<TypeRefBuilder, Void> visitor) {
+    public TypeMirrorToTypeRef(TypeVisitor<TypeRef, Integer> visitor) {
         this.visitor = visitor;
     }
 
     public TypeRef apply(TypeMirror item) {
-        return item.accept(visitor, null).build();
+        return item.accept(visitor, 0);
     }
 }

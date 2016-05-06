@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSupportFluentImpl<A> implements TypeDefFluent<A>{
 
-     Kind kind;     String packageName;     String name;     Set<VisitableBuilder<TypeRef, ?>> annotations = new LinkedHashSet();     Set<VisitableBuilder<TypeRef, ?>> extendsList = new LinkedHashSet();     Set<VisitableBuilder<TypeRef, ?>> implementsList = new LinkedHashSet();     List<VisitableBuilder<TypeParamDef, ?>> parameters = new ArrayList();     Set<VisitableBuilder<Property, ?>> properties = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> constructors = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> methods = new LinkedHashSet();
+     Kind kind;     String packageName;     String name;     Set<VisitableBuilder<ClassRef, ?>> annotations = new LinkedHashSet();     Set<VisitableBuilder<ClassRef, ?>> extendsList = new LinkedHashSet();     Set<VisitableBuilder<ClassRef, ?>> implementsList = new LinkedHashSet();     List<VisitableBuilder<TypeParamDef, ?>> parameters = new ArrayList();     Set<VisitableBuilder<Property, ?>> properties = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> constructors = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> methods = new LinkedHashSet();
 public TypeDefFluentImpl(){
     
 }
@@ -51,85 +51,83 @@ public TypeDefFluentImpl( TypeDef instance ){
     public A withName( String name){
     this.name=name; return (A) this;
     }
-    public A addToAnnotations( TypeRef ...items){
-    for (TypeRef item : items) {TypeRefBuilder builder = new TypeRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+    public A addToAnnotations( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
     }
-    public A removeFromAnnotations( TypeRef ...items){
-    for (TypeRef item : items) {TypeRefBuilder builder = new TypeRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
+    public A removeFromAnnotations( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
-    public Set<TypeRef> getAnnotations(){
+    public Set<ClassRef> getAnnotations(){
     return build(annotations);
     }
-    public A withAnnotations( Set<TypeRef> annotations){
-    this.annotations.clear();if (annotations != null) {for (TypeRef item : annotations){this.addToAnnotations(item);}} return (A) this;
+    public A withAnnotations( Set<ClassRef> annotations){
+    this.annotations.clear();if (annotations != null) {for (ClassRef item : annotations){this.addToAnnotations(item);}} return (A) this;
     }
-    public A withAnnotations( TypeRef ...annotations){
-    this.annotations.clear(); if (annotations != null) {for (TypeRef item :annotations){ this.addToAnnotations(item);}} return (A) this;
+    public A withAnnotations( ClassRef ...annotations){
+    this.annotations.clear(); if (annotations != null) {for (ClassRef item :annotations){ this.addToAnnotations(item);}} return (A) this;
     }
     public AnnotationsNested<A> addNewAnnotation(){
     return new AnnotationsNestedImpl();
     }
-    public AnnotationsNested<A> addNewAnnotationLike( TypeRef item){
+    public AnnotationsNested<A> addNewAnnotationLike( ClassRef item){
     return new AnnotationsNestedImpl(item);
     }
-    public A addToExtendsList( TypeRef ...items){
-    for (TypeRef item : items) {TypeRefBuilder builder = new TypeRefBuilder(item);_visitables.add(builder);this.extendsList.add(builder);} return (A)this;
+    public A addToExtendsList( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.extendsList.add(builder);} return (A)this;
     }
-    public A removeFromExtendsList( TypeRef ...items){
-    for (TypeRef item : items) {TypeRefBuilder builder = new TypeRefBuilder(item);_visitables.remove(builder);this.extendsList.remove(builder);} return (A)this;
+    public A removeFromExtendsList( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.extendsList.remove(builder);} return (A)this;
     }
-    public Set<TypeRef> getExtendsList(){
+    public Set<ClassRef> getExtendsList(){
     return build(extendsList);
     }
-    public A withExtendsList( Set<TypeRef> extendsList){
-    this.extendsList.clear();if (extendsList != null) {for (TypeRef item : extendsList){this.addToExtendsList(item);}} return (A) this;
+    public A withExtendsList( Set<ClassRef> extendsList){
+    this.extendsList.clear();if (extendsList != null) {for (ClassRef item : extendsList){this.addToExtendsList(item);}} return (A) this;
     }
-    public A withExtendsList( TypeRef ...extendsList){
-    this.extendsList.clear(); if (extendsList != null) {for (TypeRef item :extendsList){ this.addToExtendsList(item);}} return (A) this;
+    public A withExtendsList( ClassRef ...extendsList){
+    this.extendsList.clear(); if (extendsList != null) {for (ClassRef item :extendsList){ this.addToExtendsList(item);}} return (A) this;
     }
     public ExtendsListNested<A> addNewExtendsList(){
     return new ExtendsListNestedImpl();
     }
-    public ExtendsListNested<A> addNewExtendsListLike( TypeRef item){
+    public ExtendsListNested<A> addNewExtendsListLike( ClassRef item){
     return new ExtendsListNestedImpl(item);
     }
-    public A addToImplementsList( TypeRef ...items){
-    for (TypeRef item : items) {TypeRefBuilder builder = new TypeRefBuilder(item);_visitables.add(builder);this.implementsList.add(builder);} return (A)this;
+    public A addToImplementsList( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.implementsList.add(builder);} return (A)this;
     }
-    public A removeFromImplementsList( TypeRef ...items){
-    for (TypeRef item : items) {TypeRefBuilder builder = new TypeRefBuilder(item);_visitables.remove(builder);this.implementsList.remove(builder);} return (A)this;
+    public A removeFromImplementsList( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.implementsList.remove(builder);} return (A)this;
     }
-    public Set<TypeRef> getImplementsList(){
+    public Set<ClassRef> getImplementsList(){
     return build(implementsList);
     }
-    public A withImplementsList( Set<TypeRef> implementsList){
-    this.implementsList.clear();if (implementsList != null) {for (TypeRef item : implementsList){this.addToImplementsList(item);}} return (A) this;
+    public A withImplementsList( Set<ClassRef> implementsList){
+    this.implementsList.clear();if (implementsList != null) {for (ClassRef item : implementsList){this.addToImplementsList(item);}} return (A) this;
     }
-    public A withImplementsList( TypeRef ...implementsList){
-    this.implementsList.clear(); if (implementsList != null) {for (TypeRef item :implementsList){ this.addToImplementsList(item);}} return (A) this;
+    public A withImplementsList( ClassRef ...implementsList){
+    this.implementsList.clear(); if (implementsList != null) {for (ClassRef item :implementsList){ this.addToImplementsList(item);}} return (A) this;
     }
     public ImplementsListNested<A> addNewImplementsList(){
     return new ImplementsListNestedImpl();
     }
-    public ImplementsListNested<A> addNewImplementsListLike( TypeRef item){
+    public ImplementsListNested<A> addNewImplementsListLike( ClassRef item){
     return new ImplementsListNestedImpl(item);
-    }
-    public A withParameters( TypeParamDef ...parameters){
-    this.parameters.clear(); if (parameters != null) {for (TypeParamDef item :parameters){ this.addToParameters(item);}} return (A) this;
-    }
-    public TypeParamDef[] getParameters(){
-    List<TypeParamDef> result = new ArrayList<TypeParamDef>();
-for (VisitableBuilder<TypeParamDef, ?> builder : parameters) {
-    result.add(builder.build());
-}
-return result.toArray(new TypeParamDef[result.size()]);
-
     }
     public A addToParameters( TypeParamDef ...items){
     for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder);} return (A)this;
     }
     public A removeFromParameters( TypeParamDef ...items){
     for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);this.parameters.remove(builder);} return (A)this;
+    }
+    public List<TypeParamDef> getParameters(){
+    return build(parameters);
+    }
+    public A withParameters( List<TypeParamDef> parameters){
+    this.parameters.clear();if (parameters != null) {for (TypeParamDef item : parameters){this.addToParameters(item);}} return (A) this;
+    }
+    public A withParameters( TypeParamDef ...parameters){
+    this.parameters.clear(); if (parameters != null) {for (TypeParamDef item :parameters){ this.addToParameters(item);}} return (A) this;
     }
     public ParametersNested<A> addNewParameter(){
     return new ParametersNestedImpl();
@@ -220,15 +218,15 @@ return true;
 
     }
 
-    public class AnnotationsNestedImpl<N> extends TypeRefFluentImpl<AnnotationsNested<N>> implements AnnotationsNested<N>{
+    public class AnnotationsNestedImpl<N> extends ClassRefFluentImpl<AnnotationsNested<N>> implements AnnotationsNested<N>{
 
-        private final TypeRefBuilder builder;
+        private final ClassRefBuilder builder;
     
-             AnnotationsNestedImpl ( TypeRef item){
-        this.builder = new TypeRefBuilder(this, item);
-        }
              AnnotationsNestedImpl (){
-        this.builder = new TypeRefBuilder(this);
+        this.builder = new ClassRefBuilder(this);
+        }
+             AnnotationsNestedImpl ( ClassRef item){
+        this.builder = new ClassRefBuilder(this, item);
         }
     
             public N endAnnotation(){
@@ -239,15 +237,15 @@ return true;
         }
     
 }
-    public class ExtendsListNestedImpl<N> extends TypeRefFluentImpl<ExtendsListNested<N>> implements ExtendsListNested<N>{
+    public class ExtendsListNestedImpl<N> extends ClassRefFluentImpl<ExtendsListNested<N>> implements ExtendsListNested<N>{
 
-        private final TypeRefBuilder builder;
+        private final ClassRefBuilder builder;
     
-             ExtendsListNestedImpl ( TypeRef item){
-        this.builder = new TypeRefBuilder(this, item);
-        }
              ExtendsListNestedImpl (){
-        this.builder = new TypeRefBuilder(this);
+        this.builder = new ClassRefBuilder(this);
+        }
+             ExtendsListNestedImpl ( ClassRef item){
+        this.builder = new ClassRefBuilder(this, item);
         }
     
             public N endExtendsList(){
@@ -258,15 +256,15 @@ return true;
         }
     
 }
-    public class ImplementsListNestedImpl<N> extends TypeRefFluentImpl<ImplementsListNested<N>> implements ImplementsListNested<N>{
+    public class ImplementsListNestedImpl<N> extends ClassRefFluentImpl<ImplementsListNested<N>> implements ImplementsListNested<N>{
 
-        private final TypeRefBuilder builder;
+        private final ClassRefBuilder builder;
     
-             ImplementsListNestedImpl ( TypeRef item){
-        this.builder = new TypeRefBuilder(this, item);
-        }
              ImplementsListNestedImpl (){
-        this.builder = new TypeRefBuilder(this);
+        this.builder = new ClassRefBuilder(this);
+        }
+             ImplementsListNestedImpl ( ClassRef item){
+        this.builder = new ClassRefBuilder(this, item);
         }
     
             public N endImplementsList(){

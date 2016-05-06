@@ -20,16 +20,16 @@ import io.sundr.builder.Editable;
 
 import java.util.Map;
 
-public class EditableTypeParamRef extends TypeParamRef implements Editable<TypeParamRefBuilder> {
+public class EditableTypeParamRef extends TypeParamRef implements Editable<TypeParamRefBuilder>{
 
 
-    public EditableTypeParamRef(String name, TypeParamDef definition, Map<String, Object> attributes) {
-        super(name, definition, attributes);
-    }
+public EditableTypeParamRef( String name , Map<String, Object> attributes ){
+    super(name, attributes);
+}
 
-    public TypeParamRefBuilder edit() {
-        return new TypeParamRefBuilder(this);
-    }
+public TypeParamRefBuilder edit(){
+    return new TypeParamRefBuilder(this);
+}
 
 
 }

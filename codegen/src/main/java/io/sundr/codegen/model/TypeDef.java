@@ -16,9 +16,10 @@
 
 package io.sundr.codegen.model;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 public class TypeDef extends ModifierSupport {
 
@@ -26,16 +27,16 @@ public class TypeDef extends ModifierSupport {
     private final String packageName;
     private final String name;
 
-    private final Set<TypeRef> annotations;
-    private final Set<TypeRef> extendsList;
-    private final Set<TypeRef> implementsList;
-    private final TypeParamDef[] parameters;
+    private final Set<ClassRef> annotations;
+    private final Set<ClassRef> extendsList;
+    private final Set<ClassRef> implementsList;
+    private final List<TypeParamDef> parameters;
 
     private final Set<Property> properties;
     private final Set<Method> constructors;
     private final Set<Method> methods;
 
-    public TypeDef(Kind kind, String packageName, String name, Set<TypeRef> annotations, Set<TypeRef> extendsList, Set<TypeRef> implementsList, TypeParamDef[] parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind;
         this.packageName = packageName;
@@ -81,7 +82,7 @@ public class TypeDef extends ModifierSupport {
         return kind;
     }
 
-    public Set<TypeRef> getAnnotations() {
+    public Set<ClassRef> getAnnotations() {
         return annotations;
     }
 
@@ -93,15 +94,15 @@ public class TypeDef extends ModifierSupport {
         return name;
     }
 
-    public Set<TypeRef> getExtendsList() {
+    public Set<ClassRef> getExtendsList() {
         return extendsList;
     }
 
-    public Set<TypeRef> getImplementsList() {
+    public Set<ClassRef> getImplementsList() {
         return implementsList;
     }
 
-    public TypeParamDef[] getParameters() {
+    public List<TypeParamDef> getParameters() {
         return parameters;
     }
 
@@ -122,12 +123,10 @@ public class TypeDef extends ModifierSupport {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TypeDef type = (TypeDef) o;
+        TypeDef typeDef = (TypeDef) o;
 
-        if (packageName != null ? !packageName.equals(type.packageName) : type.packageName != null) return false;
-        if (name != null ? !name.equals(type.name) : type.name != null) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(parameters, type.parameters);
+        if (packageName != null ? !packageName.equals(typeDef.packageName) : typeDef.packageName != null) return false;
+        return name != null ? name.equals(typeDef.name) : typeDef.name == null;
 
     }
 
@@ -135,7 +134,6 @@ public class TypeDef extends ModifierSupport {
     public int hashCode() {
         int result = packageName != null ? packageName.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (parameters != null ? Arrays.hashCode(parameters) : 0);
         return result;
     }
 

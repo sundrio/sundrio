@@ -16,23 +16,9 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
+import io.sundr.builder.Fluent;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-public class EditableMethod extends Method implements Editable<MethodBuilder>{
-
-
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
-    super(annotations, parameters, name, returnType, arguments, exceptions, block, modifiers, attributes);
-}
-
-public MethodBuilder edit(){
-    return new MethodBuilder(this);
-}
+public interface VoidRefFluent<A extends VoidRefFluent<A>> extends Fluent<A>, AttributeSupportFluent<A> {
 
 
 }
-    

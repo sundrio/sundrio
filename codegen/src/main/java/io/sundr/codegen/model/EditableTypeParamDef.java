@@ -18,18 +18,19 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Editable;
 
+import java.util.List;
 import java.util.Map;
 
-public class EditableTypeParamDef extends TypeParamDef implements Editable<TypeParamDefBuilder> {
+public class EditableTypeParamDef extends TypeParamDef implements Editable<TypeParamDefBuilder>{
 
 
-    public EditableTypeParamDef(String name, TypeRef[] bounds, Map<String, Object> attributes) {
-        super(name, bounds, attributes);
-    }
+public EditableTypeParamDef( String name , List<ClassRef> bounds , Map<String, Object> attributes ){
+    super(name, bounds, attributes);
+}
 
-    public TypeParamDefBuilder edit() {
-        return new TypeParamDefBuilder(this);
-    }
+public TypeParamDefBuilder edit(){
+    return new TypeParamDefBuilder(this);
+}
 
 
 }

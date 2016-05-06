@@ -18,18 +18,19 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Editable;
 
+import java.util.List;
 import java.util.Map;
 
-public class EditableTypeRef extends TypeRef implements Editable<TypeRefBuilder> {
+public class EditableClassRef extends ClassRef implements Editable<ClassRefBuilder>{
 
 
-    public EditableTypeRef(TypeDef definition, int dimensions, ParameterReference[] arguments, Map<String, Object> attributes) {
-        super(definition, dimensions, arguments, attributes);
-    }
+public EditableClassRef( TypeDef definition , int dimensions , List<TypeRef> arguments , Map<String, Object> attributes ){
+    super(definition, dimensions, arguments, attributes);
+}
 
-    public TypeRefBuilder edit() {
-        return new TypeRefBuilder(this);
-    }
+public ClassRefBuilder edit(){
+    return new ClassRefBuilder(this);
+}
 
 
 }

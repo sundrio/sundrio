@@ -21,108 +21,74 @@ import io.sundr.builder.VisitableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeParamDefFluent<A> {
+public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeParamDefFluent<A>{
 
-    String name;
-    List<VisitableBuilder<TypeRef, ?>> bounds = new ArrayList();
+     String name;     List<VisitableBuilder<ClassRef, ?>> bounds = new ArrayList();
+public TypeParamDefFluentImpl(){
+    
+}
+public TypeParamDefFluentImpl( TypeParamDef instance ){
+    this.withName(instance.getName()); this.withBounds(instance.getBounds()); this.withAttributes(instance.getAttributes()); 
+}
 
-    public TypeParamDefFluentImpl() {
+    public String getName(){
+    return this.name;
+    }
+    public A withName( String name){
+    this.name=name; return (A) this;
+    }
+    public A addToBounds( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+    }
+    public A removeFromBounds( ClassRef ...items){
+    for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
+    }
+    public List<ClassRef> getBounds(){
+    return build(bounds);
+    }
+    public A withBounds( List<ClassRef> bounds){
+    this.bounds.clear();if (bounds != null) {for (ClassRef item : bounds){this.addToBounds(item);}} return (A) this;
+    }
+    public A withBounds( ClassRef ...bounds){
+    this.bounds.clear(); if (bounds != null) {for (ClassRef item :bounds){ this.addToBounds(item);}} return (A) this;
+    }
+    public BoundsNested<A> addNewBound(){
+    return new BoundsNestedImpl();
+    }
+    public BoundsNested<A> addNewBoundLike( ClassRef item){
+    return new BoundsNestedImpl(item);
+    }
+    public boolean equals( Object o){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+TypeParamDefFluentImpl that = (TypeParamDefFluentImpl) o;
+if (name != null ? !name.equals(that.name) :that.name != null) return false;
+if (bounds != null ? !bounds.equals(that.bounds) :that.bounds != null) return false;
+return true;
 
     }
 
-    public TypeParamDefFluentImpl(TypeParamDef instance) {
-        this.withName(instance.getName());
-        this.withBounds(instance.getBounds());
-        this.withAttributes(instance.getAttributes());
-    }
+    public class BoundsNestedImpl<N> extends ClassRefFluentImpl<BoundsNested<N>> implements BoundsNested<N>{
 
-    public String getName() {
-        return this.name;
-    }
-
-    public A withName(String name) {
-        this.name = name;
-        return (A) this;
-    }
-
-    public A withBounds(TypeRef... bounds) {
-        this.bounds.clear();
-        if (bounds != null) {
-            for (TypeRef item : bounds) {
-                this.addToBounds(item);
-            }
+        private final ClassRefBuilder builder;
+    
+             BoundsNestedImpl (){
+        this.builder = new ClassRefBuilder(this);
         }
-        return (A) this;
-    }
-
-    public TypeRef[] getBounds() {
-        List<TypeRef> result = new ArrayList<TypeRef>();
-        for (VisitableBuilder<TypeRef, ?> builder : bounds) {
-            result.add(builder.build());
+             BoundsNestedImpl ( ClassRef item){
+        this.builder = new ClassRefBuilder(this, item);
         }
-        return result.toArray(new TypeRef[result.size()]);
-
-    }
-
-    public A addToBounds(TypeRef... items) {
-        for (TypeRef item : items) {
-            TypeRefBuilder builder = new TypeRefBuilder(item);
-            _visitables.add(builder);
-            this.bounds.add(builder);
-        }
-        return (A) this;
-    }
-
-    public A removeFromBounds(TypeRef... items) {
-        for (TypeRef item : items) {
-            TypeRefBuilder builder = new TypeRefBuilder(item);
-            _visitables.remove(builder);
-            this.bounds.remove(builder);
-        }
-        return (A) this;
-    }
-
-    public BoundsNested<A> addNewBound() {
-        return new BoundsNestedImpl();
-    }
-
-    public BoundsNested<A> addNewBoundLike(TypeRef item) {
-        return new BoundsNestedImpl(item);
-    }
-
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        TypeParamDefFluentImpl that = (TypeParamDefFluentImpl) o;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (bounds != null ? !bounds.equals(that.bounds) : that.bounds != null) return false;
-        return true;
-
-    }
-
-    public class BoundsNestedImpl<N> extends TypeRefFluentImpl<BoundsNested<N>> implements BoundsNested<N> {
-
-        private final TypeRefBuilder builder;
-
-        BoundsNestedImpl(TypeRef item) {
-            this.builder = new TypeRefBuilder(this, item);
-        }
-
-        BoundsNestedImpl() {
-            this.builder = new TypeRefBuilder(this);
-        }
-
-        public N endBound() {
+    
+            public N endBound(){
             return and();
         }
-
-        public N and() {
+            public N and(){
             return (N) TypeParamDefFluentImpl.this.addToBounds(builder.build());
         }
-
-    }
+    
+}
 
 
 }

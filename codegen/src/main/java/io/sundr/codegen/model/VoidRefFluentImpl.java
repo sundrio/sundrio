@@ -16,23 +16,26 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-public class EditableMethod extends Method implements Editable<MethodBuilder>{
+public class VoidRefFluentImpl<A extends VoidRefFluent<A>> extends AttributeSupportFluentImpl<A> implements VoidRefFluent<A> {
 
 
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
-    super(annotations, parameters, name, returnType, arguments, exceptions, block, modifiers, attributes);
+    public VoidRefFluentImpl() {
+
+    }
+
+    public VoidRefFluentImpl(VoidRef instance) {
+        this.withAttributes(instance.getAttributes());
+    }
+
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        VoidRefFluentImpl that = (VoidRefFluentImpl) o;
+        return true;
+
+    }
+
+
 }
-
-public MethodBuilder edit(){
-    return new MethodBuilder(this);
-}
-
-
-}
-    

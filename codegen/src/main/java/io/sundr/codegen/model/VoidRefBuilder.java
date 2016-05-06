@@ -18,36 +18,30 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class TypeRefBuilder extends TypeRefFluentImpl<TypeRefBuilder> implements VisitableBuilder<TypeRef, TypeRefBuilder> {
+public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements VisitableBuilder<VoidRef, VoidRefBuilder> {
 
-    TypeRefFluent<?> fluent;
+    VoidRefFluent<?> fluent;
 
-    public TypeRefBuilder() {
+    public VoidRefBuilder() {
         this.fluent = this;
     }
 
-    public TypeRefBuilder(TypeRefFluent<?> fluent) {
+    public VoidRefBuilder(VoidRefFluent<?> fluent) {
         this.fluent = fluent;
     }
 
-    public TypeRefBuilder(TypeRefFluent<?> fluent, TypeRef instance) {
+    public VoidRefBuilder(VoidRefFluent<?> fluent, VoidRef instance) {
         this.fluent = fluent;
-        fluent.withDefinition(instance.getDefinition());
-        fluent.withDimensions(instance.getDimensions());
-        fluent.withArguments(instance.getArguments());
         fluent.withAttributes(instance.getAttributes());
     }
 
-    public TypeRefBuilder(TypeRef instance) {
+    public VoidRefBuilder(VoidRef instance) {
         this.fluent = this;
-        this.withDefinition(instance.getDefinition());
-        this.withDimensions(instance.getDimensions());
-        this.withArguments(instance.getArguments());
         this.withAttributes(instance.getAttributes());
     }
 
-    public EditableTypeRef build() {
-        EditableTypeRef buildable = new EditableTypeRef(fluent.getDefinition(), fluent.getDimensions(), fluent.getArguments(), fluent.getAttributes());
+    public EditableVoidRef build() {
+        EditableVoidRef buildable = new EditableVoidRef(fluent.getAttributes());
         validate(buildable);
         return buildable;
 
@@ -58,7 +52,7 @@ public class TypeRefBuilder extends TypeRefFluentImpl<TypeRefBuilder> implements
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        TypeRefBuilder that = (TypeRefBuilder) o;
+        VoidRefBuilder that = (VoidRefBuilder) o;
         if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
             return false;
         return true;

@@ -14,16 +14,13 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples.codegen;
+package io.sundr.codegen.model;
 
-import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Buildable
 public class ClassRef extends AttributeSupport implements TypeRef {
 
     private final TypeDef definition;

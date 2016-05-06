@@ -16,16 +16,17 @@
 
 package io.sundr.codegen.model;
 
+import java.util.List;
 
 public class Block {
 
-    private Statement[] statements;
+    private List<Statement> statements;
 
-    public Block(Statement[] statements) {
+    public Block(List<Statement> statements) {
         this.statements = statements;
     }
 
-    public Statement[] getStatements() {
+    public List<Statement> getStatements() {
         return statements;
     }
 }

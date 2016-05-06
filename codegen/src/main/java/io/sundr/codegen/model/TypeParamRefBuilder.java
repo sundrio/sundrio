@@ -18,53 +18,41 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class TypeParamRefBuilder extends TypeParamRefFluentImpl<TypeParamRefBuilder> implements VisitableBuilder<TypeParamRef, TypeParamRefBuilder> {
+public class TypeParamRefBuilder extends TypeParamRefFluentImpl<TypeParamRefBuilder> implements VisitableBuilder<TypeParamRef,TypeParamRefBuilder>{
 
-    TypeParamRefFluent<?> fluent;
+     TypeParamRefFluent<?> fluent;
 
-    public TypeParamRefBuilder() {
+    public TypeParamRefBuilder(){
         this.fluent = this;
     }
-
-    public TypeParamRefBuilder(TypeParamRefFluent<?> fluent) {
+    public TypeParamRefBuilder( TypeParamRefFluent<?> fluent ){
         this.fluent = fluent;
     }
-
-    public TypeParamRefBuilder(TypeParamRefFluent<?> fluent, TypeParamRef instance) {
-        this.fluent = fluent;
-        fluent.withName(instance.getName());
-        fluent.withDefinition(instance.getDefinition());
-        fluent.withAttributes(instance.getAttributes());
+    public TypeParamRefBuilder( TypeParamRefFluent<?> fluent , TypeParamRef instance ){
+        this.fluent = fluent; fluent.withName(instance.getName()); fluent.withAttributes(instance.getAttributes()); 
+    }
+    public TypeParamRefBuilder( TypeParamRef instance ){
+        this.fluent = this; this.withName(instance.getName()); this.withAttributes(instance.getAttributes()); 
     }
 
-    public TypeParamRefBuilder(TypeParamRef instance) {
-        this.fluent = this;
-        this.withName(instance.getName());
-        this.withDefinition(instance.getDefinition());
-        this.withAttributes(instance.getAttributes());
-    }
+public EditableTypeParamRef build(){
+    EditableTypeParamRef buildable = new EditableTypeParamRef(fluent.getName(),fluent.getAttributes());
+validate(buildable);
+return buildable;
 
-    public EditableTypeParamRef build() {
-        EditableTypeParamRef buildable = new EditableTypeParamRef(fluent.getName(), fluent.getDefinition(), fluent.getAttributes());
-        validate(buildable);
-        return buildable;
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+TypeParamRefBuilder that = (TypeParamRefBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    }
+}
 
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        TypeParamRefBuilder that = (TypeParamRefBuilder) o;
-        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-            return false;
-        return true;
-
-    }
-
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }

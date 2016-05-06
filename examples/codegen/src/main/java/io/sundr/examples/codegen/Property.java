@@ -25,13 +25,13 @@ import java.util.Set;
 public class Property extends ModifierSupport {
 
     private final Set<ClassRef> annotations;
-    private final ClassRef classRef;
+    private final TypeRef typeRef;
     private final String name;
 
-    public Property(Set<ClassRef> annotations, ClassRef classRef, String name, int modifiers, Map<String, Object> attributes) {
+    public Property(Set<ClassRef> annotations, TypeRef typeRef, String name, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
-        this.classRef = classRef;
+        this.typeRef = typeRef;
         this.name = name;
     }
 
@@ -39,8 +39,8 @@ public class Property extends ModifierSupport {
         return annotations;
     }
 
-    public ClassRef getClassRef() {
-        return classRef;
+    public TypeRef getTypeRef() {
+        return typeRef;
     }
 
     public String getName() {
@@ -61,5 +61,35 @@ public class Property extends ModifierSupport {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        if (isPublic()) {
+            sb.append("public ");
+        } else if (isProtected()) {
+            sb.append("protected ");
+        } else if (isPrivate()) {
+            sb.append("private ");
+        }
+
+        if (isSynchronized()) {
+            sb.append("synchronized ");
+        }
+
+        if (isStatic()) {
+            sb.append("static ");
+        }
+
+        if (isFinal()) {
+            sb.append("final ");
+        }
+
+        sb.append(typeRef).append(" ");
+        sb.append(name);
+
+        return sb.toString();
     }
 }

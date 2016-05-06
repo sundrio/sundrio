@@ -19,32 +19,15 @@ package io.sundr.codegen.model;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
 
-public interface BlockFluent<A extends BlockFluent<A>> extends Fluent<A> {
+import java.util.List;
+
+public interface BlockFluent<A extends BlockFluent<A>> extends Fluent<A>{
 
 
-    public A withStatements(Statement... statements);
-
-    public Statement[] getStatements();
-
-    public A addToStatements(Statement... items);
-
-    public A removeFromStatements(Statement... items);
-
-    public A addToStringStatementStatements(StringStatement... items);
-
-    public A removeFromStringStatementStatements(StringStatement... items);
-
-    public StringStatementStatementsNested<A> addNewStringStatementStatement();
-
-    public StringStatementStatementsNested<A> addNewStringStatementStatementLike(StringStatement item);
-
-    public A addNewStringStatementStatement(String data);
-
-    public interface StringStatementStatementsNested<N> extends Nested<N>, StringStatementFluent<StringStatementStatementsNested<N>> {
-        public N endStringStatementStatement();
-
-        public N and();
-    }
+    public A addToStatements(Statement... items);    public A removeFromStatements(Statement... items);    public List<Statement> getStatements();    public A withStatements(List<Statement> statements);    public A withStatements(Statement... statements);    public A addToStringStatementStatements(StringStatement... items);    public A removeFromStringStatementStatements(StringStatement... items);    public StringStatementStatementsNested<A> addNewStringStatementStatement();    public StringStatementStatementsNested<A> addNewStringStatementStatementLike(StringStatement item);    public A addNewStringStatementStatement(String data);
+    public interface StringStatementStatementsNested<N> extends Nested<N>,StringStatementFluent<StringStatementStatementsNested<N>>{
+            public N endStringStatementStatement();            public N and();        
+}
 
 
 }

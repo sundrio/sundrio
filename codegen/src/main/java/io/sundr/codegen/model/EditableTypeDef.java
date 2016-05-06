@@ -18,13 +18,14 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Editable;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class EditableTypeDef extends TypeDef implements Editable<TypeDefBuilder>{
 
 
-public EditableTypeDef(Kind kind , String packageName , String name , Set<TypeRef> annotations , Set<TypeRef> extendsList , Set<TypeRef> implementsList , TypeParamDef[] parameters , Set<Property> properties , Set<Method> constructors , Set<Method> methods , int modifiers , Map<String, Object> attributes ){
+public EditableTypeDef( Kind kind , String packageName , String name , Set<ClassRef> annotations , Set<ClassRef> extendsList , Set<ClassRef> implementsList , List<TypeParamDef> parameters , Set<Property> properties , Set<Method> constructors , Set<Method> methods , int modifiers , Map<String, Object> attributes ){
     super(kind, packageName, name, annotations, extendsList, implementsList, parameters, properties, constructors, methods, modifiers, attributes);
 }
 

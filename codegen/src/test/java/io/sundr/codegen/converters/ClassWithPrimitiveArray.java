@@ -14,25 +14,17 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.codegen.converters;
 
-import io.sundr.builder.Editable;
+public class ClassWithPrimitiveArray {
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+    private int[] value;
 
-public class EditableMethod extends Method implements Editable<MethodBuilder>{
+    public int[] getValue() {
+        return value;
+    }
 
-
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
-    super(annotations, parameters, name, returnType, arguments, exceptions, block, modifiers, attributes);
+    public void setValue(int[] value) {
+        this.value = value;
+    }
 }
-
-public MethodBuilder edit(){
-    return new MethodBuilder(this);
-}
-
-
-}
-    

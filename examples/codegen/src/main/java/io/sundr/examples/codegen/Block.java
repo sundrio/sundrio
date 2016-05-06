@@ -18,16 +18,18 @@ package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
 
+import java.util.List;
+
 @Buildable
 public class Block {
 
-    private Statement[] statements;
+    private List<Statement> statements;
 
-    public Block(Statement[] statements) {
+    public Block(List<Statement> statements) {
         this.statements = statements;
     }
 
-    public Statement[] getStatements() {
+    public List<Statement> getStatements() {
         return statements;
     }
 }

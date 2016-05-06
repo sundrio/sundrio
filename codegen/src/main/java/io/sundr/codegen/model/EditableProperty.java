@@ -21,16 +21,16 @@ import io.sundr.builder.Editable;
 import java.util.Map;
 import java.util.Set;
 
-public class EditableProperty extends Property implements Editable<PropertyBuilder> {
+public class EditableProperty extends Property implements Editable<PropertyBuilder>{
 
 
-    public EditableProperty(Set<TypeRef> annotations, TypeRef typeRef, String name, int modifiers, Map<String, Object> attributes) {
-        super(annotations, typeRef, name, modifiers, attributes);
-    }
+public EditableProperty( Set<ClassRef> annotations , TypeRef typeRef , String name , int modifiers , Map<String, Object> attributes ){
+    super(annotations, typeRef, name, modifiers, attributes);
+}
 
-    public PropertyBuilder edit() {
-        return new PropertyBuilder(this);
-    }
+public PropertyBuilder edit(){
+    return new PropertyBuilder(this);
+}
 
 
 }

@@ -18,21 +18,21 @@ package io.sundr.codegen.model;
 
 import io.sundr.codegen.utils.StringUtils;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class Method extends ModifierSupport {
 
-    private final Set<TypeRef> annotations;
+    private final Set<ClassRef> annotations;
     private final Set<TypeParamDef> parameters;
     private final String name;
     private final TypeRef returnType;
-    private final Property[] arguments;
-    private final Set<TypeRef> exceptions;
+    private final List<Property> arguments;
+    private final Set<ClassRef> exceptions;
     private final Block block;
 
-    public Method(Set<TypeRef> annotations, Set<TypeParamDef> parameters, String name, TypeRef returnType, Property[] arguments, Set<TypeRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
+    public Method(Set<ClassRef> annotations, Set<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, Set<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.parameters = parameters;
@@ -43,7 +43,7 @@ public class Method extends ModifierSupport {
         this.block = block;
     }
 
-    public Set<TypeRef> getAnnotations() {
+    public Set<ClassRef> getAnnotations() {
         return annotations;
     }
 
@@ -59,11 +59,11 @@ public class Method extends ModifierSupport {
         return returnType;
     }
 
-    public Property[] getArguments() {
+    public List<Property> getArguments() {
         return arguments;
     }
 
-    public Set<TypeRef> getExceptions() {
+    public Set<ClassRef> getExceptions() {
         return exceptions;
     }
 
@@ -78,18 +78,20 @@ public class Method extends ModifierSupport {
 
         Method method = (Method) o;
 
-        if (!name.equals(method.name)) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(arguments, method.arguments);
+        if (parameters != null ? !parameters.equals(method.parameters) : method.parameters != null) return false;
+        if (name != null ? !name.equals(method.name) : method.name != null) return false;
+        return arguments != null ? arguments.equals(method.arguments) : method.arguments == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + Arrays.hashCode(arguments);
+        int result = parameters != null ? parameters.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
         return result;
     }
+
 
     @Override
     public String toString() {

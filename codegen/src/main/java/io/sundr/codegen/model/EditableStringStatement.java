@@ -18,16 +18,16 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Editable;
 
-public class EditableStringStatement extends StringStatement implements Editable<StringStatementBuilder> {
+public class EditableStringStatement extends StringStatement implements Editable<StringStatementBuilder>{
 
 
-    public EditableStringStatement(String data) {
-        super(data);
-    }
+public EditableStringStatement( String data ){
+    super(data);
+}
 
-    public StringStatementBuilder edit() {
-        return new StringStatementBuilder(this);
-    }
+public StringStatementBuilder edit(){
+    return new StringStatementBuilder(this);
+}
 
 
 }

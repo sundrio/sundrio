@@ -16,44 +16,50 @@
 
 package io.sundr.codegen.model;
 
-import java.util.List;
-import java.util.Map;
+public class PrimitiveRefFluentImpl<A extends PrimitiveRefFluent<A>> extends AttributeSupportFluentImpl<A> implements PrimitiveRefFluent<A> {
 
-public class TypeParamDef extends AttributeSupport {
+    String name;
+    int dimensions;
 
-    private final String name;
-    private final List<ClassRef> bounds;
+    public PrimitiveRefFluentImpl() {
 
-    public TypeParamDef(String name, List<ClassRef> bounds, Map<String, Object> attributes) {
-        super(attributes);
-        this.name = name;
-        this.bounds = bounds;
+    }
+
+    public PrimitiveRefFluentImpl(PrimitiveRef instance) {
+        this.withName(instance.getName());
+        this.withDimensions(instance.getDimensions());
+        this.withAttributes(instance.getAttributes());
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
-    public List<ClassRef> getBounds() {
-        return bounds;
+    public A withName(String name) {
+        this.name = name;
+        return (A) this;
     }
 
-    @Override
+    public int getDimensions() {
+        return this.dimensions;
+    }
+
+    public A withDimensions(int dimensions) {
+        this.dimensions = dimensions;
+        return (A) this;
+    }
+
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
-        TypeParamDef that = (TypeParamDef) o;
-
+        if (!super.equals(o)) return false;
+        PrimitiveRefFluentImpl that = (PrimitiveRefFluentImpl) o;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return bounds != null ? bounds.equals(that.bounds) : that.bounds == null;
+        if (dimensions != that.dimensions) return false;
+        return true;
 
     }
 
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (bounds != null ? bounds.hashCode() : 0);
-        return result;
-    }
+
 }

@@ -18,19 +18,17 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Editable;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public class EditableMethod extends Method implements Editable<MethodBuilder>{
+public class EditablePrimitiveRef extends PrimitiveRef implements Editable<PrimitiveRefBuilder>{
 
 
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
-    super(annotations, parameters, name, returnType, arguments, exceptions, block, modifiers, attributes);
+public EditablePrimitiveRef( String name , int dimensions , Map<String, Object> attributes ){
+    super(name, dimensions, attributes);
 }
 
-public MethodBuilder edit(){
-    return new MethodBuilder(this);
+public PrimitiveRefBuilder edit(){
+    return new PrimitiveRefBuilder(this);
 }
 
 

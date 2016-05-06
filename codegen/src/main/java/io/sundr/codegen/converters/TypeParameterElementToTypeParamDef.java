@@ -17,6 +17,7 @@
 package io.sundr.codegen.converters;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeRef;
@@ -35,15 +36,16 @@ public class TypeParameterElementToTypeParamDef implements Function<TypeParamete
     }
 
     public TypeParamDef apply(TypeParameterElement item) {
-        List<TypeRef> typeRefs = new ArrayList();
+        List<ClassRef> typeRefs = new ArrayList();
 
-        for(TypeMirror typeMirror :item.getBounds()) {
-            typeRefs.add(toTypeRef.apply(typeMirror));
+        for(TypeMirror typeMirror : item.getBounds()) {
+            //TODO: Fix this
+            //typeRefs.add(toTypeRef.apply(typeMirror));
         }
 
         return new TypeParamDefBuilder()
                 .withName(item.getSimpleName().toString())
-                .withBounds(typeRefs.toArray(new TypeRef[typeRefs.size()]))
+                .withBounds(typeRefs.toArray(new ClassRef[typeRefs.size()]))
                 .build();
     }
 }

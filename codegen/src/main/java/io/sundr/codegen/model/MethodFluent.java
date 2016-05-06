@@ -19,70 +19,32 @@ package io.sundr.codegen.model;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
 
+import java.util.List;
 import java.util.Set;
 
-public interface MethodFluent<A extends MethodFluent<A>> extends Fluent<A>, ModifierSupportFluent<A> {
+public interface MethodFluent<A extends MethodFluent<A>> extends Fluent<A>,ModifierSupportFluent<A>{
 
 
-    public A addToAnnotations(TypeRef... items);
+    public A addToAnnotations(ClassRef... items);    public A removeFromAnnotations(ClassRef... items);    public Set<ClassRef> getAnnotations();    public A withAnnotations(Set<ClassRef> annotations);    public A withAnnotations(ClassRef... annotations);    public AnnotationsNested<A> addNewAnnotation();    public AnnotationsNested<A> addNewAnnotationLike(ClassRef item);    public A addToParameters(TypeParamDef... items);    public A removeFromParameters(TypeParamDef... items);    public Set<TypeParamDef> getParameters();    public A withParameters(Set<TypeParamDef> parameters);    public A withParameters(TypeParamDef... parameters);    public ParametersNested<A> addNewParameter();    public ParametersNested<A> addNewParameterLike(TypeParamDef item);    public String getName();    public A withName(String name);    public TypeRef getReturnType();    public A withReturnType(TypeRef returnType);    public A addToArguments(Property... items);    public A removeFromArguments(Property... items);    public List<Property> getArguments();    public A withArguments(List<Property> arguments);    public A withArguments(Property... arguments);    public ArgumentsNested<A> addNewArgument();    public ArgumentsNested<A> addNewArgumentLike(Property item);    public A addToExceptions(ClassRef... items);    public A removeFromExceptions(ClassRef... items);    public Set<ClassRef> getExceptions();    public A withExceptions(Set<ClassRef> exceptions);    public A withExceptions(ClassRef... exceptions);    public ExceptionsNested<A> addNewException();    public ExceptionsNested<A> addNewExceptionLike(ClassRef item);    public Block getBlock();    public A withBlock(Block block);    public BlockNested<A> withNewBlock();    public BlockNested<A> withNewBlockLike(Block item);    public BlockNested<A> editBlock();
+    public interface AnnotationsNested<N> extends Nested<N>,ClassRefFluent<AnnotationsNested<N>>{
+            public N endAnnotation();            public N and();        
+}
 
-    public A removeFromAnnotations(TypeRef... items);
+    public interface ParametersNested<N> extends Nested<N>,TypeParamDefFluent<ParametersNested<N>>{
+            public N endParameter();            public N and();        
+}
 
-    public Set<TypeRef> getAnnotations();
+    public interface ArgumentsNested<N> extends Nested<N>,PropertyFluent<ArgumentsNested<N>>{
+            public N endArgument();            public N and();        
+}
 
-    public A withAnnotations(Set<TypeRef> annotations);
+    public interface ExceptionsNested<N> extends Nested<N>,ClassRefFluent<ExceptionsNested<N>>{
+            public N endException();            public N and();        
+}
 
-    public A withAnnotations(TypeRef... annotations);
-
-    public A addToParameters(TypeParamDef... items);
-
-    public A removeFromParameters(TypeParamDef... items);
-
-    public Set<TypeParamDef> getParameters();
-
-    public A withParameters(Set<TypeParamDef> parameters);
-
-    public A withParameters(TypeParamDef... parameters);
-
-    public String getName();
-
-    public A withName(String name);
-
-    public TypeRef getReturnType();
-
-    public A withReturnType(TypeRef returnType);
-
-    public A withArguments(Property... arguments);
-
-    public Property[] getArguments();
-
-    public A addToArguments(Property... items);
-
-    public A removeFromArguments(Property... items);
-
-    public ArgumentsNested<A> addNewArgument();
-
-    public ArgumentsNested<A> addNewArgumentLike(Property item);
-
-    public A addToExceptions(TypeRef... items);
-
-    public A removeFromExceptions(TypeRef... items);
-
-    public Set<TypeRef> getExceptions();
-
-    public A withExceptions(Set<TypeRef> exceptions);
-
-    public A withExceptions(TypeRef... exceptions);
-
-    public Block getBlock();
-
-    public A withBlock(Block block);
-
-    public interface ArgumentsNested<N> extends Nested<N>, PropertyFluent<ArgumentsNested<N>> {
-        public N endArgument();
-
-        public N and();
-    }
+    public interface BlockNested<N> extends Nested<N>,BlockFluent<BlockNested<N>>{
+            public N endBlock();            public N and();        
+}
 
 
 }

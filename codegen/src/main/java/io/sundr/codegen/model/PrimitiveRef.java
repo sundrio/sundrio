@@ -16,23 +16,30 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-public class EditableMethod extends Method implements Editable<MethodBuilder>{
+public class PrimitiveRef extends AttributeSupport implements TypeRef {
 
+    private final String name;
+    private final int dimensions;
 
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
-    super(annotations, parameters, name, returnType, arguments, exceptions, block, modifiers, attributes);
+    public PrimitiveRef(String name, int dimensions, Map<String, Object> attributes) {
+        super(attributes);
+        this.name = name;
+        this.dimensions = dimensions;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getDimensions() {
+        return dimensions;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
 }
-
-public MethodBuilder edit(){
-    return new MethodBuilder(this);
-}
-
-
-}
-    

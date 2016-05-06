@@ -17,28 +17,17 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Fluent;
+import io.sundr.builder.Nested;
 
 import java.util.Set;
 
-public interface PropertyFluent<A extends PropertyFluent<A>> extends Fluent<A>, ModifierSupportFluent<A> {
+public interface PropertyFluent<A extends PropertyFluent<A>> extends Fluent<A>,ModifierSupportFluent<A>{
 
 
-    public A addToAnnotations(TypeRef... items);
+    public A addToAnnotations(ClassRef... items);    public A removeFromAnnotations(ClassRef... items);    public Set<ClassRef> getAnnotations();    public A withAnnotations(Set<ClassRef> annotations);    public A withAnnotations(ClassRef... annotations);    public AnnotationsNested<A> addNewAnnotation();    public AnnotationsNested<A> addNewAnnotationLike(ClassRef item);    public TypeRef getTypeRef();    public A withTypeRef(TypeRef typeRef);    public String getName();    public A withName(String name);
+    public interface AnnotationsNested<N> extends Nested<N>,ClassRefFluent<AnnotationsNested<N>>{
+            public N endAnnotation();            public N and();        
+}
 
-    public A removeFromAnnotations(TypeRef... items);
-
-    public Set<TypeRef> getAnnotations();
-
-    public A withAnnotations(Set<TypeRef> annotations);
-
-    public A withAnnotations(TypeRef... annotations);
-
-    public TypeRef getTypeRef();
-
-    public A withTypeRef(TypeRef typeRef);
-
-    public String getName();
-
-    public A withName(String name);
 
 }

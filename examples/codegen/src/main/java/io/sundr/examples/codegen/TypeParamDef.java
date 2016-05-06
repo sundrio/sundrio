@@ -19,15 +19,16 @@ package io.sundr.examples.codegen;
 import io.sundr.builder.annotations.Buildable;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Buildable
 public class TypeParamDef extends AttributeSupport {
 
     private final String name;
-    private final ClassRef[] bounds;
+    private final List<ClassRef> bounds;
 
-    public TypeParamDef(String name, ClassRef[] bounds, Map<String, Object> attributes) {
+    public TypeParamDef(String name, List<ClassRef> bounds, Map<String, Object> attributes) {
         super(attributes);
         this.name = name;
         this.bounds = bounds;
@@ -37,7 +38,7 @@ public class TypeParamDef extends AttributeSupport {
         return name;
     }
 
-    public ClassRef[] getBounds() {
+    public List<ClassRef> getBounds() {
         return bounds;
     }
 
@@ -49,15 +50,14 @@ public class TypeParamDef extends AttributeSupport {
         TypeParamDef that = (TypeParamDef) o;
 
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(bounds, that.bounds);
+        return bounds != null ? bounds.equals(that.bounds) : that.bounds == null;
 
     }
 
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + Arrays.hashCode(bounds);
+        result = 31 * result + (bounds != null ? bounds.hashCode() : 0);
         return result;
     }
 }

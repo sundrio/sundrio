@@ -17,33 +17,26 @@
 package io.sundr.codegen.converters;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.TypeRefBuilder;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVisitor;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 public class VariableElementToProperty implements Function<VariableElement, Property> {
 
-    private final static String ARRAY_DELIM = "[]";
-
     private final Function<Collection<Modifier>, Integer> modifiersToInt;
-    private final Function<TypeMirror, TypeRef> toTypeRef;
+    private final TypeVisitor<TypeRef, Integer> typeVisitor;
 
-    public VariableElementToProperty(Function<TypeMirror, TypeRef> toTypeRef) {
-        this(toTypeRef, new ModifiersToInt());
-    }
-
-    public VariableElementToProperty(Function<TypeMirror, TypeRef> toTypeRef, Function<Collection<Modifier>, Integer> modifiersToInt) {
-        this.toTypeRef = toTypeRef;
+    public VariableElementToProperty(TypeVisitor<TypeRef, Integer> typeVisitor, Function<Collection<Modifier>, Integer> modifiersToInt) {
+        this.typeVisitor = typeVisitor;
         this.modifiersToInt = modifiersToInt;
     }
 
@@ -51,16 +44,19 @@ public class VariableElementToProperty implements Function<VariableElement, Prop
         String name = variableElement.getSimpleName().toString();
 
         String elementType = variableElement.asType().toString();
-        StringTokenizer tokenizer = new StringTokenizer(elementType, ARRAY_DELIM);
-        int dimension = tokenizer.countTokens() - 1;
 
-        TypeRef type = new TypeRefBuilder(toTypeRef.apply(variableElement.asType())).withDimensions(dimension).build();
+        TypeRef type = variableElement.asType().accept(typeVisitor, 0);
 
-        Set<TypeRef> annotations = new LinkedHashSet<TypeRef>();
+        Set<ClassRef> annotations = new LinkedHashSet<ClassRef>();
         for (AnnotationMirror annotationMirror : variableElement.getAnnotationMirrors()) {
-            TypeRef annotationType = toTypeRef.apply(annotationMirror.getAnnotationType());
-            annotations.add(annotationType);
+            TypeRef annotationType = annotationMirror.getAnnotationType().accept(typeVisitor, 0);
+            if (annotationType instanceof ClassRef) {
+                annotations.add((ClassRef) annotationType);
+            } else {
+                throw new IllegalStateException();
+            }
         }
+
         return new PropertyBuilder()
                 .withName(name)
                 .withTypeRef(type)
