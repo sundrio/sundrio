@@ -111,7 +111,7 @@ public class JavaType extends AttributeSupport implements Type {
 
     public boolean isBoolean() {
         return ("boolean".equals(className)) ||
-               ("Boolean".equals(className));
+                ("Boolean".equals(className));
     }
 
     public JavaKind getKind() {
@@ -164,8 +164,22 @@ public class JavaType extends AttributeSupport implements Type {
 
 
     public boolean isAssignable(JavaType o) {
+        if (o == null) {
+            return false;
+        }
+
         if (this == o || this.equals(o)) {
             return true;
+        }
+
+        if (isAssignable(o.getSuperClass())) {
+            return true;
+        }
+
+        for (JavaType t : o.getInterfaces()) {
+            if (isAssignable(t)) {
+                return true;
+            }
         }
 
         if (packageName == null && "java.lang".equals(o.packageName) && className.equalsIgnoreCase(o.className)) {

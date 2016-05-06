@@ -17,49 +17,51 @@
 package io.sundr.codegen.converters;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.TypeRef;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
+import java.util.Collection;
 
-public class ExecutableElementToJavaMethod implements Function<ExecutableElement, JavaMethod> {
+public class ExecutableElementToMethod implements Function<ExecutableElement, Method> {
 
-    private final Function<String, JavaType> toJavaType;
-    private final Function<VariableElement, JavaProperty> toJavaProperty;
+    private final Function<TypeMirror, TypeRef> toTypeRef;
+    private final Function<VariableElement, Property> toProperty;
+    private final Function<Collection<Modifier>, Integer> modifiersToInt;
 
-    public ExecutableElementToJavaMethod(Function<String, JavaType> toJavaType, Function<VariableElement, JavaProperty> toJavaProperty) {
-        this.toJavaType = toJavaType;
-        this.toJavaProperty = toJavaProperty;
+    public ExecutableElementToMethod(Function<TypeMirror, TypeRef> toTypeRef, Function<VariableElement, Property> toProperty, Function<Collection<Modifier>, Integer> modifiersToInt) {
+        this.toTypeRef = toTypeRef;
+        this.toProperty = toProperty;
+        this.modifiersToInt = modifiersToInt;
     }
 
-    @Override
-    public JavaMethod apply(ExecutableElement executableElement) {
-        JavaMethodBuilder methodBuilder = new JavaMethodBuilder()
+    public Method apply(ExecutableElement executableElement) {
+        MethodBuilder methodBuilder = new MethodBuilder()
+                .withModifiers(modifiersToInt.apply(executableElement.getModifiers()))
                 .withName(executableElement.getSimpleName().toString())
-                .withReturnType(toJavaType.apply(executableElement.getReturnType().toString()));
+                .withReturnType(toTypeRef.apply(executableElement.getReturnType()));
+
+
         //Populate constructor parameters
         for (VariableElement variableElement : executableElement.getParameters()) {
             methodBuilder = methodBuilder
                     .withName(executableElement.getSimpleName().toString())
-                    .withReturnType(toJavaType.apply(executableElement.getReturnType().toString()))
-                    .addToArguments(toJavaProperty.apply(variableElement));
+                    .withReturnType(toTypeRef.apply(executableElement.getReturnType()))
+                    .addToArguments(toProperty.apply(variableElement));
+
             for (TypeMirror thrownType : executableElement.getThrownTypes()) {
-                methodBuilder = methodBuilder.addToExceptions(toJavaType.apply(thrownType.toString()));
+                methodBuilder = methodBuilder.addToExceptions(toTypeRef.apply(thrownType));
             }
         }
         for (AnnotationMirror annotationMirror :executableElement.getAnnotationMirrors()) {
-            JavaType annotationType = toJavaType.apply(annotationMirror.getAnnotationType().toString());
+            TypeRef annotationType = toTypeRef.apply(annotationMirror.getAnnotationType());
             methodBuilder.addToAnnotations(annotationType);
-        }
-
-        for (Modifier modifier : executableElement.getModifiers()) {
-            methodBuilder.addToModifiers(modifier);
         }
         return methodBuilder.build();
     }

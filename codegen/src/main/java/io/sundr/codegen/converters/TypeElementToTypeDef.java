@@ -17,13 +17,14 @@
 package io.sundr.codegen.converters;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -37,7 +38,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,65 +46,63 @@ import java.util.Set;
 import static io.sundr.codegen.utils.ModelUtils.getClassName;
 import static io.sundr.codegen.utils.ModelUtils.getPackageName;
 
-public class TypeElementToJavaClazz implements Function<TypeElement, JavaClazz> {
+public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
 
     private final Elements elements;
-    private final Function<String, JavaType> toJavaType;
-    private final Function<ExecutableElement, JavaMethod> toJavaMethod;
-    private final Function<VariableElement, JavaProperty> toJavaProperty;
+    private final Function<TypeMirror, TypeRef> toTypeRef;
+    private final Function<ExecutableElement, Method> toJavaMethod;
+    private final Function<VariableElement, Property> toJavaProperty;
 
-    public TypeElementToJavaClazz(Elements elements, Function<String, JavaType> toJavaType, Function<ExecutableElement, JavaMethod> toJavaMethod, Function<VariableElement, JavaProperty> toJavaProperty) {
+    public TypeElementToTypeDef(Elements elements, Function<TypeMirror, TypeRef> toTypeRef, Function<ExecutableElement, Method> toJavaMethod, Function<VariableElement, Property> toJavaProperty) {
         this.elements = elements;
-        this.toJavaType = toJavaType;
+        this.toTypeRef = toTypeRef;
         this.toJavaMethod = toJavaMethod;
         this.toJavaProperty = toJavaProperty;
     }
 
-    @Override
-    public JavaClazz apply(TypeElement classElement) {
+    public TypeDef apply(TypeElement classElement) {
         //Check SuperClass
-        JavaKind kind = JavaKind.CLASS;
-        boolean concrete = false;
+        Kind kind = Kind.CLASS;
+
         TypeMirror superClass = classElement.getSuperclass();
-        JavaType superClassType = superClass != null && !ModelUtils.NONE.equals(superClass) ? toJavaType.apply(superClass.toString()) : null;
-        List<JavaType> genericTypes = new ArrayList<JavaType>();
-        List<JavaType> interfaces = new ArrayList<JavaType>();
+        TypeRef superClassType = superClass != null && !ModelUtils.NONE.equals(superClass) ? toTypeRef.apply(superClass) : null;
+
+        List<TypeParamDef> genericTypes = new ArrayList<TypeParamDef>();
+        List<TypeRef> interfaces = new ArrayList<TypeRef>();
 
         if (classElement.getKind() == ElementKind.INTERFACE) {
-            kind = JavaKind.INTERFACE;
-            concrete = false;
+            kind = Kind.INTERFACE;
         } else if (classElement.getKind() == ElementKind.CLASS) {
-            kind = JavaKind.CLASS;
-            concrete = !classElement.getModifiers().contains(Modifier.ABSTRACT);
+            kind = Kind.CLASS;
         }
 
         for (TypeMirror interfaceTypeMirrror : classElement.getInterfaces()) {
-            JavaType interfaceType = toJavaType.apply(interfaceTypeMirrror.toString());
+            TypeRef interfaceType = toTypeRef.apply(interfaceTypeMirrror);
             interfaces.add(interfaceType);
         }
 
         for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
-
-            List<JavaType> genericBounds = new ArrayList<JavaType>();
+            List<TypeRef> genericBounds = new ArrayList<TypeRef>();
             if (!typeParameter.getBounds().isEmpty()) {
                 TypeMirror bound = typeParameter.getBounds().get(0);
-                genericBounds.add(toJavaType.apply(bound.toString()));
+                genericBounds.add(toTypeRef.apply(bound));
             }
 
-            JavaType genericType = new JavaTypeBuilder(toJavaType.apply(typeParameter.toString())).withInterfaces(genericBounds.toArray(new JavaType[genericBounds.size()])).withKind(JavaKind.GENERIC).build();
+            TypeParamDef genericType = new TypeParamDefBuilder().withName(typeParameter.getSimpleName().toString())
+                    .withBounds(genericBounds.toArray(new TypeRef[genericBounds.size()]))
+                    .build();
+
             genericTypes.add(genericType);
         }
 
-        JavaClazzBuilder builder = new JavaClazzBuilder()
-                .withType(new JavaTypeBuilder()
+        TypeDefBuilder builder = new TypeDefBuilder()
                         .withKind(kind)
                         .withPackageName(getPackageName(classElement))
-                        .withClassName(getClassName(classElement))
-                        .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()]))
-                        .withSuperClass(superClassType)
-                        .withInterfaces(interfaces.toArray(new JavaType[interfaces.size()]))
-                        .withConcrete(concrete)
-                        .build());
+                        .withName(getClassName(classElement))
+                        .withParameters(genericTypes.toArray(new TypeParamDef[genericTypes.size()]))
+                        .withExtendsList(superClassType)
+                        .withImplementsList(interfaces.toArray(new TypeRef[interfaces.size()]));
+
 
         for (ExecutableElement constructor : ElementFilter.constructorsIn(classElement.getEnclosedElements())) {
             builder.addToConstructors(toJavaMethod.apply(constructor));
@@ -112,7 +110,7 @@ public class TypeElementToJavaClazz implements Function<TypeElement, JavaClazz> 
 
         //Populate Fields
         for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
-            builder.addToFields(toJavaProperty.apply(variableElement));
+            builder.addToProperties(toJavaProperty.apply(variableElement));
         }
 
         Set<ExecutableElement> allMethods = new LinkedHashSet<ExecutableElement>();
@@ -124,7 +122,7 @@ public class TypeElementToJavaClazz implements Function<TypeElement, JavaClazz> 
         }
 
         for (AnnotationMirror annotationMirror : classElement.getAnnotationMirrors()) {
-            JavaType annotationType = toJavaType.apply(annotationMirror.getAnnotationType().toString());
+            TypeRef annotationType = toTypeRef.apply(annotationMirror.getAnnotationType());
             builder.addToAnnotations(annotationType);
         }
         return builder.build();

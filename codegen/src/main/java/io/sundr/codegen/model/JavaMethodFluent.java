@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
+public class JavaMethodFluent<T extends JavaMethodFluent<T>> extends AttributeSupportFluentImpl<T> implements Fluent<T> {
 
     Set<VisitableBuilder<JavaType, ?>> annotations = new LinkedHashSet();
     Set<Modifier> modifiers = new LinkedHashSet();

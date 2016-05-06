@@ -23,8 +23,8 @@ import io.sundr.builder.internal.functions.overrides.ToBuildableJavaClazz;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
 import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
 import io.sundr.codegen.converters.StringToJavaClazz;
-import io.sundr.codegen.converters.TypeElementToJavaClazz;
-import io.sundr.codegen.converters.ExecutableElementToJavaMethod;
+import io.sundr.codegen.converters.TypeElementToTypeDef;
+import io.sundr.codegen.converters.ExecutableElementToMethod;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaKind;
@@ -58,7 +58,6 @@ import static io.sundr.builder.Constants.VISITOR;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.Constants.*;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 import static io.sundr.codegen.utils.TypeUtils.typeImplements;
 import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
@@ -66,8 +65,7 @@ import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
 public class BuilderContext {
 
     private final Elements elements;
-            
-    private final Function<String, JavaType> stringJavaTypeFunction;
+
     private final Function<String, JavaClazz> stringToJavaClazz;
     private final Function<VariableElement, JavaProperty> variableElementJavaPropertyFunction;
     private final Function<ExecutableElement, JavaMethod> executableElementToJavaMethod;
@@ -97,8 +95,8 @@ public class BuilderContext {
 
         stringJavaTypeFunction = CachingFunction.wrap(new ToBuildableJavaType(elements));
         variableElementJavaPropertyFunction = CachingFunction.wrap(new ToBuildableJavaProperty(stringJavaTypeFunction));
-        executableElementToJavaMethod = CachingFunction.wrap(new ExecutableElementToJavaMethod(stringJavaTypeFunction, variableElementJavaPropertyFunction));
-        typeElementToJavaClazz = CachingFunction.wrap(new ToBuildableJavaClazz(new TypeElementToJavaClazz(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction)));
+        executableElementToJavaMethod = CachingFunction.wrap(new ExecutableElementToMethod(stringJavaTypeFunction, variableElementJavaPropertyFunction, modifiersToInt));
+        typeElementToJavaClazz = CachingFunction.wrap(new ToBuildableJavaClazz(new TypeElementToTypeDef(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction)));
         stringToJavaClazz = CachingFunction.wrap(new StringToJavaClazz(elements, typeElementToJavaClazz));
 
         repository = new BuildableRepository();
@@ -440,10 +438,6 @@ public class BuilderContext {
 
     public BuildableRepository getRepository() {
         return repository;
-    }
-
-    public Function<String, JavaType> getStringJavaTypeFunction() {
-        return stringJavaTypeFunction;
     }
 
     public Function<VariableElement, JavaProperty> getVariableElementJavaPropertyFunction() {

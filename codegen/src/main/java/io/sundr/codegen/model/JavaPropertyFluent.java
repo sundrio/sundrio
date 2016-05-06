@@ -24,7 +24,7 @@ import javax.lang.model.element.Modifier;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class JavaPropertyFluent<T extends JavaPropertyFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
+public class JavaPropertyFluent<T extends JavaPropertyFluent<T>> extends AttributeSupportFluentImpl<T> implements Fluent<T> {
 
     Set<VisitableBuilder<JavaType, ?>> annotations = new LinkedHashSet();
     Set<Modifier> modifiers = new LinkedHashSet();

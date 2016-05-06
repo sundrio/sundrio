@@ -23,7 +23,7 @@ import io.sundr.builder.VisitableBuilder;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class JavaClazzFluent<T extends JavaClazzFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
+public class JavaClazzFluent<T extends JavaClazzFluent<T>> extends AttributeSupportFluentImpl<T> implements Fluent<T> {
 
     VisitableBuilder<JavaType, ?> type;
     Set<VisitableBuilder<JavaType, ?>> annotations = new LinkedHashSet();

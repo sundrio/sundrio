@@ -40,6 +40,7 @@ import javax.lang.model.type.MirroredTypeException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -230,7 +231,12 @@ public class BuilderUtils {
         try {
             return ClassToJavaType.FUNCTION.apply(inline.type());
         } catch (MirroredTypeException e) {
-            return context.getStringJavaTypeFunction().apply(e.getTypeMirror().toString());
+            String className = e.getTypeMirror().toString();
+            try {
+                return ClassToJavaType.FUNCTION.apply(Class.forName(className));
+            } catch (ClassNotFoundException cnfe) {
+                throw new RuntimeException(cnfe);
+            }
         }
     }
 
@@ -238,7 +244,12 @@ public class BuilderUtils {
         try {
             return ClassToJavaType.FUNCTION.apply(inline.returnType());
         } catch (MirroredTypeException e) {
-            return context.getStringJavaTypeFunction().apply(e.getTypeMirror().toString());
+            String className = e.getTypeMirror().toString();
+            try {
+                return ClassToJavaType.FUNCTION.apply(Class.forName(className));
+            } catch (ClassNotFoundException cnfe) {
+                throw new RuntimeException(cnfe);
+            }
         }
     }
 

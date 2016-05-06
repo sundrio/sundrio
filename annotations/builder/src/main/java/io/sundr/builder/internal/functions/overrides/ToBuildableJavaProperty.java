@@ -17,7 +17,7 @@
 package io.sundr.builder.internal.functions.overrides;
 
 import io.sundr.Function;
-import io.sundr.codegen.converters.VariableElementToJavaProperty;
+import io.sundr.codegen.converters.VariableElementToProperty;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
@@ -32,10 +32,9 @@ public class ToBuildableJavaProperty implements Function<VariableElement, JavaPr
     private Function<VariableElement, JavaProperty> delegate;
     
     public ToBuildableJavaProperty(Function<String, JavaType> toType) {
-        this.delegate = new VariableElementToJavaProperty(toType);
+        this.delegate = new VariableElementToProperty(toType);
     }
 
-    @Override
     public JavaProperty apply(VariableElement variableElement) {
         JavaProperty property = delegate.apply(variableElement);
         boolean isBuildable = property.getType().getAttributes().containsKey(BUILDABLE) ?

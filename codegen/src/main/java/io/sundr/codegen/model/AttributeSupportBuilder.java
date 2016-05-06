@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Builder;
+import io.sundr.builder.VisitableBuilder;
 
-public class AttributeSupportBuilder extends AttributeSupportFluent<AttributeSupportBuilder> implements Builder<AttributeSupport> {
+public class AttributeSupportBuilder extends AttributeSupportFluentImpl<AttributeSupportBuilder> implements VisitableBuilder<AttributeSupport, AttributeSupportBuilder> {
 
     AttributeSupportFluent<?> fluent;
 
@@ -47,9 +47,20 @@ public class AttributeSupportBuilder extends AttributeSupportFluent<AttributeSup
 
     }
 
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AttributeSupportBuilder that = (AttributeSupportBuilder) o;
+        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
+            return false;
+        return true;
+
+    }
+
     private <T> void validate(T item) {
     }
 
 
 }
-    

@@ -21,11 +21,11 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.Collections;
 import java.util.Map;
 
+@Buildable
 public class AttributeSupport {
     
     private final Map<String, Object> attributes;
 
-    @Buildable
     public AttributeSupport(Map<String, Object> attributes) {
         this.attributes = attributes;
     }

@@ -46,7 +46,6 @@ public class StringToJavaType implements Function<String, JavaType> {
         this.elements = elements;
     }
 
-    @Override
     public JavaType apply(String fullName) {
         return apply(fullName, new LinkedHashSet<String>());
     }

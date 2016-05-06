@@ -25,7 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSupportFluent<T> implements Fluent<T> {
+public class JavaTypeFluent<T extends JavaTypeFluent<T>> extends AttributeSupportFluentImpl<T> implements Fluent<T> {
 
     JavaKind kind;
     String packageName;

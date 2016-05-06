@@ -1,0 +1,78 @@
+/*
+ * Copyright 2016 The original authors.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package io.sundr.codegen.converters;
+
+import io.sundr.Function;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementVisitor;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.element.VariableElement;
+
+public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Void> {
+
+    private final Function<VariableElement, Property> toProperty;
+    private final Function<ExecutableElement, Method> toMethod;
+    private final Function<TypeParameterElement, TypeParamDef> toTypeParamDef;
+
+    private final TypeDefBuilder builder = new TypeDefBuilder();
+
+    public TypeDefElementVisitor(Function<VariableElement, Property> toProperty, Function<ExecutableElement, Method> toMethod, Function<TypeParameterElement, TypeParamDef> toTypeParamDef) {
+        this.toProperty = toProperty;
+        this.toMethod = toMethod;
+        this.toTypeParamDef = toTypeParamDef;
+    }
+
+    public TypeDefBuilder visit(Element e, Void aVoid) {
+        return builder.withName(e.getSimpleName().toString());
+    }
+
+    public TypeDefBuilder visit(Element e) {
+        return builder.withName(e.getSimpleName().toString());
+    }
+
+    public TypeDefBuilder visitPackage(PackageElement e, Void aVoid) {
+        return builder.withPackageName(e.getQualifiedName().toString());
+    }
+
+    public TypeDefBuilder visitType(TypeElement e, Void aVoid) {
+        return builder.withName(e.getSimpleName().toString());
+    }
+
+    public TypeDefBuilder visitVariable(VariableElement e, Void aVoid) {
+        return builder.addToProperties(toProperty.apply(e));
+    }
+
+    public TypeDefBuilder visitExecutable(ExecutableElement e, Void aVoid) {
+        return builder.addToMethods(toMethod.apply(e));
+    }
+
+    public TypeDefBuilder visitTypeParameter(TypeParameterElement e, Void aVoid) {
+        return builder.addToParameters(toTypeParamDef.apply(e));
+    }
+
+    public TypeDefBuilder visitUnknown(Element e, Void aVoid) {
+        return builder;
+    }
+}

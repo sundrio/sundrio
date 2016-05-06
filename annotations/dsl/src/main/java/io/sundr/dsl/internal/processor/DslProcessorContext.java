@@ -17,9 +17,9 @@
 package io.sundr.dsl.internal.processor;
 
 import io.sundr.Function;
-import io.sundr.codegen.converters.ExecutableElementToJavaMethod;
+import io.sundr.codegen.converters.ExecutableElementToMethod;
 import io.sundr.codegen.converters.StringToJavaType;
-import io.sundr.codegen.converters.VariableElementToJavaProperty;
+import io.sundr.codegen.converters.VariableElementToProperty;
 import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.dsl.internal.element.functions.ToClasses;
@@ -47,7 +47,7 @@ public class DslProcessorContext {
     private final Elements elements;
     private final Function<String, JavaType> toType;
     private final Function<VariableElement, JavaProperty> toProperty;
-    private final ExecutableElementToJavaMethod toMethod;
+    private final ExecutableElementToMethod toMethod;
     private final ToRequiresAny toRequiresAny;
     private final ToRequiresAll toRequiresAll;
     private final ToRequiresNoneOf toRequiresNoneOf;
@@ -72,8 +72,8 @@ public class DslProcessorContext {
     public DslProcessorContext(Elements elements, Types types) {
         this.elements = elements;
         this.toType = new StringToJavaType(elements);
-        this.toProperty = new VariableElementToJavaProperty(toType);
-        this.toMethod = new ExecutableElementToJavaMethod(toType, toProperty);
+        this.toProperty = new VariableElementToProperty(toType);
+        this.toMethod = new ExecutableElementToMethod(toType, toProperty, modifiersToInt);
         this.toRequiresAny = new ToRequiresAny(elements);
         this.toRequiresAll = new ToRequiresAll(elements);
         this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
@@ -98,7 +98,7 @@ public class DslProcessorContext {
         return toType;
     }
 
-    public ExecutableElementToJavaMethod getToMethod() {
+    public ExecutableElementToMethod getToMethod() {
         return toMethod;
     }
 
