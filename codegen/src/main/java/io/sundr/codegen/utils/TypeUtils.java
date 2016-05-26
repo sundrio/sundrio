@@ -16,9 +16,16 @@
 
 package io.sundr.codegen.utils;
 
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.codegen.model.TypeParamRefBuilder;
+
+import javax.lang.model.element.Modifier;
+import java.util.Collection;
 
 public final class TypeUtils {
     
@@ -31,8 +38,17 @@ public final class TypeUtils {
      * @param letter       The letter of the type.
      * @return
      */
-    public static JavaType newGeneric(String letter) {
-        return new JavaTypeBuilder().withKind(JavaKind.GENERIC).withClassName(letter).build();
+    public static TypeParamRef newTypeParamRef(String letter) {
+        return new TypeParamRefBuilder().withName(letter).build();
+    }
+
+    /**
+     * Creates a new generic JavaType.
+     * @param letter       The letter of the type.
+     * @return
+     */
+    public static TypeParamDef newTypeParamDef(String letter) {
+        return new TypeParamDefBuilder().withName(letter).build();
     }
 
     /**
@@ -40,47 +56,86 @@ public final class TypeUtils {
      * @param base       The base type.
      * @return
      */
-    public static JavaType unwrapGeneric(JavaType base) {
-        return new JavaTypeBuilder(base).withGenericTypes(new JavaType[0]).build();
+    public static TypeDef unwrapGeneric(TypeDef base) {
+        return new TypeDefBuilder(base).withParameters().build();
     }
 
     /**
-     * Sets one {@link io.sundr.codegen.model.JavaType} as a generic of an other.
+     * Sets one {@link io.sundr.codegen.model.TypeDef} as a generic of an other.
      *
-     * @param base       The base type.
-     * @param generic    The generic type.
+     * @param base          The base type.
+     * @param parameters    The parameter types.
      * @return
      */
-    public static JavaType typeGenericOf(JavaType base, JavaType... generic) {
-        return new JavaTypeBuilder(base)
-                .withGenericTypes(generic)
+    public static TypeDef typeGenericOf(TypeDef base, TypeParamDef... parameters) {
+        return new TypeDefBuilder(base)
+                .withParameters(parameters)
                 .build();
     }
 
     /**
-     * Sets one {@link io.sundr.codegen.model.JavaType} as a super class of an other.
-     *
-     * @param base       The base type.
-     * @param superClass The super type.
-     * @return
-     */
-    public static JavaType typeExtends(JavaType base, JavaType superClass) {
-        return new JavaTypeBuilder(base)
-                .withSuperClass(superClass)
-                .build();
-    }
-
-    /**
-     * Sets one {@link io.sundr.codegen.model.JavaType} as an interface of an other.
+     * Sets one {@link io.sundr.codegen.model.TypeDef} as a super class of an other.
      *
      * @param base       The base type.
      * @param superClass The super type.
      * @return
      */
-    public static JavaType typeImplements(JavaType base, JavaType... superClass) {
-        return new JavaTypeBuilder(base)
-                .withInterfaces(superClass)
+    public static TypeDef typeExtends(TypeDef base, ClassRef superClass) {
+        return new TypeDefBuilder(base)
+                .withExtendsList(superClass)
                 .build();
+    }
+
+    /**
+     * Sets one {@link io.sundr.codegen.model.TypeDef} as an interface of an other.
+     *
+     * @param base       The base type.
+     * @param superClass The super type.
+     * @return
+     */
+    public static TypeDef typeImplements(TypeDef base, ClassRef... superClass) {
+        return new TypeDefBuilder(base)
+                .withImplementsList(superClass)
+                .build();
+    }
+
+
+    public static int modifiersToInt(Collection<Modifier> modifiers) {
+        int result = 0;
+
+        for (Modifier m : modifiers) {
+            switch (m) {
+                case ABSTRACT:
+                    result = result | java.lang.reflect.Modifier.ABSTRACT;
+                    break;
+                case FINAL:
+                    result = result | java.lang.reflect.Modifier.FINAL;
+                    break;
+                case NATIVE:
+                    result = result | java.lang.reflect.Modifier.NATIVE;
+                    break;
+                case PRIVATE:
+                    result = result | java.lang.reflect.Modifier.PRIVATE;
+                    break;
+                case PROTECTED:
+                    result = result | java.lang.reflect.Modifier.PROTECTED;
+                    break;
+                case PUBLIC:
+                    result = result | java.lang.reflect.Modifier.PUBLIC;
+                    break;
+                case STATIC:
+                    result = result | java.lang.reflect.Modifier.STATIC;
+                    break;
+                case SYNCHRONIZED:
+                    result = result | java.lang.reflect.Modifier.SYNCHRONIZED;
+                    break;
+                case TRANSIENT:
+                    result = result | java.lang.reflect.Modifier.TRANSIENT;
+                    break;
+            }
+        }
+
+        return result;
     }
 
 }

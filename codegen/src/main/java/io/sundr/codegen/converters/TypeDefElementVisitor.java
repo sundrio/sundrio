@@ -16,11 +16,8 @@
 
 package io.sundr.codegen.converters;
 
-import io.sundr.Function;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.Property;
+import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementVisitor;
@@ -32,17 +29,7 @@ import javax.lang.model.element.VariableElement;
 
 public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Void> {
 
-    private final Function<VariableElement, Property> toProperty;
-    private final Function<ExecutableElement, Method> toMethod;
-    private final Function<TypeParameterElement, TypeParamDef> toTypeParamDef;
-
     private final TypeDefBuilder builder = new TypeDefBuilder();
-
-    public TypeDefElementVisitor(Function<VariableElement, Property> toProperty, Function<ExecutableElement, Method> toMethod, Function<TypeParameterElement, TypeParamDef> toTypeParamDef) {
-        this.toProperty = toProperty;
-        this.toMethod = toMethod;
-        this.toTypeParamDef = toTypeParamDef;
-    }
 
     public TypeDefBuilder visit(Element e, Void aVoid) {
         return builder.withName(e.getSimpleName().toString());
@@ -61,15 +48,15 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
     }
 
     public TypeDefBuilder visitVariable(VariableElement e, Void aVoid) {
-        return builder.addToProperties(toProperty.apply(e));
+        return builder.addToProperties(ElementTo.PROPERTY.apply(e));
     }
 
     public TypeDefBuilder visitExecutable(ExecutableElement e, Void aVoid) {
-        return builder.addToMethods(toMethod.apply(e));
+        return builder.addToMethods(ElementTo.METHOD.apply(e));
     }
 
     public TypeDefBuilder visitTypeParameter(TypeParameterElement e, Void aVoid) {
-        return builder.addToParameters(toTypeParamDef.apply(e));
+        return builder.addToParameters(ElementTo.TYPEPARAMDEF.apply(e));
     }
 
     public TypeDefBuilder visitUnknown(Element e, Void aVoid) {

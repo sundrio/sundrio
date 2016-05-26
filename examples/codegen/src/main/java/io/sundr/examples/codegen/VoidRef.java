@@ -19,16 +19,24 @@ package io.sundr.examples.codegen;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.utils.StringUtils;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Buildable
 public class VoidRef extends AttributeSupport implements TypeRef {
 
+    private static final String VOID = "void";
+
+    public VoidRef() {
+        this(Collections.<String, Object>emptyMap());
+    }
+
     public VoidRef(Map<String, Object> attributes) {
         super(attributes);
     }
+
     @Override
     public String toString() {
-        return "void";
+        return VOID;
     }
 }

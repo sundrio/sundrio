@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,18 +19,17 @@ package io.sundr.codegen.model;
 import io.sundr.builder.Editable;
 
 import java.util.Map;
-import java.util.Set;
 
-public class EditableJavaType extends JavaType implements Editable<JavaTypeBuilder> {
+public class EditableWildcardRef extends WildcardRef implements Editable<WildcardRefBuilder>{
 
 
-    public EditableJavaType(JavaKind kind, String packageName, String className, boolean array, boolean collection, boolean concrete, JavaType defaultImplementation, JavaType superClass, Set<JavaType> interfaces, JavaType[] genericTypes, Map<String, Object> attributes) {
-        super(kind, packageName, className, array, collection, concrete, defaultImplementation, superClass, interfaces, genericTypes, attributes);
-    }
+public EditableWildcardRef( Map<String, Object> attributes ){
+    super(attributes);
+}
 
-    public JavaTypeBuilder edit() {
-        return new JavaTypeBuilder(this);
-    }
+public WildcardRefBuilder edit(){
+    return new WildcardRefBuilder(this);
+}
 
 
 }

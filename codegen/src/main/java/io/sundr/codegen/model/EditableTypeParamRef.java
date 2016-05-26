@@ -23,8 +23,8 @@ import java.util.Map;
 public class EditableTypeParamRef extends TypeParamRef implements Editable<TypeParamRefBuilder>{
 
 
-public EditableTypeParamRef( String name , Map<String, Object> attributes ){
-    super(name, attributes);
+public EditableTypeParamRef( String name , int dimensions , Map<String, Object> attributes ){
+    super(name, dimensions, attributes);
 }
 
 public TypeParamRefBuilder edit(){

@@ -21,7 +21,7 @@ import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.ClassToJavaType;
+import io.sundr.codegen.functions.ClassToTypeDef;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
 import io.sundr.codegen.model.JavaMethod;
@@ -266,7 +266,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
 
             JavaMethod equals = new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)
-                    .withReturnType(ClassToJavaType.FUNCTION.apply(boolean.class))
+                    .withReturnType(ClassToTypeDef.FUNCTION.apply(boolean.class))
                     .addNewArgument().withName("o").withType(Constants.OBJECT).endArgument()
                     .withName("equals")
                     .addToAttributes(BODY, toEquals(fluentType, properties))
@@ -370,7 +370,7 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             methods.add(build);
 
             JavaMethod equals = new JavaMethodBuilder()
-                    .withReturnType(ClassToJavaType.FUNCTION.apply(boolean.class))
+                    .withReturnType(ClassToTypeDef.FUNCTION.apply(boolean.class))
                     .addNewArgument().withName("o").withType(Constants.OBJECT).endArgument()
                     .withName("equals")
                     .addToAttributes(BODY, toEquals(builderType, fields))

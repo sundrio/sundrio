@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,23 +16,27 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
-import javax.lang.model.element.Modifier;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
-public class EditableJavaMethod extends JavaMethod implements Editable<JavaMethodBuilder> {
+public class WildcardRef extends AttributeSupport implements TypeRef {
 
+    private static final String WILDCARD = "?";
 
-    public EditableJavaMethod(Set<JavaType> annotations, Set<Modifier> modifiers, Set<JavaType> typeParameters, String name, JavaType returnType, JavaProperty[] arguments, Set<JavaType> exceptions, Map<String, Object> attributes) {
-        super(annotations, modifiers, typeParameters, name, returnType, arguments, exceptions, attributes);
+    public WildcardRef() {
+        this(Collections.<String, Object>emptyMap());
     }
 
-    public JavaMethodBuilder edit() {
-        return new JavaMethodBuilder(this);
+    public WildcardRef(Map<String, Object> attributes) {
+        super(attributes);
     }
 
+    @Override
+    public String toString() {
+        return WILDCARD;
+    }
 
+    public boolean isAssignable(TypeRef ref) {
+        return false;
+    }
 }
-    

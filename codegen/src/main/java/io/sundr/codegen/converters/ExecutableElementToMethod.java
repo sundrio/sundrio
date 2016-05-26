@@ -22,6 +22,7 @@ import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
@@ -38,17 +39,15 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
 
     private final Function<TypeMirror, TypeRef> toTypeRef;
     private final Function<VariableElement, Property> toProperty;
-    private final Function<Collection<Modifier>, Integer> modifiersToInt;
 
-    public ExecutableElementToMethod(Function<TypeMirror, TypeRef> toTypeRef, Function<VariableElement, Property> toProperty, Function<Collection<Modifier>, Integer> modifiersToInt) {
+    public ExecutableElementToMethod(Function<TypeMirror, TypeRef> toTypeRef, Function<VariableElement, Property> toProperty) {
         this.toTypeRef = toTypeRef;
         this.toProperty = toProperty;
-        this.modifiersToInt = modifiersToInt;
     }
 
     public Method apply(ExecutableElement executableElement) {
         MethodBuilder methodBuilder = new MethodBuilder()
-                .withModifiers(modifiersToInt.apply(executableElement.getModifiers()))
+                .withModifiers(TypeUtils.modifiersToInt(executableElement.getModifiers()))
                 .withName(executableElement.getSimpleName().toString())
                 .withReturnType(toTypeRef.apply(executableElement.getReturnType()));
 

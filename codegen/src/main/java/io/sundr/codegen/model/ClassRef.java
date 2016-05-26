@@ -23,13 +23,17 @@ import java.util.Map;
 
 public class ClassRef extends AttributeSupport implements TypeRef {
 
+    public static final ClassRef OBJECT = new ClassRefBuilder()
+            .withDefinition(TypeDef.OBJECT)
+            .build();
+
     private final TypeDef definition;
     private final int dimensions;
     private final List<TypeRef> arguments;
 
     public ClassRef(TypeDef definition, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
         super(attributes);
-        this.definition = definition;
+        this.definition = definition != null ? definition : new TypeDefBuilder().build();
         this.dimensions = dimensions;
         this.arguments = arguments;
     }
@@ -44,6 +48,45 @@ public class ClassRef extends AttributeSupport implements TypeRef {
 
     public List<TypeRef> getArguments() {
         return arguments;
+    }
+
+    public boolean isAssignable(TypeRef other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (!(other instanceof ClassRef)) {
+            return false;
+        }
+
+        if (this == other || this.equals(other)) {
+            return true;
+        }
+
+        ClassRef otherClassRef = (ClassRef) other;
+
+
+        for (ClassRef e : otherClassRef.getDefinition().getExtendsList()) {
+            if (isAssignable(e)) {
+                return true;
+            }
+        }
+
+        for (ClassRef i : otherClassRef.getDefinition().getImplementsList()) {
+            if (isAssignable(i)) {
+                return true;
+            }
+        }
+
+
+        if (definition.getPackageName() == null && "java.lang".equals(otherClassRef.getDefinition().getPackageName()) && definition.getName().equalsIgnoreCase(otherClassRef.getDefinition().getName())) {
+            return true;
+        }
+        if (otherClassRef.getDefinition().getPackageName() == null && "java.lang".equals(definition.getPackageName()) && definition.getName().equalsIgnoreCase(otherClassRef.getDefinition().getName())) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override

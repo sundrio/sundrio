@@ -17,4 +17,6 @@
 package io.sundr.codegen.model;
 
 public interface TypeRef {
+
+    boolean isAssignable(TypeRef ref);
 }

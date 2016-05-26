@@ -23,6 +23,8 @@ import io.sundr.codegen.model.JavaProperty;
 import io.sundr.codegen.model.JavaPropertyBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.Property;
 import io.sundr.codegen.utils.StringUtils;
 
 import javax.lang.model.element.Modifier;
@@ -435,9 +437,9 @@ public enum ToMethod implements Function<JavaProperty, JavaMethod> {
         }
     }, AND {
         @Override
-        public JavaMethod apply(JavaProperty property) {
+        public Method apply(Property property) {
             String classPrefix = getClassPrefix(property);
-            String prefix = property.getType().isCollection() ? "addTo" : "with";
+            String prefix = property.getTypeRef().isCollection() ? "addTo" : "with";
             String withMethodName = prefix + captializeFirst(property.getName());
             return new JavaMethodBuilder()
                     .addToModifiers(Modifier.PUBLIC)

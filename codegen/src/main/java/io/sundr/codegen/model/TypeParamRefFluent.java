@@ -21,6 +21,6 @@ import io.sundr.builder.Fluent;
 public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends Fluent<A>,AttributeSupportFluent<A>{
 
 
-    public String getName();    public A withName(String name);
+    public String getName();    public A withName(String name);    public int getDimensions();    public A withDimensions(int dimensions);
 
 }

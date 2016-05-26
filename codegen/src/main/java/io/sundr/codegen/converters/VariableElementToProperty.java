@@ -21,6 +21,7 @@ import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Modifier;
@@ -32,12 +33,10 @@ import java.util.Set;
 
 public class VariableElementToProperty implements Function<VariableElement, Property> {
 
-    private final Function<Collection<Modifier>, Integer> modifiersToInt;
     private final TypeVisitor<TypeRef, Integer> typeVisitor;
 
-    public VariableElementToProperty(TypeVisitor<TypeRef, Integer> typeVisitor, Function<Collection<Modifier>, Integer> modifiersToInt) {
+    public VariableElementToProperty(TypeVisitor<TypeRef, Integer> typeVisitor) {
         this.typeVisitor = typeVisitor;
-        this.modifiersToInt = modifiersToInt;
     }
 
     public Property apply(final VariableElement variableElement) {
@@ -61,7 +60,7 @@ public class VariableElementToProperty implements Function<VariableElement, Prop
                 .withName(name)
                 .withTypeRef(type)
                 .withAnnotations(annotations)
-                .withModifiers(modifiersToInt.apply(variableElement.getModifiers()).intValue())
+                .withModifiers(TypeUtils.modifiersToInt(variableElement.getModifiers()))
                 .build();
     }
 }

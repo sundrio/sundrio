@@ -17,6 +17,7 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,5 +60,16 @@ public class TypeParamDef extends AttributeSupport {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (bounds != null ? bounds.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(name);
+        if (bounds != null && !bounds.isEmpty()) {
+            sb.append(" extends ");
+            sb.append(StringUtils.join(bounds, ","));
+        }
+        return sb.toString();
     }
 }

@@ -16,9 +16,14 @@
 
 package io.sundr.codegen.model;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class VoidRef extends AttributeSupport implements TypeRef {
+
+    public VoidRef() {
+        this(Collections.<String, Object>emptyMap());
+    }
 
     public VoidRef(Map<String, Object> attributes) {
         super(attributes);
@@ -27,5 +32,9 @@ public class VoidRef extends AttributeSupport implements TypeRef {
     @Override
     public String toString() {
         return "void";
+    }
+
+    public boolean isAssignable(TypeRef ref) {
+        return false;
     }
 }

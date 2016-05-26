@@ -16,11 +16,7 @@
 
 package io.sundr.codegen.directives;
 
-import io.sundr.Function;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.model.TypeDef;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
@@ -29,15 +25,14 @@ import org.apache.velocity.runtime.parser.node.Node;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Collections;
-
-import static io.sundr.codegen.utils.StringUtils.join;
 
 public class ClassDirective extends Directive {
-
-    private static final JavaType OBJECT_TYPE = new JavaType(JavaKind.CLASS, "java.lang", "Object", false, false, true, null, null, null, new JavaType[0], Collections.<String, Object>emptyMap());
+    
+    
     private static final String MEMBER_OF = "MEMBER_OF";
     private static final String ABSTRACT = " abstract ";
+    private static final String STATIC = " static ";
+    private static final String FINAL = " final ";
     private static final String EXTENDS = " extends ";
     private static final String IMPLEMENTS = " implements ";
     private static final String PUBLIC = "public ";
@@ -67,13 +62,13 @@ public class ClassDirective extends Directive {
     @Override
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         String block = "";
-        JavaClazz clazz = null;
+        TypeDef clazz = null;
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
             if (node.jjtGetChild(i) != null) {
                 if (!(node.jjtGetChild(i) instanceof ASTBlock)) {
                     //reading and casting inline parameters
                     if (i == 0) {
-                        clazz = (JavaClazz) node.jjtGetChild(i).value(context);
+                        clazz = (TypeDef) node.jjtGetChild(i).value(context);
                     } else {
                         break;
                     }
@@ -91,81 +86,11 @@ public class ClassDirective extends Directive {
         return true;
     }
 
-    private void writeClazz(Writer writer, JavaClazz clazz, String block) throws IOException {
-        JavaTypeToString toString = new JavaTypeToString(getEnclosingType(clazz));
-
-        if (clazz != null) {
-            JavaType type = clazz.getType();
-            JavaKind kind = type.getKind() != null ? type.getKind() : JavaKind.CLASS;
-
-            writer.append(PUBLIC);
-            if (kind == JavaKind.CLASS && !clazz.getType().isConcrete()) {
-                writer.append(ABSTRACT);
-            }
-            writer.append(kind.name().toLowerCase()).append(SPACE);
-            writer.append(toString.apply(type));
-
-            writeExtends(writer, type, toString);
-            writeImplements(writer, type, toString);
-
+    private void writeClazz(Writer writer, TypeDef type, String block) throws IOException {
+        if (type != null) {
+            writer.append(type.toString());
             writer.append(SQUIGGLE_L).append(NEWLINE);
             writer.append(block).append(NEWLINE).append(SQUIGGLE_R).append(NEWLINE);
-        }
-    }
-
-    private void writeExtends(Writer writer, JavaType type, Function<JavaType, String> toString) throws IOException {
-        if (type.getKind() != JavaKind.INTERFACE) {
-            if (type.getSuperClass() != null && !OBJECT_TYPE.equals(type.getSuperClass())) {
-                writer.append(EXTENDS).append(toString.apply(type.getSuperClass()));
-            }
-        } else {
-            if (type.getInterfaces().size() > 0) {
-                writer.append(EXTENDS).append(join(type.getInterfaces(), toString, COMMA));
-            }
-        }
-    }
-
-    private void writeImplements(Writer writer, JavaType type, Function<JavaType, String> toString) throws IOException {
-        if (type.getKind() != JavaKind.INTERFACE && type.getInterfaces().size() > 0) {
-                writer.append(IMPLEMENTS).append(join(type.getInterfaces(), toString, COMMA));
-            }
-    }
-
-    private static JavaType getEnclosingType(JavaClazz clazz) {
-        Object obj = clazz.getAttributes().get(MEMBER_OF);
-        if (obj instanceof JavaType) {
-            return (JavaType) obj;
-        } else {
-            return clazz.getType();
-        }
-    }
-
-
-    private static class JavaTypeToString implements Function<JavaType, String> {
-
-        private final JavaType enclosingType;
-
-        JavaTypeToString(JavaType enclosingType) {
-            this.enclosingType = enclosingType;
-        }
-
-        @Override
-        public String apply(JavaType item) {
-            StringBuilder sb = new StringBuilder();
-            if (item.getClassName().equals(enclosingType.getClassName())
-                    && !item.getFullyQualifiedName().equals(enclosingType.getFullyQualifiedName())) {
-                sb.append(item.getFullyQualifiedName());
-            } else sb.append(item.getClassName());
-            if (item.isArray()) {
-                sb.append(BRACKETS_LR);
-            }
-            if (item.getKind() == JavaKind.GENERIC && item.getInterfaces() != null && !item.getInterfaces().isEmpty()) {
-                sb.append(EXTENDS).append(StringUtils.join(item.getInterfaces(), JavaType.TO_SIMPLE_NAME, ","));
-            }
-            if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
-                sb.append(LT).append(join(item.getGenericTypes(), this, COMMA)).append(GT);
-            }
-            return sb.toString();
         }
     }
 }

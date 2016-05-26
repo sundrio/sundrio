@@ -20,35 +20,35 @@ import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeclarationToJavaClazz implements Function<ClassOrInterfaceDeclaration, JavaType> {
+public class DeclarationToJavaClazz implements Function<ClassOrInterfaceDeclaration, TypeDef> {
 
-    private final ClassOrInterfaceTypeToJavaType classOrInterfaceTypeToJavaType = new ClassOrInterfaceTypeToJavaType();
+    private final ClassOrInterfaceTypeToTypeDef classOrInterfaceTypeToTypeDef = new ClassOrInterfaceTypeToTypeDef();
 
-    public JavaType apply(ClassOrInterfaceDeclaration item) {
-        JavaType superClassType = null;
-        List<JavaType> implementsTypes = new ArrayList<JavaType>();
-        List<JavaType> genericTypes = new ArrayList<JavaType>();
+    public TypeDef apply(ClassOrInterfaceDeclaration item) {
+        TypeDef superClassType = null;
+        List<TypeDef> implementsTypes = new ArrayList<TypeDef>();
+        List<TypeDef> genericTypes = new ArrayList<TypeDef>();
 
         for (ClassOrInterfaceType type : item.getImplements()) {
             if (item.isInterface()) {
-                implementsTypes.add(classOrInterfaceTypeToJavaType.apply(type));
+                implementsTypes.add(classOrInterfaceTypeToTypeDef.apply(type));
             } else if (superClassType == null) {
-                superClassType = classOrInterfaceTypeToJavaType.apply(type);
+                superClassType = classOrInterfaceTypeToTypeDef.apply(type);
             } else {
                 throw new IllegalStateException("Multiple extends found and type is not an interface");
             }
         }
 
         for (ClassOrInterfaceType type : item.getImplements()) {
-            implementsTypes.add(classOrInterfaceTypeToJavaType.apply(type));
+            implementsTypes.add(classOrInterfaceTypeToTypeDef.apply(type));
         }
 
         for (TypeParameter type : item.getTypeParameters()) {
@@ -56,13 +56,13 @@ public class DeclarationToJavaClazz implements Function<ClassOrInterfaceDeclarat
         }
 
 
-        return new JavaTypeBuilder()
+        return new TypeDefBuilder()
                 .withPackageName("changeme")
-                .withClassName(item.getName())
-                .withKind(item.isInterface() ? JavaKind.INTERFACE : JavaKind.CLASS)
-                .withConcrete(Modifier.isAbstract(item.getModifiers()))
-                .withSuperClass(superClassType)
-                .withInterfaces(implementsTypes.toArray(new JavaType[implementsTypes.size()]))
+                .withName(item.getName())
+                .withKind(item.isInterface() ? Kind.INTERFACE : Kind.CLASS)
+                .withModifiers(item.getModifiers())
+                //.withExtendsList(superClassType)
+                //.withInterfaces(implementsTypes.toArray(new TypeDef[implementsTypes.size()]))
                 .build();
     }
 }

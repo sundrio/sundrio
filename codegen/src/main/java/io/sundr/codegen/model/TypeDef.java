@@ -16,12 +16,19 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.codegen.utils.StringUtils;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
 public class TypeDef extends ModifierSupport {
+
+    public static TypeDef OBJECT = new TypeDefBuilder()
+            .withPackageName("java.lang")
+            .withName("Object")
+            .build();
 
     private final Kind kind;
     private final String packageName;
@@ -139,6 +146,42 @@ public class TypeDef extends ModifierSupport {
 
     @Override
     public String toString() {
-        return name;
+        StringBuilder sb = new StringBuilder();
+
+        if (isPublic()) {
+            sb.append("public ");
+        } else if (isProtected()) {
+            sb.append("protected ");
+        } else if (isPrivate()) {
+            sb.append("private ");
+        }
+        if (isStatic()) {
+            sb.append("static ");
+        }
+
+        if (isFinal()) {
+            sb.append("final ");
+        }
+
+        sb.append(kind.name().toLowerCase()).append(" ");
+        sb.append(name);
+
+        if (parameters != null && !parameters.isEmpty()) {
+            sb.append("<");
+            sb.append(StringUtils.join(parameters, ","));
+            sb.append(">");
+        }
+
+        if (extendsList != null && !extendsList.isEmpty()) {
+            sb.append(" extends ");
+            sb.append(StringUtils.join(extendsList, ","));
+        }
+
+        if (extendsList != null && !extendsList.isEmpty()) {
+            sb.append(" implements ");
+            sb.append(StringUtils.join(implementsList, ","));
+        }
+
+        return sb.toString();
     }
 }

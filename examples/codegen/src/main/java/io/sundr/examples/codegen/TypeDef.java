@@ -17,6 +17,7 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -142,6 +143,42 @@ public class TypeDef extends ModifierSupport {
 
     @Override
     public String toString() {
-        return name;
+        StringBuilder sb = new StringBuilder();
+
+        if (isPublic()) {
+            sb.append("public ");
+        } else if (isProtected()) {
+            sb.append("protected ");
+        } else if (isPrivate()) {
+            sb.append("private ");
+        }
+        if (isStatic()) {
+            sb.append("static ");
+        }
+
+        if (isFinal()) {
+            sb.append("final ");
+        }
+
+        sb.append(kind.name().toLowerCase()).append(" ");
+        sb.append(name);
+
+        if (parameters != null && !parameters.isEmpty()) {
+            sb.append("<");
+            sb.append(StringUtils.join(parameters, ","));
+            sb.append(">");
+        }
+
+        if (extendsList != null && !extendsList.isEmpty()) {
+            sb.append(" extends ");
+            sb.append(StringUtils.join(extendsList, ","));
+        }
+
+        if (extendsList != null && !extendsList.isEmpty()) {
+            sb.append(" implements ");
+            sb.append(StringUtils.join(implementsList, ","));
+        }
+
+        return sb.toString();
     }
 }

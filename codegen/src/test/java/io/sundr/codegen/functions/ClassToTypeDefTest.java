@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,21 +16,16 @@
 
 package io.sundr.codegen.functions;
 
-import io.sundr.Function;
-import io.sundr.codegen.model.JavaKind;
+import io.sundr.codegen.model.TypeDef;
+import org.junit.Test;
 
-public enum ClassToJavaKind implements Function<Class, JavaKind> {
+import java.util.List;
 
-    FUNCTION;
+public class ClassToTypeDefTest {
 
-    @Override
-    public JavaKind apply(Class item) {
-        if (item.isInterface()) {
-            return JavaKind.INTERFACE;
-        } else if (item.isEnum()) {
-            return JavaKind.ENUM;
-        } else {
-            return JavaKind.CLASS;
-        }
+    @Test
+    public void testConverter() {
+        TypeDef def = ClassTo.TYPEDEF.apply(List.class);
+        System.out.println(def);
     }
 }

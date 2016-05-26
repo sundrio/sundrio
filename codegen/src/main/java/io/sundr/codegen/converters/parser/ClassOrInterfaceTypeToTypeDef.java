@@ -20,27 +20,27 @@ import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassOrInterfaceTypeToJavaType implements Function<ClassOrInterfaceType, JavaType> {
+public class ClassOrInterfaceTypeToTypeDef implements Function<ClassOrInterfaceType, TypeDef> {
 
 
-    private Function<TypeParameter, JavaType> typeParamterToJavaType;
+    private Function<TypeParameter, TypeDef> typeParamterToTypeDef;
 
-    public JavaType apply(ClassOrInterfaceType item) {
-        List<JavaType> types = new ArrayList<JavaType>();
+    public TypeDef apply(ClassOrInterfaceType item) {
+        List<TypeDef> types = new ArrayList<TypeDef>();
 
         for (Type type : item.getTypeArgs()) {
 
         }
 
-        return new JavaTypeBuilder()
+        return new TypeDefBuilder()
                 .withPackageName("changeme")
-                .withClassName(item.getName())
+                .withName(item.getName())
                 .build();
     }
 }

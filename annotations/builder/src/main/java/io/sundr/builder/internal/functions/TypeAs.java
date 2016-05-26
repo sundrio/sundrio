@@ -22,9 +22,12 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,70 +38,75 @@ import java.util.Set;
 import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.Constants.PRIMITIVE_TYPES;
 import static io.sundr.builder.Constants.BOXED_PRIMITIVE_TYPES;
+import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableSuperClass;
 import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.codegen.utils.TypeUtils.typeExtends;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 import static io.sundr.codegen.utils.TypeUtils.typeImplements;
 
-public enum TypeAs implements Function<JavaType, JavaType> {
+public enum TypeAs implements Function<TypeDef, TypeDef> {
 
     FLUENT_INTERFACE {
         @Override
-        public JavaType apply(JavaType item) {
+        public TypeDef apply(TypeDef item) {
             BuilderContext ctx = BuilderContextManager.getContext();
-            JavaType fluent = SHALLOW_FLUENT.apply(item);
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+            TypeDef fluent = SHALLOW_FLUENT.apply(item);
+            List<TypeParamDef> generics = new ArrayList<TypeParamDef>();
+
+            for (TypeParamDef generic : item.getParameters()) {
                 generics.add(generic);
             }
 
-            JavaType generic = getNextGeneric(item, generics);
-            JavaType genericFluent = typeImplements(generic, fluent);
+            TypeParamDef genericFluent = new TypeParamDefBuilder(getNextGeneric(item, generics))
+                    .addNewBound()
+                    .withDefinition(fluent)
+                    .endBound()
+                    .build();
+
             generics.add(genericFluent);
 
-            JavaType superClass = isBuildable(item.getSuperClass()) ?
-                    SHALLOW_FLUENT.apply(item.getSuperClass()) :
+            TypeDef buildableSuperClass = findBuildableSuperClass(item);
+            TypeDef superClass = buildableSuperClass != null ?
+                    SHALLOW_FLUENT.apply(buildableSuperClass) :
                     ctx.getBaseFluentClass().getType();
 
-            Set<JavaType> interfaceTypes = new HashSet<JavaType>();
+            Set<TypeDef> interfaceTypes = new HashSet<TypeDef>();
             if (!superClass.getFullyQualifiedName().equals(ctx.getBaseFluentClass().getType().getFullyQualifiedName())) {
                 interfaceTypes.add(typeGenericOf(superClass, generic));
             }
             interfaceTypes.add(typeGenericOf(ctx.getFluentInterface().getType(), generic));
 
-            return new JavaTypeBuilder(item)
+            return new TypeDefBuilder(item)
                     .withKind(JavaKind.INTERFACE)
                     .withClassName(item.getClassName() + "Fluent")
                     .withPackageName(item.getPackageName())
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .withInterfaces(interfaceTypes)
                     .build();
         }
 
     }, FLUENT_IMPL {
         @Override
-        public JavaType apply(JavaType item) {
+        public TypeDef apply(TypeDef item) {
             BuilderContext ctx = BuilderContextManager.getContext();
-            JavaType fluent = SHALLOW_FLUENT.apply(item);
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+            TypeDef fluent = SHALLOW_FLUENT.apply(item);
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
 
-            JavaType generic = getNextGeneric(item, generics);
-            JavaType genericFluent = typeImplements(generic, fluent);
+            TypeDef generic = getNextGeneric(item, generics);
+            TypeDef genericFluent = typeImplements(generic, fluent);
             generics.add(genericFluent);
 
-            JavaType superClass = isBuildable(item.getSuperClass()) ?
+            TypeDef superClass = isBuildable(item.getSuperClass()) ?
                     typeGenericOf(FLUENT_IMPL.apply(item.getSuperClass()), generic) :
                     typeGenericOf(ctx.getBaseFluentClass().getType(), generic);
 
-            return new JavaTypeBuilder(item)
+            return new TypeDefBuilder(item)
                     .withKind(JavaKind.CLASS)
                     .withClassName(item.getClassName() + "FluentImpl")
                     .withPackageName(item.getPackageName())
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .withSuperClass(superClass)
                     .withInterfaces(SHALLOW_FLUENT.apply(item))
                     .build();
@@ -106,48 +114,48 @@ public enum TypeAs implements Function<JavaType, JavaType> {
 
     },
     SHALLOW_FLUENT {
-        public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+        public TypeDef apply(TypeDef item) {
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(REMOVE_INTERFACES.apply(generic));
             }
             generics.add(BuilderUtils.getNextGeneric(item));
-            return new JavaTypeBuilder(item)
+            return new TypeDefBuilder(item)
                     .withKind(JavaKind.INTERFACE)
                     .withClassName(item.getClassName() + "Fluent")
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .build();
         }
     },
     GENERIC_FLUENT {
-        public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+        public TypeDef apply(TypeDef item) {
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
             generics.add(Q);
-            return REMOVE_GENERICS_BOUNDS.apply(new JavaTypeBuilder(item)
+            return REMOVE_GENERICS_BOUNDS.apply(new TypeDefBuilder(item)
                     .withClassName(item.getClassName() + "Fluent")
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .build());
         }
     },
     BUILDER {
         @Override
-        public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+        public TypeDef apply(TypeDef item) {
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            JavaType builder = SHALLOW_BUILDER.apply(item);
+            TypeDef builder = SHALLOW_BUILDER.apply(item);
             generics.add(builder);
-            JavaType fluent = TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(FLUENT_IMPL.apply(item), generics.toArray(new JavaType[generics.size()])));
+            TypeDef fluent = TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(FLUENT_IMPL.apply(item), generics.toArray(new TypeDef[generics.size()])));
             generics.remove(builder);
 
-            return new JavaTypeBuilder(item)
+            return new TypeDefBuilder(item)
                     .withKind(JavaKind.CLASS)
                     .withClassName(item.getClassName() + "Builder")
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .withSuperClass(fluent)
                     .withInterfaces(new HashSet(Arrays.asList(
                             TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(BuilderContextManager.getContext().getVisitableBuilderInterface().getType(), item, builder))
@@ -157,15 +165,15 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         }
     }, EDITABLE {
         @Override
-        public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+        public TypeDef apply(TypeDef item) {
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            return new JavaTypeBuilder(item)
+            return new TypeDefBuilder(item)
                     .withKind(JavaKind.CLASS)
                     .withClassName("Editable" + item.getClassName())
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .withSuperClass(REMOVE_GENERICS_BOUNDS.apply(item))
                     .withInterfaces(new HashSet(Arrays.asList(REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(BuilderContextManager.getContext().getEditableInterface().getType(), SHALLOW_BUILDER.apply(item))))))
                     .build();
@@ -173,77 +181,77 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         }
     }, SHALLOW_INLINEABLE {
         @Override
-        public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+        public TypeDef apply(TypeDef item) {
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            return new JavaTypeBuilder(item)
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+            return new TypeDefBuilder(item)
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .build();
         }
     }, INLINEABLE {
         @Override
-        public JavaType apply(JavaType item) {
-            JavaType fluent = FLUENT_IMPL.apply(item);
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+        public TypeDef apply(TypeDef item) {
+            TypeDef fluent = FLUENT_IMPL.apply(item);
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
-            return new JavaTypeBuilder(item)
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+            return new TypeDefBuilder(item)
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .withSuperClass(typeGenericOf(fluent, SHALLOW_INLINEABLE.apply(item)))
                     .build();
 
         }
     }, SHALLOW_BUILDER {
-        public JavaType apply(JavaType item) {
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : item.getGenericTypes()) {
+        public TypeDef apply(TypeDef item) {
+            List<TypeDef> generics = new ArrayList<TypeDef>();
+            for (TypeDef generic : item.getGenericTypes()) {
                 generics.add(generic);
             }
 
-            return TypeAs.REMOVE_GENERICS_BOUNDS.apply(new JavaTypeBuilder(item)
+            return TypeAs.REMOVE_GENERICS_BOUNDS.apply(new TypeDefBuilder(item)
                     .withClassName(item.getClassName() + "Builder")
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
+                    .withGenericTypes(generics.toArray(new TypeDef[generics.size()]))
                     .build());
         }
 
     }, VISITABLE_BUILDER {
         @Override
-        public JavaType apply(JavaType item) {
-            JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
-            baseType = new JavaTypeBuilder(baseType).withGenericTypes().build();
-            return new JavaTypeBuilder(BuilderContextManager.getContext().getVisitableBuilderInterface().getType())
-                    .withGenericTypes(new JavaType[]{baseType, Q})
+        public TypeDef apply(TypeDef item) {
+            TypeDef baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
+            baseType = new TypeDefBuilder(baseType).withGenericTypes().build();
+            return new TypeDefBuilder(BuilderContextManager.getContext().getVisitableBuilderInterface().getType())
+                    .withGenericTypes(new TypeDef[]{baseType, Q})
                     .build();
         }
     },
 
     LIST_OF {
         @Override
-        public JavaType apply(JavaType item) {
-            return new JavaTypeBuilder(Constants.LIST)
+        public TypeDef apply(TypeDef item) {
+            return new TypeDefBuilder(Constants.LIST)
                     .withCollection(true)
-                    .withGenericTypes(new JavaType[]{item})
+                    .withGenericTypes(new TypeDef[]{item})
                     .withDefaultImplementation(Constants.ARRAY_LIST)
                     .build();
         }
 
     },
     ARRAY_AS_LIST {
-        public JavaType apply(JavaType item) {
+        public TypeDef apply(TypeDef item) {
             return LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item));
 
         }
     },
     ARRAY_LIST_OF {
-        public JavaType apply(JavaType item) {
+        public TypeDef apply(TypeDef item) {
             return typeGenericOf(Constants.ARRAY_LIST, item);
         }
 
     }, UNWRAP_COLLECTION_OF {
-        public JavaType apply(JavaType type) {
+        public TypeDef apply(TypeDef type) {
             if (type.isCollection()) {
                 return type.getGenericTypes()[0];
             } else {
@@ -252,39 +260,39 @@ public enum TypeAs implements Function<JavaType, JavaType> {
         }
 
     }, UNWRAP_ARRAY_OF {
-        public JavaType apply(JavaType type) {
-            return new JavaTypeBuilder(type).withArray(false).build();
+        public TypeDef apply(TypeDef type) {
+            return new TypeDefBuilder(type).withArray(false).build();
         }
     }, REMOVE_GENERICS {
-        public JavaType apply(JavaType type) {
-            return new JavaTypeBuilder(type).withGenericTypes().build();
+        public TypeDef apply(TypeDef type) {
+            return new TypeDefBuilder(type).withGenericTypes().build();
         }
     }, REMOVE_GENERICS_BOUNDS {
-        public JavaType apply(JavaType type) {
-            return new JavaTypeBuilder(type).accept(new Visitor<JavaTypeBuilder>() {
-                public void visit(JavaTypeBuilder builder) {
+        public TypeDef apply(TypeDef type) {
+            return new TypeDefBuilder(type).accept(new Visitor<TypeDefBuilder>() {
+                public void visit(TypeDefBuilder builder) {
                     if (builder.getGenericTypes().length > 0) {
-                        List<JavaType> generics = new ArrayList<JavaType>();
-                        for (JavaType generic : builder.getGenericTypes()) {
+                        List<TypeDef> generics = new ArrayList<TypeDef>();
+                        for (TypeDef generic : builder.getGenericTypes()) {
                             generics.add(REMOVE_INTERFACES.apply(generic));
                         }
-                        builder.withGenericTypes(generics.toArray(new JavaType[generics.size()]));
+                        builder.withGenericTypes(generics.toArray(new TypeDef[generics.size()]));
                     }
                 }
             }).build();
         }
     },REMOVE_SUPERCLASS {
-        public JavaType apply(JavaType type) {
-            return new JavaTypeBuilder(type).withSuperClass(null).build();
+        public TypeDef apply(TypeDef type) {
+            return new TypeDefBuilder(type).withSuperClass(null).build();
         }
     }, REMOVE_INTERFACES {
-        public JavaType apply(JavaType type) {
-            return new JavaTypeBuilder(type).withInterfaces().build();
+        public TypeDef apply(TypeDef type) {
+            return new TypeDefBuilder(type).withInterfaces().build();
         }
     } , BOXED_OF {
-        public JavaType apply(JavaType type) {
+        public TypeDef apply(TypeDef type) {
             int index=0;
-            for (JavaType primitive : PRIMITIVE_TYPES) {
+            for (TypeDef primitive : PRIMITIVE_TYPES) {
                 if (primitive.equals(type)) {
                     return BOXED_PRIMITIVE_TYPES[index];
                 }
@@ -296,12 +304,12 @@ public enum TypeAs implements Function<JavaType, JavaType> {
     };
 
 
-    public static Function<JavaType, JavaType> combine(final Function<JavaType, JavaType>... functions) {
-        return new Function<JavaType, JavaType>() {
+    public static Function<TypeDef, TypeDef> combine(final Function<TypeDef, TypeDef>... functions) {
+        return new Function<TypeDef, TypeDef>() {
             @Override
-            public JavaType apply(JavaType item) {
-                JavaType result = item;
-                for (Function<JavaType, JavaType> f : functions) {
+            public TypeDef apply(TypeDef item) {
+                TypeDef result = item;
+                for (Function<TypeDef, TypeDef> f : functions) {
                     result = f.apply(result);
                 }
                 return result;

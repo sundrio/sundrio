@@ -18,12 +18,12 @@ package io.sundr.codegen.model;
 
 public class TypeParamRefFluentImpl<A extends TypeParamRefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeParamRefFluent<A>{
 
-     String name;
+     String name;     int dimensions;
 public TypeParamRefFluentImpl(){
     
 }
 public TypeParamRefFluentImpl( TypeParamRef instance ){
-    this.withName(instance.getName()); this.withAttributes(instance.getAttributes()); 
+    this.withName(instance.getName()); this.withDimensions(instance.getDimensions()); this.withAttributes(instance.getAttributes()); 
 }
 
     public String getName(){
@@ -32,6 +32,12 @@ public TypeParamRefFluentImpl( TypeParamRef instance ){
     public A withName( String name){
     this.name=name; return (A) this;
     }
+    public int getDimensions(){
+    return this.dimensions;
+    }
+    public A withDimensions( int dimensions){
+    this.dimensions=dimensions; return (A) this;
+    }
     public boolean equals( Object o){
     
 if (this == o) return true;
@@ -39,6 +45,7 @@ if (o == null || getClass() != o.getClass()) return false;
 if (!super.equals(o)) return false;
 TypeParamRefFluentImpl that = (TypeParamRefFluentImpl) o;
 if (name != null ? !name.equals(that.name) :that.name != null) return false;
+if (dimensions != that.dimensions) return false;
 return true;
 
     }

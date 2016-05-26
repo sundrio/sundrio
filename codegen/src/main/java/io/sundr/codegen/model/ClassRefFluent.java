@@ -16,27 +16,21 @@
 
 package io.sundr.codegen.model;
 
-import java.util.List;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Map;
-import java.util.RandomAccess;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.AbstractCollection;
-import java.util.AbstractList;
-import java.util.HashMap;
-import java.io.Serializable;
-import io.sundr.builder.Nested;
 import io.sundr.builder.Fluent;
+import io.sundr.builder.Nested;
+
+import java.util.List;
 
 public interface ClassRefFluent<A extends ClassRefFluent<A>> extends Fluent<A>,AttributeSupportFluent<A>{
 
 
-    public TypeDef getDefinition();    public A withDefinition(TypeDef definition);    public DefinitionNested<A> withNewDefinition();    public DefinitionNested<A> withNewDefinitionLike(TypeDef item);    public DefinitionNested<A> editDefinition();    public int getDimensions();    public A withDimensions(int dimensions);    public A addToArguments(TypeRef... items);    public A removeFromArguments(TypeRef... items);    public List<TypeRef> getArguments();    public A withArguments(List<TypeRef> arguments);    public A withArguments(TypeRef... arguments);    public A addToPrimitiveRefArguments(PrimitiveRef... items);    public A removeFromPrimitiveRefArguments(PrimitiveRef... items);    public PrimitiveRefArgumentsNested<A> addNewPrimitiveRefArgument();    public PrimitiveRefArgumentsNested<A> addNewPrimitiveRefArgumentLike(PrimitiveRef item);    public A addToTypeParamRefArguments(TypeParamRef... items);    public A removeFromTypeParamRefArguments(TypeParamRef... items);    public TypeParamRefArgumentsNested<A> addNewTypeParamRefArgument();    public TypeParamRefArgumentsNested<A> addNewTypeParamRefArgumentLike(TypeParamRef item);    public A addToClassRefArguments(ClassRef... items);    public A removeFromClassRefArguments(ClassRef... items);    public ClassRefArgumentsNested<A> addNewClassRefArgument();    public ClassRefArgumentsNested<A> addNewClassRefArgumentLike(ClassRef item);    public A addToVoidRefArguments(VoidRef... items);    public A removeFromVoidRefArguments(VoidRef... items);    public VoidRefArgumentsNested<A> addNewVoidRefArgument();    public VoidRefArgumentsNested<A> addNewVoidRefArgumentLike(VoidRef item);
+    public TypeDef getDefinition();    public A withDefinition(TypeDef definition);    public DefinitionNested<A> withNewDefinition();    public DefinitionNested<A> withNewDefinitionLike(TypeDef item);    public DefinitionNested<A> editDefinition();    public int getDimensions();    public A withDimensions(int dimensions);    public A addToArguments(TypeRef... items);    public A removeFromArguments(TypeRef... items);    public List<TypeRef> getArguments();    public A withArguments(List<TypeRef> arguments);    public A withArguments(TypeRef... arguments);    public A addToWildcardRefArguments(WildcardRef... items);    public A removeFromWildcardRefArguments(WildcardRef... items);    public WildcardRefArgumentsNested<A> addNewWildcardRefArgument();    public WildcardRefArgumentsNested<A> addNewWildcardRefArgumentLike(WildcardRef item);    public A addToPrimitiveRefArguments(PrimitiveRef... items);    public A removeFromPrimitiveRefArguments(PrimitiveRef... items);    public PrimitiveRefArgumentsNested<A> addNewPrimitiveRefArgument();    public PrimitiveRefArgumentsNested<A> addNewPrimitiveRefArgumentLike(PrimitiveRef item);    public A addToTypeParamRefArguments(TypeParamRef... items);    public A removeFromTypeParamRefArguments(TypeParamRef... items);    public TypeParamRefArgumentsNested<A> addNewTypeParamRefArgument();    public TypeParamRefArgumentsNested<A> addNewTypeParamRefArgumentLike(TypeParamRef item);    public A addToClassRefArguments(ClassRef... items);    public A removeFromClassRefArguments(ClassRef... items);    public ClassRefArgumentsNested<A> addNewClassRefArgument();    public ClassRefArgumentsNested<A> addNewClassRefArgumentLike(ClassRef item);    public A addToVoidRefArguments(VoidRef... items);    public A removeFromVoidRefArguments(VoidRef... items);    public VoidRefArgumentsNested<A> addNewVoidRefArgument();    public VoidRefArgumentsNested<A> addNewVoidRefArgumentLike(VoidRef item);
     public interface DefinitionNested<N> extends Nested<N>,TypeDefFluent<DefinitionNested<N>>{
             public N endDefinition();            public N and();        
+}
+
+    public interface WildcardRefArgumentsNested<N> extends Nested<N>,WildcardRefFluent<WildcardRefArgumentsNested<N>>{
+            public N endWildcardRefArgument();            public N and();        
 }
 
     public interface PrimitiveRefArgumentsNested<N> extends Nested<N>,PrimitiveRefFluent<PrimitiveRefArgumentsNested<N>>{

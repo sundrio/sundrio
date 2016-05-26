@@ -21,14 +21,20 @@ import java.util.Map;
 public class TypeParamRef extends AttributeSupport implements TypeRef {
 
     private final String name;
+    private final int dimensions;
 
-    public TypeParamRef(String name, Map<String, Object> attributes) {
+    public TypeParamRef(String name, int dimensions, Map<String, Object> attributes) {
         super(attributes);
         this.name = name;
+        this.dimensions = dimensions;
     }
 
     public String getName() {
         return name;
+    }
+
+    public int getDimensions() {
+        return dimensions;
     }
 
     @Override
@@ -50,5 +56,9 @@ public class TypeParamRef extends AttributeSupport implements TypeRef {
     @Override
     public String toString() {
         return name;
+    }
+
+    public boolean isAssignable(TypeRef ref) {
+        return false;
     }
 }

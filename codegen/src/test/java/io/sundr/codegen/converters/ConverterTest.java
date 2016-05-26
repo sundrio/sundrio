@@ -19,6 +19,8 @@ package io.sundr.codegen.converters;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
+import io.sundr.codegen.CodegenContext;
+import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.TypeDef;
@@ -38,31 +40,15 @@ public class ConverterTest {
     private final Elements elements = JavacElements.instance(context);
     private final Types types = JavacTypes.instance(context);
 
-
-    private final ModifiersToInt modifiersToInt = new ModifiersToInt();
-    private final TypeVariableToTypeParamRef toTypeParamRef = new TypeVariableToTypeParamRef();
-
-    private final TypeRefTypeVisitor typeRefTypeVisitor = new TypeRefTypeVisitor(toTypeParamRef);
-
-    private final TypeMirrorToTypeRef toTypeRef = new TypeMirrorToTypeRef(typeRefTypeVisitor);
-    private final VariableElementToProperty toProperty = new VariableElementToProperty(typeRefTypeVisitor, modifiersToInt);
-    private final ExecutableElementToMethod toMethod = new ExecutableElementToMethod(toTypeRef,toProperty, modifiersToInt);
-
-    private final TypeParameterElementToTypeParamDef toTypeParamDef = new TypeParameterElementToTypeParamDef(toTypeRef);
-
-    private final TypeDefElementVisitor typeDefElementVisitor = new TypeDefElementVisitor(toProperty, toMethod, toTypeParamDef);
-
-    private final TypeElementToTypeDef toTypeDef = new TypeElementToTypeDef(elements, toTypeRef, toMethod, toProperty);
-
     @Before
     public void setUp() {
-        typeRefTypeVisitor.setElementVisitor(typeDefElementVisitor);
+        CodegenContext.create(elements, types);
     }
 
     @Test
     public void testWithSimpleClass() {
         TypeElement typeElement = elements.getTypeElement(SimpleClass.class.getCanonicalName());
-        TypeDef typeDef = toTypeDef.apply(typeElement);
+        TypeDef typeDef = ElementTo.TYPEDEF.apply(typeElement);
         assertNotNull(typeDef);
         assertEquals("SimpleClass", typeDef.getName());
     }
@@ -70,7 +56,7 @@ public class ConverterTest {
     @Test
     public void testWithArray() {
         TypeElement typeElement = elements.getTypeElement(ClassWithArray.class.getCanonicalName());
-        TypeDef typeDef = toTypeDef.apply(typeElement);
+        TypeDef typeDef =  ElementTo.TYPEDEF.apply(typeElement);
 
         assertNotNull(typeDef);
         assertEquals("ClassWithArray", typeDef.getName());
@@ -84,7 +70,7 @@ public class ConverterTest {
     @Test
     public void testWithPrimitiveArray() {
         TypeElement typeElement = elements.getTypeElement(ClassWithPrimitiveArray.class.getCanonicalName());
-        TypeDef typeDef = toTypeDef.apply(typeElement);
+        TypeDef typeDef =  ElementTo.TYPEDEF.apply(typeElement);
 
         assertNotNull(typeDef);
         assertEquals("ClassWithPrimitiveArray", typeDef.getName());
@@ -98,7 +84,7 @@ public class ConverterTest {
     @Test
     public void testWithParam() {
         TypeElement typeElement = elements.getTypeElement(ClassWithParam.class.getCanonicalName());
-        TypeDef typeDef = toTypeDef.apply(typeElement);
+        TypeDef typeDef =  ElementTo.TYPEDEF.apply(typeElement);
         assertNotNull(typeDef);
 
         assertEquals("ClassWithParam", typeDef.getName());
@@ -112,7 +98,7 @@ public class ConverterTest {
     @Test
     public void testWithSelfRefParam() {
         TypeElement typeElement = elements.getTypeElement(ClassWithSelfRefParam.class.getCanonicalName());
-        TypeDef typeDef = toTypeDef.apply(typeElement);
+        TypeDef typeDef =  ElementTo.TYPEDEF.apply(typeElement);
         assertNotNull(typeDef);
 
         assertEquals("ClassWithSelfRefParam", typeDef.getName());

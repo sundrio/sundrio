@@ -45,6 +45,13 @@ public class Property extends ModifierSupport {
         return name;
     }
 
+    public String getNameCapitalized() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(name.replaceAll("_", "").substring(0, 1).toUpperCase());
+        sb.append(name.replaceAll("_", "").substring(1));
+        return sb.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

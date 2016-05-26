@@ -16,6 +16,8 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.codegen.utils.StringUtils;
+
 import java.util.List;
 import java.util.Map;
 
@@ -55,5 +57,16 @@ public class TypeParamDef extends AttributeSupport {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (bounds != null ? bounds.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(name);
+        if (bounds != null && !bounds.isEmpty()) {
+            sb.append(" extends ");
+            sb.append(StringUtils.join(bounds, ","));
+        }
+        return sb.toString();
     }
 }

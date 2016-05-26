@@ -42,4 +42,7 @@ public class PrimitiveRef extends AttributeSupport implements TypeRef {
         return name;
     }
 
+    public boolean isAssignable(TypeRef ref) {
+        return false;
+    }
 }

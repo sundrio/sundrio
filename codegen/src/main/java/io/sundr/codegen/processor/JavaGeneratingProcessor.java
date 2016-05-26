@@ -18,12 +18,10 @@ package io.sundr.codegen.processor;
 
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.generator.CodeGeneratorContext;
-import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.model.TypeDef;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.FilerException;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.PackageElement;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 
@@ -31,32 +29,32 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
 
     protected CodeGeneratorContext context = new CodeGeneratorContext();
     /**
-     * Generates a source file from the specified {@link io.sundr.codegen.model.JavaClazz}.*
+     * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
      * @param model                     The model of the class to generate.
      * @param resourceName              The template to use.
      * @throws IOException
      */
-    public void generateFromClazz(JavaClazz model, String resourceName) throws IOException {
+    public void generateFromClazz(TypeDef model, String resourceName) throws IOException {
         try {
             generateFromClazz(model, processingEnv
                     .getFiler()
-                    .createSourceFile(model.getType().getFullyQualifiedName()), resourceName);
+                    .createSourceFile(model.getFullyQualifiedName()), resourceName);
         } catch (FilerException e) {
             //TODO: Need to avoid dublicate interfaces here.
         }
     }
 
     /**
-     * Generates a source file from the specified {@link io.sundr.codegen.model.JavaClazz}.
+     * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
      *
      * @param model        The model of the class to generate.
      * @param fileObject   Where to save the generated class.
      * @param resourceName The template to use.
      * @throws IOException
      */
-   public void generateFromClazz(JavaClazz model, JavaFileObject fileObject, String resourceName) throws IOException {
-        System.err.println("Generating:"+model.getType().getFullyQualifiedName());
-        new CodeGeneratorBuilder<JavaClazz>()
+   public void generateFromClazz(TypeDef model, JavaFileObject fileObject, String resourceName) throws IOException {
+        System.err.println("Generating:"+model.getFullyQualifiedName());
+        new CodeGeneratorBuilder<TypeDef>()
                 .withContext(context)
                 .withModel(model)
                 .withWriter(fileObject.openWriter())

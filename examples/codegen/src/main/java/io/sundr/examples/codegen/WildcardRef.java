@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,25 +14,32 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.examples.codegen;
 
-import io.sundr.builder.Editable;
+import io.sundr.builder.annotations.Buildable;
 
-import javax.lang.model.element.Modifier;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
-public class EditableJavaProperty extends JavaProperty implements Editable<JavaPropertyBuilder> {
+@Buildable
+public class WildcardRef extends AttributeSupport implements TypeRef {
 
+    private static final String WILDCARD = "?";
 
-    public EditableJavaProperty(Set<JavaType> annotations, Set<Modifier> modifiers, JavaType type, String name, boolean array, Map<String, Object> attributes) {
-        super(annotations, modifiers, type, name, array, attributes);
+    public WildcardRef() {
+        this(Collections.<String, Object>emptyMap());
     }
 
-    public JavaPropertyBuilder edit() {
-        return new JavaPropertyBuilder(this);
+    public WildcardRef(Map<String, Object> attributes) {
+        super(attributes);
     }
 
+    @Override
+    public String toString() {
+        return WILDCARD;
+    }
 
+    public boolean isAssignable(TypeRef ref) {
+        return false;
+    }
 }
-    

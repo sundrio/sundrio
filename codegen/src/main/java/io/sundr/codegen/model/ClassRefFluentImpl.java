@@ -16,37 +16,14 @@
 
 package io.sundr.codegen.model;
 
-import java.util.List;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Map;
-import java.util.RandomAccess;
-import java.util.Collection;
+import io.sundr.builder.VisitableBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.AbstractCollection;
-import java.util.AbstractList;
-import java.util.HashMap;
-import java.io.Serializable;
-import java.util.List;
-import java.util.List;
-import io.sundr.builder.Visitable;
-import java.util.List;
-import io.sundr.builder.Fluent;
-import io.sundr.builder.Nested;
-import io.sundr.builder.VisitableBuilder;
-import io.sundr.builder.VisitableBuilder;
-import io.sundr.builder.VisitableBuilder;
-import io.sundr.builder.Visitable;
-import io.sundr.builder.BaseFluent;
-import io.sundr.builder.VisitableBuilder;
-import io.sundr.builder.Builder;
-import java.util.List;
-import io.sundr.builder.VisitableBuilder;
 
 public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AttributeSupportFluentImpl<A> implements ClassRefFluent<A>{
 
-     VisitableBuilder<TypeDef, ?> definition;     int dimensions;     List<TypeRef> arguments = new ArrayList();     List<VisitableBuilder<PrimitiveRef, ?>> primitiveRefArguments = new ArrayList();     List<VisitableBuilder<TypeParamRef, ?>> typeParamRefArguments = new ArrayList();     List<VisitableBuilder<ClassRef, ?>> classRefArguments = new ArrayList();     List<VisitableBuilder<VoidRef, ?>> voidRefArguments = new ArrayList();
+     VisitableBuilder<TypeDef, ?> definition;     int dimensions;     List<TypeRef> arguments = new ArrayList();     List<VisitableBuilder<WildcardRef, ?>> wildcardRefArguments = new ArrayList();     List<VisitableBuilder<PrimitiveRef, ?>> primitiveRefArguments = new ArrayList();     List<VisitableBuilder<TypeParamRef, ?>> typeParamRefArguments = new ArrayList();     List<VisitableBuilder<ClassRef, ?>> classRefArguments = new ArrayList();     List<VisitableBuilder<VoidRef, ?>> voidRefArguments = new ArrayList();
 public ClassRefFluentImpl(){
     
 }
@@ -76,27 +53,41 @@ public ClassRefFluentImpl( ClassRef instance ){
     this.dimensions=dimensions; return (A) this;
     }
     public A addToArguments( TypeRef ...items){
-    for (TypeRef item : items) {if (item instanceof PrimitiveRef){addToPrimitiveRefArguments((PrimitiveRef)item);}
+    for (TypeRef item : items) {if (item instanceof WildcardRef){addToWildcardRefArguments((WildcardRef)item);}
+ else if (item instanceof PrimitiveRef){addToPrimitiveRefArguments((PrimitiveRef)item);}
  else if (item instanceof TypeParamRef){addToTypeParamRefArguments((TypeParamRef)item);}
  else if (item instanceof ClassRef){addToClassRefArguments((ClassRef)item);}
  else if (item instanceof VoidRef){addToVoidRefArguments((VoidRef)item);}
 } return (A)this;
     }
     public A removeFromArguments( TypeRef ...items){
-    for (TypeRef item : items) {if (item instanceof PrimitiveRef){removeFromPrimitiveRefArguments((PrimitiveRef)item);}
+    for (TypeRef item : items) {if (item instanceof WildcardRef){removeFromWildcardRefArguments((WildcardRef)item);}
+ else if (item instanceof PrimitiveRef){removeFromPrimitiveRefArguments((PrimitiveRef)item);}
  else if (item instanceof TypeParamRef){removeFromTypeParamRefArguments((TypeParamRef)item);}
  else if (item instanceof ClassRef){removeFromClassRefArguments((ClassRef)item);}
  else if (item instanceof VoidRef){removeFromVoidRefArguments((VoidRef)item);}
 } return (A)this;
     }
     public List<TypeRef> getArguments(){
-    return aggregate(this.<TypeRef>build(classRefArguments), this.<TypeRef>build(primitiveRefArguments), this.<TypeRef>build(typeParamRefArguments), this.<TypeRef>build(voidRefArguments));
+    return aggregate(this.<TypeRef>build(classRefArguments), this.<TypeRef>build(primitiveRefArguments), this.<TypeRef>build(typeParamRefArguments), this.<TypeRef>build(voidRefArguments), this.<TypeRef>build(wildcardRefArguments));
     }
     public A withArguments( List<TypeRef> arguments){
     this.arguments.clear();if (arguments != null) {for (TypeRef item : arguments){this.addToArguments(item);}} return (A) this;
     }
     public A withArguments( TypeRef ...arguments){
     this.arguments.clear(); if (arguments != null) {for (TypeRef item :arguments){ this.addToArguments(item);}} return (A) this;
+    }
+    public A addToWildcardRefArguments( WildcardRef ...items){
+    for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(builder);this.wildcardRefArguments.add(builder);} return (A)this;
+    }
+    public A removeFromWildcardRefArguments( WildcardRef ...items){
+    for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.remove(builder);this.wildcardRefArguments.remove(builder);} return (A)this;
+    }
+    public WildcardRefArgumentsNested<A> addNewWildcardRefArgument(){
+    return new WildcardRefArgumentsNestedImpl();
+    }
+    public WildcardRefArgumentsNested<A> addNewWildcardRefArgumentLike( WildcardRef item){
+    return new WildcardRefArgumentsNestedImpl(item);
     }
     public A addToPrimitiveRefArguments( PrimitiveRef ...items){
     for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(builder);this.primitiveRefArguments.add(builder);} return (A)this;
@@ -155,6 +146,7 @@ ClassRefFluentImpl that = (ClassRefFluentImpl) o;
 if (definition != null ? !definition.equals(that.definition) :that.definition != null) return false;
 if (dimensions != that.dimensions) return false;
 if (arguments != null ? !arguments.equals(that.arguments) :that.arguments != null) return false;
+if (wildcardRefArguments != null ? !wildcardRefArguments.equals(that.wildcardRefArguments) :that.wildcardRefArguments != null) return false;
 if (primitiveRefArguments != null ? !primitiveRefArguments.equals(that.primitiveRefArguments) :that.primitiveRefArguments != null) return false;
 if (typeParamRefArguments != null ? !typeParamRefArguments.equals(that.typeParamRefArguments) :that.typeParamRefArguments != null) return false;
 if (classRefArguments != null ? !classRefArguments.equals(that.classRefArguments) :that.classRefArguments != null) return false;
@@ -179,6 +171,25 @@ return true;
         }
             public N and(){
             return (N) ClassRefFluentImpl.this.withDefinition(builder.build());
+        }
+    
+}
+    public class WildcardRefArgumentsNestedImpl<N> extends WildcardRefFluentImpl<WildcardRefArgumentsNested<N>> implements WildcardRefArgumentsNested<N>{
+
+        private final WildcardRefBuilder builder;
+    
+             WildcardRefArgumentsNestedImpl (){
+        this.builder = new WildcardRefBuilder(this);
+        }
+             WildcardRefArgumentsNestedImpl ( WildcardRef item){
+        this.builder = new WildcardRefBuilder(this, item);
+        }
+    
+            public N endWildcardRefArgument(){
+            return and();
+        }
+            public N and(){
+            return (N) ClassRefFluentImpl.this.addToWildcardRefArguments(builder.build());
         }
     
 }

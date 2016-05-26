@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.codegen.utils.StringUtils.join;
+
 public class Method extends ModifierSupport {
 
     private final Set<ClassRef> annotations;
@@ -92,7 +94,6 @@ public class Method extends ModifierSupport {
         return result;
     }
 
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -117,12 +118,22 @@ public class Method extends ModifierSupport {
             sb.append("final ");
         }
 
+        if (parameters != null && !parameters.isEmpty()) {
+            sb.append("<");
+            sb.append(StringUtils.join(parameters, ","));
+            sb.append(">");
+        }
+
         sb.append(returnType).append(" ");
         sb.append(name);
 
         sb.append("(");
-        StringUtils.join(arguments, "");
+        sb.append(StringUtils.join(arguments, ","));
         sb.append(")");
+
+        if (exceptions != null && !exceptions.isEmpty()) {
+            sb.append(" throws ").append(join(exceptions, ","));
+        }
 
         return sb.toString();
     }

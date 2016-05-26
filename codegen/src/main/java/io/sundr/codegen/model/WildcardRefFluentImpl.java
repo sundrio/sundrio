@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,22 +16,26 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
-import java.util.Map;
-import java.util.Set;
-
-public class EditableJavaClazz extends JavaClazz implements Editable<JavaClazzBuilder> {
+public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends AttributeSupportFluentImpl<A> implements WildcardRefFluent<A>{
 
 
-    public EditableJavaClazz(JavaType type, Set<JavaType> annotations, Set<JavaMethod> constructors, Set<JavaMethod> methods, Set<JavaProperty> fields, Set<JavaType> imports, Map<String, Object> attributes, Set<JavaClazz> nested) {
-        super(type, annotations, constructors, methods, fields, imports, attributes, nested);
+public WildcardRefFluentImpl(){
+    
+}
+public WildcardRefFluentImpl( WildcardRef instance ){
+    this.withAttributes(instance.getAttributes()); 
+}
+
+    public boolean equals( Object o){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+WildcardRefFluentImpl that = (WildcardRefFluentImpl) o;
+return true;
+
     }
 
-    public JavaClazzBuilder edit() {
-        return new JavaClazzBuilder(this);
-    }
 
 
 }
-    

@@ -18,25 +18,25 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class TypeParamRefBuilder extends TypeParamRefFluentImpl<TypeParamRefBuilder> implements VisitableBuilder<TypeParamRef,TypeParamRefBuilder>{
+public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder> implements VisitableBuilder<WildcardRef,WildcardRefBuilder>{
 
-     TypeParamRefFluent<?> fluent;
+     WildcardRefFluent<?> fluent;
 
-    public TypeParamRefBuilder(){
+    public WildcardRefBuilder(){
         this.fluent = this;
     }
-    public TypeParamRefBuilder( TypeParamRefFluent<?> fluent ){
+    public WildcardRefBuilder( WildcardRefFluent<?> fluent ){
         this.fluent = fluent;
     }
-    public TypeParamRefBuilder( TypeParamRefFluent<?> fluent , TypeParamRef instance ){
-        this.fluent = fluent; fluent.withName(instance.getName()); fluent.withDimensions(instance.getDimensions()); fluent.withAttributes(instance.getAttributes()); 
+    public WildcardRefBuilder( WildcardRefFluent<?> fluent , WildcardRef instance ){
+        this.fluent = fluent; fluent.withAttributes(instance.getAttributes()); 
     }
-    public TypeParamRefBuilder( TypeParamRef instance ){
-        this.fluent = this; this.withName(instance.getName()); this.withDimensions(instance.getDimensions()); this.withAttributes(instance.getAttributes()); 
+    public WildcardRefBuilder( WildcardRef instance ){
+        this.fluent = this; this.withAttributes(instance.getAttributes()); 
     }
 
-public EditableTypeParamRef build(){
-    EditableTypeParamRef buildable = new EditableTypeParamRef(fluent.getName(),fluent.getDimensions(),fluent.getAttributes());
+public EditableWildcardRef build(){
+    EditableWildcardRef buildable = new EditableWildcardRef(fluent.getAttributes());
 validate(buildable);
 return buildable;
 
@@ -46,7 +46,7 @@ public boolean equals( Object o ){
 if (this == o) return true;
 if (o == null || getClass() != o.getClass()) return false;
 if (!super.equals(o)) return false;
-TypeParamRefBuilder that = (TypeParamRefBuilder) o;
+WildcardRefBuilder that = (WildcardRefBuilder) o;
 if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
 return true;
 

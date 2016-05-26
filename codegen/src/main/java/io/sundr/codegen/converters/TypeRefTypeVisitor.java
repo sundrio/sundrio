@@ -16,11 +16,10 @@
 
 package io.sundr.codegen.converters;
 
-import io.sundr.Function;
+import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.PrimitiveRefBuilder;
 import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRefBuilder;
 
@@ -42,13 +41,9 @@ import java.util.List;
 
 public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
 
-    private final Function<TypeVariable, TypeParamRef> toTypeParamRef;
 
-    private ElementVisitor<TypeDefBuilder, Void> elementVisitor;
+    private ElementVisitor<TypeDefBuilder, Void> elementVisitor = new TypeDefElementVisitor();
 
-    public TypeRefTypeVisitor(Function<TypeVariable, TypeParamRef> toTypeParamRef) {
-        this.toTypeParamRef = toTypeParamRef;
-    }
 
     public TypeRef visit(TypeMirror t, Integer dimension) {
         return null;
@@ -90,7 +85,7 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
     }
 
     public TypeRef visitTypeVariable(TypeVariable t, Integer dimension) {
-        return toTypeParamRef.apply(t);
+        return ElementTo.TYPEVARIABLE_TO_TYPEPARAM_REF.apply(t);
     }
 
     public TypeRef visitWildcard(WildcardType t, Integer dimension) {
@@ -117,7 +112,4 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
         return elementVisitor;
     }
 
-    public void setElementVisitor(ElementVisitor<TypeDefBuilder, Void> elementVisitor) {
-        this.elementVisitor = elementVisitor;
-    }
 }
