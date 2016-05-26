@@ -16,31 +16,54 @@
 
 package io.sundr;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 public class CachingFunction<X,Y> implements Function<X,Y> {
 
     private final Map<X,Y> cache = new HashMap<X, Y>();
     private final Function<X,Y> function;
+    private final Function<X,Y> onOverflow;
+    private final int maximumDepth;
 
-    public CachingFunction(Function<X, Y> function) {
+    private final Stack<X> stack = new Stack<X>();
+
+    public CachingFunction(Function<X, Y> function, Function<X, Y> onOverflow, int maximumDepth) {
         this.function = function;
+        this.onOverflow = onOverflow;
+        this.maximumDepth = maximumDepth;
     }
 
     public Y apply(X item) {
         Y result;
         synchronized (cache) {
-            result = cache.get(item);
-            if (result == null) {
-                result = function.apply(item);
-                cache.put(item, result);
+            stack.push(item);
+            try {
+                result = cache.get(item);
+                if (result == null) {
+                    int depth = stack != null ? Collections.frequency(stack, item) : 0;
+                    if (depth > maximumDepth && onOverflow != null) {
+                        result = onOverflow.apply(item);
+                    } else {
+                        result = function.apply(item);
+                        cache.put(item, result);
+                    }
+                }
+            } finally {
+                stack.pop();
             }
+            return result;
+
         }
-        return result;
     }
 
     public static <X, Y> CachingFunction<X, Y> wrap(Function<X, Y> function) {
-        return new CachingFunction<X, Y>(function);
+        return new CachingFunction<X, Y>(function, null, 0);
+    }
+
+    public static <X, Y> CachingFunction<X, Y> wrap(Function<X, Y> function, Function<X,Y> overflowFunction, int maximumDepth) {
+        return new CachingFunction<X, Y>(function, overflowFunction, maximumDepth);
     }
 }
