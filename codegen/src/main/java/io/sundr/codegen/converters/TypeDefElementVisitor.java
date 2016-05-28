@@ -36,7 +36,13 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
     }
 
     public TypeDefBuilder visit(Element e) {
-        return builder.withName(e.getSimpleName().toString());
+        String name = e.getSimpleName().toString();
+        builder.withName(name);
+        if (e.getEnclosingElement() instanceof PackageElement) {
+            String packageName = e.getEnclosingElement().toString();
+            builder.withPackageName(packageName);
+        }
+        return builder;
     }
 
     public TypeDefBuilder visitPackage(PackageElement e, Void aVoid) {

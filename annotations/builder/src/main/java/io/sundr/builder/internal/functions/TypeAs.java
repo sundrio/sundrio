@@ -33,13 +33,9 @@ import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.utils.TypeUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import static io.sundr.builder.Constants.BOXED_PRIMITIVE_TYPES;
 import static io.sundr.builder.Constants.PRIMITIVE_TYPES;
 import static io.sundr.builder.Constants.Q;
@@ -47,24 +43,29 @@ import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableSuperCla
 import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 import static io.sundr.codegen.utils.TypeUtils.newTypeParamRef;
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+
 
 public class TypeAs {
 
     public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             BuilderContext ctx = BuilderContextManager.getContext();
-
             TypeDef fluent = SHALLOW_FLUENT.apply(item);
             List<TypeParamDef> generics = new ArrayList<TypeParamDef>(item.getParameters());
 
             TypeParamDef nextGeneric = getNextGeneric(item, generics);
             TypeParamRef nextGenericRef = nextGeneric.toReference();
 
+            List<TypeRef> boundArguments = new ArrayList<TypeRef>();
+            for (TypeParamDef parameter :item.getParameters()) {
+                boundArguments.add(parameter.toReference());
+            }
+            boundArguments.add(nextGenericRef);
+
             TypeParamDef genericFluent = new TypeParamDefBuilder(nextGeneric)
                     .addNewBound()
                         .withDefinition(fluent)
-                        .withArguments(nextGeneric.toReference())
+                        .withArguments(boundArguments)
                     .endBound()
                     .build();
 
@@ -73,21 +74,15 @@ public class TypeAs {
             TypeDef buildableSuperClass = findBuildableSuperClass(item);
             TypeDef superClass = buildableSuperClass != null
                     ? SHALLOW_FLUENT.apply(buildableSuperClass)
-                    : ctx.getBaseFluentClass();
-
-            Set<ClassRef> extendsList = new HashSet<ClassRef>();
-
-            if (!superClass.getFullyQualifiedName().equals(ctx.getBaseFluentClass().getFullyQualifiedName())) {
-                extendsList.add(superClass.toReference(nextGenericRef));
-            }
-            extendsList.add(ctx.getFluentInterface().toReference(nextGenericRef));
+                    : ctx.getFluentInterface();
 
             return new TypeDefBuilder(item)
                     .withKind(Kind.INTERFACE)
                     .withName(item.getName() + "Fluent")
                     .withPackageName(item.getPackageName())
                     .withParameters(generics)
-                    .withExtendsList(extendsList)
+                    .withExtendsList(superClass.toReference(nextGenericRef))
+                    .withImplementsList()
                     .build();
         }
     });
@@ -100,6 +95,7 @@ public class TypeAs {
 
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>(item.getParameters());
             TypeParamDef nextParameter = getNextGeneric(item, parameters);
+            TypeParamRef nextParameterRef = nextParameter.toReference();
             TypeParamDef genericFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluent.toInternalReference()).build();
             parameters.add(genericFluent);
 
@@ -113,12 +109,14 @@ public class TypeAs {
                     .withName(item.getName() + "FluentImpl")
                     .withPackageName(item.getPackageName())
                     .withParameters(parameters)
-                    .addToExtendsList(classRefOf(superClass))
-                    .addToImplementsList(classRefOf(SHALLOW_FLUENT.apply(item)))
+                    .withExtendsList(superClass.toReference(nextParameterRef))
+                    .withImplementsList(SHALLOW_FLUENT.apply(item).toInternalReference())
                     .build();
         }
 
     });
+
+
     public static final Function<TypeDef, TypeDef> SHALLOW_FLUENT = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>(item.getParameters());
@@ -155,8 +153,8 @@ public class TypeAs {
                     .withKind(Kind.CLASS)
                     .withName(item.getName() + "Builder")
                     .withParameters(item.getParameters())
-                    .addToExtendsList(fluent)
-                    .addToImplementsList(classRefOf(BuilderContextManager.getContext().getVisitableBuilderInterface(), item, builder))
+                    .withExtendsList(fluent)
+                    .withImplementsList(classRefOf(BuilderContextManager.getContext().getVisitableBuilderInterface(), item, builder))
                     .build();
 
         }

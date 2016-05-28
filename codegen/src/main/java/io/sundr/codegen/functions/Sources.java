@@ -24,12 +24,14 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -39,6 +41,7 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 import io.sundr.builder.Function;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.BlockBuilder;
 import io.sundr.codegen.model.ClassRef;
@@ -72,8 +75,6 @@ import java.util.List;
 import java.util.Set;
 
 public class Sources {
-
-
 
     private static Function<Node, String> PACKAGENAME = new Function<Node, String>() {
 
@@ -220,7 +221,7 @@ public class Sources {
                 Set<ClassRef> implementsList = new LinkedHashSet<ClassRef>();
                 Set<Property> properties = new LinkedHashSet<Property>();
                 Set<Method> methods = new LinkedHashSet<Method>();
-
+                Set<Method> constructors = new LinkedHashSet<Method>();
 
                 for (TypeParameter typeParameter: decl.getTypeParameters()) {
                     parameters.add(TYPEPARAMDEF.apply(typeParameter));
@@ -242,12 +243,11 @@ public class Sources {
                                     .withName(var.getId().getName())
                                     .withTypeRef(TYPEREF.apply(fieldDeclaration.getType()))
                                     .withModifiers(fieldDeclaration.getModifiers())
-                                    .addToAttributes("init", var.getInit().toStringWithoutComments())
+                                    .addToAttributes("init",  var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
                                     .build());
                         }
                     } else if (bodyDeclaration instanceof MethodDeclaration) {
                         MethodDeclaration methodDeclaration = (MethodDeclaration) bodyDeclaration;
-
                         List<Property> arguments = new ArrayList<Property>();
                         Set<ClassRef> exceptions = new LinkedHashSet<ClassRef>();
 
@@ -274,20 +274,54 @@ public class Sources {
                                 .withModifiers(methodDeclaration.getModifiers())
                                 .withReturnType(TYPEREF.apply(methodDeclaration.getType()))
                                 .withExceptions(exceptions)
+                                .withArguments(arguments)
                                 .withBlock(BLOCK.apply(methodDeclaration.getBody()))
+                                .build());
+                    } else if (bodyDeclaration instanceof ConstructorDeclaration) {
+                        ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
+                        List<Property> arguments = new ArrayList<Property>();
+                        Set<ClassRef> exceptions = new LinkedHashSet<ClassRef>();
+
+                        for (NameExpr nameExpr : constructorDeclaration.getThrows()) {
+                            String name = nameExpr.getName();
+                            String packageName = PACKAGENAME.apply(nameExpr);
+                            exceptions.add(new ClassRefBuilder().withNewDefinition()
+                                    .withName(name)
+                                    .withPackageName(packageName)
+                            .endDefinition().build());
+                        }
+                        for (Parameter parameter : constructorDeclaration.getParameters()) {
+                            Set<ClassRef> annotations = new LinkedHashSet<ClassRef>();
+                            for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
+                                annotations.add(ANNOTATIONREF.apply(annotationExpr));
+                            }
+                            arguments.add(new PropertyBuilder()
+                                    .withName(parameter.getId().getName())
+                                    .withTypeRef(TYPEREF.apply(parameter.getType()))
+                                    .withModifiers(parameter.getModifiers())
+                                    .withAnnotations(annotations)
+                                    .build());
+                        }
+                        constructors.add(new MethodBuilder()
+                                .withModifiers(constructorDeclaration.getModifiers())
+                                .withExceptions(exceptions)
+                                .withArguments(arguments)
+                                .withBlock(BLOCK.apply(constructorDeclaration.getBlock()))
                                 .build());
                     }
                 }
 
-                return new TypeDefBuilder()
+               return DefinitionRepository.getRepository().register( new TypeDefBuilder()
                         .withKind(kind)
                         .withPackageName(PACKAGENAME.apply(type))
                         .withName(decl.getName())
                         .withParameters(parameters)
                         .withExtendsList(extendsList)
                         .withImplementsList(implementsList)
+                        .withProperties(properties)
                         .withMethods(methods)
-                        .build();
+                        .withConstructors(constructors)
+                        .build());
             }
             throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");
         }

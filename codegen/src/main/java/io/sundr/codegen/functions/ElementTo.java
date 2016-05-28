@@ -16,8 +16,10 @@
 
 package io.sundr.codegen.functions;
 
+import io.sundr.CachingFunction;
 import io.sundr.Function;
 import io.sundr.codegen.CodegenContext;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.converters.TypeRefTypeVisitor;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -171,7 +173,7 @@ public class ElementTo {
          }
      };
 
-    public static final Function<TypeElement, TypeDef> TYPEDEF = new Function<TypeElement, TypeDef>() {
+    public static final Function<TypeElement, TypeDef> TYPEDEF = CachingFunction.wrap(new Function<TypeElement, TypeDef>() {
 
         public TypeDef apply(TypeElement classElement) {
             //Check SuperClass
@@ -256,7 +258,7 @@ public class ElementTo {
                     throw new IllegalStateException("Annotation type: [" + annotationType + "] not mapped to a class ref.");
                 }
             }
-            return builder.build();
+            return DefinitionRepository.getRepository().register(builder.build());
         }
 
         public Set<ExecutableElement> getInheritedMethods(TypeElement typeElement) {
@@ -274,7 +276,7 @@ public class ElementTo {
 
             return result;
         }
-    };
+    });
 
 
 }

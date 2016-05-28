@@ -42,9 +42,6 @@ import java.util.List;
 public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
 
 
-    private ElementVisitor<TypeDefBuilder, Void> elementVisitor = new TypeDefElementVisitor();
-
-
     public TypeRef visit(TypeMirror t, Integer dimension) {
         return null;
     }
@@ -77,14 +74,14 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
             }
         }
         return new ClassRefBuilder()
-                .withDefinition(elementVisitor.visit(t.asElement()).build())
+                .withDefinition(new TypeDefElementVisitor().visit(t.asElement()).build())
                 .withDimensions(dimension)
                 .withArguments(arguments)
                 .build();
     }
 
     public TypeRef visitError(ErrorType t, Integer dimension) {
-        return new ClassRefBuilder().withDefinition(elementVisitor.visit(t.asElement()).build()).build();
+        return new ClassRefBuilder().withDefinition(new TypeDefElementVisitor().visit(t.asElement()).build()).build();
     }
 
     public TypeRef visitTypeVariable(TypeVariable t, Integer dimension) {
@@ -109,10 +106,6 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
 
     public TypeRef visitUnion(UnionType t, Integer dimension) {
         return null;
-    }
-
-    public ElementVisitor<TypeDefBuilder, Void> getElementVisitor() {
-        return elementVisitor;
     }
 
 }

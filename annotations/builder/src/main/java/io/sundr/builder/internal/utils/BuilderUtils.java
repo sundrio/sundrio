@@ -27,6 +27,7 @@ import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.CollectionTypes;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.ClassRef;
@@ -60,17 +61,17 @@ public class BuilderUtils {
     public static final String BUILDABLE = "BUILDABLE";
 
     public static boolean isBuildable(TypeRef  typeRef) {
-        BuildableRepository repository =  BuilderContextManager.getContext().getRepository();
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
         return repository.isBuildable(typeRef);
     }
 
     public static boolean isBuildable(TypeDef  typeDef) {
-        BuildableRepository repository =  BuilderContextManager.getContext().getRepository();
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
         return repository.isBuildable(typeDef);
     }
 
     public static TypeDef findBuildableSuperClass(TypeDef clazz) {
-        BuildableRepository repository =  BuilderContextManager.getContext().getRepository();
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
 
         for (ClassRef superClass : clazz.getExtendsList()) {
             if (repository.isBuildable(superClass)) {
@@ -98,10 +99,15 @@ public class BuilderUtils {
     }
 
     public static Method findGetter(TypeDef clazz, Property property) {
-        for (Method method : clazz.getMethods()) {
-            if (isApplicableGetterOf(method, property)) {
-                return method;
+        TypeDef current = clazz;
+        while (current!= null && !current.equals(TypeDef.OBJECT)) {
+            for (Method method : current.getMethods()) {
+                if (isApplicableGetterOf(method, property)) {
+                    return method;
+                }
             }
+            String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+            current = DefinitionRepository.getRepository().getDefinition(fqn);
         }
         throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getFullyQualifiedName());
     }
@@ -117,25 +123,17 @@ public class BuilderUtils {
 
 
     public static boolean hasOrInheritsSetter(TypeDef clazz, Property property) {
-        TypeDef target = clazz;
-        Deque<ClassRef> parents = new LinkedList<ClassRef>();
-        parents.addAll(clazz.getImplementsList());
-        parents.addAll(clazz.getExtendsList());
-
+        TypeDef current = clazz;
         //Iterate parent objects and check for properties with setters but not ctor arguments.
-        while (target != null && !OBJECT.equals(target) && BuilderContextManager.getContext().getRepository().isBuildable(target)) {
-            for (Method method : target.getMethods()) {
+        while (current!= null && !current.equals(TypeDef.OBJECT)) {
+            for (Method method : current.getMethods()) {
                 if (isApplicableSetterOf(method, property)) {
                     return true;
                 }
             }
 
-            ClassRef parent = parents.remove();
-            if (parent != null) {
-                target = parent.getDefinition();
-            } else {
-                return false;
-            }
+            String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+            current = DefinitionRepository.getRepository().getDefinition(fqn);
         }
         return false;
     }
@@ -217,7 +215,7 @@ public class BuilderUtils {
 
     public static Set<Method> getInlineableConstructors(Property property) {
         Set<Method> result = new HashSet<Method>();
-        TypeDef clazz = BuilderContextManager.getContext().getRepository().getBuildable(property.getTypeRef());
+        TypeDef clazz = BuilderContextManager.getContext().getBuildableRepository().getBuildable(property.getTypeRef());
         for (Method candidate : clazz.getConstructors()) {
             if (isInlineable(candidate)) {
                 result.add(candidate);

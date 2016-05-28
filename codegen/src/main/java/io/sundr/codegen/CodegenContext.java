@@ -25,6 +25,7 @@ public class CodegenContext {
 
     private final Types types;
     private final Elements elements;
+    private final DefinitionRepository definitionRepository = DefinitionRepository.getRepository();
 
     private CodegenContext(Elements elements, Types types) {
         this.types = types;
@@ -49,5 +50,9 @@ public class CodegenContext {
 
     public Elements getElements() {
         return elements;
+    }
+
+    public DefinitionRepository getDefinitionRepository() {
+        return definitionRepository;
     }
 }

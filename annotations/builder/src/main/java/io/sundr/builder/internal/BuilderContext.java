@@ -18,6 +18,7 @@ package io.sundr.builder.internal;
 
 import io.sundr.builder.annotations.Inline;
 import io.sundr.codegen.CodegenContext;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;
@@ -49,7 +50,7 @@ public class BuilderContext {
     private final Boolean generateBuilderPackage;
     private final String builderPackage;
     private final Inline[] inlineables;
-    private final BuildableRepository repository;
+    private final BuildableRepository buildableRepository;
 
     
     public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, String builderPackage, Inline... inlineables) {
@@ -60,7 +61,7 @@ public class BuilderContext {
         this.builderPackage = builderPackage;
         this.inlineables = inlineables;
 
-        repository = new BuildableRepository();
+        buildableRepository = new BuildableRepository();
         visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
                 .withPackageName(builderPackage)
                 .build();
@@ -183,7 +184,11 @@ public class BuilderContext {
         return inlineables;
     }
 
-    public BuildableRepository getRepository() {
-        return repository;
+    public BuildableRepository getBuildableRepository() {
+        return buildableRepository;
+    }
+
+    public DefinitionRepository getDefinitionRepository() {
+        return codegenContext.getDefinitionRepository();
     }
 }

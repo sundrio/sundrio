@@ -177,7 +177,7 @@ public final class PropertyAs {
                 //Not a typical fluent
 
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-                TypeDef typeDef = BuilderContextManager.getContext().getRepository().getBuildable(typeRef);
+                TypeDef typeDef = BuilderContextManager.getContext().getBuildableRepository().getBuildable(typeRef);
 
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
@@ -214,7 +214,7 @@ public final class PropertyAs {
                 //Not a typical fluent
 
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-                TypeDef typeDef = BuilderContextManager.getContext().getRepository().getBuildable(typeRef);
+                TypeDef typeDef = BuilderContextManager.getContext().getBuildableRepository().getBuildable(typeRef);
 
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
@@ -251,7 +251,7 @@ public final class PropertyAs {
         public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property property) {
                 TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-                TypeDef typeDef = BuilderContextManager.getContext().getRepository().getBuildable(typeRef);
+                TypeDef typeDef = BuilderContextManager.getContext().getBuildableRepository().getBuildable(typeRef);
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 for (TypeParamDef generic : typeDef.getParameters()) {
                     parameters.add(generic);

@@ -49,7 +49,7 @@ public enum ToMethods implements Function<Property, Set<Method>> {
         public Set<Method> apply(Property property) {
             Set<Method> result = new LinkedHashSet<Method>();
             TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-            TypeDef baseType = BuilderContextManager.getContext().getRepository().getBuildable(unwrappedType);
+            TypeDef baseType = BuilderContextManager.getContext().getBuildableRepository().getBuildable(unwrappedType);
 
             for (Method constructor : getInlineableConstructors(property)) {
                 boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());

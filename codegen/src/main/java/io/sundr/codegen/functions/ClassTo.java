@@ -18,6 +18,7 @@ package io.sundr.codegen.functions;
 
 import io.sundr.CachingFunction;
 import io.sundr.Function;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -135,7 +136,7 @@ public class ClassTo {
                 }
             }
 
-            return new TypeDefBuilder()
+            return DefinitionRepository.getRepository().register(new TypeDefBuilder()
                     .withKind(kind)
                     .withName(item.getSimpleName())
                     .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
@@ -145,7 +146,7 @@ public class ClassTo {
                     .withProperties(properties)
                     .withExtendsList(extendsList)
                     .withImplementsList(implementsList)
-                    .build();
+                    .build());
         }
     };
 

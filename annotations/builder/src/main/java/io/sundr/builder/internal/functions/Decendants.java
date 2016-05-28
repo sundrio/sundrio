@@ -49,7 +49,7 @@ public class Decendants {
 
             Set<TypeDef> result = new LinkedHashSet<TypeDef>();
             BuilderContext ctx = BuilderContextManager.getContext();
-            BuildableRepository repository = ctx.getRepository();
+            BuildableRepository repository = ctx.getBuildableRepository();
 
             for (TypeDef type : repository.getBuildables()) {
 

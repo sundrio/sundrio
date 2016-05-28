@@ -64,7 +64,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
@@ -172,7 +171,6 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     }).build();
         }
     }, FLUENT_IMPL {
-
         public TypeDef apply(TypeDef item) {
             Set<Method> constructors = new LinkedHashSet<Method>();
             Set<Method> methods = new LinkedHashSet<Method>();
@@ -245,7 +243,6 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-
                 Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
                 if (isMap) {
                     properties.add(toAdd);
@@ -298,7 +295,9 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
                     .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
-                    .addToAttributes(BODY, toEquals(fluentType, properties))
+                    .withNewBlock()
+                        .withStatements(toEquals(fluentType, properties))
+                    .endBlock()
                     .build();
 
             methods.add(equals);
@@ -340,12 +339,12 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
         }
     }, BUILDER {
         public TypeDef apply(TypeDef item) {
-            TypeDef builderType = TypeAs.BUILDER.apply(item);
 
+            TypeDef builderType = TypeAs.BUILDER.apply(item);
             ClassRef instanceRef = item.toInternalReference();
 
             ClassRef fluent = TypeAs.FLUENT_REF.apply(item);
-            TypeRef builderReturnType = builderType.toReference(item.toReference());
+
             Set<Method> constructors = new LinkedHashSet<Method>();
             Set<Method> methods = new LinkedHashSet<Method>();
             Set<Property> fields = new LinkedHashSet<Property>();
@@ -354,13 +353,14 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             fields.add(fluentProperty);
 
             Method emptyConstructor = new MethodBuilder()
-                    .withReturnType(builderReturnType)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withNewBlock()
                         .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(new " + item.getName() + "());" : "this.fluent = this;")
                     .endBlock()
                     .build();
 
             Method fluentConstructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
                     .withTypeRef(fluent)
                     .withName("fluent")
@@ -371,6 +371,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .build();
 
             Method instanceAndFluentCosntructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
                     .withTypeRef(fluent)
                     .withName("fluent")
@@ -384,6 +385,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .build();
 
             Method instanceConstructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
                     .withTypeRef(instanceRef)
                     .withName("instance").and()
@@ -398,6 +400,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             constructors.add(instanceConstructor);
 
             Method build = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(instanceRef)
                     .withName("build")
                     .withNewBlock()
@@ -434,9 +437,11 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
                     TypeDef editable = EDITABLE.apply(item);
                     methods.add(new MethodBuilder()
-                            .withReturnType(editable.toInternalReference())
+                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                             .withName("build")
-                            .addToAttributes(BODY, toBuild(editable, editable))
+                            .withNewBlock()
+                                .withStatements(toBuild(editable, editable))
+                            .endBlock()
                             .build());
                 } else {
                     methods.add(m);
@@ -513,7 +518,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.").append(getterName).append("());\n").toString()));
                 }
             }
-            target = BuilderContextManager.getContext().getRepository().getBuildable(target.getExtendsList().iterator().next());
+            target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
         }
 
         return statements;
@@ -552,7 +557,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
                 }
             }
-            target = BuilderContextManager.getContext().getRepository().getBuildable(target.getExtendsList().iterator().next());
+            target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
         }
 
         statements.add(new StringStatement("validate(buildable);"));
