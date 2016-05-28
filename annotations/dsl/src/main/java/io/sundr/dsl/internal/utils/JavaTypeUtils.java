@@ -18,9 +18,9 @@ package io.sundr.dsl.internal.utils;
 
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.dsl.annotations.Begin;
@@ -136,8 +136,8 @@ public final class JavaTypeUtils {
 
         JavaType genericType = Generics.MAP.apply(returnType);
 
-        JavaMethod sourceMethod = context.getToMethod().apply(executableElement);
-        JavaMethod targetMethod = new JavaMethodBuilder(sourceMethod).withReturnType(genericType).withName(methodName).build();
+        Method sourceMethod = context.getToMethod().apply(executableElement);
+        Method targetMethod = new MethodBuilder(sourceMethod).withReturnType(genericType).withName(methodName).build();
 
 
         String interfaceName = targetInterfaceName != null ?
@@ -147,9 +147,9 @@ public final class JavaTypeUtils {
         return new JavaClazzBuilder()
                 .withNewType()
                     .withPackageName(ModelUtils.getPackageElement(executableElement).toString())
-                    .withClassName(interfaceName)
+                    .withName(interfaceName)
                     .addToGenericTypes(genericType)
-                    .withKind(JavaKind.INTERFACE)
+                    .withKind(Kind.INTERFACE)
                     .addToAttributes(ORIGINAL_RETURN_TYPE, returnType)
                     .addToAttributes(IS_ENTRYPOINT, isEntryPoint)
                     .addToAttributes(IS_TERMINAL, isTerminal)

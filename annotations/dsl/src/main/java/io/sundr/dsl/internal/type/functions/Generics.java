@@ -40,7 +40,7 @@ public enum Generics implements Function<JavaType, JavaType> {
                     name += iteration;
                 }
                 counter++;
-                GENERIC_MAPPINGS.put(item, new JavaTypeBuilder().withClassName(name).addToAttributes(IS_GENERIC, true).build());
+                GENERIC_MAPPINGS.put(item, new JavaTypeBuilder().withName(name).addToAttributes(IS_GENERIC, true).build());
             }
             return GENERIC_MAPPINGS.get(item);
         }
@@ -115,7 +115,7 @@ public enum Generics implements Function<JavaType, JavaType> {
     }
     
     static {
-        GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withClassName("V").addToAttributes(IS_GENERIC, true).build());
+        GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withName("V").addToAttributes(IS_GENERIC, true).build());
         GENERIC_MAPPINGS.put(TRANSPARENT, TRANSPARENT);
     }
 }

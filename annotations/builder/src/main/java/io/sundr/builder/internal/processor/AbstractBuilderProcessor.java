@@ -22,20 +22,19 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaPropertyBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
+import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
@@ -43,7 +42,7 @@ import static io.sundr.builder.Constants.BOXED_VOID;
 import static io.sundr.builder.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
@@ -105,133 +104,110 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     }
 
 
-    JavaClazz inlineableOf(BuilderContext ctx, JavaClazz clazz, Inline inline) {
-        Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
-        JavaType type = clazz.getType();
+    TypeDef inlineableOf(BuilderContext ctx, TypeDef type, Inline inline) {
+        Set<Method> constructors = new LinkedHashSet<Method>();
 
-        JavaType typeWithUnboundParameters =  TypeAs.REMOVE_GENERICS_BOUNDS.apply(clazz.getType());
-        JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(typeWithUnboundParameters);
-        JavaType inlineableType = TypeAs.INLINEABLE.apply(type);
+        TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(type);
+        TypeDef inlineableType = TypeAs.INLINEABLE.apply(type);
 
         if (!inline.name().isEmpty()) {
-            inlineableType = new JavaTypeBuilder(inlineableType).withClassName(inline.name()).build();
+            inlineableType = new TypeDefBuilder(inlineableType).withName(inline.name()).build();
         }
 
-        JavaType returnType = BuilderUtils.getInlineReturnType(ctx, inline);
+        TypeRef returnType = BuilderUtils.getInlineReturnType(ctx, inline);
         if (returnType.equals(BOXED_VOID)) {
-            returnType = typeWithUnboundParameters;
+            returnType = classRefOf(type);
         }
 
-        JavaType functionType = typeGenericOf(ctx.getFunctionInterface().getType(), typeWithUnboundParameters, returnType);
+        TypeRef functionType = classRefOf(ctx.getFunctionInterface(), type, returnType);
 
-        JavaProperty builderProperty = new JavaPropertyBuilder()
-                .withType(TypeAs.BUILDER.apply(typeWithUnboundParameters))
+        Property builderProperty = new PropertyBuilder()
+                .withTypeRef(classRefOf(TypeAs.BUILDER.apply(type)))
                 .withName(BUILDER)
-                .addToModifiers(Modifier.PRIVATE)
-                .addToModifiers(Modifier.FINAL)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                 .build();
 
-        JavaProperty functionProperty = new JavaPropertyBuilder()
-                .withType(functionType)
+        Property functionProperty = new PropertyBuilder()
+                .withTypeRef(functionType)
                 .withName(FUNCTION)
-                .addToModifiers(Modifier.PRIVATE)
-                .addToModifiers(Modifier.FINAL)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                 .build();
 
         if (returnType.equals(Constants.BOXED_VOID)) {
-            returnType = clazz.getType();
+            returnType = classRefOf(type);
         }
 
-        JavaType baseInterface = typeGenericOf(BuilderUtils.getInlineType(ctx, inline), returnType);
-        JavaType fluentImpl = TypeAs.FLUENT_IMPL.apply(clazz.getType());
-        JavaType fluentInterface = TypeAs.FLUENT_INTERFACE.apply(clazz.getType());
+        ClassRef baseInterface = classRefOf(BuilderUtils.getInlineType(ctx, inline), returnType);
 
-        JavaType shallowInlineType = new JavaTypeBuilder(inlineableType)
-                .withClassName(inline.prefix() + inlineableType.getClassName() + inline.suffix())
-                .withInterfaces(baseInterface)
+        TypeDef shallowInlineType = new TypeDefBuilder(inlineableType)
+                .withName(inline.prefix() + inlineableType.getName() + inline.suffix())
+                .addToImplementsList(baseInterface)
                 .build();
 
-        List<JavaType> generics = new ArrayList<JavaType>();
-        for (JavaType generic : clazz.getType().getGenericTypes()) {
-            generics.add(generic);
-        }
-        generics.add(shallowInlineType);
 
-        JavaType inlineType = new JavaTypeBuilder(shallowInlineType)
-                .withSuperClass(TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(fluentImpl, generics.toArray(new JavaType[generics.size()]))))
-                .addToInterfaces(TypeAs.REMOVE_GENERICS_BOUNDS.apply(typeGenericOf(fluentInterface, generics.toArray(new JavaType[generics.size()]))))
-                .build();
+        TypeRef inlineType =classRefOf(shallowInlineType);
 
-        JavaMethod inlineMethod = new JavaMethodBuilder()
+        Method inlineMethod = new MethodBuilder()
                 .withReturnType(returnType)
                 .withName(inline.value())
                 .addToAttributes(BODY, BUILD_AND_APPLY_FUNCTION)
-                .addToModifiers(Modifier.PUBLIC)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                 .build();
 
 
-        constructors.add(new JavaMethodBuilder()
-                .withNewReturnTypeLike(inlineType)
-                    .withGenericTypes()
-                .endReturnType()
+        constructors.add(new MethodBuilder()
+                .withReturnType(inlineType)
                 .withName(EMPTY)
                 .addNewArgument()
                     .withName(FUNCTION)
-                    .withType(functionType)
+                    .withTypeRef(functionType)
                 .and()
-                .addToModifiers(Modifier.PUBLIC)
-                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getSimpleName()))
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
                 .build());
 
-        constructors.add(new JavaMethodBuilder()
-                .withNewReturnTypeLike(inlineType)
-                    .withGenericTypes()
-                .endReturnType()
+        constructors.add(new MethodBuilder()
+                .withReturnType(inlineType)
                 .withName(EMPTY)
                 .addNewArgument()
-                .withName(ITEM)
-                .withType(typeWithUnboundParameters)
+                    .withName(ITEM)
+                    .withTypeRef(classRefOf(type))
                 .and()
                 .addNewArgument()
                 .withName(FUNCTION)
-                .withType(functionType)
+                    .withTypeRef(functionType)
                 .and()
-                .addToModifiers(Modifier.PUBLIC)
-                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getSimpleName()))
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
                 .build());
 
-        if (clazz.getType().equals(returnType)) {
-            constructors.add(new JavaMethodBuilder()
-                    .withNewReturnTypeLike(inlineType)
-                        .withGenericTypes()
-                    .endReturnType()
+        if (type.equals(returnType)) {
+            constructors.add(new MethodBuilder()
+                    .withReturnType(inlineType)
                     .withName(EMPTY)
                     .addNewArgument()
                     .withName(FUNCTION)
-                    .withType(functionType)
+                    .withTypeRef(functionType)
                     .and()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName())))
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
                     .build());
 
-            constructors.add(new JavaMethodBuilder()
-                    .withNewReturnTypeLike(inlineType)
-                        .withGenericTypes()
-                    .endReturnType()
+            constructors.add(new MethodBuilder()
+                    .withReturnType(inlineType)
                     .withName(EMPTY)
                     .addNewArgument()
                     .withName(ITEM)
-                    .withType(typeWithUnboundParameters)
+                    .withTypeRef(classRefOf(type))
                     .and()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getSimpleName(), String.format(EMPTY_FUNCTION_TEXT, typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName(), typeWithUnboundParameters.getSimpleName())))
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
                     .build());
         }
 
-        return new JavaClazzBuilder()
-                .withType(inlineType)
+        return new TypeDefBuilder(inlineableType)
                 .withConstructors(constructors)
-                .addToFields(builderProperty, functionProperty)
+                .addToProperties(builderProperty, functionProperty)
                 .addToMethods(inlineMethod)
                 .build();
     }

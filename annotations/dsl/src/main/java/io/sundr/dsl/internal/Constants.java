@@ -40,8 +40,8 @@ public final class Constants {
     public static final String CARDINALITY_MULTIPLE = "CARDINALITY_MULTIPLE";
     public static final String METHOD_NAME = "METHOD_NAME";
 
-    public static final JavaType VOID = new JavaTypeBuilder().withClassName("Void").build();
-    public static final JavaType TRANSPARENT = new JavaTypeBuilder().withClassName("T").addToAttributes(IS_GENERIC, true).build();
+    public static final JavaType VOID = new JavaTypeBuilder().withName("Void").build();
+    public static final JavaType TRANSPARENT = new JavaTypeBuilder().withName("T").addToAttributes(IS_GENERIC, true).build();
 
     public static final String FILTER = "FILTER";
 

@@ -21,7 +21,7 @@ import io.sundr.builder.VisitableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AttributeSupportFluentImpl<A> implements ClassRefFluent<A>{
+public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AbstractTypeRefFluentImpl<A> implements ClassRefFluent<A>{
 
      VisitableBuilder<TypeDef, ?> definition;     int dimensions;     List<TypeRef> arguments = new ArrayList();     List<VisitableBuilder<WildcardRef, ?>> wildcardRefArguments = new ArrayList();     List<VisitableBuilder<PrimitiveRef, ?>> primitiveRefArguments = new ArrayList();     List<VisitableBuilder<TypeParamRef, ?>> typeParamRefArguments = new ArrayList();     List<VisitableBuilder<ClassRef, ?>> classRefArguments = new ArrayList();     List<VisitableBuilder<VoidRef, ?>> voidRefArguments = new ArrayList();
 public ClassRefFluentImpl(){

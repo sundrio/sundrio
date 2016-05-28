@@ -14,17 +14,28 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.converters;
+package io.sundr.codegen.model;
 
-import io.sundr.Function;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeParamRefBuilder;
+public  abstract class AbstractTypeRefFluentImpl<A extends AbstractTypeRefFluent<A>> extends AttributeSupportFluentImpl<A> implements AbstractTypeRefFluent<A>{
 
-import javax.lang.model.type.TypeVariable;
 
-public class TypeVariableToTypeParamRef implements Function<TypeVariable, TypeParamRef> {
+public AbstractTypeRefFluentImpl(){
+    
+}
+public AbstractTypeRefFluentImpl( AbstractTypeRef instance ){
+    this.withAttributes(instance.getAttributes()); 
+}
 
-    public TypeParamRef apply(TypeVariable item) {
-        return new TypeParamRefBuilder().withName(item.asElement().getSimpleName().toString()).build();
+    public boolean equals( Object o){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+AbstractTypeRefFluentImpl that = (AbstractTypeRefFluentImpl) o;
+return true;
+
     }
+
+
+
 }

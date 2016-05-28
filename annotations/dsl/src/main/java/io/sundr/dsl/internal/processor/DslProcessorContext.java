@@ -20,7 +20,7 @@ import io.sundr.Function;
 import io.sundr.codegen.converters.ExecutableElementToMethod;
 import io.sundr.codegen.converters.StringToJavaType;
 import io.sundr.codegen.converters.VariableElementToProperty;
-import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.dsl.internal.element.functions.ToClasses;
 import io.sundr.dsl.internal.element.functions.ToKeywords;
@@ -46,7 +46,7 @@ public class DslProcessorContext {
 
     private final Elements elements;
     private final Function<String, JavaType> toType;
-    private final Function<VariableElement, JavaProperty> toProperty;
+    private final Function<VariableElement, Property> toProperty;
     private final ExecutableElementToMethod toMethod;
     private final ToRequiresAny toRequiresAny;
     private final ToRequiresAll toRequiresAll;

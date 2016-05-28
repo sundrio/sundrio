@@ -21,7 +21,7 @@ import io.sundr.codegen.utils.StringUtils;
 import java.util.List;
 import java.util.Map;
 
-public class ClassRef extends AttributeSupport implements TypeRef {
+public class ClassRef extends AbstractTypeRef {
 
     public static final ClassRef OBJECT = new ClassRefBuilder()
             .withDefinition(TypeDef.OBJECT)
@@ -48,6 +48,10 @@ public class ClassRef extends AttributeSupport implements TypeRef {
 
     public List<TypeRef> getArguments() {
         return arguments;
+    }
+
+    public ClassRef withDimensions(int dimensions) {
+        return new ClassRefBuilder(this).withDimensions(dimensions).build();
     }
 
     public boolean isAssignable(TypeRef other) {

@@ -18,7 +18,7 @@ package io.sundr.codegen.model;
 
 import java.util.Map;
 
-public class PrimitiveRef extends AttributeSupport implements TypeRef {
+public class PrimitiveRef extends AbstractTypeRef {
 
     private final String name;
     private final int dimensions;
@@ -37,12 +37,36 @@ public class PrimitiveRef extends AttributeSupport implements TypeRef {
         return dimensions;
     }
 
+    public PrimitiveRef withDimensions(int dimensions) {
+        return new PrimitiveRefBuilder(this).withDimensions(dimensions).build();
+    }
+
+    public boolean isAssignable(TypeRef ref) {
+        return this.equals(ref);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        PrimitiveRef that = (PrimitiveRef) o;
+
+        if (dimensions != that.dimensions) return false;
+        return name != null ? name.equals(that.name) : that.name == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + dimensions;
+        return result;
+    }
+
     @Override
     public String toString() {
         return name;
     }
 
-    public boolean isAssignable(TypeRef ref) {
-        return false;
-    }
 }

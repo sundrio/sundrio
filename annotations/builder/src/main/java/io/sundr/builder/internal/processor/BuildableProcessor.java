@@ -23,15 +23,18 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.utils.ModelUtils;
 
+import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import java.io.IOException;
 import java.util.Set;
 
@@ -40,15 +43,17 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
+        Types types = processingEnv.getTypeUtils();
+        Filer filer = processingEnv.getFiler();
 
         //First pass register all buildables
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
-                BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
-                ctx.getRepository().register(ModelUtils.getClassElement(element));
+                BuilderContext ctx = BuilderContextManager.create(elements, types, buildable.generateBuilderPackage(), buildable.builderPackage());
+                //ctx.getRepository().register(ModelUtils.getClassElement(element));
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
-                    ctx.getRepository().register(ModelUtils.getClassElement(ref));
+                 //   ctx.getRepository().register(ModelUtils.getClassElement(ref));
                 }
             }
         }
@@ -57,32 +62,32 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 boolean isAbstract = element.getModifiers().contains(Modifier.ABSTRACT);
                 Buildable buildable = element.getAnnotation(Buildable.class);
-                BuilderContext ctx = BuilderContextManager.create(elements, buildable.generateBuilderPackage(), buildable.builderPackage());
-                JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(ModelUtils.getClassElement(element));
+                BuilderContext ctx = BuilderContextManager.create(elements, types, buildable.generateBuilderPackage(), buildable.builderPackage());
+                TypeDef typeDef = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element));
                 generateLocalDependenciesIfNeeded();
 
                 try {
-                    generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(clazz),
+                    generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                             Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
 
-                    generateFromClazz(ClazzAs.FLUENT_IMPL.apply(clazz),
+                    generateFromClazz(ClazzAs.FLUENT_IMPL.apply(typeDef),
                             Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
 
                     if (isAbstract) {
                       //ignore and move along
                     } else if (buildable.editableEnabled()) {
-                        generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(clazz),
+                        generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
                                 selectBuilderTemplate(buildable.validationEnabled()));
 
-                        generateFromClazz(ClazzAs.EDITABLE.apply(clazz),
+                        generateFromClazz(ClazzAs.EDITABLE.apply(typeDef),
                                 Constants.DEFAULT_EDITABLE_TEMPLATE_LOCATION);
                     } else {
-                        generateFromClazz(ClazzAs.BUILDER.apply(clazz),
+                        generateFromClazz(ClazzAs.BUILDER.apply(typeDef),
                                 selectBuilderTemplate(buildable.validationEnabled()));
                     }
 
                     for (final Inline inline : buildable.inline()) {
-                        generateFromClazz(inlineableOf(ctx, clazz, inline),
+                        generateFromClazz(inlineableOf(ctx, typeDef, inline),
                                 Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
                     }
                 } catch (IOException e) {

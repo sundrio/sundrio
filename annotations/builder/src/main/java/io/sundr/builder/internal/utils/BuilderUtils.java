@@ -26,17 +26,20 @@ import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.functions.ClassToTypeDef;
+import io.sundr.builder.internal.functions.CollectionTypes;
+import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 import java.util.Arrays;
@@ -47,17 +50,24 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.LIST;
-import static io.sundr.builder.Constants.MAP;
 import static io.sundr.builder.Constants.OBJECT;
-import static io.sundr.builder.Constants.SET;
-import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
+import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public class BuilderUtils {
     
     private BuilderUtils() {}
 
     public static final String BUILDABLE = "BUILDABLE";
+
+    public static boolean isBuildable(TypeRef  typeRef) {
+        BuildableRepository repository =  BuilderContextManager.getContext().getRepository();
+        return repository.isBuildable(typeRef);
+    }
+
+    public static boolean isBuildable(TypeDef  typeDef) {
+        BuildableRepository repository =  BuilderContextManager.getContext().getRepository();
+        return repository.isBuildable(typeDef);
+    }
 
     public static TypeDef findBuildableSuperClass(TypeDef clazz) {
         BuildableRepository repository =  BuilderContextManager.getContext().getRepository();
@@ -233,30 +243,17 @@ public class BuilderUtils {
         return true;
     }
 
-    public static JavaType getInlineType(BuilderContext context, Inline inline) {
+    public static TypeDef getInlineType(BuilderContext context, Inline inline) {
         try {
-            return ClassToTypeDef.FUNCTION.apply(inline.type());
+            return ClassTo.TYPEDEF.apply(inline.type());
         } catch (MirroredTypeException e) {
-            String className = e.getTypeMirror().toString();
-            try {
-                return ClassToTypeDef.FUNCTION.apply(Class.forName(className));
-            } catch (ClassNotFoundException cnfe) {
-                throw new RuntimeException(cnfe);
-            }
+            Element element = BuilderContextManager.getContext().getTypes().asElement(e.getTypeMirror());
+            return ElementTo.TYPEDEF.apply((TypeElement) element);
         }
     }
 
-    public static JavaType getInlineReturnType(BuilderContext context, Inline inline) {
-        try {
-            return ClassToTypeDef.FUNCTION.apply(inline.returnType());
-        } catch (MirroredTypeException e) {
-            String className = e.getTypeMirror().toString();
-            try {
-                return ClassToTypeDef.FUNCTION.apply(Class.forName(className));
-            } catch (ClassNotFoundException cnfe) {
-                throw new RuntimeException(cnfe);
-            }
-        }
+    public static TypeRef getInlineReturnType(BuilderContext context, Inline inline) {
+            return classRefOf(getInlineType(context,inline));
     }
 
     public static Set<TypeElement> getBuildableReferences(BuilderContext context, Buildable buildable) {
@@ -283,54 +280,49 @@ public class BuilderUtils {
         return result;
     }
 
-    public static boolean isPrimitive(JavaType type) {
-        for (JavaType t : Constants.PRIMITIVE_TYPES) {
-            if (type.getSimpleName().equals(t.getSimpleName())) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isPrimitive(TypeRef type) {
+        return type instanceof PrimitiveRef;
     }
 
-    public static boolean isMap(JavaType type) {
-        if (unwrapGeneric(type).equals(unwrapGeneric(MAP))) {
-            return true;
-        }
-        for (JavaType i : type.getInterfaces()) {
-            //prevent infinite loop
-            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isMap(i)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isMap(TypeRef type) {
+       return CollectionTypes.IS_MAP.apply(type);
     }
 
-    public static boolean isList(JavaType type) {
-        if (unwrapGeneric(type).equals(unwrapGeneric(LIST))) {
-            return true;
-        }
-        for (JavaType i : type.getInterfaces()) {
-            //prevent infinite loop
-            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isList(i)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isList(TypeRef type) {
+        return CollectionTypes.IS_LIST.apply(type);
     }
 
-    public static boolean isSet(JavaType type) {
-        if (unwrapGeneric(type).equals(unwrapGeneric(SET))) {
-            return true;
-        }
-        for (JavaType i : type.getInterfaces()) {
-            //prevent infinite loop
-            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isSet(i)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isSet(TypeRef type) {
+        return CollectionTypes.IS_SET.apply(type);
     }
 
+    public static boolean isCollection(TypeRef type) {
+        return CollectionTypes.IS_COLLECTION.apply(type);
+    }
+
+    public static boolean isBoolean(TypeRef type) {
+        if (type instanceof PrimitiveRef) {
+            return ((PrimitiveRef)type).getName().equals("boolean");
+        } else if (!(type instanceof ClassRef)) {
+            return false;
+        } else {
+            return ((ClassRef)type).getDefinition().equals(Constants.BOOLEAN);
+        }
+    }
+
+
+    public static boolean isArray(TypeRef type) {
+
+        if (type instanceof ClassRef) {
+            return ((ClassRef)type).getDimensions() > 0;
+        } else if (type instanceof PrimitiveRef) {
+            return ((PrimitiveRef)type).getDimensions() > 0;
+        } else if (type instanceof TypeParamRef) {
+            return ((TypeParamRef)type).getDimensions() > 0;
+        } else {
+            return false;
+        }
+    }
 
     public static TypeParamDef getNextGeneric(TypeDef type, TypeParamDef... excluded) {
         return getNextGeneric(type, Arrays.asList(excluded));

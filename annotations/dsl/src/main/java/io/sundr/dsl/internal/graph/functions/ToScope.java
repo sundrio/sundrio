@@ -88,7 +88,7 @@ public class ToScope implements Function<Set<JavaClazz>, Set<JavaClazz>> {
                 scopeInterface = new JavaClazzBuilder()
                                         .withNewTypeLike(clazz.getType())
                                             .withPackageName(scopeInterfaceType.getPackageName())
-                                            .withClassName(scopeInterfaceType.getClassName()+SCOPE_SUFFIX)
+                                            .withName(scopeInterfaceType.getClassName()+SCOPE_SUFFIX)
                                             .withInterfaces(scopeInterfaceType)
                                             .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                                             .addToAttributes(KEYWORDS, scopeKeywords(scopeClasses))

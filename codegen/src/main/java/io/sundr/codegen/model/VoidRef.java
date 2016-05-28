@@ -19,7 +19,7 @@ package io.sundr.codegen.model;
 import java.util.Collections;
 import java.util.Map;
 
-public class VoidRef extends AttributeSupport implements TypeRef {
+public class VoidRef extends AbstractTypeRef {
 
     public VoidRef() {
         this(Collections.<String, Object>emptyMap());
@@ -27,6 +27,14 @@ public class VoidRef extends AttributeSupport implements TypeRef {
 
     public VoidRef(Map<String, Object> attributes) {
         super(attributes);
+    }
+
+    public int getDimensions() {
+        return 0;
+    }
+
+    public TypeRef withDimensions(int dimensions) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -37,4 +45,5 @@ public class VoidRef extends AttributeSupport implements TypeRef {
     public boolean isAssignable(TypeRef ref) {
         return false;
     }
+
 }

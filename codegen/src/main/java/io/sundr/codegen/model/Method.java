@@ -26,6 +26,7 @@ import static io.sundr.codegen.utils.StringUtils.join;
 
 public class Method extends ModifierSupport {
 
+
     private final Set<ClassRef> annotations;
     private final Set<TypeParamDef> parameters;
     private final String name;
@@ -124,8 +125,13 @@ public class Method extends ModifierSupport {
             sb.append(">");
         }
 
-        sb.append(returnType).append(" ");
-        sb.append(name);
+        if (name != null) {
+            sb.append(returnType);
+            sb.append(" ").append(name);
+        } else {
+            //This is a constructor
+            sb.append(((ClassRef)returnType).getDefinition().getName());
+        }
 
         sb.append("(");
         sb.append(StringUtils.join(arguments, ","));

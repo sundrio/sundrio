@@ -19,7 +19,7 @@ package io.sundr.codegen.model;
 import java.util.Collections;
 import java.util.Map;
 
-public class AttributeSupport {
+public class AttributeSupport implements Attributeable {
 
     private final Map<String, Object> attributes;
 

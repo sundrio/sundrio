@@ -58,9 +58,9 @@ public class JavaTypeUtilsTest {
     private final Elements elements = JavacElements.instance(context);
     private final Types types = JavacTypes.instance(context);
     private final DslProcessorContext dslContext = new DslProcessorContext(elements, types);
-    private final JavaType STRING = new JavaTypeBuilder().withPackageName("java.lang").withClassName("String").build();
-    private final JavaType INTEGER = new JavaTypeBuilder().withPackageName("java.lang").withClassName("Integer").build();
-    private final JavaType LONG = new JavaTypeBuilder().withPackageName("java.lang").withClassName("Long").build();
+    private final JavaType STRING = new JavaTypeBuilder().withPackageName("java.lang").withName("String").build();
+    private final JavaType INTEGER = new JavaTypeBuilder().withPackageName("java.lang").withName("Integer").build();
+    private final JavaType LONG = new JavaTypeBuilder().withPackageName("java.lang").withName("Long").build();
 
     @Test
     public void testExecutableToInterface() throws Exception {

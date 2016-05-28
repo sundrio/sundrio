@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Buildable
-public class WildcardRef extends AttributeSupport implements TypeRef {
+public class WildcardRef extends AbstractTypeRef {
 
     private static final String WILDCARD = "?";
 
@@ -35,11 +35,23 @@ public class WildcardRef extends AttributeSupport implements TypeRef {
     }
 
     @Override
+    public boolean isAssignable(TypeRef ref) {
+        return false;
+    }
+
+    @Override
+    public int getDimensions() {
+        return 0;
+    }
+
+    @Override
+    public TypeRef withDimensions(int dimensions) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String toString() {
         return WILDCARD;
     }
 
-    public boolean isAssignable(TypeRef ref) {
-        return false;
-    }
 }

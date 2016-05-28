@@ -30,4 +30,9 @@ public class StringStatement implements Statement {
     public String getData() {
         return data;
     }
+
+    @Override
+    public String toString() {
+        return data;
+    }
 }

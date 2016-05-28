@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.model;
 
-public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends AttributeSupportFluentImpl<A> implements WildcardRefFluent<A>{
+public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends AbstractTypeRefFluentImpl<A> implements WildcardRefFluent<A>{
 
 
 public WildcardRefFluentImpl(){

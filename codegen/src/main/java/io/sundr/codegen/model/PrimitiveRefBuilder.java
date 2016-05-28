@@ -18,53 +18,41 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class PrimitiveRefBuilder extends PrimitiveRefFluentImpl<PrimitiveRefBuilder> implements VisitableBuilder<PrimitiveRef, PrimitiveRefBuilder> {
+public class PrimitiveRefBuilder extends PrimitiveRefFluentImpl<PrimitiveRefBuilder> implements VisitableBuilder<PrimitiveRef,PrimitiveRefBuilder>{
 
-    PrimitiveRefFluent<?> fluent;
+     PrimitiveRefFluent<?> fluent;
 
-    public PrimitiveRefBuilder() {
+    public PrimitiveRefBuilder(){
         this.fluent = this;
     }
-
-    public PrimitiveRefBuilder(PrimitiveRefFluent<?> fluent) {
+    public PrimitiveRefBuilder( PrimitiveRefFluent<?> fluent ){
         this.fluent = fluent;
     }
-
-    public PrimitiveRefBuilder(PrimitiveRefFluent<?> fluent, PrimitiveRef instance) {
-        this.fluent = fluent;
-        fluent.withName(instance.getName());
-        fluent.withDimensions(instance.getDimensions());
-        fluent.withAttributes(instance.getAttributes());
+    public PrimitiveRefBuilder( PrimitiveRefFluent<?> fluent , PrimitiveRef instance ){
+        this.fluent = fluent; fluent.withName(instance.getName()); fluent.withDimensions(instance.getDimensions()); fluent.withAttributes(instance.getAttributes()); 
+    }
+    public PrimitiveRefBuilder( PrimitiveRef instance ){
+        this.fluent = this; this.withName(instance.getName()); this.withDimensions(instance.getDimensions()); this.withAttributes(instance.getAttributes()); 
     }
 
-    public PrimitiveRefBuilder(PrimitiveRef instance) {
-        this.fluent = this;
-        this.withName(instance.getName());
-        this.withDimensions(instance.getDimensions());
-        this.withAttributes(instance.getAttributes());
-    }
+public EditablePrimitiveRef build(){
+    EditablePrimitiveRef buildable = new EditablePrimitiveRef(fluent.getName(),fluent.getDimensions(),fluent.getAttributes());
+validate(buildable);
+return buildable;
 
-    public EditablePrimitiveRef build() {
-        EditablePrimitiveRef buildable = new EditablePrimitiveRef(fluent.getName(), fluent.getDimensions(), fluent.getAttributes());
-        validate(buildable);
-        return buildable;
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+PrimitiveRefBuilder that = (PrimitiveRefBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    }
+}
 
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        PrimitiveRefBuilder that = (PrimitiveRefBuilder) o;
-        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-            return false;
-        return true;
-
-    }
-
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }

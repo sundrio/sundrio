@@ -19,8 +19,8 @@ package io.sundr.dsl.internal.type.functions;
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaProperty;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 
@@ -69,14 +69,14 @@ public final class Merge {
                 JavaType mergedType = TYPES.apply(new JavaType[]{items[0].getType(), items[1].getType()});
 
                 JavaClazzBuilder builder = new JavaClazzBuilder(items[0]).withType(mergedType);
-                for (JavaMethod constructor : items[1].getConstructors()) {
+                for (Method constructor : items[1].getConstructors()) {
                     builder = builder.addToConstructors(constructor);
                 }
 
-                for (JavaMethod method : items[1].getMethods()) {
+                for (Method method : items[1].getMethods()) {
                     builder = builder.addToMethods(method);
                 }
-                for (JavaProperty property : items[1].getFields()) {
+                for (Property property : items[1].getFields()) {
                     builder = builder.addToFields(property);
                 }
                 return builder.build();

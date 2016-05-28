@@ -22,7 +22,7 @@ import io.sundr.codegen.utils.StringUtils;
 import java.util.Map;
 
 @Buildable
-public class PrimitiveRef extends AttributeSupport implements TypeRef {
+public class PrimitiveRef extends AbstractTypeRef {
 
     private final String name;
     private final int dimensions;
@@ -39,6 +39,19 @@ public class PrimitiveRef extends AttributeSupport implements TypeRef {
 
     public int getDimensions() {
         return dimensions;
+    }
+
+    public PrimitiveRef withDimensions(int dimensions) {
+        return new PrimitiveRefBuilder(this).withDimensions(dimensions).build();
+    }
+
+    public boolean isAssignable(TypeRef ref) {
+        return false;
+    }
+
+    @Override
+    public int getDimesions() {
+        return 0;
     }
 
     @Override

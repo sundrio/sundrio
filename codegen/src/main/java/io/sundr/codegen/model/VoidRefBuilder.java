@@ -18,49 +18,41 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements VisitableBuilder<VoidRef, VoidRefBuilder> {
+public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements VisitableBuilder<VoidRef,VoidRefBuilder>{
 
-    VoidRefFluent<?> fluent;
+     VoidRefFluent<?> fluent;
 
-    public VoidRefBuilder() {
-        this.fluent = this;
+    public VoidRefBuilder(){
+        this(new VoidRef());
+    }
+    public VoidRefBuilder( VoidRefFluent<?> fluent ){
+        this(fluent, new VoidRef());
+    }
+    public VoidRefBuilder( VoidRefFluent<?> fluent , VoidRef instance ){
+        this.fluent = fluent; fluent.withAttributes(instance.getAttributes()); 
+    }
+    public VoidRefBuilder( VoidRef instance ){
+        this.fluent = this; this.withAttributes(instance.getAttributes()); 
     }
 
-    public VoidRefBuilder(VoidRefFluent<?> fluent) {
-        this.fluent = fluent;
-    }
+public EditableVoidRef build(){
+    EditableVoidRef buildable = new EditableVoidRef(fluent.getAttributes());
+validate(buildable);
+return buildable;
 
-    public VoidRefBuilder(VoidRefFluent<?> fluent, VoidRef instance) {
-        this.fluent = fluent;
-        fluent.withAttributes(instance.getAttributes());
-    }
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+VoidRefBuilder that = (VoidRefBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    public VoidRefBuilder(VoidRef instance) {
-        this.fluent = this;
-        this.withAttributes(instance.getAttributes());
-    }
+}
 
-    public EditableVoidRef build() {
-        EditableVoidRef buildable = new EditableVoidRef(fluent.getAttributes());
-        validate(buildable);
-        return buildable;
-
-    }
-
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        VoidRefBuilder that = (VoidRefBuilder) o;
-        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-            return false;
-        return true;
-
-    }
-
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }

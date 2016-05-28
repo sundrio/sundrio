@@ -14,23 +14,27 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.converters;
+package io.sundr.examples.codegen;
 
-import io.sundr.Function;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.builder.annotations.Buildable;
 
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVisitor;
+import java.util.Collections;
+import java.util.List;
 
-public class TypeMirrorToTypeRef implements Function<TypeMirror, TypeRef> {
+public class Source {
 
-    private final TypeVisitor<TypeRef, Integer> visitor;
+    private final List<TypeDef> types;
 
-    public TypeMirrorToTypeRef(TypeVisitor<TypeRef, Integer> visitor) {
-        this.visitor = visitor;
+    public Source() {
+        this(Collections.EMPTY_LIST);
     }
 
-    public TypeRef apply(TypeMirror item) {
-        return item.accept(visitor, 0);
+    @Buildable
+    public Source(List<TypeDef> types) {
+        this.types = types;
+    }
+
+    public List<TypeDef> getTypes() {
+        return types;
     }
 }

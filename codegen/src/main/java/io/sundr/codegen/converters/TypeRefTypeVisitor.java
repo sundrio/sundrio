@@ -71,12 +71,15 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
     public TypeRef visitDeclared(DeclaredType t, Integer dimension) {
         List<TypeRef> arguments = new ArrayList<TypeRef>();
         for (TypeMirror typeMirror : t.getTypeArguments()) {
-            arguments.add(typeMirror.accept(this, dimension));
+            TypeRef arg = typeMirror.accept(this, dimension);
+            if (arg != null) {
+                arguments.add(arg);
+            }
         }
         return new ClassRefBuilder()
                 .withDefinition(elementVisitor.visit(t.asElement()).build())
                 .withDimensions(dimension)
-                .withArguments(arguments.toArray(new TypeRef[arguments.size()]))
+                .withArguments(arguments)
                 .build();
     }
 

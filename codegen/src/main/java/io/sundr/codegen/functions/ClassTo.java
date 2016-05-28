@@ -81,10 +81,8 @@ public class ClassTo {
                     target = ((GenericArrayType) target).getGenericComponentType();
                     dimensions++;
                 }
-                return new TypeParamRefBuilder()
-                        .withName(((TypeVariable) target).getName())
-                        .withDimensions(dimensions)
-                        .build();
+                TypeRef targetRef = TYPEREF.apply(target);
+                return targetRef.withDimensions(dimensions + targetRef.getDimensions());
 
             } else if (item instanceof ParameterizedType) {
                 ParameterizedType parameterizedType = (ParameterizedType) item;

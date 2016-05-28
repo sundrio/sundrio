@@ -29,14 +29,14 @@ public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements
         this.fluent = fluent;
     }
     public TypeDefBuilder( TypeDefFluent<?> fluent , TypeDef instance ){
-        this.fluent = fluent; fluent.withKind(instance.getKind()); fluent.withPackageName(instance.getPackageName()); fluent.withName(instance.getName()); fluent.withAnnotations(instance.getAnnotations()); fluent.withExtendsList(instance.getExtendsList()); fluent.withImplementsList(instance.getImplementsList()); fluent.withParameters(instance.getParameters()); fluent.withProperties(instance.getProperties()); fluent.withConstructors(instance.getConstructors()); fluent.withMethods(instance.getMethods()); fluent.withModifiers(instance.getModifiers()); fluent.withAttributes(instance.getAttributes()); 
+        this.fluent = fluent; fluent.withKind(instance.getKind()); fluent.withPackageName(instance.getPackageName()); fluent.withName(instance.getName()); fluent.withAnnotations(instance.getAnnotations()); fluent.withExtendsList(instance.getExtendsList()); fluent.withImplementsList(instance.getImplementsList()); fluent.withParameters(instance.getParameters()); fluent.withProperties(instance.getProperties()); fluent.withConstructors(instance.getConstructors()); fluent.withMethods(instance.getMethods()); fluent.withModifiers(instance.getModifiers()); fluent.withInnerTypes(instance.getInnerTypes()); fluent.withAttributes(instance.getAttributes()); 
     }
     public TypeDefBuilder( TypeDef instance ){
-        this.fluent = this; this.withKind(instance.getKind()); this.withPackageName(instance.getPackageName()); this.withName(instance.getName()); this.withAnnotations(instance.getAnnotations()); this.withExtendsList(instance.getExtendsList()); this.withImplementsList(instance.getImplementsList()); this.withParameters(instance.getParameters()); this.withProperties(instance.getProperties()); this.withConstructors(instance.getConstructors()); this.withMethods(instance.getMethods()); this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
+        this.fluent = this; this.withKind(instance.getKind()); this.withPackageName(instance.getPackageName()); this.withName(instance.getName()); this.withAnnotations(instance.getAnnotations()); this.withExtendsList(instance.getExtendsList()); this.withImplementsList(instance.getImplementsList()); this.withParameters(instance.getParameters()); this.withProperties(instance.getProperties()); this.withConstructors(instance.getConstructors()); this.withMethods(instance.getMethods()); this.withModifiers(instance.getModifiers()); this.withInnerTypes(instance.getInnerTypes()); this.withAttributes(instance.getAttributes()); 
     }
 
 public EditableTypeDef build(){
-    EditableTypeDef buildable = new EditableTypeDef(fluent.getKind(),fluent.getPackageName(),fluent.getName(),fluent.getAnnotations(),fluent.getExtendsList(),fluent.getImplementsList(),fluent.getParameters(),fluent.getProperties(),fluent.getConstructors(),fluent.getMethods(),fluent.getModifiers(),fluent.getAttributes());
+    EditableTypeDef buildable = new EditableTypeDef(fluent.getKind(),fluent.getPackageName(),fluent.getName(),fluent.getAnnotations(),fluent.getExtendsList(),fluent.getImplementsList(),fluent.getParameters(),fluent.getProperties(),fluent.getConstructors(),fluent.getMethods(),fluent.getModifiers(),fluent.getInnerTypes(),fluent.getAttributes());
 validate(buildable);
 return buildable;
 

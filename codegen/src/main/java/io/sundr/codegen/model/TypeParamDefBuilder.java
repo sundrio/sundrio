@@ -18,53 +18,41 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class TypeParamDefBuilder extends TypeParamDefFluentImpl<TypeParamDefBuilder> implements VisitableBuilder<TypeParamDef, TypeParamDefBuilder> {
+public class TypeParamDefBuilder extends TypeParamDefFluentImpl<TypeParamDefBuilder> implements VisitableBuilder<TypeParamDef,TypeParamDefBuilder>{
 
-    TypeParamDefFluent<?> fluent;
+     TypeParamDefFluent<?> fluent;
 
-    public TypeParamDefBuilder() {
+    public TypeParamDefBuilder(){
         this.fluent = this;
     }
-
-    public TypeParamDefBuilder(TypeParamDefFluent<?> fluent) {
+    public TypeParamDefBuilder( TypeParamDefFluent<?> fluent ){
         this.fluent = fluent;
     }
-
-    public TypeParamDefBuilder(TypeParamDefFluent<?> fluent, TypeParamDef instance) {
-        this.fluent = fluent;
-        fluent.withName(instance.getName());
-        fluent.withBounds(instance.getBounds());
-        fluent.withAttributes(instance.getAttributes());
+    public TypeParamDefBuilder( TypeParamDefFluent<?> fluent , TypeParamDef instance ){
+        this.fluent = fluent; fluent.withName(instance.getName()); fluent.withBounds(instance.getBounds()); fluent.withAttributes(instance.getAttributes()); 
+    }
+    public TypeParamDefBuilder( TypeParamDef instance ){
+        this.fluent = this; this.withName(instance.getName()); this.withBounds(instance.getBounds()); this.withAttributes(instance.getAttributes()); 
     }
 
-    public TypeParamDefBuilder(TypeParamDef instance) {
-        this.fluent = this;
-        this.withName(instance.getName());
-        this.withBounds(instance.getBounds());
-        this.withAttributes(instance.getAttributes());
-    }
+public EditableTypeParamDef build(){
+    EditableTypeParamDef buildable = new EditableTypeParamDef(fluent.getName(),fluent.getBounds(),fluent.getAttributes());
+validate(buildable);
+return buildable;
 
-    public EditableTypeParamDef build() {
-        EditableTypeParamDef buildable = new EditableTypeParamDef(fluent.getName(), fluent.getBounds(), fluent.getAttributes());
-        validate(buildable);
-        return buildable;
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+TypeParamDefBuilder that = (TypeParamDefBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    }
+}
 
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        TypeParamDefBuilder that = (TypeParamDefBuilder) o;
-        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-            return false;
-        return true;
-
-    }
-
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }

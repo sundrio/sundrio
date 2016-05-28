@@ -18,36 +18,32 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.BaseFluent;
 
-public class StringStatementFluentImpl<A extends StringStatementFluent<A>> extends BaseFluent<A> implements StringStatementFluent<A> {
+public class StringStatementFluentImpl<A extends StringStatementFluent<A>> extends BaseFluent<A> implements StringStatementFluent<A>{
 
-    String data;
+     String data;
+public StringStatementFluentImpl(){
+    
+}
+public StringStatementFluentImpl( StringStatement instance ){
+    this.withData(instance.getData()); 
+}
 
-    public StringStatementFluentImpl() {
+    public String getData(){
+    return this.data;
+    }
+    public A withData( String data){
+    this.data=data; return (A) this;
+    }
+    public boolean equals( Object o){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+StringStatementFluentImpl that = (StringStatementFluentImpl) o;
+if (data != null ? !data.equals(that.data) :that.data != null) return false;
+return true;
 
     }
 
-    public StringStatementFluentImpl(StringStatement instance) {
-        this.withData(instance.getData());
-    }
-
-    public String getData() {
-        return this.data;
-    }
-
-    public A withData(String data) {
-        this.data = data;
-        return (A) this;
-    }
-
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StringStatementFluentImpl that = (StringStatementFluentImpl) o;
-        if (data != null ? !data.equals(that.data) : that.data != null) return false;
-        return true;
-
-    }
 
 
 }

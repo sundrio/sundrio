@@ -18,49 +18,42 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class AttributeSupportBuilder extends AttributeSupportFluentImpl<AttributeSupportBuilder> implements VisitableBuilder<AttributeSupport, AttributeSupportBuilder> {
+public class AttributeSupportBuilder extends AttributeSupportFluentImpl<AttributeSupportBuilder> implements VisitableBuilder<AttributeSupport,AttributeSupportBuilder>{
 
-    AttributeSupportFluent<?> fluent;
+     AttributeSupportFluent<?> fluent;
 
-    public AttributeSupportBuilder() {
+    public AttributeSupportBuilder(){
         this.fluent = this;
     }
-
-    public AttributeSupportBuilder(AttributeSupportFluent<?> fluent) {
+    public AttributeSupportBuilder( AttributeSupportFluent<?> fluent ){
         this.fluent = fluent;
     }
-
-    public AttributeSupportBuilder(AttributeSupportFluent<?> fluent, AttributeSupport instance) {
-        this.fluent = fluent;
-        fluent.withAttributes(instance.getAttributes());
+    public AttributeSupportBuilder( AttributeSupportFluent<?> fluent , AttributeSupport instance ){
+        this.fluent = fluent; fluent.withAttributes(instance.getAttributes()); 
+    }
+    public AttributeSupportBuilder( AttributeSupport instance ){
+        this.fluent = this; this.withAttributes(instance.getAttributes()); 
     }
 
-    public AttributeSupportBuilder(AttributeSupport instance) {
-        this.fluent = this;
-        this.withAttributes(instance.getAttributes());
-    }
+public EditableAttributeSupport build(){
+    EditableAttributeSupport buildable = new EditableAttributeSupport(fluent.getAttributes());
+validate(buildable);
+return buildable;
 
-    public EditableAttributeSupport build() {
-        EditableAttributeSupport buildable = new EditableAttributeSupport(fluent.getAttributes());
-        validate(buildable);
-        return buildable;
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+AttributeSupportBuilder that = (AttributeSupportBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    }
+}
 
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        AttributeSupportBuilder that = (AttributeSupportBuilder) o;
-        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-            return false;
-        return true;
-
-    }
-
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }
+    

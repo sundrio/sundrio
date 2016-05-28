@@ -16,16 +16,22 @@
 
 package io.sundr.codegen.utils;
 
+import io.sundr.Function;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeParamRefBuilder;
+import io.sundr.codegen.model.TypeRef;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public final class TypeUtils {
     
@@ -34,7 +40,37 @@ public final class TypeUtils {
     }
 
     /**
-     * Creates a new generic JavaType.
+     * Checks if a {@link TypeDef} is an instance of an other {@link TypeDef}.
+     * @param type          The type to compare.
+     * @param targetType    The target type.
+     * @param function
+     * @return  true if match, false otherwise.
+     */
+    public static boolean isInstanceOf(TypeRef type, TypeDef targetType, Function<TypeRef, Boolean> function) {
+        if (type instanceof ClassRef) {
+            ClassRef classRef = (ClassRef) type;
+            TypeDef definition = classRef.getDefinition();
+            if (type.equals(targetType)) {
+                return true;
+            }
+
+            for (TypeRef i : definition.getImplementsList()) {
+                if (function.apply(i)) {
+                    return true;
+                }
+            }
+
+            for (TypeRef e : definition.getExtendsList()) {
+                if (function.apply(e)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Creates a new generic TypeParamRef.
      * @param letter       The letter of the type.
      * @return
      */
@@ -43,7 +79,7 @@ public final class TypeUtils {
     }
 
     /**
-     * Creates a new generic JavaType.
+     * Creates a new TypeParamDef.
      * @param letter       The letter of the type.
      * @return
      */
@@ -52,7 +88,28 @@ public final class TypeUtils {
     }
 
     /**
-     * Removes a new generic JavaType.
+     * Create a {@link ClassRef} for the specified {@link TypeDef}.
+     * @param typeDef
+     * @return
+     */
+    public static ClassRef classRefOf(TypeDef typeDef, Object... arguments) {
+        List<TypeRef> acutalArguments = new ArrayList<TypeRef>();
+        for (Object a : arguments) {
+            if (a instanceof TypeRef) {
+                acutalArguments.add((TypeRef)a);
+            } else if (a instanceof TypeDef) {
+                acutalArguments.add(classRefOf((TypeDef)a));
+            }
+        }
+        return new ClassRefBuilder()
+                .withDefinition(typeDef)
+                .withArguments(acutalArguments)
+                .build();
+    }
+
+
+    /**
+     * Removes parameters from a TypeDef.
      * @param base       The base type.
      * @return
      */
@@ -99,6 +156,10 @@ public final class TypeUtils {
                 .build();
     }
 
+
+    public static int modifiersToInt(Modifier... modifiers) {
+        return modifiersToInt(Arrays.asList(modifiers));
+    }
 
     public static int modifiersToInt(Collection<Modifier> modifiers) {
         int result = 0;

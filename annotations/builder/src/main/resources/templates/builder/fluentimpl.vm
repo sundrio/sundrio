@@ -1,4 +1,4 @@
-package ${model.type.packageName};
+package ${model.packageName};
 
 #foreach($i in $model.imports)
 import $i.fullyQualifiedName;
@@ -6,19 +6,23 @@ import $i.fullyQualifiedName;
 
 #class ($model)
 
-#foreach($f in $model.fields)
+#foreach($f in $model.properties)
     #field ($f)
 #end
 
 #foreach ($c in ${model.constructors})
-public ${c.returnType.className}(#foreach ($a in ${c.arguments}) ${a.type.simpleName} ${a.name} #if( $foreach.hasNext ),#end#end){
-    ${c.attributes.get("BODY")}
-}
+    #method ($c)
+    #foreach ($s in $c.block.statements)
+        $s.toString()
+    #end
+#end
 #end
 
 #foreach($m in $model.methods)
     #method ($m)
-    ${m.attributes.get("BODY")}
+    #foreach ($s in $m.block.statements)
+        $s.toString()
+    #end
     #end
 #end
 
@@ -26,18 +30,22 @@ public ${c.returnType.className}(#foreach ($a in ${c.arguments}) ${a.type.simple
     #class ($n)
 
     #foreach($f in $n.fields)
-    private final ${f.type.simpleName} ${f.name};
+    private final ${f.typeRef} ${f.name};
     #end
 
     #foreach($c in $n.constructors)
         #method ($c)
-        ${c.attributes.get("BODY")}
+        #foreach ($s in $c.block.statements)
+            $s.toString()
+        #end
         #end
     #end
 
     #foreach($m in $n.methods)
         #method ($m)
-            ${m.attributes.get("BODY")}
+        #foreach ($s in $m.block.statements)
+            $s.toString()
+        #end
         #end
     #end
 #end

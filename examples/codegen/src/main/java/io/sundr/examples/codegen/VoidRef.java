@@ -17,13 +17,12 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Collections;
 import java.util.Map;
 
 @Buildable
-public class VoidRef extends AttributeSupport implements TypeRef {
+public class VoidRef extends AbstractTypeRef {
 
     private static final String VOID = "void";
 
@@ -36,7 +35,23 @@ public class VoidRef extends AttributeSupport implements TypeRef {
     }
 
     @Override
+    public boolean isAssignable(TypeRef ref) {
+        return false;
+    }
+
+    @Override
+    public int getDimensions() {
+        return 0;
+    }
+
+    @Override
+    public TypeRef withDimensions(int dimensions) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String toString() {
         return VOID;
     }
+
 }

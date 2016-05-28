@@ -18,12 +18,12 @@ package io.sundr.codegen.model;
 
 import java.util.Map;
 
-public class TypeParamRef extends AttributeSupport implements TypeRef {
+public class TypeParamRef extends AbstractTypeRef {
 
     private final String name;
     private final int dimensions;
 
-    public TypeParamRef(String name, int dimensions, Map<String, Object> attributes) {
+    public TypeParamRef(String name,int dimensions, Map<String, Object> attributes) {
         super(attributes);
         this.name = name;
         this.dimensions = dimensions;
@@ -35,6 +35,10 @@ public class TypeParamRef extends AttributeSupport implements TypeRef {
 
     public int getDimensions() {
         return dimensions;
+    }
+
+    public TypeParamRef withDimensions(int dimensions) {
+        return new TypeParamRefBuilder(this).withDimensions(dimensions).build();
     }
 
     @Override
@@ -59,6 +63,6 @@ public class TypeParamRef extends AttributeSupport implements TypeRef {
     }
 
     public boolean isAssignable(TypeRef ref) {
-        return false;
+        return this.equals(ref);
     }
 }

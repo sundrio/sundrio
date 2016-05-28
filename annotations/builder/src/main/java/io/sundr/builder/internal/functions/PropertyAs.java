@@ -18,15 +18,18 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamRefBuilder;
+import io.sundr.codegen.model.TypeRef;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,192 +42,227 @@ import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public final class PropertyAs {
-    
-    private PropertyAs() {}
+
+    private PropertyAs() {
+    }
 
     public static final Function<Property, TypeDef> NESTED_CLASS = new Function<Property, TypeDef>() {
 
-        @Override
         public TypeDef apply(Property item) {
-            JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-            JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
+            TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
 
-            JavaType nestedType = NESTED_TYPE.apply(item);
-            Set<JavaType> nestedInterfaces = new HashSet<JavaType>();
-            for (JavaType n : nestedType.getInterfaces()) {
-                nestedInterfaces.add(TypeAs.REMOVE_GENERICS_BOUNDS.apply(n));
-            }
-            nestedType = new JavaTypeBuilder(nestedType).withInterfaces(nestedInterfaces.toArray(new JavaType[nestedInterfaces.size()])).build();
-            JavaType nestedUnwrapped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[0]).build();
+            if (unwrapped instanceof ClassRef) {
+                TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
+                TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
 
-            Set<Method> nestedMethods = new HashSet<Method>();
-            nestedMethods.add(ToMethod.AND.apply(item));
-            nestedMethods.add(ToMethod.END.apply(item));
+                TypeDef nestedType = NESTED_TYPE.apply(item);
+                TypeRef nestedRef = classRefOf(nestedType);
 
-            Set<Property> properties = new HashSet<Property>();
-            Set<Method> constructors = new HashSet<Method>();
-            
-            JavaType memberOf = (JavaType) item.getAttributes().get(MEMBER_OF);
-            properties.add(new PropertyBuilder()
-                    .withName("builder")
-                    .withType(builderType).build());
+                Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
+                for (ClassRef n : nestedType.getImplementsList()) {
+                    nestedInterfaces.add(n);
+                }
 
-            constructors.add(new MethodBuilder()
-                    .withName("")
-                    .withReturnType(nestedUnwrapped)
-                    .addNewArgument()
+                //nestedType = new TypeDefBuilder(nestedType).withInterfaces(nestedInterfaces.toArray(new TypeDef[nestedInterfaces.size()])).build();
+                //TypeDef nestedUnwrapped = new TypeDefBuilder(nestedType).withGenericTypes(new TypeDef[0]).build();
+
+                Set<Method> nestedMethods = new HashSet<Method>();
+                nestedMethods.add(ToMethod.AND.apply(item));
+                nestedMethods.add(ToMethod.END.apply(item));
+
+                Set<Property> properties = new HashSet<Property>();
+                Set<Method> constructors = new HashSet<Method>();
+
+                TypeDef memberOf = (TypeDef) item.getAttributes().get(MEMBER_OF);
+
+                properties.add(new PropertyBuilder()
+                        .withName("builder")
+                        .withTypeRef(classRefOf(builderType)).build());
+
+                constructors.add(new MethodBuilder()
+                        .withName("")
+                        .withReturnType(nestedRef)
+                        .addNewArgument()
                         .withName("item")
-                        .withType(TypeAs.REMOVE_GENERICS_BOUNDS.apply(baseType))
-                    .endArgument()
-                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this, item);")
-                    .build());
+                        .withTypeRef(item.getTypeRef())
+                        .endArgument()
+                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this, item);")
+                        .build());
 
-            constructors.add(new MethodBuilder()
-                    .withName("")
-                    .withReturnType(nestedUnwrapped)
-                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this);")
-                    .build());
+                constructors.add(new MethodBuilder()
+                        .withName("")
+                        .withReturnType(nestedRef)
+                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this);")
+                        .build());
 
-            return new TypeDefBuilder()
-                    .withType(nestedType)
-                    .withFields(properties)
-                    .withMethods(nestedMethods)
-                    .withConstructors(constructors)
-                    .addToAttributes(MEMBER_OF, memberOf)
-                    .build();
+                return new TypeDefBuilder(nestedType)
+                        .withProperties(properties)
+                        .withMethods(nestedMethods)
+                        .withConstructors(constructors)
+                        .addToAttributes(MEMBER_OF, memberOf)
+                        .build();
+            }
+            throw new IllegalStateException();
         }
     };
 
     public static final Function<Property, TypeDef> NESTED_INTERFACE = new Function<Property, TypeDef>() {
-        @Override
         public TypeDef apply(Property item) {
-            JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-            JavaType builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
-
-            JavaType nestedType = NESTED_INTERFACE_TYPE.apply(item);
-            JavaType nestedUnwrapped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[0]).build();
-
-            Set<Method> nestedMethods = new HashSet<Method>();
-            nestedMethods.add(ToMethod.AND.apply(item));
-            nestedMethods.add(ToMethod.END.apply(item));
-
-            Set<Property> properties = new HashSet<Property>();
-            Set<Method> constructors = new HashSet<Method>();
-
-            JavaType memberOf = (JavaType) item.getAttributes().get(MEMBER_OF);
-            properties.add(new PropertyBuilder()
-                    .withName("builder")
-                    .withType(builderType).build());
-
-            constructors.add(new MethodBuilder()
-                    .withName("")
-                    .withReturnType(nestedUnwrapped)
-                    .addNewArgument()
-                    .withName("item")
-                    .withType(baseType)
-                    .endArgument()
-                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this, item);")
-                    .build());
-
-            constructors.add(new MethodBuilder()
-                    .withName("")
-                    .withReturnType(nestedUnwrapped)
-                    .addToAttributes(BODY, "this.builder = new " + builderType.getSimpleName() + "(this);")
-                    .build());
-
-            return new TypeDefBuilder()
-                    .withType(nestedType)
-                    .withFields(properties)
-                    .withMethods(nestedMethods)
-                    .withConstructors(constructors)
-                    .addToAttributes(MEMBER_OF, memberOf)
-                    .build();
-        }
-    };
 
 
-    public static final Function<Property, JavaType> NESTED_TYPE = new Function<Property, JavaType>() {
-        @Override
-        public JavaType apply(Property item) {
-            JavaType nested = SHALLOW_NESTED_TYPE.apply(item);
-            //Not a typical fluent
-            JavaType fluent = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-            JavaType nestedInterfaceType = NESTED_INTERFACE_TYPE.apply(item);
+            TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
 
-            List<JavaType> generics = new ArrayList<JavaType>();
-            List<JavaType> superClassGenerics = new ArrayList<JavaType>();
-            for (JavaType generic : fluent.getGenericTypes()) {
-                generics.add(generic);
-                superClassGenerics.add(TypeAs.REMOVE_INTERFACES.apply(generic));
+            if (unwrapped instanceof ClassRef) {
+                TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
+                TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
+
+                TypeDef nestedType = NESTED_INTERFACE_TYPE.apply(item);
+                TypeRef nestedRef = classRefOf(nestedType);
+
+                Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
+                for (ClassRef n : nestedType.getImplementsList()) {
+                    nestedInterfaces.add(n);
+                }
+
+
+                Set<Method> nestedMethods = new HashSet<Method>();
+                nestedMethods.add(ToMethod.AND.apply(item));
+                nestedMethods.add(ToMethod.END.apply(item));
+
+                Set<Property> properties = new HashSet<Property>();
+                Set<Method> constructors = new HashSet<Method>();
+
+                TypeDef memberOf = (TypeDef) item.getAttributes().get(MEMBER_OF);
+                properties.add(new PropertyBuilder()
+                        .withName("builder")
+                        .withTypeRef(classRefOf(builderType)).build());
+
+                constructors.add(new MethodBuilder()
+                        .withName("")
+                        .withReturnType(nestedRef)
+                        .addNewArgument()
+                        .withName("item")
+                        .withTypeRef(classRefOf(baseType))
+                        .endArgument()
+                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this, item);")
+                        .build());
+
+                constructors.add(new MethodBuilder()
+                        .withName("")
+                        .withReturnType(nestedRef)
+                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this);")
+                        .build());
+
+                return new TypeDefBuilder(nestedType)
+                        .withProperties(properties)
+                        .withMethods(nestedMethods)
+                        .withConstructors(constructors)
+                        .addToAttributes(MEMBER_OF, memberOf)
+                        .build();
             }
-            superClassGenerics.add(nested);
-            generics.add(N);
-
-            JavaType superClassFluent = new JavaTypeBuilder(fluent)
-                    .withClassName(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef()) + "FluentImpl")
-                    .withInterfaces(nestedInterfaceType)
-                    .withGenericTypes(superClassGenerics.toArray(new JavaType[superClassGenerics.size()]))
-                    .build();
-
-            return new JavaTypeBuilder(nested)
-                    .withConcrete(true)
-                    .withClassName(nested.getClassName()+"Impl")
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .withSuperClass(superClassFluent)
-                    .withInterfaces(nestedInterfaceType)
-                    .build();
+            throw new IllegalStateException();
         }
-
     };
 
-    public static final Function<Property, JavaType> NESTED_INTERFACE_TYPE = new Function<Property, JavaType>() {
-        @Override
-        public JavaType apply(Property item) {
-            JavaType nested = SHALLOW_NESTED_TYPE.apply(item);
-            //Not a typical fluent
-            JavaType fluent = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
 
-            List<JavaType> generics = new ArrayList<JavaType>();
-            List<JavaType> superClassGenerics = new ArrayList<JavaType>();
-            for (JavaType generic : fluent.getGenericTypes()) {
-                generics.add(generic);
-                superClassGenerics.add(TypeAs.REMOVE_INTERFACES.apply(generic));
+
+
+        public static final Function<Property, TypeDef> NESTED_TYPE = new Function<Property, TypeDef>() {
+            public TypeDef apply(Property item) {
+
+                TypeDef nested = SHALLOW_NESTED_TYPE.apply(item);
+                //Not a typical fluent
+
+                TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
+                TypeDef typeDef = BuilderContextManager.getContext().getRepository().getBuildable(typeRef);
+
+                List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+                List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
+
+                for (TypeParamDef parameter : typeDef.getParameters()) {
+                    parameters.add(parameter);
+                    superClassParameters.add(new TypeParamRefBuilder().withName(parameter.getName()).build());
+                }
+                parameters.add(N);
+
+
+                ClassRef superClassFluent = new ClassRefBuilder()
+                        .withNewDefinition()
+                        .withName(typeDef.getName() + "FluentIml")
+                        .withPackageName(typeDef.getPackageName())
+                        .endDefinition()
+                        .withArguments(superClassParameters)
+                        .build();
+
+                return new TypeDefBuilder(nested)
+                        .withKind(Kind.CLASS)
+                        .withName(nested.getName() + "Impl")
+                        .withParameters(parameters)
+                        .addToExtendsList(superClassFluent)
+                        .addToImplementsList(classRefOf(BuilderContextManager.getContext().getNestedInterface()))
+                        .build();
             }
-            generics.add(N);
-            //We need to rid of the bounds: For example: Circle<T extends Number> implements Shape<T extends Shape>
-            //We only need To define T bounds once.
-            superClassGenerics.add(TypeAs.REMOVE_GENERICS_BOUNDS.apply(nested));
 
-            JavaType superClassFluent = new JavaTypeBuilder(fluent)
-                    .withClassName(TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef()) + "Fluent")
-                    .withGenericTypes(superClassGenerics.toArray(new JavaType[superClassGenerics.size()]))
-                    .build();
+        };
 
-            return new JavaTypeBuilder(nested)
-                    .withKind(JavaKind.INTERFACE)
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .withSuperClass(superClassFluent)
-                    .withInterfaces(BuilderContextManager.getContext().getNestedInterface().getType(), superClassFluent)
-                    .build();
-        }
+        public static final Function<Property, TypeDef> NESTED_INTERFACE_TYPE = new Function<Property, TypeDef>() {
+            public TypeDef apply(Property item) {
+                TypeDef nested = SHALLOW_NESTED_TYPE.apply(item);
+                //Not a typical fluent
 
-    };
+                TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
+                TypeDef typeDef = BuilderContextManager.getContext().getRepository().getBuildable(typeRef);
 
-    public static final Function<Property, JavaType> SHALLOW_NESTED_TYPE = new Function<Property, JavaType>() {
-        public JavaType apply(Property property) {
-            JavaType baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType generic : baseType.getGenericTypes()) {
-                generics.add(TypeAs.REMOVE_INTERFACES.apply(generic));
+                List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+                List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
+
+                for (TypeParamDef parameter : typeDef.getParameters()) {
+                    parameters.add(parameter);
+                    superClassParameters.add(new TypeParamRefBuilder().withName(parameter.getName()).build());
+                }
+                parameters.add(N);
+
+
+                //We need to rid of the bounds: For example: Circle<T extends Number> implements Shape<T extends Shape>
+                //We only need To define T bounds once.
+                superClassParameters.add(classRefOf(nested));
+
+
+                //CircleFluent<T, CircleShapesNested<T, N>>
+                ClassRef superClassFluent = new ClassRefBuilder()
+                        .withNewDefinition()
+                        .withName(typeDef.getName() + "Fluent")
+                        .withPackageName(typeDef.getPackageName())
+                        .endDefinition()
+                        .withArguments(superClassParameters)
+                        .build();
+
+                return new TypeDefBuilder(nested)
+                        .withKind(Kind.INTERFACE)
+                        .withParameters(parameters)
+                        .addToExtendsList(classRefOf(BuilderContextManager.getContext().getNestedInterface()), superClassFluent)
+                        .build();
             }
-            generics.add(N);
-            return new JavaTypeBuilder()
-                    .withClassName(captializeFirst(property.getName() + "Nested"))
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .build();
-        }
-    };
+        };
 
-}
+        public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
+            public TypeDef apply(Property property) {
+                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+                TypeDef typeDef = BuilderContextManager.getContext().getRepository().getBuildable(typeRef);
+                List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+                for (TypeParamDef generic : typeDef.getParameters()) {
+                    parameters.add(generic);
+                }
+                parameters.add(N);
+
+                return new TypeDefBuilder(typeDef)
+                        .withName(captializeFirst(property.getName() + "Nested"))
+                        .withParameters(parameters)
+                        .build();
+            }
+        };
+
+    }

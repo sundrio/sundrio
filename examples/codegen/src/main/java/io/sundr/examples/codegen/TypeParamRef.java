@@ -17,12 +17,11 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Map;
 
 @Buildable
-public class TypeParamRef extends AttributeSupport implements TypeRef {
+public class TypeParamRef extends AbstractTypeRef {
 
     private final String name;
     private final int dimensions;
@@ -39,6 +38,14 @@ public class TypeParamRef extends AttributeSupport implements TypeRef {
 
     public int getDimensions() {
         return dimensions;
+    }
+
+    public TypeParamRef withDimensions(int dimensions) {
+        return new TypeParamRefBuilder(this).withDimensions(dimensions).build();
+    }
+
+    public boolean isAssignable(TypeRef ref) {
+        return false;
     }
 
     @Override
@@ -60,9 +67,5 @@ public class TypeParamRef extends AttributeSupport implements TypeRef {
     @Override
     public String toString() {
         return name;
-    }
-
-    public boolean isAssignable(io.sundr.codegen.model.TypeRef ref) {
-        return false;
     }
 }

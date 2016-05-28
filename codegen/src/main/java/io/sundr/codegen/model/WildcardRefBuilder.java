@@ -23,10 +23,10 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
      WildcardRefFluent<?> fluent;
 
     public WildcardRefBuilder(){
-        this.fluent = this;
+        this(new WildcardRef());
     }
     public WildcardRefBuilder( WildcardRefFluent<?> fluent ){
-        this.fluent = fluent;
+        this(fluent, new WildcardRef());
     }
     public WildcardRefBuilder( WildcardRefFluent<?> fluent , WildcardRef instance ){
         this.fluent = fluent; fluent.withAttributes(instance.getAttributes()); 

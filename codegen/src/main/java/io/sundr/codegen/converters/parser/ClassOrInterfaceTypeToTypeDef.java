@@ -22,25 +22,27 @@ import com.github.javaparser.ast.type.Type;
 import io.sundr.Function;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClassOrInterfaceTypeToTypeDef implements Function<ClassOrInterfaceType, TypeDef> {
 
-
     private Function<TypeParameter, TypeDef> typeParamterToTypeDef;
 
     public TypeDef apply(ClassOrInterfaceType item) {
-        List<TypeDef> types = new ArrayList<TypeDef>();
+        List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
         for (Type type : item.getTypeArgs()) {
-
+            new TypeParamDefBuilder()
+                    .build();
         }
 
         return new TypeDefBuilder()
-                .withPackageName("changeme")
                 .withName(item.getName())
+                .withParameters(parameters)
                 .build();
     }
 }

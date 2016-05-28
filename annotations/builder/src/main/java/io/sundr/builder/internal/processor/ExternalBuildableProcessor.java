@@ -23,14 +23,17 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.utils.ModelUtils;
 
+import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Set;
@@ -40,18 +43,20 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
+        Types types = processingEnv.getTypeUtils();
+        Filer filer = processingEnv.getFiler();
 
         //First pass register all externals
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 ExternalBuildables generated = element.getAnnotation(ExternalBuildables.class);
-                BuilderContext ctx = BuilderContextManager.create(elements, generated.generateBuilderPackage(), generated.builderPackage());
+                BuilderContext ctx = BuilderContextManager.create(elements, types, generated.generateBuilderPackage(), generated.builderPackage());
                 for (String name : generated.value()) {
                     TypeElement typeElement = elements.getTypeElement(name);
-                    ctx.getRepository().register(typeElement);
+                    //ctx.getRepository().register(typeElement);
                 }
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
-                    ctx.getRepository().register(ModelUtils.getClassElement(ref));
+                    //ctx.getRepository().register(ModelUtils.getClassElement(ref));
                 }
             }
         }
@@ -68,26 +73,26 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                         continue;
                     }
                     BuilderContext ctx = BuilderContextManager.getContext();
-                    JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(ModelUtils.getClassElement(typeElement));
+                    TypeDef typeDef = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element));
                     generateLocalDependenciesIfNeeded();
                     try {
-                        generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(clazz),
+                        generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                                 Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
 
                         if (generated.editableEnabled()) {
-                            generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(clazz),
+                            generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
                                     selectBuilderTemplate(generated.validationEnabled()));
 
-                            generateFromClazz(ClazzAs.EDITABLE.apply(clazz),
+                            generateFromClazz(ClazzAs.EDITABLE.apply(typeDef),
                                     Constants.DEFAULT_EDITABLE_TEMPLATE_LOCATION);
                         } else {
-                            generateFromClazz(ClazzAs.BUILDER.apply(clazz),
+                            generateFromClazz(ClazzAs.BUILDER.apply(typeDef),
                                     selectBuilderTemplate(generated.validationEnabled()));
                         }
 
 
                         for (final Inline inline : generated.inline()) {
-                            generateFromClazz(inlineableOf(ctx, clazz, inline),
+                            generateFromClazz(inlineableOf(ctx, typeDef, inline),
                                     Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
                         }
                     } catch (IOException e) {

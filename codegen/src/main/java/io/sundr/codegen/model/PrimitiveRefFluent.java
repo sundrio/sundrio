@@ -18,15 +18,9 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Fluent;
 
-public interface PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends Fluent<A>, AttributeSupportFluent<A> {
+public interface PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends Fluent<A>,AbstractTypeRefFluent<A>{
 
 
-    public String getName();
-
-    public A withName(String name);
-
-    public int getDimensions();
-
-    public A withDimensions(int dimensions);
+    public String getName();    public A withName(String name);    public int getDimensions();    public A withDimensions(int dimensions);
 
 }

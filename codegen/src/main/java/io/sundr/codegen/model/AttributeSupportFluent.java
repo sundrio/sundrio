@@ -20,19 +20,9 @@ import io.sundr.builder.Fluent;
 
 import java.util.Map;
 
-public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A> {
+public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A>{
 
 
-    public A addToAttributes(String key, Object value);
-
-    public A addToAttributes(Map<String, Object> map);
-
-    public A removeFromAttributes(String key);
-
-    public A removeFromAttributes(Map<String, Object> map);
-
-    public Map<String, Object> getAttributes();
-
-    public A withAttributes(Map<String, Object> attributes);
+    public A addToAttributes(String key, Object value);    public A addToAttributes(Map<String, Object> map);    public A removeFromAttributes(String key);    public A removeFromAttributes(Map<String, Object> map);    public Map<String, Object> getAttributes();    public A withAttributes(Map<String, Object> attributes);
 
 }

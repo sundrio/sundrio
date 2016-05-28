@@ -19,7 +19,7 @@ package io.sundr.codegen.model;
 import java.util.Collections;
 import java.util.Map;
 
-public class WildcardRef extends AttributeSupport implements TypeRef {
+public class WildcardRef extends AbstractTypeRef {
 
     private static final String WILDCARD = "?";
 
@@ -31,6 +31,14 @@ public class WildcardRef extends AttributeSupport implements TypeRef {
         super(attributes);
     }
 
+    public int getDimensions() {
+        return 0;
+    }
+
+    public TypeRef withDimensions(int dimensions) {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public String toString() {
         return WILDCARD;
@@ -39,4 +47,5 @@ public class WildcardRef extends AttributeSupport implements TypeRef {
     public boolean isAssignable(TypeRef ref) {
         return false;
     }
+
 }

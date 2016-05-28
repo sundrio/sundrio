@@ -17,66 +17,46 @@
 package io.sundr.builder.internal.functions;
 
 import com.sun.tools.javac.model.JavacElements;
+import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
-import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import org.junit.Test;
 
 import javax.lang.model.util.Elements;
-
-import static io.sundr.codegen.utils.StringUtils.join;
+import javax.lang.model.util.Types;
 
 public class ClazzAsTest {
 
     private final Context context = new Context();
     private final Elements elements = JavacElements.instance(context);
-    private final BuilderContext builderContext = BuilderContextManager.create(elements);
+    private final Types types = JavacTypes.instance(context);
 
     @Test
     public void testToFluent() {
-        JavaType type = new JavaTypeBuilder()
-                .withClassName("MyClass")
-                    .withPackageName(getClass().getPackage().getName())
-                    .withGenericTypes(new JavaType[]{})
+        BuilderContext builderContext = BuilderContextManager.create(elements, types);
+
+        TypeDef type = new TypeDefBuilder()
+                .withName("MyClass")
+                .withPackageName(getClass().getPackage().getName())
+                .withParameters()
                 .build();
 
-        JavaMethod constructor = new JavaMethodBuilder()
-                .withReturnType(type)
-                .withAnnotations(Constants.BUILDABLE_ANNOTATION)
+        Method constructor = new MethodBuilder()
+                .withReturnType(type.toReference())
+                .withAnnotations(Constants.BUILDABLE_ANNOTATION.toReference())
                 .build();
 
-        JavaClazz clazz = new JavaClazzBuilder()
-                .withType(type)
+        type = new TypeDefBuilder(type)
                 .withConstructors(constructor)
                 .build();
-        
-        JavaClazz result = ClazzAs.FLUENT_IMPL.apply(clazz);
-        System.out.println(JavaTypeToString.INSTANCE.apply(result.getType()));
-    }
 
-    //Enum Singleton
-    private enum JavaTypeToString implements Function<JavaType, String> {
-        INSTANCE;
-        @Override
-        public String apply(JavaType item) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(item.getClassName());
-            if (item.getKind() == JavaKind.GENERIC && item.getSuperClass() != null) {
-                sb.append(" extends " + apply(item.getSuperClass()));
-            }
-            if (item.getGenericTypes() != null && item.getGenericTypes().length > 0) {
-                sb.append("<").append(join(item.getGenericTypes(), JavaTypeToString.INSTANCE, ",")).append(">");
-            }
-            return sb.toString();
-        }
+        TypeDef result = ClazzAs.FLUENT_IMPL.apply(type);
+        System.out.println(result);
     }
 }

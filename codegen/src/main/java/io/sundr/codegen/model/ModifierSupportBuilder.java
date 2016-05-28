@@ -18,51 +18,41 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSupportBuilder> implements VisitableBuilder<ModifierSupport, ModifierSupportBuilder> {
+public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSupportBuilder> implements VisitableBuilder<ModifierSupport,ModifierSupportBuilder>{
 
-    ModifierSupportFluent<?> fluent;
+     ModifierSupportFluent<?> fluent;
 
-    public ModifierSupportBuilder() {
+    public ModifierSupportBuilder(){
         this.fluent = this;
     }
-
-    public ModifierSupportBuilder(ModifierSupportFluent<?> fluent) {
+    public ModifierSupportBuilder( ModifierSupportFluent<?> fluent ){
         this.fluent = fluent;
     }
-
-    public ModifierSupportBuilder(ModifierSupportFluent<?> fluent, ModifierSupport instance) {
-        this.fluent = fluent;
-        fluent.withModifiers(instance.getModifiers());
-        fluent.withAttributes(instance.getAttributes());
+    public ModifierSupportBuilder( ModifierSupportFluent<?> fluent , ModifierSupport instance ){
+        this.fluent = fluent; fluent.withModifiers(instance.getModifiers()); fluent.withAttributes(instance.getAttributes()); 
+    }
+    public ModifierSupportBuilder( ModifierSupport instance ){
+        this.fluent = this; this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
     }
 
-    public ModifierSupportBuilder(ModifierSupport instance) {
-        this.fluent = this;
-        this.withModifiers(instance.getModifiers());
-        this.withAttributes(instance.getAttributes());
-    }
+public EditableModifierSupport build(){
+    EditableModifierSupport buildable = new EditableModifierSupport(fluent.getModifiers(),fluent.getAttributes());
+validate(buildable);
+return buildable;
 
-    public EditableModifierSupport build() {
-        EditableModifierSupport buildable = new EditableModifierSupport(fluent.getModifiers(), fluent.getAttributes());
-        validate(buildable);
-        return buildable;
+}
+public boolean equals( Object o ){
+    
+if (this == o) return true;
+if (o == null || getClass() != o.getClass()) return false;
+if (!super.equals(o)) return false;
+ModifierSupportBuilder that = (ModifierSupportBuilder) o;
+if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+return true;
 
-    }
+}
 
-    public boolean equals(Object o) {
-
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ModifierSupportBuilder that = (ModifierSupportBuilder) o;
-        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-            return false;
-        return true;
-
-    }
-
-    private <T> void validate(T item) {
-    }
+private <T> void validate(T item) {}
 
 
 }

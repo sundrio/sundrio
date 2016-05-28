@@ -19,12 +19,11 @@ package io.sundr.examples.codegen;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 @Buildable
-public class ClassRef extends AttributeSupport implements TypeRef {
+public class ClassRef extends AbstractTypeRef {
 
     private final TypeDef definition;
     private final int dimensions;
@@ -41,12 +40,21 @@ public class ClassRef extends AttributeSupport implements TypeRef {
         return definition;
     }
 
+    @Override
+    public boolean isAssignable(TypeRef ref) {
+        return false;
+    }
+
     public int getDimensions() {
         return dimensions;
     }
 
     public List<TypeRef> getArguments() {
         return arguments;
+    }
+
+    public ClassRef withDimensions(int dimensions) {
+        return new ClassRefBuilder(this).withDimensions(dimensions).build();
     }
 
     @Override

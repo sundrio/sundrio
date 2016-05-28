@@ -19,7 +19,7 @@ package io.sundr.dsl.internal.graph.functions;
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaMethod;
+import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.model.JavaTypeBuilder;
 import io.sundr.dsl.internal.graph.Node;
@@ -59,7 +59,7 @@ public class ToRoot implements Function<Node<JavaClazz>, JavaClazz> {
 
         return new JavaClazzBuilder(item.getItem())
                 .withType(Generics.UNWRAP.apply(rootType))
-                .withMethods(new LinkedHashSet<JavaMethod>())
+                .withMethods(new LinkedHashSet<Method>())
                 .build();
     }
 }

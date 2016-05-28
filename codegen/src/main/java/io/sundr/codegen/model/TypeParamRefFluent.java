@@ -18,7 +18,7 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Fluent;
 
-public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends Fluent<A>,AttributeSupportFluent<A>{
+public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends Fluent<A>,AbstractTypeRefFluent<A>{
 
 
     public String getName();    public A withName(String name);    public int getDimensions();    public A withDimensions(int dimensions);

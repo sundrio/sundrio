@@ -18,39 +18,42 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.CachingFunction;
 import io.sundr.Function;
-import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaPropertyBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.ClassRef;
 
-import javax.lang.model.element.TypeElement;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeRef;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.DESCENDANT_OF;
-import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
+import static io.sundr.codegen.utils.TypeUtils.classRefOf;
+import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
+import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 
 public class Decendants {
 
-    public static final Function<JavaType, Set<JavaType>> BUILDABLE_DECENDANTS = CachingFunction.wrap(new Function<JavaType, Set<JavaType>>() {
-        public Set<JavaType> apply(JavaType item) {
-            if (item.getFullyQualifiedName().equals(Constants.OBJECT.getFullyQualifiedName())) {
-                return new LinkedHashSet<JavaType>();
+    public static final Function<TypeDef, Set<TypeDef>> BUILDABLE_DECENDANTS = CachingFunction.wrap(new Function<TypeDef, Set<TypeDef>>() {
+        public Set<TypeDef> apply(TypeDef item) {
+            if (item.equals(TypeDef.OBJECT)) {
+                return new LinkedHashSet<TypeDef>();
             }
 
-            Set<JavaType> result = new LinkedHashSet<JavaType>();
+            Set<TypeDef> result = new LinkedHashSet<TypeDef>();
             BuilderContext ctx = BuilderContextManager.getContext();
             BuildableRepository repository = ctx.getRepository();
-            for (TypeElement element : repository.getBuildables()) {
-                JavaClazz clazz = ctx.getTypeElementToJavaClazz().apply(element);
-                JavaType type = clazz.getType();
-                if (type.isConcrete() && isDescendant(type, item)) {
+
+            for (TypeDef type : repository.getBuildables()) {
+
+                if (type.getKind() == Kind.CLASS &&  !type.isAbstract() && isDescendant(type, item)) {
                     result.add(type);
                 }
             }
@@ -65,29 +68,35 @@ public class Decendants {
      * @param property
      * @return
      */
-    public static Function<JavaProperty, Set<JavaProperty>> PROPERTY_BUILDABLE_ANCESTORS = CachingFunction.wrap(new Function<JavaProperty, Set<JavaProperty>>() {
-        public Set<JavaProperty> apply(JavaProperty property) {
-            Set<JavaProperty> result = new LinkedHashSet<JavaProperty>();
-            JavaType baseType = property.getType();
+    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_ANCESTORS = CachingFunction.wrap(new Function<Property, Set<Property>>() {
+        public Set<Property> apply(Property property) {
+            Set<Property> result = new LinkedHashSet<Property>();
+            TypeRef baseType = property.getTypeRef();
 
-            if (baseType.isCollection()) {
-                JavaType candidate = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
-                for (JavaType descendant : BUILDABLE_DECENDANTS.apply(candidate)) {
-                    JavaType collectionType = new JavaTypeBuilder(baseType).withGenericTypes(new JavaType[]{descendant}).build();
-                    String propertyName = deCaptializeFirst(descendant.getClassName()) + property.getNameCapitalized();
-                    result.add(new JavaPropertyBuilder(property)
-                            .withName(propertyName)
-                            .withType(collectionType)
-                            .addToAttributes(DESCENDANT_OF, property)
-                            .addToAttributes(BUILDABLE, true)
-                            .build());
+            if (IS_COLLECTION.apply(baseType)) {
+                TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
+                if (unwrapped instanceof  ClassRef) {
+                    ClassRef candidate = (ClassRef) unwrapped;
+
+                    for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
+                        ClassRef collectionType = new ClassRefBuilder((ClassRef)baseType).withArguments(classRefOf(descendant)).build();
+                        String propertyName = deCaptializeFirst(descendant.getName()) + property.getNameCapitalized();
+
+                        result.add(new PropertyBuilder(property)
+                                .withName(propertyName)
+                                .withTypeRef(collectionType)
+                                .addToAttributes(DESCENDANT_OF, property)
+                                .addToAttributes(BUILDABLE, true)
+                                .build());
+                    }
                 }
-            } else {
-                for (JavaType descendant : BUILDABLE_DECENDANTS.apply(baseType)) {
-                    String propertyName = descendant.getSimpleName() + property.getNameCapitalized();
-                    result.add(new JavaPropertyBuilder(property)
+            } else if (baseType instanceof  ClassRef) {
+                ClassRef candidate = (ClassRef) baseType;
+                for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
+                    String propertyName = descendant.getName() + property.getNameCapitalized();
+                    result.add(new PropertyBuilder(property)
                             .withName(propertyName)
-                            .withType(descendant)
+                            .withTypeRef(classRefOf(descendant))
                             .addToAttributes(DESCENDANT_OF, property)
                             .addToAttributes(BUILDABLE, true)
                             .build());
@@ -97,7 +106,6 @@ public class Decendants {
         }
     });
 
-
     /**
      * Checks if a type is an descendant of an other type
      *
@@ -105,21 +113,26 @@ public class Decendants {
      * @param candidate The candidate type.
      * @return true if candidate is a descendant of base type.
      */
-    public static boolean isDescendant(JavaType item, JavaType candidate) {
+    public static boolean isDescendant(TypeDef item, TypeDef candidate) {
         if (item == null || candidate == null) {
             return false;
-        } else if (item.getFullyQualifiedName().equals(candidate.getFullyQualifiedName())) {
+        } else if (item.equals(candidate)) {
             return true;
-        } else if (isDescendant(item.getSuperClass(), candidate)) {
-            return true;
-        } else {
-            for (JavaType interfaceType : item.getInterfaces()) {
-                if (isDescendant(interfaceType, candidate)) {
-                    return true;
-                }
-            }
-            return false;
         }
-    }
 
+
+        for (ClassRef classRef : item.getExtendsList()) {
+            if (isDescendant(classRef.getDefinition(), candidate)) {
+                return true;
+            }
+        }
+
+        for (ClassRef classRef : item.getImplementsList()) {
+            if (isDescendant(classRef.getDefinition(), candidate)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

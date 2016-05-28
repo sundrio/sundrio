@@ -18,7 +18,9 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Fluent;
 
-public interface VoidRefFluent<A extends VoidRefFluent<A>> extends Fluent<A>, AttributeSupportFluent<A> {
+public interface VoidRefFluent<A extends VoidRefFluent<A>> extends Fluent<A>,AbstractTypeRefFluent<A>{
+
+
 
 
 }

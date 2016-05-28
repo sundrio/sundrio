@@ -178,7 +178,10 @@ public class ElementTo {
             Kind kind = Kind.CLASS;
 
             TypeMirror superClass = classElement.getSuperclass();
-            TypeRef superClassType = INTERNAL_MIRROR_TO_TYPEREF.apply(superClass);
+
+            TypeRef superClassType = superClass instanceof NoType
+                    ? TypeDef.OBJECT.toReference()
+                    : INTERNAL_MIRROR_TO_TYPEREF.apply(superClass);
 
             List<TypeParamDef> genericTypes = new ArrayList<TypeParamDef>();
             List<ClassRef> interfaces = new ArrayList<ClassRef>();

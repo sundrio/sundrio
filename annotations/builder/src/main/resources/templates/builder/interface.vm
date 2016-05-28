@@ -1,4 +1,4 @@
-package ${model.type.packageName};
+package ${model.packageName};
 
 #foreach($i in $model.imports)
 import $i.fullyQualifiedName;

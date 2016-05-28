@@ -18,9 +18,9 @@ package io.sundr.dsl.internal.processor;
 
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
+import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
@@ -75,7 +75,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     }
 
                     //2nd step create dependency graph.
-                    Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
+                    Set<Method> methods = new LinkedHashSet<Method>();
                     Set<Node<JavaClazz>> graph = context.getToGraph().apply(genericAndScopeInterfaces);
 
                     for (Node<JavaClazz> root : graph) {
@@ -86,12 +86,12 @@ public class DslProcessor extends JavaGeneratingProcessor {
                         //If there are not transitions don't generate root interface.
                         //Just add the method with the direct return type.
                         if (unwrapped.getTransitions().isEmpty()) {
-                            for (JavaMethod m : current.getMethods()) {
-                                methods.add(new JavaMethodBuilder(m).withReturnType(Generics.UNWRAP.apply(m.getReturnType())).build());
+                            for (Method m : current.getMethods()) {
+                                methods.add(new MethodBuilder(m).withReturnType(Generics.UNWRAP.apply(m.getReturnType())).build());
                             }
                         } else {
-                            for (JavaMethod m : current.getMethods()) {
-                                methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
+                            for (Method m : current.getMethods()) {
+                                methods.add(new MethodBuilder(m).withReturnType(current.getType()).build());
                             }
 
                             interfacesToGenerate.add(context.getToRoot().apply(unwrapped));
@@ -102,8 +102,8 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     interfacesToGenerate.add(new JavaClazzBuilder()
                             .withNewType()
                                 .withPackageName(ModelUtils.getPackageElement(element).toString())
-                                .withClassName(targetInterface)
-                                .withKind(JavaKind.INTERFACE)
+                                .withName(targetInterface)
+                                .withKind(Kind.INTERFACE)
                             .and()
                             .withMethods(methods)
                             .build());

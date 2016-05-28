@@ -55,6 +55,12 @@ public class TypeParamDef extends AttributeSupport {
 
     }
 
+    public TypeParamRef toReference() {
+        return new TypeParamRefBuilder()
+                .withName(name)
+                .build();
+    }
+
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;

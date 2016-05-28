@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.model;
 
-public class TypeParamRefFluentImpl<A extends TypeParamRefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeParamRefFluent<A>{
+public class TypeParamRefFluentImpl<A extends TypeParamRefFluent<A>> extends AbstractTypeRefFluentImpl<A> implements TypeParamRefFluent<A>{
 
      String name;     int dimensions;
 public TypeParamRefFluentImpl(){

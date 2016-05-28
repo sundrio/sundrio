@@ -18,6 +18,8 @@ package io.sundr.codegen.model;
 
 import io.sundr.codegen.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,10 +44,12 @@ public class TypeDef extends ModifierSupport {
     private final Set<Property> properties;
     private final Set<Method> constructors;
     private final Set<Method> methods;
+    private final Set<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, int modifiers, Set<TypeDef> innerTypes, Map<String, Object> attributes) {
         super(modifiers, attributes);
-        this.kind = kind;
+        this.innerTypes = innerTypes;
+        this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
         this.name = name;
         this.annotations = annotations;
@@ -53,8 +57,27 @@ public class TypeDef extends ModifierSupport {
         this.implementsList = implementsList;
         this.parameters = parameters;
         this.properties = properties;
-        this.constructors = constructors;
+        this.constructors = adaptConstructors(constructors, this);
         this.methods = methods;
+    }
+
+    /**
+     * The method adapts constructor method to the current class.
+     * It unsets any name that may be presetn in the method.
+     * It also sets as a return type a reference to the current type.
+     * @param methods
+     * @param target
+     * @return
+     */
+    private static Set<Method> adaptConstructors(Set<Method> methods, TypeDef target) {
+        Set<Method> adapted = new LinkedHashSet<Method>();
+        for (Method m : methods) {
+            adapted.add(new MethodBuilder(m)
+                    .withName(null)
+                    .withReturnType(target.toUnboundedReference())
+                    .build());
+        }
+        return adapted;
     }
 
     /**
@@ -125,6 +148,10 @@ public class TypeDef extends ModifierSupport {
         return methods;
     }
 
+    public Set<TypeDef> getInnerTypes() {
+        return innerTypes;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -142,6 +169,55 @@ public class TypeDef extends ModifierSupport {
         int result = packageName != null ? packageName.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     * @param arguments The arguements to be passed to the reference.
+     * @return
+     */
+    public ClassRef toReference(TypeRef... arguments) {
+        List<TypeRef> actualArguments = new ArrayList<TypeRef>();
+        for (int i = 0; i < parameters.size(); i++) {
+            if (i < arguments.length) {
+                actualArguments.add(arguments[i]);
+            } else {
+                actualArguments.add(new WildcardRef());
+            }
+        }
+        return new ClassRefBuilder()
+                .withDefinition(this)
+                .withArguments(actualArguments)
+                .build();
+    }
+
+    /**
+     * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties etc).
+     * It uses as arguments the same 'letters' as the parameters definition.
+     * @return
+     */
+    public ClassRef toInternalReference() {
+        List<TypeRef> arguments = new ArrayList<TypeRef>();
+        for (TypeParamDef parameter : parameters) {
+            arguments.add(parameter.toReference());
+        }
+        return new ClassRefBuilder()
+                .withDefinition(this)
+                .withArguments(arguments)
+                .build();
+    }
+
+
+
+    /**
+     * Creates a {@link ClassRef} without bounds.
+     * @return
+     */
+    public ClassRef toUnboundedReference() {
+        return new ClassRefBuilder()
+                .withDefinition(this)
+                .withArguments()
+                .build();
     }
 
     @Override
@@ -172,12 +248,13 @@ public class TypeDef extends ModifierSupport {
             sb.append(">");
         }
 
-        if (extendsList != null && !extendsList.isEmpty()) {
+        if (extendsList != null && !extendsList.isEmpty()
+                && (extendsList.size() != 1 || !extendsList.contains(OBJECT.toReference()))) {
             sb.append(" extends ");
             sb.append(StringUtils.join(extendsList, ","));
         }
 
-        if (extendsList != null && !extendsList.isEmpty()) {
+        if (implementsList != null && !implementsList.isEmpty()) {
             sb.append(" implements ");
             sb.append(StringUtils.join(implementsList, ","));
         }

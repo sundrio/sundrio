@@ -20,6 +20,8 @@ import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRef;
 import io.sundr.codegen.model.WildcardRef;
@@ -38,7 +40,7 @@ import java.util.Set;
 
 import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 import static io.sundr.codegen.functions.ClassTo.TYPEREF;
-import static io.sundr.codegen.utils.TypeUtils.newTypeParamDef;
+import static io.sundr.codegen.utils.TypeUtils.*;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class Constants {
@@ -59,14 +61,19 @@ public class Constants {
     public static final TypeParamDef B = newTypeParamDef("B");
     
     public static final TypeParamDef T = new TypeParamDefBuilder().withName("T").addToAttributes(REPLACEABLE, Boolean.TRUE).build();
+
+    public static final TypeParamRef T_REF = new TypeParamRefBuilder().withName("T").addToAttributes(REPLACEABLE, Boolean.TRUE).build();
     
     public static final TypeParamDef N = newTypeParamDef("N");
+    public static final TypeParamRef N_REF = newTypeParamRef("N");
+
     public static final TypeParamDef V = newTypeParamDef("V");
 
     public static final VoidRef VOID = new VoidRef();
     public static final WildcardRef Q = new WildcardRef();
 
     public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
+
     public static final TypeDef BUILDABLE_ANNOTATION = TYPEDEF.apply(Buildable.class);
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
     public static final TypeDef OBJECT = TypeDef.OBJECT;

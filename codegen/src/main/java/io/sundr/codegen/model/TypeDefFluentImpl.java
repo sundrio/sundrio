@@ -25,12 +25,12 @@ import java.util.Set;
 
 public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSupportFluentImpl<A> implements TypeDefFluent<A>{
 
-     Kind kind;     String packageName;     String name;     Set<VisitableBuilder<ClassRef, ?>> annotations = new LinkedHashSet();     Set<VisitableBuilder<ClassRef, ?>> extendsList = new LinkedHashSet();     Set<VisitableBuilder<ClassRef, ?>> implementsList = new LinkedHashSet();     List<VisitableBuilder<TypeParamDef, ?>> parameters = new ArrayList();     Set<VisitableBuilder<Property, ?>> properties = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> constructors = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> methods = new LinkedHashSet();
+     Kind kind;     String packageName;     String name;     Set<VisitableBuilder<ClassRef, ?>> annotations = new LinkedHashSet();     Set<VisitableBuilder<ClassRef, ?>> extendsList = new LinkedHashSet();     Set<VisitableBuilder<ClassRef, ?>> implementsList = new LinkedHashSet();     List<VisitableBuilder<TypeParamDef, ?>> parameters = new ArrayList();     Set<VisitableBuilder<Property, ?>> properties = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> constructors = new LinkedHashSet();     Set<VisitableBuilder<Method, ?>> methods = new LinkedHashSet();     Set<VisitableBuilder<TypeDef, ?>> innerTypes = new LinkedHashSet();
 public TypeDefFluentImpl(){
     
 }
 public TypeDefFluentImpl( TypeDef instance ){
-    this.withKind(instance.getKind()); this.withPackageName(instance.getPackageName()); this.withName(instance.getName()); this.withAnnotations(instance.getAnnotations()); this.withExtendsList(instance.getExtendsList()); this.withImplementsList(instance.getImplementsList()); this.withParameters(instance.getParameters()); this.withProperties(instance.getProperties()); this.withConstructors(instance.getConstructors()); this.withMethods(instance.getMethods()); this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
+    this.withKind(instance.getKind()); this.withPackageName(instance.getPackageName()); this.withName(instance.getName()); this.withAnnotations(instance.getAnnotations()); this.withExtendsList(instance.getExtendsList()); this.withImplementsList(instance.getImplementsList()); this.withParameters(instance.getParameters()); this.withProperties(instance.getProperties()); this.withConstructors(instance.getConstructors()); this.withMethods(instance.getMethods()); this.withModifiers(instance.getModifiers()); this.withInnerTypes(instance.getInnerTypes()); this.withAttributes(instance.getAttributes()); 
 }
 
     public Kind getKind(){
@@ -198,6 +198,27 @@ public TypeDefFluentImpl( TypeDef instance ){
     public MethodsNested<A> addNewMethodLike( Method item){
     return new MethodsNestedImpl(item);
     }
+    public A addToInnerTypes( TypeDef ...items){
+    for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.innerTypes.add(builder);} return (A)this;
+    }
+    public A removeFromInnerTypes( TypeDef ...items){
+    for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.remove(builder);this.innerTypes.remove(builder);} return (A)this;
+    }
+    public Set<TypeDef> getInnerTypes(){
+    return build(innerTypes);
+    }
+    public A withInnerTypes( Set<TypeDef> innerTypes){
+    this.innerTypes.clear();if (innerTypes != null) {for (TypeDef item : innerTypes){this.addToInnerTypes(item);}} return (A) this;
+    }
+    public A withInnerTypes( TypeDef ...innerTypes){
+    this.innerTypes.clear(); if (innerTypes != null) {for (TypeDef item :innerTypes){ this.addToInnerTypes(item);}} return (A) this;
+    }
+    public InnerTypesNested<A> addNewInnerType(){
+    return new InnerTypesNestedImpl();
+    }
+    public InnerTypesNested<A> addNewInnerTypeLike( TypeDef item){
+    return new InnerTypesNestedImpl(item);
+    }
     public boolean equals( Object o){
     
 if (this == o) return true;
@@ -214,6 +235,7 @@ if (parameters != null ? !parameters.equals(that.parameters) :that.parameters !=
 if (properties != null ? !properties.equals(that.properties) :that.properties != null) return false;
 if (constructors != null ? !constructors.equals(that.constructors) :that.constructors != null) return false;
 if (methods != null ? !methods.equals(that.methods) :that.methods != null) return false;
+if (innerTypes != null ? !innerTypes.equals(that.innerTypes) :that.innerTypes != null) return false;
 return true;
 
     }
@@ -348,6 +370,25 @@ return true;
         }
             public N and(){
             return (N) TypeDefFluentImpl.this.addToMethods(builder.build());
+        }
+    
+}
+    public class InnerTypesNestedImpl<N> extends TypeDefFluentImpl<InnerTypesNested<N>> implements InnerTypesNested<N>{
+
+        private final TypeDefBuilder builder;
+    
+             InnerTypesNestedImpl (){
+        this.builder = new TypeDefBuilder(this);
+        }
+             InnerTypesNestedImpl ( TypeDef item){
+        this.builder = new TypeDefBuilder(this, item);
+        }
+    
+            public N endInnerType(){
+            return and();
+        }
+            public N and(){
+            return (N) TypeDefFluentImpl.this.addToInnerTypes(builder.build());
         }
     
 }

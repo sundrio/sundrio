@@ -21,23 +21,26 @@ import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.ClassToTypeDef;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaPropertyBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.Statement;
+import io.sundr.codegen.model.StringStatement;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,48 +56,60 @@ import static io.sundr.builder.internal.utils.BuilderUtils.hasBuildableConstruct
 import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasOrInheritsSetter;
 import static io.sundr.builder.internal.utils.BuilderUtils.hasSetter;
+import static io.sundr.builder.internal.utils.BuilderUtils.isArray;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBoolean;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
+import static io.sundr.builder.internal.utils.BuilderUtils.isCollection;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
-import static io.sundr.codegen.utils.StringUtils.isNullOrEmpty;
+import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
-public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
+public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
     FLUENT_INTERFACE {
-        @Override
-        public JavaClazz apply(JavaClazz item) {
-            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
-            Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
-            JavaType fluentType = TypeAs.FLUENT_INTERFACE.apply(item.getType());
-            //The generic letter is always the last
-            final JavaType genericTypeLetter = new JavaTypeBuilder(fluentType.getGenericTypes()[fluentType.getGenericTypes().length -1]).withInterfaces().withSuperClass(null).build();
+        public TypeDef apply(TypeDef item) {
+            Set<Method> methods = new LinkedHashSet<Method>();
+            Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
+            TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
 
-            for (JavaProperty property : item.getFields()) {
-                if (property.getModifiers().contains(Modifier.STATIC)) {
+            //The generic letter is always the last
+            final TypeParamDef genericTypeLetter = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
+
+            for (Property property : item.getProperties()) {
+                if (property.isStatic()) {
                     continue;
                 }
                 if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property) ) {
                     continue;
                 }
 
-                JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();
-                boolean buildable = (Boolean) toAdd.getType().getAttributes().get(BUILDABLE);
-                if (toAdd.isArray()) {
-                    JavaProperty asList = arrayAsList(toAdd, buildable);
+                Property toAdd = new PropertyBuilder(property)
+                        .withModifiers(0)
+                        .build();
+
+                boolean isBuildable = isBuildable(toAdd.getTypeRef());
+                boolean isArray =  isArray(toAdd.getTypeRef());
+                boolean isSet =  isSet(toAdd.getTypeRef());
+                boolean isList =  isList(toAdd.getTypeRef());
+                boolean isMap =  isMap(toAdd.getTypeRef());
+                boolean isCollection = isSet || isList;
+
+                if (isArray) {
+                    Property asList = arrayAsList(toAdd, isBuildable);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                     methods.add(ToMethod.GETTER_ARRAY.apply(toAdd));
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
                     toAdd = asList;
-                } else if (isSet(toAdd.getType()) || isList(toAdd.getType())) {
+                } else if (isSet || isList) {
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-                } else if (isMap(toAdd.getType())) {
+                } else if (isMap) {
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
@@ -102,110 +117,122 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    toAdd = new JavaPropertyBuilder(toAdd).addToAttributes(BUILDABLE, buildable).build();
+                    toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE, isBuildable).build();
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
 
-                Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
-
-                if (isMap(toAdd.getType())) {
+                if (isMap) {
                     //
-                } else if (isBuildable(toAdd)) {
+                } else if (isBuildable) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
-                    if (!toAdd.getType().isCollection() && !toAdd.isArray()) {
+                    if (isCollection && !isArray(toAdd.getTypeRef())) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
-                    nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
-                } else if (!descendants.isEmpty() && toAdd.getType().isCollection()) {
-                    for (JavaProperty descendant : descendants) {
-                        if (descendant.getType().isCollection()) {
+                    nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new PropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
+                } else if (!descendants.isEmpty() && isCollection) {
+                    for (Property descendant : descendants) {
+                        if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
-                        nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new JavaPropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
+                        nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new PropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
                     }
                 }
             }
 
-            return new JavaClazzBuilder(item)
-                    .withType(fluentType)
-                    .withNested(nestedClazzes)
+            return new TypeDefBuilder(fluentType)
+                    .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
                     //The return type of builder methods is always T, we need to fix that.
-                    .accept(new Visitor<JavaMethodBuilder>() {
-                        public void visit(JavaMethodBuilder builder) {
-                            if (builder.getReturnType().equals(Constants.T) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
-                                builder.withReturnType(genericTypeLetter);
-                            } else if (Arrays.asList(builder.getReturnType().getGenericTypes()).contains(Constants.T)) {
-                                List<JavaType> generics = new ArrayList<JavaType>();
-                                for (JavaType g : builder.getReturnType().getGenericTypes()) {
+                    .accept(new Visitor<MethodBuilder>() {
+                        public void visit(MethodBuilder builder) {
+                            if (builder.getReturnType().equals(Constants.T_REF) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
+                                builder.withReturnType(genericTypeLetter.toReference());
+                            } else if (builder.getReturnType() instanceof ClassRef && Arrays.asList(((ClassRef)builder.getReturnType()).getArguments()).contains(Constants.T_REF)) {
+                                List<TypeRef> generics = new ArrayList<TypeRef>();
+
+                                for (TypeRef g : ((ClassRef)builder.getReturnType()).getArguments()) {
                                     if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
-                                        generics.add(genericTypeLetter);
+                                        generics.add(genericTypeLetter.toReference());
                                     } else {
                                         generics.add(g);
                                     }
                                 }
-                                builder.editReturnType().withGenericTypes(generics.toArray(new JavaType[generics.size()])).endReturnType();
+                                TypeRef updatedReturnType = new ClassRefBuilder(((ClassRef)builder.getReturnType())).withArguments(generics).build();
+                                builder.withReturnType(updatedReturnType);
                             }
                         }
                     }).build();
         }
     }, FLUENT_IMPL {
-        @Override
-        public JavaClazz apply(JavaClazz item) {
-            Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
-            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
-            Set<JavaClazz> nestedClazzes = new LinkedHashSet<JavaClazz>();
-            Set<JavaProperty> properties = new LinkedHashSet<JavaProperty>();
-            final JavaType fluentType = TypeAs.FLUENT_IMPL.apply(item.getType());
-            //The generic letter is always the last
-            final JavaType genericTypeLetter = new JavaTypeBuilder(fluentType.getGenericTypes()[fluentType.getGenericTypes().length -1]).withInterfaces().withSuperClass(null).build();
 
-            JavaMethod emptyConstructor = new JavaMethodBuilder()
-                    .withReturnType(fluentType)
-                    .addToAttributes(BODY, "")
+        public TypeDef apply(TypeDef item) {
+            Set<Method> constructors = new LinkedHashSet<Method>();
+            Set<Method> methods = new LinkedHashSet<Method>();
+            Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
+            Set<Property> properties = new LinkedHashSet<Property>();
+            final TypeDef fluentType = TypeAs.FLUENT_IMPL.apply(item);
+
+            //The generic letter is always the last
+            final TypeParamDef genericTypeLetter = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
+
+            Method emptyConstructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .build();
 
-            JavaMethod instanceConstructor = new JavaMethodBuilder()
-                    .withReturnType(fluentType)
+            Method instanceConstructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
-                    .withType(TypeAs.REMOVE_GENERICS_BOUNDS.apply(item.getType()))
+                    .withTypeRef(item.toReference())
                     .withName("instance").and()
-                    .addToAttributes(BODY, toInstanceConstructorBody(item, ""))
+                    .withNewBlock()
+                        .withStatements(toInstanceConstructorBody(item, ""))
+                    .endBlock()
                     .build();
 
             constructors.add(emptyConstructor);
             constructors.add(instanceConstructor);
 
-            for (JavaProperty property : item.getFields()) {
-                if (property.getModifiers().contains(Modifier.STATIC)) {
+            for (Property property : item.getProperties()) {
+                if (property.isStatic()) {
                     continue;
                 }
                 if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property) ) {
                     continue;
                 }
-                JavaProperty toAdd = new JavaPropertyBuilder(property).withModifiers(Collections.<Modifier>emptySet()).build();
-                boolean buildable = (Boolean) toAdd.getType().getAttributes().get(BUILDABLE);
-                if (toAdd.isArray()) {
-                    JavaProperty asList = arrayAsList(toAdd, buildable);
+
+                Property toAdd = new PropertyBuilder(property)
+                        .withModifiers(0)
+                        .build();
+
+                boolean isBuildable = isBuildable(toAdd.getTypeRef());
+                boolean isArray =  isArray(toAdd.getTypeRef());
+                boolean isSet =  isSet(toAdd.getTypeRef());
+                boolean isList =  isList(toAdd.getTypeRef());
+                boolean isMap =  isMap(toAdd.getTypeRef());
+                boolean isCollection = isSet || isList;
+
+                if (isArray) {
+                    Property asList = arrayAsList(toAdd, isBuildable);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                     methods.add(ToMethod.GETTER_ARRAY.apply(toAdd));
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
                     toAdd = asList;
-                } else if (isSet(toAdd.getType()) || isList(toAdd.getType())) {
+                } else if (isSet || isList) {
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-                } else if (isMap(toAdd.getType())) {
+                } else if (isMap) {
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
@@ -213,49 +240,51 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    toAdd = new JavaPropertyBuilder(toAdd).addToAttributes(BUILDABLE, buildable).build();
+                    toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE, isBuildable).build();
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
 
-                if (isMap(toAdd.getType())) {
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
+                if (isMap) {
                     properties.add(toAdd);
-                } else if (isBuildable(toAdd)) {
+                } else if (isBuildable) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
-                    if (!toAdd.getType().isCollection() && !toAdd.isArray()) {
+                    if (!isCollection && !isArray) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
-                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
+                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
 
-                    JavaType builderType = TypeAs.VISITABLE_BUILDER.apply(toAdd.getType());
-                    if (toAdd.getType().isCollection()) {
-                        builderType = typeGenericOf(toAdd.getType(), builderType);
+                    ClassRef classRef = (ClassRef) toAdd.getTypeRef();
+                    TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef.getDefinition());
+                    if (isCollection) {
+                        builderType = classRefOf(classRef.getDefinition(), builderType);
                     }
 
-                    properties.add(new JavaPropertyBuilder(toAdd).withType(builderType).build());
-                } else if (!descendants.isEmpty() && toAdd.getType().isCollection()) {
+                    properties.add(new PropertyBuilder(toAdd).withTypeRef(builderType).build());
+                } else if (!descendants.isEmpty() && isCollection) {
                     properties.add(toAdd);
 
-                    for (JavaProperty descendant : descendants) {
-                        if (descendant.getType().isCollection()) {
+                    for (Property descendant : descendants) {
+                        if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
-                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new JavaPropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
+                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
 
-                        JavaType builderType = TypeAs.VISITABLE_BUILDER.apply(descendant.getType());
-                        if (descendant.getType().isCollection()) {
-                            builderType = typeGenericOf(descendant.getType(), builderType);
+                        ClassRef classRef = (ClassRef) descendant.getTypeRef();
+                        TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef.getDefinition());
+                        if (isCollection(descendant.getTypeRef())) {
+                            builderType = classRefOf(classRef.getDefinition(), builderType);
                         }
 
-                        properties.add(new JavaPropertyBuilder(descendant).withType(builderType).build());
+                        properties.add(new PropertyBuilder(descendant).withTypeRef(builderType).build());
 
                     }
 
@@ -264,96 +293,103 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
                 }
             }
 
-            JavaMethod equals = new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withReturnType(ClassToTypeDef.FUNCTION.apply(boolean.class))
-                    .addNewArgument().withName("o").withType(Constants.OBJECT).endArgument()
+            Method equals = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
+                    .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
                     .addToAttributes(BODY, toEquals(fluentType, properties))
                     .build();
 
             methods.add(equals);
 
-            return new JavaClazzBuilder(item)
-                    .withType(fluentType)
+            return new TypeDefBuilder(fluentType)
                     .withConstructors(constructors)
-                    .withFields(properties)
-                    .withNested(nestedClazzes)
+                    .withProperties(properties)
+                    .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
                     //The return type of builder methods is always T, we need to fix that.
-                    .accept(new Visitor<JavaMethodBuilder>() {
-                        public void visit(JavaMethodBuilder builder) {
-                            if (builder.getReturnType().equals(Constants.T) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
-                                builder.withReturnType(genericTypeLetter);
+                    .accept(new Visitor<MethodBuilder>() {
+                        public void visit(MethodBuilder builder) {
+                            if (builder.getReturnType() != null && builder.getReturnType().equals(Constants.T_REF) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
+                                builder.withReturnType(genericTypeLetter.toReference());
                                 String body = (String) builder.getAttributes().get(BODY);
                                 if (body != null) {
-                                    body = body.replaceAll("\\(T\\)", "\\(" + genericTypeLetter.getClassName() + "\\)");
+                                    body = body.replaceAll("\\(T\\)", "\\(" + genericTypeLetter.getName() + "\\)");
                                     builder.getAttributes().put(BODY, body);
                                 }
-                            } else if (Arrays.asList(builder.getReturnType().getGenericTypes()).contains(Constants.T)) {
-                                List<JavaType> generics = new ArrayList<JavaType>();
-                                for (JavaType g : builder.getReturnType().getGenericTypes()) {
+                            } else if (builder.getReturnType() instanceof ClassRef && Arrays.asList(((ClassRef)builder.getReturnType()).getArguments()).contains(Constants.T_REF)) {
+                                List<TypeRef> generics = new ArrayList<TypeRef>();
+                                for (TypeRef g : ((ClassRef) builder.getReturnType()).getArguments()) {
                                     if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
-                                        generics.add(genericTypeLetter);
+                                        generics.add(genericTypeLetter.toReference());
                                     } else {
                                         generics.add(g);
                                     }
                                 }
                                 String body = (String) builder.getAttributes().get(BODY);
                                 if (body != null) {
-                                    body = body.replaceAll("<T>", "<" + genericTypeLetter.getClassName() + ">");
+                                    body = body.replaceAll("<T>", "<" + genericTypeLetter.toString() + ">");
                                     builder.getAttributes().put(BODY, body);
                                 }
-                                builder.editReturnType().withGenericTypes(generics.toArray(new JavaType[generics.size()])).endReturnType();
+                                TypeRef updatedReturnType = new ClassRefBuilder(((ClassRef)builder.getReturnType())).withArguments(generics).build();
+                                builder.withReturnType(updatedReturnType);
                             }
                         }
                     }).build();
         }
     }, BUILDER {
-        @Override
-        public JavaClazz apply(JavaClazz item) {
-            JavaType builderType = TypeAs.BUILDER.apply(item.getType());
-            JavaType instanceType = TypeAs.REMOVE_GENERICS_BOUNDS.apply(item.getType());
-            JavaType fluent = TypeAs.GENERIC_FLUENT.apply(item.getType());
-            Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
-            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
-            Set<JavaProperty> fields = new LinkedHashSet<JavaProperty>();
+        public TypeDef apply(TypeDef item) {
+            TypeDef builderType = TypeAs.BUILDER.apply(item);
 
-            JavaProperty fluentProperty = new JavaPropertyBuilder().withType(fluent).withName("fluent").build();
+            ClassRef instanceRef = item.toInternalReference();
+
+            ClassRef fluent = TypeAs.FLUENT_REF.apply(item);
+            TypeRef builderReturnType = builderType.toReference(item.toReference());
+            Set<Method> constructors = new LinkedHashSet<Method>();
+            Set<Method> methods = new LinkedHashSet<Method>();
+            Set<Property> fields = new LinkedHashSet<Property>();
+
+            Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
             fields.add(fluentProperty);
 
-            JavaMethod emptyConstructor = new JavaMethodBuilder()
-                    .withReturnType(builderType)
-                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(new " + item.getType().getClassName() + "());" : "this.fluent = this;")
+            Method emptyConstructor = new MethodBuilder()
+                    .withReturnType(builderReturnType)
+                    .withNewBlock()
+                        .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(new " + item.getName() + "());" : "this.fluent = this;")
+                    .endBlock()
                     .build();
 
-            JavaMethod fluentConstructor = new JavaMethodBuilder()
-                    .withReturnType(builderType)
+            Method fluentConstructor = new MethodBuilder()
                     .addNewArgument()
-                    .withType(fluent)
+                    .withTypeRef(fluent)
                     .withName("fluent")
                     .and()
-                    .addToAttributes(BODY, hasDefaultConstructor(item) ? "this(fluent, new " + item.getType().getClassName() + "());" : "this.fluent = fluent;")
+                    .withNewBlock()
+                        .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(fluent, new " + item.getName() + "());" : "this.fluent = fluent;")
+                    .endBlock()
                     .build();
 
-            JavaMethod instanceAndFluentCosntructor = new JavaMethodBuilder()
-                    .withReturnType(builderType)
+            Method instanceAndFluentCosntructor = new MethodBuilder()
                     .addNewArgument()
-                    .withType(fluent)
+                    .withTypeRef(fluent)
                     .withName("fluent")
                     .and()
                     .addNewArgument()
-                    .withType(instanceType)
+                    .withTypeRef(instanceRef)
                     .withName("instance").and()
-                    .addToAttributes(BODY, toInstanceConstructorBody(item, "fluent"))
+                    .withNewBlock()
+                        .withStatements(toInstanceConstructorBody(item, "fluent"))
+                    .endBlock()
                     .build();
 
-            JavaMethod instanceConstructor = new JavaMethodBuilder()
-                    .withReturnType(builderType)
+            Method instanceConstructor = new MethodBuilder()
                     .addNewArgument()
-                    .withType(instanceType)
+                    .withTypeRef(instanceRef)
                     .withName("instance").and()
-                    .addToAttributes(BODY, toInstanceConstructorBody(item, "this"))
+                    .withNewBlock()
+                        .withStatements(toInstanceConstructorBody(item, "this"))
+                    .endBlock()
                     .build();
 
             constructors.add(emptyConstructor);
@@ -361,78 +397,77 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
             constructors.add(instanceAndFluentCosntructor);
             constructors.add(instanceConstructor);
 
-            JavaMethod build = new JavaMethodBuilder()
-                    .withReturnType(instanceType)
+            Method build = new MethodBuilder()
+                    .withReturnType(instanceRef)
                     .withName("build")
-                    .addToAttributes(BODY, toBuild(item, instanceType))
+                    .withNewBlock()
+                        .withStatements(toBuild(item, item))
+                    .endBlock()
                     .build();
 
             methods.add(build);
 
-            JavaMethod equals = new JavaMethodBuilder()
-                    .withReturnType(ClassToTypeDef.FUNCTION.apply(boolean.class))
-                    .addNewArgument().withName("o").withType(Constants.OBJECT).endArgument()
+            Method equals = new MethodBuilder()
+                    .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
+                    .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
-                    .addToAttributes(BODY, toEquals(builderType, fields))
+                    .withNewBlock()
+                        .withStatements(toEquals(builderType, fields))
+                    .endBlock()
                     .build();
 
             methods.add(equals);
 
-            return new JavaClazzBuilder(item)
-                    .withType(builderType)
-                    .withFields(fields)
+            return new TypeDefBuilder(builderType)
+                    .withProperties(fields)
                     .withConstructors(constructors)
                     .withMethods(methods)
                     .build();
         }
 
     }, EDITABLE_BUILDER {
-        @Override
-        public JavaClazz apply(JavaClazz item) {
-            JavaClazz builder = BUILDER.apply(item);
-            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
-            for (JavaMethod m : builder.getMethods()) {
+        public TypeDef apply(TypeDef item) {
+            TypeDef builder = BUILDER.apply(item);
+            Set<Method> methods = new LinkedHashSet<Method>();
+            for (Method m : builder.getMethods()) {
                 if (m.getName().equals("build")) {
 
-                    JavaClazz editable = EDITABLE.apply(item);
-                    methods.add(new JavaMethodBuilder()
-                            .withReturnType(TypeAs.EDITABLE.apply(m.getReturnType()))
+                    TypeDef editable = EDITABLE.apply(item);
+                    methods.add(new MethodBuilder()
+                            .withReturnType(editable.toInternalReference())
                             .withName("build")
-                            .addToAttributes(BODY, toBuild(editable, TypeAs.REMOVE_GENERICS_BOUNDS.apply(editable.getType())))
+                            .addToAttributes(BODY, toBuild(editable, editable))
                             .build());
                 } else {
                     methods.add(m);
                 }
             }
-            return new JavaClazzBuilder(builder)
+            return new TypeDefBuilder(builder)
                     .withMethods(methods)
                     .build();
 
         }
     }, EDITABLE {
-        @Override
-        public JavaClazz apply(JavaClazz item) {
-            JavaType type = item.getType();
-            JavaType editableType = TypeAs.EDITABLE.apply(type);
-            JavaType builderType = TypeAs.combine(TypeAs.BUILDER, TypeAs.REMOVE_GENERICS_BOUNDS).apply(type);
+        public TypeDef apply(TypeDef item) {
+            TypeDef editableType = TypeAs.EDITABLE.apply(item);
+            TypeDef builderType = TypeAs.BUILDER.apply(item);
 
-            Set<JavaMethod> constructors = new LinkedHashSet<JavaMethod>();
-            Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
+            Set<Method> constructors = new LinkedHashSet<Method>();
+            Set<Method> methods = new LinkedHashSet<Method>();
 
-            for (JavaMethod constructor : item.getConstructors()) {
+            for (Method constructor : item.getConstructors()) {
                 constructors.add(superConstructorOf(constructor, editableType));
             }
 
-            JavaMethod edit = new JavaMethodBuilder()
-                    .withReturnType(builderType)
+            Method edit = new MethodBuilder()
+                    .withReturnType(builderType.toReference())
                     .withName("edit")
-                    .addToAttributes(BODY, "return new " + builderType.getSimpleName() + "(this);")
+                    .addToAttributes(BODY, "return new " + builderType.getName() + "(this);")
                     .build();
 
             methods.add(edit);
 
-            return new JavaClazzBuilder()
-                    .withType(editableType)
+            return new TypeDefBuilder(editableType)
                     .withConstructors(constructors)
                     .withMethods(methods)
                     .addToAttributes(BUILDABLE, true)
@@ -440,132 +475,136 @@ public enum ClazzAs implements Function<JavaClazz, JavaClazz> {
         }
     };
 
-    private static JavaProperty arrayAsList(JavaProperty property, boolean buildable) {
-        return new JavaPropertyBuilder(property)
-                .withArray(false)
-                .withType(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(property.getType())))
+    private static Property arrayAsList(Property property, boolean buildable) {
+        return new PropertyBuilder(property)
+                .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(property.getTypeRef())))
                 .addToAttributes(BUILDABLE, buildable)
                 .build();
     }
 
-    private static String toInstanceConstructorBody(JavaClazz clazz, String fluent) {
-        JavaMethod constructor = findBuildableConstructor(clazz);
-        StringBuilder sb = new StringBuilder();
+    private static List<Statement> toInstanceConstructorBody(TypeDef clazz, String fluent) {
+        Method constructor = findBuildableConstructor(clazz);
+        List<Statement> statements = new ArrayList<Statement>();
         String ref = fluent;
 
         //We may use a reference to fluent or we may use directly "this". So we need to check.
         if (fluent != null && !fluent.isEmpty()) {
-            sb.append("this.fluent = " + fluent + "; ");
+            statements.add(new StringStatement("this.fluent = " + fluent + "; "));
         } else {
             ref = "this";
         }
 
-        for (JavaProperty property : constructor.getArguments()) {
-            JavaMethod getter = findGetter(clazz, property);
+        for (Property property : constructor.getArguments()) {
+            Method getter = findGetter(clazz, property);
             if (getter != null) {
-                sb.append(ref).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ");
+                statements.add(new StringStatement(new StringBuilder().append(ref).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ").toString()));
             } else {
                 throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
             }
         }
 
-        JavaClazz target = clazz;
+        TypeDef target = clazz;
         //Iterate parent objects and check for properties with setters but not ctor arguments.
         while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
-            for (JavaProperty property : target.getFields()) {
+            for (Property property : target.getProperties()) {
                 if (!hasBuildableConstructorWithArgument(target, property) && hasSetter(target, property)) {
                     String withName = "with" + property.getNameCapitalized();
                     String getterName = BuilderUtils.findGetter(target, property).getName();
-                    sb.append(ref).append(".").append(withName).append("(instance.").append(getterName).append("());\n");
+                    statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.").append(getterName).append("());\n").toString()));
                 }
             }
-            String superFQN = target.getType().getSuperClass().getFullyQualifiedName();
-            target = isNullOrEmpty(superFQN) ? null : BuilderContextManager.getContext().getStringToJavaClazz().apply(superFQN);
+            target = BuilderContextManager.getContext().getRepository().getBuildable(target.getExtendsList().iterator().next());
         }
 
-        return sb.toString();
+        return statements;
     }
 
-    private static String toBuild(final JavaClazz clazz, final JavaType instanceType) {
-        JavaMethod constructor = findBuildableConstructor(clazz);
-        StringBuilder sb = new StringBuilder();
-        sb.append(instanceType.getSimpleName()).append(" buildable = new ").append(instanceType.getSimpleName()).append("(");
-        //TODO: Need to find a cleaner way to check when to cast generic types. Unfortunately, I can't get it working via JavaKind.
-        final Set<String> genericTypes = new HashSet<String>();
-        for (JavaType genericType : instanceType.getGenericTypes()) {
-            genericTypes.add(genericType.getFullyQualifiedName());
-        }
-        sb.append(StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
-            @Override
-            public String apply(JavaProperty item) {
-                String prefix = item.getType().isBoolean() ? "is" : "get";
-                String cast = genericTypes.contains(item.getType().getFullyQualifiedName()) ? "("+item.getType().getFullyQualifiedName()+")" : "";
-                return cast + "fluent." + prefix + item.getNameCapitalized() + "()";
-            }
-        }, ","));
+    private static List<Statement> toBuild(final TypeDef clazz, final TypeDef instanceType) {
+        Method constructor = findBuildableConstructor(clazz);
+        List<Statement> statements = new ArrayList<Statement>();
 
-        sb.append(");\n");
+        statements.add(new StringStatement(new StringBuilder().toString()));
 
-        JavaClazz target = clazz;
+        statements.add(new StringStatement(new StringBuilder()
+                .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
+                .append(StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+                    public String apply(Property item) {
+                        String prefix = isBoolean(item.getTypeRef()) ? "is" : "get";
+                        //String cast = genericTypes.contains(item.getTypeRef().getFullyQualifiedName()) ? "("+item.getType().getFullyQualifiedName()+")" : "";
+                        return  "fluent." + prefix + item.getNameCapitalized() + "()";
+                    }
+                }, ","))
+                .append(");")
+                .toString()));
+
+
+        TypeDef target = clazz;
 
         //Iterate parent objects and check for properties with setters but not ctor arguments.
         while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
-            for (JavaProperty property : target.getFields()) {
+            for (Property property : target.getProperties()) {
                 if (!hasBuildableConstructorWithArgument(target, property) && hasSetter(target, property)) {
                     String setterName = "set" + property.getNameCapitalized();
                     String getterName = BuilderUtils.findGetter(target, property).getName();
-                    sb.append("buildable.").append(setterName).append("(fluent.").append(getterName).append("());\n");
+                    statements.add(new StringStatement(new StringBuilder()
+                            .append("buildable.").append(setterName).append("(fluent.").append(getterName).append("());")
+                            .toString()));
+
                 }
             }
-            String superFQN = target.getType().getSuperClass().getFullyQualifiedName();
-            target = isNullOrEmpty(superFQN) ? null : BuilderContextManager.getContext().getStringToJavaClazz().apply(superFQN);
+            target = BuilderContextManager.getContext().getRepository().getBuildable(target.getExtendsList().iterator().next());
         }
 
-        sb.append("validate(buildable);\n");
-        sb.append("return buildable;\n");
-        return sb.toString();
+        statements.add(new StringStatement("validate(buildable);"));
+        statements.add(new StringStatement("return buildable;"));
+        return statements;
     }
 
 
-    private static String toEquals(JavaType type, Collection<JavaProperty> properties) {
-        String simpleName = type.getClassName();
-        JavaType superClass = type.getSuperClass();
-        StringBuilder sb = new StringBuilder();
-        sb.append("\n");
-        sb.append("if (this == o) return true;").append("\n");
-        sb.append("if (o == null || getClass() != o.getClass()) return false;").append("\n");
+    private static List<Statement> toEquals(TypeDef type, Collection<Property> properties) {
+        List<Statement> statements = new ArrayList<Statement>();
+
+        String simpleName = type.getName();
+        ClassRef superClass = type.getExtendsList().iterator().next();
+        statements.add(new StringStatement("if (this == o) return true;"));
+        statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
+
         //If base fluent is the superclass just skip.
-        if (!Constants.BASE_FLUENT.getClassName().equals(superClass.getClassName())) {
-            sb.append("if (!super.equals(o)) return false;").append("\n");
+        if (!Constants.BASE_FLUENT.getFullyQualifiedName().equals(superClass.getDefinition().getFullyQualifiedName())) {
+            statements.add(new StringStatement("if (!super.equals(o)) return false;"));
         }
-        sb.append(simpleName).append(" that = (").append(simpleName).append(") o;").append("\n");
-        for (JavaProperty property : properties) {
+        statements.add(new StringStatement(new StringBuilder().append(simpleName).append(" that = (").append(simpleName).append(") o;").toString()));
+
+        for (Property property : properties) {
             String name = property.getName();
-            if (BuilderUtils.isPrimitive(property.getType())) {
-                sb.append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").append("\n");
-            } else if (Decendants.isDescendant(type, property.getType())) {
-                sb.append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
-                        .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n");
+            if (BuilderUtils.isPrimitive(property.getTypeRef())) {
+                statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").toString()));
+            } else if (property.getTypeRef() instanceof ClassRef && Decendants.isDescendant(type, ((ClassRef) property.getTypeRef()).getDefinition())) {
+                statements.add(new StringStatement(new StringBuilder()
+                        .append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
+                        .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n")
+                        .toString()));
             } else {
-                sb.append("if (").append(name).append(" != null ? !").append(name).append(".equals(that.").append(name).append(") :")
-                        .append("that.").append(name).append(" != null) return false;").append("\n");
+                statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != null ? !").append(name).append(".equals(that.").append(name).append(") :")
+                        .append("that.").append(name).append(" != null) return false;").toString()));
+
             }
         }
 
-        sb.append("return true;").append("\n");
-        return sb.toString();
+        statements.add(new StringStatement("return true;"));
+        return statements;
     }
 
-    private static JavaMethod superConstructorOf(JavaMethod constructor, JavaType constructorType) {
-        return new JavaMethodBuilder(constructor)
-                .withReturnType(constructorType)
-                .addToAttributes(BODY, "super(" + StringUtils.join(constructor.getArguments(), new Function<JavaProperty, String>() {
-                    @Override
-                    public String apply(JavaProperty item) {
-                        return item.getName();
-                    }
-                }, ", ") + ");")
+    private static Method superConstructorOf(Method constructor, TypeDef constructorType) {
+        return new MethodBuilder(constructor)
+                .withReturnType(constructorType.toReference())
+                .withNewBlock()
+                    .addNewStringStatementStatement( "super(" + StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+                        public String apply(Property item) {
+                            return item.getName();
+                        }
+                    }, ", ") + ");")
+                .endBlock()
                 .build();
     }
-
 }

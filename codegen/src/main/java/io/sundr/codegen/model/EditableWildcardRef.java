@@ -23,6 +23,9 @@ import java.util.Map;
 public class EditableWildcardRef extends WildcardRef implements Editable<WildcardRefBuilder>{
 
 
+public EditableWildcardRef(){
+    super();
+}
 public EditableWildcardRef( Map<String, Object> attributes ){
     super(attributes);
 }

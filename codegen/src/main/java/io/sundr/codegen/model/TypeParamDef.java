@@ -59,6 +59,12 @@ public class TypeParamDef extends AttributeSupport {
         return result;
     }
 
+    public TypeParamRef toReference() {
+        return new TypeParamRefBuilder()
+                .withName(name)
+                .build();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

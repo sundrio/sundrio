@@ -19,7 +19,7 @@ package io.sundr.dsl.internal.type.functions;
 import io.sundr.Function;
 import io.sundr.codegen.model.JavaClazz;
 import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
+import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.JavaType;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.dsl.internal.utils.JavaTypeUtils;
@@ -87,8 +87,8 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
 
         JavaClazz combination = new JavaClazzBuilder()
                 .withNewType()
-                    .withKind(JavaKind.INTERFACE)
-                    .withClassName(className)
+                    .withKind(Kind.INTERFACE)
+                    .withName(className)
                     .withPackageName(interfaces.iterator().next().getPackageName())
                     .withInterfaces(interfaces)
                     .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()]))
