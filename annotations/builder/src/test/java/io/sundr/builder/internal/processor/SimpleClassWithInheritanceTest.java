@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.builder;
+package io.sundr.builder.internal.processor;
 
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
@@ -27,35 +27,41 @@ import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class SimpleClassTest {
+public class SimpleClassWithInheritanceTest {
 
     private final Context context = new Context();
     private final Elements elements = JavacElements.instance(context);
     private final Types types = JavacTypes.instance(context);
     private final BuilderContext builderContext = BuilderContextManager.create(elements, types);
+
     TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
+    TypeDef simpleClassWithDateDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClassWithDate.java"));
 
-
+    @Before
+    public void setUp() {
+        builderContext.getBuildableRepository().register(simpleClassDef);
+    }
 
     @Test
     public void testFluent() {
-        TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassDef);
+        TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassWithDateDef);
 
         assertEquals(Kind.INTERFACE, fluent.getKind());
-        assertEquals("SimpleClassFluent", fluent.getName());
+        assertEquals("SimpleClassWithDateFluent", fluent.getName());
         assertEquals(1, fluent.getExtendsList().size());
 
-
         ClassRef superClass = fluent.getExtendsList().iterator().next();
-        assertEquals("Fluent", superClass.getDefinition().getName());
+        assertEquals("SimpleClassFluent", superClass.getDefinition().getName());
         assertEquals(1, superClass.getArguments().size());
         assertEquals("A", superClass.getArguments().iterator().next().toString());
 
@@ -64,16 +70,16 @@ public class SimpleClassTest {
 
 
     @Test
-    public void testFluentImpl() {
-        TypeDef typeDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
-        TypeDef fluent = ClazzAs.FLUENT_IMPL.apply(typeDef);
+    public void testFluentImpl() throws FileNotFoundException {
+        TypeDef fluent = ClazzAs.FLUENT_IMPL.apply(simpleClassWithDateDef);
 
         assertEquals(Kind.CLASS, fluent.getKind());
-        assertEquals("SimpleClassFluentImpl", fluent.getName());
+        assertEquals("SimpleClassWithDateFluentImpl", fluent.getName());
         assertEquals(1, fluent.getExtendsList().size());
 
+
         ClassRef superClass = fluent.getExtendsList().iterator().next();
-        assertEquals("BaseFluent", superClass.getDefinition().getName());
+        assertEquals("SimpleClassFluentImpl", superClass.getDefinition().getName());
         assertEquals(1, superClass.getArguments().size());
         assertEquals("A", superClass.getArguments().iterator().next().toString());
 
@@ -81,21 +87,20 @@ public class SimpleClassTest {
     }
 
     @Test
-    public void testBuilder() {
-        TypeDef typeDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
-        TypeDef fluent = ClazzAs.BUILDER.apply(typeDef);
+    public void testBuilder() throws FileNotFoundException {
+        TypeDef fluent = ClazzAs.BUILDER.apply(simpleClassWithDateDef);
 
         assertEquals(Kind.CLASS, fluent.getKind());
-        assertEquals("SimpleClassBuilder", fluent.getName());
+        assertEquals("SimpleClassWithDateBuilder", fluent.getName());
         assertEquals(1, fluent.getExtendsList().size());
 
 
         ClassRef superClass = fluent.getImplementsList().iterator().next();
-        assertEquals("VisitableBuilder", superClass.getDefinition().getName());
+        assertEquals(builderContext.getVisitableBuilderInterface().getName(), superClass.getDefinition().getName());
         assertEquals(2, superClass.getArguments().size());
         Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
-        assertEquals("testpackage.SimpleClass", argIterator.next().toString());
-        assertEquals("testpackage.SimpleClassBuilder", argIterator.next().toString());
+        assertEquals("testpackage.SimpleClassWithDate", argIterator.next().toString());
+        assertEquals("testpackage.SimpleClassWithDateBuilder", argIterator.next().toString());
         System.out.println(fluent);
     }
 }

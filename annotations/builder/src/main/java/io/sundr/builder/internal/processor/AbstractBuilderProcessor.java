@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -103,23 +104,55 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         }
     }
 
+    /**
+     *
+     *
+     private final ContainerCreateRequestBuilder builder;
+     private final Function<ContainerCreateRequest, ContainerCreateResponse> function;
 
-    TypeDef inlineableOf(BuilderContext ctx, TypeDef type, Inline inline) {
+     public InlineContainerCreate(Function<ContainerCreateRequest, ContainerCreateResponse> function) {
+     this.builder = new ContainerCreateRequestBuilder(this);
+     this.function = function;
+     }
+
+     public InlineContainerCreate(ContainerCreateRequest item, Function<ContainerCreateRequest, ContainerCreateResponse> function) {
+     this.builder = new ContainerCreateRequestBuilder(this);
+     this.function = function;
+     }
+
+     public ContainerCreateResponse done() {
+     return function.apply(builder.build());
+     }
+     */
+
+
+    static TypeDef inlineableOf(BuilderContext ctx, TypeDef type, Inline inline) {
+        final String inlineableName = !inline.name().isEmpty()
+                ? inline.name()
+                : inline.prefix() + type.getName() + inline.suffix();
+
         Set<Method> constructors = new LinkedHashSet<Method>();
+        final TypeDef builderType = TypeAs.BUILDER.apply(type);
+        TypeDef inlineType = BuilderUtils.getInlineType(ctx, inline);
+        TypeDef returnType = BuilderUtils.getInlineReturnType(ctx, inline, type);
+        ClassRef inlineTypeRef = inlineType.toReference(returnType.toReference());
 
-        TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(type);
-        TypeDef inlineableType = TypeAs.INLINEABLE.apply(type);
+        //Use the builder as the base of the inlineable. Just add interface and change name.
+        TypeDef shallowInlineType = new TypeDefBuilder(builderType)
+                .withName(inlineableName)
+                .withImplementsList(inlineTypeRef)
+                .withProperties()
+                .withMethods()
+                .withConstructors()
+                .accept(new TypedVisitor<TypeDefBuilder>() {
+                    public void visit(TypeDefBuilder builder) {
+                        if (builder.getName().equals(builderType.getName())) {
+                            builder.withName(inlineableName);
+                        }
+                    }
+                }).build();
 
-        if (!inline.name().isEmpty()) {
-            inlineableType = new TypeDefBuilder(inlineableType).withName(inline.name()).build();
-        }
-
-        TypeRef returnType = BuilderUtils.getInlineReturnType(ctx, inline);
-        if (returnType.equals(BOXED_VOID)) {
-            returnType = classRefOf(type);
-        }
-
-        TypeRef functionType = classRefOf(ctx.getFunctionInterface(), type, returnType);
+        TypeRef functionType = ctx.getFunctionInterface().toReference(type.toInternalReference(), returnType.toReference());
 
         Property builderProperty = new PropertyBuilder()
                 .withTypeRef(classRefOf(TypeAs.BUILDER.apply(type)))
@@ -133,41 +166,33 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                 .build();
 
-        if (returnType.equals(Constants.BOXED_VOID)) {
-            returnType = classRefOf(type);
-        }
 
-        ClassRef baseInterface = classRefOf(BuilderUtils.getInlineType(ctx, inline), returnType);
-
-        TypeDef shallowInlineType = new TypeDefBuilder(inlineableType)
-                .withName(inline.prefix() + inlineableType.getName() + inline.suffix())
-                .addToImplementsList(baseInterface)
-                .build();
-
-
-        TypeRef inlineType =classRefOf(shallowInlineType);
 
         Method inlineMethod = new MethodBuilder()
-                .withReturnType(returnType)
+                .withReturnType(returnType.toInternalReference())
                 .withName(inline.value())
-                .addToAttributes(BODY, BUILD_AND_APPLY_FUNCTION)
+                .withNewBlock()
+                    .addNewStringStatementStatement(BUILD_AND_APPLY_FUNCTION)
+                .endBlock()
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                 .build();
 
 
         constructors.add(new MethodBuilder()
-                .withReturnType(inlineType)
+                .withReturnType(inlineTypeRef)
                 .withName(EMPTY)
                 .addNewArgument()
                     .withName(FUNCTION)
                     .withTypeRef(functionType)
                 .and()
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
+                .withNewBlock()
+                    .addNewStringStatementStatement(String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
+                .endBlock()
                 .build());
 
         constructors.add(new MethodBuilder()
-                .withReturnType(inlineType)
+                .withReturnType(inlineTypeRef)
                 .withName(EMPTY)
                 .addNewArgument()
                     .withName(ITEM)
@@ -178,34 +203,40 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     .withTypeRef(functionType)
                 .and()
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                .addToAttributes(BODY, String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
+                .withNewBlock()
+                    .addNewStringStatementStatement(String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
+                .endBlock()
                 .build());
 
         if (type.equals(returnType)) {
             constructors.add(new MethodBuilder()
-                    .withReturnType(inlineType)
+                    .withReturnType(inlineTypeRef)
                     .withName(EMPTY)
                     .addNewArgument()
                     .withName(FUNCTION)
                     .withTypeRef(functionType)
                     .and()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
+                    .withNewBlock()
+                        .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
+                    .endBlock()
                     .build());
 
             constructors.add(new MethodBuilder()
-                    .withReturnType(inlineType)
+                    .withReturnType(inlineTypeRef)
                     .withName(EMPTY)
                     .addNewArgument()
                     .withName(ITEM)
                     .withTypeRef(classRefOf(type))
                     .and()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .addToAttributes(BODY, String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
+                    .withNewBlock()
+                    .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
+                    .endBlock()
                     .build());
         }
 
-        return new TypeDefBuilder(inlineableType)
+        return new TypeDefBuilder(shallowInlineType)
                 .withConstructors(constructors)
                 .addToProperties(builderProperty, functionProperty)
                 .addToMethods(inlineMethod)

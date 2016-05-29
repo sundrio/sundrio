@@ -114,6 +114,7 @@ public class ClassTo {
 
     private static final Function<Class, TypeDef> INTERNAL_TYPEDEF = new Function<Class, TypeDef>() {
         public TypeDef apply(Class item) {
+
             if (Object.class.equals(item)) {
                 return TypeDef.OBJECT;
             }
@@ -122,6 +123,7 @@ public class ClassTo {
             Set<ClassRef> implementsList = new LinkedHashSet<ClassRef>();
             Set<Property> properties = new LinkedHashSet<Property>();
             Set<Method> methods = new LinkedHashSet<Method>();
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
             if (item.getSuperclass() != null && kind == Kind.INTERFACE) {
                 extendsList.add((ClassRef) TYPEREF.apply(item.getSuperclass()));
@@ -136,12 +138,26 @@ public class ClassTo {
                 }
             }
 
+            for (TypeVariable typeVariable : item.getTypeParameters()) {
+                List<ClassRef> bounds = new ArrayList<ClassRef>();
+                for (Type boundType : typeVariable.getBounds()) {
+                    TypeRef typeRef = TYPEREF.apply(boundType);
+                    if (typeRef instanceof ClassRef) {
+                        bounds.add((ClassRef)typeRef);
+                    }
+                }
+                parameters.add(new TypeParamDefBuilder()
+                        .withName(typeVariable.getName())
+                        .withBounds(bounds)
+                        .build());
+            }
+
             return DefinitionRepository.getRepository().register(new TypeDefBuilder()
                     .withKind(kind)
                     .withName(item.getSimpleName())
                     .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
                     .withModifiers(item.getModifiers())
-                    .withParameters()
+                    .withParameters(parameters)
                     .withMethods(methods)
                     .withProperties(properties)
                     .withExtendsList(extendsList)

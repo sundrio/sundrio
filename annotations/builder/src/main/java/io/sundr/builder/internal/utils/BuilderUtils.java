@@ -45,14 +45,9 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Set;
-
-import static io.sundr.builder.Constants.OBJECT;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public class BuilderUtils {
     
@@ -245,13 +240,22 @@ public class BuilderUtils {
         try {
             return ClassTo.TYPEDEF.apply(inline.type());
         } catch (MirroredTypeException e) {
-            Element element = BuilderContextManager.getContext().getTypes().asElement(e.getTypeMirror());
+            Element element = context.getTypes().asElement(e.getTypeMirror());
             return ElementTo.TYPEDEF.apply((TypeElement) element);
         }
     }
 
-    public static TypeRef getInlineReturnType(BuilderContext context, Inline inline) {
-            return classRefOf(getInlineType(context,inline));
+    public static TypeDef getInlineReturnType(BuilderContext context, Inline inline, TypeDef fallback) {
+        try {
+            Class returnType = inline.returnType();
+            if (returnType == null) {
+                return fallback;
+            }
+            return ClassTo.TYPEDEF.apply(inline.returnType());
+        } catch (MirroredTypeException e) {
+            Element element = context.getTypes().asElement(e.getTypeMirror());
+            return ElementTo.TYPEDEF.apply((TypeElement) element);
+        }
     }
 
     public static Set<TypeElement> getBuildableReferences(BuilderContext context, Buildable buildable) {

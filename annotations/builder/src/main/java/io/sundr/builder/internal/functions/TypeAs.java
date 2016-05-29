@@ -43,7 +43,6 @@ import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableSuperClass;
 import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
-import static io.sundr.codegen.utils.TypeUtils.newTypeParamRef;
 
 
 public class TypeAs {
@@ -179,23 +178,6 @@ public class TypeAs {
         }
     });
 
-    public static final Function<TypeDef, TypeDef> SHALLOW_INLINEABLE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
-        public TypeDef apply(TypeDef item) {
-            return item;
-        }
-    });
-
-    public static final Function<TypeDef, TypeDef> INLINEABLE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
-        public TypeDef apply(TypeDef item) {
-            TypeDef fluent = FLUENT_IMPL.apply(item);
-            return new TypeDefBuilder(item)
-                    .withParameters(item.getParameters())
-                    .withExtendsList(classRefOf(fluent, SHALLOW_INLINEABLE.apply(item)))
-                    .build();
-
-        }
-    });
-
     public static final Function<TypeDef, TypeDef> SHALLOW_BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             return new TypeDefBuilder(item)
@@ -214,8 +196,7 @@ public class TypeAs {
 
     public static final Function<TypeRef, TypeRef> LIST_OF = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
-            return classRefOf(Constants.LIST, item);
-
+            return Constants.LIST.toReference(item);
             //TODO: Need a home for: .withDefaultImplementation(Constants.ARRAY_LIST)
         }
 
