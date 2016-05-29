@@ -171,8 +171,11 @@ public class TypeAs {
                     .withKind(Kind.CLASS)
                     .withName("Editable" + item.getName())
                     .withParameters(parameters)
-                    .withExtendsList(classRefOf(item))
-                    .withImplementsList(classRefOf(BuilderContextManager.getContext().getEditableInterface(), SHALLOW_BUILDER.apply(item)))
+                    .withExtendsList(item.toInternalReference())
+                    .withImplementsList(BuilderContextManager.getContext().getEditableInterface().toReference(SHALLOW_BUILDER.apply(item).toInternalReference()))
+                    .withProperties()
+                    .withMethods()
+                    .withConstructors()
                     .build();
 
         }

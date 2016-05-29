@@ -16,12 +16,6 @@
 
 package io.sundr.builder.internal.processor;
 
-import com.sun.tools.javac.model.JavacElements;
-import com.sun.tools.javac.model.JavacTypes;
-import com.sun.tools.javac.util.Context;
-import io.sundr.builder.annotations.Inline;
-import io.sundr.builder.internal.BuilderContext;
-import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.ClassRef;
@@ -30,110 +24,83 @@ import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
 import org.junit.Test;
 
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-import java.lang.annotation.Annotation;
 import java.util.Iterator;
-import java.util.concurrent.Callable;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class SimpleClassTest {
+public class SimpleClassTest extends AbstractProcessorTest {
 
-    private final Context context = new Context();
-    private final Elements elements = JavacElements.instance(context);
-    private final Types types = JavacTypes.instance(context);
-    private final BuilderContext builderContext = BuilderContextManager.create(elements, types);
+
     TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
-
-
 
     @Test
     public void testFluent() {
         TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassDef);
+        System.out.println(fluent);
 
         assertEquals(Kind.INTERFACE, fluent.getKind());
         assertEquals("SimpleClassFluent", fluent.getName());
         assertEquals(1, fluent.getExtendsList().size());
 
-
         ClassRef superClass = fluent.getExtendsList().iterator().next();
         assertEquals("Fluent", superClass.getDefinition().getName());
         assertEquals(1, superClass.getArguments().size());
         assertEquals("A", superClass.getArguments().iterator().next().toString());
-
-        System.out.println(fluent);
     }
 
 
     @Test
     public void testFluentImpl() {
-        TypeDef fluent = ClazzAs.FLUENT_IMPL.apply(simpleClassDef);
+        TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassDef);
+        System.out.println(fluentImpl);
 
-        assertEquals(Kind.CLASS, fluent.getKind());
-        assertEquals("SimpleClassFluentImpl", fluent.getName());
-        assertEquals(1, fluent.getExtendsList().size());
+        assertEquals(Kind.CLASS, fluentImpl.getKind());
+        assertEquals("SimpleClassFluentImpl", fluentImpl.getName());
+        assertEquals(1, fluentImpl.getExtendsList().size());
 
-        ClassRef superClass = fluent.getExtendsList().iterator().next();
+        ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
         assertEquals("BaseFluent", superClass.getDefinition().getName());
         assertEquals(1, superClass.getArguments().size());
         assertEquals("A", superClass.getArguments().iterator().next().toString());
-
-        System.out.println(fluent);
     }
 
     @Test
     public void testBuilder() {
-        TypeDef fluent = ClazzAs.BUILDER.apply(simpleClassDef);
+        TypeDef builder = ClazzAs.BUILDER.apply(simpleClassDef);
+        System.out.println(builder);
 
-        assertEquals(Kind.CLASS, fluent.getKind());
-        assertEquals("SimpleClassBuilder", fluent.getName());
-        assertEquals(1, fluent.getExtendsList().size());
+        assertEquals(Kind.CLASS, builder.getKind());
+        assertEquals("SimpleClassBuilder", builder.getName());
+        assertEquals(1, builder.getExtendsList().size());
 
 
-        ClassRef superClass = fluent.getImplementsList().iterator().next();
+        ClassRef superClass = builder.getImplementsList().iterator().next();
         assertEquals("VisitableBuilder", superClass.getDefinition().getName());
         assertEquals(2, superClass.getArguments().size());
         Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
         assertEquals("testpackage.SimpleClass", argIterator.next().toString());
         assertEquals("testpackage.SimpleClassBuilder", argIterator.next().toString());
-        System.out.println(fluent);
     }
 
     @Test
+    public void testEditable() {
+        TypeDef editable = ClazzAs.EDITABLE.apply(simpleClassDef);
+        System.out.println(editable);
+
+        assertEquals(Kind.CLASS, editable.getKind());
+        assertEquals("EditableSimpleClass", editable.getName());
+        assertEquals(1, editable.getExtendsList().size());
+
+        ClassRef superClass = editable.getExtendsList().iterator().next();
+        assertEquals(simpleClassDef.toReference(), superClass);
+    }
+
+
+    @Test
     public void testInline() {
-        Inline inline = new Inline() {
-            public Class<? extends Annotation> annotationType() {
-                return null;
-            }
-
-            public String value() {
-                return "call";
-            }
-
-            public String prefix() {
-                return "Callable";
-            }
-
-            public String name() {
-                return "";
-            }
-
-            public String suffix() {
-                return "";
-            }
-
-            public Class type() {
-                return Callable.class;
-            }
-
-            public Class returnType() {
-                return null;
-            }
-        };
-
         TypeDef inlineable = BuildableProcessor.inlineableOf(builderContext, simpleClassDef, inline);
-
-
+        System.out.println(inlineable);
+        assertEquals(Kind.CLASS, inlineable.getKind());
+        assertEquals("CallableSimpleClass", inlineable.getName());
     }
 }

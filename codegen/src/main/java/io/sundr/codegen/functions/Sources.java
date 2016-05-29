@@ -65,18 +65,20 @@ import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRef;
 import io.sundr.codegen.model.WildcardRef;
 import io.sundr.codegen.utils.IOUtils;
+import io.sundr.codegen.utils.TypeUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 public class Sources {
 
-    private static final String JAVA_LANG = "java.lang.";
+    private static final String JAVA_LANG = "java.lang";
 
     private static Function<Node, String> PACKAGENAME = new Function<Node, String>() {
 
@@ -97,7 +99,7 @@ public class Sources {
                 }
 
                try {
-                   Class.forName(JAVA_LANG + name);
+                   Class.forName(JAVA_LANG + "." + name);
                    return JAVA_LANG;
                } catch (ClassNotFoundException ex) {
                    return compilationUnit.getPackage().getPackageName();
@@ -251,9 +253,10 @@ public class Sources {
                     if (bodyDeclaration instanceof FieldDeclaration) {
                         FieldDeclaration fieldDeclaration = (FieldDeclaration) bodyDeclaration;
                         for (VariableDeclarator var : fieldDeclaration.getVariables()) {
+                            TypeRef typeRef = checkAgainstTypeParamRef(TYPEREF.apply(fieldDeclaration.getType()), parameters);
                             properties.add(new PropertyBuilder()
                                     .withName(var.getId().getName())
-                                    .withTypeRef(TYPEREF.apply(fieldDeclaration.getType()))
+                                    .withTypeRef(typeRef)
                                     .withModifiers(fieldDeclaration.getModifiers())
                                     .addToAttributes("init",  var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
                                     .build());
@@ -281,10 +284,12 @@ public class Sources {
                                     .withAnnotations(annotations)
                                     .build());
                         }
+
+                        TypeRef returnType = checkAgainstTypeParamRef(TYPEREF.apply(methodDeclaration.getType()), parameters);
                         methods.add(new MethodBuilder()
                                 .withName(methodDeclaration.getName())
                                 .withModifiers(methodDeclaration.getModifiers())
-                                .withReturnType(TYPEREF.apply(methodDeclaration.getType()))
+                                .withReturnType(returnType)
                                 .withExceptions(exceptions)
                                 .withArguments(arguments)
                                 .withBlock(BLOCK.apply(methodDeclaration.getBody()))
@@ -307,9 +312,10 @@ public class Sources {
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
                                 annotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }
+                            TypeRef typeRef = checkAgainstTypeParamRef(TYPEREF.apply(parameter.getType()), parameters);
                             arguments.add(new PropertyBuilder()
                                     .withName(parameter.getId().getName())
-                                    .withTypeRef(TYPEREF.apply(parameter.getType()))
+                                    .withTypeRef(typeRef)
                                     .withModifiers(parameter.getModifiers())
                                     .withAnnotations(annotations)
                                     .build());
@@ -336,6 +342,16 @@ public class Sources {
                         .build());
             }
             throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");
+        }
+
+        //To be more accurate we need to check if there is a matching type parameter definition
+        //and if so, return a reference to that (rather than consider it a class).
+        private TypeRef checkAgainstTypeParamRef(TypeRef typeRef, Collection<TypeParamDef> parameters) {
+            TypeParamDef parameterDef = TypeUtils.getParamterDefinition(typeRef, parameters);
+            if (parameterDef != null) {
+                return parameterDef.toReference();
+            }
+            return typeRef;
         }
     };
 

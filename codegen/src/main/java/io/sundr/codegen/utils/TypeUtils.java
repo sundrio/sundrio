@@ -19,6 +19,7 @@ package io.sundr.codegen.utils;
 import io.sundr.Function;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
@@ -67,6 +68,26 @@ public final class TypeUtils {
             }
         }
         return false;
+    }
+
+    public static TypeParamDef getParamterDefinition(TypeRef typeRef, Collection<TypeParamDef> parameters) {
+        String name;
+        if (typeRef instanceof ClassRef) {
+            name = ((ClassRef)typeRef).getDefinition().getName();
+        } else if (typeRef instanceof TypeParamDef) {
+            name = ((TypeParamRef)typeRef).getName();
+        } else if (typeRef instanceof PrimitiveRef) {
+            name = ((PrimitiveRef)typeRef).getName();
+        } else {
+            name = typeRef.toString();
+        }
+
+        for (TypeParamDef parameter : parameters) {
+            if (parameter.getName().equals(name)) {
+                return parameter;
+            }
+        }
+        return null;
     }
 
     /**

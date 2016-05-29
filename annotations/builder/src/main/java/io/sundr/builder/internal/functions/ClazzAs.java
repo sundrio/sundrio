@@ -35,6 +35,7 @@ import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
@@ -449,9 +450,12 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             }
 
             Method edit = new MethodBuilder()
-                    .withReturnType(builderType.toReference())
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(builderType.toInternalReference())
                     .withName("edit")
-                    .addToAttributes(BODY, "return new " + builderType.getName() + "(this);")
+                    .withNewBlock()
+                        .addNewStringStatementStatement("return new " + builderType.getName() + "(this);")
+                    .endBlock()
                     .build();
 
             methods.add(edit);
@@ -486,7 +490,8 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
         for (Property property : constructor.getArguments()) {
             Method getter = findGetter(clazz, property);
             if (getter != null) {
-                statements.add(new StringStatement(new StringBuilder().append(ref).append(".with").append(property.getNameCapitalized()).append("(instance.").append(getter.getName()).append("()); ").toString()));
+                String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() +")" : "";
+                statements.add(new StringStatement(new StringBuilder().append(ref).append(".with").append(property.getNameCapitalized()).append("(").append(cast).append("instance.").append(getter.getName()).append("()); ").toString()));
             } else {
                 throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
             }
