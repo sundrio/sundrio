@@ -76,6 +76,8 @@ import java.util.Set;
 
 public class Sources {
 
+    private static final String JAVA_LANG = "java.lang.";
+
     private static Function<Node, String> PACKAGENAME = new Function<Node, String>() {
 
         public String apply(Node node) {
@@ -87,17 +89,19 @@ public class Sources {
                 }
 
                 CompilationUnit compilationUnit = (CompilationUnit) current;
-                //TODO: we may want to check against java.lang here...
-
-                if (compilationUnit.getImports().isEmpty()) {
-                    return compilationUnit.getPackage().getPackageName();
-                }
 
                 for (ImportDeclaration importDecl : compilationUnit.getImports()) {
                     if (importDecl.getName().getName().endsWith(name)) {
                         return importDecl.getName().getName();
                     }
                 }
+
+               try {
+                   Class.forName(JAVA_LANG + name);
+                   return JAVA_LANG;
+               } catch (ClassNotFoundException ex) {
+                   return compilationUnit.getPackage().getPackageName();
+               }
             }
             return null;
         }
@@ -121,13 +125,21 @@ public class Sources {
                             .build());
                 }
             }
-            return new ClassRefBuilder()
+
+            ClassRef tmpRef = new ClassRefBuilder()
                     .withNewDefinition()
                     .withPackageName(boundPackage)
                     .withName(boundName)
                     .endDefinition()
                     .withArguments(arguments)
                     .build();
+
+            TypeDef knwonDefition = DefinitionRepository.getRepository().getDefinition(tmpRef);
+            if (knwonDefition != null) {
+                return new ClassRefBuilder(tmpRef).withDefinition(knwonDefition).build();
+            } else {
+                return tmpRef;
+            }
         }
     };
 
@@ -374,7 +386,7 @@ public class Sources {
 
         public TypeDef apply(String resource) {
             CompilationUnit cu = Sources.FROM_CLASSPATH_TO_COMPILATIONUNIT.apply(resource);
-            TypeDeclaration typeDeclaration =cu.getTypes().get(0);
+            TypeDeclaration typeDeclaration = cu.getTypes().get(0);
             return TYPEDEF.apply(typeDeclaration);
 
         }

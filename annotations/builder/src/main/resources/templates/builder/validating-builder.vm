@@ -8,7 +8,7 @@ import javax.validation.ValidatorFactory;
 import javax.validation.ValidationException;
 import java.util.Set;
 #foreach($i in $model.imports)
-import $i.fullyQualifiedName;
+import $i.definition.getFullyQualifiedName();
 #end
 
 #class ($model)

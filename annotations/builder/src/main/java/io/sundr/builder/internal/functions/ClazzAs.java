@@ -18,9 +18,11 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.Constants;
+import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.builder.internal.visitors.StatementReplacingVistor;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -308,15 +310,11 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
                     //The return type of builder methods is always T, we need to fix that.
-                    .accept(new Visitor<MethodBuilder>() {
+                    .accept(new TypedVisitor<MethodBuilder>() {
                         public void visit(MethodBuilder builder) {
                             if (builder.getReturnType() != null && builder.getReturnType().equals(Constants.T_REF) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
                                 builder.withReturnType(genericTypeLetter.toReference());
-                                String body = (String) builder.getAttributes().get(BODY);
-                                if (body != null) {
-                                    body = body.replaceAll("\\(T\\)", "\\(" + genericTypeLetter.getName() + "\\)");
-                                    builder.getAttributes().put(BODY, body);
-                                }
+                                builder.accept(new StatementReplacingVistor("\\(T\\)", "\\(" + genericTypeLetter.getName() + "\\)"));
                             } else if (builder.getReturnType() instanceof ClassRef && Arrays.asList(((ClassRef)builder.getReturnType()).getArguments()).contains(Constants.T_REF)) {
                                 List<TypeRef> generics = new ArrayList<TypeRef>();
                                 for (TypeRef g : ((ClassRef) builder.getReturnType()).getArguments()) {
@@ -326,11 +324,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                                         generics.add(g);
                                     }
                                 }
-                                String body = (String) builder.getAttributes().get(BODY);
-                                if (body != null) {
-                                    body = body.replaceAll("<T>", "<" + genericTypeLetter.toString() + ">");
-                                    builder.getAttributes().put(BODY, body);
-                                }
+                                builder.accept(new StatementReplacingVistor("<T>", "<" + genericTypeLetter.toString() + ">"));
                                 TypeRef updatedReturnType = new ClassRefBuilder(((ClassRef)builder.getReturnType())).withArguments(generics).build();
                                 builder.withReturnType(updatedReturnType);
                             }
@@ -411,6 +405,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             methods.add(build);
 
             Method equals = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
                     .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
@@ -430,27 +425,16 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
     }, EDITABLE_BUILDER {
         public TypeDef apply(TypeDef item) {
-            TypeDef builder = BUILDER.apply(item);
-            Set<Method> methods = new LinkedHashSet<Method>();
-            for (Method m : builder.getMethods()) {
-                if (m.getName().equals("build")) {
-
-                    TypeDef editable = EDITABLE.apply(item);
-                    methods.add(new MethodBuilder()
-                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                            .withName("build")
-                            .withNewBlock()
+            final TypeDef editable = EDITABLE.apply(item);
+            return new TypeDefBuilder(BUILDER.apply(item)).accept(new TypedVisitor<MethodBuilder>() {
+                public void visit(MethodBuilder builder) {
+                    if (builder.getName() != null && builder.getName().equals("build")) {
+                        builder.withNewBlock()
                                 .withStatements(toBuild(editable, editable))
-                            .endBlock()
-                            .build());
-                } else {
-                    methods.add(m);
+                                .endBlock();
+                    }
                 }
-            }
-            return new TypeDefBuilder(builder)
-                    .withMethods(methods)
-                    .build();
-
+            }).build();
         }
     }, EDITABLE {
         public TypeDef apply(TypeDef item) {

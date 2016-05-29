@@ -16,6 +16,7 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -207,8 +208,6 @@ public class TypeDef extends ModifierSupport {
                 .build();
     }
 
-
-
     /**
      * Creates a {@link ClassRef} without bounds.
      * @return
@@ -218,6 +217,16 @@ public class TypeDef extends ModifierSupport {
                 .withDefinition(this)
                 .withArguments()
                 .build();
+    }
+
+    public Set<ClassRef> getImports() {
+        final Set<ClassRef> imports = new LinkedHashSet<ClassRef>();
+        new TypeDefBuilder(this).accept(new TypedVisitor<ClassRefBuilder>() {
+            public void visit(ClassRefBuilder builder) {
+                imports.add(builder.build());
+            }
+        });
+        return imports;
     }
 
     @Override

@@ -62,9 +62,11 @@ public class BuilderContext {
         this.inlineables = inlineables;
 
         buildableRepository = new BuildableRepository();
+
         visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
                 .withPackageName(builderPackage)
                 .build();
+
         typedVisitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/TypedVisitor.java"))
                 .withPackageName(builderPackage)
                 .build();

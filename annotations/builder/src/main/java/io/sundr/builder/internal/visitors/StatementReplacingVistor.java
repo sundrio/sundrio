@@ -14,21 +14,23 @@
  *    limitations under the License.
  */
 
-package testpackage;
+package io.sundr.builder.internal.visitors;
 
-import io.sundr.builder.annotations.Buidlable;
+import io.sundr.builder.TypedVisitor;
+import io.sundr.codegen.model.StringStatementBuilder;
 
-public class SimpleClassWithDate extends SimpleClass {
 
-    private final Date date;
+public class StatementReplacingVistor extends TypedVisitor<StringStatementBuilder> {
 
-    @Buildable
-    public SimpleClass(Long id, String name, Boolean enabled, Date date) {
-        super(id, name, enabled);
-        this.date=date;
+    private final String target;
+    private final String replacement;
+
+    public StatementReplacingVistor(String target, String replacement) {
+        this.target = target;
+        this.replacement = replacement;
     }
 
-    public Date getDate() {
-        return date;
+    public void visit(StringStatementBuilder builder) {
+        builder.withData(builder.getData().replaceAll(target,replacement));
     }
 }

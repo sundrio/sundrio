@@ -99,8 +99,8 @@ public class SimpleClassWithInheritanceTest {
         assertEquals(builderContext.getVisitableBuilderInterface().getName(), superClass.getDefinition().getName());
         assertEquals(2, superClass.getArguments().size());
         Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
-        assertEquals("SimpleClassWithDate", argIterator.next().toString());
-        assertEquals("SimpleClassWithDateBuilder", argIterator.next().toString());
+        assertEquals("testpackage.SimpleClassWithDate", argIterator.next().toString());
+        assertEquals("testpackage.SimpleClassWithDateBuilder", argIterator.next().toString());
         System.out.println(fluent);
     }
 }

@@ -21,6 +21,7 @@ import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.Type;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -90,7 +91,6 @@ public class TypeAs {
     public static final Function<TypeDef, TypeDef> FLUENT_IMPL = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             BuilderContext ctx = BuilderContextManager.getContext();
-
             TypeDef fluent = SHALLOW_FLUENT.apply(item);
 
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>(item.getParameters());
@@ -133,28 +133,31 @@ public class TypeAs {
 
     public static final Function<TypeDef, ClassRef> FLUENT_REF = CachingFunction.wrap(new Function<TypeDef, ClassRef>() {
         public ClassRef apply(TypeDef item) {
-            List<Object> parameters = new ArrayList<Object>(item.getParameters());
+            List<TypeRef> parameters = new ArrayList<TypeRef>();
+            for (TypeParamDef param : item.getParameters()) {
+                parameters.add(param.toReference());
+            }
             parameters.add(Q);
-           return classRefOf(SHALLOW_FLUENT.apply(item), parameters.toArray());
+           return SHALLOW_FLUENT.apply(item).toReference(parameters.toArray(new TypeRef[parameters.size()]));
         }
     });
 
     public static final Function<TypeDef, TypeDef> BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
-            ClassRef builder = classRefOf(SHALLOW_BUILDER.apply(item));
-            List<TypeRef> parameterRefs = new ArrayList<TypeRef>();
-            for (TypeParamDef parameter : item.getParameters()) {
-                parameterRefs.add(newTypeParamRef(parameter.getName()));
-            }
-            parameterRefs.add(builder);
-            ClassRef fluent = classRefOf(FLUENT_IMPL.apply(item), parameterRefs.toArray(new TypeRef[parameterRefs.size()]));
+            TypeDef builder = SHALLOW_BUILDER.apply(item);
+            TypeDef fluent = FLUENT_IMPL.apply(item);
 
+            List<TypeRef> parameters = new ArrayList<TypeRef>();
+            for (TypeParamDef param : item.getParameters()) {
+                parameters.add(param.toReference());
+            }
+            parameters.add(builder.toInternalReference());
             return new TypeDefBuilder(item)
                     .withKind(Kind.CLASS)
                     .withName(item.getName() + "Builder")
                     .withParameters(item.getParameters())
-                    .withExtendsList(fluent)
-                    .withImplementsList(classRefOf(BuilderContextManager.getContext().getVisitableBuilderInterface(), item, builder))
+                    .withExtendsList(fluent.toReference(parameters.toArray(new TypeRef[parameters.size()])))
+                    .withImplementsList(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(item.toInternalReference(), builder.toInternalReference()))
                     .build();
 
         }
@@ -169,8 +172,8 @@ public class TypeAs {
                     .withKind(Kind.CLASS)
                     .withName("Editable" + item.getName())
                     .withParameters(parameters)
-                    .addToExtendsList(classRefOf(item))
-                    .addToImplementsList(classRefOf(BuilderContextManager.getContext().getEditableInterface(), SHALLOW_BUILDER.apply(item)))
+                    .withExtendsList(classRefOf(item))
+                    .withImplementsList(classRefOf(BuilderContextManager.getContext().getEditableInterface(), SHALLOW_BUILDER.apply(item)))
                     .build();
 
         }

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.builder.internal;
+package testpackage;
 
 import io.sundr.builder.annotations.Buidlable;
 

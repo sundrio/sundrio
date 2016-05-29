@@ -62,7 +62,8 @@ public class Constants {
     
     public static final TypeParamDef T = new TypeParamDefBuilder().withName("T").addToAttributes(REPLACEABLE, Boolean.TRUE).build();
 
-    public static final TypeParamRef T_REF = new TypeParamRefBuilder().withName("T").addToAttributes(REPLACEABLE, Boolean.TRUE).build();
+    public static final TypeParamRef T_REF = new TypeParamRefBuilder().withName("T").addToAttributes(REPLACEABLE, Boolean.TRUE)
+            .build();
     
     public static final TypeParamDef N = newTypeParamDef("N");
     public static final TypeParamRef N_REF = newTypeParamRef("N");

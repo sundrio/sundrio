@@ -71,7 +71,6 @@ public enum ToMethod implements Function<Property, Method> {
     WITH {
         public Method apply(Property property) {
             String methodName = "with" + property.getNameCapitalized();
-
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
