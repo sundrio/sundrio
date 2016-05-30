@@ -23,6 +23,8 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.StatementReplacingVistor;
+import io.sundr.builder.internal.visitors.TypeParamDefReplacingVisitor;
+import io.sundr.builder.internal.visitors.TypeParamRefReplacingVisitor;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -48,9 +50,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.OBJECT;
+import static io.sundr.builder.Constants.OUTER_CLASS;
+import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.Constants.REPLACEABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
@@ -75,9 +79,10 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             Set<Method> methods = new LinkedHashSet<Method>();
             Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
             TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
+            TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
             //The generic letter is always the last
-            final TypeParamDef genericTypeLetter = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
+            final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
 
             for (Property property : item.getProperties()) {
                 if (property.isStatic()) {
@@ -89,6 +94,9 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(0)
+                        .addToAttributes(OUTER_INTERFACE, fluentType)
+                        .addToAttributes(OUTER_CLASS, fluentImplType)
+                        .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
                         .build();
 
                 boolean isBuildable = isBuildable(toAdd.getTypeRef());
@@ -141,6 +149,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }
+
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
@@ -156,13 +165,15 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .accept(new Visitor<MethodBuilder>() {
                         public void visit(MethodBuilder builder) {
                             if (builder.getReturnType().equals(Constants.T_REF) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
-                                builder.withReturnType(genericTypeLetter.toReference());
+                                builder.withReturnType(genericType.toReference());
+                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
                             } else if (builder.getReturnType() instanceof ClassRef && Arrays.asList(((ClassRef)builder.getReturnType()).getArguments()).contains(Constants.T_REF)) {
+                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
                                 List<TypeRef> generics = new ArrayList<TypeRef>();
 
                                 for (TypeRef g : ((ClassRef)builder.getReturnType()).getArguments()) {
                                     if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
-                                        generics.add(genericTypeLetter.toReference());
+                                        generics.add(genericType.toReference());
                                     } else {
                                         generics.add(g);
                                     }
@@ -179,10 +190,11 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             Set<Method> methods = new LinkedHashSet<Method>();
             Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
             Set<Property> properties = new LinkedHashSet<Property>();
-            final TypeDef fluentType = TypeAs.FLUENT_IMPL.apply(item);
+            TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
+            final TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
             //The generic letter is always the last
-            final TypeParamDef genericTypeLetter = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
+            final TypeParamDef genericType = fluentImplType.getParameters().get(fluentImplType.getParameters().size() - 1);
 
             Method emptyConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -211,6 +223,9 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(0)
+                        .addToAttributes(OUTER_INTERFACE, fluentType)
+                        .addToAttributes(OUTER_CLASS, fluentImplType)
+                        .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
                         .build();
 
                 boolean isBuildable = isBuildable(toAdd.getTypeRef());
@@ -256,7 +271,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
-                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
+                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentImplType).build()));
 
                     ClassRef classRef = (ClassRef) toAdd.getTypeRef();
                     TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
@@ -273,13 +288,11 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }
+
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
-                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
-
-
-                        // List<VisitableBuilder<? extends TypeRef, ?>> allArguments = new ArrayList();
+                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentImplType).build()));
 
                         ClassRef classRef = (ClassRef) descendant.getTypeRef();
                         TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
@@ -302,13 +315,13 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
                     .withNewBlock()
-                        .withStatements(toEquals(fluentType, properties))
+                        .withStatements(toEquals(fluentImplType, properties))
                     .endBlock()
                     .build();
 
             methods.add(equals);
 
-            return new TypeDefBuilder(fluentType)
+            return new TypeDefBuilder(fluentImplType)
                     .withConstructors(constructors)
                     .withProperties(properties)
                     .withInnerTypes(nestedClazzes)
@@ -316,19 +329,21 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     //The return type of builder methods is always T, we need to fix that.
                     .accept(new TypedVisitor<MethodBuilder>() {
                         public void visit(MethodBuilder builder) {
+                            builder.accept(new TypeParamRefReplacingVisitor("T", genericType.getName()))
+                                    .accept(new TypeParamDefReplacingVisitor("T", genericType.getName()));
                             if (builder.getReturnType() != null && builder.getReturnType().equals(Constants.T_REF) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
-                                builder.withReturnType(genericTypeLetter.toReference());
-                                builder.accept(new StatementReplacingVistor("\\(T\\)", "\\(" + genericTypeLetter.getName() + "\\)"));
+                                builder.withReturnType(genericType.toReference());
+                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
                             } else if (builder.getReturnType() instanceof ClassRef && Arrays.asList(((ClassRef)builder.getReturnType()).getArguments()).contains(Constants.T_REF)) {
                                 List<TypeRef> generics = new ArrayList<TypeRef>();
                                 for (TypeRef g : ((ClassRef) builder.getReturnType()).getArguments()) {
                                     if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
-                                        generics.add(genericTypeLetter.toReference());
+                                        generics.add(genericType.toReference());
                                     } else {
                                         generics.add(g);
                                     }
                                 }
-                                builder.accept(new StatementReplacingVistor("<T>", "<" + genericTypeLetter.toString() + ">"));
+                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
                                 TypeRef updatedReturnType = new ClassRefBuilder(((ClassRef)builder.getReturnType())).withArguments(generics).build();
                                 builder.withReturnType(updatedReturnType);
                             }

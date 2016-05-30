@@ -152,7 +152,7 @@ public class Method extends ModifierSupport {
             if (varArg.getTypeRef().getDimensions() == 1) {
                 sb.append(varArg.getTypeRef().withDimensions(0)).append("... ");
             } else {
-                sb.append(varArg.getTypeRef().withDimensions(0)).append("... ");
+                sb.append(varArg.getTypeRef()).append(" ");
             }
             sb.append(varArg.getName());
         }

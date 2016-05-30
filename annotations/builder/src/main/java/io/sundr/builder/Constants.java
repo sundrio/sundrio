@@ -51,6 +51,13 @@ public class Constants {
 
     public static final String REPLACEABLE = "REPLACEABLE";
     public static final String MEMBER_OF = "MEMBER_OF";
+
+    public static final String OUTER_INTERFACE = "OUTER_INTERFACE";
+    public static final String OUTER_CLASS = "OUTER_CLASS";
+
+    public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
+
+
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
     public static final String BODY = "BODY";
     public static final String EMPTY = "";

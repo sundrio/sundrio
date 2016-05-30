@@ -16,6 +16,7 @@
 
 package io.sundr.examples.codegen;
 
+import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.model.*;
 import io.sundr.codegen.utils.StringUtils;
@@ -28,7 +29,6 @@ import java.util.Set;
 
 @Buildable
 public class TypeDef extends ModifierSupport {
-
     public static TypeDef OBJECT = new TypeDefBuilder()
             .withPackageName("java.lang")
             .withName("Object")
@@ -46,11 +46,11 @@ public class TypeDef extends ModifierSupport {
     private final Set<Property> properties;
     private final Set<Method> constructors;
     private final Set<Method> methods;
+    private final TypeDef outerType;
     private final Set<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, int modifiers, Set<TypeDef> innerTypes, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, TypeDef outerType, Set<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
-        this.innerTypes = innerTypes;
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
         this.name = name;
@@ -61,6 +61,8 @@ public class TypeDef extends ModifierSupport {
         this.properties = properties;
         this.constructors = adaptConstructors(constructors, this);
         this.methods = methods;
+        this.outerType = outerType;
+        this.innerTypes = setOuterType(innerTypes, this);
     }
 
     /**
@@ -82,20 +84,38 @@ public class TypeDef extends ModifierSupport {
         return adapted;
     }
 
+    private static Set<TypeDef> setOuterType(Set<TypeDef> types, TypeDef outer) {
+        Set<TypeDef> updated = new LinkedHashSet<TypeDef>();
+        for (TypeDef typeDef : types) {
+            if (typeDef.getOuterType().equals(outer)) {
+                updated.add(typeDef);
+            } else {
+                updated.add(new TypeDefBuilder(typeDef).withOuterType(outer).build());
+            }
+        }
+        return updated;
+    }
+
     /**
      * Returns the fully qualified name of the type.
      *
      * @return
      */
     public String getFullyQualifiedName() {
+        StringBuilder sb = new StringBuilder();
         if (packageName != null && !packageName.isEmpty()) {
-            return getPackageName() + "." + getName();
-        } else {
-            return getName();
+            sb.append(getPackageName()).append(".");
         }
+
+        if (outerType != null) {
+            sb.append(outerType.getName()).append(".");
+        }
+        sb.append(getName());
+
+        return sb.toString();
     }
 
-    public boolean isAssignable(TypeDef o) {
+    public boolean isAssignableFrom(TypeDef o) {
         if (this == o || this.equals(o)) {
             return true;
         }
@@ -106,6 +126,19 @@ public class TypeDef extends ModifierSupport {
         if (o.packageName == null && "java.lang".equals(packageName) && name.equalsIgnoreCase(o.name)) {
             return true;
         }
+
+        for (ClassRef e : o.getExtendsList()) {
+            if (isAssignableFrom(e.getDefinition())) {
+                return true;
+            }
+        }
+
+        for (ClassRef i : o.getImplementsList()) {
+            if (isAssignableFrom(i.getDefinition())) {
+                return true;
+            }
+        }
+
 
         return false;
     }
@@ -148,6 +181,10 @@ public class TypeDef extends ModifierSupport {
 
     public Set<Method> getMethods() {
         return methods;
+    }
+
+    public TypeDef getOuterType() {
+        return outerType;
     }
 
     public Set<TypeDef> getInnerTypes() {
@@ -209,8 +246,6 @@ public class TypeDef extends ModifierSupport {
                 .build();
     }
 
-
-
     /**
      * Creates a {@link ClassRef} without bounds.
      * @return
@@ -222,10 +257,19 @@ public class TypeDef extends ModifierSupport {
                 .build();
     }
 
+    public Set<ClassRef> getImports() {
+        final Set<ClassRef> imports = new LinkedHashSet<ClassRef>();
+        new TypeDefBuilder(this).accept(new TypedVisitor<ClassRefBuilder>() {
+            public void visit(ClassRefBuilder builder) {
+                imports.add(builder.build());
+            }
+        });
+        return imports;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
         if (isPublic()) {
             sb.append("public ");
         } else if (isProtected()) {
@@ -250,7 +294,8 @@ public class TypeDef extends ModifierSupport {
             sb.append(">");
         }
 
-        if (extendsList != null && !extendsList.isEmpty()) {
+        if (extendsList != null && !extendsList.isEmpty()
+                && (extendsList.size() != 1 || !extendsList.contains(OBJECT.toReference()))) {
             sb.append(" extends ");
             sb.append(StringUtils.join(extendsList, ","));
         }

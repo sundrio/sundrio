@@ -16,9 +16,11 @@
 
 package io.sundr.builder.internal;
 
+import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;
@@ -28,7 +30,16 @@ import io.sundr.codegen.utils.TypeUtils;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static io.sundr.builder.Constants.ARRAY_LIST;
 import static io.sundr.builder.Constants.INLINEABLE;
+import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 
 public class BuilderContext {
 
@@ -62,6 +73,9 @@ public class BuilderContext {
         this.inlineables = inlineables;
 
         buildableRepository = new BuildableRepository();
+
+        ClassTo.TYPEDEF.apply(ArrayList.class);
+
 
         visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
                 .withPackageName(builderPackage)

@@ -42,6 +42,7 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 import io.sundr.builder.Function;
+import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.BlockBuilder;
@@ -120,8 +121,8 @@ public class Sources {
         }
     };
 
-    private static Function<ClassOrInterfaceType, ClassRef> CLASSREF = new Function<ClassOrInterfaceType, ClassRef>() {
-        public ClassRef apply(ClassOrInterfaceType classOrInterfaceType) {
+    private static Function<ClassOrInterfaceType, TypeRef> CLASS_OR_TYPEPARAM_REF = new Function<ClassOrInterfaceType, TypeRef>() {
+        public TypeRef apply(ClassOrInterfaceType classOrInterfaceType) {
             String boundPackage = PACKAGENAME.apply(classOrInterfaceType);
             String boundName = classOrInterfaceType.getName();
 
@@ -133,12 +134,20 @@ public class Sources {
                     Type type = referenceType.getType();
                     int dimensions = referenceType.getArrayCount();
                     if (type instanceof ClassOrInterfaceType) {
-                        arguments.add(new ClassRefBuilder(CLASSREF.apply((ClassOrInterfaceType)type))
-                                .withDimensions(dimensions)
-                                .build());
+                        TypeRef intermediateRef = CLASS_OR_TYPEPARAM_REF.apply((ClassOrInterfaceType)type);
+                        if (intermediateRef instanceof ClassRef) {
+                            arguments.add(new ClassRefBuilder((ClassRef) intermediateRef)
+                                    .withDimensions(dimensions)
+                                    .build());
+                        } else if (intermediateRef instanceof TypeParamRef) {
+                            arguments.add(new TypeParamRefBuilder((TypeParamRef) intermediateRef)
+                                    .withDimensions(dimensions)
+                                    .build());
+                        } else {
+                            throw new IllegalStateException("Expected class or type param reference");
+                        }
                     } else {
                         String name = referenceType.toString();
-
                         arguments.add(new TypeParamRefBuilder()
                                 .withName(name)
                                 .withDimensions(dimensions)
@@ -158,6 +167,9 @@ public class Sources {
             TypeDef knwonDefition = DefinitionRepository.getRepository().getDefinition(tmpRef);
             if (knwonDefition != null) {
                 return new ClassRefBuilder(tmpRef).withDefinition(knwonDefition).build();
+            } else if (classOrInterfaceType.getTypeArgs().isEmpty() && boundName.length() == 1)  {
+                //We are doing our best here to distinguish between class refs and type parameter refs.
+                return new TypeParamRefBuilder().withName(boundName).build();
             } else {
                 return tmpRef;
             }
@@ -188,7 +200,7 @@ public class Sources {
                 PrimitiveType primitiveType = (PrimitiveType) type;
                 return new PrimitiveRefBuilder().withName(primitiveType.getType().name()).build();
             } else if (type instanceof ClassOrInterfaceType) {
-                return CLASSREF.apply((ClassOrInterfaceType) type);
+                return CLASS_OR_TYPEPARAM_REF.apply((ClassOrInterfaceType) type);
             }
             throw new IllegalArgumentException("Can't handle type:[" + type + "].");
         }
@@ -199,7 +211,7 @@ public class Sources {
         public TypeParamDef apply(TypeParameter typeParameter) {
             List<ClassRef> bounds = new ArrayList<ClassRef>();
             for (ClassOrInterfaceType classOrInterfaceType : typeParameter.getTypeBound()) {
-                bounds.add(CLASSREF.apply(classOrInterfaceType));
+                bounds.add((ClassRef) CLASS_OR_TYPEPARAM_REF.apply(classOrInterfaceType));
             }
             return new TypeParamDefBuilder()
                     .withName(typeParameter.getName())
@@ -261,11 +273,11 @@ public class Sources {
                 }
 
                 for (ClassOrInterfaceType classOrInterfaceType : decl.getExtends()) {
-                    extendsList.add(CLASSREF.apply(classOrInterfaceType));
+                    extendsList.add((ClassRef) CLASS_OR_TYPEPARAM_REF.apply(classOrInterfaceType));
                 }
 
                 for (ClassOrInterfaceType classOrInterfaceType : decl.getImplements()) {
-                    implementsList.add(CLASSREF.apply(classOrInterfaceType));
+                    implementsList.add((ClassRef) CLASS_OR_TYPEPARAM_REF.apply(classOrInterfaceType));
                 }
 
                 for (BodyDeclaration bodyDeclaration : decl.getMembers()) {

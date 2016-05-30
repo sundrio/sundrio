@@ -28,7 +28,7 @@ import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamRefBuilder;
+import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
 
 import java.util.ArrayList;
@@ -36,11 +36,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
+import static io.sundr.builder.Constants.OUTER_CLASS;
+import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
@@ -52,13 +54,13 @@ public final class PropertyAs {
     public static final Function<Property, TypeDef> NESTED_CLASS = new Function<Property, TypeDef>() {
 
         public TypeDef apply(Property item) {
-            TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
+            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item.getTypeRef());
 
             if (unwrapped instanceof ClassRef) {
                 TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
                 TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
 
-                TypeDef nestedType = NESTED_TYPE.apply(item);
+                TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
                 TypeRef nestedRef = classRefOf(nestedType);
 
                 Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
@@ -87,7 +89,7 @@ public final class PropertyAs {
                         .withReturnType(nestedRef)
                         .addNewArgument()
                         .withName("item")
-                        .withTypeRef(item.getTypeRef())
+                        .withTypeRef(unwrapped)
                         .endArgument()
                         .withNewBlock()
                             .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this, item);")
@@ -140,6 +142,7 @@ public final class PropertyAs {
                 Set<Method> constructors = new HashSet<Method>();
 
                 TypeDef memberOf = (TypeDef) item.getAttributes().get(MEMBER_OF);
+
                 properties.add(new PropertyBuilder()
                         .withName("builder")
                         .withTypeRef(classRefOf(builderType)).build());
@@ -151,13 +154,17 @@ public final class PropertyAs {
                         .withName("item")
                         .withTypeRef(classRefOf(baseType))
                         .endArgument()
-                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this, item);")
+                        .withNewBlock()
+                            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this, item);")
+                        .endBlock()
                         .build());
 
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
-                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this);")
+                        .withNewBlock()
+                            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this);")
+                        .endBlock()
                         .build());
 
                 return new TypeDefBuilder(nestedType)
@@ -174,12 +181,17 @@ public final class PropertyAs {
 
 
 
-        public static final Function<Property, TypeDef> NESTED_TYPE = new Function<Property, TypeDef>() {
+        public static final Function<Property, TypeDef> NESTED_CLASS_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property item) {
+                TypeDef shallowNestedType = SHALLOW_NESTED_TYPE.apply(item);
+                TypeDef nestedInterfaceType = NESTED_INTERFACE_TYPE.apply(item);
 
-                TypeDef nested = SHALLOW_NESTED_TYPE.apply(item);
+                TypeDef nested = new TypeDefBuilder(shallowNestedType)
+                        .withName(shallowNestedType.getName() + "Impl")
+                        .withOuterType((TypeDef) item.getAttributes().get(OUTER_CLASS))
+                        .build();
+
                 //Not a typical fluent
-
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
@@ -188,10 +200,14 @@ public final class PropertyAs {
 
                 for (TypeParamDef parameter : typeDef.getParameters()) {
                     parameters.add(parameter);
-                    superClassParameters.add(new TypeParamRefBuilder().withName(parameter.getName()).build());
+                    superClassParameters.add(parameter.toReference());
                 }
                 parameters.add(N);
+                List<TypeRef> pivotParameters = new ArrayList<TypeRef>(superClassParameters);
+                pivotParameters.add(N.toReference());
 
+                ClassRef nestedInterfaceRef = nestedInterfaceType.toReference(pivotParameters.toArray(new TypeParamRef[pivotParameters.size()]));
+                superClassParameters.add(nestedInterfaceRef);
 
                 ClassRef superClassFluent = new ClassRefBuilder()
                         .withNewDefinition()
@@ -203,10 +219,9 @@ public final class PropertyAs {
 
                 return new TypeDefBuilder(nested)
                         .withKind(Kind.CLASS)
-                        .withName(nested.getName() + "Impl")
                         .withParameters(parameters)
                         .withExtendsList(superClassFluent)
-                        .withImplementsList(BuilderContextManager.getContext().getNestedInterface().toReference())
+                        .withImplementsList(nestedInterfaceRef, BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()))
                         .build();
             }
 
@@ -214,7 +229,7 @@ public final class PropertyAs {
 
         public static final Function<Property, TypeDef> NESTED_INTERFACE_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property item) {
-                TypeDef nested = SHALLOW_NESTED_TYPE.apply(item);
+                TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item)).withOuterType((TypeDef) item.getAttributes().get(OUTER_INTERFACE)).build();
                 //Not a typical fluent
 
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
@@ -225,15 +240,12 @@ public final class PropertyAs {
 
                 for (TypeParamDef parameter : typeDef.getParameters()) {
                     parameters.add(parameter);
-                    superClassParameters.add(new TypeParamRefBuilder().withName(parameter.getName()).build());
+                    superClassParameters.add(parameter.toReference());
                 }
                 parameters.add(N);
-
-
-                //We need to rid of the bounds: For example: Circle<T extends Number> implements Shape<T extends Shape>
-                //We only need To define T bounds once.
-                superClassParameters.add(classRefOf(nested));
-
+                List<TypeRef> pivotParameters = new ArrayList<TypeRef>(superClassParameters);
+                pivotParameters.add(N.toReference());
+                superClassParameters.add(nested.toReference(pivotParameters.toArray(new TypeParamRef[pivotParameters.size()])));
 
                 //CircleFluent<T, CircleShapesNested<T, N>>
                 ClassRef superClassFluent = new ClassRefBuilder()
@@ -247,7 +259,9 @@ public final class PropertyAs {
                 return new TypeDefBuilder(nested)
                         .withKind(Kind.INTERFACE)
                         .withParameters(parameters)
-                        .addToExtendsList(classRefOf(BuilderContextManager.getContext().getNestedInterface()), superClassFluent)
+                        .withOuterType((TypeDef) item.getAttributes().get(OUTER_INTERFACE))
+                        .withImplementsList()
+                        .withExtendsList(BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()), superClassFluent)
                         .build();
             }
         };

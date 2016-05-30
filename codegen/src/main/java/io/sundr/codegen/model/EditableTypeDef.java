@@ -25,8 +25,8 @@ import java.util.Set;
 public class EditableTypeDef extends TypeDef implements Editable<TypeDefBuilder>{
 
 
-public EditableTypeDef( Kind kind , String packageName , String name , Set<ClassRef> annotations , Set<ClassRef> extendsList , Set<ClassRef> implementsList , List<TypeParamDef> parameters , Set<Property> properties , Set<Method> constructors , Set<Method> methods , int modifiers , Set<TypeDef> innerTypes , Map<String, Object> attributes ){
-    super(kind, packageName, name, annotations, extendsList, implementsList, parameters, properties, constructors, methods, modifiers, innerTypes, attributes);
+public EditableTypeDef( Kind kind , String packageName , String name , Set<ClassRef> annotations , Set<ClassRef> extendsList , Set<ClassRef> implementsList , List<TypeParamDef> parameters , Set<Property> properties , Set<Method> constructors , Set<Method> methods , TypeDef outerType , Set<TypeDef> innerTypes , int modifiers , Map<String, Object> attributes ){
+    super(kind, packageName, name, annotations, extendsList, implementsList, parameters, properties, constructors, methods, outerType, innerTypes, modifiers, attributes);
 }
 
 public TypeDefBuilder edit(){

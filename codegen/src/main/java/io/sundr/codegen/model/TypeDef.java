@@ -25,13 +25,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 public class TypeDef extends ModifierSupport {
 
     public static TypeDef OBJECT = new TypeDefBuilder()
             .withPackageName("java.lang")
             .withName("Object")
             .build();
+
+    public static TypeRef OBJECT_REF = OBJECT.toReference();
 
     private final Kind kind;
     private final String packageName;
@@ -45,11 +46,11 @@ public class TypeDef extends ModifierSupport {
     private final Set<Property> properties;
     private final Set<Method> constructors;
     private final Set<Method> methods;
+    private final TypeDef outerType;
     private final Set<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, int modifiers, Set<TypeDef> innerTypes, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, TypeDef outerType, Set<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
-        this.innerTypes = innerTypes;
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
         this.name = name;
@@ -60,6 +61,8 @@ public class TypeDef extends ModifierSupport {
         this.properties = properties;
         this.constructors = adaptConstructors(constructors, this);
         this.methods = methods;
+        this.outerType = outerType;
+        this.innerTypes = setOuterType(innerTypes, this);
     }
 
     /**
@@ -81,17 +84,35 @@ public class TypeDef extends ModifierSupport {
         return adapted;
     }
 
+    private static Set<TypeDef> setOuterType(Set<TypeDef> types, TypeDef outer) {
+        Set<TypeDef> updated = new LinkedHashSet<TypeDef>();
+        for (TypeDef typeDef : types) {
+            if (outer.equals(typeDef.getOuterType())) {
+                updated.add(typeDef);
+            } else {
+                updated.add(new TypeDefBuilder(typeDef).withOuterType(outer).build());
+            }
+        }
+        return updated;
+    }
+
     /**
      * Returns the fully qualified name of the type.
      *
      * @return
      */
     public String getFullyQualifiedName() {
+        StringBuilder sb = new StringBuilder();
         if (packageName != null && !packageName.isEmpty()) {
-            return getPackageName() + "." + getName();
-        } else {
-            return getName();
+            sb.append(getPackageName()).append(".");
         }
+
+        if (outerType != null) {
+            sb.append(outerType.getName()).append(".");
+        }
+        sb.append(getName());
+
+        return sb.toString();
     }
 
     public boolean isAssignableFrom(TypeDef o) {
@@ -162,6 +183,10 @@ public class TypeDef extends ModifierSupport {
         return methods;
     }
 
+    public TypeDef getOuterType() {
+        return outerType;
+    }
+
     public Set<TypeDef> getInnerTypes() {
         return innerTypes;
     }
@@ -187,7 +212,7 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Creates a {@link ClassRef} for the current definition with the specified arguments.
-     * @param arguments The arguements to be passed to the reference.
+     * @param arguments The arguments to be passed to the reference.
      * @return
      */
     public ClassRef toReference(TypeRef... arguments) {
@@ -245,7 +270,6 @@ public class TypeDef extends ModifierSupport {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
         if (isPublic()) {
             sb.append("public ");
         } else if (isProtected()) {

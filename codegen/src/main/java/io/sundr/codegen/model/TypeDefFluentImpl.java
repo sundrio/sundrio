@@ -35,6 +35,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     Set<VisitableBuilder<Property, ?>> properties = new LinkedHashSet();
     Set<VisitableBuilder<Method, ?>> constructors = new LinkedHashSet();
     Set<VisitableBuilder<Method, ?>> methods = new LinkedHashSet();
+    VisitableBuilder<TypeDef, ?> outerType;
     Set<VisitableBuilder<TypeDef, ?>> innerTypes = new LinkedHashSet();
 
     public TypeDefFluentImpl() {
@@ -52,8 +53,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         this.withProperties(instance.getProperties());
         this.withConstructors(instance.getConstructors());
         this.withMethods(instance.getMethods());
-        this.withModifiers(instance.getModifiers());
+        this.withOuterType(instance.getOuterType());
         this.withInnerTypes(instance.getInnerTypes());
+        this.withModifiers(instance.getModifiers());
         this.withAttributes(instance.getAttributes());
     }
 
@@ -434,6 +436,30 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return new MethodsNestedImpl(item);
     }
 
+    public TypeDef getOuterType() {
+        return this.outerType != null ? this.outerType.build() : null;
+    }
+
+    public A withOuterType(TypeDef outerType) {
+        if (outerType != null) {
+            this.outerType = new TypeDefBuilder(outerType);
+            _visitables.add(this.outerType);
+        }
+        return (A) this;
+    }
+
+    public OuterTypeNested<A> withNewOuterType() {
+        return new OuterTypeNestedImpl();
+    }
+
+    public OuterTypeNested<A> withNewOuterTypeLike(TypeDef item) {
+        return new OuterTypeNestedImpl(item);
+    }
+
+    public OuterTypeNested<A> editOuterType() {
+        return withNewOuterTypeLike(getOuterType());
+    }
+
     public A addToInnerTypes(TypeDef... items) {
         for (TypeDef item : items) {
             TypeDefBuilder builder = new TypeDefBuilder(item);
@@ -501,6 +527,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         if (properties != null ? !properties.equals(that.properties) : that.properties != null) return false;
         if (constructors != null ? !constructors.equals(that.constructors) : that.constructors != null) return false;
         if (methods != null ? !methods.equals(that.methods) : that.methods != null) return false;
+        if (outerType != null ? !outerType.equals(that.outerType) : that.outerType != null) return false;
         if (innerTypes != null ? !innerTypes.equals(that.innerTypes) : that.innerTypes != null) return false;
         return true;
 
@@ -656,6 +683,28 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
         public N and() {
             return (N) TypeDefFluentImpl.this.addToMethods(builder.build());
+        }
+
+    }
+
+    public class OuterTypeNestedImpl<N> extends TypeDefFluentImpl<OuterTypeNested<N>> implements OuterTypeNested<N> {
+
+        private final TypeDefBuilder builder;
+
+        OuterTypeNestedImpl() {
+            this.builder = new TypeDefBuilder(this);
+        }
+
+        OuterTypeNestedImpl(TypeDef item) {
+            this.builder = new TypeDefBuilder(this, item);
+        }
+
+        public N endOuterType() {
+            return and();
+        }
+
+        public N and() {
+            return (N) TypeDefFluentImpl.this.withOuterType(builder.build());
         }
 
     }

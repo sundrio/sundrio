@@ -79,7 +79,7 @@ public class Decendants {
                     ClassRef candidate = (ClassRef) unwrapped;
 
                     for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
-                        ClassRef collectionType = new ClassRefBuilder((ClassRef)baseType).withArguments(classRefOf(descendant)).build();
+                        ClassRef collectionType = new ClassRefBuilder((ClassRef)baseType).withArguments(descendant.toInternalReference()).build();
                         String propertyName = deCaptializeFirst(descendant.getName()) + property.getNameCapitalized();
 
                         result.add(new PropertyBuilder(property)

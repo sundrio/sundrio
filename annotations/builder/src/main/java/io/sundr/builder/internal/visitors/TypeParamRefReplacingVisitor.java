@@ -16,30 +16,25 @@
 
 package io.sundr.builder.internal.visitors;
 
+import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
-import io.sundr.codegen.model.StringStatementBuilder;
+import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeParamRefBuilder;
 
-import static java.lang.String.format;
-
-public class StatementReplacingVistor extends TypedVisitor<StringStatementBuilder> {
-
-    private static final String CAST_TARGET_FORMAT = "\\(%s\\)";
-    private static final String CAST_REPLACEMENT_FORMAT = "(%s)";
-    private static final String PARAM_FORMAT = "<%s>";
+public class TypeParamRefReplacingVisitor extends TypedVisitor<TypeParamRefBuilder> {
 
     private final String target;
     private final String replacement;
 
-    public StatementReplacingVistor(String target, String replacement) {
+    public TypeParamRefReplacingVisitor(String target, String replacement) {
         this.target = target;
         this.replacement = replacement;
     }
 
-    public void visit(StringStatementBuilder builder) {
-        builder.withData(builder.getData()
-                .replaceAll(format(CAST_TARGET_FORMAT, target), format(CAST_REPLACEMENT_FORMAT, replacement))
-                .replaceAll(format(PARAM_FORMAT, target), format(PARAM_FORMAT, replacement))
-        );
 
+    public void visit(TypeParamRefBuilder builder) {
+        if (builder.getName().equals(target) && builder.getAttributes().containsKey(Constants.REPLACEABLE)) {
+            builder.withName(replacement);
+        }
     }
 }

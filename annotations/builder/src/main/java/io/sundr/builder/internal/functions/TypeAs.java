@@ -191,7 +191,10 @@ public class TypeAs {
     public static final Function<TypeRef, TypeRef> VISITABLE_BUILDER = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
             TypeRef baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
-            return classRefOf(BuilderContextManager.getContext().getVisitableBuilderInterface(), baseType, Q);
+            if (baseType instanceof ClassRef) {
+                baseType = new ClassRefBuilder((ClassRef)baseType).withArguments().build();
+            }
+            return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(baseType, Q);
         }
     });
 
