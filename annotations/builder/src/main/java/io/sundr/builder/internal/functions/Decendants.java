@@ -116,23 +116,9 @@ public class Decendants {
     public static boolean isDescendant(TypeDef item, TypeDef candidate) {
         if (item == null || candidate == null) {
             return false;
-        } else if (item.equals(candidate)) {
+        } else if (candidate.isAssignableFrom(item)) {
             return true;
         }
-
-
-        for (ClassRef classRef : item.getExtendsList()) {
-            if (isDescendant(classRef.getDefinition(), candidate)) {
-                return true;
-            }
-        }
-
-        for (ClassRef classRef : item.getImplementsList()) {
-            if (isDescendant(classRef.getDefinition(), candidate)) {
-                return true;
-            }
-        }
-
         return false;
     }
 }

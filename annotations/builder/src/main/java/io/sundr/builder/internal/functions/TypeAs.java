@@ -21,7 +21,6 @@ import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.Type;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -189,9 +188,9 @@ public class TypeAs {
         }
     });
 
-    public static final Function<TypeDef, TypeRef> VISITABLE_BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeRef>() {
-        public TypeRef apply(TypeDef item) {
-            TypeRef baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(classRefOf(item));
+    public static final Function<TypeRef, TypeRef> VISITABLE_BUILDER = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+        public TypeRef apply(TypeRef item) {
+            TypeRef baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
             return classRefOf(BuilderContextManager.getContext().getVisitableBuilderInterface(), baseType, Q);
         }
     });

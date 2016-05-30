@@ -41,7 +41,7 @@ public class PrimitiveRef extends AbstractTypeRef {
         return new PrimitiveRefBuilder(this).withDimensions(dimensions).build();
     }
 
-    public boolean isAssignable(TypeRef ref) {
+    public boolean isAssignableFrom(TypeRef ref) {
         return this.equals(ref);
     }
 

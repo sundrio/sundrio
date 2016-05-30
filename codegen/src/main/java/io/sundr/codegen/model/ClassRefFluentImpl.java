@@ -25,7 +25,6 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AbstractTyp
 
     VisitableBuilder<TypeDef, ?> definition;
     int dimensions;
-    List<TypeRef> arguments = new ArrayList();
     List<VisitableBuilder<? extends TypeRef, ?>> allArguments = new ArrayList();
 
     public ClassRefFluentImpl() {
@@ -112,7 +111,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AbstractTyp
     }
 
     public A withArguments(List<TypeRef> arguments) {
-        this.arguments.clear();
+        this.allArguments.clear();
         if (arguments != null) {
             for (TypeRef item : arguments) {
                 this.addToArguments(item);
@@ -122,7 +121,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AbstractTyp
     }
 
     public A withArguments(TypeRef... arguments) {
-        this.arguments.clear();
+        this.allArguments.clear();
         if (arguments != null) {
             for (TypeRef item : arguments) {
                 this.addToArguments(item);
@@ -269,7 +268,6 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AbstractTyp
         ClassRefFluentImpl that = (ClassRefFluentImpl) o;
         if (definition != null ? !definition.equals(that.definition) : that.definition != null) return false;
         if (dimensions != that.dimensions) return false;
-        if (arguments != null ? !arguments.equals(that.arguments) : that.arguments != null) return false;
         if (allArguments != null ? !allArguments.equals(that.allArguments) : that.allArguments != null)
             return false;
         return true;

@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.internal.functions.ClazzAs;
+import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Kind;
@@ -27,6 +28,7 @@ import org.junit.Test;
 import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SimpleClassTest extends AbstractProcessorTest {
 
@@ -57,6 +59,9 @@ public class SimpleClassTest extends AbstractProcessorTest {
         assertEquals(Kind.CLASS, fluentImpl.getKind());
         assertEquals("SimpleClassFluentImpl", fluentImpl.getName());
         assertEquals(1, fluentImpl.getExtendsList().size());
+
+        assertTrue(hasMethod(fluentImpl, "addToTags", ClassTo.TYPEREF.apply(String.class).withDimensions(1)));
+        assertTrue(hasMethod(fluentImpl, "removeFromTags", ClassTo.TYPEREF.apply(String.class).withDimensions(1)));
 
         ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
         assertEquals("BaseFluent", superClass.getDefinition().getName());

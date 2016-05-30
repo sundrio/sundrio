@@ -22,6 +22,9 @@ import com.sun.tools.javac.util.Context;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeRef;
 
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -64,4 +67,25 @@ public class AbstractProcessorTest {
             return null;
         }
     };
+
+    static boolean hasMethod(TypeDef typeDef, String name, TypeRef... arguments) {
+        for (Method method : typeDef.getMethods()) {
+            if (!method.getName().equals(name)) {
+                continue;
+            } else if (method.getArguments().size() != arguments.length) {
+                continue;
+            }
+
+            boolean argumentsMatched = true;
+            for (int i = 0; i < arguments.length; i++) {
+                if (!arguments[i].equals(method.getArguments().get(i).getTypeRef())) {
+                    argumentsMatched = false;
+                }
+            }
+            if (argumentsMatched) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

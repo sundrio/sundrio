@@ -26,28 +26,33 @@ import static io.sundr.codegen.utils.StringUtils.join;
 
 public class Method extends ModifierSupport {
 
-
     private final Set<ClassRef> annotations;
     private final Set<TypeParamDef> parameters;
     private final String name;
     private final TypeRef returnType;
     private final List<Property> arguments;
+    private final boolean varArgPreferred;
     private final Set<ClassRef> exceptions;
     private final Block block;
 
-    public Method(Set<ClassRef> annotations, Set<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, Set<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
+    public Method(Set<ClassRef> annotations, Set<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, Set<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.parameters = parameters;
         this.name = name;
         this.returnType = returnType;
         this.arguments = arguments;
+        this.varArgPreferred = varArgPreferred;
         this.exceptions = exceptions;
         this.block = block;
     }
 
     public Set<ClassRef> getAnnotations() {
         return annotations;
+    }
+
+    public boolean isVarArgPreferred() {
+        return varArgPreferred;
     }
 
     public Set<TypeParamDef> getParameters() {
@@ -65,6 +70,7 @@ public class Method extends ModifierSupport {
     public List<Property> getArguments() {
         return arguments;
     }
+
 
     public Set<ClassRef> getExceptions() {
         return exceptions;
@@ -134,7 +140,22 @@ public class Method extends ModifierSupport {
         }
 
         sb.append("(");
-        sb.append(StringUtils.join(arguments, ","));
+        if (!varArgPreferred) {
+            sb.append(StringUtils.join(arguments, ","));
+        } else if (!arguments.isEmpty()) {
+            List<Property> args = arguments.subList(0, arguments.size() - 1);
+            Property varArg = arguments.get(arguments.size() - 1);
+            sb.append(StringUtils.join(args, ","));
+            if (!args.isEmpty()) {
+                sb.append(",");
+            }
+            if (varArg.getTypeRef().getDimensions() == 1) {
+                sb.append(varArg.getTypeRef().withDimensions(0)).append("... ");
+            } else {
+                sb.append(varArg.getTypeRef().withDimensions(0)).append("... ");
+            }
+            sb.append(varArg.getName());
+        }
         sb.append(")");
 
         if (exceptions != null && !exceptions.isEmpty()) {

@@ -44,7 +44,7 @@ public class WildcardRef extends AbstractTypeRef {
         return WILDCARD;
     }
 
-    public boolean isAssignable(TypeRef ref) {
+    public boolean isAssignableFrom(TypeRef ref) {
         return false;
     }
 

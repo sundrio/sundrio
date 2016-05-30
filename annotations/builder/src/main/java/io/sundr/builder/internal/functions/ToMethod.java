@@ -75,7 +75,8 @@ public enum ToMethod implements Function<Property, Method> {
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
                     .withReturnType(T_REF)
-                    .withArguments(new Property[]{property})
+                    .withArguments(property)
+                    .withVarArgPreferred(true)
                     .withNewBlock()
                         .withStatements(getStementes(property))
                     .endBlock()
@@ -185,7 +186,7 @@ public enum ToMethod implements Function<Property, Method> {
             String methodName = prefix + property.getNameCapitalized();
             TypeRef type = property.getTypeRef();
             Boolean isBuildable = isBuildable(type);
-            TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(((ClassRef)type).getDefinition()) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
+            TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
             String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,
                     type.toString(),
                     targetType.toString(),
@@ -252,6 +253,7 @@ public enum ToMethod implements Function<Property, Method> {
                     .withName(methodName)
                     .withReturnType(T_REF)
                     .withArguments(item)
+                    .withVarArgPreferred(true)
                     .withNewBlock()
                         .withStatements(statements)
                     .endBlock()
@@ -292,7 +294,8 @@ public enum ToMethod implements Function<Property, Method> {
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
                     .withReturnType(T_REF)
-                    .withArguments(new Property[]{item})
+                    .withArguments(item)
+                    .withVarArgPreferred(true)
                     .withNewBlock()
                         .withStatements(statements)
                     .endBlock()

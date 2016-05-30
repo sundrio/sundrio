@@ -46,6 +46,7 @@ public class CachingFunction<X,Y> implements Function<X,Y> {
                     int depth = stack != null ? Collections.frequency(stack, item) : 0;
                     if (depth > maximumDepth && onOverflow != null) {
                         result = onOverflow.apply(item);
+                        cache.put(item, result);
                     } else {
                         result = function.apply(item);
                         cache.put(item, result);

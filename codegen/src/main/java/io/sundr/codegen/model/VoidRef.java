@@ -42,7 +42,7 @@ public class VoidRef extends AbstractTypeRef {
         return "void";
     }
 
-    public boolean isAssignable(TypeRef ref) {
+    public boolean isAssignableFrom(TypeRef ref) {
         return false;
     }
 

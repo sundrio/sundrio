@@ -25,8 +25,8 @@ import java.util.Set;
 public class EditableMethod extends Method implements Editable<MethodBuilder>{
 
 
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
-    super(annotations, parameters, name, returnType, arguments, exceptions, block, modifiers, attributes);
+public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , boolean varArgPreferred , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
+    super(annotations, parameters, name, returnType, arguments, varArgPreferred, exceptions, block, modifiers, attributes);
 }
 
 public MethodBuilder edit(){

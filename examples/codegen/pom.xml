@@ -45,12 +45,12 @@
         <dependency>
             <groupId>io.sundr</groupId>
             <artifactId>sundr-core</artifactId>
-            <version>${project.version}</version>
+            <version>0.2.7</version>
         </dependency>
         <dependency>
             <groupId>io.sundr</groupId>
             <artifactId>builder-annotations</artifactId>
-            <version>${project.version}</version>
+            <version>0.2.7</version>
         </dependency>
     </dependencies>
 

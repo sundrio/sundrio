@@ -11,7 +11,7 @@ import $i.definition.getFullyQualifiedName();
     #method ($m)#end
 #end
 
-#foreach($n in $model.nested)
+#foreach($n in $model.innerTypes)
     #class ($n)
     #foreach($m in $n.methods)
         #method ($m)#end

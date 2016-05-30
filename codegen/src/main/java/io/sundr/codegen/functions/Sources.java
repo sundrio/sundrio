@@ -32,6 +32,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.QualifiedNameExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -79,6 +80,8 @@ import java.util.Set;
 public class Sources {
 
     private static final String JAVA_LANG = "java.lang";
+    private static final String SEPARATOR = ".";
+
 
     private static Function<Node, String> PACKAGENAME = new Function<Node, String>() {
 
@@ -93,8 +96,16 @@ public class Sources {
                 CompilationUnit compilationUnit = (CompilationUnit) current;
 
                 for (ImportDeclaration importDecl : compilationUnit.getImports()) {
-                    if (importDecl.getName().getName().endsWith(name)) {
-                        return importDecl.getName().getName();
+                    NameExpr importExpr = importDecl.getName();
+                    if (importExpr instanceof QualifiedNameExpr) {
+                        QualifiedNameExpr qualifiedNameExpr = (QualifiedNameExpr) importExpr;
+                        String className = qualifiedNameExpr.getName();
+                        if (name.equals(className)) {
+                            return qualifiedNameExpr.getQualifier().toString();
+                        }
+                    } else if (importDecl.getName().getName().endsWith(SEPARATOR + name)) {
+                        String importName = importDecl.getName().getName();
+                        return  importName.substring(0, importName.length() - name.length() -1);
                     }
                 }
 
@@ -119,12 +130,20 @@ public class Sources {
                 if (arg instanceof ReferenceType) {
                     //TODO: Need to check if this is valid for all cases...
                     ReferenceType referenceType = (ReferenceType) arg;
-                    String name = referenceType.toString();
-                    int dimension = referenceType.getArrayCount();
-                    arguments.add(new TypeParamRefBuilder()
-                            .withName(name)
-                            .withDimensions(dimension)
-                            .build());
+                    Type type = referenceType.getType();
+                    int dimensions = referenceType.getArrayCount();
+                    if (type instanceof ClassOrInterfaceType) {
+                        arguments.add(new ClassRefBuilder(CLASSREF.apply((ClassOrInterfaceType)type))
+                                .withDimensions(dimensions)
+                                .build());
+                    } else {
+                        String name = referenceType.toString();
+
+                        arguments.add(new TypeParamRefBuilder()
+                                .withName(name)
+                                .withDimensions(dimensions)
+                                .build());
+                    }
                 }
             }
 
@@ -391,7 +410,7 @@ public class Sources {
             try {
                 return JavaParser.parse(is);
             } catch (Exception ex) {
-                throw new RuntimeException("Failed to parse stream.");
+                throw new RuntimeException("Failed to parse stream.", ex);
             } finally {
                 IOUtils.closeQuietly(is);
             }

@@ -35,7 +35,7 @@ public class VoidRef extends AbstractTypeRef {
     }
 
     @Override
-    public boolean isAssignable(TypeRef ref) {
+    public boolean isAssignableFrom(TypeRef ref) {
         return false;
     }
 

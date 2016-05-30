@@ -89,13 +89,17 @@ public final class PropertyAs {
                         .withName("item")
                         .withTypeRef(item.getTypeRef())
                         .endArgument()
-                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this, item);")
+                        .withNewBlock()
+                            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this, item);")
+                        .endBlock()
                         .build());
 
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
-                        .addToAttributes(BODY, "this.builder = new " + builderType.getName() + "(this);")
+                        .withNewBlock()
+                            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this);")
+                        .endBlock()
                         .build());
 
                 return new TypeDefBuilder(nestedType)
@@ -177,7 +181,7 @@ public final class PropertyAs {
                 //Not a typical fluent
 
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-                TypeDef typeDef = BuilderContextManager.getContext().getBuildableRepository().getBuildable(typeRef);
+                TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
@@ -191,7 +195,7 @@ public final class PropertyAs {
 
                 ClassRef superClassFluent = new ClassRefBuilder()
                         .withNewDefinition()
-                        .withName(typeDef.getName() + "FluentIml")
+                        .withName(typeDef.getName() + "FluentImpl")
                         .withPackageName(typeDef.getPackageName())
                         .endDefinition()
                         .withArguments(superClassParameters)
@@ -201,8 +205,8 @@ public final class PropertyAs {
                         .withKind(Kind.CLASS)
                         .withName(nested.getName() + "Impl")
                         .withParameters(parameters)
-                        .addToExtendsList(superClassFluent)
-                        .addToImplementsList(classRefOf(BuilderContextManager.getContext().getNestedInterface()))
+                        .withExtendsList(superClassFluent)
+                        .withImplementsList(BuilderContextManager.getContext().getNestedInterface().toReference())
                         .build();
             }
 
@@ -214,7 +218,7 @@ public final class PropertyAs {
                 //Not a typical fluent
 
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-                TypeDef typeDef = BuilderContextManager.getContext().getBuildableRepository().getBuildable(typeRef);
+                TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
@@ -251,7 +255,7 @@ public final class PropertyAs {
         public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property property) {
                 TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-                TypeDef typeDef = BuilderContextManager.getContext().getBuildableRepository().getBuildable(typeRef);
+                TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 for (TypeParamDef generic : typeDef.getParameters()) {
                     parameters.add(generic);

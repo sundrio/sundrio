@@ -16,9 +16,11 @@
 
 package io.sundr.codegen.converters;
 
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.PrimitiveRefBuilder;
+import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRefBuilder;
@@ -73,8 +75,11 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
                 arguments.add(arg);
             }
         }
+        TypeDef typeDef = new TypeDefElementVisitor().visit(t.asElement()).build();
+        DefinitionRepository.getRepository().register(typeDef);
+
         return new ClassRefBuilder()
-                .withDefinition(new TypeDefElementVisitor().visit(t.asElement()).build())
+                .withDefinition(typeDef)
                 .withDimensions(dimension)
                 .withArguments(arguments)
                 .build();

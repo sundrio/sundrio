@@ -26,7 +26,6 @@ import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.PrimitiveRefBuilder;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
@@ -36,31 +35,19 @@ import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRefBuilder;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.ErrorType;
-import javax.lang.model.type.ExecutableType;
 import javax.lang.model.type.NoType;
-import javax.lang.model.type.NullType;
-import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import javax.lang.model.type.TypeVisitor;
-import javax.lang.model.type.UnionType;
-import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -72,14 +59,30 @@ import static io.sundr.codegen.utils.ModelUtils.getPackageName;
 
 public class ElementTo {
 
-
     private static final String OBJECT_BOUND = "java.lang.Object";
 
-    private static final Function<TypeMirror, TypeRef> INTERNAL_MIRROR_TO_TYPEREF = new Function<TypeMirror, TypeRef>() {
+    private static final Function<TypeMirror, TypeRef> DEEP_MIRROR_TO_TYPEREF = new Function<TypeMirror, TypeRef>() {
+        public TypeRef apply(TypeMirror item) {
+            Element element = CodegenContext.getContext().getTypes().asElement(item);
+            TypeDef known = null;
+            if (element instanceof TypeElement) {
+                known = TYPEDEF.apply((TypeElement) element);
+            }
+            TypeRef typeRef = item.accept(new TypeRefTypeVisitor(), 0);
+            if (typeRef instanceof ClassRef && known != null) {
+                return new ClassRefBuilder((ClassRef) typeRef).withDefinition(known).build();
+            }
+            return typeRef;
+        }
+    };
+
+    private static final Function<TypeMirror, TypeRef> SHALLOW_MIRROR_TO_TYPEREF = new Function<TypeMirror, TypeRef>() {
         public TypeRef apply(TypeMirror item) {
             return item.accept(new TypeRefTypeVisitor(), 0);
         }
     };
+
+    private static final Function<TypeMirror, TypeRef> INTERNAL_MIRROR_TO_TYPEREF = CachingFunction.wrap(DEEP_MIRROR_TO_TYPEREF, SHALLOW_MIRROR_TO_TYPEREF, 1);
 
     public static final  Function<TypeParameterElement, TypeParamDef> TYPEPARAMDEF = new  Function<TypeParameterElement, TypeParamDef> () {
 
@@ -174,7 +177,6 @@ public class ElementTo {
      };
 
     public static final Function<TypeElement, TypeDef> TYPEDEF = CachingFunction.wrap(new Function<TypeElement, TypeDef>() {
-
         public TypeDef apply(TypeElement classElement) {
             //Check SuperClass
             Kind kind = Kind.CLASS;
@@ -226,6 +228,7 @@ public class ElementTo {
 
             TypeDefBuilder builder = new TypeDefBuilder()
                     .withKind(kind)
+                    .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
                     .withPackageName(getPackageName(classElement))
                     .withName(getClassName(classElement))
                     .withParameters(genericTypes.toArray(new TypeParamDef[genericTypes.size()]))

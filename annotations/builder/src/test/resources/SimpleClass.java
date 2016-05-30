@@ -18,16 +18,20 @@ package testpackage;
 
 import io.sundr.builder.annotations.Buidlable;
 
+import java.util.List;
+
 public class SimpleClass {
 
     private final Long id;
     private final String name;
+    private final List<String> tags;
     private final Boolean enabled;
 
     @Buildable
-    public SimpleClass(Long id, String name, Boolean enabled) {
+    public SimpleClass(Long id, String name, List<String> tags, Boolean enabled) {
         this.id = id;
         this.name = name;
+        this.tags = tags;
         this.enabled = enabled;
     }
 
@@ -37,6 +41,10 @@ public class SimpleClass {
 
     public String getName() {
         return name;
+    }
+
+    public List<String> getTags() {
+        return tags;
     }
 
     public Boolean getEnabled() {

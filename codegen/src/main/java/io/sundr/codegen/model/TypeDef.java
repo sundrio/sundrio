@@ -94,7 +94,7 @@ public class TypeDef extends ModifierSupport {
         }
     }
 
-    public boolean isAssignable(TypeDef o) {
+    public boolean isAssignableFrom(TypeDef o) {
         if (this == o || this.equals(o)) {
             return true;
         }
@@ -105,6 +105,19 @@ public class TypeDef extends ModifierSupport {
         if (o.packageName == null && "java.lang".equals(packageName) && name.equalsIgnoreCase(o.name)) {
             return true;
         }
+
+        for (ClassRef e : o.getExtendsList()) {
+            if (isAssignableFrom(e.getDefinition())) {
+                return true;
+            }
+        }
+
+        for (ClassRef i : o.getImplementsList()) {
+            if (isAssignableFrom(i.getDefinition())) {
+                return true;
+            }
+        }
+
 
         return false;
     }

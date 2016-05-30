@@ -18,7 +18,7 @@ package io.sundr.codegen.model;
 
 public interface TypeRef extends Attributeable {
 
-    boolean isAssignable(TypeRef ref);
+    boolean isAssignableFrom(TypeRef ref);
     int getDimensions();
     TypeRef withDimensions(int dimensions);
 }

@@ -51,7 +51,7 @@ public final class TypeUtils {
         if (type instanceof ClassRef) {
             ClassRef classRef = (ClassRef) type;
             TypeDef definition = classRef.getDefinition();
-            if (type.equals(targetType)) {
+            if (definition.getFullyQualifiedName().equals(targetType.getFullyQualifiedName())) {
                 return true;
             }
 

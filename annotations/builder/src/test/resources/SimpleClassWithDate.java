@@ -18,13 +18,15 @@ package testpackage;
 
 import io.sundr.builder.annotations.Buidlable;
 
+import java.util.List;
+
 public class SimpleClassWithDate extends SimpleClass {
 
     private final Date date;
 
     @Buildable
-    public SimpleClass(Long id, String name, Boolean enabled, Date date) {
-        super(id, name, enabled);
+    public SimpleClass(Long id, String name, List<String> tags, Boolean enabled, Date date) {
+        super(id, name, tags, enabled);
         this.date=date;
     }
 

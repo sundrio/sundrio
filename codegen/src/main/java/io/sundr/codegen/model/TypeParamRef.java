@@ -62,7 +62,7 @@ public class TypeParamRef extends AbstractTypeRef {
         return name;
     }
 
-    public boolean isAssignable(TypeRef ref) {
+    public boolean isAssignableFrom(TypeRef ref) {
         return this.equals(ref);
     }
 }

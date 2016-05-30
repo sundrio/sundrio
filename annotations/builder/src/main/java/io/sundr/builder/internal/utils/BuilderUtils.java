@@ -127,14 +127,18 @@ public class BuilderUtils {
                 }
             }
 
-            String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
-            current = DefinitionRepository.getRepository().getDefinition(fqn);
+            if (!current.getExtendsList().isEmpty()) {
+                String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+                current = DefinitionRepository.getRepository().getDefinition(fqn);
+            } else {
+                current = null;
+            }
         }
         return false;
     }
 
     private static boolean isApplicableGetterOf(Method method, Property property) {
-        if (!method.getReturnType().isAssignable(property.getTypeRef())) {
+        if (!method.getReturnType().isAssignableFrom(property.getTypeRef())) {
             return false;
         }
 
@@ -210,7 +214,7 @@ public class BuilderUtils {
 
     public static Set<Method> getInlineableConstructors(Property property) {
         Set<Method> result = new HashSet<Method>();
-        TypeDef clazz = BuilderContextManager.getContext().getBuildableRepository().getBuildable(property.getTypeRef());
+        TypeDef clazz = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(property.getTypeRef());
         for (Method candidate : clazz.getConstructors()) {
             if (isInlineable(candidate)) {
                 result.add(candidate);

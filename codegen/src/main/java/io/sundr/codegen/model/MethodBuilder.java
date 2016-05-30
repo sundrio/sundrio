@@ -29,14 +29,14 @@ public class MethodBuilder extends MethodFluentImpl<MethodBuilder> implements Vi
         this.fluent = fluent;
     }
     public MethodBuilder( MethodFluent<?> fluent , Method instance ){
-        this.fluent = fluent; fluent.withAnnotations(instance.getAnnotations()); fluent.withParameters(instance.getParameters()); fluent.withName(instance.getName()); fluent.withReturnType(instance.getReturnType()); fluent.withArguments(instance.getArguments()); fluent.withExceptions(instance.getExceptions()); fluent.withBlock(instance.getBlock()); fluent.withModifiers(instance.getModifiers()); fluent.withAttributes(instance.getAttributes()); 
+        this.fluent = fluent; fluent.withAnnotations(instance.getAnnotations()); fluent.withParameters(instance.getParameters()); fluent.withName(instance.getName()); fluent.withReturnType(instance.getReturnType()); fluent.withArguments(instance.getArguments()); fluent.withVarArgPreferred(instance.isVarArgPreferred()); fluent.withExceptions(instance.getExceptions()); fluent.withBlock(instance.getBlock()); fluent.withModifiers(instance.getModifiers()); fluent.withAttributes(instance.getAttributes()); 
     }
     public MethodBuilder( Method instance ){
-        this.fluent = this; this.withAnnotations(instance.getAnnotations()); this.withParameters(instance.getParameters()); this.withName(instance.getName()); this.withReturnType(instance.getReturnType()); this.withArguments(instance.getArguments()); this.withExceptions(instance.getExceptions()); this.withBlock(instance.getBlock()); this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
+        this.fluent = this; this.withAnnotations(instance.getAnnotations()); this.withParameters(instance.getParameters()); this.withName(instance.getName()); this.withReturnType(instance.getReturnType()); this.withArguments(instance.getArguments()); this.withVarArgPreferred(instance.isVarArgPreferred()); this.withExceptions(instance.getExceptions()); this.withBlock(instance.getBlock()); this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
     }
 
 public EditableMethod build(){
-    EditableMethod buildable = new EditableMethod(fluent.getAnnotations(),fluent.getParameters(),fluent.getName(),fluent.getReturnType(),fluent.getArguments(),fluent.getExceptions(),fluent.getBlock(),fluent.getModifiers(),fluent.getAttributes());
+    EditableMethod buildable = new EditableMethod(fluent.getAnnotations(),fluent.getParameters(),fluent.getName(),fluent.getReturnType(),fluent.getArguments(),fluent.isVarArgPreferred(),fluent.getExceptions(),fluent.getBlock(),fluent.getModifiers(),fluent.getAttributes());
 validate(buildable);
 return buildable;
 

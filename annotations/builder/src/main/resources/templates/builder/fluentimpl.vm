@@ -26,10 +26,10 @@ import $i.definition.getFullyQualifiedName();
     #end
 #end
 
-#foreach($n in $model.nested)
+#foreach($n in $model.innerTypes)
     #class ($n)
 
-    #foreach($f in $n.fields)
+    #foreach($f in $n.properties)
     private final ${f.typeRef} ${f.name};
     #end
 

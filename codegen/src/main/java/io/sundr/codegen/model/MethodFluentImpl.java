@@ -25,12 +25,12 @@ import java.util.Set;
 
 public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupportFluentImpl<A> implements MethodFluent<A>{
 
-     Set<VisitableBuilder<ClassRef, ?>> annotations = new LinkedHashSet();     Set<VisitableBuilder<TypeParamDef, ?>> parameters = new LinkedHashSet();     String name;     TypeRef returnType;     List<VisitableBuilder<Property, ?>> arguments = new ArrayList();     Set<VisitableBuilder<ClassRef, ?>> exceptions = new LinkedHashSet();     VisitableBuilder<Block, ?> block;
+     Set<VisitableBuilder<ClassRef, ?>> annotations = new LinkedHashSet();     Set<VisitableBuilder<TypeParamDef, ?>> parameters = new LinkedHashSet();     String name;     TypeRef returnType;     List<VisitableBuilder<Property, ?>> arguments = new ArrayList();     boolean varArgPreferred;     Set<VisitableBuilder<ClassRef, ?>> exceptions = new LinkedHashSet();     VisitableBuilder<Block, ?> block;
 public MethodFluentImpl(){
     
 }
 public MethodFluentImpl( Method instance ){
-    this.withAnnotations(instance.getAnnotations()); this.withParameters(instance.getParameters()); this.withName(instance.getName()); this.withReturnType(instance.getReturnType()); this.withArguments(instance.getArguments()); this.withExceptions(instance.getExceptions()); this.withBlock(instance.getBlock()); this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
+    this.withAnnotations(instance.getAnnotations()); this.withParameters(instance.getParameters()); this.withName(instance.getName()); this.withReturnType(instance.getReturnType()); this.withArguments(instance.getArguments()); this.withVarArgPreferred(instance.isVarArgPreferred()); this.withExceptions(instance.getExceptions()); this.withBlock(instance.getBlock()); this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
 }
 
     public A addToAnnotations( ClassRef ...items){
@@ -108,6 +108,12 @@ public MethodFluentImpl( Method instance ){
     public ArgumentsNested<A> addNewArgumentLike( Property item){
     return new ArgumentsNestedImpl(item);
     }
+    public boolean isVarArgPreferred(){
+    return this.varArgPreferred;
+    }
+    public A withVarArgPreferred( boolean varArgPreferred){
+    this.varArgPreferred=varArgPreferred; return (A) this;
+    }
     public A addToExceptions( ClassRef ...items){
     for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.exceptions.add(builder);} return (A)this;
     }
@@ -155,6 +161,7 @@ if (parameters != null ? !parameters.equals(that.parameters) :that.parameters !=
 if (name != null ? !name.equals(that.name) :that.name != null) return false;
 if (returnType != null ? !returnType.equals(that.returnType) :that.returnType != null) return false;
 if (arguments != null ? !arguments.equals(that.arguments) :that.arguments != null) return false;
+if (varArgPreferred != that.varArgPreferred) return false;
 if (exceptions != null ? !exceptions.equals(that.exceptions) :that.exceptions != null) return false;
 if (block != null ? !block.equals(that.block) :that.block != null) return false;
 return true;

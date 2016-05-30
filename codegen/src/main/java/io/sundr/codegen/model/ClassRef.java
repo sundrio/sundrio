@@ -54,7 +54,7 @@ public class ClassRef extends AbstractTypeRef {
         return new ClassRefBuilder(this).withDimensions(dimensions).build();
     }
 
-    public boolean isAssignable(TypeRef other) {
+    public boolean isAssignableFrom(TypeRef other) {
         if (other == null) {
             return false;
         }
@@ -67,30 +67,7 @@ public class ClassRef extends AbstractTypeRef {
             return true;
         }
 
-        ClassRef otherClassRef = (ClassRef) other;
-
-
-        for (ClassRef e : otherClassRef.getDefinition().getExtendsList()) {
-            if (isAssignable(e)) {
-                return true;
-            }
-        }
-
-        for (ClassRef i : otherClassRef.getDefinition().getImplementsList()) {
-            if (isAssignable(i)) {
-                return true;
-            }
-        }
-
-
-        if (definition.getPackageName() == null && "java.lang".equals(otherClassRef.getDefinition().getPackageName()) && definition.getName().equalsIgnoreCase(otherClassRef.getDefinition().getName())) {
-            return true;
-        }
-        if (otherClassRef.getDefinition().getPackageName() == null && "java.lang".equals(definition.getPackageName()) && definition.getName().equalsIgnoreCase(otherClassRef.getDefinition().getName())) {
-            return true;
-        }
-
-        return false;
+        return definition.isAssignableFrom(((ClassRef) other).getDefinition());
     }
 
     @Override

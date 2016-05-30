@@ -259,7 +259,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
 
                     ClassRef classRef = (ClassRef) toAdd.getTypeRef();
-                    TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef.getDefinition());
+                    TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
                     if (isCollection) {
                         builderType = classRefOf(classRef.getDefinition(), builderType);
                     }
@@ -278,8 +278,11 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
 
+
+                        // List<VisitableBuilder<? extends TypeRef, ?>> allArguments = new ArrayList();
+
                         ClassRef classRef = (ClassRef) descendant.getTypeRef();
-                        TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef.getDefinition());
+                        TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
                         if (isCollection(descendant.getTypeRef())) {
                             builderType = classRefOf(classRef.getDefinition(), builderType);
                         }

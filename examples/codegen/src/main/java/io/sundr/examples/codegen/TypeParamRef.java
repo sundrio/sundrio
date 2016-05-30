@@ -44,7 +44,7 @@ public class TypeParamRef extends AbstractTypeRef {
         return new TypeParamRefBuilder(this).withDimensions(dimensions).build();
     }
 
-    public boolean isAssignable(TypeRef ref) {
+    public boolean isAssignableFrom(TypeRef ref) {
         return false;
     }
 

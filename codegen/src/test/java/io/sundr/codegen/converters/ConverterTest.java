@@ -26,6 +26,7 @@ import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.lang.model.element.TypeElement;
@@ -36,12 +37,12 @@ import static org.junit.Assert.*;
 
 public class ConverterTest {
 
-    private final Context context = new Context();
-    private final Elements elements = JavacElements.instance(context);
-    private final Types types = JavacTypes.instance(context);
+    private static final Context context = new Context();
+    private static final Elements elements = JavacElements.instance(context);
+    private static final Types types = JavacTypes.instance(context);
 
-    @Before
-    public void setUp() {
+    @BeforeClass
+    public static void setUp() {
         CodegenContext.create(elements, types);
     }
 
