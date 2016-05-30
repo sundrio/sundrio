@@ -19,15 +19,10 @@ package io.sundr.builder.internal.functions;
 import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
-import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.builder.internal.visitors.StatementReplacingVistor;
-import io.sundr.builder.internal.visitors.TypeParamDefReplacingVisitor;
-import io.sundr.builder.internal.visitors.TypeParamRefReplacingVisitor;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
@@ -44,7 +39,6 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,7 +49,6 @@ import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
-import static io.sundr.builder.Constants.REPLACEABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
@@ -161,28 +154,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             return new TypeDefBuilder(fluentType)
                     .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
-                    //The return type of builder methods is always T, we need to fix that.
-                    .accept(new Visitor<MethodBuilder>() {
-                        public void visit(MethodBuilder builder) {
-                            if (builder.getReturnType().equals(Constants.T_REF) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
-                                builder.withReturnType(genericType.toReference());
-                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
-                            } else if (builder.getReturnType() instanceof ClassRef && Arrays.asList(((ClassRef)builder.getReturnType()).getArguments()).contains(Constants.T_REF)) {
-                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
-                                List<TypeRef> generics = new ArrayList<TypeRef>();
-
-                                for (TypeRef g : ((ClassRef)builder.getReturnType()).getArguments()) {
-                                    if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
-                                        generics.add(genericType.toReference());
-                                    } else {
-                                        generics.add(g);
-                                    }
-                                }
-                                TypeRef updatedReturnType = new ClassRefBuilder(((ClassRef)builder.getReturnType())).withArguments(generics).build();
-                                builder.withReturnType(updatedReturnType);
-                            }
-                        }
-                    }).build();
+                    .build();
         }
     }, FLUENT_IMPL {
         public TypeDef apply(TypeDef item) {
@@ -326,29 +298,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withProperties(properties)
                     .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
-                    //The return type of builder methods is always T, we need to fix that.
-                    .accept(new TypedVisitor<MethodBuilder>() {
-                        public void visit(MethodBuilder builder) {
-                            builder.accept(new TypeParamRefReplacingVisitor("T", genericType.getName()))
-                                    .accept(new TypeParamDefReplacingVisitor("T", genericType.getName()));
-                            if (builder.getReturnType() != null && builder.getReturnType().equals(Constants.T_REF) && builder.getReturnType().getAttributes().containsKey(REPLACEABLE)) {
-                                builder.withReturnType(genericType.toReference());
-                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
-                            } else if (builder.getReturnType() instanceof ClassRef && Arrays.asList(((ClassRef)builder.getReturnType()).getArguments()).contains(Constants.T_REF)) {
-                                List<TypeRef> generics = new ArrayList<TypeRef>();
-                                for (TypeRef g : ((ClassRef) builder.getReturnType()).getArguments()) {
-                                    if (g.equals(Constants.T) && g.getAttributes().containsKey(REPLACEABLE)) {
-                                        generics.add(genericType.toReference());
-                                    } else {
-                                        generics.add(g);
-                                    }
-                                }
-                                builder.accept(new StatementReplacingVistor("T", genericType.toString()));
-                                TypeRef updatedReturnType = new ClassRefBuilder(((ClassRef)builder.getReturnType())).withArguments(generics).build();
-                                builder.withReturnType(updatedReturnType);
-                            }
-                        }
-                    }).build();
+                    .build();
         }
     }, BUILDER {
         public TypeDef apply(TypeDef item) {
