@@ -68,7 +68,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isCollection;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public class ClazzAs {
 
@@ -83,6 +82,7 @@ public class ClazzAs {
             final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
 
             for (Property property : item.getProperties()) {
+                final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
                 if (property.isStatic()) {
                     continue;
                 }
@@ -97,7 +97,7 @@ public class ClazzAs {
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
                         .build();
 
-                boolean isBuildable = isBuildable(toAdd.getTypeRef());
+                boolean isBuildable = isBuildable(unwrapped);
                 boolean isArray = isArray(toAdd.getTypeRef());
                 boolean isSet = isSet(toAdd.getTypeRef());
                 boolean isList = isList(toAdd.getTypeRef());
@@ -129,7 +129,7 @@ public class ClazzAs {
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(toAdd);
 
                 if (isMap) {
                     //
@@ -204,7 +204,7 @@ public class ClazzAs {
                 }
 
 
-                final boolean isBuildable = isBuildable(property.getTypeRef());
+                final boolean isBuildable = isBuildable(unwrapped);
                 final boolean isArray = isArray(property.getTypeRef());
                 final boolean isSet = isSet(property.getTypeRef());
                 final boolean isList = isList(property.getTypeRef());
@@ -254,7 +254,7 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(toAdd);
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(toAdd);
                 if (isMap) {
                     properties.add(toAdd);
                 } else if (isBuildable) {
@@ -266,10 +266,10 @@ public class ClazzAs {
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
 
-                    ClassRef classRef = (ClassRef) toAdd.getTypeRef();
+                    ClassRef classRef = (ClassRef) unwrapped;
                     TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
                     if (isCollection) {
-                        builderType = classRefOf(classRef.getDefinition(), builderType);
+                        builderType = classRef.getDefinition().toReference(builderType);
                     }
 
                     properties.add(new PropertyBuilder(toAdd).withTypeRef(builderType).build());
@@ -302,8 +302,6 @@ public class ClazzAs {
                         } else {
                             properties.add(new PropertyBuilder(descendant).withTypeRef(builderType).build());
                         }
-
-
                     }
 
                 } else {

@@ -59,13 +59,16 @@ public class Property extends ModifierSupport {
 
         Property property = (Property) o;
 
-        return name.equals(property.name);
+        if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null) return false;
+        return name != null ? name.equals(property.name) : property.name == null;
 
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        int result = typeRef != null ? typeRef.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 
     @Override

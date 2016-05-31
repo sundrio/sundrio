@@ -23,7 +23,7 @@ import java.util.List;
 
 public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AbstractTypeRefFluentImpl<A> implements ClassRefFluent<A> {
 
-    VisitableBuilder<TypeDef, ?> definition;
+    TypeDef definition;
     int dimensions;
     List<VisitableBuilder<? extends TypeRef, ?>> allArguments = new ArrayList();
 
@@ -39,14 +39,11 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends AbstractTyp
     }
 
     public TypeDef getDefinition() {
-        return this.definition != null ? this.definition.build() : null;
+        return definition;
     }
 
     public A withDefinition(TypeDef definition) {
-        if (definition != null) {
-            this.definition = new TypeDefBuilder(definition);
-            _visitables.add(this.definition);
-        }
+            this.definition = definition;
         return (A) this;
     }
 

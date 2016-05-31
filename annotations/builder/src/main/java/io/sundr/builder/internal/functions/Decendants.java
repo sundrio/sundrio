@@ -53,7 +53,7 @@ public class Decendants {
 
             for (TypeDef type : repository.getBuildables()) {
 
-                if (type.getKind() == Kind.CLASS &&  !type.isAbstract() && isDescendant(type, item)) {
+                if (type.getKind() == Kind.CLASS &&  !type.isAbstract() && isDescendant(type, item) && !type.equals(item)) {
                     result.add(type);
                 }
             }
@@ -68,7 +68,7 @@ public class Decendants {
      * @param property
      * @return
      */
-    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_ANCESTORS = CachingFunction.wrap(new Function<Property, Set<Property>>() {
+    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DECENDANTS = CachingFunction.wrap(new Function<Property, Set<Property>>() {
         public Set<Property> apply(Property property) {
             Set<Property> result = new LinkedHashSet<Property>();
             TypeRef baseType = property.getTypeRef();
