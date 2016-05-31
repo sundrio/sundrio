@@ -16,7 +16,9 @@
 
 package io.sundr.builder.internal.functions;
 
+import io.sundr.CachingFunction;
 import io.sundr.Function;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
@@ -55,6 +57,7 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
+import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBoolean;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
@@ -66,9 +69,12 @@ import static io.sundr.codegen.utils.StringUtils.singularize;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 
-public enum ToMethod implements Function<Property, Method> {
+public class ToMethod {
 
-    WITH {
+    private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
+    private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
+
+    public static final Function<Property, Method> WITH = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
@@ -79,7 +85,7 @@ public enum ToMethod implements Function<Property, Method> {
                     .withArguments(property)
                     .withVarArgPreferred(true)
                     .withNewBlock()
-                        .withStatements(getStementes(property))
+                    .withStatements(getStementes(property))
                     .endBlock()
                     .build();
         }
@@ -93,27 +99,29 @@ public enum ToMethod implements Function<Property, Method> {
             List<Statement> statements = new ArrayList<Statement>();
 
             if (IS_COLLECTION.apply(type)) {
-                String className = ((ClassRef)type).getDefinition().getName();
+                String className = ((ClassRef) type).getDefinition().getName();
                 statements.add(new StringStatement("this." + name + ".clear();"));
                 if (className.contains("Map")) {
-                    statements.add(new StringStatement("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return ("+returnType+") this;"));
+                    statements.add(new StringStatement("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (" + returnType + ") this;"));
                 } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
                     String addToMethodName = "addTo" + property.getNameCapitalized();
-                    statements.add(new StringStatement("if (" + name + " != null) {for (" + unwraped.toString() + " item : " + name + "){this." + addToMethodName + "(item);}} return ("+returnType+") this;"));
+                    statements.add(new StringStatement("if (" + name + " != null) {for (" + unwraped.toString() + " item : " + name + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
                 }
                 return statements;
             } else if (isBuildable(unwraped)) {
-                TypeDef builder = BUILDER.apply(((ClassRef)unwraped).getDefinition());
+                TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
                 String propertyName = property.getName();
                 String builderClass = builder.getName();
-                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return ("+returnType+") this;"));
+                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
                 return statements;
             }
-            statements.add(new StringStatement("this." + property.getName() + "=" + property.getName() + "; return ("+returnType+") this;"));
+            statements.add(new StringStatement("this." + property.getName() + "=" + property.getName() + "; return (" + returnType + ") this;"));
             return statements;
         }
 
-    }, WITH_ARRAY {
+    });
+
+    public static final Function<Property, Method> WITH_ARRAY = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
 
@@ -130,12 +138,14 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(returnType)
                     .withArguments(arrayProperty)
                     .withNewBlock()
-                        .addNewStringStatementStatement("this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return ("+returnType+") this;")
+                    .addNewStringStatementStatement("this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
                     .endBlock()
                     .build();
         }
 
-    }, GETTER {
+    });
+
+    public static final Function<Property, Method> GETTER = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(final Property property) {
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
@@ -161,6 +171,7 @@ public enum ToMethod implements Function<Property, Method> {
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     String names = StringUtils.join(descendants, new Function<Property, String>() {
                         String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef()).toString();
+
                         public String apply(Property item) {
                             return "this.<" + className + ">build(" + item.getName() + ")";
                         }
@@ -180,11 +191,13 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(property.getTypeRef())
                     .withArguments(new Property[]{})
                     .withNewBlock()
-                        .withStatements(statements)
+                    .withStatements(statements)
                     .endBlock()
                     .build();
         }
-    }, GETTER_ARRAY {
+    });
+
+    public static final Function<Property, Method> GETTER_ARRAY = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
@@ -205,12 +218,13 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(property.getTypeRef())
                     .withArguments()
                     .withNewBlock()
-                        .addNewStringStatementStatement(body)
+                    .addNewStringStatementStatement(body)
                     .endBlock()
                     .build();
         }
-    },
-    SETTER {
+    });
+
+    public static final Function<Property, Method> SETTER = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             String methodName = "set" + property.getNameCapitalized();
             return new MethodBuilder()
@@ -219,12 +233,14 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(VOID)
                     .withArguments()
                     .withNewBlock()
-                        .addNewStringStatementStatement("this." + property.getName() + "=" + property.getName() + ";")
+                    .addNewStringStatementStatement("this." + property.getName() + "=" + property.getName() + ";")
                     .endBlock()
                     .build();
         }
-    },
-    ADD_TO_COLLECTION {
+    });
+
+
+    public static final Function<Property, Method> ADD_TO_COLLECTION = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(final Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
@@ -244,7 +260,7 @@ public enum ToMethod implements Function<Property, Method> {
                 String targetClass = targetType.getDefinition().getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
-                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return ("+returnType+")this;"));
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
@@ -252,13 +268,13 @@ public enum ToMethod implements Function<Property, Method> {
 
                     public String apply(Property item) {
                         TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
-                        String className = ((ClassRef)itemRef).getDefinition().getName();
+                        String className = ((ClassRef) itemRef).getDefinition().getName();
                         String addToMethodName = "addTo" + captializeFirst(item.getName());
                         return "if (item instanceof " + className + "){" + addToMethodName + "((" + className + ")item);}\n";
                     }
-                }, " else ") + "} return ("+returnType+")this;"));
+                }, " else ") + "} return (" + returnType + ")this;"));
             } else {
-                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".add(item);} return ("+returnType+")this;"));
+                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".add(item);} return (" + returnType + ")this;"));
             }
 
             return new MethodBuilder()
@@ -269,13 +285,13 @@ public enum ToMethod implements Function<Property, Method> {
                     .withArguments(item)
                     .withVarArgPreferred(true)
                     .withNewBlock()
-                        .withStatements(statements)
+                    .withStatements(statements)
                     .endBlock()
                     .build();
         }
-    },
-    REMOVE_FROM_COLLECTION {
+    });
 
+    public static final Function<Property, Method> REMOVE_FROM_COLLECTION = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(final Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
@@ -295,21 +311,21 @@ public enum ToMethod implements Function<Property, Method> {
                 String targetClass = targetType.getDefinition().getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
-                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return ("+returnType+")this;"));
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
                 statements.add(new StringStatement("for (" + targetType.toString() + " item : items) {" + StringUtils.join(descendants, new Function<Property, String>() {
                     public String apply(Property item) {
                         TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
-                        String className = ((ClassRef)itemRef).getDefinition().getName();
+                        String className = ((ClassRef) itemRef).getDefinition().getName();
                         String removeFromMethodName = "removeFrom" + captializeFirst(item.getName());
-                        return "if (item instanceof " + className + "){" + removeFromMethodName + "((" +className + ")item);}\n";
+                        return "if (item instanceof " + className + "){" + removeFromMethodName + "((" + className + ")item);}\n";
                     }
-                }, " else ") + "} return ("+returnType+")this;"));
+                }, " else ") + "} return (" + returnType + ")this;"));
 
             } else {
-                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".remove(item);} return ("+returnType+")this;"));
+                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
             }
 
             return new MethodBuilder()
@@ -320,12 +336,13 @@ public enum ToMethod implements Function<Property, Method> {
                     .withArguments(item)
                     .withVarArgPreferred(true)
                     .withNewBlock()
-                        .withStatements(statements)
+                    .withStatements(statements)
                     .endBlock()
                     .build();
         }
-    },
-    ADD_MAP_TO_MAP {
+    });
+
+    public static final Function<Property, Method> ADD_MAP_TO_MAP = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef mapType = (ClassRef) property.getTypeRef();
@@ -337,13 +354,13 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(returnType)
                     .withArguments(mapProperty)
                     .withNewBlock()
-                    .addNewStringStatementStatement("if(map != null) { this." + property.getName() + ".putAll(map);} return ("+returnType+")this;")
+                    .addNewStringStatementStatement("if(map != null) { this." + property.getName() + ".putAll(map);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
         }
-    },
-    ADD_TO_MAP {
+    });
 
+    public static final Function<Property, Method> ADD_TO_MAP = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef mapType = (ClassRef) property.getTypeRef();
@@ -360,11 +377,14 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(returnType)
                     .withArguments(new Property[]{keyProperty, valueProperty})
                     .withNewBlock()
-                        .addNewStringStatementStatement("if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return ("+returnType+")this;")
+                    .addNewStringStatementStatement("if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
         }
-    }, REMOVE_MAP_FROM_MAP {
+    });
+
+
+    public static final Function<Property, Method> REMOVE_MAP_FROM_MAP = CachingFunction.wrap(new Function<Property, Method>() {
 
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
@@ -377,11 +397,13 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(returnType)
                     .withArguments(mapProperty)
                     .withNewBlock()
-                        .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {this." + property.getName() + ".remove(key);}} return ("+returnType+")this;")
+                    .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {this." + property.getName() + ".remove(key);}} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
         }
-    }, REMOVE_FROM_MAP {
+    });
+
+    public static final Function<Property, Method> REMOVE_FROM_MAP = CachingFunction.wrap(new Function<Property, Method>() {
 
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
@@ -396,11 +418,13 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(returnType)
                     .withArguments(keyProperty)
                     .withNewBlock()
-                        .addNewStringStatementStatement("if(key != null) {this." + property.getName() + ".remove(key);} return ("+returnType+")this;")
+                    .addNewStringStatementStatement("if(key != null) {this." + property.getName() + ".remove(key);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
         }
-    }, WITH_NEW_NESTED {
+    });
+
+    public static final Function<Property, Method> WITH_NEW_NESTED = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
@@ -430,12 +454,55 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .withNewBlock()
-                        .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "();")
+                    .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "();")
                     .endBlock()
                     .build();
 
         }
-    }, WITH_NEW_LIKE_NESTED {
+    });
+
+    public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = CachingFunction.wrap(new Function<Property, Set<Method>>() {
+        public Set<Method> apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            Set<Method> result = new LinkedHashSet<Method>();
+            TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+            TypeDef baseType = BuilderContextManager.getContext().getBuildableRepository().getBuildable(unwrappedType);
+
+            for (Method constructor : getInlineableConstructors(property)) {
+                boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
+                String ownPrefix = isCollection ? "addNew" : "withNew";
+                String ownName = ownPrefix + captializeFirst(isCollection
+                        ? singularize(property.getName())
+                        : property.getName());
+
+                String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
+                String delegateName = delegatePrefix + captializeFirst(property.getName());
+
+                String args = StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+                    public String apply(Property item) {
+                        return item.getName();
+                    }
+                }, ", ");
+
+
+                result.add(new MethodBuilder()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withReturnType(returnType)
+                        .withArguments(constructor.getArguments())
+                        .withName(ownName)
+                        //TODO: decide how to roll. Use sets or lists?
+                        .withParameters(new LinkedHashSet<TypeParamDef>(baseType.getParameters()))
+                        .withNewBlock()
+                        .addNewStringStatementStatement("return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
+                        .endBlock()
+                        .build());
+            }
+
+            return result;
+        }
+    });
+
+    public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
@@ -449,7 +516,7 @@ public enum ToMethod implements Function<Property, Method> {
             }
             typeArguments.add(returnType);
 
-            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray()) ;
+            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray());
             ClassRef rewrapedImpl = classRefOf(nestedTypeImpl, typeArguments.toArray());
 
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
@@ -470,13 +537,14 @@ public enum ToMethod implements Function<Property, Method> {
                     .withTypeRef(baseType)
                     .endArgument()
                     .withNewBlock()
-                        .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "(item);")
+                    .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "(item);")
                     .endBlock()
                     .build();
 
         }
-    }, EDIT_NESTED {
+    });
 
+    public static final Function<Property, Method> EDIT_NESTED = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
@@ -491,12 +559,14 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .withNewBlock()
-                        .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "());")
+                    .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "());")
                     .endBlock()
                     .build();
 
         }
-    }, AND {
+    });
+
+    public static final Function<Property, Method> AND = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
             String classPrefix = getClassPrefix(property);
             String prefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
@@ -506,7 +576,7 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(N_REF)
                     .withName("and")
                     .withNewBlock()
-                        .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(builder.build());")
+                    .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(builder.build());")
                     .endBlock()
                     .build();
 
@@ -519,7 +589,9 @@ public enum ToMethod implements Function<Property, Method> {
             } else return "";
         }
 
-    }, END {
+    });
+
+    public static final Function<Property, Method> END = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
 
             String methodName = "end" + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
@@ -531,12 +603,9 @@ public enum ToMethod implements Function<Property, Method> {
                     .withReturnType(N_REF)
                     .withName(methodName)
                     .withNewBlock()
-                        .addNewStringStatementStatement("return and();")
+                    .addNewStringStatementStatement("return and();")
                     .endBlock()
                     .build();
         }
-    };
-
-    private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
-    private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
+    });
 }

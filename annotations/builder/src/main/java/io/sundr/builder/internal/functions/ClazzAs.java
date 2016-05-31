@@ -16,6 +16,7 @@
 
 package io.sundr.builder.internal.functions;
 
+import io.sundr.CachingFunction;
 import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
@@ -69,9 +70,9 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
-public enum ClazzAs implements Function<TypeDef, TypeDef> {
+public class ClazzAs {
 
-    FLUENT_INTERFACE {
+    public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             Set<Method> methods = new LinkedHashSet<Method>();
             Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
@@ -85,7 +86,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                 if (property.isStatic()) {
                     continue;
                 }
-                if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property) ) {
+                if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property)) {
                     continue;
                 }
 
@@ -97,10 +98,10 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         .build();
 
                 boolean isBuildable = isBuildable(toAdd.getTypeRef());
-                boolean isArray =  isArray(toAdd.getTypeRef());
-                boolean isSet =  isSet(toAdd.getTypeRef());
-                boolean isList =  isList(toAdd.getTypeRef());
-                boolean isMap =  isMap(toAdd.getTypeRef());
+                boolean isArray = isArray(toAdd.getTypeRef());
+                boolean isSet = isSet(toAdd.getTypeRef());
+                boolean isList = isList(toAdd.getTypeRef());
+                boolean isMap = isMap(toAdd.getTypeRef());
                 boolean isCollection = isSet || isList;
 
                 if (isArray) {
@@ -138,7 +139,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     if (isCollection && !isArray(toAdd.getTypeRef())) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
-                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
+                    methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
                 } else if (!descendants.isEmpty() && isCollection) {
                     for (Property descendant : descendants) {
@@ -149,7 +150,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
-                        methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
+                        methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
                     }
                 }
@@ -159,8 +160,11 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
                     .build();
+
         }
-    }, FLUENT_IMPL {
+    });
+
+    public static final Function<TypeDef, TypeDef> FLUENT_IMPL = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             Set<Method> constructors = new LinkedHashSet<Method>();
             Set<Method> methods = new LinkedHashSet<Method>();
@@ -182,7 +186,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withTypeRef(item.toReference())
                     .withName("instance").and()
                     .withNewBlock()
-                        .withStatements(toInstanceConstructorBody(item, ""))
+                    .withStatements(toInstanceConstructorBody(item, ""))
                     .endBlock()
                     .build();
 
@@ -195,16 +199,16 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                 if (property.isStatic()) {
                     continue;
                 }
-                if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property) ) {
+                if (!hasBuildableConstructorWithArgument(item, property) && !hasOrInheritsSetter(item, property)) {
                     continue;
                 }
 
 
                 final boolean isBuildable = isBuildable(property.getTypeRef());
-                final boolean isArray =  isArray(property.getTypeRef());
-                final boolean isSet =  isSet(property.getTypeRef());
-                final boolean isList =  isList(property.getTypeRef());
-                final boolean isMap =  isMap(property.getTypeRef());
+                final boolean isArray = isArray(property.getTypeRef());
+                final boolean isSet = isSet(property.getTypeRef());
+                final boolean isList = isList(property.getTypeRef());
+                final boolean isMap = isMap(property.getTypeRef());
                 final boolean isCollection = isSet || isList;
 
                 Property toAdd = new PropertyBuilder(property)
@@ -259,7 +263,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     if (!isCollection && !isArray) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
-                    methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
+                    methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
 
                     ClassRef classRef = (ClassRef) toAdd.getTypeRef();
@@ -280,7 +284,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
-                        methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
+                        methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
 
                         ClassRef classRef = (ClassRef) descendant.getTypeRef();
@@ -288,12 +292,12 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         if (isList(classRef)) {
                             builderType = classRef.getDefinition().toReference(builderType);
                             properties.add(new PropertyBuilder(descendant).withTypeRef(builderType)
-                                    .addToAttributes(INIT,  " new "+ARRAY_LIST.toReference(builderType)+ "()")
+                                    .addToAttributes(INIT, " new " + ARRAY_LIST.toReference(builderType) + "()")
                                     .build());
                         } else if (isSet(classRef)) {
                             builderType = classRef.getDefinition().toReference(builderType);
                             properties.add(new PropertyBuilder(descendant).withTypeRef(builderType)
-                                    .addToAttributes(INIT,  " new "+LINKED_HASH_SET.toReference(builderType)+ "()")
+                                    .addToAttributes(INIT, " new " + LINKED_HASH_SET.toReference(builderType) + "()")
                                     .build());
                         } else {
                             properties.add(new PropertyBuilder(descendant).withTypeRef(builderType).build());
@@ -313,7 +317,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
                     .withNewBlock()
-                        .withStatements(toEquals(fluentImplType, properties))
+                    .withStatements(toEquals(fluentImplType, properties))
                     .endBlock()
                     .build();
 
@@ -326,7 +330,10 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withMethods(methods)
                     .build();
         }
-    }, BUILDER {
+    });
+
+
+    public static final Function<TypeDef, TypeDef> BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
 
             TypeDef builderType = TypeAs.BUILDER.apply(item);
@@ -344,7 +351,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             Method emptyConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withNewBlock()
-                        .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(new " + item.getName() + "());" : "this.fluent = this;")
+                    .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(new " + item.getName() + "());" : "this.fluent = this;")
                     .endBlock()
                     .build();
 
@@ -355,7 +362,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withName("fluent")
                     .and()
                     .withNewBlock()
-                        .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(fluent, new " + item.getName() + "());" : "this.fluent = fluent;")
+                    .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(fluent, new " + item.getName() + "());" : "this.fluent = fluent;")
                     .endBlock()
                     .build();
 
@@ -369,7 +376,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withTypeRef(instanceRef)
                     .withName("instance").and()
                     .withNewBlock()
-                        .withStatements(toInstanceConstructorBody(item, "fluent"))
+                    .withStatements(toInstanceConstructorBody(item, "fluent"))
                     .endBlock()
                     .build();
 
@@ -379,7 +386,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withTypeRef(instanceRef)
                     .withName("instance").and()
                     .withNewBlock()
-                        .withStatements(toInstanceConstructorBody(item, "this"))
+                    .withStatements(toInstanceConstructorBody(item, "this"))
                     .endBlock()
                     .build();
 
@@ -393,7 +400,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withReturnType(instanceRef)
                     .withName("build")
                     .withNewBlock()
-                        .withStatements(toBuild(item, item))
+                    .withStatements(toBuild(item, item))
                     .endBlock()
                     .build();
 
@@ -405,7 +412,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
                     .withNewBlock()
-                        .withStatements(toEquals(builderType, fields))
+                    .withStatements(toEquals(builderType, fields))
                     .endBlock()
                     .build();
 
@@ -418,7 +425,9 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .build();
         }
 
-    }, EDITABLE_BUILDER {
+    });
+
+    public static final Function<TypeDef, TypeDef> EDITABLE_BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(final TypeDef item) {
             final TypeDef editable = EDITABLE.apply(item);
             return new TypeDefBuilder(BUILDER.apply(item)).accept(new TypedVisitor<MethodBuilder>() {
@@ -432,7 +441,9 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                 }
             }).build();
         }
-    }, EDITABLE {
+    });
+
+    public static final Function<TypeDef, TypeDef> EDITABLE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             TypeDef editableType = TypeAs.EDITABLE.apply(item);
             TypeDef builderType = TypeAs.BUILDER.apply(item);
@@ -449,7 +460,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     .withReturnType(builderType.toInternalReference())
                     .withName("edit")
                     .withNewBlock()
-                        .addNewStringStatementStatement("return new " + builderType.getName() + "(this);")
+                    .addNewStringStatementStatement("return new " + builderType.getName() + "(this);")
                     .endBlock()
                     .build();
 
@@ -457,14 +468,14 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
             //We need to treat the editable classes as buildables themselves.
             return CodegenContext.getContext().getDefinitionRepository().register(
-                        BuilderContextManager.getContext().getBuildableRepository().register(new TypeDefBuilder(editableType)
+                    BuilderContextManager.getContext().getBuildableRepository().register(new TypeDefBuilder(editableType)
                             .withConstructors(constructors)
                             .withMethods(methods)
                             .addToAttributes(BUILDABLE, true)
                             .build())
-                    );
+            );
         }
-    };
+    });
 
     private static Property arrayAsList(Property property, boolean buildable) {
         return new PropertyBuilder(property)
@@ -488,7 +499,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
         for (Property property : constructor.getArguments()) {
             Method getter = findGetter(clazz, property);
             if (getter != null) {
-                String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() +")" : "";
+                String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() + ")" : "";
                 statements.add(new StringStatement(new StringBuilder().append(ref).append(".with").append(property.getNameCapitalized()).append("(").append(cast).append("instance.").append(getter.getName()).append("()); ").toString()));
             } else {
                 throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
@@ -521,7 +532,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     public String apply(Property item) {
                         String prefix = isBoolean(item.getTypeRef()) ? "is" : "get";
                         //String cast = genericTypes.contains(item.getTypeRef().getFullyQualifiedName()) ? "("+item.getType().getFullyQualifiedName()+")" : "";
-                        return  "fluent." + prefix + item.getNameCapitalized() + "()";
+                        return "fluent." + prefix + item.getNameCapitalized() + "()";
                     }
                 }, ","))
                 .append(");")
@@ -589,11 +600,11 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
         return new MethodBuilder(constructor)
                 .withReturnType(constructorType.toReference())
                 .withNewBlock()
-                    .addNewStringStatementStatement( "super(" + StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
-                        public String apply(Property item) {
-                            return item.getName();
-                        }
-                    }, ", ") + ");")
+                .addNewStringStatementStatement("super(" + StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+                    public String apply(Property item) {
+                        return item.getName();
+                    }
+                }, ", ") + ");")
                 .endBlock()
                 .build();
     }
