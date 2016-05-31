@@ -21,6 +21,7 @@ import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
@@ -455,11 +456,13 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             methods.add(edit);
 
             //We need to treat the editable classes as buildables themselves.
-            return BuilderContextManager.getContext().getBuildableRepository().register(new TypeDefBuilder(editableType)
-                    .withConstructors(constructors)
-                    .withMethods(methods)
-                    .addToAttributes(BUILDABLE, true)
-                    .build());
+            return CodegenContext.getContext().getDefinitionRepository().register(
+                        BuilderContextManager.getContext().getBuildableRepository().register(new TypeDefBuilder(editableType)
+                            .withConstructors(constructors)
+                            .withMethods(methods)
+                            .addToAttributes(BUILDABLE, true)
+                            .build())
+                    );
         }
     };
 
