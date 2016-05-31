@@ -40,11 +40,10 @@ import java.util.TreeSet;
 
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
-import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N_REF;
+import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
-import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
@@ -514,7 +513,7 @@ public enum ToMethod implements Function<Property, Method> {
         }
 
         private String getClassPrefix(Property property) {
-            Object memberOf = property.getAttributes().get(MEMBER_OF);
+            Object memberOf = property.getAttributes().get(OUTER_CLASS);
             if (memberOf instanceof TypeDef) {
                 return ((TypeDef) memberOf).getName() + ".this.";
             } else return "";

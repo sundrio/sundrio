@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
-import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
@@ -135,7 +134,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
-                    nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new PropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentType).build()));
+                    nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
                 } else if (!descendants.isEmpty() && isCollection) {
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
@@ -146,7 +145,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
-                        nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(new PropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentType).build()));
+                        nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
                     }
                 }
             }
@@ -243,7 +242,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
                     methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(toAdd));
-                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(toAdd).addToAttributes(MEMBER_OF, fluentImplType).build()));
+                    nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
 
                     ClassRef classRef = (ClassRef) toAdd.getTypeRef();
                     TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
@@ -264,7 +263,7 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethods.WITH_NESTED_INLINE.apply(descendant));
-                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(new PropertyBuilder(descendant).addToAttributes(MEMBER_OF, fluentImplType).build()));
+                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
 
                         ClassRef classRef = (ClassRef) descendant.getTypeRef();
                         TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);

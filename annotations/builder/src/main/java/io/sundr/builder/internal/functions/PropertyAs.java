@@ -36,13 +36,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.MEMBER_OF;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
-import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
@@ -78,8 +76,6 @@ public final class PropertyAs {
                 Set<Property> properties = new HashSet<Property>();
                 Set<Method> constructors = new HashSet<Method>();
 
-                TypeDef memberOf = (TypeDef) item.getAttributes().get(MEMBER_OF);
-
                 properties.add(new PropertyBuilder()
                         .withName("builder")
                         .withTypeRef(classRefOf(builderType)).build());
@@ -108,7 +104,6 @@ public final class PropertyAs {
                         .withProperties(properties)
                         .withMethods(nestedMethods)
                         .withConstructors(constructors)
-                        .addToAttributes(MEMBER_OF, memberOf)
                         .build();
             }
             throw new IllegalStateException();
@@ -141,8 +136,6 @@ public final class PropertyAs {
                 Set<Property> properties = new HashSet<Property>();
                 Set<Method> constructors = new HashSet<Method>();
 
-                TypeDef memberOf = (TypeDef) item.getAttributes().get(MEMBER_OF);
-
                 properties.add(new PropertyBuilder()
                         .withName("builder")
                         .withTypeRef(classRefOf(builderType)).build());
@@ -171,7 +164,6 @@ public final class PropertyAs {
                         .withProperties(properties)
                         .withMethods(nestedMethods)
                         .withConstructors(constructors)
-                        .addToAttributes(MEMBER_OF, memberOf)
                         .build();
             }
             throw new IllegalStateException();
