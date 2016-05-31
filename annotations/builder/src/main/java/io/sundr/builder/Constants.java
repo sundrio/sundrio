@@ -51,8 +51,11 @@ public class Constants {
     public static final String OUTER_CLASS = "OUTER_CLASS";
 
     public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
-
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
+
+    public static final String DEFAULT_IMPL = "DEFAULT_IMPL";
+    public static final String INIT = "INIT";
+
     public static final String EMPTY = "";
 
     public static final TypeParamDef F = newTypeParamDef("F");
@@ -80,6 +83,7 @@ public class Constants {
     public static final TypeDef LINKED_HASH_MAP = TYPEDEF.apply(LinkedHashMap.class);
     public static final TypeDef LIST = TYPEDEF.apply(List.class);
     public static final TypeDef ARRAY_LIST = TYPEDEF.apply(ArrayList.class);
+
     public static final TypeDef SET = TYPEDEF.apply(Set.class);
     public static final TypeDef LINKED_HASH_SET = TYPEDEF.apply(LinkedHashSet.class);
 
@@ -135,5 +139,4 @@ public class Constants {
             TYPEREF.apply(Byte.class), TYPEREF.apply(Character.class),
             TYPEREF.apply(Short.class), TYPEREF.apply(Integer.class), TYPEREF.apply(Long.class),
             TYPEREF.apply(Double.class), TYPEREF.apply(Float.class)};
-
 }

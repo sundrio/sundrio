@@ -31,10 +31,11 @@ public class BuildableRepository {
 
     private final Map<String, TypeDef> buildables = new HashMap<String, TypeDef>();
 
-    public void register(TypeDef buildable) {
+    public TypeDef register(TypeDef buildable) {
         if (buildable != null) {
             buildables.put(buildable.getFullyQualifiedName(), buildable);
         }
+        return buildable;
     }
 
     public Set<TypeDef> getBuildables() {

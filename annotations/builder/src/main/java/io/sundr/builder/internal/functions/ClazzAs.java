@@ -44,7 +44,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.ARRAY_LIST;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
+import static io.sundr.builder.Constants.INIT;
+import static io.sundr.builder.Constants.LINKED_HASH_MAP;
+import static io.sundr.builder.Constants.LINKED_HASH_SET;
 import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
@@ -185,6 +189,8 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
             constructors.add(instanceConstructor);
 
             for (Property property : item.getProperties()) {
+                final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+
                 if (property.isStatic()) {
                     continue;
                 }
@@ -192,19 +198,30 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
                     continue;
                 }
 
+
+                final boolean isBuildable = isBuildable(property.getTypeRef());
+                final boolean isArray =  isArray(property.getTypeRef());
+                final boolean isSet =  isSet(property.getTypeRef());
+                final boolean isList =  isList(property.getTypeRef());
+                final boolean isMap =  isMap(property.getTypeRef());
+                final boolean isCollection = isSet || isList;
+
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(0)
                         .addToAttributes(OUTER_INTERFACE, fluentType)
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
-                        .build();
-
-                boolean isBuildable = isBuildable(toAdd.getTypeRef());
-                boolean isArray =  isArray(toAdd.getTypeRef());
-                boolean isSet =  isSet(toAdd.getTypeRef());
-                boolean isList =  isList(toAdd.getTypeRef());
-                boolean isMap =  isMap(toAdd.getTypeRef());
-                boolean isCollection = isSet || isList;
+                        .accept(new TypedVisitor<PropertyBuilder>() {
+                            public void visit(PropertyBuilder builder) {
+                                if (isArray || isList) {
+                                    builder.addToAttributes(INIT, "new " + ARRAY_LIST.toReference(unwrapped) + "()");
+                                } else if (isSet) {
+                                    builder.addToAttributes(INIT, "new " + LINKED_HASH_SET.toReference(unwrapped) + "()");
+                                } else if (isMap) {
+                                    builder.addToAttributes(INIT, "new " + LINKED_HASH_MAP.toReference(unwrapped) + "()");
+                                }
+                            }
+                        }).build();
 
                 if (isArray) {
                     Property asList = arrayAsList(toAdd, isBuildable);
@@ -267,11 +284,20 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
                         ClassRef classRef = (ClassRef) descendant.getTypeRef();
                         TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
-                        if (isCollection(descendant.getTypeRef())) {
-                            builderType = classRefOf(classRef.getDefinition(), builderType);
+                        if (isList(classRef)) {
+                            builderType = classRef.getDefinition().toReference(builderType);
+                            properties.add(new PropertyBuilder(descendant).withTypeRef(builderType)
+                                    .addToAttributes(INIT,  " new "+ARRAY_LIST.toReference(builderType)+ "()")
+                                    .build());
+                        } else if (isSet(classRef)) {
+                            builderType = classRef.getDefinition().toReference(builderType);
+                            properties.add(new PropertyBuilder(descendant).withTypeRef(builderType)
+                                    .addToAttributes(INIT,  " new "+LINKED_HASH_SET.toReference(builderType)+ "()")
+                                    .build());
+                        } else {
+                            properties.add(new PropertyBuilder(descendant).withTypeRef(builderType).build());
                         }
 
-                        properties.add(new PropertyBuilder(descendant).withTypeRef(builderType).build());
 
                     }
 
@@ -428,11 +454,12 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
 
             methods.add(edit);
 
-            return new TypeDefBuilder(editableType)
+            //We need to treat the editable classes as buildables themselves.
+            return BuilderContextManager.getContext().getBuildableRepository().register(new TypeDefBuilder(editableType)
                     .withConstructors(constructors)
                     .withMethods(methods)
                     .addToAttributes(BUILDABLE, true)
-                    .build();
+                    .build());
         }
     };
 
@@ -484,8 +511,6 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
     private static List<Statement> toBuild(final TypeDef clazz, final TypeDef instanceType) {
         Method constructor = findBuildableConstructor(clazz);
         List<Statement> statements = new ArrayList<Statement>();
-
-        statements.add(new StringStatement(new StringBuilder().toString()));
 
         statements.add(new StringStatement(new StringBuilder()
                 .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")

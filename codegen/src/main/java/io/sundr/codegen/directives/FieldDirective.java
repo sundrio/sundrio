@@ -52,11 +52,9 @@ public class FieldDirective extends Directive {
         if (field != null) {
             writer.append(field.toString());
 
-            //TODO: Fix default impl
-            //if (field.getType().getDefaultImplementation() != null) {
-            //    JavaType defaultImpl = field.getType().getDefaultImplementation();
-            //    writer.append(" = new ").append(JavaTypeToString.INSTANCE.apply(defaultImpl)).append("()");
-           // }
+            if (field.getAttributes().get("INIT") != null) {
+                writer.append(" = ").append((String) field.getAttributes().get("INIT"));
+            }
         }
         writer.append(";");
     }
