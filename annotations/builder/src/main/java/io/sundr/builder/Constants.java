@@ -19,9 +19,7 @@ package io.sundr.builder;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRef;
 import io.sundr.codegen.model.WildcardRef;
@@ -49,17 +47,12 @@ public class Constants {
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
-    public static final String REPLACEABLE = "REPLACEABLE";
-    public static final String MEMBER_OF = "MEMBER_OF";
-
     public static final String OUTER_INTERFACE = "OUTER_INTERFACE";
     public static final String OUTER_CLASS = "OUTER_CLASS";
 
     public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
 
-
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
-    public static final String BODY = "BODY";
     public static final String EMPTY = "";
 
     public static final TypeParamDef F = newTypeParamDef("F");
@@ -67,10 +60,8 @@ public class Constants {
     public static final TypeParamDef O = newTypeParamDef("O");
     public static final TypeParamDef B = newTypeParamDef("B");
     
-    public static final TypeParamDef T = new TypeParamDefBuilder().withName("T").addToAttributes(REPLACEABLE, Boolean.TRUE).build();
-
-    public static final TypeParamRef T_REF = new TypeParamRefBuilder().withName("T").addToAttributes(REPLACEABLE, Boolean.TRUE)
-            .build();
+    public static final TypeParamDef T = newTypeParamDef("Τ");
+    public static final TypeParamRef T_REF = newTypeParamRef("T");
     
     public static final TypeParamDef N = newTypeParamDef("N");
     public static final TypeParamRef N_REF = newTypeParamRef("N");

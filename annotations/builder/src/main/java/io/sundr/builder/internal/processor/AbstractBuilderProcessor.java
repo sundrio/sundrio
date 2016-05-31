@@ -38,8 +38,6 @@ import javax.lang.model.element.Modifier;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.BODY;
-import static io.sundr.builder.Constants.BOXED_VOID;
 import static io.sundr.builder.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
