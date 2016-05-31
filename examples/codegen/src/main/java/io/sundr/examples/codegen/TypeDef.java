@@ -253,7 +253,7 @@ public class TypeDef extends ModifierSupport {
     public ClassRef toUnboundedReference() {
         return new ClassRefBuilder()
                 .withDefinition(this)
-                .withArguments()
+                .withArguments(new TypeRef[0])
                 .build();
     }
 

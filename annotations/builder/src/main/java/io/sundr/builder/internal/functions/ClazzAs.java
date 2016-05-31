@@ -47,13 +47,16 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.ARRAY_LIST;
+import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.INIT;
 import static io.sundr.builder.Constants.LINKED_HASH_MAP;
 import static io.sundr.builder.Constants.LINKED_HASH_SET;
+import static io.sundr.builder.Constants.LIST;
 import static io.sundr.builder.Constants.OBJECT;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
+import static io.sundr.builder.Constants.SET;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
@@ -105,7 +108,7 @@ public class ClazzAs {
                 boolean isCollection = isSet || isList;
 
                 if (isArray) {
-                    Property asList = arrayAsList(toAdd, isBuildable);
+                    Property asList = arrayAsList(toAdd);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                     methods.add(ToMethod.GETTER_ARRAY.apply(toAdd));
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
@@ -136,7 +139,7 @@ public class ClazzAs {
                 } else if (isBuildable) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
-                    if (isCollection && !isArray(toAdd.getTypeRef())) {
+                    if (!isCollection && !isArray) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                     }
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
@@ -169,7 +172,7 @@ public class ClazzAs {
             Set<Method> constructors = new LinkedHashSet<Method>();
             Set<Method> methods = new LinkedHashSet<Method>();
             Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
-            Set<Property> properties = new LinkedHashSet<Property>();
+            final Set<Property> properties = new LinkedHashSet<Property>();
             TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
             final TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
@@ -193,7 +196,7 @@ public class ClazzAs {
             constructors.add(emptyConstructor);
             constructors.add(instanceConstructor);
 
-            for (Property property : item.getProperties()) {
+            for (final Property property : item.getProperties()) {
                 final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
 
                 if (property.isStatic()) {
@@ -212,7 +215,7 @@ public class ClazzAs {
                 final boolean isCollection = isSet || isList;
 
                 Property toAdd = new PropertyBuilder(property)
-                        .withModifiers(0)
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
                         .addToAttributes(OUTER_INTERFACE, fluentType)
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
@@ -223,13 +226,14 @@ public class ClazzAs {
                                 } else if (isSet) {
                                     builder.addToAttributes(INIT, "new " + LINKED_HASH_SET.toReference(unwrapped) + "()");
                                 } else if (isMap) {
-                                    builder.addToAttributes(INIT, "new " + LINKED_HASH_MAP.toReference(unwrapped) + "()");
+                                    List<TypeRef> arguments = ((ClassRef)property.getTypeRef()).getArguments();
+                                    builder.addToAttributes(INIT, "new " + LINKED_HASH_MAP.toReference(arguments.toArray(new TypeRef[arguments.size()])) + "()");
                                 }
                             }
                         }).build();
 
                 if (isArray) {
-                    Property asList = arrayAsList(toAdd, isBuildable);
+                    Property asList = arrayAsList(toAdd);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                     methods.add(ToMethod.GETTER_ARRAY.apply(toAdd));
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
@@ -249,7 +253,6 @@ public class ClazzAs {
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE, isBuildable).build();
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
@@ -266,42 +269,19 @@ public class ClazzAs {
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
 
-                    ClassRef classRef = (ClassRef) unwrapped;
-                    TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
-                    if (isCollection) {
-                        builderType = classRef.getDefinition().toReference(builderType);
-                    }
-
-                    properties.add(new PropertyBuilder(toAdd).withTypeRef(builderType).build());
+                    properties.add(buildableField(toAdd));
                 } else if (!descendants.isEmpty() && isCollection) {
                     properties.add(toAdd);
-
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }
-
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
-
-                        ClassRef classRef = (ClassRef) descendant.getTypeRef();
-                        TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(classRef);
-                        if (isList(classRef)) {
-                            builderType = classRef.getDefinition().toReference(builderType);
-                            properties.add(new PropertyBuilder(descendant).withTypeRef(builderType)
-                                    .addToAttributes(INIT, " new " + ARRAY_LIST.toReference(builderType) + "()")
-                                    .build());
-                        } else if (isSet(classRef)) {
-                            builderType = classRef.getDefinition().toReference(builderType);
-                            properties.add(new PropertyBuilder(descendant).withTypeRef(builderType)
-                                    .addToAttributes(INIT, " new " + LINKED_HASH_SET.toReference(builderType) + "()")
-                                    .build());
-                        } else {
-                            properties.add(new PropertyBuilder(descendant).withTypeRef(builderType).build());
-                        }
+                        properties.add(buildableField(descendant));
                     }
 
                 } else {
@@ -470,15 +450,15 @@ public class ClazzAs {
                             .withConstructors(constructors)
                             .withMethods(methods)
                             .addToAttributes(BUILDABLE, true)
+                            .addToAttributes(GENERATED, true) // We want to know that its a generated type...
                             .build())
             );
         }
     });
 
-    private static Property arrayAsList(Property property, boolean buildable) {
+    private static Property arrayAsList(Property property) {
         return new PropertyBuilder(property)
                 .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(property.getTypeRef())))
-                .addToAttributes(BUILDABLE, buildable)
                 .build();
     }
 
@@ -605,5 +585,24 @@ public class ClazzAs {
                 }, ", ") + ");")
                 .endBlock()
                 .build();
+    }
+
+    private static Property buildableField(Property property) {
+        TypeRef typeRef = property.getTypeRef();
+        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(typeRef);
+        ClassRef classRef = (ClassRef) typeRef;
+        TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(unwrapped);
+
+        if (isList(classRef)) {
+            return new PropertyBuilder(property).withTypeRef(LIST.toReference(builderType))
+                    .addToAttributes(INIT, " new " + ARRAY_LIST.toReference(builderType) + "()")
+                    .build();
+        } else if (isSet(classRef)) {
+            return new PropertyBuilder(property).withTypeRef(SET.toReference(builderType))
+                    .addToAttributes(INIT, " new " + LINKED_HASH_SET.toReference(builderType) + "()")
+                    .build();
+        } else {
+            return new PropertyBuilder(property).withTypeRef(builderType).build();
+        }
     }
 }

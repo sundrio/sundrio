@@ -147,6 +147,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> GETTER = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(final Property property) {
+            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             final List<Statement> statements = new ArrayList<Statement>();
@@ -160,7 +161,7 @@ public class ToMethod {
 
             if (isMap(property.getTypeRef())) {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
-            } else if (isBuildable(property.getTypeRef())) {
+            } else if (isBuildable(unwrapped)) {
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
@@ -179,7 +180,7 @@ public class ToMethod {
                     statements.add(new StringStatement("return aggregate(" + names + ");"));
                 } else {
                     //TODO: What are we doing in this case?
-                    statements.add(new StringStatement("return aggregate(" + "return this." + property.getName() + ";" + ");"));
+                    statements.add(new StringStatement("return this." + property.getName() + ";"));
                 }
             } else {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
@@ -424,7 +425,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> WITH_NEW_NESTED = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> WITH_NEW_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
@@ -459,9 +460,9 @@ public class ToMethod {
                     .build();
 
         }
-    });
+    };
 
-    public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = CachingFunction.wrap(new Function<Property, Set<Method>>() {
+    public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = new Function<Property, Set<Method>>() {
         public Set<Method> apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
@@ -500,9 +501,9 @@ public class ToMethod {
 
             return result;
         }
-    });
+    };
 
-    public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
@@ -542,7 +543,7 @@ public class ToMethod {
                     .build();
 
         }
-    });
+    };
 
     public static final Function<Property, Method> EDIT_NESTED = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {
@@ -566,7 +567,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> AND = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> AND = new Function<Property, Method>() {
         public Method apply(Property property) {
             String classPrefix = getClassPrefix(property);
             String prefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
@@ -589,7 +590,7 @@ public class ToMethod {
             } else return "";
         }
 
-    });
+    };
 
     public static final Function<Property, Method> END = CachingFunction.wrap(new Function<Property, Method>() {
         public Method apply(Property property) {

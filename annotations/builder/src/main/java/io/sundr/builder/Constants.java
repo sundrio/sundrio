@@ -53,8 +53,9 @@ public class Constants {
     public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
 
-    public static final String DEFAULT_IMPL = "DEFAULT_IMPL";
     public static final String INIT = "INIT";
+
+    public static final String GENERATED = "GENERATED";
 
     public static final String EMPTY = "";
 

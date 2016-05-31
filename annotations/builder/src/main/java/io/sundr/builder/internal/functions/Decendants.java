@@ -34,6 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.DESCENDANT_OF;
+import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
@@ -53,7 +54,7 @@ public class Decendants {
 
             for (TypeDef type : repository.getBuildables()) {
 
-                if (type.getKind() == Kind.CLASS &&  !type.isAbstract() && isDescendant(type, item) && !type.equals(item)) {
+                if (type.getKind() == Kind.CLASS &&  !type.isAbstract() && isDescendant(type, item) && !type.equals(item) && !type.getAttributes().containsKey(GENERATED)) {
                     result.add(type);
                 }
             }
@@ -94,6 +95,7 @@ public class Decendants {
                 ClassRef candidate = (ClassRef) baseType;
                 for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
                     String propertyName = descendant.getName() + property.getNameCapitalized();
+
                     result.add(new PropertyBuilder(property)
                             .withName(propertyName)
                             .withTypeRef(classRefOf(descendant))
