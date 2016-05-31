@@ -27,6 +27,7 @@ import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.CollectionTypes;
+import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.ElementTo;
@@ -214,7 +215,8 @@ public class BuilderUtils {
 
     public static Set<Method> getInlineableConstructors(Property property) {
         Set<Method> result = new HashSet<Method>();
-        TypeDef clazz = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(property.getTypeRef());
+        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+        TypeDef clazz = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
         for (Method candidate : clazz.getConstructors()) {
             if (isInlineable(candidate)) {
                 result.add(candidate);

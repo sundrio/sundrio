@@ -33,7 +33,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BODY;
+import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.T;
+import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
@@ -47,6 +49,7 @@ public enum ToMethods implements Function<Property, Set<Method>> {
    WITH_NESTED_INLINE {
 
         public Set<Method> apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
             TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             TypeDef baseType = BuilderContextManager.getContext().getBuildableRepository().getBuildable(unwrappedType);
@@ -70,12 +73,14 @@ public enum ToMethods implements Function<Property, Set<Method>> {
 
                 result.add(new MethodBuilder()
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                        .withReturnType(new TypeParamRefBuilder().withName(T.getName()).build())
+                        .withReturnType(returnType)
                         .withArguments(constructor.getArguments())
                         .withName(ownName)
                         //TODO: decide how to roll. Use sets or lists?
                         .withParameters(new LinkedHashSet<TypeParamDef>(baseType.getParameters()))
-                        .addToAttributes(BODY, "return " + delegateName + "(new " + baseType.getName() + "(" + args + "));")
+                        .withNewBlock()
+                            .addNewStringStatementStatement( "return ("+returnType+")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
+                        .endBlock()
                         .build());
             }
 
