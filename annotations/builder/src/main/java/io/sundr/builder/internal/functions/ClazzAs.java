@@ -393,11 +393,12 @@ public enum ClazzAs implements Function<TypeDef, TypeDef> {
         }
 
     }, EDITABLE_BUILDER {
-        public TypeDef apply(TypeDef item) {
+        public TypeDef apply(final TypeDef item) {
             final TypeDef editable = EDITABLE.apply(item);
             return new TypeDefBuilder(BUILDER.apply(item)).accept(new TypedVisitor<MethodBuilder>() {
                 public void visit(MethodBuilder builder) {
                     if (builder.getName() != null && builder.getName().equals("build")) {
+                        builder.withReturnType(editable.toInternalReference());
                         builder.withNewBlock()
                                 .withStatements(toBuild(editable, editable))
                                 .endBlock();
