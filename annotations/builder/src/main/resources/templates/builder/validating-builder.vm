@@ -1,6 +1,7 @@
 package ${model.type.packageName};
 
 import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -29,22 +30,18 @@ public ${m.returnType.simpleName} ${m.name}(#foreach ($a in ${m.arguments}) ${a.
 #end
 
 private <T> void validate(T item) {
+    Validator validator = null;
     try {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        
-        Set<ConstraintViolation<T>> violations = validator.validate(item);
-        if (!violations.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Constraint Violations:\n");
-            for (ConstraintViolation violation : violations) {
-                sb.append("\t").append(violation.getRootBeanClass().getSimpleName()).append(" ").append(violation.getPropertyPath()).append(":").append(violation.getMessage()).append("\n");
-            }
-            throw new IllegalStateException(sb.toString());
-        }
+        validator = factory.getValidator();
     } catch(ValidationException e) {
         //ignore
+        return;
+    }
+
+    Set<ConstraintViolation<T>> violations = validator.validate(item);
+    if (!violations.isEmpty()) {
+        throw new ConstraintViolationException(violations);
     }
 }
-
-#end    
+#end
