@@ -18,27 +18,21 @@ package io.sundr.examples.validation;
 
 import org.junit.Test;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.util.Set;
-
-import static org.junit.Assert.*;
+import javax.validation.ConstraintViolationException;
 
 public class AddressValidationTest {
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testWithNullStreet() {
         Address address = new AddressBuilder().build();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testWithZeroNumber() {
         Address address = new AddressBuilder().withStreet("Sesame").withNumber(0).build();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testWithAlphanumericZipCode() {
         Address address = new AddressBuilder().withStreet("Sesame")
                 .withNumber(1)
@@ -47,7 +41,7 @@ public class AddressValidationTest {
     }
 
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void testWithLongZipCode() {
         Address address = new AddressBuilder().withStreet("Sesame")
                 .withNumber(1)
