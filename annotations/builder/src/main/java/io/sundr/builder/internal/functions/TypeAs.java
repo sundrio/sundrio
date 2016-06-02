@@ -46,7 +46,7 @@ import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public class TypeAs {
 
-    public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             BuilderContext ctx = BuilderContextManager.getContext();
             TypeDef fluent = SHALLOW_FLUENT.apply(item);
@@ -84,9 +84,9 @@ public class TypeAs {
                     .withImplementsList()
                     .build();
         }
-    });
+    };
 
-    public static final Function<TypeDef, TypeDef> FLUENT_IMPL = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> FLUENT_IMPL = new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             BuilderContext ctx = BuilderContextManager.getContext();
             TypeDef fluent = SHALLOW_FLUENT.apply(item);
@@ -112,7 +112,7 @@ public class TypeAs {
                     .build();
         }
 
-    });
+    };
 
 
     public static final Function<TypeDef, TypeDef> SHALLOW_FLUENT = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {

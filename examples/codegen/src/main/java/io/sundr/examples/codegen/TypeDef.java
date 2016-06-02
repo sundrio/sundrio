@@ -18,7 +18,6 @@ package io.sundr.examples.codegen;
 
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.codegen.model.*;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
