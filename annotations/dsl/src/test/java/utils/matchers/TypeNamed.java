@@ -16,13 +16,13 @@
 
 package utils.matchers;
 
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.ClassRef;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
-public class TypeNamed extends BaseMatcher<JavaType> {
+public class TypeNamed extends BaseMatcher<ClassRef> {
 
     private final String expectedValue;
 
@@ -30,25 +30,22 @@ public class TypeNamed extends BaseMatcher<JavaType> {
         expectedValue = equalArg;
     }
 
-
-    @Override
     public boolean matches(Object item) {
-        if (item instanceof JavaType) {
-            JavaType type = (JavaType) item;
-            if (type.getSimpleName().equals(expectedValue)) {
+        if (item instanceof ClassRef) {
+            ClassRef type = (ClassRef) item;
+            if (type.getDefinition().toString().equals(expectedValue)) {
                 return true;
             }
         }
         return false;
     }
 
-    @Override
     public void describeTo(Description description) {
         description.appendValue(expectedValue);
     }
 
     @Factory
-    public static Matcher<JavaType> typeNamed(String operand) {
+    public static Matcher<ClassRef> typeNamed(String operand) {
         return new TypeNamed(operand);
     }
 }

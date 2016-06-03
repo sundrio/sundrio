@@ -1,14 +1,13 @@
-package ${model.type.packageName};
+package ${model.packageName};
 
 #foreach($i in $model.imports)
-import $i.fullyQualifiedName;
+import $i.definition.getFullyQualifiedName();
 #end
-
 
 #class ($model)
 
 #foreach($m in $model.methods)
-    ${m.returnType.className} ${m.name}( #foreach($p in ${m.arguments})$p.type.simpleName $p.name#if( $foreach.hasNext ), #end#end );
+    #method ($m)#end
 #end
 
 #end

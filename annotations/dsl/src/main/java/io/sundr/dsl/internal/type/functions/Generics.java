@@ -17,22 +17,37 @@
 package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.builder.TypedVisitor;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.codegen.model.TypeRef;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
-import static io.sundr.dsl.internal.Constants.VOID;
+import static io.sundr.dsl.internal.Constants.TRANSPARENT_REF;
+import static io.sundr.dsl.internal.Constants.VOID_REF;
 
-public enum Generics implements Function<JavaType, JavaType> {
+public class Generics {
 
-    MAP {
-        public JavaType apply(JavaType item) {
+
+    private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"};
+    private static final Map<TypeRef, TypeParamDef> GENERIC_MAPPINGS = new HashMap<TypeRef, TypeParamDef>();
+    private static int counter = 0;
+
+
+    public static final Function<TypeRef, TypeParamDef> MAP = new Function<TypeRef, TypeParamDef>() {
+        public TypeParamDef apply(TypeRef item) {
             if (!GENERIC_MAPPINGS.containsKey(item)) {
                 int iteration = counter / GENERIC_NAMES.length;
                 String name = GENERIC_NAMES[counter % GENERIC_NAMES.length];
@@ -40,82 +55,52 @@ public enum Generics implements Function<JavaType, JavaType> {
                     name += iteration;
                 }
                 counter++;
-                GENERIC_MAPPINGS.put(item, new JavaTypeBuilder().withName(name).addToAttributes(IS_GENERIC, true).build());
+                GENERIC_MAPPINGS.put(item, new TypeParamDefBuilder().withName(name).addToAttributes(IS_GENERIC, true).build());
             }
             return GENERIC_MAPPINGS.get(item);
         }
+    };
+    public static final Function<TypeDef, TypeDef> UNWRAP = new Function<TypeDef, TypeDef>() {
 
-    }, UNMAP {
-        public JavaType apply(JavaType item) {
-            if (containsValue(GENERIC_MAPPINGS, item)) {
-                return getKeyForValue(GENERIC_MAPPINGS, item);
-            } else {
-                return item;
-            }
-        }
-    }, UNWRAP {
-        public JavaType apply(JavaType type) {
-           return unwrap(type, new LinkedHashSet<String>());
+        public TypeDef apply(TypeDef type) {
+            return new TypeDefBuilder(type).accept(new TypedVisitor<ClassRefBuilder>() {
+                public void visit(ClassRefBuilder builder) {
+                    List<TypeRef> unwrappedArguments = new ArrayList<TypeRef>();
+                    for (TypeRef argument : builder.getArguments()) {
+                        TypeRef key = getKeyForValue(GENERIC_MAPPINGS, argument);
+                        if (key != null) {
+                            unwrappedArguments.add(key);
+                        } else {
+                            unwrappedArguments.add(argument);
+                        }
+                    }
+                    builder.withArguments(unwrappedArguments);
+                }
+            }).build();
         }
     };
 
-    private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"};
-    private static final Map<JavaType, JavaType> GENERIC_MAPPINGS = new HashMap<JavaType, JavaType>();
-    private static int counter = 0;
-
-    private static JavaType unwrap(JavaType type, Set<String> visited) {
-        //Try to detect circles...
-        Set<String> path = new LinkedHashSet<String>(visited);
-        path.add(type.getFullyQualifiedName());
-        //We use containsValue that is not using equals, but getFullyQualifiedName instead.
-        //This is needed to prevent possible infinite loops
-        if (containsValue(GENERIC_MAPPINGS, type)) {
-            JavaType unmapped = UNMAP.apply(type);
-            if (!unmapped.equals(type) && !path.contains(unmapped)) {
-                return unwrap(unmapped, path);
-            }
-            return unmapped;
-        } else {
-            Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
-            Set<JavaType> generics = new LinkedHashSet<JavaType>();
-
-            for (JavaType iface : type.getInterfaces()) {
-                if (!path.contains(iface.getFullyQualifiedName())) {
-                    interfaces.add(unwrap(iface, path));
-                }
-            }
-            for (JavaType generic : type.getGenericTypes()) {
-                if (!path.contains(generic.getFullyQualifiedName())) {
-                    generics.add(unwrap(generic, path));
-                }
-            }
-            return new JavaTypeBuilder(type)
-                    .withGenericTypes(generics.toArray(new JavaType[generics.size()]))
-                    .withInterfaces(interfaces)
-                    .build();
-        }
-    }
-
-    private static boolean containsValue(Map<JavaType, JavaType> map, JavaType value) {
-        for (Map.Entry<JavaType,JavaType> entry : map.entrySet()) {
-            if (value.getFullyQualifiedName().equals(entry.getValue().getFullyQualifiedName())) {
+    private static boolean containsValue(Map<TypeRef, TypeParamDef> map, TypeRef value) {
+        for (Map.Entry<TypeRef, TypeParamDef> entry : map.entrySet()) {
+            if (value instanceof TypeParamRef && ((TypeParamRef) value).getName().equals(entry.getValue().getName())) {
                 return true;
             }
         }
         return false;
     }
 
-    private static JavaType getKeyForValue(Map<JavaType, JavaType> map, JavaType value) {
-        for (Map.Entry<JavaType,JavaType> entry : map.entrySet()) {
-            if (value.getFullyQualifiedName().equals(entry.getValue().getFullyQualifiedName())) {
+    private static TypeRef getKeyForValue(Map<TypeRef, TypeParamDef> map, TypeRef value) {
+        for (Map.Entry<TypeRef, TypeParamDef> entry : map.entrySet()) {
+            if (value instanceof TypeParamRef && ((TypeParamRef) value).getName().equals(entry.getValue().getName())) {
                 return entry.getKey();
             }
         }
-        throw new IllegalStateException("Key not found for value:" + value.getFullyQualifiedName());
+        throw new IllegalStateException("Key not found for value:[" + value +"].");
     }
+
     
     static {
-        GENERIC_MAPPINGS.put(VOID, new JavaTypeBuilder().withName("V").addToAttributes(IS_GENERIC, true).build());
-        GENERIC_MAPPINGS.put(TRANSPARENT, TRANSPARENT);
+        GENERIC_MAPPINGS.put(VOID_REF, new TypeParamDefBuilder().withName("V").addToAttributes(IS_GENERIC, true).build());
+        GENERIC_MAPPINGS.put(TRANSPARENT_REF,  TRANSPARENT);
     }
 }

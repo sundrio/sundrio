@@ -16,13 +16,18 @@
 
 package io.sundr.dsl.internal.utils;
 
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.Attributeable;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.ModelUtils;
+import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.annotations.Begin;
 import io.sundr.dsl.annotations.End;
 import io.sundr.dsl.annotations.EntryPoint;
@@ -34,11 +39,12 @@ import io.sundr.dsl.annotations.Terminal;
 import io.sundr.dsl.internal.element.functions.filter.AndTransitionFilter;
 import io.sundr.dsl.internal.element.functions.filter.OrTransitionFilter;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
-import io.sundr.dsl.internal.processor.DslProcessorContext;
+import io.sundr.dsl.internal.processor.DslContext;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.type.functions.Merge;
 
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,22 +74,23 @@ import static io.sundr.dsl.internal.Constants.METHOD_NAME;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
-import static io.sundr.dsl.internal.Constants.VOID;
+import static io.sundr.dsl.internal.Constants.TRANSPARENT_REF;
+import static io.sundr.dsl.internal.Constants.VOID_REF;
 
-public final class JavaTypeUtils {
+public final class TypeDefUtils {
 
-    private JavaTypeUtils() {
+    private TypeDefUtils() {
         //Utility Class
     }
 
     /**
-     * Convert an {@link javax.lang.model.element.ExecutableElement} to a {@link io.sundr.codegen.model.JavaClazz}
+     * Convert an {@link javax.lang.model.element.ExecutableElement} to a {@link io.sundr.codegen.model.TypeDef}
      *
      * @param context           The context of the operation.
      * @param executableElement The target element.
-     * @return                  An instance of {@link io.sundr.codegen.model.JavaClazz} that describes the interface.
+     * @return                  An instance of {@link io.sundr.codegen.model.TypeDef} that describes the interface.
      */
-    public static JavaClazz executableToInterface(DslProcessorContext context, ExecutableElement executableElement) {
+    public static TypeDef executableToInterface(DslContext context, ExecutableElement executableElement) {
         //Do generate the interface
         Boolean multiple = executableElement.getAnnotation(Multiple.class) != null;
         Boolean isEntryPoint = executableElement.getAnnotation(EntryPoint.class) != null;
@@ -109,13 +116,13 @@ public final class JavaTypeUtils {
         //Let's add the name of the method as a keyword to make things simpler
         methods.add(executableElement.getSimpleName().toString());
 
-        JavaType returnType;
+        TypeRef returnType;
         if (isTerminal(executableElement)) {
             returnType = isVoid(executableElement) ?
-                    VOID :
-                    context.getToType().apply(executableElement.getReturnType().toString());
+                    VOID_REF :
+                    ElementTo.MIRROR_TO_TYPEREF.apply(executableElement.getReturnType());
         } else {
-            returnType = TRANSPARENT;
+            returnType = TRANSPARENT_REF;
         }
 
         InterfaceName targetInterfaceName = executableElement.getAnnotation(InterfaceName.class);
@@ -129,27 +136,28 @@ public final class JavaTypeUtils {
         if (end != null) {
             keywords.add(end.value());
         }
+
         String methodName = tagetMethodName != null ? tagetMethodName.value() : executableElement.getSimpleName().toString();
 
         String beginScope = begin != null ? begin.value() : null;
         String endScope = end != null ? end.value() : null;
 
-        JavaType genericType = Generics.MAP.apply(returnType);
+        TypeParamDef paremeterType = Generics.MAP.apply(returnType);
 
-        Method sourceMethod = context.getToMethod().apply(executableElement);
-        Method targetMethod = new MethodBuilder(sourceMethod).withReturnType(genericType).withName(methodName).build();
+        Method sourceMethod = ElementTo.METHOD.apply(executableElement);
+        Method targetMethod = new MethodBuilder(sourceMethod).withReturnType(paremeterType.toReference()).withName(methodName).build();
 
 
         String interfaceName = targetInterfaceName != null ?
                 targetInterfaceName.value() :
                 toInterfaceName(targetMethod.getName());
 
-        return new JavaClazzBuilder()
-                .withNewType()
+        return new TypeDefBuilder()
                     .withPackageName(ModelUtils.getPackageElement(executableElement).toString())
                     .withName(interfaceName)
-                    .addToGenericTypes(genericType)
+                    .withParameters(paremeterType)
                     .withKind(Kind.INTERFACE)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addToAttributes(ORIGINAL_RETURN_TYPE, returnType)
                     .addToAttributes(IS_ENTRYPOINT, isEntryPoint)
                     .addToAttributes(IS_TERMINAL, isTerminal)
@@ -161,70 +169,84 @@ public final class JavaTypeUtils {
                     .addToAttributes(END_SCOPE, endScope)
                     .addToAttributes(FILTER, filter)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
-                    .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<JavaType>(Arrays.asList(returnType)) : Collections.emptySet())
+                    .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<TypeRef>(Arrays.asList(returnType)) : Collections.emptySet())
                     .addToAttributes(METHOD_NAME, methodName)
-                .endType()
                 .addToMethods(targetMethod)
                 .build();
     }
 
 
     /**
-     * Convert a {@link Collection} of {@link javax.lang.model.element.ExecutableElement}s to a {@link java.util.Set} of {@link io.sundr.codegen.model.JavaClazz}es.
+     * Convert a {@link Collection} of {@link javax.lang.model.element.ExecutableElement}s to a {@link java.util.Set} of {@link io.sundr.codegen.model.TypeDef}es.
      *
      * @param context           The context of the operation.
      * @param elements          The target elements.
-     * @return                  A set of {@link io.sundr.codegen.model.JavaClazz} that describes the interfaces.
+     * @return                  A set of {@link io.sundr.codegen.model.TypeDef} that describes the interfaces.
      */
-    public static Set<JavaClazz> executablesToInterfaces(DslProcessorContext context, Collection<ExecutableElement> elements) {
-        Map<String, JavaClazz> byName = new LinkedHashMap<String, JavaClazz>();
+    public static Set<TypeDef> executablesToInterfaces(DslContext context, Collection<ExecutableElement> elements) {
+        Map<String, TypeDef> byName = new LinkedHashMap<String, TypeDef>();
         for (ExecutableElement current : elements) {
-            JavaClazz clazz = executableToInterface(context, current);
+            TypeDef clazz = executableToInterface(context, current);
             InterfaceName interfaceName = current.getAnnotation(InterfaceName.class);
-            String name = interfaceName != null ? clazz.getType().getPackageName() + "." + interfaceName.value() : clazz.getType().getFullyQualifiedName();
+            String name = interfaceName != null ? clazz.getPackageName() + "." + interfaceName.value() : clazz.getFullyQualifiedName();
             if (byName.containsKey(name)) {
-                JavaClazz other = byName.remove(name);
-                byName.put(name, Merge.CLASSES.apply(new JavaClazz[]{other, clazz}));
+                TypeDef other = byName.remove(name);
+                byName.put(name, Merge.CLASSES.apply(new TypeDef[]{other, clazz}));
             } else {
                 byName.put(name, clazz);
             }
         }
-        return new LinkedHashSet<JavaClazz>(byName.values());
+        return new LinkedHashSet<TypeDef>(byName.values());
     }
 
 
 
-    public static final Set<JavaType> getTerminatingTypes(JavaType type) {
-        Set<JavaType> result = new LinkedHashSet<JavaType>();
+    public static final Set<TypeDef> getTerminatingTypes(Attributeable type) {
+        Set<TypeDef> result = new LinkedHashSet<TypeDef>();
         if (type.getAttributes().containsKey(TERMINATING_TYPES)) {
-            result.addAll((Collection<JavaType>) type.getAttributes().get(TERMINATING_TYPES));
+            result.addAll((Collection<TypeDef>) type.getAttributes().get(TERMINATING_TYPES));
         }
         if (type.getAttributes().containsKey(IS_COMPOSITE)
                 && (Boolean) type.getAttributes().get(IS_TERMINAL)
                 && !(type.getAttributes().get(ORIGINAL_RETURN_TYPE).equals(TRANSPARENT))) {
-            result.add((JavaType) type.getAttributes().get(ORIGINAL_RETURN_TYPE));
+            result.add((TypeDef) type.getAttributes().get(ORIGINAL_RETURN_TYPE));
         }
         return result;
     }
 
-    public static Set<JavaType> extractInterfaces(Set<JavaType> types) {
-        Set<JavaType> result = new LinkedHashSet<JavaType>();
-        for (JavaType type : types) {
-            result.addAll(extractInterfaces(type));
+
+
+
+    public static Set<ClassRef> extractInterfacesFromTypes(Set<TypeDef> types) {
+        Set<ClassRef> result = new LinkedHashSet<ClassRef>();
+        for (TypeDef type : types) {
+            result.addAll(extractInterfacesFromType(type));
         }
         return result;
     }
 
-    public static Set<JavaType> extractInterfaces(JavaType type) {
-        Set<JavaType> result = new LinkedHashSet<JavaType>();
-        if (type.getInterfaces().isEmpty()) {
-            result.add(type);
+    public static Set<ClassRef> extractInterfacesFromClassRefs(Set<ClassRef> types) {
+        Set<ClassRef> result = new LinkedHashSet<ClassRef>();
+        for (ClassRef type : types) {
+            result.addAll(extractInterfacesFromClassRef(type));
+        }
+        return result;
+    }
+
+    public static Set<ClassRef> extractInterfacesFromType(TypeDef type) {
+        Set<ClassRef> result = new LinkedHashSet<ClassRef>();
+        if (type.getExtendsList().isEmpty()) {
+            result.add(type.toInternalReference());
         } else {
-            for (JavaType interfaceType : type.getInterfaces()) {
-                result.addAll(extractInterfaces(interfaceType));
+            for (ClassRef interfaceType : type.getExtendsList()) {
+                result.addAll(extractInterfacesFromClassRef(interfaceType));
             }
         }
         return result;
+    }
+
+    public static Set<ClassRef> extractInterfacesFromClassRef(ClassRef classRef) {
+        return extractInterfacesFromType(classRef.getDefinition());
     }
 
     public static String toInterfaceName(String name) {
@@ -242,47 +264,39 @@ public final class JavaTypeUtils {
         return executableElement.getAnnotation(Terminal.class) != null;
     }
 
-    public static boolean isEntryPoint(JavaClazz clazz) {
-        return clazz.getType().getAttributes().containsKey(IS_ENTRYPOINT)
-                && (clazz.getType().getAttributes().get(IS_ENTRYPOINT) instanceof Boolean)
-                && (Boolean) clazz.getType().getAttributes().get(IS_ENTRYPOINT);
+    public static boolean isEntryPoint(Attributeable type) {
+        return type.getAttributes().containsKey(IS_ENTRYPOINT)
+                && (type.getAttributes().get(IS_ENTRYPOINT) instanceof Boolean)
+                && (Boolean) type.getAttributes().get(IS_ENTRYPOINT);
     }
 
-    public static boolean isTerminal(JavaClazz clazz) {
-        return clazz.getType().getAttributes().containsKey(IS_TERMINAL)
-                && (clazz.getType().getAttributes().get(IS_TERMINAL) instanceof Boolean)
-                && (Boolean) clazz.getType().getAttributes().get(IS_TERMINAL);
+    public static boolean isTerminal(Attributeable type) {
+        return type.getAttributes().containsKey(IS_TERMINAL)
+                && (type.getAttributes().get(IS_TERMINAL) instanceof Boolean)
+                && (Boolean) type.getAttributes().get(IS_TERMINAL);
     }
 
-    public static boolean isTransition(JavaClazz clazz) {
-        return clazz.getType().getAttributes().containsKey(IS_TRANSITION)
-                && (clazz.getType().getAttributes().get(IS_TRANSITION) instanceof Boolean)
-                && (Boolean) clazz.getType().getAttributes().get(IS_TRANSITION);
+    public static boolean isTransition(Attributeable type) {
+        return type.getAttributes().containsKey(IS_TRANSITION)
+                && (type.getAttributes().get(IS_TRANSITION) instanceof Boolean)
+                && (Boolean) type.getAttributes().get(IS_TRANSITION);
     }
 
-    public static boolean isBeginScope(JavaClazz clazz) {
-        return isBeginScope(clazz.getType());
-    }
-
-    public static boolean isBeginScope(JavaType type) {
+    public static boolean isBeginScope(Attributeable type) {
         return type.getAttributes().containsKey(BEGIN_SCOPE);
     }
 
-    public static boolean isEndScope(JavaClazz clazz) {
-        return isEndScope(clazz.getType());
-    }
-
-    public static boolean isEndScope(JavaType type) {
+    public static boolean isEndScope(Attributeable type) {
         return type.getAttributes().containsKey(END_SCOPE);
     }
 
-    public static boolean isCardinalityMultiple(JavaClazz clazz) {
-        return clazz.getType().getAttributes().containsKey(CARDINALITY_MULTIPLE)
-                && (clazz.getType().getAttributes().get(CARDINALITY_MULTIPLE) instanceof Boolean)
-                && (Boolean) clazz.getType().getAttributes().get(CARDINALITY_MULTIPLE);
+    public static boolean isCardinalityMultiple(Attributeable type) {
+        return type.getAttributes().containsKey(CARDINALITY_MULTIPLE)
+                && (type.getAttributes().get(CARDINALITY_MULTIPLE) instanceof Boolean)
+                && (Boolean) type.getAttributes().get(CARDINALITY_MULTIPLE);
     }
 
-    public static boolean isGeneric(JavaType type) {
+    public static boolean isGeneric(Attributeable type) {
         return type.getAttributes().containsKey(IS_GENERIC)
                 && (type.getAttributes().get(IS_GENERIC) instanceof Boolean)
                 && (Boolean) type.getAttributes().get(IS_GENERIC);

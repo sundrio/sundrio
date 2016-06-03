@@ -16,12 +16,10 @@
 
 package io.sundr.dsl.internal.utils;
 
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeDef;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.EmptyStackException;
 import java.util.HashSet;
@@ -38,8 +36,8 @@ import static io.sundr.dsl.internal.Constants.FILTER;
 import static io.sundr.dsl.internal.Constants.CLASSES;
 import static io.sundr.dsl.internal.Constants.KEYWORDS;
 import static io.sundr.dsl.internal.Constants.METHODS;
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.isCardinalityMultiple;
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.isTerminal;
+import static io.sundr.dsl.internal.utils.TypeDefUtils.isCardinalityMultiple;
+import static io.sundr.dsl.internal.utils.TypeDefUtils.isTerminal;
 
 public final class GraphUtils {
 
@@ -47,32 +45,32 @@ public final class GraphUtils {
         //Utility Class
     }
 
-    public static Set<JavaClazz> exclusion(Set<JavaClazz> one, Collection<JavaType> excluded) {
-        Set<JavaClazz> result = new LinkedHashSet<JavaClazz>();
-        for (JavaClazz item : one) {
-            if (!excluded.contains(item.getType()) || isTerminal(item) || isCardinalityMultiple(item)) {
+    public static Set<TypeDef> exclusion(Set<TypeDef> one, Collection<TypeDef> excluded) {
+        Set<TypeDef> result = new LinkedHashSet<TypeDef>();
+        for (TypeDef item : one) {
+            if (!excluded.contains(item) || isTerminal(item) || isCardinalityMultiple(item)) {
                 result.add(item);
             }
         }
         return result;
     }
 
-    public static boolean isSatisfied(JavaClazz candidate, List<JavaType> path) {
+    public static boolean isSatisfied(TypeDef candidate, List<TypeDef> path) {
         Set<String> keywordsAndScopes = new LinkedHashSet<String>();
         Set<String> visitedKeywords = getKeywords(path);
         Deque<String> activeScopes = getScopes(path);
         keywordsAndScopes.addAll(visitedKeywords);
         keywordsAndScopes.addAll(activeScopes);
 
-        TransitionFilter filter = (TransitionFilter) candidate.getType().getAttributes().get(FILTER);
-        Boolean multiple = (Boolean) candidate.getType().getAttributes().get(CARDINALITY_MULTIPLE);
+        TransitionFilter filter = (TransitionFilter) candidate.getAttributes().get(FILTER);
+        Boolean multiple = (Boolean) candidate.getAttributes().get(CARDINALITY_MULTIPLE);
 
-        Set<String> keywords = (Set<String>) candidate.getType().getAttributes().get(KEYWORDS);
+        Set<String> keywords = (Set<String>) candidate.getAttributes().get(KEYWORDS);
         if (!activeScopes.isEmpty() && !keywords.contains(activeScopes.getLast())) {
             return false;
         }
-        int lastIndex = path.lastIndexOf(candidate.getType());
-        if (!multiple && path.contains(candidate.getType())) {
+        int lastIndex = path.lastIndexOf(candidate);
+        if (!multiple && path.contains(candidate)) {
             //Eliminate circles if not explicitly specified
             return false;
         } else if (multiple && lastIndex > 0 && lastIndex < path.size() - 1) {
@@ -82,9 +80,9 @@ public final class GraphUtils {
         return filter.apply(path);
     }
 
-    public static Set<String> getClasses(Collection<JavaType> types) {
+    public static Set<String> getClasses(Collection<TypeDef> types) {
         Set<String> result = new HashSet<String>();
-        for (JavaType type : types) {
+        for (TypeDef type : types) {
             Set<String> classes = (Set<String>) type.getAttributes().get(CLASSES);
             if (classes != null) {
                 result.addAll(classes);
@@ -93,9 +91,9 @@ public final class GraphUtils {
         return result;
     }
 
-    public static Set<String> getKeywords(Collection<JavaType> types) {
+    public static Set<String> getKeywords(Collection<TypeDef> types) {
         Set<String> result = new HashSet<String>();
-        for (JavaType type : types) {
+        for (TypeDef type : types) {
             Set<String> keywords = (Set<String>) type.getAttributes().get(KEYWORDS);
             if (keywords != null) {
                 result.addAll(keywords);
@@ -104,9 +102,9 @@ public final class GraphUtils {
         return result;
     }
 
-    public static Set<String> getMethods(Collection<JavaType> types) {
+    public static Set<String> getMethods(Collection<TypeDef> types) {
         Set<String> result = new HashSet<String>();
-        for (JavaType type : types) {
+        for (TypeDef type : types) {
             Set<String> methods = (Set<String>) type.getAttributes().get(METHODS);
             if (methods != null) {
                 result.addAll(methods);
@@ -115,9 +113,9 @@ public final class GraphUtils {
         return result;
     }
 
-    public static LinkedList<String> getScopes(Collection<JavaType> types) {
+    public static LinkedList<String> getScopes(Collection<TypeDef> types) {
         Stack<String> stack = new Stack<String>();
-        for (JavaType type : types) {
+        for (TypeDef type : types) {
 
             String scope = (String) type.getAttributes().get(BEGIN_SCOPE);
             if (scope != null && !scope.isEmpty()) {

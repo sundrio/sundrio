@@ -17,18 +17,22 @@
 package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.utils.StringUtils;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
+import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
 
+import javax.lang.model.element.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,91 +45,187 @@ import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.REMOVABLE_PREFIXES;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
-import static io.sundr.dsl.internal.Constants.TRANSPARENT;
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.getTerminatingTypes;
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.toInterfaceName;
+import static io.sundr.dsl.internal.Constants.TRANSPARENT_REF;
+import static io.sundr.dsl.internal.utils.TypeDefUtils.getTerminatingTypes;
+import static io.sundr.dsl.internal.utils.TypeDefUtils.toInterfaceName;
 
-public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
+public class Combine {
 
-    FUNCTION;
 
-    @Override
-    public JavaClazz apply(Collection<JavaClazz> alternatives) {
-        String key = createKey(alternatives);
-        if (combinations.containsKey(key)) {
-            return combinations.get(key);
-        }
+    public static Function<Collection<ClassRef>, TypeDef> TYPEREFS = new Function<Collection<ClassRef>, TypeDef>() {
+        public TypeDef apply(Collection<ClassRef> alternatives) {
+            String key = createKeyForClasses(alternatives);
+            if (combinations.containsKey(key)) {
+                return combinations.get(key);
+            }
 
-        Set<JavaType> genericTypes = new LinkedHashSet<JavaType>();
-        Set<JavaType> interfaces = new LinkedHashSet<JavaType>();
-        Set<JavaType> terminatingTypes = new LinkedHashSet<JavaType>();
+            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+            Set<ClassRef> interfaces = new LinkedHashSet<ClassRef>();
+            Set<TypeDef> terminatingTypes = new LinkedHashSet<TypeDef>();
 
-        JavaClazz fallback = null;
-        for (JavaClazz alternative : alternatives) {
-            if (!canBeExcluded(alternative, alternatives)) {
-                interfaces.add(alternative.getType());
-                terminatingTypes.addAll(getTerminatingTypes(alternative.getType()));
-                for (JavaType candidate : alternative.getType().getGenericTypes()) {
-                    genericTypes.addAll(getGenericReferences(candidate));
-                }
-            } else {
-                if (fallback == null) {
-                    fallback = alternative;
-                } else if (canBeExcluded(fallback, Arrays.asList(alternative))) {
-                    fallback = alternative;
+            ClassRef fallback = null;
+            for (ClassRef alternative : alternatives) {
+                if (!canBeExcluded(alternative, alternatives)) {
+                    interfaces.add(alternative);
+                    terminatingTypes.addAll(getTerminatingTypes(alternative));
+
+                    for (TypeParamDef candidate : alternative.getDefinition().getParameters()) {
+                        parameters.add(candidate);
+                    }
+
+                } else {
+                    if (fallback == null) {
+                        fallback = alternative;
+                    } else if (canBeExcluded(fallback, Arrays.asList(alternative))) {
+                        fallback = alternative;
+                    }
                 }
             }
-        }
-        if (interfaces.isEmpty()) {
-            interfaces.add(fallback.getType());
-            terminatingTypes.addAll(getTerminatingTypes(fallback.getType()));
-            for (JavaType candidate : fallback.getType().getGenericTypes()) {
-                genericTypes.addAll(getGenericReferences(candidate));
-            }
-        }
-        String className = classNameOf(interfaces);
 
-        JavaClazz combination = new JavaClazzBuilder()
-                .withNewType()
+            if (interfaces.isEmpty()) {
+                interfaces.add(fallback);
+                terminatingTypes.addAll(getTerminatingTypes(fallback));
+                for (TypeParamDef candidate : fallback.getDefinition().getParameters()) {
+                    parameters.add(candidate);
+                }
+            }
+            String className = CLASSREFS_TO_NAME.apply(interfaces);
+            String packageName = CLASSREFS_TO_PACKAGE.apply(interfaces);
+
+            TypeDef combination = new TypeDefBuilder()
                     .withKind(Kind.INTERFACE)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(className)
-                    .withPackageName(interfaces.iterator().next().getPackageName())
-                    .withInterfaces(interfaces)
-                    .withGenericTypes(genericTypes.toArray(new JavaType[genericTypes.size()]))
-                    .addToAttributes(ORIGINAL_RETURN_TYPE, TRANSPARENT)
+                    .withPackageName(packageName)
+                    .withExtendsList(interfaces)
+                    .withParameters(parameters.toArray(new TypeParamDef[parameters.size()]))
+                    .addToAttributes(ORIGINAL_RETURN_TYPE, TRANSPARENT_REF)
                     .addToAttributes(TERMINATING_TYPES, terminatingTypes)
                     .addToAttributes(IS_TERMINAL, false)
                     .addToAttributes(IS_COMPOSITE, false)
-                .endType()
-                .build();
+                    .build();
 
-        combinations.put(key, combination);
-        return combination;
-    }
+            combinations.put(key, combination);
+            return combination;
+        }
+    };
 
-    private static final String classNameOf(Set<JavaType> types) {
-        final Function<JavaType, String> toString = new Function<JavaType, String>() {
-            @Override
-            public String apply(JavaType item) {
-                return stripSuffix(item.getClassName());
+    public static Function<Collection<TypeDef>, TypeDef> TYPEDEFS = new Function<Collection<TypeDef>, TypeDef>() {
+
+        public TypeDef apply(Collection<TypeDef> alternatives) {
+            String key = createKeyForTypes(alternatives);
+            if (combinations.containsKey(key)) {
+                return combinations.get(key);
             }
-        };
 
+            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+            Set<ClassRef> interfaces = new LinkedHashSet<ClassRef>();
+            Set<TypeDef> terminatingTypes = new LinkedHashSet<TypeDef>();
 
-        final String prefix = StringUtils.getPrefix(types, toString);
+            TypeDef fallback = null;
+            for (TypeDef alternative : alternatives) {
+                if (!canBeExcluded(alternative, alternatives)) {
+                    interfaces.add(alternative.toInternalReference());
+                    terminatingTypes.addAll(getTerminatingTypes(alternative));
 
-        return  toInterfaceName(prefix + compact(StringUtils.join(types, new Function<JavaType, String>() {
-            @Override
-            public String apply(JavaType item) {
-                String str = stripPrefix(stripSuffix(item.getClassName()));
-                if (str.length() > prefix.length()) {
-                    return str.substring(prefix.length());
+                    for (TypeParamDef candidate : alternative.getParameters()) {
+                        parameters.add(candidate);
+                    }
+
                 } else {
-                    return str;
+                    if (fallback == null) {
+                        fallback = alternative;
+                    } else if (canBeExcluded(fallback, Arrays.asList(alternative))) {
+                        fallback = alternative;
+                    }
                 }
             }
-        }, "")));
-    }
+
+            if (interfaces.isEmpty()) {
+                interfaces.add(fallback.toInternalReference());
+                terminatingTypes.addAll(getTerminatingTypes(fallback));
+                for (TypeParamDef candidate : fallback.getParameters()) {
+                    parameters.add(candidate);
+                }
+            }
+            String className = CLASSREFS_TO_NAME.apply(interfaces);
+            String packageName = CLASSREFS_TO_PACKAGE.apply(interfaces);
+
+            TypeDef combination = new TypeDefBuilder()
+                    .withKind(Kind.INTERFACE)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withName(className)
+                    .withPackageName(packageName)
+                    .withExtendsList(interfaces)
+                    .withParameters(parameters.toArray(new TypeParamDef[parameters.size()]))
+                    .addToAttributes(ORIGINAL_RETURN_TYPE, TRANSPARENT_REF)
+                    .addToAttributes(TERMINATING_TYPES, terminatingTypes)
+                    .addToAttributes(IS_TERMINAL, false)
+                    .addToAttributes(IS_COMPOSITE, false)
+                    .build();
+
+            combinations.put(key, combination);
+            return combination;
+        }
+    };
+
+    public static final Function<Collection<TypeDef>, String> TYPEDEFS_TO_NAME = new Function<Collection<TypeDef>, String>() {
+        public String apply(Collection<TypeDef> types) {
+            final Function<TypeDef, String> toString = new Function<TypeDef, String>() {
+                public String apply(TypeDef item) {
+                    return stripSuffix(item.getName());
+                }
+            };
+
+            final String prefix = StringUtils.getPrefix(types, toString);
+
+            return  toInterfaceName(prefix + compact(StringUtils.join(types, new Function<TypeDef, String>() {
+                public String apply(TypeDef item) {
+                    String str = stripPrefix(stripSuffix(item.getName()));
+                    if (str.length() > prefix.length()) {
+                        return str.substring(prefix.length());
+                    } else {
+                        return str;
+                    }
+                }
+            }, "")));
+        }
+    };
+
+    public static final Function<Collection<ClassRef>, String> CLASSREFS_TO_NAME = new Function<Collection<ClassRef>, String>() {
+        public String apply(Collection<ClassRef> types) {
+            final Function<ClassRef, String> toString = new Function<ClassRef, String>() {
+                public String apply(ClassRef item) {
+                    return stripSuffix(item.getDefinition().getName());
+                }
+            };
+
+            final String prefix = StringUtils.getPrefix(types, toString);
+
+            return  toInterfaceName(prefix + compact(StringUtils.join(types, new Function<ClassRef, String>() {
+                public String apply(ClassRef item) {
+                    String str = stripPrefix(stripSuffix(item.getDefinition().getName()));
+                    if (str.length() > prefix.length()) {
+                        return str.substring(prefix.length());
+                    } else {
+                        return str;
+                    }
+                }
+            }, "")));
+        }
+    };
+
+    public static final Function<Set<ClassRef>, String> CLASSREFS_TO_PACKAGE = new Function<Set<ClassRef>, String>() {
+
+        public String apply(Set<ClassRef> types) {
+            Iterator<ClassRef> iterator = types.iterator();
+            if (iterator.hasNext()) {
+                return  iterator.next().getDefinition().getPackageName();
+            }
+            return "";
+        }
+    };
+
 
 
     /**
@@ -142,16 +242,16 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
         return StringUtils.join(parts,"");
     }
 
-    private static boolean canBeExcluded(JavaClazz candidate, Iterable<JavaClazz> provided) {
-        Set<JavaType> allOther = new LinkedHashSet<JavaType>();
-        for (JavaClazz c : provided) {
+    private static boolean canBeExcluded(TypeDef candidate, Iterable<TypeDef> provided) {
+        Set<TypeDef> allOther = new LinkedHashSet<TypeDef>();
+        for (TypeDef c : provided) {
             if (!c.equals(candidate)) {
-                allOther.addAll(JavaTypeUtils.extractInterfaces(c.getType()));
+                allOther.add(c);
             }
         }
 
-        Set<JavaType> allProvided = JavaTypeUtils.extractInterfaces(allOther);
-        for (JavaType type : JavaTypeUtils.extractInterfaces(candidate.getType())) {
+        Set<ClassRef> allProvided = TypeDefUtils.extractInterfacesFromTypes(allOther);
+        for (ClassRef type : TypeDefUtils.extractInterfacesFromType(candidate)) {
             if (!allProvided.contains(type)) {
                 return false;
             }
@@ -159,16 +259,22 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
         return true;
     }
 
-    private Set<JavaType> getGenericReferences(JavaType type) {
-        Set<JavaType> result = new LinkedHashSet<JavaType>();
-        if (JavaTypeUtils.isGeneric(type)) {
-            result.add(type);
-        } else {
-            for (JavaType t : type.getGenericTypes()) {
-                result.addAll(getGenericReferences(t));
+
+    private static boolean canBeExcluded(ClassRef candidate, Iterable<ClassRef> provided) {
+        Set<ClassRef> allOther = new LinkedHashSet<ClassRef>();
+        for (ClassRef c : provided) {
+            if (!c.equals(candidate)) {
+                allOther.add(c);
             }
         }
-        return result;
+
+        Set<ClassRef> allProvided = TypeDefUtils.extractInterfacesFromClassRefs(allOther);
+        for (ClassRef type : TypeDefUtils.extractInterfacesFromClassRef(candidate)) {
+            if (!allProvided.contains(type)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static final String stripPrefix(String str) {
@@ -186,24 +292,29 @@ public enum Combine implements Function<Collection<JavaClazz>, JavaClazz> {
         }
         return str;
     }
+    private static String createKeyForClasses(Collection<ClassRef> alternatives) {
+        List<TypeDef> typeDefs = new LinkedList<TypeDef>();
+        for (ClassRef classRef : alternatives) {
+            typeDefs.add(classRef.getDefinition());
+        }
+        return createKeyForTypes(typeDefs);
+    }
 
-    private static String createKey(Collection<JavaClazz> alternatives) {
-        List<JavaClazz> clazzes = new LinkedList<JavaClazz>(alternatives);
-        Collections.sort(clazzes, new Comparator<JavaClazz>() {
-            @Override
-            public int compare(JavaClazz left, JavaClazz right) {
-                return left.getType().getFullyQualifiedName().compareTo(right.getType().getFullyQualifiedName());
+    private static String createKeyForTypes(Collection<TypeDef> alternatives) {
+        List<TypeDef> clazzes = new LinkedList<TypeDef>(alternatives);
+        Collections.sort(clazzes, new Comparator<TypeDef>() {
+            public int compare(TypeDef left, TypeDef right) {
+                return left.getFullyQualifiedName().compareTo(right.getFullyQualifiedName());
             }
         });
-        return StringUtils.join(clazzes, new Function<JavaClazz, String>() {
-            @Override
-            public String apply(JavaClazz item) {
-                return item.getType().getSimpleName();
+        return StringUtils.join(clazzes, new Function<TypeDef, String>() {
+            public String apply(TypeDef item) {
+                return item.getName();
             }
         }, "#");
     }
 
-    private static Map<String, JavaClazz> combinations = new HashMap<String, JavaClazz>();
+    private static Map<String, TypeDef> combinations = new HashMap<String, TypeDef>();
 
     private static final String SPLITTER_REGEX = "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])";
 }
