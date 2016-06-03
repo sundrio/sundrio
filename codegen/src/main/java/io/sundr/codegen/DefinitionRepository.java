@@ -18,6 +18,7 @@ package io.sundr.codegen;
 
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeRef;
 
 import java.util.Collections;
@@ -49,8 +50,33 @@ public class DefinitionRepository {
         return definition;
     }
 
-    public Set<TypeDef> getDefinitions() {
-        return Collections.unmodifiableSet(new LinkedHashSet<TypeDef>(definitions.values()));
+
+    public TypeDef register(TypeDef definition, String... flags) {
+        TypeDefBuilder builder = new TypeDefBuilder(definition);
+        for (String flag : flags) {
+            builder.addToAttributes(flag, true);
+        }
+        return register(builder.build());
+    }
+
+
+    public Set<TypeDef> getDefinitions(String... flags) {
+
+        Set<TypeDef> result = new LinkedHashSet<TypeDef>();
+        for (TypeDef candidate : definitions.values()) {
+            boolean matches = true;
+            for (String flag :flags) {
+                if (!candidate.getAttributes().containsKey(flag) || !((Boolean) candidate.getAttributes().get(flag))) {
+                   matches = false;
+                   break;
+                }
+            }
+            if (matches) {
+                result.add(candidate);
+            }
+        }
+
+        return Collections.unmodifiableSet(result);
     }
 
     public TypeDef getDefinition(String fullyQualifiedName) {
