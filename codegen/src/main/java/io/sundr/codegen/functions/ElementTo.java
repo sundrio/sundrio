@@ -82,7 +82,7 @@ public class ElementTo {
         }
     };
 
-    private static final Function<TypeMirror, TypeRef> INTERNAL_MIRROR_TO_TYPEREF = CachingFunction.wrap(DEEP_MIRROR_TO_TYPEREF, SHALLOW_MIRROR_TO_TYPEREF, 1);
+    public static final Function<TypeMirror, TypeRef> MIRROR_TO_TYPEREF = CachingFunction.wrap(DEEP_MIRROR_TO_TYPEREF, SHALLOW_MIRROR_TO_TYPEREF, 1);
 
     public static final  Function<TypeParameterElement, TypeParamDef> TYPEPARAMDEF = new  Function<TypeParameterElement, TypeParamDef> () {
 
@@ -143,14 +143,14 @@ public class ElementTo {
              MethodBuilder methodBuilder = new MethodBuilder()
                      .withModifiers(TypeUtils.modifiersToInt(executableElement.getModifiers()))
                      .withName(executableElement.getSimpleName().toString())
-                     .withReturnType(INTERNAL_MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()));
+                     .withReturnType(MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()));
 
 
              //Populate constructor parameters
              for (VariableElement variableElement : executableElement.getParameters()) {
                  methodBuilder = methodBuilder
                          .withName(executableElement.getSimpleName().toString())
-                         .withReturnType(INTERNAL_MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()))
+                         .withReturnType(MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()))
                          .addToArguments(PROPERTY.apply(variableElement));
 
                  Set<ClassRef> exceptionRefs = new LinkedHashSet<ClassRef>();
@@ -164,7 +164,7 @@ public class ElementTo {
 
              Set<ClassRef> annotationRefs = new LinkedHashSet<ClassRef>();
              for (AnnotationMirror annotationMirror : executableElement.getAnnotationMirrors()) {
-                 TypeRef annotationType = INTERNAL_MIRROR_TO_TYPEREF.apply(annotationMirror.getAnnotationType());
+                 TypeRef annotationType = MIRROR_TO_TYPEREF.apply(annotationMirror.getAnnotationType());
                  if (annotationType instanceof ClassRef) {
                      annotationRefs.add((ClassRef) annotationType);
                  }
@@ -191,7 +191,7 @@ public class ElementTo {
             } else if (superClass.toString().equals(TypeDef.OBJECT.getFullyQualifiedName())) {
                 //ignore
             } else {
-                superClassType = INTERNAL_MIRROR_TO_TYPEREF.apply(superClass);
+                superClassType = MIRROR_TO_TYPEREF.apply(superClass);
             }
 
             List<TypeParamDef> genericTypes = new ArrayList<TypeParamDef>();
@@ -204,7 +204,7 @@ public class ElementTo {
             }
 
             for (TypeMirror interfaceTypeMirrror : classElement.getInterfaces()) {
-                TypeRef interfaceType = INTERNAL_MIRROR_TO_TYPEREF.apply(interfaceTypeMirrror);
+                TypeRef interfaceType = MIRROR_TO_TYPEREF.apply(interfaceTypeMirrror);
                 if (interfaceType instanceof ClassRef) {
                     interfaces.add((ClassRef) interfaceType);
                 } else {
@@ -217,7 +217,7 @@ public class ElementTo {
                 if (!typeParameter.getBounds().isEmpty()) {
                     TypeMirror bound = typeParameter.getBounds().get(0);
                     if (!OBJECT_BOUND.equals(bound.toString())) {
-                        TypeRef boundRef = INTERNAL_MIRROR_TO_TYPEREF.apply(bound);
+                        TypeRef boundRef = MIRROR_TO_TYPEREF.apply(bound);
                         if (boundRef instanceof ClassRef) {
                             genericBounds.add((ClassRef) boundRef);
                         } else {
@@ -261,7 +261,7 @@ public class ElementTo {
             }
 
             for (AnnotationMirror annotationMirror : classElement.getAnnotationMirrors()) {
-                TypeRef annotationType = INTERNAL_MIRROR_TO_TYPEREF.apply(annotationMirror.getAnnotationType());
+                TypeRef annotationType = MIRROR_TO_TYPEREF.apply(annotationMirror.getAnnotationType());
                 if (annotationType instanceof ClassRef) {
                     builder.addToAnnotations((ClassRef) annotationType);
                 } else {
