@@ -66,7 +66,12 @@ public class PrimitiveRef extends AbstractTypeRef {
 
     @Override
     public String toString() {
-        return name;
+        StringBuilder sb = new StringBuilder();
+        sb.append(name);
+        for (int i=0;i<dimensions;i++) {
+            sb.append("[]");
+        }
+        return sb.toString();
     }
 
 }
