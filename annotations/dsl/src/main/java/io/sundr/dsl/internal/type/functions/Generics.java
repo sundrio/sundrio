@@ -18,6 +18,7 @@ package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
@@ -63,20 +64,26 @@ public class Generics {
     public static final Function<TypeDef, TypeDef> UNWRAP = new Function<TypeDef, TypeDef>() {
 
         public TypeDef apply(TypeDef type) {
-            return new TypeDefBuilder(type).accept(new TypedVisitor<ClassRefBuilder>() {
-                public void visit(ClassRefBuilder builder) {
-                    List<TypeRef> unwrappedArguments = new ArrayList<TypeRef>();
-                    for (TypeRef argument : builder.getArguments()) {
-                        TypeRef key = getKeyForValue(GENERIC_MAPPINGS, argument);
-                        if (key != null) {
-                            unwrappedArguments.add(key);
-                        } else {
-                            unwrappedArguments.add(argument);
-                        }
-                    }
-                    builder.withArguments(unwrappedArguments);
+            return new TypeDefBuilder(type).accept(UNWRAP_CLASSREF_VISITOR).build();
+        }
+    };
+
+    private static final TypedVisitor<ClassRefBuilder> UNWRAP_CLASSREF_VISITOR = new TypedVisitor<ClassRefBuilder>() {
+        public void visit(ClassRefBuilder builder) {
+            List<TypeRef> unwrappedArguments = new ArrayList<TypeRef>();
+            for (TypeRef argument : builder.getArguments()) {
+                TypeRef key = getKeyForValue(GENERIC_MAPPINGS, argument);
+                if (TRANSPARENT_REF.equals(key)) {
+                    continue;
+                } else if (key != null) {
+                    unwrappedArguments.add(key);
+                } else if (argument instanceof ClassRef) {
+                    unwrappedArguments.add(new ClassRefBuilder((ClassRef)argument).accept(UNWRAP_CLASSREF_VISITOR).build());
+                } else {
+                    unwrappedArguments.add(argument);
                 }
-            }).build();
+            }
+            builder.withArguments(unwrappedArguments);
         }
     };
 
@@ -95,7 +102,8 @@ public class Generics {
                 return entry.getKey();
             }
         }
-        throw new IllegalStateException("Key not found for value:[" + value +"].");
+        return null;
+        //throw new IllegalStateException("Key not found for value:[" + value +"].");
     }
 
     

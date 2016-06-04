@@ -141,10 +141,9 @@ public class Nodes {
             Set<ClassRef> interfaces = new LinkedHashSet<ClassRef>();
 
             for (Node<TypeDef> child : item.getTransitions()) {
-                TypeDef transitionInterface = TO_TRANSITION.apply(child);
-                interfaces.add(transitionInterface.toInternalReference());
+                ClassRef transitionInterface = TO_TRANSITION.apply(child);
+                interfaces.add(transitionInterface);
                 CodegenContext.getContext().getDefinitionRepository().register(child.getItem(), IS_GENERATED);
-                CodegenContext.getContext().getDefinitionRepository().register(transitionInterface, IS_GENERATED);
             }
 
             TypeDef rootType = new TypeDefBuilder(item.getItem())
@@ -160,53 +159,50 @@ public class Nodes {
     };
 
 
-    public static final Function<Node<TypeDef>, TypeDef> TO_TRANSITION = new Function<Node<TypeDef>, TypeDef>() {
-        public TypeDef apply(Node<TypeDef> current) {
+    public static final Function<Node<TypeDef>, ClassRef> TO_TRANSITION = new Function<Node<TypeDef>, ClassRef>() {
+        public ClassRef apply(Node<TypeDef> current) {
             if (current.getTransitions().isEmpty()) {
-                return current.getItem();
+                return current.getItem().toInternalReference();
             } else {
                 TypeDef clazz = current.getItem();
-                Set<TypeDef> toCombine = new LinkedHashSet<TypeDef>();
+                Set<ClassRef> toCombine = new LinkedHashSet<ClassRef>();
 
                 for (Node<TypeDef> v : current.getTransitions()) {
                     toCombine.add(apply(v));
                 }
 
-                TypeDef nextClazz = toCombine.size() == 1
+                ClassRef nextClazz = toCombine.size() == 1
                         ? toCombine.iterator().next()
-                        : Combine.TYPEDEFS.apply(Generify.TYPEDEFS.apply(toCombine));
+                        : Combine.TYPEREFS.apply(Generify.CLASSREFS.apply(toCombine)).toInternalReference();
 
                 if (TypeDefUtils.isCardinalityMultiple(clazz)) {
                     //1st pass create the self ref
-                    TypeDef selfRef = transition(clazz, nextClazz);
-                    Set<TypeDef> toReCombine = new LinkedHashSet<TypeDef>(toCombine);
+                    ClassRef selfRef = transition(clazz, nextClazz);
+                    Set<ClassRef> toReCombine = new LinkedHashSet<ClassRef>(toCombine);
                     toReCombine.add(selfRef);
-                    TypeDef reCombined = Combine.TYPEDEFS.apply(toReCombine);
+                    ClassRef reCombined = Combine.TYPEREFS.apply(toReCombine).toInternalReference();
 
                     //2nd pass recreate the combination
                     selfRef = transition(clazz, reCombined);
-                    toReCombine = new LinkedHashSet<TypeDef>(toCombine);
+                    toReCombine = new LinkedHashSet<ClassRef>(toCombine);
                     toReCombine.add(selfRef);
-                    reCombined = Combine.TYPEDEFS.apply(toReCombine);
-                    DslContextManager.getContext().getDefinitionRepository().register(reCombined, IS_GENERATED);
-                    DslContextManager.getContext().getDefinitionRepository().register(nextClazz, IS_GENERATED);
+                    reCombined = Combine.TYPEREFS.apply(toReCombine).toInternalReference();
+                    DslContextManager.getContext().getDefinitionRepository().register(reCombined.getDefinition(), IS_GENERATED);
+                    DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
                     return transition(clazz, reCombined);
                 } else {
                     //If we have a couple of classes to combine that are non-multiple
                     // we may end up with intermediate garbage in the registry, which are masking the real thing
                     if (!isTransition(nextClazz)) {
-                        DslContextManager.getContext().getDefinitionRepository().register(nextClazz, IS_GENERATED);
+                        DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
                     }
                     return transition(clazz, nextClazz);
                 }
             }
         }
 
-        public TypeDef transition(TypeDef from, TypeDef to) {
-            return new TypeDefBuilder(from)
-                    .withName(Combine.TYPEDEFS_TO_NAME.apply(Arrays.asList(from, to)))
-                    .withExtendsList(to.toInternalReference())
-                    .build();
+        public ClassRef transition(TypeDef from, ClassRef to) {
+            return from.toReference(to);
 
         }
     };
@@ -283,7 +279,7 @@ public class Nodes {
                     for (TypeDef scopeClass : scopeClasses) {
                         DslContextManager.getContext().getDefinitionRepository().register(scopeClass, IS_GENERATED);
                     }
-                    ClassRef scopeInterface = TO_TRANSITION.apply(node).toInternalReference();
+                    ClassRef scopeInterface = TO_TRANSITION.apply(node);
 
                     result.removeAll(scopeClasses);
                     result.add(new TypeDefBuilder(clazz)

@@ -45,6 +45,7 @@ import static io.sundr.dsl.internal.Constants.IS_TERMINAL;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.REMOVABLE_PREFIXES;
 import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
+import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT_REF;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.getTerminatingTypes;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.toInterfaceName;
@@ -70,7 +71,9 @@ public class Combine {
                     terminatingTypes.addAll(getTerminatingTypes(alternative));
 
                     for (TypeParamDef candidate : alternative.getDefinition().getParameters()) {
-                        parameters.add(candidate);
+                        if (!candidate.equals(TRANSPARENT)) {
+                            parameters.add(candidate);
+                        }
                     }
 
                 } else {

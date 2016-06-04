@@ -17,9 +17,13 @@
 package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeRef;
+import io.sundr.dsl.internal.visitors.TypeArgumentReplace;
 import io.sundr.dsl.internal.visitors.TypeParamDefReplace;
 
 import java.util.Collections;
@@ -30,12 +34,28 @@ import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 
 public class Generify {
 
+    public static final Function<Set<ClassRef>, Set<ClassRef>> CLASSREFS = new Function<Set<ClassRef>, Set<ClassRef>>() {
+        public Set<ClassRef> apply(Set<ClassRef> source) {
+            Set<ClassRef> result = new LinkedHashSet<ClassRef>(source);
+            Set<TypeRef> typeArguments = findTypeArguments(source);
+
+            for (TypeRef type : typeArguments) {
+                Set<ClassRef> intermediate = new LinkedHashSet<ClassRef>();
+                for (ClassRef clazz : result) {
+                    intermediate.add(new ClassRefBuilder(clazz).accept(new TypeArgumentReplace(type, Generics.MAP.apply(type).toReference())).build());
+                }
+                result = new LinkedHashSet<ClassRef>(intermediate);
+            }
+            return result;
+        }
+    };
+
     public static final Function<Set<TypeDef>, Set<TypeDef>> TYPEDEFS = new Function<Set<TypeDef>, Set<TypeDef>>() {
         public Set<TypeDef> apply(Set<TypeDef> source) {
             Set<TypeDef> result = new LinkedHashSet<TypeDef>(source);
-            Set<TypeParamDef> generifiableTypes = findParameters(source);
+            Set<TypeParamDef> typeParameters = findParameters(source);
 
-            for (TypeParamDef type : generifiableTypes) {
+            for (TypeParamDef type : typeParameters) {
                 Set<TypeDef> intermediate = new LinkedHashSet<TypeDef>();
                 for (TypeDef clazz : result) {
                     intermediate.add(new TypeDefBuilder(clazz).accept(new TypeParamDefReplace(type, Generics.MAP.apply(type.toReference()))).build());
@@ -45,6 +65,36 @@ public class Generify {
             return result;
         }
     };
+
+
+    private static Set<TypeRef> findTypeArguments(Set<ClassRef> interfaces) {
+        if (interfaces.size() < 2) {
+            return Collections.<TypeRef>emptySet();
+        }
+        //1st pass find all generics
+        Set<TypeRef> allGenerics = new LinkedHashSet<TypeRef>();
+        for (ClassRef clazz : interfaces) {
+            allGenerics.addAll(clazz.getArguments());
+        }
+
+        //2nd pass collect common generics
+        Set<TypeRef> common = new LinkedHashSet<TypeRef>(allGenerics);
+        for (ClassRef clazz : interfaces) {
+            Set<TypeRef> ownGenerics = new LinkedHashSet<TypeRef>();
+            ownGenerics.addAll(clazz.getArguments());
+            common.remove(clazz);
+            common.retainAll(ownGenerics);
+        }
+        Set<TypeRef> result = new LinkedHashSet<TypeRef>();
+        for (TypeRef type : common) {
+            Boolean isGeneric = type.getAttributes().containsKey(IS_GENERIC) ?  (Boolean) type.getAttributes().get(IS_GENERIC) : false;
+            if (!isGeneric) {
+                result.add(type);
+            }
+        }
+        return result;
+
+    }
 
 
     private static Set<TypeParamDef> findParameters(Set<TypeDef> interfaces) {
