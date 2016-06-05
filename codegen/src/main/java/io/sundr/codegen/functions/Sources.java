@@ -42,7 +42,6 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 import io.sundr.builder.Function;
-import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.BlockBuilder;
@@ -82,6 +81,7 @@ public class Sources {
 
     private static final String JAVA_LANG = "java.lang";
     private static final String SEPARATOR = ".";
+    public static final String INIT = "INIT";
 
 
     private static Function<Node, String> PACKAGENAME = new Function<Node, String>() {
@@ -289,7 +289,7 @@ public class Sources {
                                     .withName(var.getId().getName())
                                     .withTypeRef(typeRef)
                                     .withModifiers(fieldDeclaration.getModifiers())
-                                    .addToAttributes("init",  var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
+                                    .addToAttributes(INIT,  var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
                                     .build());
                         }
                     } else if (bodyDeclaration instanceof MethodDeclaration) {
@@ -316,15 +316,23 @@ public class Sources {
                                     .build());
                         }
 
+
+                        Set<TypeParamDef> typeParamDefs = new LinkedHashSet<TypeParamDef>();
+                        for (TypeParameter typeParameter : methodDeclaration.getTypeParameters()) {
+                            typeParamDefs.add(TYPEPARAMDEF.apply(typeParameter));
+                        }
+
                         TypeRef returnType = checkAgainstTypeParamRef(TYPEREF.apply(methodDeclaration.getType()), parameters);
                         methods.add(new MethodBuilder()
                                 .withName(methodDeclaration.getName())
                                 .withModifiers(methodDeclaration.getModifiers())
+                                .withParameters(typeParamDefs)
                                 .withReturnType(returnType)
                                 .withExceptions(exceptions)
                                 .withArguments(arguments)
                                 .withBlock(BLOCK.apply(methodDeclaration.getBody()))
                                 .build());
+
                     } else if (bodyDeclaration instanceof ConstructorDeclaration) {
                         ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
                         List<Property> arguments = new ArrayList<Property>();
@@ -364,6 +372,7 @@ public class Sources {
                         .withKind(kind)
                         .withPackageName(PACKAGENAME.apply(type))
                         .withName(decl.getName())
+                        .withModifiers(type.getModifiers())
                         .withParameters(parameters)
                         .withExtendsList(extendsList)
                         .withImplementsList(implementsList)
@@ -443,7 +452,7 @@ public class Sources {
 
         public TypeDef apply(InputStream is) {
             CompilationUnit cu = Sources.FROM_INPUTSTREAM_TO_COMPILATIONUNIT.apply(is);
-            TypeDeclaration typeDeclaration =cu.getTypes().get(0);
+            TypeDeclaration typeDeclaration = cu.getTypes().get(0);
             return TYPEDEF.apply(typeDeclaration);
 
         }
