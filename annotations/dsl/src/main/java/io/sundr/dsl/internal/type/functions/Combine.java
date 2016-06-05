@@ -18,13 +18,18 @@ package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
+import io.sundr.dsl.internal.visitors.TypeParamDefColletor;
+import io.sundr.dsl.internal.visitors.TypeParamRefColletor;
 
 import javax.lang.model.element.Modifier;
 import java.util.Arrays;
@@ -70,7 +75,7 @@ public class Combine {
                     interfaces.add(alternative);
                     terminatingTypes.addAll(getTerminatingTypes(alternative));
 
-                    for (TypeParamDef candidate : alternative.getDefinition().getParameters()) {
+                    for (TypeParamDef candidate : extractParameters(alternative)) {
                         if (!candidate.equals(TRANSPARENT)) {
                             parameters.add(candidate);
                         }
@@ -88,8 +93,10 @@ public class Combine {
             if (interfaces.isEmpty()) {
                 interfaces.add(fallback);
                 terminatingTypes.addAll(getTerminatingTypes(fallback));
-                for (TypeParamDef candidate : fallback.getDefinition().getParameters()) {
-                    parameters.add(candidate);
+                for (TypeParamDef candidate : extractParameters(fallback.getDefinition())) {
+                    if (!candidate.equals(TRANSPARENT)) {
+                        parameters.add(candidate);
+                    }
                 }
             }
             String className = CLASSREFS_TO_NAME.apply(interfaces);
@@ -131,8 +138,10 @@ public class Combine {
                     interfaces.add(alternative.toInternalReference());
                     terminatingTypes.addAll(getTerminatingTypes(alternative));
 
-                    for (TypeParamDef candidate : alternative.getParameters()) {
-                        parameters.add(candidate);
+                    for (TypeParamDef candidate : extractParameters(alternative)) {
+                        if (!candidate.equals(TRANSPARENT)) {
+                            parameters.add(candidate);
+                        }
                     }
 
                 } else {
@@ -147,8 +156,10 @@ public class Combine {
             if (interfaces.isEmpty()) {
                 interfaces.add(fallback.toInternalReference());
                 terminatingTypes.addAll(getTerminatingTypes(fallback));
-                for (TypeParamDef candidate : fallback.getParameters()) {
-                    parameters.add(candidate);
+                for (TypeParamDef candidate : extractParameters(fallback)) {
+                    if (!candidate.equals(TRANSPARENT)) {
+                        parameters.add(candidate);
+                    }
                 }
             }
             String className = CLASSREFS_TO_NAME.apply(interfaces);
@@ -280,7 +291,31 @@ public class Combine {
         return true;
     }
 
-    public static final String stripPrefix(String str) {
+    private static final Set<TypeParamDef> extractParameters(TypeDef typeDef) {
+        final Set<TypeParamDef> result = new LinkedHashSet<TypeParamDef>();
+        final Set<TypeParamRef> refs = new LinkedHashSet<TypeParamRef>();
+
+        TypeDef ignored = new TypeDefBuilder(typeDef).accept(new TypeParamDefColletor(result)).accept(new TypeParamRefColletor(refs)).build();
+        for (TypeParamRef typeParamRef : refs) {
+            result.add(new TypeParamDefBuilder().withName(typeParamRef.getName()).withAttributes(typeParamRef.getAttributes()).build());
+        }
+
+        return result;
+    }
+
+    private static final Set<TypeParamDef> extractParameters(ClassRef classRef) {
+        final Set<TypeParamDef> result = new LinkedHashSet<TypeParamDef>();
+        final Set<TypeParamRef> refs = new LinkedHashSet<TypeParamRef>();
+
+        ClassRef ignored = new ClassRefBuilder(classRef).accept(new TypeParamDefColletor(result)).accept(new TypeParamRefColletor(refs)).build();
+        for (TypeParamRef typeParamRef : refs) {
+            result.add(new TypeParamDefBuilder().withName(typeParamRef.getName()).withAttributes(typeParamRef.getAttributes()).build());
+        }
+
+        return result;
+    }
+
+    private static final String stripPrefix(String str) {
         for (String prefix : REMOVABLE_PREFIXES) {
             if (str.startsWith(prefix)) {
                 return str.substring(prefix.length());
@@ -289,12 +324,13 @@ public class Combine {
         return str;
     }
 
-    public static final String stripSuffix(String str) {
+    private static final String stripSuffix(String str) {
         if (str.endsWith(INTERFACE_SUFFIX)) {
             return str.substring(0, str.length() - INTERFACE_SUFFIX.length());
         }
         return str;
     }
+
     private static String createKeyForClasses(Collection<ClassRef> alternatives) {
         List<TypeDef> typeDefs = new LinkedList<TypeDef>();
         for (ClassRef classRef : alternatives) {

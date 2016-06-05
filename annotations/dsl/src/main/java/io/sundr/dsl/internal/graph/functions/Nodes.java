@@ -84,16 +84,16 @@ public class Nodes {
     };
 
     public static final Function<NodeContext, Node<TypeDef>> TO_TREE = new Function<NodeContext, Node<TypeDef>>() {
-        public Node<TypeDef> apply(NodeContext ctx) {
+        public Node<TypeDef> apply(NodeContext context) {
             Set<Node<TypeDef>> nextVertices = new LinkedHashSet<Node<TypeDef>>();
 
             //visited and path are the same only in the first iteration. see bellow:
-            Set<TypeDef> visited = new LinkedHashSet<TypeDef>(ctx.getVisited());
-            List<TypeDef> nextCandidates = new ArrayList<TypeDef>(TO_NEXT.apply(ctx));
-            Collections.sort(nextCandidates, new CandidateComparator(ctx));
+            Set<TypeDef> visited = new LinkedHashSet<TypeDef>(context.getVisited());
+            List<TypeDef> nextCandidates = new ArrayList<TypeDef>(TO_NEXT.apply(context));
+            Collections.sort(nextCandidates, new CandidateComparator(context));
 
             for (TypeDef next : nextCandidates) {
-                NodeContext nextContext = ctx.contextOfChild(next)
+                NodeContext nextContext = context.contextOfChild(next)
                         .addToVisited(visited)
                         .addToVisited(next)
                         .build();
@@ -106,7 +106,7 @@ public class Nodes {
                     nextVertices.add(subGraph);
                 }
             }
-            return DslContextManager.getContext().getNodeRepository().getOrCreateNode(ctx.getItem(), nextVertices);
+            return DslContextManager.getContext().getNodeRepository().getOrCreateNode(context.getItem(), nextVertices);
         }
     };
 
@@ -177,23 +177,40 @@ public class Nodes {
 
                 if (TypeDefUtils.isCardinalityMultiple(clazz)) {
                     //1st pass create the self ref
-                    ClassRef selfRef = transition(clazz, nextClazz);
+                    final ClassRef selfRef = transition(clazz, nextClazz);
                     Set<ClassRef> toReCombine = new LinkedHashSet<ClassRef>(toCombine);
                     toReCombine.add(selfRef);
-                    ClassRef reCombined = Combine.TYPEREFS.apply(toReCombine).toInternalReference();
+                    TypeDef reCombinedType = Combine.TYPEREFS.apply(toReCombine);
+                    final ClassRef reCombinedRef = reCombinedType.toInternalReference();
 
+                    reCombinedType = new TypeDefBuilder(reCombinedType).accept(new TypedVisitor<TypeDefBuilder>() {
+                        public void visit(TypeDefBuilder builder) {
+                            Set<ClassRef> updatedInterfaces = new LinkedHashSet<ClassRef>();
+                            for (ClassRef interfaceRef : builder.getExtendsList()) {
+                                if (interfaceRef.equals(selfRef)) {
+                                    updatedInterfaces.add(selfRef.getDefinition().toReference(reCombinedRef));
+                                } else {
+                                    updatedInterfaces.add(interfaceRef);
+                                }
+                            }
+                            builder.withExtendsList(updatedInterfaces);
+                        }
+                    }).build();
+
+                    ClassRef reCombined = reCombinedType.toInternalReference();
                     //2nd pass recreate the combination
-                    selfRef = transition(clazz, reCombined);
+                    ClassRef updatedSelfRef = transition(clazz, reCombined);
                     toReCombine = new LinkedHashSet<ClassRef>(toCombine);
-                    toReCombine.add(selfRef);
+                    toReCombine.add(updatedSelfRef);
                     reCombined = Combine.TYPEREFS.apply(toReCombine).toInternalReference();
-                    DslContextManager.getContext().getDefinitionRepository().register(reCombined.getDefinition(), IS_GENERATED);
+                    DslContextManager.getContext().getDefinitionRepository().register(reCombinedType, IS_GENERATED);
                     DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
                     return transition(clazz, reCombined);
                 } else {
                     //If we have a couple of classes to combine that are non-multiple
                     // we may end up with intermediate garbage in the registry, which are masking the real thing
-                    if (!isTransition(nextClazz)) {
+                    if (!isTransition(nextClazz) &&
+                            DslContextManager.getContext().getDefinitionRepository().getDefinition(nextClazz.getDefinition().getFullyQualifiedName()) == null) {
                         DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
                     }
                     return transition(clazz, nextClazz);
@@ -287,10 +304,11 @@ public class Nodes {
                             .withPackageName(scopeInterface.getDefinition().getPackageName())
                             .withName(scopeInterface.getDefinition().getName() + SCOPE_SUFFIX)
                             .withExtendsList(scopeInterface)
+                            .withMethods()
                             .addToAttributes(CARDINALITY_MULTIPLE, multiple)
                             .addToAttributes(KEYWORDS, scopeKeywords(scopeClasses))
-                            .accept(new TypedVisitor<AttributeSupportBuilder>() {
-                                public void visit(AttributeSupportBuilder builder) {
+                            .accept(new TypedVisitor<TypeDefBuilder>() {
+                                public void visit(TypeDefBuilder builder) {
                                     builder.getAttributes().remove(BEGIN_SCOPE);
                                     builder.getAttributes().remove(END_SCOPE);
                                 }
