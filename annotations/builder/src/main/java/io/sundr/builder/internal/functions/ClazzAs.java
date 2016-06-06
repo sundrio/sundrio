@@ -16,8 +16,8 @@
 
 package io.sundr.builder.internal.functions;
 
-import io.sundr.FunctionFactory;
 import io.sundr.Function;
+import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -41,6 +41,7 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -71,6 +72,7 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isCollection;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 
 public class ClazzAs {
 
@@ -222,12 +224,18 @@ public class ClazzAs {
                         .accept(new TypedVisitor<PropertyBuilder>() {
                             public void visit(PropertyBuilder builder) {
                                 if (isArray || isList) {
-                                    builder.addToAttributes(INIT, "new " + ARRAY_LIST.toReference(unwrapped) + "()");
+                                    ClassRef listRef =  ARRAY_LIST.toReference(unwrapped);
+                                    builder.addToAttributes(INIT, "new " + listRef+ "()")
+                                            .addToAttributes(ALSO_IMPORT, listRef);
                                 } else if (isSet) {
-                                    builder.addToAttributes(INIT, "new " + LINKED_HASH_SET.toReference(unwrapped) + "()");
+                                    ClassRef setRef = LINKED_HASH_SET.toReference(unwrapped);
+                                    builder.addToAttributes(INIT, "new " + setRef + "()")
+                                            .addToAttributes(ALSO_IMPORT, setRef);
                                 } else if (isMap) {
                                     List<TypeRef> arguments = ((ClassRef)property.getTypeRef()).getArguments();
-                                    builder.addToAttributes(INIT, "new " + LINKED_HASH_MAP.toReference(arguments.toArray(new TypeRef[arguments.size()])) + "()");
+                                    ClassRef mapRef = LINKED_HASH_MAP.toReference(arguments.toArray(new TypeRef[arguments.size()]));
+                                    builder.addToAttributes(INIT, "new " + mapRef  + "()")
+                                            .addToAttributes(ALSO_IMPORT, mapRef);
                                 }
                             }
                         }).build();
@@ -592,18 +600,24 @@ public class ClazzAs {
         TypeRef typeRef = property.getTypeRef();
         TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(typeRef);
         ClassRef classRef = (ClassRef) typeRef;
-        TypeRef builderType = TypeAs.VISITABLE_BUILDER.apply(unwrapped);
+        ClassRef builderType = TypeAs.VISITABLE_BUILDER.apply(unwrapped);
 
         if (isList(classRef)) {
+            ClassRef listRef =  ARRAY_LIST.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(LIST.toReference(builderType))
-                    .addToAttributes(INIT, " new " + ARRAY_LIST.toReference(builderType) + "()")
+                    .addToAttributes(INIT, " new " + listRef + "()")
+                    .addToAttributes(ALSO_IMPORT, Arrays.asList(listRef, builderType))
                     .build();
         } else if (isSet(classRef)) {
+            ClassRef setRef = LINKED_HASH_SET.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(SET.toReference(builderType))
-                    .addToAttributes(INIT, " new " + LINKED_HASH_SET.toReference(builderType) + "()")
+                    .addToAttributes(INIT, " new " + setRef+ "()")
+                    .addToAttributes(ALSO_IMPORT,  Arrays.asList(setRef, builderType))
                     .build();
         } else {
-            return new PropertyBuilder(property).withTypeRef(builderType).build();
+            return new PropertyBuilder(property).withTypeRef(builderType)
+                    .addToAttributes(ALSO_IMPORT, builderType)
+                    .build();
         }
     }
 }

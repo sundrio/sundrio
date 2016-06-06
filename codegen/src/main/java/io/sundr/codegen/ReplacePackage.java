@@ -93,17 +93,17 @@ public class ReplacePackage implements Visitor<Builder> {
         if (target.equals(builder.getPackageName())) {
             builder.withPackageName(replacement);
         }
-        if (builder.getAttributes().containsKey(TypeDef.IMPORTS)) {
+        if (builder.getAttributes().containsKey(TypeDef.ALSO_IMPORT)) {
             Set<ClassRef> updatedImports = new LinkedHashSet<ClassRef>();
 
-            for (ClassRef classRef : (Set<ClassRef>) builder.getAttributes().get(TypeDef.IMPORTS)) {
+            for (ClassRef classRef : (Set<ClassRef>) builder.getAttributes().get(TypeDef.ALSO_IMPORT)) {
                 if (target.equals(classRef.getDefinition().getPackageName())) {
                     updatedImports.add(new ClassRefBuilder(classRef).accept(this).build());
                 } else {
                     updatedImports.add(classRef);
                 }
             }
-            builder.getAttributes().put(TypeDef.IMPORTS, updatedImports);
+            builder.getAttributes().put(TypeDef.ALSO_IMPORT, updatedImports);
         }
     }
 

@@ -20,5 +20,7 @@ import java.util.Map;
 
 public interface Attributeable {
 
+    String ALSO_IMPORT = "ALSO_IMPORT";
+
     Map<String, Object> getAttributes();
 }

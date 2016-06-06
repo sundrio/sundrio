@@ -18,6 +18,8 @@ package io.sundr.codegen.model;
 
 import io.sundr.codegen.utils.StringUtils;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,6 +80,42 @@ public class Method extends ModifierSupport {
 
     public Block getBlock() {
         return block;
+    }
+
+
+    public Set<ClassRef> getReferences() {
+        Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+        if (returnType instanceof ClassRef) {
+            ClassRef classRef = (ClassRef)returnType;
+            refs.addAll(classRef.getReferences());
+        }
+
+        for (Property argument : arguments) {
+            refs.addAll(argument.getReferences());
+        }
+
+        for (ClassRef e : exceptions) {
+            refs.addAll(e.getReferences());
+        }
+
+        for (ClassRef a : getAnnotations()) {
+            refs.addAll(a.getReferences());
+        }
+
+        for (TypeParamDef typeParamDef : parameters) {
+            for (ClassRef bound : typeParamDef.getBounds()) {
+                refs.addAll(bound.getReferences());
+            }
+        }
+        if (getAttributes().containsKey(ALSO_IMPORT)) {
+            Object obj = getAttributes().get(ALSO_IMPORT);
+            if (obj instanceof ClassRef) {
+                refs.add((ClassRef) obj);
+            } else if (obj instanceof Collection) {
+                refs.addAll((Collection<? extends ClassRef>) obj);
+            }
+        }
+        return refs;
     }
 
     @Override

@@ -16,7 +16,6 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ public class TypeDef extends ModifierSupport {
             .build();
 
     public static ClassRef OBJECT_REF = OBJECT.toReference();
-    public static String IMPORTS = "IMPORTS";
 
     private final Kind kind;
     private final String packageName;
@@ -92,7 +90,7 @@ public class TypeDef extends ModifierSupport {
             if (outer.equals(typeDef.getOuterType())) {
                 updated.add(typeDef);
             } else {
-                updated.add(new TypeDefBuilder(typeDef).withOuterType(outer).build());
+                updated.add(new TypeDefBuilder(typeDef).withOuterType(outer).withPackageName(outer.getPackageName()).build());
             }
         }
         return updated;
@@ -259,18 +257,67 @@ public class TypeDef extends ModifierSupport {
                 .build();
     }
 
-    public Set<ClassRef> getImports() {
-        final Set<ClassRef> imports = new LinkedHashSet<ClassRef>();
-        new TypeDefBuilder(this).accept(new TypedVisitor<ClassRefBuilder>() {
-            public void visit(ClassRefBuilder builder) {
-                imports.add(builder.build());
+    public Set<String> getImports() {
+        final Set<String> imports = new LinkedHashSet<String>();
+        for (ClassRef ref : getReferences()) {
+            if (ref.getDefinition().getPackageName().equals(packageName)) {
+                continue;
+            } else {
+                imports.add(ref.getDefinition().getFullyQualifiedName());
             }
-        });
-        if (getAttributes().containsKey(IMPORTS)) {
-            imports.addAll((Set<ClassRef>) getAttributes().get(IMPORTS));
+
         }
         return imports;
     }
+
+    public Set<ClassRef> getReferences() {
+        final Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+
+        for (ClassRef i : implementsList) {
+            refs.addAll(i.getReferences());
+
+        }
+
+        for (ClassRef e : extendsList) {
+            refs.addAll(e.getReferences());
+        }
+
+        for (Property property : properties) {
+            refs.addAll(property.getReferences());
+        }
+
+        for (Method method : constructors) {
+            refs.addAll(method.getReferences());
+        }
+
+
+        for (Method method : methods) {
+            refs.addAll(method.getReferences());
+        }
+
+        for (TypeParamDef typeParamDef : parameters) {
+            for (ClassRef bound : typeParamDef.getBounds()) {
+                refs.addAll(bound.getReferences());
+            }
+        }
+
+        for (TypeDef innerType : innerTypes) {
+            refs.addAll(innerType.getReferences());
+        }
+
+        if (getAttributes().containsKey(ALSO_IMPORT)) {
+            Object obj = getAttributes().get(ALSO_IMPORT);
+            if (obj instanceof ClassRef) {
+                refs.add((ClassRef) obj);
+            } else if (obj instanceof Collection) {
+                refs.addAll((Collection<? extends ClassRef>) obj);
+            }
+        }
+        return refs;
+    }
+
+
+
 
     @Override
     public String toString() {

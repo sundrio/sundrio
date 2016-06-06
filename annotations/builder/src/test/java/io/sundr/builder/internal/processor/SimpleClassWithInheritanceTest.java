@@ -85,8 +85,8 @@ public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
         assertEquals(builderContext.getVisitableBuilderInterface().getName(), superClass.getDefinition().getName());
         assertEquals(2, superClass.getArguments().size());
         Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
-        assertEquals("testpackage.SimpleClassWithDate", argIterator.next().toString());
-        assertEquals("testpackage.SimpleClassWithDateBuilder", argIterator.next().toString());
+        assertEquals("SimpleClassWithDate", argIterator.next().toString());
+        assertEquals("SimpleClassWithDateBuilder", argIterator.next().toString());
     }
 
     @Test

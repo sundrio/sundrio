@@ -18,8 +18,10 @@ package io.sundr.codegen.model;
 
 import io.sundr.codegen.utils.StringUtils;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ClassRef extends AbstractTypeRef {
 
@@ -70,6 +72,18 @@ public class ClassRef extends AbstractTypeRef {
         return definition.isAssignableFrom(((ClassRef) other).getDefinition());
     }
 
+    public Set<ClassRef> getReferences() {
+        Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+        for (TypeRef argument : arguments) {
+            if (argument instanceof ClassRef) {
+                refs.addAll(((ClassRef)argument).getReferences());
+            }
+        }
+        refs.add(this);
+        return refs;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -96,7 +110,7 @@ public class ClassRef extends AbstractTypeRef {
         StringBuilder sb = new StringBuilder();
 
         if (definition != null) {
-            sb.append(definition.getFullyQualifiedName());
+            sb.append(definition.getName());
         } else {
             sb.append("<unknown>");
         }

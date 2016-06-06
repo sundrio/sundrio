@@ -17,6 +17,9 @@
 package io.sundr.codegen.model;
 
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,6 +53,27 @@ public class Property extends ModifierSupport {
         sb.append(name.replaceAll("_", "").substring(0, 1).toUpperCase());
         sb.append(name.replaceAll("_", "").substring(1));
         return sb.toString();
+    }
+
+    public Set<ClassRef> getReferences() {
+        Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+        if (typeRef instanceof ClassRef) {
+            ClassRef classRef = (ClassRef) typeRef;
+            refs.addAll(classRef.getReferences());
+        }
+        for (ClassRef a : getAnnotations()) {
+            refs.addAll(a.getReferences());
+        }
+
+        if (getAttributes().containsKey(ALSO_IMPORT)) {
+            Object obj = getAttributes().get(ALSO_IMPORT);
+            if (obj instanceof ClassRef) {
+                refs.add((ClassRef) obj);
+            } else if (obj instanceof Collection) {
+                refs.addAll((Collection<? extends ClassRef>) obj);
+            }
+        }
+        return refs;
     }
 
     @Override

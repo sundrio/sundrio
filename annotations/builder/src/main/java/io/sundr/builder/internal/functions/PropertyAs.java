@@ -177,10 +177,12 @@ public final class PropertyAs {
             public TypeDef apply(Property item) {
                 TypeDef shallowNestedType = SHALLOW_NESTED_TYPE.apply(item);
                 TypeDef nestedInterfaceType = NESTED_INTERFACE_TYPE.apply(item);
+                TypeDef outerClass = (TypeDef) item.getAttributes().get(OUTER_CLASS);
 
                 TypeDef nested = new TypeDefBuilder(shallowNestedType)
+                        .withPackageName(outerClass.getPackageName())
                         .withName(shallowNestedType.getName() + "Impl")
-                        .withOuterType((TypeDef) item.getAttributes().get(OUTER_CLASS))
+                        .withOuterType(outerClass)
                         .build();
 
                 //Not a typical fluent
@@ -222,6 +224,7 @@ public final class PropertyAs {
         public static final Function<Property, TypeDef> NESTED_INTERFACE_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property item) {
                 TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item)).withOuterType((TypeDef) item.getAttributes().get(OUTER_INTERFACE)).build();
+                TypeDef outerInterface = (TypeDef) item.getAttributes().get(OUTER_INTERFACE);
                 //Not a typical fluent
 
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
@@ -250,8 +253,9 @@ public final class PropertyAs {
 
                 return new TypeDefBuilder(nested)
                         .withKind(Kind.INTERFACE)
+                        .withPackageName(outerInterface.getPackageName())
                         .withParameters(parameters)
-                        .withOuterType((TypeDef) item.getAttributes().get(OUTER_INTERFACE))
+                        .withOuterType(outerInterface)
                         .withImplementsList()
                         .withExtendsList(BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()), superClassFluent)
                         .build();
@@ -262,6 +266,9 @@ public final class PropertyAs {
             public TypeDef apply(Property property) {
                 TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
+
+                TypeDef outerInterface = (TypeDef) property.getAttributes().get(OUTER_INTERFACE);
+
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 for (TypeParamDef generic : typeDef.getParameters()) {
                     parameters.add(generic);
@@ -269,6 +276,7 @@ public final class PropertyAs {
                 parameters.add(N);
 
                 return new TypeDefBuilder(typeDef)
+                        .withPackageName(outerInterface.getPackageName())
                         .withName(captializeFirst(property.getName() + "Nested"))
                         .withParameters(parameters)
                         .build();

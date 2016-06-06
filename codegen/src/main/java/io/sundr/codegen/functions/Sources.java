@@ -438,7 +438,7 @@ public class Sources {
                         .withProperties(properties)
                         .withMethods(methods)
                         .withConstructors(constructors)
-                        .addToAttributes(TypeDef.IMPORTS, IMPORTS.apply(type))
+                        .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
                         .build());
             }
             throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");

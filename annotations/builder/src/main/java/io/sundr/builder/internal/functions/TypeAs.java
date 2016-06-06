@@ -197,8 +197,8 @@ public class TypeAs {
         }
     };
 
-    public static final Function<TypeRef, TypeRef> VISITABLE_BUILDER = new Function<TypeRef, TypeRef>() {
-        public TypeRef apply(TypeRef item) {
+    public static final Function<TypeRef, ClassRef> VISITABLE_BUILDER = new Function<TypeRef, ClassRef>() {
+        public ClassRef apply(TypeRef item) {
             TypeRef baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
             if (baseType instanceof ClassRef) {
                 baseType = new ClassRefBuilder((ClassRef)baseType).withArguments().build();
