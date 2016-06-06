@@ -33,7 +33,9 @@ import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.utils.TypeUtils;
 
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import static io.sundr.builder.Constants.BOXED_PRIMITIVE_TYPES;
@@ -77,6 +79,7 @@ public class TypeAs {
 
             return new TypeDefBuilder(item)
                     .withKind(Kind.INTERFACE)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Fluent")
                     .withPackageName(item.getPackageName())
                     .withParameters(generics)
@@ -104,6 +107,7 @@ public class TypeAs {
 
             return new TypeDefBuilder(item)
                     .withKind(Kind.CLASS)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "FluentImpl")
                     .withPackageName(item.getPackageName())
                     .withParameters(parameters)
@@ -122,6 +126,7 @@ public class TypeAs {
 
             return new TypeDefBuilder(item)
                     .withKind(Kind.INTERFACE)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Fluent")
                     .withParameters(parameters)
                     .build();
@@ -152,6 +157,7 @@ public class TypeAs {
             parameters.add(builder.toInternalReference());
             return new TypeDefBuilder(item)
                     .withKind(Kind.CLASS)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Builder")
                     .withParameters(item.getParameters())
                     .withExtendsList(fluent.toReference(parameters.toArray(new TypeRef[parameters.size()])))
@@ -168,6 +174,7 @@ public class TypeAs {
             }
             return new TypeDefBuilder(item)
                     .withKind(Kind.CLASS)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName("Editable" + item.getName())
                     .withParameters(parameters)
                     .withExtendsList(item.toInternalReference())
@@ -183,6 +190,7 @@ public class TypeAs {
     public static final Function<TypeDef, TypeDef> SHALLOW_BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             return new TypeDefBuilder(item)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Builder")
                     .build();
         }

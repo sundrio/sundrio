@@ -397,6 +397,7 @@ public class ClazzAs {
             methods.add(equals);
 
             return new TypeDefBuilder(builderType)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withProperties(fields)
                     .withConstructors(constructors)
                     .withMethods(methods)

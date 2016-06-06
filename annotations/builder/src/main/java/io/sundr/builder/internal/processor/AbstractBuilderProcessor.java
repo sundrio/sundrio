@@ -24,6 +24,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
@@ -35,7 +36,9 @@ import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.EMPTY;
@@ -133,22 +136,15 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         final TypeDef builderType = TypeAs.BUILDER.apply(type);
         TypeDef inlineType = BuilderUtils.getInlineType(ctx, inline);
         TypeDef returnType = BuilderUtils.getInlineReturnType(ctx, inline, type);
-        ClassRef inlineTypeRef = inlineType.toReference(returnType.toReference());
+        final ClassRef inlineTypeRef = inlineType.toReference(returnType.toReference());
 
         //Use the builder as the base of the inlineable. Just add interface and change name.
-        TypeDef shallowInlineType = new TypeDefBuilder(builderType)
+        final TypeDef shallowInlineType = new TypeDefBuilder(builderType)
                 .withName(inlineableName)
                 .withImplementsList(inlineTypeRef)
                 .withProperties()
                 .withMethods()
-                .withConstructors()
-                .accept(new TypedVisitor<TypeDefBuilder>() {
-                    public void visit(TypeDefBuilder builder) {
-                        if (builder.getName().equals(builderType.getName())) {
-                            builder.withName(inlineableName);
-                        }
-                    }
-                }).build();
+                .withConstructors().build();
 
         TypeRef functionType = ctx.getFunctionInterface().toReference(type.toInternalReference(), returnType.toReference());
 
@@ -202,7 +198,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .and()
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                 .withNewBlock()
-                    .addNewStringStatementStatement(String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
+                    .addNewStringStatementStatement(String.format(NEW_BULDER_WITH_ITEM_AND_SET_FUNCTION_FORMAT, builderType.getName()))
                 .endBlock()
                 .build());
 
@@ -239,7 +235,19 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .withConstructors(constructors)
                 .addToProperties(builderProperty, functionProperty)
                 .addToMethods(inlineMethod)
-                .build();
+                .accept(new TypedVisitor<ClassRefBuilder>() {
+                    public void visit(ClassRefBuilder builder) {
+                        List<TypeRef> updatedArguments = new ArrayList<TypeRef>();
+                        for (TypeRef arg : builder.getArguments()) {
+                            if (arg.equals(builderType.toInternalReference())) {
+                                updatedArguments.add(shallowInlineType.toInternalReference());
+                            } else {
+                                updatedArguments.add(arg);
+                            }
+                        }
+                        builder.withArguments(updatedArguments);
+                    }
+                }).build();
     }
 
     private static final String EMPTY_FUNCTION_TEXT = loadResourceQuietly(EMPTY_FUNCTION_SNIPPET);
@@ -250,6 +258,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
     private static final String NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT = "this.builder=new %s(this, item);this.function=new %s;";
     private static final String NEW_BULDER_AND_SET_FUNCTION_FORMAT = "this.builder=new %s(this);this.function=function;";
+    private static final String NEW_BULDER_WITH_ITEM_AND_SET_FUNCTION_FORMAT = "this.builder=new %s(item);this.function=function;";
     private static final String BUILD_AND_APPLY_FUNCTION = " return function.apply(builder.build());";
 
 

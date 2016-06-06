@@ -138,6 +138,7 @@ public class ToMethod {
                     .withName(methodName)
                     .withReturnType(returnType)
                     .withArguments(arrayProperty)
+                    .withVarArgPreferred(true)
                     .withNewBlock()
                     .addNewStringStatementStatement("this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
                     .endBlock()
