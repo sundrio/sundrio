@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
@@ -88,7 +88,7 @@ public class ElementTo {
         }
     };
 
-    public static final Function<TypeMirror, TypeRef> MIRROR_TO_TYPEREF = CachingFunction.wrap(DEEP_MIRROR_TO_TYPEREF, SHALLOW_MIRROR_TO_TYPEREF, 1);
+    public static final Function<TypeMirror, TypeRef> MIRROR_TO_TYPEREF = FunctionFactory.cache(DEEP_MIRROR_TO_TYPEREF).withFallback(SHALLOW_MIRROR_TO_TYPEREF).withMaximumRecursionLevel(1).withMaximumNestingDepth(5);
 
     public static final  Function<TypeParameterElement, TypeParamDef> TYPEPARAMDEF = new  Function<TypeParameterElement, TypeParamDef> () {
 
@@ -176,7 +176,7 @@ public class ElementTo {
          }
      };
 
-    public static final Function<TypeElement, TypeDef> INTERNAL_TYPEDEF = CachingFunction.wrap(new Function<TypeElement, TypeDef>() {
+    public static final Function<TypeElement, TypeDef> INTERNAL_TYPEDEF = new Function<TypeElement, TypeDef>() {
         public TypeDef apply(TypeElement classElement) {
             //Check SuperClass
             Kind kind = Kind.CLASS;
@@ -299,45 +299,34 @@ public class ElementTo {
 
             return result;
         }
-    });
+    };
 
 
-    public static final Function<TypeElement, TypeDef> SHALLOW_TYPEDEF = CachingFunction.wrap(new Function<TypeElement, TypeDef>() {
+    public static final Function<TypeElement, TypeDef> SHALLOW_TYPEDEF = new Function<TypeElement, TypeDef>() {
 
         public TypeDef apply(TypeElement classElement) {
+            Set<ClassRef> extendsList = new LinkedHashSet<ClassRef>();
+
             //Check SuperClass
             Kind kind = Kind.CLASS;
             if (classElement.getKind() == ElementKind.INTERFACE) {
                 kind = Kind.INTERFACE;
             } else if (classElement.getKind() == ElementKind.CLASS) {
                 kind = Kind.CLASS;
+                extendsList.add(TypeDef.OBJECT_REF);
             }
 
             return new TypeDefBuilder()
                     .withKind(kind)
                     .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
                     .withPackageName(getPackageName(classElement))
-                    .withName(getClassName(classElement)).build();
+                    .withName(getClassName(classElement))
+                    .withExtendsList(extendsList)
+                    .build();
         }
+    };
 
-        public Set<ExecutableElement> getInheritedMethods(TypeElement typeElement) {
-            Set<ExecutableElement> result = new LinkedHashSet<ExecutableElement>();
-            if (typeElement != null) {
-                for (ExecutableElement method : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
-                    if (!method.getModifiers().contains(Modifier.PRIVATE)) {
-                        result.add(method);
-                    }
-                }
-                result.addAll(getInheritedMethods(typeElement.getSuperclass() != null ?
-                        CodegenContext.getContext().getElements().getTypeElement(typeElement.getSuperclass().toString()) : null));
-
-            }
-
-            return result;
-        }
-    });
-
-    public static final Function<TypeElement, TypeDef> TYPEDEF = CachingFunction.wrap(INTERNAL_TYPEDEF, SHALLOW_TYPEDEF, 1);
+    public static final Function<TypeElement, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF).withFallback(SHALLOW_TYPEDEF).withMaximumRecursionLevel(1).withMaximumNestingDepth(5);
 
 
 }

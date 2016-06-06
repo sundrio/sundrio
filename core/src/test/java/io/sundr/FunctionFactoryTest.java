@@ -19,19 +19,19 @@ package io.sundr;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CachingFunctionTest
+public class FunctionFactoryTest
 {
 
 
-    private static final Function<String, String> TEST_FUNCTION = CachingFunction.wrap(new Function<String, String>() {
+    private static final Function<String, String> TEST_FUNCTION = FunctionFactory.cache(new Function<String, String>() {
         public String apply(String item) {
             return "R" + TEST_FUNCTION.apply(item);
         }
-    }, new Function<String, String>() {
+    }).withFallback( new Function<String, String>() {
         public String apply(String item) {
             return "overflow";
         }
-    }, 10);
+    }).withMaximumRecursionLevel(10);
 
 
     @Test

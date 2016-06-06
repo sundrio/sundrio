@@ -16,7 +16,7 @@
 
 package io.sundr.builder.internal.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
@@ -74,7 +74,7 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 
 public class ClazzAs {
 
-    public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             Set<Method> methods = new LinkedHashSet<Method>();
             Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
@@ -167,7 +167,7 @@ public class ClazzAs {
         }
     });
 
-    public static final Function<TypeDef, TypeDef> FLUENT_IMPL = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> FLUENT_IMPL = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             Set<Method> constructors = new LinkedHashSet<Method>();
             Set<Method> methods = new LinkedHashSet<Method>();
@@ -311,7 +311,7 @@ public class ClazzAs {
     });
 
 
-    public static final Function<TypeDef, TypeDef> BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
 
             TypeDef builderType = TypeAs.BUILDER.apply(item);
@@ -406,7 +406,7 @@ public class ClazzAs {
 
     });
 
-    public static final Function<TypeDef, TypeDef> EDITABLE_BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> EDITABLE_BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(final TypeDef item) {
             final TypeDef editable = EDITABLE.apply(item);
             return new TypeDefBuilder(BUILDER.apply(item)).accept(new TypedVisitor<MethodBuilder>() {
@@ -422,7 +422,7 @@ public class ClazzAs {
         }
     });
 
-    public static final Function<TypeDef, TypeDef> EDITABLE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> EDITABLE = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             TypeDef editableType = TypeAs.EDITABLE.apply(item);
             TypeDef builderType = TypeAs.BUILDER.apply(item);

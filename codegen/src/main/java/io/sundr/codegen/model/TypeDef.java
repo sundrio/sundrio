@@ -33,7 +33,7 @@ public class TypeDef extends ModifierSupport {
             .withName("Object")
             .build();
 
-    public static TypeRef OBJECT_REF = OBJECT.toReference();
+    public static ClassRef OBJECT_REF = OBJECT.toReference();
     public static String IMPORTS = "IMPORTS";
 
     private final Kind kind;

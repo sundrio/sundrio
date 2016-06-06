@@ -16,7 +16,7 @@
 
 package io.sundr.builder.internal.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
@@ -119,7 +119,7 @@ public class TypeAs {
     };
 
 
-    public static final Function<TypeDef, TypeDef> SHALLOW_FLUENT = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> SHALLOW_FLUENT = new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>(item.getParameters());
             parameters.add(getNextGeneric(item));
@@ -131,10 +131,10 @@ public class TypeAs {
                     .withParameters(parameters)
                     .build();
         }
-    });
+    };
 
 
-    public static final Function<TypeDef, ClassRef> FLUENT_REF = CachingFunction.wrap(new Function<TypeDef, ClassRef>() {
+    public static final Function<TypeDef, ClassRef> FLUENT_REF = new Function<TypeDef, ClassRef>() {
         public ClassRef apply(TypeDef item) {
             List<TypeRef> parameters = new ArrayList<TypeRef>();
             for (TypeParamDef param : item.getParameters()) {
@@ -143,9 +143,9 @@ public class TypeAs {
             parameters.add(Q);
            return SHALLOW_FLUENT.apply(item).toReference(parameters.toArray(new TypeRef[parameters.size()]));
         }
-    });
+    };
 
-    public static final Function<TypeDef, TypeDef> BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> BUILDER = new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             TypeDef builder = SHALLOW_BUILDER.apply(item);
             TypeDef fluent = FLUENT_IMPL.apply(item);
@@ -165,8 +165,9 @@ public class TypeAs {
                     .build();
 
         }
-    });
-    public static final Function<TypeDef, TypeDef> EDITABLE = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    };
+
+    public static final Function<TypeDef, TypeDef> EDITABLE = new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
             for (TypeParamDef generic : item.getParameters()) {
@@ -185,18 +186,18 @@ public class TypeAs {
                     .build();
 
         }
-    });
+    };
 
-    public static final Function<TypeDef, TypeDef> SHALLOW_BUILDER = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
+    public static final Function<TypeDef, TypeDef> SHALLOW_BUILDER = new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             return new TypeDefBuilder(item)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Builder")
                     .build();
         }
-    });
+    };
 
-    public static final Function<TypeRef, TypeRef> VISITABLE_BUILDER = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+    public static final Function<TypeRef, TypeRef> VISITABLE_BUILDER = new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
             TypeRef baseType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
             if (baseType instanceof ClassRef) {
@@ -204,10 +205,10 @@ public class TypeAs {
             }
             return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(baseType, Q);
         }
-    });
+    };
 
 
-    public static final Function<TypeRef, TypeRef> LIST_OF = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+    public static final Function<TypeRef, TypeRef> LIST_OF = FunctionFactory.cache(new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
             return Constants.LIST.toReference(item);
             //TODO: Need a home for: .withDefaultImplementation(Constants.ARRAY_LIST)
@@ -215,21 +216,21 @@ public class TypeAs {
 
     });
 
-    public static final Function<TypeRef, TypeRef> ARRAY_AS_LIST = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+    public static final Function<TypeRef, TypeRef> ARRAY_AS_LIST = FunctionFactory.cache(new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
             return LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item));
 
         }
     });
 
-    public static final Function<TypeRef, TypeRef> ARRAY_LIST_OF = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+    public static final Function<TypeRef, TypeRef> ARRAY_LIST_OF = new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
             return classRefOf(Constants.ARRAY_LIST, item);
         }
 
-    });
+    };
 
-    public static final Function<TypeRef, TypeRef> UNWRAP_COLLECTION_OF = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+    public static final Function<TypeRef, TypeRef> UNWRAP_COLLECTION_OF = new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef type) {
             if (type instanceof ClassRef) {
                 ClassRef classRef = (ClassRef) type;
@@ -239,9 +240,9 @@ public class TypeAs {
             }
             return type;
         }
-    });
+    };
 
-    public static final Function<TypeRef, TypeRef> UNWRAP_ARRAY_OF = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+    public static final Function<TypeRef, TypeRef> UNWRAP_ARRAY_OF = new Function<TypeRef, TypeRef>() {
 
         public TypeRef apply(TypeRef item) {
             if (item instanceof PrimitiveRef) {
@@ -254,28 +255,11 @@ public class TypeAs {
                 return item;
             }
         }
-    });
-
-    public static final Function<TypeDef, TypeDef> REMOVE_GENERICS = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
-        public TypeDef apply(TypeDef type) {
-            return new TypeDefBuilder(type).withParameters().build();
-        }
-    });
-
-    public static final Function<TypeDef, TypeDef> REMOVE_SUPERCLASS = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
-        public TypeDef apply(TypeDef type) {
-            return new TypeDefBuilder(type).withExtendsList().build();
-        }
-    });
-
-    public static final Function<TypeDef, TypeDef> REMOVE_INTERFACES = CachingFunction.wrap(new Function<TypeDef, TypeDef>() {
-        public TypeDef apply(TypeDef type) {
-            return new TypeDefBuilder(type).withImplementsList().build();
-        }
-    });
+    };
 
 
-    public static final Function<TypeRef, TypeRef> BOXED_OF = CachingFunction.wrap(new Function<TypeRef, TypeRef>() {
+
+    public static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef type) {
             int index=0;
             for (TypeRef primitive : PRIMITIVE_TYPES) {
@@ -290,7 +274,7 @@ public class TypeAs {
     });
 
 
-    public static Function<TypeRef, TypeRef> ARRAY_OF = CachingFunction.wrap(new Function<TypeRef, TypeRef>(){
+    public static Function<TypeRef, TypeRef> ARRAY_OF = new Function<TypeRef, TypeRef>(){
 
         public TypeRef apply(TypeRef type) {
             if (type instanceof ClassRef) {
@@ -311,7 +295,7 @@ public class TypeAs {
                 throw new IllegalStateException("A property type should be either class, primitive or param referemce.");
             }
         }
-    });
+    };
 
 
     public static <T> Function<T,T> combine(final Function<T, T>... functions) {

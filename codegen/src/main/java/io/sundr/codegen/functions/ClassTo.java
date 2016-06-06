@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.ClassRef;
@@ -53,7 +53,7 @@ public class ClassTo {
 
     private static final String ARGUMENT_PREFIX = "arg";
 
-    public static final Function<Class, Kind> KIND = CachingFunction.wrap(new Function<Class, Kind>() {
+    public static final Function<Class, Kind> KIND = FunctionFactory.cache(new Function<Class, Kind>() {
         public Kind apply(Class item) {
             if (item.isAnnotation()) {
                 return Kind.ANNOTATION;
@@ -67,7 +67,7 @@ public class ClassTo {
         }
     });
 
-    public static final Function<Type, TypeRef> TYPEREF = CachingFunction.wrap(new Function<Type, TypeRef>() {
+    public static final Function<Type, TypeRef> TYPEREF = FunctionFactory.cache(new Function<Type, TypeRef>() {
         public TypeRef apply(Type item) {
             if (item == null) {
                 return new VoidRefBuilder().build();
@@ -184,9 +184,9 @@ public class ClassTo {
         }
     };
 
-    public static final Function<Class, TypeDef> TYPEDEF = CachingFunction.wrap(INTERNAL_TYPEDEF, INTERNAL_SHALLOW_TYPEDEF, 5);
+    public static final Function<Class, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF).withFallback(INTERNAL_SHALLOW_TYPEDEF).withMaximumRecursionLevel(5).withMaximumNestingDepth(5);
 
-    private static Function<Type, TypeParamDef> TYPEPARAMDEF = CachingFunction.wrap(new Function<Type, TypeParamDef>() {
+    private static Function<Type, TypeParamDef> TYPEPARAMDEF = FunctionFactory.cache(new Function<Type, TypeParamDef>() {
 
         public TypeParamDef apply(Type item) {
             if (item instanceof TypeVariable) {

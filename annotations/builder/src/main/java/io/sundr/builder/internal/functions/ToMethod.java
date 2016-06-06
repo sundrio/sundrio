@@ -16,7 +16,7 @@
 
 package io.sundr.builder.internal.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.model.ClassRef;
@@ -75,7 +75,7 @@ public class ToMethod {
     private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
     private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
 
-    public static final Function<Property, Method> WITH = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> WITH = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
@@ -122,7 +122,7 @@ public class ToMethod {
 
     });
 
-    public static final Function<Property, Method> WITH_ARRAY = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> WITH_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
 
@@ -147,7 +147,7 @@ public class ToMethod {
 
     });
 
-    public static final Function<Property, Method> GETTER = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> GETTER = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(final Property property) {
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
@@ -200,7 +200,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> GETTER_ARRAY = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> GETTER_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
@@ -227,7 +227,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> SETTER = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> SETTER = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             String methodName = "set" + property.getNameCapitalized();
             return new MethodBuilder()
@@ -243,7 +243,7 @@ public class ToMethod {
     });
 
 
-    public static final Function<Property, Method> ADD_TO_COLLECTION = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(final Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
@@ -294,7 +294,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> REMOVE_FROM_COLLECTION = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(final Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
@@ -345,7 +345,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> ADD_MAP_TO_MAP = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> ADD_MAP_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef mapType = (ClassRef) property.getTypeRef();
@@ -363,7 +363,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> ADD_TO_MAP = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> ADD_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef mapType = (ClassRef) property.getTypeRef();
@@ -387,7 +387,7 @@ public class ToMethod {
     });
 
 
-    public static final Function<Property, Method> REMOVE_MAP_FROM_MAP = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> REMOVE_MAP_FROM_MAP = FunctionFactory.cache(new Function<Property, Method>() {
 
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
@@ -406,7 +406,7 @@ public class ToMethod {
         }
     });
 
-    public static final Function<Property, Method> REMOVE_FROM_MAP = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> REMOVE_FROM_MAP = FunctionFactory.cache(new Function<Property, Method>() {
 
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
@@ -594,7 +594,7 @@ public class ToMethod {
 
     };
 
-    public static final Function<Property, Method> END = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> END = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
 
             String methodName = "end" + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())

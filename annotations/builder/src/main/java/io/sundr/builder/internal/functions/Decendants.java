@@ -16,7 +16,7 @@
 
 package io.sundr.builder.internal.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
@@ -42,7 +42,7 @@ import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 
 public class Decendants {
 
-    public static final Function<TypeDef, Set<TypeDef>> BUILDABLE_DECENDANTS = CachingFunction.wrap(new Function<TypeDef, Set<TypeDef>>() {
+    public static final Function<TypeDef, Set<TypeDef>> BUILDABLE_DECENDANTS = FunctionFactory.cache(new Function<TypeDef, Set<TypeDef>>() {
         public Set<TypeDef> apply(TypeDef item) {
             if (item.equals(TypeDef.OBJECT)) {
                 return new LinkedHashSet<TypeDef>();
@@ -69,7 +69,7 @@ public class Decendants {
      * @param property
      * @return
      */
-    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DECENDANTS = CachingFunction.wrap(new Function<Property, Set<Property>>() {
+    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DECENDANTS = FunctionFactory.cache(new Function<Property, Set<Property>>() {
         public Set<Property> apply(Property property) {
             Set<Property> result = new LinkedHashSet<Property>();
             TypeRef baseType = property.getTypeRef();

@@ -91,6 +91,7 @@ public class BuilderUtils {
                 return candidate;
             }
         }
+
         return clazz.getConstructors().iterator().next();
     }
 

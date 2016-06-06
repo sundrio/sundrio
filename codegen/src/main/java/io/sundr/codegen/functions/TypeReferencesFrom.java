@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 public class TypeReferencesFrom  {
 
-    public static final Function<TypeRef,Set<TypeRef>> TYPEREF = CachingFunction.wrap(new Function<TypeRef, Set<TypeRef>>() {
+    public static final Function<TypeRef,Set<TypeRef>> TYPEREF = FunctionFactory.cache(new Function<TypeRef, Set<TypeRef>>() {
 
         public Set<TypeRef> apply(TypeRef item) {
             Set<TypeRef> result = new LinkedHashSet<TypeRef>();
@@ -45,7 +45,7 @@ public class TypeReferencesFrom  {
         }
     });
 
-    public static final Function<Property,Set<TypeRef>> PROPERTY = CachingFunction.wrap(new Function<Property, Set<TypeRef>>() {
+    public static final Function<Property,Set<TypeRef>> PROPERTY = FunctionFactory.cache(new Function<Property, Set<TypeRef>>() {
 
         public Set<TypeRef> apply(Property item) {
             Set<TypeRef> result = new LinkedHashSet<TypeRef>();
@@ -59,7 +59,7 @@ public class TypeReferencesFrom  {
         }
     });
 
-    public static final Function<Method,Set<TypeRef>> METHOD = CachingFunction.wrap(new Function<Method, Set<TypeRef>>() {
+    public static final Function<Method,Set<TypeRef>> METHOD = FunctionFactory.cache(new Function<Method, Set<TypeRef>>() {
 
         public Set<TypeRef> apply(Method item) {
             Set<TypeRef> result = new HashSet<TypeRef>();

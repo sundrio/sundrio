@@ -16,7 +16,7 @@
 
 package io.sundr.builder.internal.functions;
 
-import io.sundr.CachingFunction;
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.TypeUtils;
@@ -27,25 +27,25 @@ import static io.sundr.builder.Constants.MAP;
 
 public class CollectionTypes {
 
-    public static final Function<TypeRef, Boolean> IS_LIST = CachingFunction.wrap(new Function<TypeRef, Boolean>() {
+    public static final Function<TypeRef, Boolean> IS_LIST = FunctionFactory.cache(new Function<TypeRef, Boolean>() {
         public Boolean apply(TypeRef type) {
             return TypeUtils.isInstanceOf(type, LIST, IS_LIST);
         }
     });
 
-    public static final Function<TypeRef, Boolean> IS_SET = CachingFunction.wrap(new Function<TypeRef, Boolean>() {
+    public static final Function<TypeRef, Boolean> IS_SET = FunctionFactory.cache(new Function<TypeRef, Boolean>() {
         public Boolean apply(TypeRef type) {
             return TypeUtils.isInstanceOf(type, SET, IS_SET);
         }
     });
 
-    public static final Function<TypeRef, Boolean> IS_MAP = CachingFunction.wrap(new Function<TypeRef, Boolean>() {
+    public static final Function<TypeRef, Boolean> IS_MAP = FunctionFactory.cache(new Function<TypeRef, Boolean>() {
         public Boolean apply(TypeRef type) {
             return TypeUtils.isInstanceOf(type, MAP, IS_MAP);
         }
     });
 
-    public static final Function<TypeRef, Boolean> IS_COLLECTION = CachingFunction.wrap(new Function<TypeRef, Boolean>() {
+    public static final Function<TypeRef, Boolean> IS_COLLECTION = FunctionFactory.cache(new Function<TypeRef, Boolean>() {
         public Boolean apply(TypeRef type) {
             return IS_LIST.apply(type) || IS_SET.apply(type);
         }
