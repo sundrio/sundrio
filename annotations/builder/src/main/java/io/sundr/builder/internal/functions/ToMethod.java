@@ -50,6 +50,7 @@ import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_LIST;
+import static io.sundr.builder.internal.functions.CollectionTypes.IS_MAP;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_SET;
 import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
@@ -98,10 +99,10 @@ public class ToMethod {
 
             List<Statement> statements = new ArrayList<Statement>();
 
-            if (IS_COLLECTION.apply(type)) {
+            if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
                 String className = ((ClassRef) type).getDefinition().getName();
                 statements.add(new StringStatement("this." + name + ".clear();"));
-                if (className.contains("Map")) {
+                if (IS_MAP.apply(type)) {
                     statements.add(new StringStatement("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (" + returnType + ") this;"));
                 } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
                     String addToMethodName = "addTo" + property.getNameCapitalized();
@@ -545,7 +546,7 @@ public class ToMethod {
         }
     };
 
-    public static final Function<Property, Method> EDIT_NESTED = CachingFunction.wrap(new Function<Property, Method>() {
+    public static final Function<Property, Method> EDIT_NESTED =new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
@@ -565,7 +566,7 @@ public class ToMethod {
                     .build();
 
         }
-    });
+    };
 
     public static final Function<Property, Method> AND = new Function<Property, Method>() {
         public Method apply(Property property) {

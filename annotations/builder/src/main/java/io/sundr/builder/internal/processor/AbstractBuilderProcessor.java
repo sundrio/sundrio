@@ -235,6 +235,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         }
 
         return new TypeDefBuilder(shallowInlineType)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                 .withConstructors(constructors)
                 .addToProperties(builderProperty, functionProperty)
                 .addToMethods(inlineMethod)

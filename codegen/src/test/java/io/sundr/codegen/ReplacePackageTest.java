@@ -14,22 +14,20 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.codegen;
 
-import io.sundr.builder.Editable;
+import io.sundr.codegen.functions.Sources;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import org.junit.Test;
 
-public class EditableClassRef extends ClassRef implements Editable<ClassRefBuilder>{
+public class ReplacePackageTest {
 
 
-    public EditableClassRef(TypeDef definition,int dimensions,java.util.List<TypeRef> arguments,java.util.Map<String,Object> attributes){
-            super(definition, dimensions, arguments, attributes);
+    @Test
+    public void testMoveToPackage() {
+        TypeDef baseFluent = Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java");
+        TypeDef refactored = new TypeDefBuilder(baseFluent).accept(new ReplacePackage("io.sundr.builder","my.pkg")).build();
+        System.out.println(refactored);
     }
-
-    public ClassRefBuilder edit(){
-            return new ClassRefBuilder(this);
-    }
-
-
-
 }
-    

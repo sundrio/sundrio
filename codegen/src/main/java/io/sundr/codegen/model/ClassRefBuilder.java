@@ -18,39 +18,46 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
+
 public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder> implements VisitableBuilder<ClassRef,ClassRefBuilder>{
 
-     ClassRefFluent<?> fluent;
+   ClassRefFluent<?> fluent;
 
     public ClassRefBuilder(){
-        this.fluent = this;
-    }
-    public ClassRefBuilder( ClassRefFluent<?> fluent ){
-        this.fluent = fluent;
-    }
-    public ClassRefBuilder( ClassRefFluent<?> fluent , ClassRef instance ){
-        this.fluent = fluent; fluent.withDefinition(instance.getDefinition()); fluent.withDimensions(instance.getDimensions()); fluent.withArguments(instance.getArguments()); fluent.withAttributes(instance.getAttributes()); 
-    }
-    public ClassRefBuilder( ClassRef instance ){
-        this.fluent = this; this.withDefinition(instance.getDefinition()); this.withDimensions(instance.getDimensions()); this.withArguments(instance.getArguments()); this.withAttributes(instance.getAttributes()); 
-    }
+            this.fluent = this;
+        }
+    public ClassRefBuilder(ClassRefFluent<?> fluent){
+            this.fluent = fluent;
+        }
+    public ClassRefBuilder(ClassRefFluent<?> fluent,ClassRef instance){
+            this.fluent = fluent;
+            fluent.withDefinition(instance.getDefinition());
+            fluent.withDimensions(instance.getDimensions());
+            fluent.withArguments(instance.getArguments());
+            fluent.withAttributes(instance.getAttributes());
+        }
+    public ClassRefBuilder(ClassRef instance){
+            this.fluent = this;
+            this.withDefinition(instance.getDefinition());
+            this.withDimensions(instance.getDimensions());
+            this.withArguments(instance.getArguments());
+            this.withAttributes(instance.getAttributes());
+        }
 
-public EditableClassRef build(){
-    EditableClassRef buildable = new EditableClassRef(fluent.getDefinition(),fluent.getDimensions(),fluent.getArguments(),fluent.getAttributes());
-validate(buildable);
-return buildable;
+    public EditableClassRef build(){
+            EditableClassRef buildable = new EditableClassRef(fluent.getDefinition(),fluent.getDimensions(),fluent.getArguments(),fluent.getAttributes());
+            validate(buildable);
+            return buildable;
+        }
+    public boolean equals(Object o){
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            ClassRefBuilder that = (ClassRefBuilder) o;
+            if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
 
-}
-public boolean equals( Object o ){
-    
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-ClassRefBuilder that = (ClassRefBuilder) o;
-if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
-return true;
-
-}
+            return true;
+        }
 
 private <T> void validate(T item) {}
 

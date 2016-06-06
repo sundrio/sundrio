@@ -18,41 +18,67 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class MethodBuilder extends MethodFluentImpl<MethodBuilder> implements VisitableBuilder<Method,MethodBuilder>{
+public class MethodBuilder extends MethodFluentImpl<MethodBuilder> implements VisitableBuilder<Method, MethodBuilder> {
 
-     MethodFluent<?> fluent;
+    MethodFluent<?> fluent;
 
-    public MethodBuilder(){
+    public MethodBuilder() {
         this.fluent = this;
     }
-    public MethodBuilder( MethodFluent<?> fluent ){
+
+    public MethodBuilder(MethodFluent<?> fluent) {
         this.fluent = fluent;
     }
-    public MethodBuilder( MethodFluent<?> fluent , Method instance ){
-        this.fluent = fluent; fluent.withAnnotations(instance.getAnnotations()); fluent.withParameters(instance.getParameters()); fluent.withName(instance.getName()); fluent.withReturnType(instance.getReturnType()); fluent.withArguments(instance.getArguments()); fluent.withVarArgPreferred(instance.isVarArgPreferred()); fluent.withExceptions(instance.getExceptions()); fluent.withBlock(instance.getBlock()); fluent.withModifiers(instance.getModifiers()); fluent.withAttributes(instance.getAttributes()); 
+
+    public MethodBuilder(MethodFluent<?> fluent, Method instance) {
+        this.fluent = fluent;
+        fluent.withAnnotations(instance.getAnnotations());
+        fluent.withParameters(instance.getParameters());
+        fluent.withName(instance.getName());
+        fluent.withReturnType(instance.getReturnType());
+        fluent.withArguments(instance.getArguments());
+        fluent.withVarArgPreferred(instance.isVarArgPreferred());
+        fluent.withExceptions(instance.getExceptions());
+        fluent.withBlock(instance.getBlock());
+        fluent.withModifiers(instance.getModifiers());
+        fluent.withAttributes(instance.getAttributes());
     }
-    public MethodBuilder( Method instance ){
-        this.fluent = this; this.withAnnotations(instance.getAnnotations()); this.withParameters(instance.getParameters()); this.withName(instance.getName()); this.withReturnType(instance.getReturnType()); this.withArguments(instance.getArguments()); this.withVarArgPreferred(instance.isVarArgPreferred()); this.withExceptions(instance.getExceptions()); this.withBlock(instance.getBlock()); this.withModifiers(instance.getModifiers()); this.withAttributes(instance.getAttributes()); 
+
+    public MethodBuilder(Method instance) {
+        this.fluent = this;
+        this.withAnnotations(instance.getAnnotations());
+        this.withParameters(instance.getParameters());
+        this.withName(instance.getName());
+        this.withReturnType(instance.getReturnType());
+        this.withArguments(instance.getArguments());
+        this.withVarArgPreferred(instance.isVarArgPreferred());
+        this.withExceptions(instance.getExceptions());
+        this.withBlock(instance.getBlock());
+        this.withModifiers(instance.getModifiers());
+        this.withAttributes(instance.getAttributes());
     }
 
-public EditableMethod build(){
-    EditableMethod buildable = new EditableMethod(fluent.getAnnotations(),fluent.getParameters(),fluent.getName(),fluent.getReturnType(),fluent.getArguments(),fluent.isVarArgPreferred(),fluent.getExceptions(),fluent.getBlock(),fluent.getModifiers(),fluent.getAttributes());
-validate(buildable);
-return buildable;
+    public EditableMethod build() {
+        EditableMethod buildable = new EditableMethod(fluent.getAnnotations(), fluent.getParameters(), fluent.getName(), fluent.getReturnType(), fluent.getArguments(), fluent.isVarArgPreferred(), fluent.getExceptions(), fluent.getBlock(), fluent.getModifiers(), fluent.getAttributes());
+        validate(buildable);
+        return buildable;
 
-}
-public boolean equals( Object o ){
-    
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-MethodBuilder that = (MethodBuilder) o;
-if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
-return true;
+    }
 
-}
+    public boolean equals(Object o) {
 
-private <T> void validate(T item) {}
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        MethodBuilder that = (MethodBuilder) o;
+        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
+            return false;
+        return true;
+
+    }
+
+    private <T> void validate(T item) {
+    }
 
 
 }

@@ -176,7 +176,7 @@ public class ElementTo {
          }
      };
 
-    public static final Function<TypeElement, TypeDef> TYPEDEF = CachingFunction.wrap(new Function<TypeElement, TypeDef>() {
+    public static final Function<TypeElement, TypeDef> INTERNAL_TYPEDEF = CachingFunction.wrap(new Function<TypeElement, TypeDef>() {
         public TypeDef apply(TypeElement classElement) {
             //Check SuperClass
             Kind kind = Kind.CLASS;
@@ -287,6 +287,44 @@ public class ElementTo {
             return result;
         }
     });
+
+
+    public static final Function<TypeElement, TypeDef> SHALLOW_TYPEDEF = CachingFunction.wrap(new Function<TypeElement, TypeDef>() {
+
+        public TypeDef apply(TypeElement classElement) {
+            //Check SuperClass
+            Kind kind = Kind.CLASS;
+            if (classElement.getKind() == ElementKind.INTERFACE) {
+                kind = Kind.INTERFACE;
+            } else if (classElement.getKind() == ElementKind.CLASS) {
+                kind = Kind.CLASS;
+            }
+
+            return new TypeDefBuilder()
+                    .withKind(kind)
+                    .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
+                    .withPackageName(getPackageName(classElement))
+                    .withName(getClassName(classElement)).build();
+        }
+
+        public Set<ExecutableElement> getInheritedMethods(TypeElement typeElement) {
+            Set<ExecutableElement> result = new LinkedHashSet<ExecutableElement>();
+            if (typeElement != null) {
+                for (ExecutableElement method : ElementFilter.methodsIn(typeElement.getEnclosedElements())) {
+                    if (!method.getModifiers().contains(Modifier.PRIVATE)) {
+                        result.add(method);
+                    }
+                }
+                result.addAll(getInheritedMethods(typeElement.getSuperclass() != null ?
+                        CodegenContext.getContext().getElements().getTypeElement(typeElement.getSuperclass().toString()) : null));
+
+            }
+
+            return result;
+        }
+    });
+
+    public static final Function<TypeElement, TypeDef> TYPEDEF = CachingFunction.wrap(INTERNAL_TYPEDEF, SHALLOW_TYPEDEF, 1);
 
 
 }

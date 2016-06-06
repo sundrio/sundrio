@@ -65,6 +65,7 @@ import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRef;
 import io.sundr.codegen.model.WildcardRef;
+import io.sundr.codegen.model.WildcardRefBuilder;
 import io.sundr.codegen.utils.IOUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -121,6 +122,43 @@ public class Sources {
         }
     };
 
+
+    private static Function<Node, Set<ClassRef>> IMPORTS = new Function<Node, Set<ClassRef>>() {
+
+        public Set<ClassRef> apply(Node node) {
+            Set<ClassRef> imports = new LinkedHashSet<ClassRef>();
+
+            if (node instanceof NamedNode) {
+                String name = ((NamedNode)node).getName();
+                Node current = node;
+                while (!(current instanceof CompilationUnit)) {
+                    current = current.getParentNode();
+                }
+
+                CompilationUnit compilationUnit = (CompilationUnit) current;
+
+                for (ImportDeclaration importDecl : compilationUnit.getImports()) {
+                    String className = null;
+                    String packageName = null;
+
+                    NameExpr importExpr = importDecl.getName();
+                    if (importExpr instanceof QualifiedNameExpr) {
+                        QualifiedNameExpr qualifiedNameExpr = (QualifiedNameExpr) importExpr;
+                        className = qualifiedNameExpr.getName();
+                        packageName = qualifiedNameExpr.getQualifier().toString();
+                    } else if (importDecl.getName().getName().endsWith(SEPARATOR + name)) {
+                        String importName = importDecl.getName().getName();
+                        packageName = importName.substring(0, importName.length() - name.length() -1);
+                    }
+                    if (className != null && !className.isEmpty()) {
+                        imports.add(new ClassRefBuilder().withNewDefinition().withName(className).withPackageName(packageName).and().build());
+                    }
+                }
+            }
+            return imports;
+        }
+    };
+
     private static Function<ClassOrInterfaceType, TypeRef> CLASS_OR_TYPEPARAM_REF = new Function<ClassOrInterfaceType, TypeRef>() {
         public TypeRef apply(ClassOrInterfaceType classOrInterfaceType) {
             String boundPackage = PACKAGENAME.apply(classOrInterfaceType);
@@ -152,6 +190,14 @@ public class Sources {
                                 .withName(name)
                                 .withDimensions(dimensions)
                                 .build());
+                    }
+                } else if (arg instanceof WildcardType) {
+                    WildcardType wildcardType = (WildcardType)arg;
+                    if (wildcardType.getExtends() != null) {
+                        TypeRef bound = TYPEREF.apply(wildcardType.getExtends());
+                        arguments.add(new WildcardRefBuilder().addToBounds(bound).build());
+                    } else {
+                        arguments.add(new WildcardRef());
                     }
                 }
             }
@@ -303,14 +349,25 @@ public class Sources {
                                 exceptions.add((ClassRef) exceptionRef);
                             }
                         }
+                        Boolean preferVarArg = false;
+
                         for (Parameter parameter : methodDeclaration.getParameters()) {
                             Set<ClassRef> annotations = new LinkedHashSet<ClassRef>();
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
                                 annotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }
+
+
+                            TypeRef typeRef = TYPEREF.apply(parameter.getType());
+
+                            if (parameter.isVarArgs()) {
+                                preferVarArg = true;
+                                typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
+                            }
+
                             arguments.add(new PropertyBuilder()
                                     .withName(parameter.getId().getName())
-                                    .withTypeRef(TYPEREF.apply(parameter.getType()))
+                                    .withTypeRef(typeRef)
                                     .withModifiers(parameter.getModifiers())
                                     .withAnnotations(annotations)
                                     .build());
@@ -324,9 +381,11 @@ public class Sources {
 
                         TypeRef returnType = checkAgainstTypeParamRef(TYPEREF.apply(methodDeclaration.getType()), parameters);
                         methods.add(new MethodBuilder()
+
                                 .withName(methodDeclaration.getName())
                                 .withModifiers(methodDeclaration.getModifiers())
                                 .withParameters(typeParamDefs)
+                                .withVarArgPreferred(preferVarArg)
                                 .withReturnType(returnType)
                                 .withExceptions(exceptions)
                                 .withArguments(arguments)
@@ -379,6 +438,7 @@ public class Sources {
                         .withProperties(properties)
                         .withMethods(methods)
                         .withConstructors(constructors)
+                        .addToAttributes(TypeDef.IMPORTS, IMPORTS.apply(type))
                         .build());
             }
             throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");

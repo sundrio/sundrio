@@ -25,24 +25,23 @@ import java.util.Map;
 @Buildable
 public class ClassRef extends AbstractTypeRef {
 
+    public static final ClassRef OBJECT = new ClassRefBuilder()
+            .withDefinition(TypeDef.OBJECT)
+            .build();
+
     private final TypeDef definition;
     private final int dimensions;
     private final List<TypeRef> arguments;
 
     public ClassRef(TypeDef definition, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
         super(attributes);
-        this.definition = definition;
+        this.definition = definition != null ? definition : new TypeDefBuilder().build();
         this.dimensions = dimensions;
         this.arguments = arguments;
     }
 
     public TypeDef getDefinition() {
         return definition;
-    }
-
-    @Override
-    public boolean isAssignableFrom(TypeRef ref) {
-        return false;
     }
 
     public int getDimensions() {
@@ -55,6 +54,22 @@ public class ClassRef extends AbstractTypeRef {
 
     public ClassRef withDimensions(int dimensions) {
         return new ClassRefBuilder(this).withDimensions(dimensions).build();
+    }
+
+    public boolean isAssignableFrom(TypeRef other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (!(other instanceof ClassRef)) {
+            return false;
+        }
+
+        if (this == other || this.equals(other)) {
+            return true;
+        }
+
+        return definition.isAssignableFrom(((ClassRef) other).getDefinition());
     }
 
     @Override

@@ -18,21 +18,19 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Editable;
 
-import java.util.Map;
+public class EditableWildcardRef extends WildcardRef implements Editable<WildcardRefBuilder> {
 
-public class EditableWildcardRef extends WildcardRef implements Editable<WildcardRefBuilder>{
+    public EditableWildcardRef(){
+            super();
+    }
+    public EditableWildcardRef(java.util.List<TypeRef> bounds,java.util.Map<String,Object> attributes){
+            super(bounds, attributes);
+    }
 
+    public WildcardRefBuilder edit(){
+            return new WildcardRefBuilder(this);
+    }
 
-public EditableWildcardRef(){
-    super();
-}
-public EditableWildcardRef( Map<String, Object> attributes ){
-    super(attributes);
-}
-
-public WildcardRefBuilder edit(){
-    return new WildcardRefBuilder(this);
-}
 
 
 }

@@ -17,41 +17,55 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @Buildable
 public class WildcardRef extends AbstractTypeRef {
 
+
     private static final String WILDCARD = "?";
+    private final List<TypeRef> bounds;
+
 
     public WildcardRef() {
-        this(Collections.<String, Object>emptyMap());
+        this(Collections.<TypeRef>emptyList(), Collections.<String, Object>emptyMap());
     }
 
-    public WildcardRef(Map<String, Object> attributes) {
+    public WildcardRef(List<TypeRef> bounds, Map<String, Object> attributes) {
         super(attributes);
+        this.bounds = bounds;
     }
 
-    @Override
-    public boolean isAssignableFrom(TypeRef ref) {
-        return false;
+    public List<TypeRef> getBounds() {
+        return bounds;
     }
 
-    @Override
     public int getDimensions() {
         return 0;
     }
 
-    @Override
     public TypeRef withDimensions(int dimensions) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public String toString() {
-        return WILDCARD;
+        StringBuilder sb = new StringBuilder();
+        sb.append(WILDCARD);
+        if (bounds != null && !bounds.isEmpty()) {
+            sb.append(" extends ");
+            sb.append(StringUtils.join(bounds, ","));
+        }
+        return sb.toString();
     }
+
+    public boolean isAssignableFrom(TypeRef ref) {
+        return false;
+    }
+
 
 }

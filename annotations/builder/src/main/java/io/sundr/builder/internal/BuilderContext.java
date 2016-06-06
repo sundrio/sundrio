@@ -16,10 +16,10 @@
 
 package io.sundr.builder.internal;
 
-import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.ReplacePackage;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.Kind;
@@ -31,15 +31,8 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import static io.sundr.builder.Constants.ARRAY_LIST;
 import static io.sundr.builder.Constants.INLINEABLE;
-import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 
 public class BuilderContext {
 
@@ -78,19 +71,19 @@ public class BuilderContext {
 
 
         visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
         typedVisitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/TypedVisitor.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
         functionInterface  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
         visitableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitable.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
         
         builderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Builder.java"))
@@ -98,28 +91,28 @@ public class BuilderContext {
                 .build();
 
         fluentInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Fluent.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
 
         baseFluentClass  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
         nestedInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Nested.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
         editableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Editable.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
         visitableBuilderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableBuilder.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
         inlineableBase = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Inlineable.java"))
-                .withPackageName(builderPackage)
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
     }
 

@@ -20,37 +20,39 @@ import io.sundr.builder.VisitableBuilder;
 
 public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder> implements VisitableBuilder<WildcardRef,WildcardRefBuilder>{
 
-     WildcardRefFluent<?> fluent;
+    WildcardRefFluent<?> fluent;
 
     public WildcardRefBuilder(){
-        this(new WildcardRef());
-    }
-    public WildcardRefBuilder( WildcardRefFluent<?> fluent ){
-        this(fluent, new WildcardRef());
-    }
-    public WildcardRefBuilder( WildcardRefFluent<?> fluent , WildcardRef instance ){
-        this.fluent = fluent; fluent.withAttributes(instance.getAttributes()); 
-    }
-    public WildcardRefBuilder( WildcardRef instance ){
-        this.fluent = this; this.withAttributes(instance.getAttributes()); 
-    }
+            this(new WildcardRef());
+        }
+    public WildcardRefBuilder(WildcardRefFluent<?> fluent){
+            this(fluent, new WildcardRef());
+        }
+    public WildcardRefBuilder(WildcardRefFluent<?> fluent,WildcardRef instance){
+            this.fluent = fluent;
+            fluent.withBounds(instance.getBounds());
+            fluent.withAttributes(instance.getAttributes());
+        }
+    public WildcardRefBuilder(WildcardRef instance){
+            this.fluent = this;
+            this.withBounds(instance.getBounds());
+            this.withAttributes(instance.getAttributes());
+        }
 
-public EditableWildcardRef build(){
-    EditableWildcardRef buildable = new EditableWildcardRef(fluent.getAttributes());
-validate(buildable);
-return buildable;
+    public EditableWildcardRef build(){
+            EditableWildcardRef buildable = new EditableWildcardRef(fluent.getBounds(),fluent.getAttributes());
+            validate(buildable);
+            return buildable;
+        }
+    public boolean equals(Object o){
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            WildcardRefBuilder that = (WildcardRefBuilder) o;
+            if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
 
-}
-public boolean equals( Object o ){
-    
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-WildcardRefBuilder that = (WildcardRefBuilder) o;
-if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
-return true;
-
-}
+            return true;
+        }
 
 private <T> void validate(T item) {}
 

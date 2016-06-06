@@ -20,6 +20,7 @@ import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class TypeDef extends ModifierSupport {
             .build();
 
     public static TypeRef OBJECT_REF = OBJECT.toReference();
+    public static String IMPORTS = "IMPORTS";
 
     private final Kind kind;
     private final String packageName;
@@ -253,7 +255,7 @@ public class TypeDef extends ModifierSupport {
     public ClassRef toUnboundedReference() {
         return new ClassRefBuilder()
                 .withDefinition(this)
-                .withArguments()
+                .withArguments(new TypeRef[0])
                 .build();
     }
 
@@ -264,6 +266,9 @@ public class TypeDef extends ModifierSupport {
                 imports.add(builder.build());
             }
         });
+        if (getAttributes().containsKey(IMPORTS)) {
+            imports.addAll((Set<ClassRef>) getAttributes().get(IMPORTS));
+        }
         return imports;
     }
 
@@ -277,8 +282,13 @@ public class TypeDef extends ModifierSupport {
         } else if (isPrivate()) {
             sb.append("private ");
         }
+
         if (isStatic()) {
             sb.append("static ");
+        }
+
+        if (isAbstract()) {
+            sb.append("abstract ");
         }
 
         if (isFinal()) {
