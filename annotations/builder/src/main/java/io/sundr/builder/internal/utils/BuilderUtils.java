@@ -217,7 +217,7 @@ public class BuilderUtils {
     public static Set<Method> getInlineableConstructors(Property property) {
         Set<Method> result = new HashSet<Method>();
         TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-        TypeDef clazz = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
+        TypeDef clazz = unwrapped instanceof ClassRef ? ((ClassRef)unwrapped).getDefinition() : BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
         for (Method candidate : clazz.getConstructors()) {
             if (isInlineable(candidate)) {
                 result.add(candidate);
