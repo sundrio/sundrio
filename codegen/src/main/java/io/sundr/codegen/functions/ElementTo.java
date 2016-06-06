@@ -35,6 +35,7 @@ import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.model.VoidRef;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -63,9 +64,14 @@ public class ElementTo {
 
     private static final Function<TypeMirror, TypeRef> DEEP_MIRROR_TO_TYPEREF = new Function<TypeMirror, TypeRef>() {
         public TypeRef apply(TypeMirror item) {
+            if (item instanceof NoType) {
+                return new VoidRef();
+            }
+
             Element element = CodegenContext.getContext().getTypes().asElement(item);
-            TypeDef known = null;
-            if (element instanceof TypeElement) {
+            TypeDef known = element != null ? CodegenContext.getContext().getDefinitionRepository().getDefinition(element.toString()) : null;
+
+            if (known == null && element instanceof TypeElement) {
                 known = TYPEDEF.apply((TypeElement) element);
             }
             TypeRef typeRef = item.accept(new TypeRefTypeVisitor(), 0);
@@ -113,10 +119,7 @@ public class ElementTo {
         public Property apply(final VariableElement variableElement) {
             String name = variableElement.getSimpleName().toString();
 
-            String elementType = variableElement.asType().toString();
-
-            TypeRef type = variableElement.asType().accept(new TypeRefTypeVisitor(), 0);
-
+            TypeRef type = MIRROR_TO_TYPEREF.apply(variableElement.asType());
             Set<ClassRef> annotations = new LinkedHashSet<ClassRef>();
             for (AnnotationMirror annotationMirror : variableElement.getAnnotationMirrors()) {
                 TypeRef annotationType = annotationMirror.getAnnotationType().accept(new TypeRefTypeVisitor(), 0);
@@ -148,10 +151,7 @@ public class ElementTo {
 
              //Populate constructor parameters
              for (VariableElement variableElement : executableElement.getParameters()) {
-                 methodBuilder = methodBuilder
-                         .withName(executableElement.getSimpleName().toString())
-                         .withReturnType(MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()))
-                         .addToArguments(PROPERTY.apply(variableElement));
+                 methodBuilder = methodBuilder.addToArguments(PROPERTY.apply(variableElement));
 
                  Set<ClassRef> exceptionRefs = new LinkedHashSet<ClassRef>();
                  for (TypeMirror thrownType : executableElement.getThrownTypes()) {
@@ -233,15 +233,28 @@ public class ElementTo {
                 genericTypes.add(genericType);
             }
 
-            TypeDefBuilder builder = new TypeDefBuilder()
+
+            TypeDef baseType = new TypeDefBuilder()
                     .withKind(kind)
                     .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
                     .withPackageName(getPackageName(classElement))
                     .withName(getClassName(classElement))
                     .withParameters(genericTypes.toArray(new TypeParamDef[genericTypes.size()]))
                     .withExtendsList(superClassType instanceof ClassRef ? (ClassRef) superClassType : null)
-                    .withImplementsList(interfaces.toArray(new ClassRef[interfaces.size()]));
+                    .withImplementsList(interfaces.toArray(new ClassRef[interfaces.size()]))
+                    .build();
 
+
+            Set<TypeDef> innerTypes = new LinkedHashSet<TypeDef>();
+            for (TypeElement innerElement : ElementFilter.typesIn(classElement.getEnclosedElements())) {
+                TypeDef innerType = TYPEDEF.apply(innerElement);
+                innerType = new TypeDefBuilder(innerType).withOuterType(baseType).build();
+                DefinitionRepository.getRepository().register(innerType);
+                innerTypes.add(innerType);
+            }
+
+            TypeDefBuilder builder = new TypeDefBuilder(baseType)
+                    .withInnerTypes(innerTypes);
 
             for (ExecutableElement constructor : ElementFilter.constructorsIn(classElement.getEnclosedElements())) {
                 builder.addToConstructors(METHOD.apply(constructor));

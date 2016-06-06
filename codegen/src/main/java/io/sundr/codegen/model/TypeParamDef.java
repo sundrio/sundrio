@@ -62,6 +62,7 @@ public class TypeParamDef extends AttributeSupport {
     public TypeParamRef toReference() {
         return new TypeParamRefBuilder()
                 .withName(name)
+                .withAttributes(getAttributes())
                 .build();
     }
 

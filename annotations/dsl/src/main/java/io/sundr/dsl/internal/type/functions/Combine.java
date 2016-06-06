@@ -348,7 +348,7 @@ public class Combine {
         });
         return StringUtils.join(clazzes, new Function<TypeDef, String>() {
             public String apply(TypeDef item) {
-                return item.getName();
+                return item.getFullyQualifiedName();
             }
         }, "#");
     }

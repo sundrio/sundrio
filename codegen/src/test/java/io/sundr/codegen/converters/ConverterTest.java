@@ -40,6 +40,7 @@ public class ConverterTest {
     private static final Context context = new Context();
     private static final Elements elements = JavacElements.instance(context);
     private static final Types types = JavacTypes.instance(context);
+    private static final CodegenContext codegenContext = CodegenContext.create(elements, types);
 
     @BeforeClass
     public static void setUp() {

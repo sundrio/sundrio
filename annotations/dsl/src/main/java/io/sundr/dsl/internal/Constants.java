@@ -50,6 +50,8 @@ public final class Constants {
     public static final String CARDINALITY_MULTIPLE = "CARDINALITY_MULTIPLE";
     public static final String METHOD_NAME = "METHOD_NAME";
 
+    public static final String ORIGINAL_REF = "ORIGINAL_REF";
+
 
     public static final TypeDef VOID = ClassTo.TYPEDEF.apply(Void.class);
     public static final ClassRef VOID_REF = VOID.toInternalReference();

@@ -210,7 +210,7 @@ public class ToMethod {
                     type.toString(),
                     targetType.toString(),
                     property.getName(),
-                    type.toString(),
+                    targetType.toString(),
                     property.getName()
             );
 

@@ -47,6 +47,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static io.sundr.dsl.internal.Constants.ORIGINAL_REF;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.executablesToInterfaces;
 import static io.sundr.dsl.internal.Constants.IS_GENERATED;
 
@@ -64,6 +65,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 if (element instanceof TypeElement) {
+                    Generics.clear();
                     TypeElement typeElement = (TypeElement) element;
                     InterfaceName interfaceName = element.getAnnotation(InterfaceName.class);
                     String targetInterface = interfaceName.value();
@@ -96,6 +98,8 @@ public class DslProcessor extends JavaGeneratingProcessor {
                                 if (returnType instanceof ClassRef) {
                                     TypeDef toUnwrap = ((ClassRef)returnType).getDefinition();
                                     methods.add(new MethodBuilder(m).withReturnType(Generics.UNWRAP.apply(toUnwrap).toInternalReference()).build());
+                                } else if (returnType.getAttributes().containsKey(ORIGINAL_REF)) {
+                                    methods.add(new MethodBuilder(m).withReturnType((TypeRef) returnType.getAttributes().get(ORIGINAL_REF)).build());
                                 } else {
                                     methods.add(new MethodBuilder(m).withReturnType(returnType).build());
                                 }

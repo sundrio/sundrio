@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.IS_GENERIC;
+import static io.sundr.dsl.internal.Constants.ORIGINAL_REF;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT_REF;
 import static io.sundr.dsl.internal.Constants.VOID_REF;
@@ -46,7 +47,6 @@ public class Generics {
     private static final Map<TypeRef, TypeParamDef> GENERIC_MAPPINGS = new HashMap<TypeRef, TypeParamDef>();
     private static int counter = 0;
 
-
     public static final Function<TypeRef, TypeParamDef> MAP = new Function<TypeRef, TypeParamDef>() {
         public TypeParamDef apply(TypeRef item) {
             if (!GENERIC_MAPPINGS.containsKey(item)) {
@@ -56,11 +56,18 @@ public class Generics {
                     name += iteration;
                 }
                 counter++;
-                GENERIC_MAPPINGS.put(item, new TypeParamDefBuilder().withName(name).addToAttributes(IS_GENERIC, true).build());
+                GENERIC_MAPPINGS.put(item, new TypeParamDefBuilder().withName(name)
+                        .addToAttributes(IS_GENERIC, true)
+                        .addToAttributes(ORIGINAL_REF, item)
+                        .build());
             }
             return GENERIC_MAPPINGS.get(item);
         }
     };
+
+
+
+
     public static final Function<TypeDef, TypeDef> UNWRAP = new Function<TypeDef, TypeDef>() {
 
         public TypeDef apply(TypeDef type) {
@@ -106,9 +113,14 @@ public class Generics {
         //throw new IllegalStateException("Key not found for value:[" + value +"].");
     }
 
-    
-    static {
+    public static void clear() {
+        counter = 0;
+        GENERIC_MAPPINGS.clear();
         GENERIC_MAPPINGS.put(VOID_REF, new TypeParamDefBuilder().withName("V").addToAttributes(IS_GENERIC, true).build());
         GENERIC_MAPPINGS.put(TRANSPARENT_REF,  TRANSPARENT);
+    }
+    
+    static {
+        clear();
     }
 }
