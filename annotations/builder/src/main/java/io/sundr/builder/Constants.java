@@ -17,7 +17,9 @@
 package io.sundr.builder;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
@@ -30,6 +32,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,6 +56,8 @@ public class Constants {
     public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
 
+    public static final String VALIDATION_ENABLED = "VALIDATION_ENABLED";
+
     public static final String INIT = "INIT";
 
     public static final String GENERATED = "GENERATED";
@@ -64,7 +69,7 @@ public class Constants {
     public static final TypeParamDef O = newTypeParamDef("O");
     public static final TypeParamDef B = newTypeParamDef("B");
     
-    public static final TypeParamDef T = newTypeParamDef("Τ");
+    public static final TypeParamDef T = newTypeParamDef("T");
     public static final TypeParamRef T_REF = newTypeParamRef("T");
     
     public static final TypeParamDef N = newTypeParamDef("N");
@@ -76,6 +81,7 @@ public class Constants {
     public static final WildcardRef Q = new WildcardRef();
 
     public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
+    public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
     public static final TypeDef BUILDABLE_ANNOTATION = TYPEDEF.apply(Buildable.class);
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
@@ -106,6 +112,40 @@ public class Constants {
     public static final TypeDef VISITABLE = TYPEDEF.apply(Visitable.class);
     public static final TypeDef VISITABLE_BUILDER = typeGenericOf(TYPEDEF.apply(VisitableBuilder.class), T, V);
     public static final TypeDef BOXED_VOID = TYPEDEF.apply(Void.class);
+
+
+    //The classes below are created programmatically rather than by class to avoid bringing in more deps
+    public static final ClassRef VALIDATION = new TypeDefBuilder()
+            .withPackageName("javax.validation")
+            .withName("Validation")
+            .build().toInternalReference();
+
+    public static final ClassRef VALIDATOR = new TypeDefBuilder()
+            .withPackageName("javax.validation")
+            .withName("Validator")
+            .build().toInternalReference();
+
+    public static final ClassRef VALIDATOR_FACTORY = new TypeDefBuilder()
+            .withPackageName("javax.validation")
+            .withName("ValidatorFactory")
+            .build().toInternalReference();
+
+    public static final ClassRef VALIDATION_EXCEPTION = new TypeDefBuilder()
+            .withPackageName("javax.validation")
+            .withName("ValidationException")
+            .build().toInternalReference();
+
+    public static final ClassRef CONSTRAIN_VIOLATION = new TypeDefBuilder()
+            .withPackageName("javax.validation")
+            .withName("ConstraintViolation")
+            .build().toInternalReference();
+
+    public static final ClassRef CONSTRAIN_VIOLATION_EXCEPTION = new TypeDefBuilder()
+            .withPackageName("javax.validation")
+            .withName("ConstraintViolationException")
+            .build().toInternalReference();
+
+    public static List<ClassRef> VALIDATION_REFS = Arrays.<ClassRef>asList(VALIDATION, VALIDATOR, VALIDATOR_FACTORY, VALIDATION_EXCEPTION, CONSTRAIN_VIOLATION, CONSTRAIN_VIOLATION_EXCEPTION, SET.toInternalReference());
 
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
     public static final String DEFAULT_CLASS_TEMPLATE_LOCATION = "templates/builder/class.vm";

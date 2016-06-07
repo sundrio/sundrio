@@ -92,40 +92,6 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         }
     }
 
-    /**
-     * Selects a builder template based on the criteria.
-     * @param validationEnabled Flag that indicates if validationEnabled is enabled.
-     * @return
-     */
-    String selectBuilderTemplate(boolean validationEnabled) {
-        if (validationEnabled) {
-            return Constants.VALIDATING_BUILDER_TEMPLATE_LOCATION;
-        } else {
-            return Constants.DEFAULT_BUILDER_TEMPLATE_LOCATION;
-        }
-    }
-
-    /**
-     *
-     *
-     private final ContainerCreateRequestBuilder builder;
-     private final Function<ContainerCreateRequest, ContainerCreateResponse> function;
-
-     public InlineContainerCreate(Function<ContainerCreateRequest, ContainerCreateResponse> function) {
-     this.builder = new ContainerCreateRequestBuilder(this);
-     this.function = function;
-     }
-
-     public InlineContainerCreate(ContainerCreateRequest item, Function<ContainerCreateRequest, ContainerCreateResponse> function) {
-     this.builder = new ContainerCreateRequestBuilder(this);
-     this.function = function;
-     }
-
-     public ContainerCreateResponse done() {
-     return function.apply(builder.build());
-     }
-     */
-
 
     static TypeDef inlineableOf(BuilderContext ctx, TypeDef type, Inline inline) {
         final String inlineableName = !inline.name().isEmpty()

@@ -25,6 +25,7 @@ import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.Filer;
@@ -37,6 +38,8 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.io.IOException;
 import java.util.Set;
+
+import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
 public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
@@ -73,7 +76,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                         continue;
                     }
                     BuilderContext ctx = BuilderContextManager.getContext();
-                    TypeDef typeDef = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element));
+                    TypeDef typeDef = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element))).addToAttributes(VALIDATION_ENABLED, generated.validationEnabled()).build();
                     generateLocalDependenciesIfNeeded();
                     try {
                         generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
@@ -81,13 +84,13 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
                         if (generated.editableEnabled()) {
                             generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
-                                    selectBuilderTemplate(generated.validationEnabled()));
+                                    Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
 
                             generateFromClazz(ClazzAs.EDITABLE.apply(typeDef),
                                     Constants.DEFAULT_EDITABLE_TEMPLATE_LOCATION);
                         } else {
                             generateFromClazz(ClazzAs.BUILDER.apply(typeDef),
-                                    selectBuilderTemplate(generated.validationEnabled()));
+                                    Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
                         }
 
 
