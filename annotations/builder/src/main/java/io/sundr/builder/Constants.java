@@ -147,13 +147,9 @@ public class Constants {
 
     public static List<ClassRef> VALIDATION_REFS = Arrays.<ClassRef>asList(VALIDATION, VALIDATOR, VALIDATOR_FACTORY, VALIDATION_EXCEPTION, CONSTRAIN_VIOLATION, CONSTRAIN_VIOLATION_EXCEPTION, SET.toInternalReference());
 
-    public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
-    public static final String DEFAULT_CLASS_TEMPLATE_LOCATION = "templates/builder/class.vm";
-    public static final String DEFAULT_FLUENT_TEMPLATE_LOCATION = "templates/builder/fluentinterface.vm";
-    public static final String DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION = "templates/builder/fluentimpl.vm";
-    public static final String DEFAULT_EDITABLE_TEMPLATE_LOCATION = "templates/builder/editable.vm";
-    public static final String DEFAULT_BUILDER_TEMPLATE_LOCATION = "templates/builder/builder.vm";
-    public static final String VALIDATING_BUILDER_TEMPLATE_LOCATION = "templates/builder/validating-builder.vm";
+
+    public static final String DEFAULT_SOURCEFILE_TEMPLATE_LOCATION = "templates/builder/sourcefile.vm";
+
 
     public static final String ACCEPT_VISITOR_SNIPPET = "snippets/accept-visitor.txt";
     public static final String BUILD_LIST_SNIPPET = "snippets/build-list.txt";

@@ -85,6 +85,7 @@ public class TypeAs {
                     .withParameters(generics)
                     .withExtendsList(superClass.toReference(nextGenericRef))
                     .withImplementsList()
+                    .withInnerTypes()
                     .build();
         }
     };
@@ -113,6 +114,7 @@ public class TypeAs {
                     .withParameters(parameters)
                     .withExtendsList(superClass.toReference(nextParameterRef))
                     .withImplementsList(SHALLOW_FLUENT.apply(item).toInternalReference())
+                    .withInnerTypes()
                     .build();
         }
 
@@ -129,6 +131,7 @@ public class TypeAs {
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Fluent")
                     .withParameters(parameters)
+                    .withInnerTypes()
                     .build();
         }
     };
@@ -160,6 +163,7 @@ public class TypeAs {
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Builder")
                     .withParameters(item.getParameters())
+                    .withInnerTypes()
                     .withExtendsList(fluent.toReference(parameters.toArray(new TypeRef[parameters.size()])))
                     .withImplementsList(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(item.toInternalReference(), builder.toInternalReference()))
                     .build();
@@ -180,6 +184,7 @@ public class TypeAs {
                     .withParameters(parameters)
                     .withExtendsList(item.toInternalReference())
                     .withImplementsList(BuilderContextManager.getContext().getEditableInterface().toReference(SHALLOW_BUILDER.apply(item).toInternalReference()))
+                    .withInnerTypes()
                     .withProperties()
                     .withMethods()
                     .withConstructors()
@@ -193,6 +198,7 @@ public class TypeAs {
             return new TypeDefBuilder(item)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Builder")
+                    .withInnerTypes()
                     .build();
         }
     };

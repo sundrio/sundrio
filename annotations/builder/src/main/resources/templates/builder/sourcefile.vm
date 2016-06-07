@@ -6,8 +6,11 @@ import $i;
 
 #class ($model)
 
+#if  ($model.isInterface())
+#else
 #foreach($f in $model.properties)
     #field ($f)
+
 #end
 
 #foreach ($c in ${model.constructors})
@@ -17,18 +20,22 @@ import $i;
     #end
 #end
 #end
+#end
 
 #foreach($m in $model.methods)
-    #method ($m)
+    #method ($m, $model.isInterface())
     #foreach ($s in $m.block.statements)
         $s.toString()
     #end
-    #end
+#end
+
 #end
 
 #foreach($n in $model.innerTypes)
     #class ($n)
 
+    #if  ($n.isInterface())
+    #else
     #foreach($f in $n.properties)
     private final ${f.typeRef} ${f.name};
     #end
@@ -38,16 +45,17 @@ import $i;
         #foreach ($s in $c.block.statements)
             $s.toString()
         #end
-        #end
     #end
+    #end
+#end
 
-    #foreach($m in $n.methods)
-        #method ($m)
-        #foreach ($s in $m.block.statements)
-            $s.toString()
-        #end
-        #end
+#foreach($m in $n.methods)
+    #method ($m, $n.isInterface())
+    #foreach ($s in $m.block.statements)
+        $s.toString()
     #end
+#end
+#end
 #end
 #end
 

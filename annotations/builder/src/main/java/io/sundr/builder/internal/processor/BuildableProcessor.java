@@ -71,27 +71,27 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
 
                 try {
                     generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
-                            Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                     generateFromClazz(ClazzAs.FLUENT_IMPL.apply(typeDef),
-                            Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                     if (isAbstract) {
                       //ignore and move along
                     } else if (buildable.editableEnabled()) {
                         generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
-                                Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                         generateFromClazz(ClazzAs.EDITABLE.apply(typeDef),
-                                Constants.DEFAULT_EDITABLE_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                     } else {
                         generateFromClazz(ClazzAs.BUILDER.apply(typeDef),
-                                Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                     }
 
                     for (final Inline inline : buildable.inline()) {
                         generateFromClazz(inlineableOf(ctx, typeDef, inline),
-                                Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);

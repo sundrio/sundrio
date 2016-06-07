@@ -18,6 +18,7 @@ package io.sundr.codegen.model;
 
 import io.sundr.codegen.utils.StringUtils;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -191,6 +192,22 @@ public class TypeDef extends ModifierSupport {
         return innerTypes;
     }
 
+    public boolean isClass() {
+        return kind == Kind.INTERFACE;
+    }
+
+    public boolean isInterface() {
+        return kind == Kind.INTERFACE;
+    }
+
+    public boolean isEnum() {
+        return kind == Kind.ENUM;
+    }
+
+    public boolean isAnnotation() {
+        return kind == Kind.ANNOTATION;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -315,8 +332,6 @@ public class TypeDef extends ModifierSupport {
         }
         return refs;
     }
-
-
 
 
     @Override
