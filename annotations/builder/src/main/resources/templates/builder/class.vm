@@ -1,25 +1,29 @@
-package ${model.type.packageName};
+package ${model.packageName};
 
 #foreach($i in $model.imports)
-import $i.fullyQualifiedName;
+import $i;
 #end
 
 #class ($model)
 
 
-#foreach($f in $model.fields)
+#foreach($f in $model.properties)
     #field ($f)
 #end
 
 #foreach ($c in ${model.constructors})
     #method ($c)
-    ${c.attributes.get("BODY")}
+    #foreach ($s in $c.block.statements)
+        $s.toString()
+    #end
 #end
 #end
 
 #foreach($m in $model.methods)
     #method ($m)
-    ${m.attributes.get("BODY")}
+    #foreach ($s in $m.block.statements)
+        $s.toString()
+    #end
 #end
 #end
 

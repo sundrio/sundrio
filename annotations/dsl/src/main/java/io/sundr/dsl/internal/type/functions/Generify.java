@@ -17,88 +17,112 @@
 package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeRef;
+import io.sundr.dsl.internal.visitors.TypeArgumentReplace;
+import io.sundr.dsl.internal.visitors.TypeParamDefReplace;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 
-public enum Generify implements Function<Set<JavaClazz>, Set<JavaClazz>> {
+public class Generify {
 
-    FUNCTION;
+    public static final Function<Set<ClassRef>, Set<ClassRef>> CLASSREFS = new Function<Set<ClassRef>, Set<ClassRef>>() {
+        public Set<ClassRef> apply(Set<ClassRef> source) {
+            Set<ClassRef> result = new LinkedHashSet<ClassRef>(source);
+            Set<TypeRef> typeArguments = findTypeArguments(source);
 
-    @Override
-    public Set<JavaClazz> apply(Set<JavaClazz> source) {
-        Set<JavaClazz> result = new LinkedHashSet<JavaClazz>(source);
-        Set<JavaType> generifiableTypes = findGenerifiables(source);
-
-        for (JavaType type : generifiableTypes) {
-            Set<JavaClazz> intermediate = new LinkedHashSet<JavaClazz>();
-            for (JavaClazz clazz : result) {
-                intermediate.add(new JavaClazzBuilder(clazz).withType(replaceGenericWith(clazz.getType(), type, Generics.MAP.apply(type))).build());
+            for (TypeRef type : typeArguments) {
+                Set<ClassRef> intermediate = new LinkedHashSet<ClassRef>();
+                for (ClassRef clazz : result) {
+                    intermediate.add(new ClassRefBuilder(clazz).accept(new TypeArgumentReplace(type, Generics.MAP.apply(type).toReference())).build());
+                }
+                result = new LinkedHashSet<ClassRef>(intermediate);
             }
-            result = new LinkedHashSet<JavaClazz>(intermediate);
+            return result;
         }
-        return result;
-    }
+    };
+
+    public static final Function<Set<TypeDef>, Set<TypeDef>> TYPEDEFS = new Function<Set<TypeDef>, Set<TypeDef>>() {
+        public Set<TypeDef> apply(Set<TypeDef> source) {
+            Set<TypeDef> result = new LinkedHashSet<TypeDef>(source);
+            Set<TypeParamDef> typeParameters = findParameters(source);
+
+            for (TypeParamDef type : typeParameters) {
+                Set<TypeDef> intermediate = new LinkedHashSet<TypeDef>();
+                for (TypeDef clazz : result) {
+                    intermediate.add(new TypeDefBuilder(clazz).accept(new TypeParamDefReplace(type, Generics.MAP.apply(type.toReference()))).build());
+                }
+                result = new LinkedHashSet<TypeDef>(intermediate);
+            }
+            return result;
+        }
+    };
 
 
-    private static Set<JavaType> findGenerifiables(Set<JavaClazz> interfaces) {
+    private static Set<TypeRef> findTypeArguments(Set<ClassRef> interfaces) {
         if (interfaces.size() < 2) {
-            return Collections.<JavaType>emptySet();
+            return Collections.<TypeRef>emptySet();
         }
         //1st pass find all generics
-        Set<JavaType> allGenerics = new LinkedHashSet<JavaType>();
-        for (JavaClazz clazz : interfaces) {
-            popullateGenericTypes(clazz.getType(), allGenerics);
+        Set<TypeRef> allGenerics = new LinkedHashSet<TypeRef>();
+        for (ClassRef clazz : interfaces) {
+            allGenerics.addAll(clazz.getArguments());
         }
 
         //2nd pass collect common generics
-        Set<JavaType> common = new LinkedHashSet<JavaType>(allGenerics);
-        for (JavaClazz clazz : interfaces) {
-            Set<JavaType> ownGenerics = new LinkedHashSet<JavaType>();
-            popullateGenericTypes(clazz.getType(), ownGenerics);
-            common.remove(clazz.getType());
+        Set<TypeRef> common = new LinkedHashSet<TypeRef>(allGenerics);
+        for (ClassRef clazz : interfaces) {
+            Set<TypeRef> ownGenerics = new LinkedHashSet<TypeRef>();
+            ownGenerics.addAll(clazz.getArguments());
+            common.remove(clazz);
             common.retainAll(ownGenerics);
         }
-        Set<JavaType> result = new LinkedHashSet<JavaType>();
-        for (JavaType type : common) {
+        Set<TypeRef> result = new LinkedHashSet<TypeRef>();
+        for (TypeRef type : common) {
             Boolean isGeneric = type.getAttributes().containsKey(IS_GENERIC) ?  (Boolean) type.getAttributes().get(IS_GENERIC) : false;
             if (!isGeneric) {
                 result.add(type);
             }
         }
         return result;
+
     }
 
 
-    private static void popullateGenericTypes(JavaType type, Set<JavaType> result) {
-        for (JavaType generic : type.getGenericTypes()) {
-            popullateGenericTypes(generic, result);
+    private static Set<TypeParamDef> findParameters(Set<TypeDef> interfaces) {
+        if (interfaces.size() < 2) {
+            return Collections.<TypeParamDef>emptySet();
         }
-        result.add(type);
-    }
+        //1st pass find all generics
+        Set<TypeParamDef> allGenerics = new LinkedHashSet<TypeParamDef>();
+        for (TypeDef clazz : interfaces) {
+            allGenerics.addAll(clazz.getParameters());
+        }
 
-    private JavaType replaceGenericWith(JavaType source, JavaType from, JavaType to) {
-        List<JavaType> generics = Arrays.asList(source.getGenericTypes());
-        if (generics.isEmpty()) {
-            return source;
-        } else if (source.equals(from)) {
-            return to;
-        } else {
-            List<JavaType> updatedGenerics = new ArrayList<JavaType>();
-            for (JavaType generic : generics) {
-                updatedGenerics.add(replaceGenericWith(generic, from, to));
+        //2nd pass collect common generics
+        Set<TypeParamDef> common = new LinkedHashSet<TypeParamDef>(allGenerics);
+        for (TypeDef clazz : interfaces) {
+            Set<TypeParamDef> ownGenerics = new LinkedHashSet<TypeParamDef>();
+            ownGenerics.addAll(clazz.getParameters());
+            common.remove(clazz);
+            common.retainAll(ownGenerics);
+        }
+        Set<TypeParamDef> result = new LinkedHashSet<TypeParamDef>();
+        for (TypeParamDef type : common) {
+            Boolean isGeneric = type.getAttributes().containsKey(IS_GENERIC) ?  (Boolean) type.getAttributes().get(IS_GENERIC) : false;
+            if (!isGeneric) {
+                result.add(type);
             }
-            return new JavaTypeBuilder(source).withGenericTypes(updatedGenerics.toArray(new JavaType[generics.size()])).build();
         }
+        return result;
+
     }
 }

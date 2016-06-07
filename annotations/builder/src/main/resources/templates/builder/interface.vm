@@ -1,7 +1,7 @@
-package ${model.type.packageName};
+package ${model.packageName};
 
 #foreach($i in $model.imports)
-import $i.fullyQualifiedName;
+import $i;
 #end
 
 #class ($model)

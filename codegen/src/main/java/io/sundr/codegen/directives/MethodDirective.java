@@ -16,26 +16,16 @@
 
 package io.sundr.codegen.directives;
 
-import io.sundr.Function;
-import io.sundr.builder.Visitor;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaPropertyBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.Method;
 import io.sundr.codegen.utils.StringUtils;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-
-
-import static io.sundr.codegen.utils.StringUtils.join;
 
 public class MethodDirective extends Directive {
 
@@ -52,13 +42,13 @@ public class MethodDirective extends Directive {
     @Override
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         String block = "";
-        JavaMethod method = null;
+        Method method = null;
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
             if (node.jjtGetChild(i) != null) {
                 if (!(node.jjtGetChild(i) instanceof ASTBlock)) {
                     //reading and casting inline parameters
                     if (i == 0) {
-                        method = (JavaMethod) node.jjtGetChild(i).value(context);
+                        method = (Method) node.jjtGetChild(i).value(context);
                     } else {
                         break;
                     }
@@ -76,109 +66,15 @@ public class MethodDirective extends Directive {
         return true;
     }
 
-    private void writeMethod(Writer writer, JavaMethod method, String block) throws IOException {
+    private void writeMethod(Writer writer, Method method, String block) throws IOException {
         if (method != null) {
-
-            writer.append(join(method.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
-            if (method.getTypeParameters() != null && !method.getTypeParameters().isEmpty()) {
-                writer.append("<")
-                        .append(StringUtils.join(method.getTypeParameters(), JavaTypeToString.INSTANCE, ", "))
-                        .append("> ");
-            }
-
-            writer.append(method.getReturnType().getSimpleName())
-                    .append(" ")
-                    .append(method.getName())
-                    .append("(")
-                    .append(methodArguments(method.getArguments()))
-                    .append(")");
-
-            writeExceptions(writer, method);
+            writer.append(method.toString());
             if (!StringUtils.isNullOrEmpty(block)) {
                 writer.append("{\n");
                 writer.append(block).append("}\n");
             } else {
                 writer.append(";");
             }
-        }
-    }
-
-    private void writeExceptions(Writer writer, JavaMethod method) throws IOException {
-        if (method.getExceptions().size() > 0) {
-            writer.append(" throws ").append(join(method.getExceptions(), ""));
-        }
-    }
-
-    private String methodArguments(JavaProperty[] arguments) {
-        if (arguments.length == 0) {
-            return "";
-        } else {
-            int lastIndex = arguments.length - 1;
-            if (arguments[lastIndex].isArray()) {
-                JavaProperty[] pre = new JavaProperty[arguments.length -1];
-                System.arraycopy(arguments, 0, pre, 0, arguments.length -1);
-                JavaProperty varArg = new JavaPropertyBuilder(arguments[lastIndex]).accept(new Visitor() {
-                    @Override
-                    public void visit(Object element) {
-                        if (element instanceof JavaTypeBuilder) {
-                            ((JavaTypeBuilder)element).withArray(false);
-                        }
-                    }
-                }).build();
-                return join(pre, JavaPropertyToString.INSTANCE, ", ") + VarArgPropertyToString.INSTANCE.apply(varArg);
-            } else {
-                return join(arguments, JavaPropertyToString.INSTANCE, ", ");
-            }
-        }
-    }
-
-    //Enum Singleton
-    private enum ModifierToString implements Function<Modifier, String> {
-        INSTANCE;
-
-        public String apply(Modifier modifier) {
-            return modifier.name().toLowerCase();
-        }
-    }
-
-    //Enum Singleton
-    private enum JavaTypeToString implements Function<JavaType, String> {
-        INSTANCE;
-
-        @Override
-        public String apply(JavaType item) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(item.getSimpleName());
-            if (item.getSuperClass() != null) {
-                sb.append(" extends ").append(item.getSuperClass().getClassName());
-            }
-            return sb.toString();
-        }
-    }
-
-    //Enum Singleton
-    private enum JavaPropertyToString implements Function<JavaProperty, String> {
-        INSTANCE;
-
-        @Override
-        public String apply(JavaProperty item) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(join(item.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
-            sb.append(item.getType().getSimpleName()).append(" ").append(item.getName());
-            return sb.toString();
-        }
-    }
-
-    private enum VarArgPropertyToString implements Function<JavaProperty, String> {
-        INSTANCE;
-
-        @Override
-        public String apply(JavaProperty item) {
-            StringBuilder sb = new StringBuilder();
-            String propertyType = item.getType().getSimpleName();
-            sb.append(join(item.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
-            sb.append(propertyType).append(" ...").append(item.getName());
-            return sb.toString();
         }
     }
 }

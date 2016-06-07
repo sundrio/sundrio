@@ -18,14 +18,13 @@ package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public abstract class KeywordsAndMethodsToFilter implements Function<Element, TransitionFilter> {
@@ -70,7 +69,7 @@ public abstract class KeywordsAndMethodsToFilter implements Function<Element, Tr
 
     void addToSet(AnnotationMirror mirror, Element element, Set<String> target) {
         if (mirror.getElementValues().containsKey(element)) {
-            target.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(element).getValue()));
+            target.addAll(TypeDefUtils.toClassNames(mirror.getElementValues().get(element).getValue()));
         }
     }
 

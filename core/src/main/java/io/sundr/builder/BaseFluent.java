@@ -80,7 +80,6 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         return false;
     }
 
-    @Override
     public F accept(Visitor visitor) {
         for (Visitable visitable : _visitables) {
             visitable.accept(visitor);

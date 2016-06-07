@@ -17,12 +17,12 @@
 package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.TypeParamDef;
 
 import java.util.Arrays;
 
@@ -30,60 +30,60 @@ public final class Merge {
     
     private Merge() {}
 
-    public static final Function<JavaType[], JavaType> TYPES = new Function<JavaType[], JavaType>() {
-        @Override
-        public JavaType apply(JavaType... items) {
+    public static final Function<TypeDef[], TypeDef> TYPES = new Function<TypeDef[], TypeDef>() {
+
+        public TypeDef apply(TypeDef... items) {
             if (items == null || items.length == 0) {
                 throw new IllegalArgumentException("Items cannot be empty.");
             } else if (items.length == 1) {
                 return items[0];
             } else if (items.length == 2) {
-                JavaTypeBuilder builder = new JavaTypeBuilder(items[0]);
-                for (JavaType type : items[1].getInterfaces()) {
-                    builder = builder.addToInterfaces(type);
+                TypeDefBuilder builder = new TypeDefBuilder(items[0]);
+
+                for (ClassRef classRef : items[1].getExtendsList()) {
+                    builder = builder.addToExtendsList(classRef);
                 }
 
-                for (JavaType type : items[1].getGenericTypes()) {
-                    if (!Arrays.asList(items[0].getGenericTypes()).contains(type)) {
-                        builder = builder.addToGenericTypes(type);
+                for (TypeParamDef type : items[1].getParameters()) {
+                    if (!items[0].getParameters().contains(type)) {
+                        builder = builder.addToParameters(type);
                     }
                 }
                 return builder.build();
             } else {
-                JavaType[] rest = new JavaType[items.length - 1];
+                TypeDef[] rest = new TypeDef[items.length - 1];
                 System.arraycopy(items, 1, rest, 0, rest.length);
-                return TYPES.apply(new JavaType[]{items[0], TYPES.apply(rest)});
+                return TYPES.apply(new TypeDef[]{items[0], TYPES.apply(rest)});
             }
         }
     };
 
 
-    public static final Function<JavaClazz[], JavaClazz> CLASSES = new Function<JavaClazz[], JavaClazz>() {
-        @Override
-        public JavaClazz apply(JavaClazz... items) {
+    public static final Function<TypeDef[], TypeDef> CLASSES = new Function<TypeDef[], TypeDef>() {
+        public TypeDef apply(TypeDef... items) {
             if (items == null || items.length == 0) {
                 throw new IllegalArgumentException("Items cannot be empty.");
             } else if (items.length == 1) {
                 return items[0];
             } else if (items.length == 2) {
-                JavaType mergedType = TYPES.apply(new JavaType[]{items[0].getType(), items[1].getType()});
+                TypeDef mergedType = TYPES.apply(new TypeDef[]{items[0], items[1]});
 
-                JavaClazzBuilder builder = new JavaClazzBuilder(items[0]).withType(mergedType);
-                for (JavaMethod constructor : items[1].getConstructors()) {
+                TypeDefBuilder builder = new TypeDefBuilder(mergedType);
+                for (Method constructor : items[1].getConstructors()) {
                     builder = builder.addToConstructors(constructor);
                 }
 
-                for (JavaMethod method : items[1].getMethods()) {
+                for (Method method : items[1].getMethods()) {
                     builder = builder.addToMethods(method);
                 }
-                for (JavaProperty property : items[1].getFields()) {
-                    builder = builder.addToFields(property);
+                for (Property property : items[1].getProperties()) {
+                    builder = builder.addToProperties(property);
                 }
                 return builder.build();
             } else {
-                JavaClazz[] rest = new JavaClazz[items.length - 1];
+                TypeDef[] rest = new TypeDef[items.length - 1];
                 System.arraycopy(items, 1, rest, 0, rest.length);
-                CLASSES.apply(new JavaClazz[]{items[0], CLASSES.apply(rest)});
+                CLASSES.apply(new TypeDef[]{items[0], CLASSES.apply(rest)});
             }
             return null;
 

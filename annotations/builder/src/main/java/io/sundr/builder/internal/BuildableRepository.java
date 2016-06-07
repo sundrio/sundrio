@@ -16,27 +16,48 @@
 
 package io.sundr.builder.internal;
 
-import javax.lang.model.element.TypeElement;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ParameterReference;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeRef;
+
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class BuildableRepository {
 
-    private final Set<TypeElement> buildables = new LinkedHashSet<TypeElement>();
+    private final Map<String, TypeDef> buildables = new HashMap<String, TypeDef>();
 
-    public void register(TypeElement buildable) {
+    public TypeDef register(TypeDef buildable) {
         if (buildable != null) {
-            buildables.add(buildable);
+            buildables.put(buildable.getFullyQualifiedName(), buildable);
         }
+        return buildable;
     }
 
-    public Set<TypeElement> getBuildables() {
-        return Collections.unmodifiableSet(buildables);
+    public Set<TypeDef> getBuildables() {
+        return Collections.unmodifiableSet(new LinkedHashSet<TypeDef>(buildables.values()));
     }
 
-    public boolean isBuildable(TypeElement buildable) {
-        return buildable != null && buildables.contains(buildable);
+    public TypeDef getBuildable(TypeRef type) {
+        if (type instanceof ClassRef) {
+            return buildables.get(((ClassRef)type).getDefinition().getFullyQualifiedName());
+        }
+        return null;
+    }
+
+    public boolean isBuildable(TypeDef type) {
+        return type != null && buildables.containsKey(type.getFullyQualifiedName());
+    }
+
+    public boolean isBuildable(TypeRef type) {
+        if (type instanceof ClassRef) {
+            return isBuildable(((ClassRef)type).getDefinition());
+        }
+        return false;
     }
 
     public void clear() {

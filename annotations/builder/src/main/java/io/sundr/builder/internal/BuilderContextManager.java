@@ -20,6 +20,7 @@ import io.sundr.builder.Builder;
 import io.sundr.builder.annotations.Inline;
 
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class BuilderContextManager {
@@ -28,14 +29,14 @@ public class BuilderContextManager {
 
     private static final AtomicReference<BuilderContext> context = new AtomicReference<BuilderContext>();
 
-    public static BuilderContext create(Elements elements) {
-        BuilderContext ctx = new BuilderContext(elements, false, Builder.class.getPackage().getName());
+    public static BuilderContext create(Elements elements, Types types) {
+        BuilderContext ctx = new BuilderContext(elements, types, false, Builder.class.getPackage().getName());
         context.set(ctx);
         return ctx;
     }
 
-    public static BuilderContext create(Elements elements, Boolean generateBuilderPackage, String packageName, Inline...inlineables) {
-        BuilderContext ctx = new BuilderContext(elements, generateBuilderPackage, packageName, inlineables);
+    public static BuilderContext create(Elements elements, Types types, Boolean generateBuilderPackage, String packageName, Inline...inlineables) {
+        BuilderContext ctx = new BuilderContext(elements, types, generateBuilderPackage, packageName, inlineables);
         if (context.compareAndSet(null, ctx)) {
             return ctx;
         } else {

@@ -16,18 +16,13 @@
 
 package io.sundr.codegen.directives;
 
-import io.sundr.Function;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.Property;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.io.Writer;
-
-import static io.sundr.codegen.utils.StringUtils.join;
 
 public class FieldDirective extends Directive {
 
@@ -44,55 +39,23 @@ public class FieldDirective extends Directive {
     @Override
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         String block = "";
-        JavaProperty field = null;
+        Property field = null;
         //reading params
         if (node.jjtGetChild(0) != null) {
-            field = (JavaProperty) node.jjtGetChild(0).value(context);
+            field = (Property) node.jjtGetChild(0).value(context);
         }
         writeField(writer, field, block);
         return true;
     }
 
-    private void writeField(Writer writer, JavaProperty field, String block) throws IOException {
+    private void writeField(Writer writer, Property field, String block) throws IOException {
         if (field != null) {
-            writer.append(JavaPropertyToString.INSTANCE.apply(field));
-            if (field.getType().getDefaultImplementation() != null) {
-                JavaType defaultImpl = field.getType().getDefaultImplementation();
-                writer.append(" = new ").append(JavaTypeToString.INSTANCE.apply(defaultImpl)).append("()");
+            writer.append(field.toString());
+
+            if (field.getAttributes().get("INIT") != null) {
+                writer.append(" = ").append((String) field.getAttributes().get("INIT"));
             }
         }
         writer.append(";");
-    }
-
-    //Enum Singleton
-    private enum ModifierToString implements Function<Modifier, String> {
-        INSTANCE;
-
-        public String apply(Modifier modifier) {
-            return modifier.name().toLowerCase();
-        }
-    }
-
-    //Enum Singleton
-    private enum JavaTypeToString implements Function<JavaType, String> {
-        INSTANCE;
-
-        @Override
-        public String apply(JavaType item) {
-            return item.getSimpleName();
-        }
-    }
-
-    //Enum Singleton
-    private enum JavaPropertyToString implements Function<JavaProperty, String> {
-        INSTANCE;
-
-        @Override
-        public String apply(JavaProperty item) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(join(item.getModifiers(), ModifierToString.INSTANCE, " ")).append(" ");
-            sb.append(item.getType().getSimpleName()).append(" ").append(item.getName());
-            return sb.toString();
-        }
     }
 }

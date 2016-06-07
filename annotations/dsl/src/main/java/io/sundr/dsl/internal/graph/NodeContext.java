@@ -16,10 +16,9 @@
 
 package io.sundr.dsl.internal.graph;
 
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeDef;
 import io.sundr.dsl.internal.utils.GraphUtils;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,54 +30,54 @@ import java.util.Set;
 
 public class NodeContext {
 
-    private final JavaClazz item;
-    private final List<JavaClazz> path;
-    private final Set<JavaClazz> visited;
-    private final Set<JavaClazz> all;
+    private final TypeDef item;
+    private final List<TypeDef> path;
+    private final Set<TypeDef> visited;
+    private final Set<TypeDef> all;
 
     public static class Builder {
-        private JavaClazz item;
-        private List<JavaClazz> path = new ArrayList<JavaClazz>();
-        private Set<JavaClazz> visited = new HashSet<JavaClazz>();
-        private Set<JavaClazz> all = new LinkedHashSet<JavaClazz>();
+        private TypeDef item;
+        private List<TypeDef> path = new ArrayList<TypeDef>();
+        private Set<TypeDef> visited = new HashSet<TypeDef>();
+        private Set<TypeDef> all = new LinkedHashSet<TypeDef>();
 
-        public Builder withItem(JavaClazz item) {
+        public Builder withItem(TypeDef item) {
             this.item = item;
             return this;
         }
 
-        public Builder withPath(List<JavaClazz> path) {
+        public Builder withPath(List<TypeDef> path) {
             this.path = path;
             return this;
         }
 
-        public Builder addToPath(JavaClazz clazz) {
-            List<JavaClazz> newPath = new ArrayList<JavaClazz>(path);
+        public Builder addToPath(TypeDef clazz) {
+            List<TypeDef> newPath = new ArrayList<TypeDef>(path);
             newPath.add(clazz);
             this.path = newPath;
             return this;
         }
 
-        public Builder withVisited(Set<JavaClazz> visited) {
+        public Builder withVisited(Set<TypeDef> visited) {
             this.visited = visited;
             return this;
         }
 
-        public Builder addToVisited(JavaClazz clazz) {
-            Set<JavaClazz> newVisited = new HashSet<JavaClazz>(visited);
+        public Builder addToVisited(TypeDef clazz) {
+            Set<TypeDef> newVisited = new HashSet<TypeDef>(visited);
             newVisited.add(clazz);
             this.visited = newVisited;
             return this;
         }
 
-        public Builder addToVisited(Collection<JavaClazz> clazzes) {
-            Set<JavaClazz> newVisited = new HashSet<JavaClazz>(visited);
+        public Builder addToVisited(Collection<TypeDef> clazzes) {
+            Set<TypeDef> newVisited = new HashSet<TypeDef>(visited);
             newVisited.addAll(clazzes);
             this.visited = newVisited;
             return this;
         }
 
-        public Builder withAll(Set<JavaClazz> all) {
+        public Builder withAll(Set<TypeDef> all) {
             this.all = all;
             return this;
         }
@@ -92,42 +91,42 @@ public class NodeContext {
         return new Builder();
     }
 
-    public NodeContext(JavaClazz item, List<JavaClazz> path, Set<JavaClazz> visited, Set<JavaClazz> all) {
+    public NodeContext(TypeDef item, List<TypeDef> path, Set<TypeDef> visited, Set<TypeDef> all) {
         this.item = item;
-        this.path = path != null ? Collections.unmodifiableList(path) : Collections.<JavaClazz>emptyList();
-        this.visited = visited != null ? Collections.unmodifiableSet(visited) : Collections.<JavaClazz>emptySet();
-        this.all = all != null ? Collections.unmodifiableSet(all) : Collections.<JavaClazz>emptySet();
+        this.path = path != null ? Collections.unmodifiableList(path) : Collections.<TypeDef>emptyList();
+        this.visited = visited != null ? Collections.unmodifiableSet(visited) : Collections.<TypeDef>emptySet();
+        this.all = all != null ? Collections.unmodifiableSet(all) : Collections.<TypeDef>emptySet();
     }
 
-    public JavaClazz getItem() {
+    public TypeDef getItem() {
         return item;
     }
 
-    public List<JavaClazz> getPath() {
+    public List<TypeDef> getPath() {
         return path;
     }
 
-    public List<JavaType> getPathTypes() {
-        List<JavaType> pathTypes = new ArrayList<JavaType>();
-        for (JavaClazz c : path) {
-            pathTypes.add(c.getType());
+    public List<TypeDef> getPathTypes() {
+        List<TypeDef> pathTypes = new ArrayList<TypeDef>();
+        for (TypeDef c : path) {
+            pathTypes.add(c);
         }
         return pathTypes;
     }
 
-    public Set<JavaClazz> getVisited() {
+    public Set<TypeDef> getVisited() {
         return visited;
     }
 
-    public Set<JavaType> getVisitedTypes() {
-        Set<JavaType> visitedTypes = new HashSet<JavaType>();
-        for (JavaClazz c : visited) {
-            visitedTypes.add(c.getType());
+    public Set<TypeDef> getVisitedTypes() {
+        Set<TypeDef> visitedTypes = new HashSet<TypeDef>();
+        for (TypeDef c : visited) {
+            visitedTypes.add(c);
         }
         return visitedTypes;
     }
 
-    public Set<JavaClazz> getAll() {
+    public Set<TypeDef> getAll() {
         return all;
     }
 
@@ -137,21 +136,21 @@ public class NodeContext {
 
     public Builder but() {
         return builder().withItem(item)
-                .withPath(new ArrayList<JavaClazz>(path))
-                .withVisited(new HashSet<JavaClazz>(visited))
-                .withAll(new HashSet<JavaClazz>(all));
+                .withPath(new ArrayList<TypeDef>(path))
+                .withVisited(new HashSet<TypeDef>(visited))
+                .withAll(new HashSet<TypeDef>(all));
     }
 
-    public Builder contextOfChild(JavaClazz child) {
-        if (JavaTypeUtils.isBeginScope(child)) {
-            return builder().withItem(child).withAll(new HashSet<JavaClazz>(all));
+    public Builder contextOfChild(TypeDef child) {
+        if (TypeDefUtils.isBeginScope(child)) {
+            return builder().withItem(child).withAll(new HashSet<TypeDef>(all));
         }
 
         return but().withItem(child)
-                .withPath(new ArrayList<JavaClazz>(path))
+                .withPath(new ArrayList<TypeDef>(path))
                 .addToPath(item)
-                .withVisited(new HashSet<JavaClazz>(visited))
+                .withVisited(new HashSet<TypeDef>(visited))
                 .addToVisited(item)
-                .withAll(new LinkedHashSet<JavaClazz>(all));
+                .withAll(new LinkedHashSet<TypeDef>(all));
     }
 }

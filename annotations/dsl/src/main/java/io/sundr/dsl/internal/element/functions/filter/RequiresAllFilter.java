@@ -16,7 +16,7 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeDef;
 
 import java.util.Collection;
 import java.util.Set;
@@ -38,7 +38,7 @@ public class RequiresAllFilter implements TransitionFilter {
         this.methods = methods;
     }
 
-    public Boolean apply(Collection<JavaType> items) {
+    public Boolean apply(Collection<TypeDef> items) {
         Set<String> pathClasses = getClasses(items);
         Set<String> pathKeywords = getKeywords(items);
         Set<String> pathMethods = getMethods(items);

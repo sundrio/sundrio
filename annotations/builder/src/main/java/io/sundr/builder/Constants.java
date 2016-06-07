@@ -17,9 +17,12 @@
 package io.sundr.builder;
 
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.codegen.functions.ClassToJavaType;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.model.VoidRef;
+import io.sundr.codegen.model.WildcardRef;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -33,7 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.sundr.codegen.utils.TypeUtils.newGeneric;
+import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
+import static io.sundr.codegen.functions.ClassTo.TYPEREF;
+import static io.sundr.codegen.utils.TypeUtils.*;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class Constants {
@@ -42,50 +47,65 @@ public class Constants {
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
-    public static final String REPLACEABLE = "REPLACEABLE";
-    public static final String MEMBER_OF = "MEMBER_OF";
+    public static final String OUTER_INTERFACE = "OUTER_INTERFACE";
+    public static final String OUTER_CLASS = "OUTER_CLASS";
+
+    public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
-    public static final String BODY = "BODY";
+
+    public static final String INIT = "INIT";
+
+    public static final String GENERATED = "GENERATED";
+
     public static final String EMPTY = "";
 
-    public static final JavaType F = newGeneric("F");
-    public static final JavaType I = newGeneric("I");
-    public static final JavaType O = newGeneric("O");
-    public static final JavaType B = newGeneric("B");
-    public static final JavaType T = new JavaTypeBuilder(newGeneric("T")).addToAttributes(REPLACEABLE, Boolean.TRUE).build();
-    public static final JavaType N = newGeneric("N");
-    public static final JavaType V = newGeneric("V");
-    public static final JavaType VOID = new JavaTypeBuilder().withClassName("void").build();
-    public static final JavaType Q = newGeneric("?");
-    public static final JavaType BOOLEAN = ClassToJavaType.FUNCTION.apply(Boolean.class);
-    public static final JavaType BUILDABLE_ANNOTATION = ClassToJavaType.FUNCTION.apply(Buildable.class);
-    public static final JavaType CLASS = ClassToJavaType.FUNCTION.apply(Class.class);
-    public static final JavaType OBJECT = ClassToJavaType.FUNCTION.apply(Object.class);
-    public static final JavaType MAP = ClassToJavaType.FUNCTION.apply(Map.class);
-    public static final JavaType LINKED_HASH_MAP = ClassToJavaType.FUNCTION.apply(LinkedHashMap.class);
-    public static final JavaType LIST = ClassToJavaType.FUNCTION.apply(List.class);
-    public static final JavaType ARRAY_LIST = ClassToJavaType.FUNCTION.apply(ArrayList.class);
-    public static final JavaType SET = ClassToJavaType.FUNCTION.apply(Set.class);
-    public static final JavaType LINKED_HASH_SET = ClassToJavaType.FUNCTION.apply(LinkedHashSet.class);
+    public static final TypeParamDef F = newTypeParamDef("F");
+    public static final TypeParamDef I = newTypeParamDef("I");
+    public static final TypeParamDef O = newTypeParamDef("O");
+    public static final TypeParamDef B = newTypeParamDef("B");
+    
+    public static final TypeParamDef T = newTypeParamDef("Τ");
+    public static final TypeParamRef T_REF = newTypeParamRef("T");
+    
+    public static final TypeParamDef N = newTypeParamDef("N");
+    public static final TypeParamRef N_REF = newTypeParamRef("N");
 
-    public static final JavaType ARRAY = ClassToJavaType.FUNCTION.apply(Array.class);
-    public static final JavaType TYPE = ClassToJavaType.FUNCTION.apply(Type.class);
-    public static final JavaType TYPE_VARIABLE = ClassToJavaType.FUNCTION.apply(TypeVariable.class);
-    public static final JavaType GENERIC_ARRAY_TYPE = ClassToJavaType.FUNCTION.apply(GenericArrayType.class);
-    public static final JavaType PARAMETERIZED_TYPE = ClassToJavaType.FUNCTION.apply(ParameterizedType.class);
+    public static final TypeParamDef V = newTypeParamDef("V");
 
-    public static final JavaType BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(Builder.class), T);
-    public static final JavaType BASE_FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(BaseFluent.class), T);
-    public static final JavaType EDITABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Editable.class), T);
-    public static final JavaType FLUENT = typeGenericOf(ClassToJavaType.FUNCTION.apply(Fluent.class), T);
-    public static final JavaType FUNCTION = typeGenericOf(ClassToJavaType.FUNCTION.apply(Function.class), I, O);
-    public static final JavaType INLINEABLE = typeGenericOf(ClassToJavaType.FUNCTION.apply(Inlineable.class), T);
-    public static final JavaType NESTED = typeGenericOf(ClassToJavaType.FUNCTION.apply(Nested.class), N);
-    public static final JavaType VISITOR = typeGenericOf(ClassToJavaType.FUNCTION.apply(Visitor.class), V);
-    public static final JavaType TYPED_VISITOR = typeGenericOf(ClassToJavaType.FUNCTION.apply(TypedVisitor.class), V);
-    public static final JavaType VISITABLE = ClassToJavaType.FUNCTION.apply(Visitable.class);
-    public static final JavaType VISITABLE_BUILDER = typeGenericOf(ClassToJavaType.FUNCTION.apply(VisitableBuilder.class), T, V);
-    public static final JavaType BOXED_VOID = ClassToJavaType.FUNCTION.apply(Void.class);
+    public static final VoidRef VOID = new VoidRef();
+    public static final WildcardRef Q = new WildcardRef();
+
+    public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
+
+    public static final TypeDef BUILDABLE_ANNOTATION = TYPEDEF.apply(Buildable.class);
+    public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
+    public static final TypeDef OBJECT = TypeDef.OBJECT;
+    public static final TypeDef MAP = TYPEDEF.apply(Map.class);
+    public static final TypeDef LINKED_HASH_MAP = TYPEDEF.apply(LinkedHashMap.class);
+    public static final TypeDef LIST = TYPEDEF.apply(List.class);
+    public static final TypeDef ARRAY_LIST = TYPEDEF.apply(ArrayList.class);
+
+    public static final TypeDef SET = TYPEDEF.apply(Set.class);
+    public static final TypeDef LINKED_HASH_SET = TYPEDEF.apply(LinkedHashSet.class);
+
+    public static final TypeDef ARRAY = TYPEDEF.apply(Array.class);
+    public static final TypeDef TYPE = TYPEDEF.apply(Type.class);
+    public static final TypeDef TYPE_VARIABLE = TYPEDEF.apply(TypeVariable.class);
+    public static final TypeDef GENERIC_ARRAY_TYPE = TYPEDEF.apply(GenericArrayType.class);
+    public static final TypeDef PARAMETERIZED_TYPE = TYPEDEF.apply(ParameterizedType.class);
+
+    public static final TypeDef BUILDER = typeGenericOf(TYPEDEF.apply(Builder.class), T);
+    public static final TypeDef BASE_FLUENT = typeGenericOf(TYPEDEF.apply(BaseFluent.class), T);
+    public static final TypeDef EDITABLE = typeGenericOf(TYPEDEF.apply(Editable.class), T);
+    public static final TypeDef FLUENT = typeGenericOf(TYPEDEF.apply(Fluent.class), T);
+    public static final TypeDef FUNCTION = typeGenericOf(TYPEDEF.apply(Function.class), I, O);
+    public static final TypeDef INLINEABLE = typeGenericOf(TYPEDEF.apply(Inlineable.class), T);
+    public static final TypeDef NESTED = typeGenericOf(TYPEDEF.apply(Nested.class), N);
+    public static final TypeDef VISITOR = typeGenericOf(TYPEDEF.apply(Visitor.class), V);
+    public static final TypeDef TYPED_VISITOR = typeGenericOf(TYPEDEF.apply(TypedVisitor.class), V);
+    public static final TypeDef VISITABLE = TYPEDEF.apply(Visitable.class);
+    public static final TypeDef VISITABLE_BUILDER = typeGenericOf(TYPEDEF.apply(VisitableBuilder.class), T, V);
+    public static final TypeDef BOXED_VOID = TYPEDEF.apply(Void.class);
 
     public static final String DEFAULT_INTERFACE_TEMPLATE_LOCATION = "templates/builder/interface.vm";
     public static final String DEFAULT_CLASS_TEMPLATE_LOCATION = "templates/builder/class.vm";
@@ -110,15 +130,14 @@ public class Constants {
 
     public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
 
-    public static JavaType[] PRIMITIVE_TYPES =
-            {ClassToJavaType.FUNCTION.apply(boolean.class),
-                    ClassToJavaType.FUNCTION.apply(byte.class), ClassToJavaType.FUNCTION.apply(char.class),
-                    ClassToJavaType.FUNCTION.apply(short.class), ClassToJavaType.FUNCTION.apply(int.class), ClassToJavaType.FUNCTION.apply(long.class),
-                    ClassToJavaType.FUNCTION.apply(double.class), ClassToJavaType.FUNCTION.apply(float.class)};
+    public static TypeRef[] PRIMITIVE_TYPES =
+            {TYPEREF.apply(boolean.class),
+                    TYPEREF.apply(byte.class), TYPEREF.apply(char.class),
+                    TYPEREF.apply(short.class), TYPEREF.apply(int.class), TYPEREF.apply(long.class),
+                    TYPEREF.apply(double.class), TYPEREF.apply(float.class)};
 
-    public static JavaType[] BOXED_PRIMITIVE_TYPES = {ClassToJavaType.FUNCTION.apply(Boolean.class),
-            ClassToJavaType.FUNCTION.apply(Byte.class), ClassToJavaType.FUNCTION.apply(Character.class),
-            ClassToJavaType.FUNCTION.apply(Short.class), ClassToJavaType.FUNCTION.apply(Integer.class), ClassToJavaType.FUNCTION.apply(Long.class),
-            ClassToJavaType.FUNCTION.apply(Double.class), ClassToJavaType.FUNCTION.apply(Float.class)};
-
+    public static TypeRef[] BOXED_PRIMITIVE_TYPES = {TYPEREF.apply(Boolean.class),
+            TYPEREF.apply(Byte.class), TYPEREF.apply(Character.class),
+            TYPEREF.apply(Short.class), TYPEREF.apply(Integer.class), TYPEREF.apply(Long.class),
+            TYPEREF.apply(Double.class), TYPEREF.apply(Float.class)};
 }

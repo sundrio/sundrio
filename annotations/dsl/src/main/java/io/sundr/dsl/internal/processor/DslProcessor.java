@@ -16,24 +16,28 @@
 
 package io.sundr.dsl.internal.processor;
 
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
+import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.graph.NodeContext;
+import io.sundr.dsl.internal.graph.functions.Nodes;
 import io.sundr.dsl.internal.type.functions.Generics;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
@@ -43,7 +47,9 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.dsl.internal.utils.JavaTypeUtils.executablesToInterfaces;
+import static io.sundr.dsl.internal.Constants.ORIGINAL_REF;
+import static io.sundr.dsl.internal.utils.TypeDefUtils.executablesToInterfaces;
+import static io.sundr.dsl.internal.Constants.IS_GENERATED;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {
@@ -54,64 +60,72 @@ public class DslProcessor extends JavaGeneratingProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         Elements elements = processingEnv.getElementUtils();
         Types types = processingEnv.getTypeUtils();
-        DslProcessorContext context = new DslProcessorContext(elements, types);
+        DslContext context = DslContextManager.create(elements, types);
 
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
                 if (element instanceof TypeElement) {
+                    Generics.clear();
                     TypeElement typeElement = (TypeElement) element;
                     InterfaceName interfaceName = element.getAnnotation(InterfaceName.class);
                     String targetInterface = interfaceName.value();
-                    Set<JavaClazz> interfacesToGenerate = new LinkedHashSet<JavaClazz>();
-
+                    Set<TypeDef> interfacesToGenerate = new LinkedHashSet<TypeDef>();
                     Collection<ExecutableElement> sorted = ElementFilter.methodsIn(typeElement.getEnclosedElements());
+
                     //1st step generate generic interface for all types.
-                    Set<JavaClazz> genericInterfaces = executablesToInterfaces(context, sorted);
-                    Set<JavaClazz> genericAndScopeInterfaces = context.getToScope().apply(genericInterfaces);
-                    for (JavaClazz clazz : genericAndScopeInterfaces) {
-                        if (!JavaTypeUtils.isEntryPoint(clazz)) {
+                    Set<TypeDef> genericInterfaces = executablesToInterfaces(context, sorted);
+                    Set<TypeDef> genericAndScopeInterfaces = Nodes.TO_SCOPE.apply(genericInterfaces);
+                    for (TypeDef clazz : genericAndScopeInterfaces) {
+                        if (!TypeDefUtils.isEntryPoint(clazz)) {
                             interfacesToGenerate.add(clazz);
                         }
                     }
 
                     //2nd step create dependency graph.
-                    Set<JavaMethod> methods = new LinkedHashSet<JavaMethod>();
-                    Set<Node<JavaClazz>> graph = context.getToGraph().apply(genericAndScopeInterfaces);
+                    Set<Method> methods = new LinkedHashSet<Method>();
+                    Set<Node<TypeDef>> graph = Nodes.TO_GRAPH.apply(genericAndScopeInterfaces);
 
-                    for (Node<JavaClazz> root : graph) {
-                        Node<JavaClazz> uncyclic = context.getToUncyclic().apply(root);
-                        Node<JavaClazz> unwrapped = context.getToUnwrapped().apply(NodeContext.builder().withItem(uncyclic.getItem()).build());
-                        JavaClazz current = unwrapped.getItem();
+                    for (Node<TypeDef> root : graph) {
+                        Node<TypeDef> uncyclic = Nodes.TO_UNCYCLIC.apply(root);
+                        Node<TypeDef> unwrapped = Nodes.TO_UNWRAPPED.apply(NodeContext.builder().withItem(uncyclic.getItem()).build());
+                        TypeDef current = unwrapped.getItem();
 
                         //If there are not transitions don't generate root interface.
                         //Just add the method with the direct return type.
                         if (unwrapped.getTransitions().isEmpty()) {
-                            for (JavaMethod m : current.getMethods()) {
-                                methods.add(new JavaMethodBuilder(m).withReturnType(Generics.UNWRAP.apply(m.getReturnType())).build());
+                            for (Method m : current.getMethods()) {
+                                TypeRef returnType = m.getReturnType();
+                                if (returnType instanceof ClassRef) {
+                                    TypeDef toUnwrap = ((ClassRef)returnType).getDefinition();
+                                    methods.add(new MethodBuilder(m).withReturnType(Generics.UNWRAP.apply(toUnwrap).toInternalReference()).build());
+                                } else if (returnType.getAttributes().containsKey(ORIGINAL_REF)) {
+                                    methods.add(new MethodBuilder(m).withReturnType((TypeRef) returnType.getAttributes().get(ORIGINAL_REF)).build());
+                                } else {
+                                    methods.add(new MethodBuilder(m).withReturnType(returnType).build());
+                                }
                             }
                         } else {
-                            for (JavaMethod m : current.getMethods()) {
-                                methods.add(new JavaMethodBuilder(m).withReturnType(current.getType()).build());
+                            for (Method m : current.getMethods()) {
+                                methods.add(new MethodBuilder(m).withReturnType(current.toUnboundedReference()).build());
                             }
 
-                            interfacesToGenerate.add(context.getToRoot().apply(unwrapped));
+                            interfacesToGenerate.add(Nodes.TO_ROOT.apply(unwrapped));
                         }
                     }
 
                     //Do generate the DSL interface
-                    interfacesToGenerate.add(new JavaClazzBuilder()
-                            .withNewType()
-                                .withPackageName(ModelUtils.getPackageElement(element).toString())
-                                .withClassName(targetInterface)
-                                .withKind(JavaKind.INTERFACE)
-                            .and()
+                    interfacesToGenerate.add(new TypeDefBuilder()
+                            .withPackageName(ModelUtils.getPackageElement(element).toString())
+                            .withName(targetInterface)
+                            .withKind(Kind.INTERFACE)
+                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                             .withMethods(methods)
                             .build());
 
-                    interfacesToGenerate.addAll(context.getClassRepository().getInterfacesToGenerate());
+                    interfacesToGenerate.addAll(context.getDefinitionRepository().getDefinitions(IS_GENERATED));
 
                     try {
-                        for (JavaClazz clazz : interfacesToGenerate) {
+                        for (TypeDef clazz : interfacesToGenerate) {
                             generateFromClazz(clazz, DEFAULT_TEMPLATE_LOCATION);
                         }
                     } catch (IOException e) {

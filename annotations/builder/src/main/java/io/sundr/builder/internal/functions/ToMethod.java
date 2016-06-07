@@ -16,14 +16,21 @@
 
 package io.sundr.builder.internal.functions;
 
+import io.sundr.FunctionFactory;
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaMethodBuilder;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaPropertyBuilder;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.Statement;
+import io.sundr.codegen.model.StringStatement;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
@@ -33,20 +40,26 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static io.sundr.builder.Constants.BODY;
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
-import static io.sundr.builder.Constants.MEMBER_OF;
-import static io.sundr.builder.Constants.N;
+import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
+import static io.sundr.builder.Constants.N_REF;
+import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
-import static io.sundr.builder.Constants.T;
+import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
+import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
+import static io.sundr.builder.internal.functions.CollectionTypes.IS_LIST;
+import static io.sundr.builder.internal.functions.CollectionTypes.IS_MAP;
+import static io.sundr.builder.internal.functions.CollectionTypes.IS_SET;
+import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
-import static io.sundr.builder.internal.functions.TypeAs.REMOVE_GENERICS;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
+import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBoolean;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.builder.internal.utils.BuilderUtils.isList;
 import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
@@ -54,422 +67,548 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.StringUtils.singularize;
+import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 
-public enum ToMethod implements Function<JavaProperty, JavaMethod> {
+public class ToMethod {
 
-    WITH {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
+    private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
+    private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
+
+    public static final Function<Property, Method> WITH = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
-
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(T)
-                    .withArguments(new JavaProperty[]{property})
-                    .addToAttributes(BODY, getBody(property))
+                    .withReturnType(returnType)
+                    .withArguments(property)
+                    .withVarArgPreferred(true)
+                    .withNewBlock()
+                    .withStatements(getStementes(property))
+                    .endBlock()
                     .build();
         }
 
-        private String getBody(JavaProperty property) {
+        private List<Statement> getStementes(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             String name = property.getName();
-            JavaType type = property.getType();
-            String className = type.getClassName();
-            StringBuilder sb = new StringBuilder();
-            if (type.isCollection()) {
-                sb.append("this." + name + ".clear();");
-                if (className.contains("Map")) {
-                    sb.append("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (T) this;");
-                } else if (className.contains("List") || className.contains("Set")) {
-                    JavaType unwraped = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
+            TypeRef type = property.getTypeRef();
+            TypeRef unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+
+            List<Statement> statements = new ArrayList<Statement>();
+
+            if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
+                String className = ((ClassRef) type).getDefinition().getName();
+                statements.add(new StringStatement("this." + name + ".clear();"));
+                if (IS_MAP.apply(type)) {
+                    statements.add(new StringStatement("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (" + returnType + ") this;"));
+                } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
                     String addToMethodName = "addTo" + property.getNameCapitalized();
-                    sb.append("if (" + name + " != null) {for (" + unwraped.getSimpleName() + " item : " + name + "){this." + addToMethodName + "(item);}} return (T) this;");
+                    statements.add(new StringStatement("if (" + name + " != null) {for (" + unwraped.toString() + " item : " + name + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
                 }
-                return sb.toString();
-            } else if (isBuildable(property)) {
-                JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
+                return statements;
+            } else if (isBuildable(unwraped)) {
+                TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
                 String propertyName = property.getName();
-                String builderClass = builder.getSimpleName();
-                return "if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return (T) this;";
+                String builderClass = builder.getName();
+                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
+                return statements;
             }
-            return "this." + property.getName() + "=" + property.getName() + "; return (T) this;";
+            statements.add(new StringStatement("this." + property.getName() + "=" + property.getName() + "; return (" + returnType + ") this;"));
+            return statements;
         }
 
-    }, WITH_ARRAY {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
+    });
+
+    public static final Function<Property, Method> WITH_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+
             String methodName = "with" + property.getNameCapitalized();
-            JavaType unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getType());
+            TypeRef unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             String addToMethodName = "addTo" + property.getNameCapitalized();
 
-            JavaProperty arrayProperty = new JavaPropertyBuilder(property)
-                    .withType(new JavaTypeBuilder(unwraped)
-                            .withArray(true)
-                            .build())
-                    .withArray(true)
-                    .build();
+            TypeRef arrayType = ARRAY_OF.apply(unwraped);
+            Property arrayProperty = new PropertyBuilder(property).withTypeRef(arrayType).build();
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(T)
-                    .withArguments(new JavaProperty[]{arrayProperty})
-                    .addToAttributes(BODY, "this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.getSimpleName() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (T) this;")
+                    .withReturnType(returnType)
+                    .withArguments(arrayProperty)
+                    .withVarArgPreferred(true)
+                    .withNewBlock()
+                    .addNewStringStatementStatement("this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
+                    .endBlock()
                     .build();
         }
 
-    }, GETTER {
-        @Override
-        public JavaMethod apply(final JavaProperty property) {
-            String prefix = property.getType().isBoolean() ? "is" : "get";
-            String methodName = prefix + property.getNameCapitalized();
-            String body;
+    });
 
-            TreeSet<JavaProperty> descendants = new TreeSet<JavaProperty>(new Comparator<JavaProperty>() {
-                @Override
-                public int compare(JavaProperty left, JavaProperty right) {
+    public static final Function<Property, Method> GETTER = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(final Property property) {
+            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+            String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
+            String methodName = prefix + property.getNameCapitalized();
+            final List<Statement> statements = new ArrayList<Statement>();
+
+            TreeSet<Property> descendants = new TreeSet<Property>(new Comparator<Property>() {
+                public int compare(Property left, Property right) {
                     return left.getName().compareTo(right.getName());
                 }
             });
-            descendants.addAll(Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property));
+            descendants.addAll(Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(property));
 
-            if (isMap(property.getType())) {
-                body = "return this." + property.getName() + ";";
-            } else if (isBuildable(property)) {
-                if (isList(property.getType()) || isSet(property.getType())) {
-                    body = "return build(" + property.getName() + ");";
+            if (isMap(property.getTypeRef())) {
+                statements.add(new StringStatement("return this." + property.getName() + ";"));
+            } else if (isBuildable(unwrapped)) {
+                if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
+                    statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
-                    body = "return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;";
+                    statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
             } else if (!descendants.isEmpty()) {
-                if (isList(property.getType()) || isSet(property.getType())) {
-                    String names = StringUtils.join(descendants, new Function<JavaProperty, String>() {
-                        String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType()).getClassName();
-                        @Override
-                        public String apply(JavaProperty item) {
+                //TODO: This should also work for array types, so we should check....
+                if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
+                    String names = StringUtils.join(descendants, new Function<Property, String>() {
+                        String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef()).toString();
+
+                        public String apply(Property item) {
                             return "this.<" + className + ">build(" + item.getName() + ")";
                         }
                     }, ", ");
-                    body = "return aggregate(" + names + ");";
+                    statements.add(new StringStatement("return aggregate(" + names + ");"));
                 } else {
                     //TODO: What are we doing in this case?
-                    body = "return this." + property.getName() + ";";
+                    statements.add(new StringStatement("return this." + property.getName() + ";"));
                 }
             } else {
-                body = "return this." + property.getName() + ";";
+                statements.add(new StringStatement("return this." + property.getName() + ";"));
             }
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(property.getType())
-                    .withArguments(new JavaProperty[]{})
-                    .addToAttributes(BODY, body)
+                    .withReturnType(property.getTypeRef())
+                    .withArguments(new Property[]{})
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
                     .build();
         }
-    }, GETTER_ARRAY {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            String prefix = property.getType().isBoolean() ? "is" : "get";
+    });
+
+    public static final Function<Property, Method> GETTER_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(Property property) {
+            String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
-            JavaType type = property.getType();
+            TypeRef type = property.getTypeRef();
             Boolean isBuildable = isBuildable(type);
-            JavaType targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
+            TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
             String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,
-                    type.getClassName(),
-                    targetType.getSimpleName(),
+                    type.toString(),
+                    targetType.toString(),
                     property.getName(),
-                    type.getClassName(),
+                    targetType.toString(),
                     property.getName()
             );
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(property.getType())
-                    .withArguments(new JavaProperty[]{})
-                    .addToAttributes(BODY, body)
+                    .withReturnType(property.getTypeRef())
+                    .withArguments()
+                    .withNewBlock()
+                    .addNewStringStatementStatement(body)
+                    .endBlock()
                     .build();
         }
-    },
-    SETTER {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
+    });
+
+    public static final Function<Property, Method> SETTER = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(Property property) {
             String methodName = "set" + property.getNameCapitalized();
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
                     .withReturnType(VOID)
-                    .withArguments(new JavaProperty[]{property})
-                    .addToAttributes(BODY, "this." + property.getName() + "=" + property.getName() + ";")
+                    .withArguments()
+                    .withNewBlock()
+                    .addNewStringStatementStatement("this." + property.getName() + "=" + property.getName() + ";")
+                    .endBlock()
                     .build();
         }
-    },
-    ADD_TO_COLLECTION {
-        @Override
-        public JavaMethod apply(final JavaProperty property) {
-            JavaProperty item = new JavaPropertyBuilder(property)
+    });
+
+
+    public static final Function<Property, Method> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(final Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+
+            Property item = new PropertyBuilder(property)
                     .withName("items")
-                    .withArray(true)
-                    .withType(TypeAs.combine(UNWRAP_COLLECTION_OF, REMOVE_GENERICS).apply(property.getType()))
+                    .withTypeRef(unwrapped.withDimensions(1))
                     .build();
 
+            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+
             String methodName = "addTo" + property.getNameCapitalized();
-            String body;
-            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);
-            if (isBuildable(property)) {
-                JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
-                String builderClass = builder.getClassName();
-                body = "for (" + item.getType().getClassName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (T)this;";
+            List<Statement> statements = new ArrayList<Statement>();
+            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(property);
+            if (isBuildable(unwrapped)) {
+                final ClassRef targetType = (ClassRef) unwrapped;
+                String targetClass = targetType.getDefinition().getName();
+                parameters.addAll(targetType.getDefinition().getParameters());
+                String builderClass = targetClass + "Builder";
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
-                body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
-                    @Override
-                    public String apply(JavaProperty item) {
-                        JavaType t = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+                final ClassRef targetType = (ClassRef) unwrapped;
+                parameters.addAll(targetType.getDefinition().getParameters());
+                statements.add(new StringStatement("for (" + targetType.toString() + " item : items) {" + StringUtils.join(descendants, new Function<Property, String>() {
+
+                    public String apply(Property item) {
+                        TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
+                        String className = ((ClassRef) itemRef).getDefinition().getName();
                         String addToMethodName = "addTo" + captializeFirst(item.getName());
-                        return "if (item instanceof " + t.getClassName() + "){" + addToMethodName + "((" + t.getClassName() + ")item);}\n";
+                        return "if (item instanceof " + className + "){" + addToMethodName + "((" + className + ")item);}\n";
                     }
-                }, " else ");
-
-                body += "} return (T)this;";
+                }, " else ") + "} return (" + returnType + ")this;"));
             } else {
-                body = "for (" + item.getType().getSimpleName() + " item : items) {this." + property.getName() + ".add(item);} return (T)this;";
+                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".add(item);} return (" + returnType + ")this;"));
             }
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
                     .withName(methodName)
-                    .withReturnType(T)
+                    .withReturnType(returnType)
                     .withArguments(item)
-                    .addToAttributes(BODY, body)
+                    .withVarArgPreferred(true)
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
                     .build();
         }
-    },
-    REMOVE_FROM_COLLECTION {
-        @Override
-        public JavaMethod apply(final JavaProperty property) {
-            JavaProperty item = new JavaPropertyBuilder(property)
+    });
+
+    public static final Function<Property, Method> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(final Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+            Property item = new PropertyBuilder(property)
                     .withName("items")
-                    .withArray(true)
-                    .withType(TypeAs.combine(UNWRAP_COLLECTION_OF, REMOVE_GENERICS).apply(property.getType()))
+                    .withTypeRef(unwrapped.withDimensions(1))
                     .build();
 
+            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+
             String methodName = "removeFrom" + property.getNameCapitalized();
-            String body;
-            Set<JavaProperty> descendants = Decendants.PROPERTY_BUILDABLE_ANCESTORS.apply(property);            
-            if (isBuildable(property)) {
-                JavaType builder = combine(UNWRAP_COLLECTION_OF, BUILDER).apply(property.getType());
-                String builderClass = builder.getClassName();
-                body = "for (" + item.getType().getClassName() + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (T)this;";
+            List<Statement> statements = new ArrayList<Statement>();
+
+            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(property);
+            if (isBuildable(unwrapped)) {
+                final ClassRef targetType = (ClassRef) unwrapped;
+                String targetClass = targetType.getDefinition().getName();
+                parameters.addAll(targetType.getDefinition().getParameters());
+                String builderClass = targetClass + "Builder";
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
-                body = "for (" + item.getType().getSimpleName() + " item : items) {" + StringUtils.join(descendants, new Function<JavaProperty, String>() {
-                    @Override
-                    public String apply(JavaProperty item) {
-                        JavaType t = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getType());
+                final ClassRef targetType = (ClassRef) unwrapped;
+                parameters.addAll(targetType.getDefinition().getParameters());
+                statements.add(new StringStatement("for (" + targetType.toString() + " item : items) {" + StringUtils.join(descendants, new Function<Property, String>() {
+                    public String apply(Property item) {
+                        TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
+                        String className = ((ClassRef) itemRef).getDefinition().getName();
                         String removeFromMethodName = "removeFrom" + captializeFirst(item.getName());
-                        return "if (item instanceof " + t.getClassName() + "){" + removeFromMethodName + "((" + t.getClassName() + ")item);}\n";
+                        return "if (item instanceof " + className + "){" + removeFromMethodName + "((" + className + ")item);}\n";
                     }
-                }, " else ");
+                }, " else ") + "} return (" + returnType + ")this;"));
 
-                body += "} return (T)this;";
             } else {
-                body = "for (" + item.getType().getClassName() + " item : items) {this." + property.getName() + ".remove(item);} return (T)this;";
+                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
             }
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(T)
-                    .withArguments(new JavaProperty[]{item})
-                    .addToAttributes(BODY, body)
+                    .withParameters(parameters)
+                    .withReturnType(returnType)
+                    .withArguments(item)
+                    .withVarArgPreferred(true)
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
                     .build();
         }
-    },
-    ADD_MAP_TO_MAP {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            JavaType mapType = property.getType();
-            JavaProperty mapProperty = new JavaPropertyBuilder().withName("map").withType(mapType).build();
+    });
+
+    public static final Function<Property, Method> ADD_MAP_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            ClassRef mapType = (ClassRef) property.getTypeRef();
+            Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
             String methodName = "addTo" + property.getNameCapitalized();
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(T)
+                    .withReturnType(returnType)
                     .withArguments(mapProperty)
-                    .addToAttributes(BODY, "if(map != null) { this." + property.getName() + ".putAll(map);} return (T)this;")
+                    .withNewBlock()
+                    .addNewStringStatementStatement("if(map != null) { this." + property.getName() + ".putAll(map);} return (" + returnType + ")this;")
+                    .endBlock()
                     .build();
         }
-    },
-    ADD_TO_MAP {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            JavaType mapType = property.getType();
-            JavaType keyType = mapType.getGenericTypes()[0];
-            JavaType valueType = mapType.getGenericTypes()[1];
+    });
 
-            JavaProperty keyProperty = new JavaPropertyBuilder().withName("key").withType(keyType).build();
-            JavaProperty valueProperty = new JavaPropertyBuilder().withName("value").withType(valueType).build();
+    public static final Function<Property, Method> ADD_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            ClassRef mapType = (ClassRef) property.getTypeRef();
+            TypeRef keyType = mapType.getArguments().get(0);
+            TypeRef valueType = mapType.getArguments().get(1);
+
+
+            Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
+            Property valueProperty = new PropertyBuilder().withName("value").withTypeRef(valueType).build();
             String methodName = "addTo" + property.getNameCapitalized();
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(T)
-                    .withArguments(new JavaProperty[]{keyProperty, valueProperty})
-                    .addToAttributes(BODY, "if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return (T)this;")
+                    .withReturnType(returnType)
+                    .withArguments(new Property[]{keyProperty, valueProperty})
+                    .withNewBlock()
+                    .addNewStringStatementStatement("if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return (" + returnType + ")this;")
+                    .endBlock()
                     .build();
         }
-    }, REMOVE_MAP_FROM_MAP {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            JavaType mapType = property.getType();
-            JavaProperty mapProperty = new JavaPropertyBuilder().withName("map").withType(mapType).build();
+    });
+
+
+    public static final Function<Property, Method> REMOVE_MAP_FROM_MAP = FunctionFactory.cache(new Function<Property, Method>() {
+
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef mapType = property.getTypeRef();
+            Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
             String methodName = "removeFrom" + property.getNameCapitalized();
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(T)
+                    .withReturnType(returnType)
                     .withArguments(mapProperty)
-                    .addToAttributes(BODY, "if(map != null) { for(Object key : map.keySet()) {this." + property.getName() + ".remove(key);}} return (T)this;")
+                    .withNewBlock()
+                    .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {this." + property.getName() + ".remove(key);}} return (" + returnType + ")this;")
+                    .endBlock()
                     .build();
         }
-    }, REMOVE_FROM_MAP {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            JavaType mapType = property.getType();
-            JavaType keyType = mapType.getGenericTypes()[0];
+    });
 
-            JavaProperty keyProperty = new JavaPropertyBuilder().withName("key").withType(keyType).build();
+    public static final Function<Property, Method> REMOVE_FROM_MAP = FunctionFactory.cache(new Function<Property, Method>() {
+
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            ClassRef mapType = (ClassRef) property.getTypeRef();
+            TypeRef keyType = mapType.getArguments().get(0);
+
+            Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
             String methodName = "removeFrom" + property.getNameCapitalized();
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
-                    .withReturnType(T)
-                    .withArguments(new JavaProperty[]{keyProperty})
-                    .addToAttributes(BODY, "if(key != null) {this." + property.getName() + ".remove(key);} return (T)this;")
+                    .withReturnType(returnType)
+                    .withArguments(keyProperty)
+                    .withNewBlock()
+                    .addNewStringStatementStatement("if(key != null) {this." + property.getName() + ".remove(key);} return (" + returnType + ")this;")
+                    .endBlock()
                     .build();
         }
-    }, WITH_NEW_NESTED {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
-            //We need to repackage because we are nesting under this class.
-            JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
-            JavaType nestedTypeImpl = PropertyAs.NESTED_TYPE.apply(property);
+    });
 
-            List<JavaType> generics = new ArrayList<JavaType>();
-            Set<JavaType> typeParameters = new LinkedHashSet<JavaType>();
-            for (JavaType generic : baseType.getGenericTypes()) {
-                generics.add(TypeAs.REMOVE_SUPERCLASS.apply(generic));
-                typeParameters.add(generic);
+    public static final Function<Property, Method> WITH_NEW_NESTED = new Function<Property, Method>() {
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+            TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+
+            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(baseType.getDefinition().getParameters());
+            List<TypeRef> typeArguments = new ArrayList<TypeRef>();
+            for (TypeRef arg : baseType.getArguments()) {
+                typeArguments.add(arg);
             }
-            generics.add(T);
-            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
-            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
+            typeArguments.add(returnType);
 
-            String prefix = property.getType().isCollection() ? "addNew" : "withNew";
-            String methodName = prefix + captializeFirst(property.getType().isCollection()
+
+            ClassRef rewraped = nestedType.toReference(typeArguments.toArray(new TypeRef[typeArguments.size()]));
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments.toArray(new TypeRef[typeArguments.size()]));
+
+            boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
+            String prefix = isCollection ? "addNew" : "withNew";
+            String methodName = prefix + captializeFirst(isCollection
                     ? singularize(property.getName())
                     : property.getName());
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withTypeParameters(typeParameters)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
                     .withReturnType(rewraped)
                     .withName(methodName)
-                    .addToAttributes(BODY, "return new " + rewrapedImpl.getClassName() + "();")
+                    .withNewBlock()
+                    .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "();")
+                    .endBlock()
                     .build();
 
         }
-    }, WITH_NEW_LIKE_NESTED {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            JavaType baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getType());
-            JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
-            JavaType nestedTypeImpl = PropertyAs.NESTED_TYPE.apply(property);
+    };
 
-            List<JavaType> generics = new ArrayList<JavaType>();
-            for (JavaType ignore : baseType.getGenericTypes()) {
-                generics.add(Q);
+    public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = new Function<Property, Set<Method>>() {
+        public Set<Method> apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            Set<Method> result = new LinkedHashSet<Method>();
+            TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+            TypeDef baseType = BuilderContextManager.getContext().getBuildableRepository().getBuildable(unwrappedType);
+
+            for (Method constructor : getInlineableConstructors(property)) {
+                boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
+                String ownPrefix = isCollection ? "addNew" : "withNew";
+                String ownName = ownPrefix + captializeFirst(isCollection
+                        ? singularize(property.getName())
+                        : property.getName());
+
+                String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
+                String delegateName = delegatePrefix + captializeFirst(property.getName());
+
+                String args = StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+                    public String apply(Property item) {
+                        return item.getName();
+                    }
+                }, ", ");
+
+
+                result.add(new MethodBuilder()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withReturnType(returnType)
+                        .withArguments(constructor.getArguments())
+                        .withName(ownName)
+                        //TODO: decide how to roll. Use sets or lists?
+                        .withParameters(new LinkedHashSet<TypeParamDef>(baseType.getParameters()))
+                        .withNewBlock()
+                        .addNewStringStatementStatement("return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
+                        .endBlock()
+                        .build());
             }
-            generics.add(T);
-            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
-            JavaType rewrapedImpl = new JavaTypeBuilder(nestedTypeImpl).withGenericTypes(generics.toArray(new JavaType[generics.size()])).build();
 
-            String prefix = property.getType().isCollection() ? "addNew" : "withNew";
+            return result;
+        }
+    };
+
+    public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = new Function<Property, Method>() {
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+            TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+
+            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(baseType.getDefinition().getParameters());
+            List<TypeRef> typeArguments = new ArrayList<TypeRef>();
+            for (TypeRef ignore : baseType.getArguments()) {
+                typeArguments.add(Q);
+            }
+            typeArguments.add(returnType);
+
+            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray());
+            ClassRef rewrapedImpl = classRefOf(nestedTypeImpl, typeArguments.toArray());
+
+            boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
+
+            String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
-            String methodName = prefix + captializeFirst(property.getType().isCollection()
+            String methodName = prefix + captializeFirst(isCollection
                     ? singularize(property.getName())
                     : property.getName()) + suffix;
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .addNewArgument()
                     .withName("item")
-                    .withType(TypeAs.REMOVE_GENERICS.apply(baseType))
+                    .withTypeRef(baseType)
                     .endArgument()
-                    .addToAttributes(BODY, "return new " + rewrapedImpl.getClassName() + "(item);")
+                    .withNewBlock()
+                    .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "(item);")
+                    .endBlock()
                     .build();
 
         }
-    }, EDIT_NESTED {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            JavaType nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+    };
+
+    public static final Function<Property, Method> EDIT_NESTED =new Function<Property, Method>() {
+        public Method apply(Property property) {
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             //We need to repackage because we are nesting under this class.
-            JavaType rewraped = new JavaTypeBuilder(nestedType).withGenericTypes(new JavaType[]{T}).build();
+            ClassRef rewraped = classRefOf(nestedType, returnType);
             String prefix = "edit";
             String methodNameBase = captializeFirst(property.getName());
             String methodName = prefix + methodNameBase;
 
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(rewraped)
                     .withName(methodName)
-                    .addToAttributes(BODY, "return withNew" + methodNameBase + "Like(get" + methodNameBase + "());")
+                    .withNewBlock()
+                    .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "());")
+                    .endBlock()
                     .build();
 
-        }
-    }, AND {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            String classPrefix = getClassPrefix(property);
-            String prefix = property.getType().isCollection() ? "addTo" : "with";
-            String withMethodName = prefix + captializeFirst(property.getName());
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withReturnType(N)
-                    .withName("and")
-                    .addToAttributes(BODY, "return (N) " + classPrefix + withMethodName + "(builder.build());")
-                    .build();
-
-        }
-
-        private String getClassPrefix(JavaProperty property) {
-            Object memberOf = property.getAttributes().get(MEMBER_OF);
-            if (memberOf instanceof JavaType) {
-                return ((JavaType) memberOf).getClassName() + ".this.";
-            } else return "";
-        }
-
-    }, END {
-        @Override
-        public JavaMethod apply(JavaProperty property) {
-            String methodName = "end" + captializeFirst(property.getType().isCollection()
-                    ? singularize(property.getName())
-                    : property.getName());
-
-            return new JavaMethodBuilder()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withReturnType(N)
-                    .withName(methodName)
-                    .addToAttributes(BODY, "return and();")
-                    .build();
         }
     };
 
-    private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
-    private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
+    public static final Function<Property, Method> AND = new Function<Property, Method>() {
+        public Method apply(Property property) {
+            String classPrefix = getClassPrefix(property);
+            String prefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
+            String withMethodName = prefix + captializeFirst(property.getName());
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(N_REF)
+                    .withName("and")
+                    .withNewBlock()
+                    .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(builder.build());")
+                    .endBlock()
+                    .build();
+
+        }
+
+        private String getClassPrefix(Property property) {
+            Object memberOf = property.getAttributes().get(OUTER_CLASS);
+            if (memberOf instanceof TypeDef) {
+                return ((TypeDef) memberOf).getName() + ".this.";
+            } else return "";
+        }
+
+    };
+
+    public static final Function<Property, Method> END = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(Property property) {
+
+            String methodName = "end" + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
+                    ? singularize(property.getName())
+                    : property.getName());
+
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(N_REF)
+                    .withName(methodName)
+                    .withNewBlock()
+                    .addNewStringStatementStatement("return and();")
+                    .endBlock()
+                    .build();
+        }
+    });
 }

@@ -1,4 +1,4 @@
-%s[] result = new %s[%s.size()];
+%s result = new %s[%s.size()];
 int index=0;
 for (%s item : %s) {
     result[index++]=item;

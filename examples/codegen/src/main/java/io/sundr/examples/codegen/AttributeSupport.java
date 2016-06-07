@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.Collections;
 import java.util.Map;
 
-public class AttributeSupport {
-    
+@Buildable
+public class AttributeSupport implements Attributeable {
+
     private final Map<String, Object> attributes;
 
-    @Buildable
     public AttributeSupport(Map<String, Object> attributes) {
         this.attributes = attributes;
     }

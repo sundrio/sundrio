@@ -16,17 +16,10 @@
 
 package io.sundr.codegen.generator;
 
-import io.sundr.codegen.directives.ClassDirective;
-import io.sundr.codegen.directives.FieldDirective;
-import io.sundr.codegen.directives.MethodDirective;
 import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
-import org.apache.velocity.runtime.resource.util.StringResourceRepositoryImpl;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -39,7 +32,7 @@ public class CodeGenerator<M> {
 
     private static final String TEMPLATE = "template";
     private static final String MODEL = "model";
-    private static final String TEMPLATE_READER_FAILURE  = "Failed to read template.";
+    private static final String TEMPLATE_READER_FAILURE = "Failed to read template.";
 
     private final CodeGeneratorContext context;
     private final Writer writer;

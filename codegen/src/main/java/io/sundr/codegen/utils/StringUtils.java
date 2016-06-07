@@ -27,7 +27,6 @@ import java.net.URL;
 public final class StringUtils {
 
     public static final class ToString<X> implements Function<X, String> {
-        @Override
         public String apply(X item) {
             return String.valueOf(item);
         }
@@ -121,7 +120,6 @@ public final class StringUtils {
 
     public static String getPrefix(Iterable<String> items) {
         return getPrefix(items, new Function<String, String>() {
-            @Override
             public String apply(String item) {
                 return item;
             }

@@ -17,14 +17,13 @@
 package io.sundr.dsl.internal.element.functions.filter;
 
 import io.sundr.Function;
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeDef;
 
 import java.util.Collection;
-import java.util.Set;
 
 /**
  * A Function that determines if a set of visited keyword types satisfies some requirements.
  */
-public interface TransitionFilter extends Function<Collection<JavaType>, Boolean> {
+public interface TransitionFilter extends Function<Collection<TypeDef>, Boolean> {
 
 }

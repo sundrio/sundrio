@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,34 +16,13 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Fluent;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class AttributeSupportFluent<T extends AttributeSupportFluent<T>> extends BaseFluent<T> implements Fluent<T> {
+public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A>{
 
-    Map<String, Object> attributes = new HashMap();
 
-    public T addToAttributes(String key, Object value) {
-        if (key != null && value != null) {
-            this.attributes.put(key, value);
-        }
-        return (T) this;
-    }
-
-    public Map<String, Object> getAttributes() {
-        return this.attributes;
-    }
-
-    public T withAttributes(Map<String, Object> attributes) {
-        this.attributes.clear();
-        if (attributes != null) {
-            this.attributes.putAll(attributes);
-        }
-        return (T) this;
-    }
-
+    public A addToAttributes(String key, Object value);    public A addToAttributes(Map<String, Object> map);    public A removeFromAttributes(String key);    public A removeFromAttributes(Map<String, Object> map);    public Map<String, Object> getAttributes();    public A withAttributes(Map<String, Object> attributes);
 
 }

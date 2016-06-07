@@ -23,18 +23,25 @@ import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.BuildableReference;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
+import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.functions.PropertyAs;
-import io.sundr.codegen.functions.ClassToJavaType;
-import io.sundr.codegen.model.AttributeSupport;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.utils.StringUtils;
-import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.builder.internal.functions.CollectionTypes;
+import io.sundr.builder.internal.functions.TypeAs;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.PrimitiveRef;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.codegen.model.TypeRef;
 
+import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 import java.util.Arrays;
@@ -43,47 +50,67 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.LIST;
-import static io.sundr.builder.Constants.MAP;
-import static io.sundr.builder.Constants.OBJECT;
-import static io.sundr.builder.Constants.SET;
-import static io.sundr.codegen.utils.StringUtils.isNullOrEmpty;
-import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
-
 public class BuilderUtils {
     
     private BuilderUtils() {}
 
     public static final String BUILDABLE = "BUILDABLE";
 
-    public static JavaMethod findBuildableConstructor(JavaClazz clazz) {
+    public static boolean isBuildable(TypeRef  typeRef) {
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
+        return repository.isBuildable(typeRef);
+    }
+
+    public static boolean isBuildable(TypeDef  typeDef) {
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
+        return repository.isBuildable(typeDef);
+    }
+
+    public static TypeDef findBuildableSuperClass(TypeDef clazz) {
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
+
+        for (ClassRef superClass : clazz.getExtendsList()) {
+            if (repository.isBuildable(superClass)) {
+                return repository.getBuildable(superClass);
+            }
+        }
+        return null;
+    }
+
+    public static Method findBuildableConstructor(TypeDef clazz) {
         //1st pass go for annotated method
-        for (JavaMethod candidate : clazz.getConstructors()) {
+        for (Method candidate : clazz.getConstructors()) {
             if (candidate.getAnnotations().contains(Constants.BUILDABLE_ANNOTATION)) {
                 return candidate;
             }
         }
 
         //2nd pass go for the first non-empty constructor
-        for (JavaMethod candidate : clazz.getConstructors()) {
-            if (candidate.getArguments().length != 0) {
+        for (Method candidate : clazz.getConstructors()) {
+            if (candidate.getArguments().size() != 0) {
                 return candidate;
             }
         }
+
         return clazz.getConstructors().iterator().next();
     }
 
-    public static JavaMethod findGetter(JavaClazz clazz, JavaProperty property) {
-        for (JavaMethod method : clazz.getMethods()) {
-            if (isApplicableGetterOf(method, property)) {
-                return method;
+    public static Method findGetter(TypeDef clazz, Property property) {
+        TypeDef current = clazz;
+        while (current!= null && !current.equals(TypeDef.OBJECT)) {
+            for (Method method : current.getMethods()) {
+                if (isApplicableGetterOf(method, property)) {
+                    return method;
+                }
             }
+            String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+            current = DefinitionRepository.getRepository().getDefinition(fqn);
         }
-        throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getType().getFullyQualifiedName());
+        throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getFullyQualifiedName());
     }
 
-    public static boolean hasSetter(JavaClazz clazz, JavaProperty property) {
-        for (JavaMethod method : clazz.getMethods()) {
+    public static boolean hasSetter(TypeDef clazz, Property property) {
+        for (Method method : clazz.getMethods()) {
             if (isApplicableSetterOf(method, property)) {
                 return true;
             }
@@ -92,23 +119,28 @@ public class BuilderUtils {
     }
 
 
-    public static boolean hasOrInheritsSetter(JavaClazz clazz, JavaProperty property) {
-        JavaClazz target = clazz;
+    public static boolean hasOrInheritsSetter(TypeDef clazz, Property property) {
+        TypeDef current = clazz;
         //Iterate parent objects and check for properties with setters but not ctor arguments.
-        while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
-            for (JavaMethod method : target.getMethods()) {
+        while (current!= null && !current.equals(TypeDef.OBJECT)) {
+            for (Method method : current.getMethods()) {
                 if (isApplicableSetterOf(method, property)) {
                     return true;
                 }
             }
-            String superFQN = target.getType().getSuperClass().getFullyQualifiedName();
-            target = isNullOrEmpty(superFQN) ? null : BuilderContextManager.getContext().getStringToJavaClazz().apply(superFQN);
+
+            if (!current.getExtendsList().isEmpty()) {
+                String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+                current = DefinitionRepository.getRepository().getDefinition(fqn);
+            } else {
+                current = null;
+            }
         }
         return false;
     }
 
-    private static boolean isApplicableGetterOf(JavaMethod method, JavaProperty property) {
-        if (!method.getReturnType().isAssignable(property.getType())) {
+    private static boolean isApplicableGetterOf(Method method, Property property) {
+        if (!method.getReturnType().isAssignableFrom(property.getTypeRef())) {
             return false;
         }
 
@@ -123,10 +155,10 @@ public class BuilderUtils {
     }
 
 
-    private static boolean isApplicableSetterOf(JavaMethod method, JavaProperty property) {
-        if (method.getArguments().length != 1) {
+    private static boolean isApplicableSetterOf(Method method, Property property) {
+        if (method.getArguments().size() != 1) {
             return false;
-        } else if (!method.getArguments()[0].getType().equals(property.getType())) {
+        } else if (!method.getArguments().get(0).getTypeRef().equals(property.getTypeRef())) {
             return false;
         } else if (method.getName().endsWith("set" + property.getNameCapitalized())) {
             return true;
@@ -141,8 +173,8 @@ public class BuilderUtils {
      * @param property      The arguement.
      * @return              True if matching argument if found.
      */
-    public static boolean methodHasArgument(JavaMethod method, JavaProperty property) {
-        for (JavaProperty candidate : method.getArguments()) {
+    public static boolean methodHasArgument(Method method, Property property) {
+        for (Property candidate : method.getArguments()) {
             if (candidate.equals(property)) {
                 return true;
             }
@@ -150,8 +182,8 @@ public class BuilderUtils {
         return false;
     }
 
-    public static boolean hasBuildableConstructorWithArgument(JavaClazz clazz, JavaProperty property) {
-        JavaMethod constructor = findBuildableConstructor(clazz);
+    public static boolean hasBuildableConstructorWithArgument(TypeDef clazz, Property property) {
+        Method constructor = findBuildableConstructor(clazz);
         if (constructor == null) {
             return false;
         } else {
@@ -166,14 +198,14 @@ public class BuilderUtils {
      * @param item The clazz to check.
      * @return
      */
-    public static boolean hasDefaultConstructor(JavaClazz item) {
+    public static boolean hasDefaultConstructor(TypeDef item) {
         if (item == null) {
             return false;
         } else if (item.getConstructors().isEmpty()) {
             return true;
         } else {
-            for (JavaMethod constructor : item.getConstructors()) {
-                if (constructor.getArguments().length == 0) {
+            for (Method constructor : item.getConstructors()) {
+                if (constructor.getArguments().size() == 0) {
                     return true;
                 }
             }
@@ -182,26 +214,11 @@ public class BuilderUtils {
     }
 
 
-    /**
-     * Checks if {@link io.sundr.codegen.model.JavaType} has the BUILDABLE attribute set to true.
-     *
-     * @param item The type to check.
-     * @return
-     */
-    public static boolean isBuildable(AttributeSupport item) {
-        if (item == null) {
-            return false;
-        } else if (item.getAttributes().containsKey(BUILDABLE)) {
-            return (Boolean) item.getAttributes().get(BUILDABLE);
-        }
-        return false;
-    }
-
-
-    public static Set<JavaMethod> getInlineableConstructors(JavaProperty property) {
-        Set<JavaMethod> result = new HashSet<JavaMethod>();
-        JavaClazz clazz = PropertyAs.CLASS.apply(property);
-        for (JavaMethod candidate : clazz.getConstructors()) {
+    public static Set<Method> getInlineableConstructors(Property property) {
+        Set<Method> result = new HashSet<Method>();
+        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+        TypeDef clazz = unwrapped instanceof ClassRef ? ((ClassRef)unwrapped).getDefinition() : BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
+        for (Method candidate : clazz.getConstructors()) {
             if (isInlineable(candidate)) {
                 result.add(candidate);
             }
@@ -209,15 +226,15 @@ public class BuilderUtils {
         return result;
     }
 
-    public static boolean isInlineable(JavaMethod method) {
-        if (method.getArguments().length == 0 || method.getArguments().length > 5) {
+    public static boolean isInlineable(Method method) {
+        if (method.getArguments().size() == 0 || method.getArguments().size() > 5) {
             return false;
         }
 
-        for (JavaProperty argument : method.getArguments()) {
-            if (StringUtils.isNullOrEmpty(argument.getType().getPackageName())) {
+        for (Property argument : method.getArguments()) {
+            if (!(argument.getTypeRef() instanceof ClassRef)) {
                 continue;
-            } else if (argument.getType().getPackageName().startsWith("java.lang")) {
+            } else if (((ClassRef)argument.getTypeRef()).getDefinition().getFullyQualifiedName().startsWith("java.lang")) {
                 continue;
             } else {
                 return false;
@@ -226,19 +243,25 @@ public class BuilderUtils {
         return true;
     }
 
-    public static JavaType getInlineType(BuilderContext context, Inline inline) {
+    public static TypeDef getInlineType(BuilderContext context, Inline inline) {
         try {
-            return ClassToJavaType.FUNCTION.apply(inline.type());
+            return ClassTo.TYPEDEF.apply(inline.type());
         } catch (MirroredTypeException e) {
-            return context.getStringJavaTypeFunction().apply(e.getTypeMirror().toString());
+            Element element = context.getTypes().asElement(e.getTypeMirror());
+            return ElementTo.TYPEDEF.apply((TypeElement) element);
         }
     }
 
-    public static JavaType getInlineReturnType(BuilderContext context, Inline inline) {
+    public static TypeDef getInlineReturnType(BuilderContext context, Inline inline, TypeDef fallback) {
         try {
-            return ClassToJavaType.FUNCTION.apply(inline.returnType());
+            Class returnType = inline.returnType();
+            if (returnType == null) {
+                return fallback;
+            }
+            return ClassTo.TYPEDEF.apply(inline.returnType());
         } catch (MirroredTypeException e) {
-            return context.getStringJavaTypeFunction().apply(e.getTypeMirror().toString());
+            Element element = context.getTypes().asElement(e.getTypeMirror());
+            return ElementTo.TYPEDEF.apply((TypeElement) element);
         }
     }
 
@@ -266,62 +289,63 @@ public class BuilderUtils {
         return result;
     }
 
-    public static boolean isPrimitive(JavaType type) {
-        for (JavaType t : Constants.PRIMITIVE_TYPES) {
-            if (type.getSimpleName().equals(t.getSimpleName())) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isPrimitive(TypeRef type) {
+        return type instanceof PrimitiveRef;
     }
 
-    public static boolean isMap(JavaType type) {
-        if (unwrapGeneric(type).equals(unwrapGeneric(MAP))) {
-            return true;
-        }
-        for (JavaType i : type.getInterfaces()) {
-            //prevent infinite loop
-            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isMap(i)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isMap(TypeRef type) {
+       return CollectionTypes.IS_MAP.apply(type);
     }
 
-    public static boolean isList(JavaType type) {
-        if (unwrapGeneric(type).equals(unwrapGeneric(LIST))) {
-            return true;
-        }
-        for (JavaType i : type.getInterfaces()) {
-            //prevent infinite loop
-            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isList(i)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isList(TypeRef type) {
+        return CollectionTypes.IS_LIST.apply(type);
     }
 
-    public static boolean isSet(JavaType type) {
-        if (unwrapGeneric(type).equals(unwrapGeneric(SET))) {
-            return true;
-        }
-        for (JavaType i : type.getInterfaces()) {
-            //prevent infinite loop
-            if (!type.getFullyQualifiedName().equals(i.getFullyQualifiedName()) && isSet(i)) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isSet(TypeRef type) {
+        return CollectionTypes.IS_SET.apply(type);
     }
 
-    public static JavaType getNextGeneric(JavaType type, Collection<JavaType> excluded) {
+    public static boolean isCollection(TypeRef type) {
+        return CollectionTypes.IS_COLLECTION.apply(type);
+    }
+
+    public static boolean isBoolean(TypeRef type) {
+        if (type instanceof PrimitiveRef) {
+            return ((PrimitiveRef)type).getName().equals("boolean");
+        } else if (!(type instanceof ClassRef)) {
+            return false;
+        } else {
+            return ((ClassRef)type).getDefinition().equals(Constants.BOOLEAN);
+        }
+    }
+
+
+    public static boolean isArray(TypeRef type) {
+
+        if (type instanceof ClassRef) {
+            return ((ClassRef)type).getDimensions() > 0;
+        } else if (type instanceof PrimitiveRef) {
+            return ((PrimitiveRef)type).getDimensions() > 0;
+        } else if (type instanceof TypeParamRef) {
+            return ((TypeParamRef)type).getDimensions() > 0;
+        } else {
+            return false;
+        }
+    }
+
+    public static TypeParamDef getNextGeneric(TypeDef type, TypeParamDef... excluded) {
+        return getNextGeneric(type, Arrays.asList(excluded));
+    }
+
+
+    public static TypeParamDef getNextGeneric(TypeDef type, Collection<TypeParamDef> excluded) {
         Set<String> skip = new HashSet<String>();
-        for (JavaType s : allGenericsOf(type)) {
-            skip.add(s.getClassName());
+        for (String s : allGenericsOf(type)) {
+            skip.add(s);
         }
 
-        for (JavaType s : excluded) {
-            skip.add(s.getClassName());
+        for (TypeParamDef e : excluded) {
+            skip.add(e.getName());
         }
 
         for (int i = 0; i < 10; i++) {
@@ -329,43 +353,50 @@ public class BuilderUtils {
 
                 String name = GENERIC_NAMES[j] + ((i > 0) ? String.valueOf(i) : "");
                 if (!skip.contains(name)) {
-                    return TypeUtils.newGeneric(name);
+                    return new TypeParamDefBuilder().withName(name).build();
                 }
             }
         }
         throw new IllegalStateException("Could not allocate generic parameter letter for: " + type.getFullyQualifiedName());
     }
 
-    public static JavaType getNextGeneric(JavaType type, JavaType... excluded) {
-        return getNextGeneric(type, Arrays.asList(excluded));
-    }
+    public static Set<String> allGenericsOf(TypeDef clazz) {
+        Set<String> result = new HashSet<String>();
 
-
-    public static Set<JavaType> allGenericsOf(JavaClazz clazz) {
-        Set<JavaType> result = new HashSet<JavaType>(allGenericsOf(clazz.getType()));
-
-        for (JavaProperty property : clazz.getFields()) {
+        for (TypeParamDef paramDef : clazz.getParameters()) {
+            result.add(paramDef.getName());
+        }
+        for (Property property : clazz.getProperties()) {
             result.addAll(allGenericsOf(property));
         }
 
-        for (JavaMethod method : clazz.getMethods()) {
+        for (Method method : clazz.getMethods()) {
             result.addAll(allGenericsOf(method));
         }
 
         return result;
     }
 
-    public static Set<JavaType> allGenericsOf(JavaType type) {
-        return new HashSet<JavaType>(Arrays.asList(type.getGenericTypes()));
+    public static Set<String> allGenericsOf(TypeRef type) {
+        Set<String> result = new HashSet<String>();
+        if (type instanceof ClassRef) {
+            for (TypeRef ref : ((ClassRef)type).getArguments()) {
+                if (ref instanceof TypeParamRef) {
+                    result.add(((TypeParamRef)ref).getName());
+                }
+            }
+        }
+        return result;
     }
 
-    public static Collection<JavaType> allGenericsOf(JavaProperty property) {
-        return allGenericsOf(property.getType());
+
+    public static Collection<String> allGenericsOf(Property property) {
+        return allGenericsOf(property.getTypeRef());
     }
 
-    public static Collection<JavaType> allGenericsOf(JavaMethod method) {
-        Set<JavaType> result = new HashSet<JavaType>(allGenericsOf(method.getReturnType()));
-        for (JavaProperty property : method.getArguments()) {
+    public static Collection<String> allGenericsOf(Method method) {
+        Set<String> result = new HashSet<String>(allGenericsOf(method.getReturnType()));
+        for (Property property : method.getArguments()) {
             result.addAll(allGenericsOf(property));
 
         }
@@ -373,5 +404,4 @@ public class BuilderUtils {
     }
 
     private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"};
-    private static int counter = 0;
 }

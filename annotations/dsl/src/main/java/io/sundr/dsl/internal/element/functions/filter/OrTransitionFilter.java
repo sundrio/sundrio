@@ -16,7 +16,7 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
-import io.sundr.codegen.model.JavaType;
+import io.sundr.codegen.model.TypeDef;
 
 import java.util.Collection;
 
@@ -28,7 +28,7 @@ public class OrTransitionFilter implements TransitionFilter {
         this.filters = filters;
     }
 
-    public Boolean apply(Collection<JavaType> items) {
+    public Boolean apply(Collection<TypeDef> items) {
         for (TransitionFilter filter : filters) {
             if (filter.apply(items)) {
                 return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 The original authors.
+ * Copyright 2016 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@ import io.sundr.builder.Editable;
 
 import java.util.Map;
 
-public class EditableAttributeSupport extends AttributeSupport implements Editable<AttributeSupportBuilder> {
+public class EditableAttributeSupport extends AttributeSupport implements Editable<AttributeSupportBuilder>{
 
 
-    public EditableAttributeSupport(Map<String, Object> attributes) {
-        super(attributes);
-    }
+public EditableAttributeSupport( Map<String, Object> attributes ){
+    super(attributes);
+}
 
-    public AttributeSupportBuilder edit() {
-        return new AttributeSupportBuilder(this);
-    }
+public AttributeSupportBuilder edit(){
+    return new AttributeSupportBuilder(this);
+}
 
 
 }

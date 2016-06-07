@@ -1,26 +1,30 @@
-package ${model.type.packageName};
+package ${model.packageName};
 
 #foreach($i in $model.imports)
-import $i.fullyQualifiedName;
+import $i;
 #end
 
 #class ($model)
 
-#foreach($f in $model.fields)
+#foreach($f in $model.properties)
     #field ($f)
 #end
 
 
 #foreach ($c in ${model.constructors})
-    public ${c.returnType.className}(#foreach ($a in ${c.arguments}) ${a.type.simpleName} ${a.name} #if( $foreach.hasNext ),#end#end){
-        ${c.attributes.get("BODY")}
-    }
+    #method ($c)
+    #foreach ($s in $c.block.statements)
+        $s.toString()
+    #end
+    #end
 #end
 
 #foreach ($m in $model.methods)
-public ${m.returnType.simpleName} ${m.name}(#foreach ($a in ${m.arguments}) ${a.type.simpleName} ${a.name} #if( $foreach.hasNext ),#end#end){
-    ${m.attributes.get("BODY")}
-}
+    #method ($m)
+    #foreach ($s in $m.block.statements)
+        $s.toString()
+    #end
+    #end
 #end
 
 private <T> void validate(T item) {}

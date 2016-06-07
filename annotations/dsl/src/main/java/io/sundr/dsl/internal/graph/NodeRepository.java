@@ -16,7 +16,7 @@
 
 package io.sundr.dsl.internal.graph;
 
-import io.sundr.codegen.model.JavaClazz;
+import io.sundr.codegen.model.TypeDef;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,26 +24,26 @@ import java.util.Set;
 
 public class NodeRepository {
 
-    private final Map<String, Node<JavaClazz>> map = new HashMap<String, Node<JavaClazz>>();
+    private final Map<String, Node<TypeDef>> map = new HashMap<String, Node<TypeDef>>();
 
-    public Node<JavaClazz> createNode(JavaClazz item, Set<Node<JavaClazz>> transitions) {
-        return new Node<JavaClazz>(item, transitions);
+    public Node<TypeDef> createNode(TypeDef item, Set<Node<TypeDef>> transitions) {
+        return new Node<TypeDef>(item, transitions);
     }
 
-    public Node<JavaClazz> get(JavaClazz item) {
+    public Node<TypeDef> get(TypeDef item) {
         String key = getKey(item);
         return map.get(key);
     }
 
-    public Node<JavaClazz> getOrCreateNode(JavaClazz item, Set<Node<JavaClazz>> transitions) {
-        Node<JavaClazz> node;
+    public Node<TypeDef> getOrCreateNode(TypeDef item, Set<Node<TypeDef>> transitions) {
+        Node<TypeDef> node;
         String key = getKey(item);
         if (map.containsKey(key)) {
             node = map.get(key);
             node.getTransitions().addAll(transitions);
             return node;
         } else {
-            node = new Node<JavaClazz>(item, transitions);
+            node = new Node<TypeDef>(item, transitions);
             map.put(key, node);
         }
         return node;
@@ -53,7 +53,7 @@ public class NodeRepository {
         map.clear();
     }
 
-    private static String getKey(JavaClazz clazz) {
-        return clazz.getType().getFullyQualifiedName();
+    private static String getKey(TypeDef clazz) {
+        return clazz.getFullyQualifiedName();
     }
 }

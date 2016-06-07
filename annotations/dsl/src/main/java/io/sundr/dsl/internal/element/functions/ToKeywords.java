@@ -18,14 +18,13 @@ package io.sundr.dsl.internal.element.functions;
 
 import io.sundr.Function;
 import io.sundr.dsl.annotations.Keyword;
-import io.sundr.dsl.internal.utils.JavaTypeUtils;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class ToKeywords implements Function<Element, Set<String>> {
@@ -43,16 +42,16 @@ public class ToKeywords implements Function<Element, Set<String>> {
         Set<String> keywords = new HashSet<String>();
         for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
             if (mirror.getAnnotationType().asElement().equals(KEYWORD)) {
-                keywords.addAll(JavaTypeUtils.toClassNames(mirror.getElementValues().get(VALUE).getValue()));
+                keywords.addAll(TypeDefUtils.toClassNames(mirror.getElementValues().get(VALUE).getValue()));
             }
 
 
             for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
                 if (innerMirror.getAnnotationType().asElement().equals(KEYWORD)) {
                     if (innerMirror.getElementValues().containsKey(VALUE)) {
-                        keywords.addAll(JavaTypeUtils.toClassNames(innerMirror.getElementValues().get(VALUE).getValue()));
+                        keywords.addAll(TypeDefUtils.toClassNames(innerMirror.getElementValues().get(VALUE).getValue()));
                     } else {
-                        keywords.addAll(JavaTypeUtils.toClassNames(mirror.getAnnotationType().asElement().toString()));
+                        keywords.addAll(TypeDefUtils.toClassNames(mirror.getAnnotationType().asElement().toString()));
                     }
                 }
             }

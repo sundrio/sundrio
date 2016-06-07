@@ -16,13 +16,22 @@
 
 package io.sundr.dsl.internal;
 
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.codegen.model.TypeParamRefBuilder;
+import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.model.VoidRef;
 
 public final class Constants {
     
     private Constants() {}
 
+    public static final String IS_GENERATED = "IS_GENERATED";
     public static final String[] REMOVABLE_PREFIXES = {"With"};
     public static final String INTERFACE_SUFFIX = "Interface";
     public static final String ORIGINAL_RETURN_TYPE = "ORIGINAL_RETURN_TYPE";
@@ -36,12 +45,19 @@ public final class Constants {
     public static final String BEGIN_SCOPE = "BEGIN_SCOPE";
     public static final String END_SCOPE = "END_SCOPE";
     public static final String IS_COMPOSITE = "IS_COMPOSITE";
+
     public static final String IS_TRANSITION = "IS_TRANSITION";
     public static final String CARDINALITY_MULTIPLE = "CARDINALITY_MULTIPLE";
     public static final String METHOD_NAME = "METHOD_NAME";
 
-    public static final JavaType VOID = new JavaTypeBuilder().withClassName("Void").build();
-    public static final JavaType TRANSPARENT = new JavaTypeBuilder().withClassName("T").addToAttributes(IS_GENERIC, true).build();
+    public static final String ORIGINAL_REF = "ORIGINAL_REF";
+
+
+    public static final TypeDef VOID = ClassTo.TYPEDEF.apply(Void.class);
+    public static final ClassRef VOID_REF = VOID.toInternalReference();
+
+    public static final TypeParamDef TRANSPARENT = new TypeParamDefBuilder().withName("T").addToAttributes(IS_GENERIC, true).build();
+    public static final TypeParamRef TRANSPARENT_REF = new TypeParamRefBuilder().withName("T").addToAttributes(IS_GENERIC, true).build();
 
     public static final String FILTER = "FILTER";
 

@@ -39,7 +39,7 @@ public final class ModelUtils {
     public static TypeElement getClassElement(Element element) {
         if (element instanceof PackageElement) {
             throw new IllegalArgumentException("Invalid element. A package element can't be used to retrieve a class element");
-        } else if (element instanceof TypeElement && element.getEnclosingElement() instanceof PackageElement) {
+        } else if (element instanceof TypeElement) {
             return (TypeElement) element;
         } else {
             return getClassElement(element.getEnclosingElement());
@@ -48,12 +48,16 @@ public final class ModelUtils {
 
     public static String getClassName(Element element) {
         TypeElement typeElement = getClassElement(element);
+        return typeElement.getSimpleName().toString();
+        /*
+        TypeElement typeElement = getClassElement(element);
         String qualifiedName = typeElement.getQualifiedName().toString();
         String packageName = getPackageName(typeElement);
         if (packageName.isEmpty()) {
             return qualifiedName;
         }
         return  qualifiedName.substring(packageName.length() + 1);
+        */
     }
 
     public static PackageElement getPackageElement(Element element) {

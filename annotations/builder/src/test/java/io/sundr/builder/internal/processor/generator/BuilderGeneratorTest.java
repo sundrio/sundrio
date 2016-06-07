@@ -18,48 +18,50 @@ package io.sundr.builder.internal.processor.generator;
 
 import io.sundr.builder.Constants;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
+
 public class BuilderGeneratorTest {
+
+    private static final TypeDef INTEGER = TYPEDEF.apply(Integer.class);
 
     @Test
     public void testFluentTemplate() throws IOException {
 
 
-        JavaClazz javaClazz = new JavaClazzBuilder()
-                .withNewType()
-                .withClassName("Circle")
+        TypeDef type = new TypeDefBuilder()
+                .withName("Circle")
                 .withPackageName("my.Test")
-                .endType()
                 .addNewConstructor()
-                .addNewArgument()
-                .withName("w")
-                .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
-                .endArgument()
-                .addNewArgument()
-                .withName("w")
-                .withNewType().withPackageName("java.lang").withClassName("Integer").endType()
-                .endArgument()
+                    .addNewArgument()
+                        .withName("w")
+                        .withTypeRef(INTEGER.toReference())
+                    .endArgument()
+                    .addNewArgument()
+                        .withName("w")
+                        .withTypeRef(INTEGER.toReference())
+                    .endArgument()
                 .endConstructor()
                 .build();
 
         File tmp = new File("/tmp");
-        generate(javaClazz, tmp, "CircleFluent.java", Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
-        generate(javaClazz, tmp, "CircleBuilder.java", Constants.DEFAULT_BUILDER_TEMPLATE_LOCATION);
+        generate(type, tmp, "CircleFluent.java", Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
+        generate(type, tmp, "CircleBuilder.java", Constants.DEFAULT_BUILDER_TEMPLATE_LOCATION);
 
     }
 
-    private static void generate(JavaClazz model, File dir, String name, String templateResource) throws IOException {
+    private static void generate(TypeDef model, File dir, String name, String templateResource) throws IOException {
         FileWriter fluentWriter = null;
         try {
             fluentWriter = new FileWriter(new File(dir, name));
-            new CodeGeneratorBuilder<JavaClazz>()
+            new CodeGeneratorBuilder<TypeDef>()
                     .withModel(model)
                     .withWriter(fluentWriter)
                     .withTemplateResource(templateResource)

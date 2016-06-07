@@ -16,354 +16,112 @@
 
 package io.sundr.builder.internal;
 
-import io.sundr.CachingFunction;
-import io.sundr.Function;
 import io.sundr.builder.annotations.Inline;
-import io.sundr.builder.internal.functions.overrides.ToBuildableJavaClazz;
-import io.sundr.builder.internal.functions.overrides.ToBuildableJavaProperty;
-import io.sundr.builder.internal.functions.overrides.ToBuildableJavaType;
-import io.sundr.codegen.converters.StringToJavaClazz;
-import io.sundr.codegen.converters.TypeElementToJavaClazz;
-import io.sundr.codegen.converters.ExecutableElementToJavaMethod;
-import io.sundr.codegen.model.JavaClazz;
-import io.sundr.codegen.model.JavaClazzBuilder;
-import io.sundr.codegen.model.JavaKind;
-import io.sundr.codegen.model.JavaMethod;
-import io.sundr.codegen.model.JavaProperty;
-import io.sundr.codegen.model.JavaType;
-import io.sundr.codegen.model.JavaTypeBuilder;
+import io.sundr.codegen.CodegenContext;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.ReplacePackage;
+import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.Sources;
+import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.utils.TypeUtils;
 
-
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
-import static io.sundr.builder.Constants.ARRAY_LIST;
-import static io.sundr.builder.Constants.BASE_FLUENT;
-import static io.sundr.builder.Constants.BODY;
-import static io.sundr.builder.Constants.BUILDER;
-import static io.sundr.builder.Constants.EDITABLE;
-import static io.sundr.builder.Constants.FLUENT;
-import static io.sundr.builder.Constants.LINKED_HASH_SET;
-import static io.sundr.builder.Constants.LIST;
-import static io.sundr.builder.Constants.N;
-import static io.sundr.builder.Constants.NESTED;
-import static io.sundr.builder.Constants.T;
-import static io.sundr.builder.Constants.Q;
-import static io.sundr.builder.Constants.V;
-import static io.sundr.builder.Constants.VISITABLE;
-import static io.sundr.builder.Constants.VISITOR;
-import static io.sundr.builder.Constants.VOID;
-import static io.sundr.builder.Constants.*;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.typeExtends;
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
-import static io.sundr.codegen.utils.TypeUtils.unwrapGeneric;
+import java.util.ArrayList;
+
+import static io.sundr.builder.Constants.INLINEABLE;
 
 public class BuilderContext {
 
     private final Elements elements;
-            
-    private final Function<String, JavaType> stringJavaTypeFunction;
-    private final Function<String, JavaClazz> stringToJavaClazz;
-    private final Function<VariableElement, JavaProperty> variableElementJavaPropertyFunction;
-    private final Function<ExecutableElement, JavaMethod> executableElementToJavaMethod;
-    private final Function<TypeElement, JavaClazz> typeElementToJavaClazz;
+    private final Types types;
+    private final CodegenContext codegenContext;
 
-    private final JavaClazz baseFluentClass;
-    private final JavaClazz fluentInterface;
-    private final JavaClazz builderInterface;
-    private final JavaClazz nestedInterface;
-    private final JavaClazz editableInterface;
-    private final JavaClazz visitableInterface;
-    private final JavaClazz visitableBuilderInterface;
-    private final JavaClazz visitorInterface;
-    private final JavaClazz typedVisitorInterface;
-    private final JavaClazz functionInterface;
-    private final JavaClazz inlineableBase;
+    private final TypeDef baseFluentClass;
+    private final TypeDef fluentInterface;
+    private final TypeDef builderInterface;
+    private final TypeDef nestedInterface;
+    private final TypeDef editableInterface;
+    private final TypeDef visitableInterface;
+    private final TypeDef visitableBuilderInterface;
+    private final TypeDef visitorInterface;
+    private final TypeDef typedVisitorInterface;
+    private final TypeDef functionInterface;
+    private final TypeDef inlineableBase;
     private final Boolean generateBuilderPackage;
     private final String builderPackage;
     private final Inline[] inlineables;
-    private final BuildableRepository repository;
+    private final BuildableRepository buildableRepository;
 
-    public BuilderContext(Elements elements, Boolean generateBuilderPackage, String builderPackage, Inline... inlineables) {
+    
+    public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, String builderPackage, Inline... inlineables) {
         this.elements = elements;
+        this.types = types;
+        this.codegenContext = CodegenContext.create(elements, types);
         this.generateBuilderPackage = generateBuilderPackage;
         this.builderPackage = builderPackage;
         this.inlineables = inlineables;
 
-        stringJavaTypeFunction = CachingFunction.wrap(new ToBuildableJavaType(elements));
-        variableElementJavaPropertyFunction = CachingFunction.wrap(new ToBuildableJavaProperty(stringJavaTypeFunction));
-        executableElementToJavaMethod = CachingFunction.wrap(new ExecutableElementToJavaMethod(stringJavaTypeFunction, variableElementJavaPropertyFunction));
-        typeElementToJavaClazz = CachingFunction.wrap(new ToBuildableJavaClazz(new TypeElementToJavaClazz(elements, stringJavaTypeFunction, executableElementToJavaMethod, variableElementJavaPropertyFunction)));
-        stringToJavaClazz = CachingFunction.wrap(new StringToJavaClazz(elements, typeElementToJavaClazz));
+        buildableRepository = new BuildableRepository();
 
-        repository = new BuildableRepository();
+        ClassTo.TYPEDEF.apply(ArrayList.class);
 
-        visitorInterface = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(VISITOR.getClassName())
-                .withGenericTypes(VISITOR.getGenericTypes())
-                .and()
-                .addNewMethod()
-                .addToModifiers(Modifier.PUBLIC)
-                .withReturnType(VOID)
-                .withName("visit")
-                .addNewArgument()
-                .withName("item")
-                .withType(V)
-                .endArgument()
-                .and()
+
+        visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        typedVisitorInterface = new JavaClazzBuilder()
-                .withNewTypeLike(TYPED_VISITOR)
-                    .withConcrete(false)
-                    .withKind(JavaKind.CLASS)
-                    .withPackageName(builderPackage)
-                    .withInterfaces(visitorInterface.getType())
-                .and()
-                .addNewMethod()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withReturnType(typeGenericOf(CLASS, V))
-                    .withName("getType")
-                    .addToAttributes(BODY, loadResourceQuietly(GET_TYPE_SNIPPET))
-                .and()
-                .addNewMethod()
-                    .addToModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .withReturnType(typeGenericOf(CLASS, Q))
-                    .withName("getClass")
-                    .addNewArgument()
-                        .withName("type")
-                        .withType(TYPE)
-                    .endArgument()
-                    .addToAttributes(BODY, loadResourceQuietly(GET_CLASS_SNIPPET))
-                .and()
-                .addNewMethod()
-                    .addToModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addToTypeParameters(T)
-                    .withReturnType(typeGenericOf(LIST, typeGenericOf(CLASS, Q)))
-                    .withName("getTypeArguments")
-                    .addNewArgument()
-                        .withName("baseClass")
-                        .withType(typeGenericOf(CLASS, T))
-                    .endArgument()
-                    .addNewArgument()
-                        .withName("childClass")
-                        .withType(typeGenericOf(CLASS, typeExtends(Q,T)))
-                    .endArgument()
-                    .addToAttributes(BODY, loadResourceQuietly(GET_TYPE_ARGUMENTS_SNIPPET))
-                .and()
-                .addToImports(LIST, ARRAY_LIST, MAP, LINKED_HASH_MAP, ARRAY, TYPE, TYPE_VARIABLE, GENERIC_ARRAY_TYPE, PARAMETERIZED_TYPE)
+        typedVisitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/TypedVisitor.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        functionInterface = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(FUNCTION.getClassName())
-                .withGenericTypes(FUNCTION.getGenericTypes())
-                .and()
-                .addNewMethod()
-                .addToModifiers(Modifier.PUBLIC)
-                .withReturnType(O)
-                .withName("apply")
-                .addNewArgument()
-                .withName("item")
-                .withType(I)
-                .endArgument()
-                .and()
+        functionInterface  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        JavaType visitorBase = unwrapGeneric(visitorInterface.getType());
-
-        visitableInterface = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(VISITABLE.getClassName())
-                .withGenericTypes(new JavaType[]{V})
-                .and()
-                .addNewMethod()
-                .addToModifiers(Modifier.PUBLIC)
-                .withReturnType(V)
-                .withName("accept")
-                .addNewArgument()
-                .withName("visitor")
-                .withType(visitorBase)
-                .endArgument()
-                .and()
+        visitableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitable.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
-
-        JavaType visitableBase = unwrapGeneric(visitableInterface.getType());
         
-        builderInterface = new JavaClazzBuilder()
-                .withNewType()
+        builderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Builder.java"))
                 .withPackageName(builderPackage)
-                .withKind(JavaKind.INTERFACE)
-                .withClassName(BUILDER.getClassName())
-                .withGenericTypes(BUILDER.getGenericTypes())
-                .and()
-                .addNewMethod()
-                .withReturnType(T)
-                .withName("build")
-                .and()
                 .build();
 
-        fluentInterface = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(FLUENT.getClassName())
-                .withGenericTypes(FLUENT.getGenericTypes())
-                .and()
+        fluentInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Fluent.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        baseFluentClass = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.CLASS)
-                .withPackageName(builderPackage)
-                .withClassName(BASE_FLUENT.getClassName())
-                .withGenericTypes(BASE_FLUENT.getGenericTypes())
-                .addToInterfaces(fluentInterface.getType())
-                .addToInterfaces(typeGenericOf(visitableInterface.getType(),T))
-                .and()
-                .addNewMethod()
-                    .addToTypeParameters(T)
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withName("build")
-                    .withReturnType(typeGenericOf(ARRAY_LIST,T))
-                    .addNewArgument()
-                        .withType(typeGenericOf(LIST, typeExtends(Q, typeGenericOf(builderInterface.getType(), typeExtends(Q,T)))))
-                        .withName("list")
-                    .endArgument()
-                .addToAttributes(BODY, loadResourceQuietly(BUILD_LIST_SNIPPET))
-                .and()
-                .addNewMethod()
-                    .addToTypeParameters(T)
-                    .addToModifiers(Modifier.PUBLIC)
-                        .withName("build")
-                        .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
-                        .addNewArgument()
-                            .withType(typeGenericOf(LINKED_HASH_SET, typeExtends(Q, typeGenericOf(builderInterface.getType(), T))))
-                            .withName("set")
-                        .endArgument()
-                    .addToAttributes(BODY, loadResourceQuietly(BUILD_SET_SNIPPET))
-                .and()
-                .addNewMethod()
-                    .addToTypeParameters(T)
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withName("aggregate")
-                    .withReturnType(typeGenericOf(ARRAY_LIST, T))
-                    .addNewArgument()
-                        .withType(typeGenericOf(LIST, typeExtends(Q, T)))
-                        .withName("...lists")
-                    .endArgument()
-                    .addToAttributes(BODY, loadResourceQuietly(AGGREGATE_LIST_SNIPPET))
-                .and()
-                .addNewMethod()
-                    .addToTypeParameters(T)
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withName("aggregate")
-                    .withReturnType(typeGenericOf(LINKED_HASH_SET, T))
-                    .addNewArgument()
-                .withType(typeGenericOf(SET, typeExtends(Q, T)))
-                        .withName("...sets")
-                    .endArgument()
-                    .addToAttributes(BODY, loadResourceQuietly(AGGREGATE_SET_SNIPPET))
-                .and()
-                .addNewMethod()
-                    .addToTypeParameters(V,F)
-                    .addToModifiers(Modifier.PRIVATE, Modifier.STATIC)
-                    .withName("canVisit")
-                    .withReturnType(BOOLEAN)
-                    .addNewArgument()
-                        .withType(V)
-                        .withName("visitor")
-                    .endArgument()
-                    .addNewArgument()
-                        .withType(F)
-                        .withName("fluent")
-                    .endArgument()
-                    .addToAttributes(BODY, loadResourceQuietly(CAN_VISIT_SNIPPET))
-                .endMethod()
-                .addNewMethod()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .withName("accept")
-                    .withReturnType(T)
-                    .addNewArgument()
-                        .withType(visitorBase)
-                        .withName("visitor")
-                    .endArgument()
-                .addToAttributes(BODY, loadResourceQuietly(ACCEPT_VISITOR_SNIPPET))
-                .and()
-                .addNewField()
-                    .addToModifiers(Modifier.PUBLIC)
-                    .addToModifiers(Modifier.FINAL)
-                    .withName("_visitables")
-                    .withType(new JavaTypeBuilder(typeGenericOf(LIST, visitableBase))
-                            .withDefaultImplementation(typeGenericOf(ARRAY_LIST, visitableBase))
-                            .build())
-                .and()
+
+        baseFluentClass  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        nestedInterface = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(NESTED.getClassName())
-                .withGenericTypes(NESTED.getGenericTypes())
-                .and()
-                .addNewMethod()
-                .withReturnType(N)
-                .withName("and")
-                .and()
+        nestedInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Nested.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        editableInterface = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(EDITABLE.getClassName())
-                .withGenericTypes(EDITABLE.getGenericTypes())
-                .and()
-                .addNewMethod()
-                .withReturnType(T)
-                .withName("edit")
-                .and()
+        editableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Editable.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        visitableBuilderInterface = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(VISITABLE_BUILDER.getClassName())
-                .addToInterfaces(visitableInterface.getType())
-                .addToInterfaces(builderInterface.getType())
-                .withGenericTypes(VISITABLE_BUILDER.getGenericTypes())
-                .and()
+        visitableBuilderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableBuilder.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        inlineableBase = new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
-                .withPackageName(builderPackage)
-                .withClassName(INLINEABLE.getClassName())
-                .withGenericTypes(INLINEABLE.getGenericTypes())
-                .and()
-                .addNewMethod()
-                .withReturnType(T)
-                .withName("inline")
-                .and()
+        inlineableBase = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Inlineable.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
     }
 
     public Elements getElements() {
         return elements;
+    }
+
+    public Types getTypes() {
+        return types;
     }
 
     public Boolean getGenerateBuilderPackage() {
@@ -374,60 +132,58 @@ public class BuilderContext {
         return builderPackage;
     }
 
-    public JavaClazz getBaseFluentClass() {
+    public TypeDef getBaseFluentClass() {
         return baseFluentClass;
     }
 
-    public JavaClazz getFluentInterface() {
+    public TypeDef getFluentInterface() {
         return fluentInterface;
     }
 
-    public JavaClazz getFunctionInterface() {
+    public TypeDef getFunctionInterface() {
         return functionInterface;
     }
 
-    public JavaClazz getBuilderInterface() {
+    public TypeDef getBuilderInterface() {
         return builderInterface;
     }
 
-    public JavaClazz getNestedInterface() {
+    public TypeDef getNestedInterface() {
         return nestedInterface;
     }
 
-    public JavaClazz getEditableInterface() {
+    public TypeDef getEditableInterface() {
         return editableInterface;
     }
 
-    public JavaClazz getVisitableInterface() {
+    public TypeDef getVisitableInterface() {
         return visitableInterface;
     }
 
-    public JavaClazz getVisitableBuilderInterface() {
+    public TypeDef getVisitableBuilderInterface() {
         return visitableBuilderInterface;
     }
 
-    public JavaClazz getVisitorInterface() {
+    public TypeDef getVisitorInterface() {
         return visitorInterface;
     }
 
-    public JavaClazz getTypedVisitorInterface() {
+    public TypeDef getTypedVisitorInterface() {
         return typedVisitorInterface;
     }
 
-    public JavaClazz getInlineableBase() {
+    public TypeDef getInlineableBase() {
         return inlineableBase;
     }
 
-    public JavaClazz getInlineableInterface(Inline inline) {
-        return new JavaClazzBuilder()
-                .withNewType()
-                .withKind(JavaKind.INTERFACE)
+    public TypeDef getInlineableInterface(Inline inline) {
+        return new TypeDefBuilder(inlineableBase)
+                .withKind(Kind.INTERFACE)
                 .withPackageName(builderPackage)
-                .withClassName(inline.prefix() + (!inline.name().isEmpty() ? inline.name() : INLINEABLE.getClassName()) + inline.suffix())
-                .withGenericTypes(INLINEABLE.getGenericTypes())
-                .and()
+                .withName(inline.prefix() + (!inline.name().isEmpty() ? inline.name() : INLINEABLE.getName()) + inline.suffix())
+                .withParameters(INLINEABLE.getParameters())
                 .addNewMethod()
-                .withReturnType(T)
+                .withReturnType(TypeUtils.newTypeParamRef("T"))
                 .withName(inline.value())
                 .and()
                 .build();
@@ -437,27 +193,11 @@ public class BuilderContext {
         return inlineables;
     }
 
-    public BuildableRepository getRepository() {
-        return repository;
+    public BuildableRepository getBuildableRepository() {
+        return buildableRepository;
     }
 
-    public Function<String, JavaType> getStringJavaTypeFunction() {
-        return stringJavaTypeFunction;
-    }
-
-    public Function<VariableElement, JavaProperty> getVariableElementJavaPropertyFunction() {
-        return variableElementJavaPropertyFunction;
-    }
-
-    public Function<ExecutableElement, JavaMethod> getExecutableElementToJavaMethod() {
-        return executableElementToJavaMethod;
-    }
-
-    public Function<TypeElement, JavaClazz> getTypeElementToJavaClazz() {
-        return typeElementToJavaClazz;
-    }
-
-    public Function<String, JavaClazz> getStringToJavaClazz() {
-        return stringToJavaClazz;
+    public DefinitionRepository getDefinitionRepository() {
+        return codegenContext.getDefinitionRepository();
     }
 }
