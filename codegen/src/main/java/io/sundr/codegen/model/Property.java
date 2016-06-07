@@ -100,26 +100,22 @@ public class Property extends ModifierSupport {
         StringBuilder sb = new StringBuilder();
 
         if (isPublic()) {
-            sb.append("public ");
+            sb.append(PUBLIC).append(SPACE);
         } else if (isProtected()) {
-            sb.append("protected ");
+            sb.append(PROTECTED).append(SPACE);
         } else if (isPrivate()) {
-            sb.append("private ");
-        }
-
-        if (isSynchronized()) {
-            sb.append("synchronized ");
+            sb.append(PRIVATE).append(SPACE);
         }
 
         if (isStatic()) {
-            sb.append("static ");
+            sb.append(STATIC).append(SPACE);
         }
 
         if (isFinal()) {
-            sb.append("final ");
+            sb.append(FINAL).append(SPACE);
         }
 
-        sb.append(typeRef).append(" ");
+        sb.append(typeRef).append(SPACE);
         sb.append(name);
 
         return sb.toString();

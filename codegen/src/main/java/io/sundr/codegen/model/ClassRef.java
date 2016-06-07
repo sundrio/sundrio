@@ -25,6 +25,9 @@ import java.util.Set;
 
 public class ClassRef extends AbstractTypeRef {
 
+    public static final String UNKWNON = "<unkwnon>";
+    public static final String BRACKETS = "[]";
+
     public static final ClassRef OBJECT = new ClassRefBuilder()
             .withDefinition(TypeDef.OBJECT)
             .build();
@@ -109,20 +112,23 @@ public class ClassRef extends AbstractTypeRef {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        if (definition != null) {
-            sb.append(definition.getName());
+        if (definition == null) {
+            sb.append(UNKWNON);
+        }
+        else if (definition.getOuterType() != null) {
+            sb.append(definition.getOuterType().getName()).append(DOT).append(definition.getName());
         } else {
-            sb.append("<unknown>");
+            sb.append(definition.getName());
         }
 
         if (arguments.size() > 0) {
-            sb.append("<");
-            sb.append(StringUtils.join(arguments, ","));
-            sb.append(">");
+            sb.append(LT);
+            sb.append(StringUtils.join(arguments, COMA));
+            sb.append(GT);
         }
 
         for (int i=0;i<dimensions;i++) {
-            sb.append("[]");
+            sb.append(BRACKETS);
         }
         return sb.toString();
     }

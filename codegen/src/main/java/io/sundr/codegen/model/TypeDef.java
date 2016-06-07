@@ -323,43 +323,40 @@ public class TypeDef extends ModifierSupport {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (isPublic()) {
-            sb.append("public ");
+            sb.append(PUBLIC).append(SPACE);
         } else if (isProtected()) {
-            sb.append("protected ");
+            sb.append(PROTECTED).append(SPACE);
         } else if (isPrivate()) {
-            sb.append("private ");
+            sb.append(PRIVATE).append(SPACE);
         }
-
         if (isStatic()) {
-            sb.append("static ");
+            sb.append(STATIC).append(SPACE);
         }
-
         if (isAbstract()) {
-            sb.append("abstract ");
+            sb.append(ABSTRACT).append(SPACE);
         }
-
         if (isFinal()) {
-            sb.append("final ");
+            sb.append(FINAL).append(SPACE);
         }
 
-        sb.append(kind.name().toLowerCase()).append(" ");
+        sb.append(kind.name().toLowerCase()).append(SPACE);
         sb.append(name);
 
         if (parameters != null && !parameters.isEmpty()) {
-            sb.append("<");
-            sb.append(StringUtils.join(parameters, ","));
-            sb.append(">");
+            sb.append(LT);
+            sb.append(StringUtils.join(parameters, COMA));
+            sb.append(GT);
         }
 
         if (extendsList != null && !extendsList.isEmpty()
                 && (extendsList.size() != 1 || !extendsList.contains(OBJECT.toReference()))) {
-            sb.append(" extends ");
-            sb.append(StringUtils.join(extendsList, ","));
+            sb.append(SPACE).append(EXTENDS).append(SPACE);
+            sb.append(StringUtils.join(extendsList, COMA));
         }
 
         if (implementsList != null && !implementsList.isEmpty()) {
-            sb.append(" implements ");
-            sb.append(StringUtils.join(implementsList, ","));
+            sb.append(SPACE).append(IMPLEMENTS).append(SPACE);
+            sb.append(StringUtils.join(implementsList, COMA));
         }
 
         return sb.toString();

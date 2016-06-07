@@ -21,6 +21,14 @@ import java.util.Map;
 
 public class ModifierSupport extends AttributeSupport {
 
+    public static final String ABSTRACT = "abstract";
+    public static final String PUBLIC = "public";
+    public static final String PROTECTED = "protected";
+    public static final String PRIVATE = "private";
+    public static final String STATIC = "static";
+    public static final String FINAL = "final";
+    public static final String SYNCHRONIZED = "synchronized";
+
     private final int modifiers;
 
     public ModifierSupport(int modifiers, Map<String, Object> attributes) {
