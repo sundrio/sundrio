@@ -145,7 +145,11 @@ public final class TypeDefUtils {
         TypeParamDef paremeterType = Generics.MAP.apply(returnType);
 
         Method sourceMethod = ElementTo.METHOD.apply(executableElement);
-        Method targetMethod = new MethodBuilder(sourceMethod).withReturnType(paremeterType.toReference()).withName(methodName).build();
+        Method targetMethod = new MethodBuilder(sourceMethod)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withReturnType(paremeterType.toReference())
+                .withName(methodName)
+                .build();
 
 
         String interfaceName = targetInterfaceName != null ?

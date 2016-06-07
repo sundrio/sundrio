@@ -217,10 +217,22 @@ public class BuilderUtils {
     public static Set<Method> getInlineableConstructors(Property property) {
         Set<Method> result = new HashSet<Method>();
         TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-        TypeDef clazz = unwrapped instanceof ClassRef ? ((ClassRef)unwrapped).getDefinition() : BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
-        for (Method candidate : clazz.getConstructors()) {
-            if (isInlineable(candidate)) {
-                result.add(candidate);
+
+        if (unwrapped instanceof ClassRef) {
+            for (Method candidate : ((ClassRef)unwrapped).getDefinition().getConstructors()) {
+                if (isInlineable(candidate)) {
+                    result.add(candidate);
+                }
+            }
+        }
+
+        //We try both types to make sure...
+        TypeDef fromRepo = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
+        if (fromRepo != null) {
+            for (Method candidate : fromRepo.getConstructors()) {
+                if (isInlineable(candidate)) {
+                    result.add(candidate);
+                }
             }
         }
         return result;

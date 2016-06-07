@@ -25,6 +25,7 @@ import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 
 import javax.annotation.processing.Filer;
@@ -37,6 +38,8 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
 import java.util.Set;
+
+import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
 public class BuildableProcessor extends AbstractBuilderProcessor {
@@ -63,32 +66,32 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                 boolean isAbstract = element.getModifiers().contains(Modifier.ABSTRACT);
                 Buildable buildable = element.getAnnotation(Buildable.class);
                 BuilderContext ctx = BuilderContextManager.create(elements, types, buildable.generateBuilderPackage(), buildable.builderPackage());
-                TypeDef typeDef = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element));
+                TypeDef typeDef = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element))).addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled()).build();
                 generateLocalDependenciesIfNeeded();
 
                 try {
                     generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
-                            Constants.DEFAULT_FLUENT_TEMPLATE_LOCATION);
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                     generateFromClazz(ClazzAs.FLUENT_IMPL.apply(typeDef),
-                            Constants.DEFAULT_FLUENT_IMPL_TEMPLATE_LOCATION);
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                     if (isAbstract) {
                       //ignore and move along
                     } else if (buildable.editableEnabled()) {
                         generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
-                                selectBuilderTemplate(buildable.validationEnabled()));
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                         generateFromClazz(ClazzAs.EDITABLE.apply(typeDef),
-                                Constants.DEFAULT_EDITABLE_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                     } else {
                         generateFromClazz(ClazzAs.BUILDER.apply(typeDef),
-                                selectBuilderTemplate(buildable.validationEnabled()));
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                     }
 
                     for (final Inline inline : buildable.inline()) {
                         generateFromClazz(inlineableOf(ctx, typeDef, inline),
-                                Constants.DEFAULT_CLASS_TEMPLATE_LOCATION);
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);

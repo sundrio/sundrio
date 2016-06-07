@@ -43,12 +43,15 @@ public class MethodDirective extends Directive {
     public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
         String block = "";
         Method method = null;
+        Boolean isInterface = false;
         for (int i = 0; i < node.jjtGetNumChildren(); i++) {
             if (node.jjtGetChild(i) != null) {
                 if (!(node.jjtGetChild(i) instanceof ASTBlock)) {
                     //reading and casting inline parameters
                     if (i == 0) {
                         method = (Method) node.jjtGetChild(i).value(context);
+                    } else if (i == 1) {
+                        isInterface = (Boolean) node.jjtGetChild(i).value(context);
                     } else {
                         break;
                     }
@@ -62,14 +65,14 @@ public class MethodDirective extends Directive {
                 }
             }
         }
-        writeMethod(writer, method, block);
+        writeMethod(writer, method, block, isInterface);
         return true;
     }
 
-    private void writeMethod(Writer writer, Method method, String block) throws IOException {
+    private void writeMethod(Writer writer, Method method, String block, Boolean isInterface) throws IOException {
         if (method != null) {
             writer.append(method.toString());
-            if (!StringUtils.isNullOrEmpty(block)) {
+            if (!isInterface && !StringUtils.isNullOrEmpty(block)) {
                 writer.append("{\n");
                 writer.append(block).append("}\n");
             } else {
