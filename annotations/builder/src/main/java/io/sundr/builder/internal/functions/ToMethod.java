@@ -19,6 +19,7 @@ package io.sundr.builder.internal.functions;
 import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.functions.Singularize;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
@@ -66,7 +67,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.StringUtils.singularize;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 
@@ -448,7 +448,7 @@ public class ToMethod {
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
             String prefix = isCollection ? "addNew" : "withNew";
             String methodName = prefix + captializeFirst(isCollection
-                    ? singularize(property.getName())
+                    ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());
 
             return new MethodBuilder()
@@ -475,7 +475,7 @@ public class ToMethod {
                 boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
                 String ownPrefix = isCollection ? "addNew" : "withNew";
                 String ownName = ownPrefix + captializeFirst(isCollection
-                        ? singularize(property.getName())
+                        ? Singularize.FUNCTION.apply(property.getName())
                         : property.getName());
 
                 String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
@@ -527,7 +527,7 @@ public class ToMethod {
             String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
             String methodName = prefix + captializeFirst(isCollection
-                    ? singularize(property.getName())
+                    ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName()) + suffix;
 
             return new MethodBuilder()
@@ -598,7 +598,7 @@ public class ToMethod {
         public Method apply(Property property) {
 
             String methodName = "end" + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
-                    ? singularize(property.getName())
+                    ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());
 
             return new MethodBuilder()
