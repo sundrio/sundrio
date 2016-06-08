@@ -24,13 +24,13 @@ import java.util.regex.Pattern;
 public class StringReplace implements Function<String, String> {
 
     private final String target;
-    private final String replacemnent;
+    private final String replacement;
     private final Pattern pattern;
 
 
-    public StringReplace(String target, String replacemnent) {
+    public StringReplace(String target, String replacement) {
         this.target = target;
-        this.replacemnent = replacemnent;
+        this.replacement = replacement;
         this.pattern = Pattern.compile(target, Pattern.CASE_INSENSITIVE);
     }
 
@@ -39,7 +39,7 @@ public class StringReplace implements Function<String, String> {
         if (!matcher.find()) {
             return null;
         }
-        return matcher.replaceAll(replacemnent);
+        return matcher.replaceAll(replacement);
     }
 }
 
