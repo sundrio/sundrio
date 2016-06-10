@@ -92,7 +92,12 @@ public class BuilderUtils {
             }
         }
 
-        return clazz.getConstructors().iterator().next();
+        if (!clazz.getConstructors().isEmpty()) {
+            return clazz.getConstructors().iterator().next();
+        } else {
+            throw new IllegalStateException("Could not find buildable constructor in: ["+clazz.getFullyQualifiedName()+"].");
+        }
+
     }
 
     public static Method findGetter(TypeDef clazz, Property property) {

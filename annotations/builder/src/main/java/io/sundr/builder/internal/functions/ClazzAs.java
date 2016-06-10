@@ -598,9 +598,13 @@ public class ClazzAs {
                     statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.").append(getterName).append("());\n").toString()));
                 }
             }
-            target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
-        }
 
+            if (!target.getExtendsList().isEmpty()) {
+                target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
+            } else {
+                return statements;
+            }
+        }
         return statements;
     }
 
@@ -648,7 +652,7 @@ public class ClazzAs {
         List<Statement> statements = new ArrayList<Statement>();
 
         String simpleName = type.getName();
-        ClassRef superClass = type.getExtendsList().iterator().next();
+        ClassRef superClass = type.getExtendsList().isEmpty() ? TypeDef.OBJECT_REF : type.getExtendsList().iterator().next();
         statements.add(new StringStatement("if (this == o) return true;"));
         statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
 
