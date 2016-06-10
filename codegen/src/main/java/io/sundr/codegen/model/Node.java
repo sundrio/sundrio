@@ -18,15 +18,17 @@ package io.sundr.codegen.model;
 
 public interface Node {
 
-    public static final String DOT = ".";
-    public static final String COMA = ",";
-    public static final String SEMICOLN = ";";
-    public static final String SPACE = " ";
+    String DOT = ".";
+    String COMA = ",";
+    String SEMICOLN = ";";
+    String SPACE = " ";
 
-    public static final String LT = "<";
-    public static final String GT = ">";
+    String LT = "<";
+    String GT = ">";
 
-    public static final String EXTENDS = "extends";
-    public static final String IMPLEMENTS = "implements";
+    String EXTENDS = "extends";
+    String IMPLEMENTS = "implements";
+
+    String JAVA_LANG = "java.lang";
 
 }
