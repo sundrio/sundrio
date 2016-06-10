@@ -19,10 +19,7 @@ package io.sundr.builder.internal.utils;
 
 import io.sundr.SundrException;
 import io.sundr.builder.Constants;
-import io.sundr.builder.annotations.Buildable;
-import io.sundr.builder.annotations.BuildableReference;
-import io.sundr.builder.annotations.ExternalBuildables;
-import io.sundr.builder.annotations.Inline;
+import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -280,6 +277,10 @@ public class BuilderUtils {
             }
             return ClassTo.TYPEDEF.apply(inline.returnType());
         } catch (MirroredTypeException e) {
+            if (None.FQN.equals(e.getTypeMirror().toString())) {
+                return fallback;
+            }
+
             Element element = context.getTypes().asElement(e.getTypeMirror());
             return ElementTo.TYPEDEF.apply((TypeElement) element);
         }

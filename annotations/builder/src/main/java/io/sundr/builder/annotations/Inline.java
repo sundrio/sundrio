@@ -52,5 +52,5 @@ public @interface Inline {
     /**
      * @return The return type of the "inline" method.
      */
-    Class returnType() default Void.class;
+    Class returnType() default None.class;
 }

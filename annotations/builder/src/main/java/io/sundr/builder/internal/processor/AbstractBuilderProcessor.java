@@ -112,7 +112,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .withMethods()
                 .withConstructors().build();
 
-        TypeRef functionType = ctx.getFunctionInterface().toReference(type.toInternalReference(), returnType.toReference());
+        TypeRef functionType = ctx.getFunctionInterface().toReference(type.toInternalReference(), returnType.toInternalReference());
 
         Property builderProperty = new PropertyBuilder()
                 .withTypeRef(classRefOf(TypeAs.BUILDER.apply(type)))
@@ -178,7 +178,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     .and()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withNewBlock()
-                        .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
+                        .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT,type.toInternalReference(), returnType.toInternalReference(),  returnType.toInternalReference(),type.toInternalReference())))
                     .endBlock()
                     .build());
 
@@ -191,7 +191,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     .and()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withNewBlock()
-                    .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.getName(), type.getName(), type.getName(), type.getName())))
+                    .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT, type.toInternalReference(), returnType.toInternalReference(),  returnType.toInternalReference(), type.toInternalReference())))
                     .endBlock()
                     .build());
         }
