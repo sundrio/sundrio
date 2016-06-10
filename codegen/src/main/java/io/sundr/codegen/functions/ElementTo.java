@@ -326,7 +326,7 @@ public class ElementTo {
         }
     };
 
-    public static final Function<TypeElement, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF).withFallback(SHALLOW_TYPEDEF).withMaximumRecursionLevel(1).withMaximumNestingDepth(5);
+    public static final Function<TypeElement, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF).withFallback(SHALLOW_TYPEDEF).withMaximumRecursionLevel(5).withMaximumNestingDepth(5);
 
 
 }
