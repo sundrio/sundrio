@@ -51,7 +51,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class BuilderUtils {
-    
+
     private BuilderUtils() {}
 
     public static final String BUILDABLE = "BUILDABLE";
@@ -102,6 +102,9 @@ public class BuilderUtils {
                 if (isApplicableGetterOf(method, property)) {
                     return method;
                 }
+            }
+            if (!current.getExtendsList().iterator().hasNext()) {
+                break;
             }
             String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
             current = DefinitionRepository.getRepository().getDefinition(fqn);
