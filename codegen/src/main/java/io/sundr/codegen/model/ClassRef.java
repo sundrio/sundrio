@@ -60,8 +60,19 @@ public class ClassRef extends AbstractTypeRef {
     }
 
     public boolean isAssignableFrom(TypeRef other) {
-        if (other == null) {
+        if (this == other) {
+            return true;
+        } else if (other == null) {
             return false;
+        } else if (other instanceof PrimitiveRef) {
+            if (!getDefinition().getPackageName().equals(JAVA_LANG)) {
+                return false;
+            }
+
+            if(!getDefinition().getName().toUpperCase().startsWith(((PrimitiveRef) other).getName().toUpperCase())) {
+                return false;
+            }
+            return true;
         }
 
         if (!(other instanceof ClassRef)) {

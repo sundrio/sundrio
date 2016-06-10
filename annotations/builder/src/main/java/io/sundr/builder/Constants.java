@@ -84,6 +84,8 @@ public class Constants {
     public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
     public static final TypeDef BUILDABLE_ANNOTATION = TYPEDEF.apply(Buildable.class);
+    public static final ClassRef BUILDABLE_ANNOTATION_REF = BUILDABLE_ANNOTATION.toInternalReference();
+
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
     public static final TypeDef OBJECT = TypeDef.OBJECT;
     public static final TypeDef MAP = TYPEDEF.apply(Map.class);
