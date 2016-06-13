@@ -76,7 +76,6 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
             }
         }
         TypeDef typeDef = new TypeDefElementVisitor().visit(t.asElement()).build();
-        DefinitionRepository.getRepository().register(typeDef);
 
         return new ClassRefBuilder()
                 .withDefinition(typeDef)
