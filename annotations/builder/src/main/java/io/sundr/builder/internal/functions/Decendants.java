@@ -69,7 +69,7 @@ public class Decendants {
      * @param property
      * @return
      */
-    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DECENDANTS = FunctionFactory.cache(new Function<Property, Set<Property>>() {
+    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DESCENDANTS = FunctionFactory.cache(new Function<Property, Set<Property>>() {
         public Set<Property> apply(Property property) {
             Set<Property> result = new LinkedHashSet<Property>();
             TypeRef baseType = property.getTypeRef();
@@ -94,7 +94,7 @@ public class Decendants {
             } else if (baseType instanceof  ClassRef) {
                 ClassRef candidate = (ClassRef) baseType;
                 for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
-                    String propertyName = descendant.getName() + property.getNameCapitalized();
+                    String propertyName =  deCaptializeFirst(descendant.getName() + property.getNameCapitalized());
 
                     result.add(new PropertyBuilder(property)
                             .withName(propertyName)

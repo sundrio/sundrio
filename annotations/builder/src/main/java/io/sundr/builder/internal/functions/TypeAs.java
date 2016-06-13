@@ -21,18 +21,7 @@ import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.PrimitiveRef;
-import io.sundr.codegen.model.PrimitiveRefBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeParamRefBuilder;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.model.*;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
@@ -214,7 +203,8 @@ public class TypeAs {
             if (baseType instanceof ClassRef) {
                 baseType = new ClassRefBuilder((ClassRef)baseType).withArguments().build();
             }
-            return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(baseType, Q);
+            WildcardRef wildcardRef = new WildcardRefBuilder().addToBounds(baseType).build();
+            return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(wildcardRef, Q);
         }
     };
 

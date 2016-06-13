@@ -139,7 +139,7 @@ public class ClazzAs {
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(toAdd);
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
 
                 if (isMap) {
                     //
@@ -270,7 +270,7 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(toAdd);
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 if (isMap) {
                     properties.add(toAdd);
                 } else if (isBuildable) {
@@ -281,10 +281,10 @@ public class ClazzAs {
                     }
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
-
                     properties.add(buildableField(toAdd));
+
                 } else if (!descendants.isEmpty() && isCollection) {
-                    properties.add(toAdd);
+                    properties.add(buildableField(toAdd));
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
@@ -294,7 +294,6 @@ public class ClazzAs {
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
-                        properties.add(buildableField(descendant));
                     }
 
                 } else {
@@ -732,6 +731,7 @@ public class ClazzAs {
         TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(typeRef);
         ClassRef classRef = (ClassRef) typeRef;
         ClassRef builderType = TypeAs.VISITABLE_BUILDER.apply(unwrapped);
+
 
         if (isList(classRef)) {
             ClassRef listRef =  ARRAY_LIST.toReference(builderType);
