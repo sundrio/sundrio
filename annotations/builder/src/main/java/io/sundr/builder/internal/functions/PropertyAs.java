@@ -171,8 +171,6 @@ public final class PropertyAs {
     };
 
 
-
-
         public static final Function<Property, TypeDef> NESTED_CLASS_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property item) {
                 TypeDef shallowNestedType = SHALLOW_NESTED_TYPE.apply(item);
@@ -188,6 +186,14 @@ public final class PropertyAs {
                 //Not a typical fluent
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
+
+                if (typeDef == null) {
+                    if (typeRef instanceof ClassRef) {
+                        typeDef = ((ClassRef)typeRef).getDefinition();
+                    } else {
+                        throw new IllegalStateException("Could not find definition from property: ["+item+"] neither in the repo nor via the object tree.");
+                    }
+                }
 
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
@@ -230,6 +236,14 @@ public final class PropertyAs {
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
+                if (typeDef == null) {
+                    if (typeRef instanceof ClassRef) {
+                        typeDef = ((ClassRef)typeRef).getDefinition();
+                    } else {
+                        throw new IllegalStateException("Could not find definition from property: ["+item+"] neither in the repo nor via the object tree.");
+                    }
+                }
+
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
 
@@ -266,6 +280,14 @@ public final class PropertyAs {
             public TypeDef apply(Property property) {
                 TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
+
+                if (typeDef == null) {
+                    if (typeRef instanceof ClassRef) {
+                        typeDef = ((ClassRef)typeRef).getDefinition();
+                    } else {
+                        throw new IllegalStateException("Could not find definition from property: ["+property+"] neither in the repo nor via the object tree.");
+                    }
+                }
 
                 TypeDef outerInterface = (TypeDef) property.getAttributes().get(OUTER_INTERFACE);
 

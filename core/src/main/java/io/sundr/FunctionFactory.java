@@ -60,7 +60,6 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
                     boolean predicateMatched = fallbackPredicate != null && fallbackPredicate.apply(item);
                     if ((recursionLevelExceeded || nestringDeptExceeded || predicateMatched) && fallback != null) {
                         result = fallback.apply(item);
-                        cacheIfEnabled(item, result);
                     }  else {
                         result = function.apply(item);
                         cacheIfEnabled(item, result);
