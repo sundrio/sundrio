@@ -222,9 +222,9 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     private static final String FUNCTION = "function";
     private static final String ITEM = "item";
 
-    private static final String NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT = "this.builder=new %s(this, item);this.function=new %s;";
-    private static final String NEW_BULDER_AND_SET_FUNCTION_FORMAT = "this.builder=new %s(this);this.function=function;";
-    private static final String NEW_BULDER_WITH_ITEM_AND_SET_FUNCTION_FORMAT = "this.builder=new %s(item);this.function=function;";
+    private static final String NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT = "super(item);this.builder=new %s(this, item);this.function=new %s;";
+    private static final String NEW_BULDER_AND_SET_FUNCTION_FORMAT = "super();this.builder=new %s(this);this.function=function;";
+    private static final String NEW_BULDER_WITH_ITEM_AND_SET_FUNCTION_FORMAT = "super(item);this.builder=new %s(item);this.function=function;";
     private static final String BUILD_AND_APPLY_FUNCTION = " return function.apply(builder.build());";
 
 
