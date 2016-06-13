@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.FunctionFactory;
 import io.sundr.Function;
+import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.functions.Singularize;
 import io.sundr.codegen.model.ClassRef;
@@ -159,7 +160,7 @@ public class ToMethod {
                     return left.getName().compareTo(right.getName());
                 }
             });
-            descendants.addAll(Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(property));
+            descendants.addAll(Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property));
 
             if (isMap(property.getTypeRef())) {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
@@ -172,14 +173,16 @@ public class ToMethod {
             } else if (!descendants.isEmpty()) {
                 //TODO: This should also work for array types, so we should check....
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
-                    String names = StringUtils.join(descendants, new Function<Property, String>() {
-                        String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef()).toString();
 
-                        public String apply(Property item) {
-                            return "this.<" + className + ">build(" + item.getName() + ")";
-                        }
-                    }, ", ");
-                    statements.add(new StringStatement("return aggregate(" + names + ");"));
+                    //String names = StringUtils.join(descendants, new Function<Property, String>() {
+                    //    String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef()).toString();
+                    //
+                    //    public String apply(Property item) {
+                    //        return "this.<" + className + ">build(" + item.getName() + ")";
+                    //   }
+                    //}, ", ");
+
+                    statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
                     //TODO: What are we doing in this case?
                     statements.add(new StringStatement("return this." + property.getName() + ";"));
@@ -257,13 +260,20 @@ public class ToMethod {
 
             String methodName = "addTo" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
-            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(property);
+            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
             if (isBuildable(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
+                String propertyName = property.getName();
+                if (property.getAttributes().containsKey(Constants.DESCENDANT_OF)) {
+                    Object attrValue = property.getAttributes().get(Constants.DESCENDANT_OF);
+                    if (attrValue instanceof Property) {
+                        propertyName = ((Property)attrValue).getName();
+                    }
+                }
                 String targetClass = targetType.getDefinition().getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
-                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + property.getName() + ".add(builder);} return (" + returnType + ")this;"));
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
@@ -276,7 +286,7 @@ public class ToMethod {
                         return "if (item instanceof " + className + "){" + addToMethodName + "((" + className + ")item);}\n";
                     }
                 }, " else ") + "} return (" + returnType + ")this;"));
-            } else {
+            }  else {
                 statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".add(item);} return (" + returnType + ")this;"));
             }
 
@@ -308,13 +318,20 @@ public class ToMethod {
             String methodName = "removeFrom" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
 
-            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DECENDANTS.apply(property);
+            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
             if (isBuildable(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
+                String propertyName = property.getName();
+                if (property.getAttributes().containsKey(Constants.DESCENDANT_OF)) {
+                    Object attrValue = property.getAttributes().get(Constants.DESCENDANT_OF);
+                    if (attrValue instanceof Property) {
+                        propertyName = ((Property)attrValue).getName();
+                    }
+                }
                 String targetClass = targetType.getDefinition().getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
-                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + property.getName() + ".remove(builder);} return (" + returnType + ")this;"));
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + propertyName + ".remove(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
