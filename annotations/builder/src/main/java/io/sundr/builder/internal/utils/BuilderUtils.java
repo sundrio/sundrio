@@ -63,6 +63,17 @@ public class BuilderUtils {
         return repository.isBuildable(typeDef);
     }
 
+    public static ClassRef findBuildableSuperClassRef(TypeDef clazz) {
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
+
+        for (ClassRef superClass : clazz.getExtendsList()) {
+            if (repository.isBuildable(superClass)) {
+                return superClass;
+            }
+        }
+        return null;
+    }
+
     public static TypeDef findBuildableSuperClass(TypeDef clazz) {
         BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
 

@@ -42,6 +42,7 @@ import static io.sundr.builder.Constants.BOXED_PRIMITIVE_TYPES;
 import static io.sundr.builder.Constants.PRIMITIVE_TYPES;
 import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableSuperClass;
+import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableSuperClassRef;
 import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
@@ -52,27 +53,23 @@ public class TypeAs {
         public TypeDef apply(TypeDef item) {
             BuilderContext ctx = BuilderContextManager.getContext();
             TypeDef fluent = SHALLOW_FLUENT.apply(item);
-            List<TypeParamDef> generics = new ArrayList<TypeParamDef>(item.getParameters());
 
-            TypeParamDef nextGeneric = getNextGeneric(item, generics);
-            TypeParamRef nextGenericRef = nextGeneric.toReference();
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>(item.getParameters());
+            List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
 
-            List<TypeRef> boundArguments = new ArrayList<TypeRef>();
-            for (TypeParamDef parameter :item.getParameters()) {
-                boundArguments.add(parameter.toReference());
-            }
-            boundArguments.add(nextGenericRef);
+            TypeParamDef nextParameter = getNextGeneric(item, parameters);
 
-            TypeParamDef genericFluent = new TypeParamDefBuilder(nextGeneric)
-                    .addNewBound()
-                        .withDefinition(fluent)
-                        .withArguments(boundArguments)
-                    .endBound()
-                    .build();
-
-            generics.add(genericFluent);
+            ClassRef builableSuperClassRef = findBuildableSuperClassRef(item);
 
             TypeDef buildableSuperClass = findBuildableSuperClass(item);
+            if (builableSuperClassRef != null) {
+                superClassParameters.addAll(builableSuperClassRef.getArguments());
+            }
+
+            TypeParamDef parameterFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluent.toInternalReference()).build();
+            parameters.add(parameterFluent);
+            superClassParameters.add(parameterFluent.toReference());
+
             TypeDef superClass = buildableSuperClass != null
                     ? SHALLOW_FLUENT.apply(buildableSuperClass)
                     : ctx.getFluentInterface();
@@ -82,8 +79,8 @@ public class TypeAs {
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(item.getName() + "Fluent")
                     .withPackageName(item.getPackageName())
-                    .withParameters(generics)
-                    .withExtendsList(superClass.toReference(nextGenericRef))
+                    .withParameters(parameters)
+                    .withExtendsList(superClass.toReference(superClassParameters.toArray(new TypeRef[superClassParameters.size()])))
                     .withImplementsList()
                     .withInnerTypes()
                     .build();
@@ -96,12 +93,20 @@ public class TypeAs {
             TypeDef fluent = SHALLOW_FLUENT.apply(item);
 
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>(item.getParameters());
+            List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
             TypeParamDef nextParameter = getNextGeneric(item, parameters);
-            TypeParamRef nextParameterRef = nextParameter.toReference();
-            TypeParamDef genericFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluent.toInternalReference()).build();
-            parameters.add(genericFluent);
+
+            ClassRef builableSuperClassRef = findBuildableSuperClassRef(item);
+            if (builableSuperClassRef != null) {
+                superClassParameters.addAll(builableSuperClassRef.getArguments());
+            }
+
+            TypeParamDef parameterFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluent.toInternalReference()).build();
+            parameters.add(parameterFluent);
+            superClassParameters.add(parameterFluent.toReference());
 
             TypeDef buildableSuperClass = findBuildableSuperClass(item);
+
             TypeDef superClass = buildableSuperClass != null
                     ? FLUENT_IMPL.apply(buildableSuperClass)
                     : ctx.getBaseFluentClass();
@@ -112,7 +117,7 @@ public class TypeAs {
                     .withName(item.getName() + "FluentImpl")
                     .withPackageName(item.getPackageName())
                     .withParameters(parameters)
-                    .withExtendsList(superClass.toReference(nextParameterRef))
+                    .withExtendsList(superClass.toReference(superClassParameters.toArray(new TypeRef[superClassParameters.size()])))
                     .withImplementsList(SHALLOW_FLUENT.apply(item).toInternalReference())
                     .withInnerTypes()
                     .build();
