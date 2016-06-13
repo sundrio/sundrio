@@ -78,9 +78,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     generateFromClazz(ClazzAs.FLUENT_IMPL.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
-                    if (isAbstract) {
-                      //ignore and move along
-                    } else if (buildable.editableEnabled()) {
+                     if (buildable.editableEnabled()) {
                         generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
                                 Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 

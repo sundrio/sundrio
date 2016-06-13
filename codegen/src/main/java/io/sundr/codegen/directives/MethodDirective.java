@@ -72,7 +72,7 @@ public class MethodDirective extends Directive {
     private void writeMethod(Writer writer, Method method, String block, Boolean isInterface) throws IOException {
         if (method != null) {
             writer.append(method.toString());
-            if (!isInterface && !StringUtils.isNullOrEmpty(block)) {
+            if (!method.isAbstract() && !isInterface && !StringUtils.isNullOrEmpty(block)) {
                 writer.append("{\n");
                 writer.append(block).append("}\n");
             } else {
