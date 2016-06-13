@@ -19,10 +19,7 @@ package io.sundr.builder.internal.utils;
 
 import io.sundr.SundrException;
 import io.sundr.builder.Constants;
-import io.sundr.builder.annotations.Buildable;
-import io.sundr.builder.annotations.BuildableReference;
-import io.sundr.builder.annotations.ExternalBuildables;
-import io.sundr.builder.annotations.Inline;
+import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -66,6 +63,17 @@ public class BuilderUtils {
         return repository.isBuildable(typeDef);
     }
 
+    public static ClassRef findBuildableSuperClassRef(TypeDef clazz) {
+        BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
+
+        for (ClassRef superClass : clazz.getExtendsList()) {
+            if (repository.isBuildable(superClass)) {
+                return superClass;
+            }
+        }
+        return null;
+    }
+
     public static TypeDef findBuildableSuperClass(TypeDef clazz) {
         BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
 
@@ -92,7 +100,12 @@ public class BuilderUtils {
             }
         }
 
-        return clazz.getConstructors().iterator().next();
+        if (!clazz.getConstructors().isEmpty()) {
+            return clazz.getConstructors().iterator().next();
+        } else {
+            throw new IllegalStateException("Could not find buildable constructor in: ["+clazz.getFullyQualifiedName()+"].");
+        }
+
     }
 
     public static Method findGetter(TypeDef clazz, Property property) {
@@ -275,6 +288,10 @@ public class BuilderUtils {
             }
             return ClassTo.TYPEDEF.apply(inline.returnType());
         } catch (MirroredTypeException e) {
+            if (None.FQN.equals(e.getTypeMirror().toString())) {
+                return fallback;
+            }
+
             Element element = context.getTypes().asElement(e.getTypeMirror());
             return ElementTo.TYPEDEF.apply((TypeElement) element);
         }

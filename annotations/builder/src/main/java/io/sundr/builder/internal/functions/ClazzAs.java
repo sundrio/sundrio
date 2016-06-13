@@ -326,6 +326,9 @@ public class ClazzAs {
 
     public static final Function<TypeDef, TypeDef> BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
+            final Modifier[] modifiers = item.isAbstract()
+                    ? new Modifier[]{Modifier.PUBLIC, Modifier.ABSTRACT}
+                    : new Modifier[]{Modifier.PUBLIC};
 
             TypeDef builderType = TypeAs.BUILDER.apply(item);
             ClassRef instanceRef = item.toInternalReference();
@@ -459,7 +462,7 @@ public class ClazzAs {
             constructors.add(instanceAndValidationConstructor);
 
             Method build = new MethodBuilder()
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withModifiers(TypeUtils.modifiersToInt(modifiers))
                     .withReturnType(instanceRef)
                     .withName("build")
                     .withNewBlock()
@@ -500,7 +503,7 @@ public class ClazzAs {
             methods.add(equals);
 
             return new TypeDefBuilder(builderType)
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withModifiers(TypeUtils.modifiersToInt(modifiers))
                     .withProperties(fields)
                     .withConstructors(constructors)
                     .withMethods(methods)
@@ -511,10 +514,15 @@ public class ClazzAs {
 
     public static final Function<TypeDef, TypeDef> EDITABLE_BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(final TypeDef item) {
+            final Modifier[] modifiers = item.isAbstract()
+                    ? new Modifier[]{Modifier.PUBLIC, Modifier.ABSTRACT}
+                    : new Modifier[]{Modifier.PUBLIC};
+
             final TypeDef editable = EDITABLE.apply(item);
             return new TypeDefBuilder(BUILDER.apply(item)).accept(new TypedVisitor<MethodBuilder>() {
                 public void visit(MethodBuilder builder) {
                     if (builder.getName() != null && builder.getName().equals("build")) {
+                        builder.withModifiers(TypeUtils.modifiersToInt(modifiers));
                         builder.withReturnType(editable.toInternalReference());
                         builder.withNewBlock()
                                 .withStatements(toBuild(editable, editable))
@@ -527,6 +535,10 @@ public class ClazzAs {
 
     public static final Function<TypeDef, TypeDef> EDITABLE = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
+            Modifier[] modifiers = item.isAbstract()
+                    ? new Modifier[]{Modifier.PUBLIC, Modifier.ABSTRACT}
+                    : new Modifier[]{Modifier.PUBLIC};
+
             TypeDef editableType = TypeAs.EDITABLE.apply(item);
             TypeDef builderType = TypeAs.BUILDER.apply(item);
 
@@ -538,11 +550,11 @@ public class ClazzAs {
             }
 
             Method edit = new MethodBuilder()
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withModifiers(TypeUtils.modifiersToInt(modifiers))
                     .withReturnType(builderType.toInternalReference())
                     .withName("edit")
                     .withNewBlock()
-                    .addNewStringStatementStatement("return new " + builderType.getName() + "(this);")
+                        .addNewStringStatementStatement("return new " + builderType.getName() + "(this);")
                     .endBlock()
                     .build();
 
@@ -551,6 +563,7 @@ public class ClazzAs {
             //We need to treat the editable classes as buildables themselves.
             return CodegenContext.getContext().getDefinitionRepository().register(
                     BuilderContextManager.getContext().getBuildableRepository().register(new TypeDefBuilder(editableType)
+                            .withModifiers(TypeUtils.modifiersToInt(modifiers))
                             .withConstructors(constructors)
                             .withMethods(methods)
                             .addToAttributes(BUILDABLE, true)
@@ -598,9 +611,13 @@ public class ClazzAs {
                     statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.").append(getterName).append("());\n").toString()));
                 }
             }
-            target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
-        }
 
+            if (!target.getExtendsList().isEmpty()) {
+                target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
+            } else {
+                return statements;
+            }
+        }
         return statements;
     }
 
@@ -648,7 +665,7 @@ public class ClazzAs {
         List<Statement> statements = new ArrayList<Statement>();
 
         String simpleName = type.getName();
-        ClassRef superClass = type.getExtendsList().iterator().next();
+        ClassRef superClass = type.getExtendsList().isEmpty() ? TypeDef.OBJECT_REF : type.getExtendsList().iterator().next();
         statements.add(new StringStatement("if (this == o) return true;"));
         statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
 

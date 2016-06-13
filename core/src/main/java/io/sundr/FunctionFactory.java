@@ -26,6 +26,7 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
     private final Map<X,Y> cache;
     private final Function<X,Y> function;
     private final Function<X,Y> fallback;
+    private final Function<X, Boolean> fallbackPredicate;
     private final int maximumRecursionLevel;
     private final int maximumNestingDepth;
 
@@ -33,10 +34,11 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
     private final Stack<X> ownStack;
     private static final Stack globalStack = new Stack();
 
-    public FunctionFactory(Map<X, Y> cache, Function<X, Y> function, Function<X, Y> fallback, int maximumRecursionLevel, int maximumNestingDepth, Stack<X> ownStack) {
+    public FunctionFactory(Map<X, Y> cache, Function<X, Y> function, Function<X, Y> fallback, Function<X, Boolean> fallbackPredicate, int maximumRecursionLevel, int maximumNestingDepth, Stack<X> ownStack) {
         this.cache = cache;
         this.function = function;
         this.fallback = fallback;
+        this.fallbackPredicate = fallbackPredicate;
         this.maximumRecursionLevel = maximumRecursionLevel;
         this.maximumNestingDepth = maximumNestingDepth;
         this.ownStack = ownStack;
@@ -53,9 +55,11 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
                 if (result == null) {
                     int recursionLevel = ownStack != null ? Collections.frequency(ownStack, item) : 0;
                     int nestingDepth = globalStack.size();
-                    if (((recursionLevel > maximumRecursionLevel && maximumRecursionLevel > 0) || (nestingDepth > maximumNestingDepth && maximumNestingDepth > 0)) && fallback != null) {
+                    boolean recursionLevelExceeded = recursionLevel > maximumRecursionLevel && maximumRecursionLevel > 0;
+                    boolean nestringDeptExceeded =nestingDepth > maximumNestingDepth && maximumNestingDepth > 0;
+                    boolean predicateMatched = fallbackPredicate != null && fallbackPredicate.apply(item);
+                    if ((recursionLevelExceeded || nestringDeptExceeded || predicateMatched) && fallback != null) {
                         result = fallback.apply(item);
-                        cacheIfEnabled(item, result);
                     }  else {
                         result = function.apply(item);
                         cacheIfEnabled(item, result);
@@ -66,7 +70,6 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
                 globalStack.pop();
             }
             return result;
-
         }
     }
 
@@ -78,22 +81,26 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
 
 
     public static <X, Y> FunctionFactory<X, Y> cache(Function<X, Y> function) {
-        return new FunctionFactory<X, Y>(new HashMap<X, Y>(), function, null, 0, 0, new Stack<X>());
+        return new FunctionFactory<X, Y>(new HashMap<X, Y>(), function, null, null, 0, 0, new Stack<X>());
     }
 
     public static <X, Y> FunctionFactory<X, Y> wrap(Function<X, Y> function) {
-        return new FunctionFactory<X, Y>(null, function, null, 0, 0, new Stack<X>());
+        return new FunctionFactory<X, Y>(null, function, null, null, 0, 0, new Stack<X>());
     }
 
     public FunctionFactory<X,Y> withFallback(Function<X,Y> fallback) {
-        return new FunctionFactory<X, Y>(cache, function, fallback, maximumRecursionLevel, maximumNestingDepth, ownStack);
+        return new FunctionFactory<X, Y>(cache, function, fallback, fallbackPredicate, maximumRecursionLevel, maximumNestingDepth, ownStack);
     }
 
     public FunctionFactory<X,Y> withMaximumRecursionLevel(int maximumRecursionLevel) {
-        return new FunctionFactory<X, Y>(cache, function, fallback, maximumRecursionLevel, maximumNestingDepth, ownStack);
+        return new FunctionFactory<X, Y>(cache, function, fallback, fallbackPredicate, maximumRecursionLevel, maximumNestingDepth, ownStack);
     }
 
     public FunctionFactory<X,Y> withMaximumNestingDepth(int maximumNestingDepth) {
-        return new FunctionFactory<X, Y>(cache, function, fallback, maximumRecursionLevel, maximumNestingDepth, ownStack);
+        return new FunctionFactory<X, Y>(cache, function, fallback, fallbackPredicate, maximumRecursionLevel, maximumNestingDepth, ownStack);
+    }
+
+    public FunctionFactory<X,Y> withFallbackPredicate(Function<X,Boolean> fallbackPredicate) {
+        return new FunctionFactory<X, Y>(cache, function, fallback, fallbackPredicate, maximumRecursionLevel, maximumNestingDepth, ownStack);
     }
 }

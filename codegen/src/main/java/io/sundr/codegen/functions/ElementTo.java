@@ -61,6 +61,26 @@ import static io.sundr.codegen.utils.ModelUtils.getPackageName;
 public class ElementTo {
 
     private static final String OBJECT_BOUND = "java.lang.Object";
+    private static final String JAVA_PEFIX = "java.";
+    private static final String JAVAX_PEFIX = "javax.";
+    private static final String COM_SUN_PREFIX = "com.sun.";
+
+    private static final Function<TypeMirror, Boolean> IS_JAVA_TYPE_MIRROR = new Function<TypeMirror, Boolean>() {
+
+        public Boolean apply(TypeMirror item) {
+            String fqn = item.toString();
+            return fqn.startsWith(JAVA_PEFIX) || fqn.startsWith(JAVAX_PEFIX) || fqn.startsWith(COM_SUN_PREFIX);
+        }
+    };
+
+
+    private static final Function<TypeElement, Boolean> IS_JAVA_ELEMENT = new Function<TypeElement, Boolean>() {
+
+        public Boolean apply(TypeElement item) {
+            String fqn = item.toString();
+            return fqn.startsWith(JAVA_PEFIX) || fqn.startsWith(JAVAX_PEFIX) || fqn.startsWith(COM_SUN_PREFIX);
+        }
+    };
 
     private static final Function<TypeMirror, TypeRef> DEEP_MIRROR_TO_TYPEREF = new Function<TypeMirror, TypeRef>() {
         public TypeRef apply(TypeMirror item) {
@@ -88,7 +108,11 @@ public class ElementTo {
         }
     };
 
-    public static final Function<TypeMirror, TypeRef> MIRROR_TO_TYPEREF = FunctionFactory.cache(DEEP_MIRROR_TO_TYPEREF).withFallback(SHALLOW_MIRROR_TO_TYPEREF).withMaximumRecursionLevel(1).withMaximumNestingDepth(5);
+    public static final Function<TypeMirror, TypeRef> MIRROR_TO_TYPEREF = FunctionFactory.cache(DEEP_MIRROR_TO_TYPEREF)
+            .withFallback(SHALLOW_MIRROR_TO_TYPEREF)
+            .withFallbackPredicate(IS_JAVA_TYPE_MIRROR)
+            .withMaximumRecursionLevel(10)
+            .withMaximumNestingDepth(10);
 
     public static final  Function<TypeParameterElement, TypeParamDef> TYPEPARAMDEF = new  Function<TypeParameterElement, TypeParamDef> () {
 
@@ -326,7 +350,11 @@ public class ElementTo {
         }
     };
 
-    public static final Function<TypeElement, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF).withFallback(SHALLOW_TYPEDEF).withMaximumRecursionLevel(5).withMaximumNestingDepth(5);
+    public static final Function<TypeElement, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF)
+            .withFallback(SHALLOW_TYPEDEF)
+            .withFallbackPredicate(IS_JAVA_ELEMENT)
+            .withMaximumRecursionLevel(10)
+            .withMaximumNestingDepth(10);
 
 
 }
