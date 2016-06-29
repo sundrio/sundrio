@@ -35,21 +35,9 @@ import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
-import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
-import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
-import static io.sundr.builder.Constants.N_REF;
-import static io.sundr.builder.Constants.OUTER_CLASS;
-import static io.sundr.builder.Constants.Q;
-import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
-import static io.sundr.builder.Constants.T_REF;
-import static io.sundr.builder.Constants.VOID;
+import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_LIST;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_MAP;
@@ -60,12 +48,7 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
-import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBoolean;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.builder.internal.utils.BuilderUtils.isList;
-import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
-import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
@@ -87,21 +70,20 @@ public class ToMethod {
                     .withArguments(property)
                     .withVarArgPreferred(true)
                     .withNewBlock()
-                    .withStatements(getStementes(property))
+                    .withStatements(getStatements(property))
                     .endBlock()
                     .build();
         }
 
-        private List<Statement> getStementes(Property property) {
+        private List<Statement> getStatements(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             String name = property.getName();
             TypeRef type = property.getTypeRef();
             TypeRef unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-
             List<Statement> statements = new ArrayList<Statement>();
+            Set<Property> descendants = property.getAttributes().containsKey(DESCENDANTS) ? (Set<Property>) property.getAttributes().get(DESCENDANTS) : Collections.EMPTY_SET;
 
             if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
-                String className = ((ClassRef) type).getDefinition().getName();
                 statements.add(new StringStatement("this." + name + ".clear();"));
                 if (IS_MAP.apply(type)) {
                     statements.add(new StringStatement("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (" + returnType + ") this;"));
@@ -110,17 +92,26 @@ public class ToMethod {
                     statements.add(new StringStatement("if (" + name + " != null) {for (" + unwraped.toString() + " item : " + name + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
                 }
                 return statements;
-            } else if (isBuildable(unwraped)) {
+            } else if (isBuildable(unwraped) && !isAbstract(unwraped)) {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
                 String propertyName = property.getName();
                 String builderClass = builder.getName();
                 statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
                 return statements;
+            } else if (!descendants.isEmpty()) {
+                for (Property descendant : descendants) {
+                    TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(descendant.getTypeRef());
+                    TypeDef builder = BUILDER.apply(((ClassRef) dunwraped).getDefinition());
+                    String propertyName = property.getName();
+                    String builderClass = builder.getName();
+                    statements.add(new StringStatement("if (" + propertyName + " instanceof " + dunwraped + "){ this." + propertyName + "= new " + builderClass + "((" + dunwraped + ")" + propertyName + "); _visitables.add(this." + propertyName + ");}"));
+                }
+                statements.add(new StringStatement("return (" + returnType + ") this;"));
+                return statements;
             }
             statements.add(new StringStatement("this." + property.getName() + "=" + property.getName() + "; return (" + returnType + ") this;"));
             return statements;
         }
-
     });
 
     public static final Function<Property, Method> WITH_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
@@ -171,21 +162,10 @@ public class ToMethod {
                     statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
             } else if (!descendants.isEmpty()) {
-                //TODO: This should also work for array types, so we should check....
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
-
-                    //String names = StringUtils.join(descendants, new Function<Property, String>() {
-                    //    String className = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef()).toString();
-                    //
-                    //    public String apply(Property item) {
-                    //        return "this.<" + className + ">build(" + item.getName() + ")";
-                    //   }
-                    //}, ", ");
-
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
-                    //TODO: What are we doing in this case?
-                    statements.add(new StringStatement("return this." + property.getName() + ";"));
+                    statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
             } else {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
@@ -261,7 +241,7 @@ public class ToMethod {
             String methodName = "addTo" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
             Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
-            if (isBuildable(unwrapped)) {
+            if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 String propertyName = property.getName();
                 if (property.getAttributes().containsKey(Constants.DESCENDANT_OF)) {
@@ -319,7 +299,7 @@ public class ToMethod {
             List<Statement> statements = new ArrayList<Statement>();
 
             Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
-            if (isBuildable(unwrapped)) {
+            if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 String propertyName = property.getName();
                 if (property.getAttributes().containsKey(Constants.DESCENDANT_OF)) {

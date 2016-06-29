@@ -48,35 +48,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.ARRAY_LIST;
-import static io.sundr.builder.Constants.BOOLEAN_REF;
-import static io.sundr.builder.Constants.GENERATED;
-import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
-import static io.sundr.builder.Constants.INIT;
-import static io.sundr.builder.Constants.LINKED_HASH_MAP;
-import static io.sundr.builder.Constants.LINKED_HASH_SET;
-import static io.sundr.builder.Constants.LIST;
-import static io.sundr.builder.Constants.OBJECT;
-import static io.sundr.builder.Constants.OUTER_CLASS;
-import static io.sundr.builder.Constants.OUTER_INTERFACE;
-import static io.sundr.builder.Constants.SET;
-import static io.sundr.builder.Constants.T;
-import static io.sundr.builder.Constants.T_REF;
-import static io.sundr.builder.Constants.VALIDATION_ENABLED;
-import static io.sundr.builder.internal.utils.BuilderUtils.BUILDABLE;
-import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
-import static io.sundr.builder.internal.utils.BuilderUtils.findGetter;
-import static io.sundr.builder.internal.utils.BuilderUtils.hasBuildableConstructorWithArgument;
-import static io.sundr.builder.internal.utils.BuilderUtils.hasDefaultConstructor;
-import static io.sundr.builder.internal.utils.BuilderUtils.hasOrInheritsSetter;
-import static io.sundr.builder.internal.utils.BuilderUtils.hasSetter;
-import static io.sundr.builder.internal.utils.BuilderUtils.isArray;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBoolean;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.builder.internal.utils.BuilderUtils.isCollection;
-import static io.sundr.builder.internal.utils.BuilderUtils.isList;
-import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
-import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.builder.Constants.*;
+import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 
 public class ClazzAs {
@@ -113,6 +86,10 @@ public class ClazzAs {
                 boolean isList = isList(toAdd.getTypeRef());
                 boolean isMap = isMap(toAdd.getTypeRef());
                 boolean isCollection = isSet || isList;
+                boolean isAbstract = isAbstract(unwrapped);
+
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
+                toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
 
                 if (isArray) {
                     Property asList = arrayAsList(toAdd);
@@ -139,11 +116,10 @@ public class ClazzAs {
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
 
                 if (isMap) {
                     //
-                } else if (isBuildable) {
+                } else if (isBuildable && !isAbstract) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
                     if (!isCollection && !isArray) {
@@ -220,6 +196,7 @@ public class ClazzAs {
                 final boolean isList = isList(property.getTypeRef());
                 final boolean isMap = isMap(property.getTypeRef());
                 final boolean isCollection = isSet || isList;
+                final boolean isAbstract = isAbstract(unwrapped);
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
@@ -244,6 +221,9 @@ public class ClazzAs {
                                 }
                             }
                         }).build();
+
+                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
+                toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
 
                 if (isArray) {
                     Property asList = arrayAsList(toAdd);
@@ -270,10 +250,9 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 if (isMap) {
                     properties.add(toAdd);
-                } else if (isBuildable) {
+                } else if (isBuildable && !isAbstract) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
                     if (!isCollection && !isArray) {
@@ -282,8 +261,9 @@ public class ClazzAs {
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
                     properties.add(buildableField(toAdd));
-
-                } else if (!descendants.isEmpty() && isCollection) {
+                } else if (descendants.isEmpty()) {
+                    properties.add(toAdd);
+                } else if (isCollection) {
                     properties.add(buildableField(toAdd));
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
@@ -297,7 +277,7 @@ public class ClazzAs {
                     }
 
                 } else {
-                    properties.add(toAdd);
+                    properties.add(buildableField(toAdd));
                 }
             }
 
