@@ -277,7 +277,7 @@ public class TypeDef extends ModifierSupport {
     public Set<String> getImports() {
         final Set<String> imports = new LinkedHashSet<String>();
         for (ClassRef ref : getReferences()) {
-            if (ref.getDefinition().getPackageName().equals(packageName)) {
+            if (ref .getDefinition().getPackageName() != null && ref.getDefinition().getPackageName().equals(packageName)) {
                 continue;
             } else {
                 imports.add(ref.getDefinition().getFullyQualifiedName());
