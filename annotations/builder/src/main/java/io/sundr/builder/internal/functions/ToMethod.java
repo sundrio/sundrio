@@ -446,8 +446,14 @@ public class ToMethod {
 
     public static final Function<Property, Method> WITH_NEW_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            //Let's reload the class from the repository if available....
+            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
+            if (propertyTypeDef != null) {
+                baseType = propertyTypeDef.toInternalReference();
+            }
+
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
@@ -524,8 +530,14 @@ public class ToMethod {
 
     public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            //Let's reload the class from the repository if available....
+            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
+            if (propertyTypeDef != null) {
+                baseType = propertyTypeDef.toInternalReference();
+            }
+
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
@@ -566,10 +578,27 @@ public class ToMethod {
 
     public static final Function<Property, Method> EDIT_NESTED =new Function<Property, Method>() {
         public Method apply(Property property) {
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            //Let's reload the class from the repository if available....
+            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
+            if (propertyTypeDef != null) {
+                baseType = propertyTypeDef.toInternalReference();
+            }
+
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
-            //We need to repackage because we are nesting under this class.
-            ClassRef rewraped = classRefOf(nestedType, returnType);
+            TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+
+            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(baseType.getDefinition().getParameters());
+            List<TypeRef> typeArguments = new ArrayList<TypeRef>();
+            for (TypeRef ignore : baseType.getArguments()) {
+                typeArguments.add(Q);
+            }
+            typeArguments.add(returnType);
+
+            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray());
+            ClassRef rewrapedImpl = classRefOf(nestedTypeImpl, typeArguments.toArray());
+
             String prefix = "edit";
             String methodNameBase = captializeFirst(property.getName());
             String methodName = prefix + methodNameBase;
