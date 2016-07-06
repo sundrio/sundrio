@@ -24,6 +24,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
@@ -717,18 +718,41 @@ public class ClazzAs {
             ClassRef listRef =  ARRAY_LIST.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(LIST.toReference(builderType))
                     .addToAttributes(INIT, " new " + listRef + "()")
-                    .addToAttributes(ALSO_IMPORT, Arrays.asList(listRef, builderType))
+                    .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
                     .build();
         } else if (isSet(classRef)) {
             ClassRef setRef = LINKED_HASH_SET.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(SET.toReference(builderType))
                     .addToAttributes(INIT, " new " + setRef+ "()")
-                    .addToAttributes(ALSO_IMPORT,  Arrays.asList(setRef, builderType))
+                    .addToAttributes(ALSO_IMPORT,  alsoImport(property, setRef, builderType))
                     .build();
         } else {
             return new PropertyBuilder(property).withTypeRef(builderType)
-                    .addToAttributes(ALSO_IMPORT, builderType)
+                    .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
                     .build();
         }
+    }
+
+    private static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
+        List<ClassRef> result = new ArrayList<ClassRef>();
+        if (attributeable.getAttributes().containsKey(ALSO_IMPORT)) {
+            Object existingImports = attributeable.getAttributes().get(ALSO_IMPORT);
+            if (existingImports instanceof Collection) {
+                result.addAll((Collection<? extends ClassRef>) existingImports);
+            } else if (existingImports instanceof ClassRef) {
+                result.add((ClassRef) existingImports);
+            } else {
+                throw new IllegalStateException("Illegal value for ALSO_IMPORT attribute. Expected a Collection, but found :["+existingImports+"].");
+            }
+        }
+        return result;
+    }
+
+    private static List<ClassRef> alsoImport(Attributeable attributeable, ClassRef... refs) {
+        List<ClassRef> result = alsoImportAsList(attributeable);
+        for (ClassRef ref : refs) {
+            result.add(ref);
+        }
+        return result;
     }
 }

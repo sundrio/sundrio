@@ -16,11 +16,12 @@
 
 package io.sundr.builder.internal.functions;
 
-import io.sundr.FunctionFactory;
 import io.sundr.Function;
+import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.functions.Singularize;
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
@@ -35,9 +36,23 @@ import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import static io.sundr.builder.Constants.*;
+import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
+import static io.sundr.builder.Constants.DESCENDANTS;
+import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
+import static io.sundr.builder.Constants.N_REF;
+import static io.sundr.builder.Constants.OUTER_CLASS;
+import static io.sundr.builder.Constants.Q;
+import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
+import static io.sundr.builder.Constants.T_REF;
+import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_LIST;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_MAP;
@@ -48,7 +63,13 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
-import static io.sundr.builder.internal.utils.BuilderUtils.*;
+import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
+import static io.sundr.builder.internal.utils.BuilderUtils.isAbstract;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBoolean;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
+import static io.sundr.builder.internal.utils.BuilderUtils.isList;
+import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
+import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.classRefOf;
@@ -63,6 +84,7 @@ public class ToMethod {
         public Method apply(Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
+            List<ClassRef> alsoImport = new ArrayList<ClassRef>();
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
@@ -70,12 +92,13 @@ public class ToMethod {
                     .withArguments(property)
                     .withVarArgPreferred(true)
                     .withNewBlock()
-                    .withStatements(getStatements(property))
+                    .withStatements(getStatements(property, alsoImport))
                     .endBlock()
+                    .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
         }
 
-        private List<Statement> getStatements(Property property) {
+        private List<Statement> getStatements(Property property, List<ClassRef> alsoImport) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             String name = property.getName();
             TypeRef type = property.getTypeRef();
@@ -105,6 +128,9 @@ public class ToMethod {
                     String propertyName = property.getName();
                     String builderClass = builder.getName();
                     statements.add(new StringStatement("if (" + propertyName + " instanceof " + dunwraped + "){ this." + propertyName + "= new " + builderClass + "((" + dunwraped + ")" + propertyName + "); _visitables.add(this." + propertyName + ");}"));
+
+                    alsoImport.add((ClassRef) dunwraped);
+                    alsoImport.add(builder.toInternalReference());
                 }
                 statements.add(new StringStatement("return (" + returnType + ") this;"));
                 return statements;
@@ -230,6 +256,7 @@ public class ToMethod {
         public Method apply(final Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+            List<ClassRef> alsoImport = new ArrayList<ClassRef>();
 
             Property item = new PropertyBuilder(property)
                     .withName("items")
@@ -253,6 +280,9 @@ public class ToMethod {
                 String targetClass = targetType.getDefinition().getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
+
+                //We need to do it more elegantly
+                alsoImport.add(TypeAs.BUILDER.apply(targetType.getDefinition()).toInternalReference());
                 statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
@@ -280,6 +310,7 @@ public class ToMethod {
                     .withNewBlock()
                     .withStatements(statements)
                     .endBlock()
+                    .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
         }
     });
@@ -288,6 +319,7 @@ public class ToMethod {
         public Method apply(final Property property) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+            List<ClassRef> alsoImport = new ArrayList<ClassRef>();
             Property item = new PropertyBuilder(property)
                     .withName("items")
                     .withTypeRef(unwrapped.withDimensions(1))
@@ -311,6 +343,9 @@ public class ToMethod {
                 String targetClass = targetType.getDefinition().getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
+
+                //We need to do it more elegantly
+                alsoImport.add(TypeAs.BUILDER.apply(targetType.getDefinition()).toInternalReference());
                 statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + propertyName + ".remove(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
