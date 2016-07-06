@@ -55,8 +55,10 @@ public class Constants {
 
     public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
     public static final String DESCENDANT_OF = "DESCENDANT_OF";
+    public static final String DESCENDANTS = "DESCENDANTS";
 
     public static final String VALIDATION_ENABLED = "VALIDATION_ENABLED";
+    public static final String EDIATABLE_ENABLED = "EDITABLE_ENABLED";
 
     public static final String INIT = "INIT";
 

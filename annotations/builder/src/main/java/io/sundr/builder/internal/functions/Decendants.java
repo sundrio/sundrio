@@ -69,7 +69,7 @@ public class Decendants {
      * @param property
      * @return
      */
-    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DESCENDANTS = FunctionFactory.cache(new Function<Property, Set<Property>>() {
+    public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DESCENDANTS = FunctionFactory.wrap(new Function<Property, Set<Property>>() {
         public Set<Property> apply(Property property) {
             Set<Property> result = new LinkedHashSet<Property>();
             TypeRef baseType = property.getTypeRef();

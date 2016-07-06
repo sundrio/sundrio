@@ -371,12 +371,30 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     }
 
     /**
-     * Resolves dependencies.
-     *
-     * @param dependencies
+     * Collects dependencies, including transitives.
+     * Project dependencies retain their scope, while test only dependencies (including transitives) will have test scope.
+     * @param projectDependencies
      * @return
      */
-    private Set<Artifact> getDependencies(final Set<Artifact> dependencies) {
+    private Set<Artifact> getDependencies(final Set<Artifact> projectDependencies) {
+        Set<Artifact> result = new LinkedHashSet<Artifact>(projectDependencies);
+        Set<Artifact> testDependencies = dependenciesWithScope(projectDependencies, Artifact.SCOPE_TEST);
+        Set<Artifact> nonTestDependencies = allBut(projectDependencies, testDependencies);
+
+        Set<Artifact> testTransitives = resolve(testDependencies);
+        Set<Artifact> nonTestTransitives = resolve(nonTestDependencies);
+
+        Set<Artifact> testOnlyDependencies = allBut(testTransitives, nonTestTransitives);
+
+        for (Artifact testOnly : testOnlyDependencies) {
+            result.add(new DefaultArtifact(testOnly.getGroupId(), testOnly.getArtifactId(), testOnly.getVersion(), Artifact.SCOPE_TEST, testOnly.getType(), testOnly.getClassifier(), testOnly.getArtifactHandler()));
+        }
+
+        result.addAll(resolve(projectDependencies));
+        return result;
+    }
+
+    private Set<Artifact> resolve(final Set<Artifact> dependencies) {
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setArtifact(getProject().getArtifact());
         request.setArtifactDependencies(dependencies);
@@ -387,6 +405,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         ArtifactResolutionResult result = artifactResolver.resolve(request);
         return result.getArtifacts();
     }
+
 
     private Artifact toArtifact(Dependency dependency) {
         return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getScope(), dependency.getType(), dependency.getClassifier(), getArtifactHandler());
@@ -402,7 +421,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         dependency.setArtifactId(artifact.getArtifactId());
         dependency.setVersion(artifact.getVersion());
         dependency.setType(artifact.getType());
-        dependency.setScope(artifact.getScope());
+        dependency.setScope(Artifact.SCOPE_COMPILE.equals(artifact.getScope()) ? null : artifact.getScope());
         dependency.setClassifier(artifact.getClassifier());
         dependency.setOptional(artifact.isOptional());
         return dependency;
@@ -438,4 +457,21 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             config.getModules().getIncludes().add("*:*");
         }
     }
+
+    private static Set<Artifact> dependenciesWithScope(final Set<Artifact> dependencies, String scope) {
+        Set<Artifact> result = new LinkedHashSet<Artifact>();
+        for (Artifact artifact : dependencies) {
+            if (scope.equals(artifact.getScope())) {
+                result.add(artifact);
+            }
+        }
+        return result;
+    }
+
+    private static Set<Artifact> allBut(Set<Artifact> source, Set<Artifact> exclusions) {
+        Set<Artifact> result = new LinkedHashSet<Artifact>(source);
+        result.removeAll(exclusions);
+        return result;
+    }
+
 }

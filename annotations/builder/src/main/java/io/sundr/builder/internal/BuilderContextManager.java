@@ -27,36 +27,34 @@ public class BuilderContextManager {
     
     private BuilderContextManager() {}
 
-    private static final AtomicReference<BuilderContext> context = new AtomicReference<BuilderContext>();
+    private static BuilderContext context = null;
 
-    public static BuilderContext create(Elements elements, Types types) {
-        BuilderContext ctx = new BuilderContext(elements, types, false, Builder.class.getPackage().getName());
-        context.set(ctx);
-        return ctx;
+    public synchronized static BuilderContext create(Elements elements, Types types) {
+        context = new BuilderContext(elements, types, false, Builder.class.getPackage().getName());
+        return context;
     }
 
     public static BuilderContext create(Elements elements, Types types, Boolean generateBuilderPackage, String packageName, Inline...inlineables) {
-        BuilderContext ctx = new BuilderContext(elements, types, generateBuilderPackage, packageName, inlineables);
-        if (context.compareAndSet(null, ctx)) {
-            return ctx;
+        if (context == null) {
+            context = new BuilderContext(elements, types, generateBuilderPackage, packageName, inlineables);
+            return context;
         } else {
-            BuilderContext existing = context.get();
-            if (!packageName.equals(existing.getBuilderPackage())) {
+            if (!packageName.equals(context.getBuilderPackage())) {
                 throw new IllegalStateException("Cannot use different builder package names in a single project. Used:"
                         + packageName + " but package:"
-                        + existing.getGenerateBuilderPackage() + " already exists.");
-            } else if (!generateBuilderPackage.equals(existing.getGenerateBuilderPackage())) {
+                        + context.getGenerateBuilderPackage() + " already exists.");
+            } else if (!generateBuilderPackage.equals(context.getGenerateBuilderPackage())) {
                 throw new IllegalStateException("Cannot use different values for generate builder package in a single project.");
             } else {
-                return existing;
+                return context;
             }
         }
     }
 
     public static synchronized BuilderContext getContext() {
-        if (context.get() == null) {
+        if (context== null) {
             throw new IllegalStateException("Builder context not available.");
         }
-        return context.get();
+        return context;
     }
 }
