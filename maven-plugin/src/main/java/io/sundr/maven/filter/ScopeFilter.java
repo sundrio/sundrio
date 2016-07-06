@@ -22,6 +22,6 @@ import org.apache.maven.artifact.DefaultArtifact;
 public class ScopeFilter implements ArtifactFilter {
 
     public Artifact apply(Artifact artifact) {
-        return artifact == null ? null : new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), Artifact.SCOPE_COMPILE, artifact.getType(), artifact.getClassifier(), artifact.getArtifactHandler());
+        return artifact == null ? null : new DefaultArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getScope() != null ? artifact.getScope() : Artifact.SCOPE_COMPILE, artifact.getType(), artifact.getClassifier(), artifact.getArtifactHandler());
     }
 }

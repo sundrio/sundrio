@@ -373,19 +373,24 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     /**
      * Resolves dependencies.
      *
-     * @param dependencies
+     * @param projectDependencies
      * @return
      */
-    private Set<Artifact> getDependencies(final Set<Artifact> dependencies) {
+    private Set<Artifact> getDependencies(final Set<Artifact> projectDependencies) {
+        Set<Artifact> dependencies = new LinkedHashSet<Artifact>(projectDependencies);
+
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setArtifact(getProject().getArtifact());
-        request.setArtifactDependencies(dependencies);
+        request.setArtifactDependencies(projectDependencies);
         request.setLocalRepository(localRepository);
         request.setRemoteRepositories(remoteRepositories);
         request.setManagedVersionMap(getProject().getManagedVersionMap());
         request.setResolveTransitively(true);
         ArtifactResolutionResult result = artifactResolver.resolve(request);
-        return result.getArtifacts();
+
+        dependencies.addAll(result.getArtifacts());
+
+        return dependencies;
     }
 
     private Artifact toArtifact(Dependency dependency) {
@@ -402,7 +407,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         dependency.setArtifactId(artifact.getArtifactId());
         dependency.setVersion(artifact.getVersion());
         dependency.setType(artifact.getType());
-        dependency.setScope(artifact.getScope());
+        dependency.setScope(Artifact.SCOPE_COMPILE.equals(artifact.getScope()) ? null : artifact.getScope());
         dependency.setClassifier(artifact.getClassifier());
         dependency.setOptional(artifact.isOptional());
         return dependency;
