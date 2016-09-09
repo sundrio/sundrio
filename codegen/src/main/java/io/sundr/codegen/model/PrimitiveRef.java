@@ -18,7 +18,7 @@ package io.sundr.codegen.model;
 
 import java.util.Map;
 
-public class PrimitiveRef extends AbstractTypeRef {
+public class PrimitiveRef extends TypeRef {
 
     private final String name;
     private final int dimensions;

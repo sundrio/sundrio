@@ -16,9 +16,18 @@
 
 package io.sundr.examples.codegen;
 
-public interface TypeRef extends Attributeable {
+import io.sundr.builder.annotations.Buildable;
 
-    boolean isAssignableFrom(TypeRef ref);
-    int getDimensions();
-    TypeRef withDimensions(int dimensions);
+import java.util.Map;
+
+@Buildable
+public abstract class TypeRef extends AttributeSupport {
+
+    public TypeRef(Map<String, Object> attributes) {
+        super(attributes);
+    }
+
+    public abstract boolean isAssignableFrom(TypeRef ref);
+    public abstract int getDimensions();
+    public abstract TypeRef withDimensions(int dimensions);
 }

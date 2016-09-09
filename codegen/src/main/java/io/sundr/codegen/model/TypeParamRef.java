@@ -18,7 +18,7 @@ package io.sundr.codegen.model;
 
 import java.util.Map;
 
-public class TypeParamRef extends AbstractTypeRef {
+public class TypeParamRef extends TypeRef {
 
     private final String name;
     private final int dimensions;

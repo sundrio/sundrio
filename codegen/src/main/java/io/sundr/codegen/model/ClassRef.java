@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ClassRef extends AbstractTypeRef {
+public class ClassRef extends TypeRef {
 
     public static final String UNKWNON = "<unkwnon>";
     public static final String BRACKETS = "[]";

@@ -21,7 +21,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.Map;
 
 @Buildable
-public class TypeParamRef extends AbstractTypeRef {
+public class TypeParamRef extends TypeRef {
 
     private final String name;
     private final int dimensions;

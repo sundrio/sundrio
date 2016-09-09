@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 @Buildable
-public class ClassRef extends AbstractTypeRef {
+public class ClassRef extends TypeRef {
 
     public static final ClassRef OBJECT = new ClassRefBuilder()
             .withDefinition(TypeDef.OBJECT)

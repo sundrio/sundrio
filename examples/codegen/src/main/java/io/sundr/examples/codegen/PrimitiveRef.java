@@ -22,7 +22,7 @@ import io.sundr.codegen.utils.StringUtils;
 import java.util.Map;
 
 @Buildable
-public class PrimitiveRef extends AbstractTypeRef {
+public class PrimitiveRef extends TypeRef {
 
     private final String name;
     private final int dimensions;

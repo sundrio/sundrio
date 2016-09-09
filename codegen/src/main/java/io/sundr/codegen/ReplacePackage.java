@@ -56,7 +56,7 @@ public class ReplacePackage implements Visitor<Builder> {
     private void visitMethodBuilder(MethodBuilder builder) {
         if (builder.getReturnType() instanceof ClassRef) {
             ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.getReturnType());
-            if (classRefBuilder.getDefinition().getPackageName().equals(target)) {
+            if (classRefBuilder.getDefinition() != null && classRefBuilder.getDefinition().getPackageName() != null && classRefBuilder.getDefinition().getPackageName().equals(target)) {
                 classRefBuilder.editDefinition().withPackageName(replacement).endDefinition();
             }
             builder.withReturnType(classRefBuilder.accept(this).build());
@@ -67,7 +67,7 @@ public class ReplacePackage implements Visitor<Builder> {
 
         if (builder.getTypeRef() instanceof ClassRef) {
             ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.getTypeRef());
-            if (classRefBuilder.getDefinition().getPackageName().equals(target)) {
+            if (classRefBuilder.getDefinition() != null && classRefBuilder.getDefinition().getPackageName() != null && classRefBuilder.getDefinition().getPackageName().equals(target)) {
                 classRefBuilder.editDefinition().withPackageName(replacement).endDefinition();
             }
             builder.withTypeRef(classRefBuilder.accept(this).build());
@@ -75,7 +75,7 @@ public class ReplacePackage implements Visitor<Builder> {
     }
 
     private void visitClassRefBuilder(ClassRefBuilder builder) {
-        if (builder.getDefinition().getPackageName().equals(target)) {
+        if (builder.getDefinition() != null && builder.getDefinition().getPackageName() != null && builder.getDefinition().getPackageName().equals(target)) {
             builder.editDefinition().withPackageName(replacement).endDefinition();
         }
 
