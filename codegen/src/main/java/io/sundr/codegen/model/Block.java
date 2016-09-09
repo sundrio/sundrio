@@ -16,17 +16,28 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.Provider;
+
 import java.util.List;
 
 public class Block {
 
-    private List<Statement> statements;
+    private final Provider<List<Statement>> provider;
 
-    public Block(List<Statement> statements) {
-        this.statements = statements;
+    public Block(Provider<List<Statement>> provider) {
+        this.provider = provider;
+    }
+
+    public Block(final List<Statement> statements) {
+        this.provider = new Provider<List<Statement>>() {
+            @Override
+            public List<Statement> get() {
+                return statements;
+            }
+        };
     }
 
     public List<Statement> getStatements() {
-        return statements;
+        return provider.get();
     }
 }
