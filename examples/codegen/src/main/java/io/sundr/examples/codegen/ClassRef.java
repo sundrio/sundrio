@@ -23,25 +23,31 @@ import java.util.List;
 import java.util.Map;
 
 @Buildable
-public class ClassRef extends AbstractTypeRef {
+public class ClassRef extends TypeRef {
 
     public static final ClassRef OBJECT = new ClassRefBuilder()
             .withDefinition(TypeDef.OBJECT)
             .build();
 
     private final TypeDef definition;
+    private final String fullyQualifiedName;
     private final int dimensions;
     private final List<TypeRef> arguments;
 
-    public ClassRef(TypeDef definition, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
+    public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
         super(attributes);
         this.definition = definition != null ? definition : new TypeDefBuilder().build();
         this.dimensions = dimensions;
         this.arguments = arguments;
+        this.fullyQualifiedName = fullyQualifiedName != null ? fullyQualifiedName : (definition != null ? definition.getFullyQualifiedName() : null);
     }
 
     public TypeDef getDefinition() {
         return definition;
+    }
+
+    public String getFullyQualifiedName() {
+        return fullyQualifiedName;
     }
 
     public int getDimensions() {

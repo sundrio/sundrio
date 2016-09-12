@@ -16,6 +16,7 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ClassRef extends AbstractTypeRef {
+public class ClassRef extends TypeRef {
 
     public static final String UNKWNON = "<unkwnon>";
     public static final String BRACKETS = "[]";
@@ -33,18 +34,28 @@ public class ClassRef extends AbstractTypeRef {
             .build();
 
     private final TypeDef definition;
+    private final String fullyQualifiedName;
     private final int dimensions;
     private final List<TypeRef> arguments;
 
-    public ClassRef(TypeDef definition, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
+    public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
         super(attributes);
         this.definition = definition != null ? definition : new TypeDefBuilder().build();
         this.dimensions = dimensions;
         this.arguments = arguments;
+        this.fullyQualifiedName = fullyQualifiedName != null ? fullyQualifiedName : (definition != null ? definition.getFullyQualifiedName() : null);
+        if (definition != null) {
+            DefinitionRepository.getRepository().registerIfAbsent(definition);
+        }
     }
 
     public TypeDef getDefinition() {
-        return definition;
+        return DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
+    }
+
+
+    public String getFullyQualifiedName() {
+        return fullyQualifiedName;
     }
 
     public int getDimensions() {
@@ -122,7 +133,7 @@ public class ClassRef extends AbstractTypeRef {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
+        TypeDef definition = getDefinition();
         if (definition == null) {
             sb.append(UNKWNON);
         }

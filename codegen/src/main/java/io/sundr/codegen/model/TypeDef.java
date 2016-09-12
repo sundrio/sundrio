@@ -21,6 +21,7 @@ import io.sundr.codegen.utils.StringUtils;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -276,15 +277,26 @@ public class TypeDef extends ModifierSupport {
 
     public Set<String> getImports() {
         final Set<String> imports = new LinkedHashSet<String>();
-        for (ClassRef ref : getReferences()) {
+        for (ClassRef ref : getReferenceMap().values()) {
             if (ref .getDefinition().getPackageName() == null || ref .getDefinition().getPackageName().isEmpty() ||  ref.getDefinition().getPackageName().equals(packageName)) {
                 continue;
             } else {
                 imports.add(ref.getDefinition().getFullyQualifiedName());
             }
-
         }
         return imports;
+    }
+
+    /**
+     * Create a mapping from class name to {@link ClassRef}.
+     * @return
+     */
+    public Map<String, ClassRef> getReferenceMap() {
+        Map<String, ClassRef> mapping = new HashMap<String, ClassRef>();
+        for (ClassRef ref : getReferences()) {
+            mapping.put(ref.getDefinition().getName(), ref);
+        }
+        return mapping;
     }
 
     public Set<ClassRef> getReferences() {

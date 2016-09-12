@@ -74,7 +74,7 @@ public final class TypeUtils {
         String name;
         if (typeRef instanceof ClassRef) {
             name = ((ClassRef)typeRef).getDefinition().getName();
-        } else if (typeRef instanceof TypeParamDef) {
+        } else if (typeRef instanceof TypeParamRef) {
             name = ((TypeParamRef)typeRef).getName();
         } else if (typeRef instanceof PrimitiveRef) {
             name = ((PrimitiveRef)typeRef).getName();

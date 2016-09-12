@@ -16,20 +16,31 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.Provider;
+
 public class StringStatement implements Statement {
 
-    private final String data;
+    private final Provider<String> provider;
 
-    public StringStatement(String data) {
-        this.data = data;
+    public StringStatement(final String data) {
+        this.provider = new Provider<String>() {
+            @Override
+            public String get() {
+                return data;
+            }
+        };
+    }
+
+    public StringStatement(Provider<String> provider) {
+        this.provider = provider;
     }
 
     public String getData() {
-        return data;
+        return provider.get();
     }
 
     @Override
     public String toString() {
-        return data;
+        return getData();
     }
 }

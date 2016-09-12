@@ -16,12 +16,24 @@
 
 package io.sundr.codegen.model;
 
-import java.util.Map;
-import java.lang.String;
 import java.lang.Object;
 
-public interface VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A>{
+public class TypeRefFluentImpl<A extends TypeRefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeRefFluent<A>{
 
+
+    public TypeRefFluentImpl(){
+    }
+    public TypeRefFluentImpl(TypeRef instance){
+            this.withAttributes(instance.getAttributes()); 
+    }
+
+    public boolean equals(Object o){
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            TypeRefFluentImpl that = (TypeRefFluentImpl) o;
+            return true;
+    }
 
 
 

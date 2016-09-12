@@ -67,7 +67,7 @@ public abstract class TypedVisitor<V> implements Visitor<V> {
      * @param childClass the child class
      * @return a list of the raw classes for the actual type arguments.
      */
-    private static <T> List<Class<?>> getTypeArguments(Class<T> baseClass, Class<? extends T> childClass) {
+    private static <T> List<Class> getTypeArguments(Class<T> baseClass, Class<? extends T> childClass) {
         Map<Type, Type> resolvedTypes = new LinkedHashMap<Type, Type>();
         Type type = childClass;
         // start walking up the inheritance hierarchy until we hit baseClass
@@ -101,7 +101,7 @@ public abstract class TypedVisitor<V> implements Visitor<V> {
         else {
             actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
         }
-        List<Class<?>> typeArgumentsAsClasses = new ArrayList<Class<?>>();
+        List<Class> typeArgumentsAsClasses = new ArrayList<Class>();
         // resolve types by chasing down type variables.
         for (Type baseType: actualTypeArguments) {
             while (resolvedTypes.containsKey(baseType)) {

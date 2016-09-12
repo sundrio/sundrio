@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.FunctionFactory;
+import io.sundr.Provider;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -25,6 +26,7 @@ import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.Attributeable;
+import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
@@ -287,10 +289,12 @@ public class ClazzAs {
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
                     .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
-                    .withNewBlock()
-                    .withStatements(toEquals(fluentImplType, properties))
-                    .endBlock()
-                    .build();
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return toEquals(fluentImplType, properties);
+                        }
+                    })).build();
 
             methods.add(equals);
 
@@ -305,19 +309,19 @@ public class ClazzAs {
 
 
     public static final Function<TypeDef, TypeDef> BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
-        public TypeDef apply(TypeDef item) {
+        public TypeDef apply(final TypeDef item) {
             final Modifier[] modifiers = item.isAbstract()
                     ? new Modifier[]{Modifier.PUBLIC, Modifier.ABSTRACT}
                     : new Modifier[]{Modifier.PUBLIC};
 
-            TypeDef builderType = TypeAs.BUILDER.apply(item);
+            final TypeDef builderType = TypeAs.BUILDER.apply(item);
             ClassRef instanceRef = item.toInternalReference();
 
             ClassRef fluent = TypeAs.FLUENT_REF.apply(item);
 
             Set<Method> constructors = new LinkedHashSet<Method>();
             Set<Method> methods = new LinkedHashSet<Method>();
-            Set<Property> fields = new LinkedHashSet<Property>();
+            final Set<Property> fields = new LinkedHashSet<Property>();
 
             Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
             Property validationEnabledProperty = new PropertyBuilder().withTypeRef(BOOLEAN_REF).withName("validationEnabled").build();
@@ -339,7 +343,12 @@ public class ClazzAs {
                         .withName("validationEnabled")
                     .and()
                     .withNewBlock()
-                    .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(new " + item.getName() + "(), validationEnabled);" : "this.fluent = this; this.validationEnabled=validationEnabled;")
+                    .addToStatements(new StringStatement(new Provider<String>() {
+                        @Override
+                        public String get() {
+                            return hasDefaultConstructor(item) ? "this(new " + item.getName() + "(), validationEnabled);" : "this.fluent = this; this.validationEnabled=validationEnabled;";
+                        }
+                    }))
                     .endBlock()
                     .build();
 
@@ -366,7 +375,12 @@ public class ClazzAs {
                     .withName("validationEnabled")
                     .and()
                     .withNewBlock()
-                    .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(fluent, new " + item.getName() + "(), validationEnabled);" : "this.fluent = fluent; this.validationEnabled=validationEnabled;")
+                    .addToStatements(new StringStatement(new Provider<String>() {
+                        @Override
+                        public String get() {
+                            return hasDefaultConstructor(item) ? "this(fluent, new " + item.getName() + "(), validationEnabled);" : "this.fluent = fluent; this.validationEnabled=validationEnabled;";
+                        }
+                    }))
                     .endBlock()
                     .build();
 
@@ -384,8 +398,7 @@ public class ClazzAs {
                     .endBlock()
                     .build();
 
-            List<Statement> instanceAndFluentConstructorStatements = toInstanceConstructorBody(item, "fluent");
-            instanceAndFluentConstructorStatements.add(new StringStatement("this.validationEnabled = validationEnabled; "));
+
 
             Method instanceAndFluentAndValidationCosntructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -400,10 +413,14 @@ public class ClazzAs {
                     .withTypeRef(BOOLEAN_REF)
                     .withName("validationEnabled")
                     .and()
-                    .withNewBlock()
-                    .withStatements(instanceAndFluentConstructorStatements)
-                    .endBlock()
-                    .build();
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            List<Statement> instanceAndFluentConstructorStatements = toInstanceConstructorBody(item, "fluent");
+                            instanceAndFluentConstructorStatements.add(new StringStatement("this.validationEnabled = validationEnabled; "));
+                            return instanceAndFluentConstructorStatements;
+                        }
+                    })).build();
 
             Method instanceConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -415,8 +432,6 @@ public class ClazzAs {
                     .endBlock()
                     .build();
 
-            List<Statement> instanceConstructorStatements = toInstanceConstructorBody(item, "this");
-            instanceConstructorStatements.add(new StringStatement("this.validationEnabled = validationEnabled; "));
 
             Method instanceAndValidationConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -427,10 +442,14 @@ public class ClazzAs {
                     .withTypeRef(BOOLEAN_REF)
                     .withName("validationEnabled")
                     .and()
-                    .withNewBlock()
-                    .withStatements(instanceConstructorStatements)
-                    .endBlock()
-                    .build();
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            List<Statement> statements = toInstanceConstructorBody(item, "this");
+                            statements.add(new StringStatement("this.validationEnabled = validationEnabled; "));
+                            return statements;
+                        }
+                    })).build();
 
             constructors.add(emptyConstructor);
             constructors.add(validationConstructor);
@@ -445,14 +464,16 @@ public class ClazzAs {
                     .withModifiers(TypeUtils.modifiersToInt(modifiers))
                     .withReturnType(instanceRef)
                     .withName("build")
-                    .withNewBlock()
-                    .withStatements(toBuild(item, item))
-                    .endBlock()
-                    .build();
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return toBuild(item, item);
+                        }
+                    })).build();
             methods.add(build);
 
             //  private <T> void validate(T item) {}
-            Boolean validationGloballyEnabled = item.getAttributes().containsKey(VALIDATION_ENABLED) && (Boolean) item.getAttributes().get(VALIDATION_ENABLED);
+            final Boolean validationGloballyEnabled = item.getAttributes().containsKey(VALIDATION_ENABLED) && (Boolean) item.getAttributes().get(VALIDATION_ENABLED);
             Method validate = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
                     .withParameters(T)
@@ -462,9 +483,12 @@ public class ClazzAs {
                         .withTypeRef(T_REF)
                     .endArgument()
                     .withName("validate")
-                    .withNewBlock()
-                        .withStatements(toValidate(item,validationGloballyEnabled))
-                    .endBlock()
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return toValidate(item,validationGloballyEnabled);
+                        }
+                    }))
                     .addToAttributes(ALSO_IMPORT, validationGloballyEnabled ? Constants.VALIDATION_REFS : Collections.emptyList())
                     .build();
 
@@ -475,10 +499,12 @@ public class ClazzAs {
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
                     .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
-                    .withNewBlock()
-                    .withStatements(toEquals(builderType, fields))
-                    .endBlock()
-                    .build();
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return toEquals(builderType, fields);
+                        }
+                    })).build();
 
             methods.add(equals);
 
@@ -504,9 +530,12 @@ public class ClazzAs {
                     if (builder.getName() != null && builder.getName().equals("build")) {
                         builder.withModifiers(TypeUtils.modifiersToInt(modifiers));
                         builder.withReturnType(editable.toInternalReference());
-                        builder.withNewBlock()
-                                .withStatements(toBuild(editable, editable))
-                                .endBlock();
+                        builder.withBlock(new Block(new Provider<List<Statement>>() {
+                            @Override
+                            public List<Statement> get() {
+                                return toBuild(editable, editable);
+                            }
+                        }));
                     }
                 }
             }).build();
@@ -520,7 +549,7 @@ public class ClazzAs {
                     : new Modifier[]{Modifier.PUBLIC};
 
             TypeDef editableType = TypeAs.EDITABLE.apply(item);
-            TypeDef builderType = TypeAs.BUILDER.apply(item);
+            final TypeDef builderType = TypeAs.BUILDER.apply(item);
 
             Set<Method> constructors = new LinkedHashSet<Method>();
             Set<Method> methods = new LinkedHashSet<Method>();
@@ -534,7 +563,12 @@ public class ClazzAs {
                     .withReturnType(builderType.toInternalReference())
                     .withName("edit")
                     .withNewBlock()
-                        .addNewStringStatementStatement("return new " + builderType.getName() + "(this);")
+                        .addToStatements(new StringStatement(new Provider<String>() {
+                            @Override
+                            public String get() {
+                                return "return new " + builderType.getName() + "(this);";
+                            }
+                        }))
                     .endBlock()
                     .build();
 

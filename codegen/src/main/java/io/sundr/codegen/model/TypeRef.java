@@ -16,9 +16,15 @@
 
 package io.sundr.codegen.model;
 
-public interface TypeRef extends Attributeable {
+import java.util.Map;
 
-    boolean isAssignableFrom(TypeRef ref);
-    int getDimensions();
-    TypeRef withDimensions(int dimensions);
+public abstract class TypeRef extends AttributeSupport {
+
+    public TypeRef(Map<String, Object> attributes) {
+        super(attributes);
+    }
+
+    public abstract boolean isAssignableFrom(TypeRef ref);
+    public abstract int getDimensions();
+    public abstract TypeRef withDimensions(int dimensions);
 }

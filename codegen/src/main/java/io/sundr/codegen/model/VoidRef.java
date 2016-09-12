@@ -19,7 +19,7 @@ package io.sundr.codegen.model;
 import java.util.Collections;
 import java.util.Map;
 
-public class VoidRef extends AbstractTypeRef {
+public class VoidRef extends TypeRef {
 
     public VoidRef() {
         this(Collections.<String, Object>emptyMap());

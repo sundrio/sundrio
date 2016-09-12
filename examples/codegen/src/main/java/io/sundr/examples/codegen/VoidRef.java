@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Buildable
-public class VoidRef extends AbstractTypeRef {
+public class VoidRef extends TypeRef {
 
     private static final String VOID = "void";
 

@@ -38,6 +38,7 @@ import javax.lang.model.util.Types;
 import java.io.IOException;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
@@ -49,16 +50,16 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         Types types = processingEnv.getTypeUtils();
         Filer filer = processingEnv.getFiler();
 
-        Buildable buildable = null;
         BuilderContext ctx = null;
 
         //First pass register all buildables
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-                buildable = element.getAnnotation(Buildable.class);
+                Buildable buildable = element.getAnnotation(Buildable.class);
 
                 ctx = BuilderContextManager.create(elements, types, buildable.generateBuilderPackage(), buildable.builderPackage());
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
+                                .addToAttributes(BUILDABLE, buildable)
                                 .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())
                                 .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
                                 .build();
@@ -68,6 +69,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
 
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
                     TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
+                            .addToAttributes(BUILDABLE, buildable)
                             .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())
                             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
                             .build();
@@ -105,9 +107,12 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }
 
-                for (final Inline inline : buildable.inline()) {
-                    generateFromClazz(inlineableOf(ctx, typeDef, inline),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                Buildable buildable = (Buildable) typeDef.getAttributes().get(BUILDABLE);
+                if (buildable != null) {
+                    for (final Inline inline : buildable.inline()) {
+                        generateFromClazz(inlineableOf(ctx, typeDef, inline),
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

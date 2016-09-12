@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Buildable
-public class WildcardRef extends AbstractTypeRef {
+public class WildcardRef extends TypeRef {
 
 
     private static final String WILDCARD = "?";

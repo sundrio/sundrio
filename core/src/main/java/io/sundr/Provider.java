@@ -14,16 +14,9 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr;
 
-import java.util.Map;
-import java.lang.String;
-import java.lang.Object;
+public interface Provider<T> {
 
-public interface VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A>{
-
-
-
-
-
+    T get();
 }
