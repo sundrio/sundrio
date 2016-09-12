@@ -133,7 +133,7 @@ public class ClassRef extends TypeRef {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
+        TypeDef definition = getDefinition();
         if (definition == null) {
             sb.append(UNKWNON);
         }

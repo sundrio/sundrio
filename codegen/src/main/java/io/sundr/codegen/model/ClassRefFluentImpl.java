@@ -46,7 +46,9 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     }
 
     public A withDefinition(TypeDef definition){
-            this.definition = definition; return (A) this;
+        this.definition = definition;
+        this.fullyQualifiedName = definition.getFullyQualifiedName();
+        return (A) this;
     }
 
     public ClassRefFluent.DefinitionNested<A> withNewDefinition(){

@@ -59,6 +59,7 @@ public class Constants {
 
     public static final String VALIDATION_ENABLED = "VALIDATION_ENABLED";
     public static final String EDIATABLE_ENABLED = "EDITABLE_ENABLED";
+    public static final String BUILDABLE = "BUILDABLE";
 
     public static final String INIT = "INIT";
 

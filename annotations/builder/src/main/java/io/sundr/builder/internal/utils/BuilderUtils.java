@@ -51,8 +51,6 @@ public class BuilderUtils {
 
     private BuilderUtils() {}
 
-    public static final String BUILDABLE = "BUILDABLE";
-
     public static boolean isAbstract(TypeRef  typeRef) {
         DefinitionRepository repository =  BuilderContextManager.getContext().getDefinitionRepository();
         TypeDef def = repository.getDefinition(typeRef);
