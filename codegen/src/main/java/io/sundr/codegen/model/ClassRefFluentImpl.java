@@ -17,14 +17,16 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
-import io.sundr.builder.Nested;
-import java.util.ArrayList;
+import java.lang.String;
 import java.util.List;
+import java.util.ArrayList;
 import java.lang.Object;
+import io.sundr.builder.Nested;
 
 public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFluentImpl<A> implements ClassRefFluent<A>{
 
     private VisitableBuilder<? extends TypeDef,?> definition;
+    private String fullyQualifiedName;
     private int dimensions;
     private List<VisitableBuilder<? extends TypeRef,?>> arguments =  new ArrayList<VisitableBuilder<? extends TypeRef,?>>();
 
@@ -32,6 +34,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     }
     public ClassRefFluentImpl(ClassRef instance){
             this.withDefinition(instance.getDefinition()); 
+            this.withFullyQualifiedName(instance.getFullyQualifiedName()); 
             this.withDimensions(instance.getDimensions()); 
             this.withArguments(instance.getArguments()); 
             this.withAttributes(instance.getAttributes()); 
@@ -55,6 +58,14 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     public ClassRefFluent.DefinitionNested<A> editDefinition(){
             return withNewDefinitionLike(getDefinition());
+    }
+
+    public String getFullyQualifiedName(){
+            return this.fullyQualifiedName;
+    }
+
+    public A withFullyQualifiedName(String fullyQualifiedName){
+            this.fullyQualifiedName=fullyQualifiedName; return (A) this;
     }
 
     public int getDimensions(){
@@ -182,6 +193,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
             if (!super.equals(o)) return false;
             ClassRefFluentImpl that = (ClassRefFluentImpl) o;
             if (definition != null ? !definition.equals(that.definition) :that.definition != null) return false;
+            if (fullyQualifiedName != null ? !fullyQualifiedName.equals(that.fullyQualifiedName) :that.fullyQualifiedName != null) return false;
             if (dimensions != that.dimensions) return false;
             if (arguments != null ? !arguments.equals(that.arguments) :that.arguments != null) return false;
             return true;

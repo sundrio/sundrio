@@ -1,10 +1,10 @@
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Nested;
+import java.lang.String;
 import java.util.List;
 import java.lang.Object;
 import java.util.Map;
-import java.lang.String;
+import io.sundr.builder.Nested;
 
 public interface ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A>{
 
@@ -14,6 +14,8 @@ public interface ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFlue
     public ClassRefFluent.DefinitionNested<A> withNewDefinition();
     public ClassRefFluent.DefinitionNested<A> withNewDefinitionLike(TypeDef item);
     public ClassRefFluent.DefinitionNested<A> editDefinition();
+    public String getFullyQualifiedName();
+    public A withFullyQualifiedName(String fullyQualifiedName);
     public int getDimensions();
     public A withDimensions(int dimensions);
     public A addToArguments(TypeRef... items);

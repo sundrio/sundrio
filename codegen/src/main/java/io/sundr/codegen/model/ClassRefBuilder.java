@@ -43,6 +43,7 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder> impleme
     public ClassRefBuilder(ClassRefFluent<?> fluent,ClassRef instance,Boolean validationEnabled){
             this.fluent = fluent; 
             fluent.withDefinition(instance.getDefinition()); 
+            fluent.withFullyQualifiedName(instance.getFullyQualifiedName()); 
             fluent.withDimensions(instance.getDimensions()); 
             fluent.withArguments(instance.getArguments()); 
             fluent.withAttributes(instance.getAttributes()); 
@@ -54,6 +55,7 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder> impleme
     public ClassRefBuilder(ClassRef instance,Boolean validationEnabled){
             this.fluent = this; 
             this.withDefinition(instance.getDefinition()); 
+            this.withFullyQualifiedName(instance.getFullyQualifiedName()); 
             this.withDimensions(instance.getDimensions()); 
             this.withArguments(instance.getArguments()); 
             this.withAttributes(instance.getAttributes()); 
@@ -61,7 +63,7 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder> impleme
     }
 
     public EditableClassRef build(){
-            EditableClassRef buildable = new EditableClassRef(fluent.getDefinition(),fluent.getDimensions(),fluent.getArguments(),fluent.getAttributes());
+            EditableClassRef buildable = new EditableClassRef(fluent.getDefinition(),fluent.getFullyQualifiedName(),fluent.getDimensions(),fluent.getArguments(),fluent.getAttributes());
             validate(buildable);
             return buildable;
     }
