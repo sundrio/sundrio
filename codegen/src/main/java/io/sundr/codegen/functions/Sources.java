@@ -202,22 +202,28 @@ public class Sources {
                 }
             }
 
-            ClassRef tmpRef = new ClassRefBuilder()
-                    .withNewDefinition()
-                    .withPackageName(boundPackage)
-                    .withName(boundName)
-                    .endDefinition()
-                    .withArguments(arguments)
-                    .build();
 
-            TypeDef knwonDefition = DefinitionRepository.getRepository().getDefinition(tmpRef);
-            if (knwonDefition != null) {
-                return new ClassRefBuilder(tmpRef).withDefinition(knwonDefition).build();
+            if (classOrInterfaceType.getParentNode()  == classOrInterfaceType) {
+                return new TypeParamRefBuilder().withName(boundName).build();
+            }
+
+            String fqn = boundPackage + "." + boundName;
+            TypeDef knownDefinition = DefinitionRepository.getRepository().getDefinition(fqn);
+            if (knownDefinition == null) {
+                return new ClassRefBuilder()
+                        .withNewDefinition()
+                            .withPackageName(boundPackage)
+                            .withName(boundName)
+                        .endDefinition()
+                        .withArguments(arguments)
+                        .build();
             } else if (classOrInterfaceType.getTypeArgs().isEmpty() && boundName.length() == 1)  {
                 //We are doing our best here to distinguish between class refs and type parameter refs.
                 return new TypeParamRefBuilder().withName(boundName).build();
+            } else if (arguments.size() > 0) {
+                return knownDefinition.toReference(arguments.toArray(new TypeRef[arguments.size()]));
             } else {
-                return tmpRef;
+                return new ClassRefBuilder().withDefinition(knownDefinition).build();
             }
         }
     };

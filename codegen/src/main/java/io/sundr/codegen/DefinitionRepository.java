@@ -26,12 +26,14 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class DefinitionRepository {
 
     private static DefinitionRepository INSTANCE;
 
-    private final Map<String, TypeDef> definitions = new HashMap<String, TypeDef>();
+    private final ConcurrentMap<String, TypeDef> definitions = new ConcurrentHashMap<String, TypeDef>();
 
     private DefinitionRepository() {
     }
@@ -43,10 +45,15 @@ public class DefinitionRepository {
         return INSTANCE;
     }
 
-    public TypeDef register(TypeDef definition) {
+    public TypeDef registerIfAbsent(TypeDef definition) {
         if (definition != null) {
-            definitions.put(definition.getFullyQualifiedName(), definition);
+            definitions.putIfAbsent(definition.getFullyQualifiedName(), definition);
         }
+        return definition;
+    }
+
+    public TypeDef register(TypeDef definition) {
+        definitions.put(definition.getFullyQualifiedName(), definition);
         return definition;
     }
 
@@ -85,7 +92,7 @@ public class DefinitionRepository {
 
     public TypeDef getDefinition(TypeRef type) {
         if (type instanceof ClassRef) {
-            return definitions.get(((ClassRef)type).getDefinition().getFullyQualifiedName());
+            return definitions.get(((ClassRef)type).getFullyQualifiedName());
         }
         return null;
     }

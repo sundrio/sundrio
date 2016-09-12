@@ -22,10 +22,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.lang.Object;
 import io.sundr.builder.Nested;
+import io.sundr.codegen.DefinitionRepository;
 
 public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFluentImpl<A> implements ClassRefFluent<A>{
 
-    private VisitableBuilder<? extends TypeDef,?> definition;
+    private TypeDef definition;
     private String fullyQualifiedName;
     private int dimensions;
     private List<VisitableBuilder<? extends TypeRef,?>> arguments =  new ArrayList<VisitableBuilder<? extends TypeRef,?>>();
@@ -40,12 +41,12 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
             this.withAttributes(instance.getAttributes()); 
     }
 
-    public TypeDef getDefinition(){
-            return this.definition!=null?this.definition.build():null;
+    public TypeDef getDefinition() {
+            return this.definition;
     }
 
     public A withDefinition(TypeDef definition){
-            if (definition!=null){ this.definition= new TypeDefBuilder(definition); _visitables.add(this.definition);} return (A) this;
+            this.definition = definition; return (A) this;
     }
 
     public ClassRefFluent.DefinitionNested<A> withNewDefinition(){
@@ -60,12 +61,16 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
             return withNewDefinitionLike(getDefinition());
     }
 
-    public String getFullyQualifiedName(){
-            return this.fullyQualifiedName;
+    public String getFullyQualifiedName() {
+        return this.fullyQualifiedName;
     }
 
     public A withFullyQualifiedName(String fullyQualifiedName){
-            this.fullyQualifiedName=fullyQualifiedName; return (A) this;
+            this.fullyQualifiedName=fullyQualifiedName;
+            if (definition == null) {
+                this.definition = DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
+            }
+            return (A) this;
     }
 
     public int getDimensions(){

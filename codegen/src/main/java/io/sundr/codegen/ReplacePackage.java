@@ -75,6 +75,9 @@ public class ReplacePackage implements Visitor<Builder> {
     }
 
     private void visitClassRefBuilder(ClassRefBuilder builder) {
+
+        builder.withFullyQualifiedName(builder.getFullyQualifiedName().replace(target, replacement));
+
         if (builder.getDefinition() != null && builder.getDefinition().getPackageName() != null && builder.getDefinition().getPackageName().equals(target)) {
             builder.editDefinition().withPackageName(replacement).endDefinition();
         }
@@ -83,8 +86,9 @@ public class ReplacePackage implements Visitor<Builder> {
         for (TypeRef arg : builder.getArguments()) {
             if (arg instanceof ClassRef && ((ClassRef) arg).getDefinition().getPackageName().equals(target)) {
                 updatedArguments.add(new ClassRefBuilder((ClassRef) arg).editDefinition().withPackageName(replacement).endDefinition().build());
+            } else {
+                updatedArguments.add(arg);
             }
-            updatedArguments.add(arg);
         }
         builder.withArguments(updatedArguments);
     }

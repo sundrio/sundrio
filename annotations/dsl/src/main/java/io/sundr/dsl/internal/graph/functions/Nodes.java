@@ -205,8 +205,10 @@ public class Nodes {
                 } else {
                     //If we have a couple of classes to combine that are non-multiple
                     // we may end up with intermediate garbage in the registry, which are masking the real thing
-                    if (!isTransition(nextClazz) &&
-                            DslContextManager.getContext().getDefinitionRepository().getDefinition(nextClazz.getDefinition().getFullyQualifiedName()) == null) {
+                    if (!isTransition(nextClazz)
+                            //&&
+                            //DslContextManager.getContext().getDefinitionRepository().getDefinition(nextClazz.getDefinition().getFullyQualifiedName()) == null
+                            ) {
                         DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
                     }
                     return transition(clazz, nextClazz);
