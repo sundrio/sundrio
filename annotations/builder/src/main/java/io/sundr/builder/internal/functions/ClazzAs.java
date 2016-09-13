@@ -130,11 +130,13 @@ public class ClazzAs {
                     }
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
-                } else if (!descendants.isEmpty() && isCollection) {
+                } else if (!descendants.isEmpty()) {
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                        } else {
+                            methods.add(ToMethod.WITH.apply(descendant));
                         }
 
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
@@ -266,19 +268,20 @@ public class ClazzAs {
                     properties.add(buildableField(toAdd));
                 } else if (descendants.isEmpty()) {
                     properties.add(toAdd);
-                } else if (isCollection) {
+                } else if (!descendants.isEmpty()) {
                     properties.add(buildableField(toAdd));
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                        }  else {
+                            methods.add(ToMethod.WITH.apply(descendant));
                         }
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
                     }
-
                 } else {
                     properties.add(buildableField(toAdd));
                 }

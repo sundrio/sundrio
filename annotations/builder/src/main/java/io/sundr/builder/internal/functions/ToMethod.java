@@ -46,6 +46,7 @@ import java.util.TreeSet;
 
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.DESCENDANTS;
+import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.N_REF;
 import static io.sundr.builder.Constants.OUTER_CLASS;
@@ -119,7 +120,11 @@ public class ToMethod {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
                 String propertyName = property.getName();
                 String builderClass = builder.getName();
-                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
+                if (property.getAttributes().containsKey(DESCENDANT_OF)) {
+                    Property descedantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
+                    propertyName = descedantOf.getName();
+                }
+                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
                 return statements;
             } else if (!descendants.isEmpty()) {
                 for (Property descendant : descendants) {
