@@ -121,10 +121,10 @@ public class ToMethod {
                 String propertyName = property.getName();
                 String builderClass = builder.getName();
                 if (property.getAttributes().containsKey(DESCENDANT_OF)) {
-                    Property descedantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
-                    propertyName = descedantOf.getName();
+                    Property descendantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
+                    propertyName = descendantOf.getName();
                 }
-                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
+                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "("+name+"); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
                 return statements;
             } else if (!descendants.isEmpty()) {
                 for (Property descendant : descendants) {
