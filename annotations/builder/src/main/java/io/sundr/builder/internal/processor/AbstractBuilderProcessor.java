@@ -39,7 +39,6 @@ import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import static io.sundr.builder.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
@@ -98,7 +97,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 ? inline.name()
                 : inline.prefix() + type.getName() + inline.suffix();
 
-        Set<Method> constructors = new LinkedHashSet<Method>();
+        List<Method> constructors = new ArrayList<Method>();
         final TypeDef builderType = TypeAs.BUILDER.apply(type);
         TypeDef inlineType = BuilderUtils.getInlineType(ctx, inline);
         TypeDef returnType = BuilderUtils.getInlineReturnType(ctx, inline, type);
@@ -169,19 +168,6 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .build());
 
         if (type.equals(returnType)) {
-            constructors.add(new MethodBuilder()
-                    .withReturnType(inlineTypeRef)
-                    .withName(EMPTY)
-                    .addNewArgument()
-                    .withName(FUNCTION)
-                    .withTypeRef(functionType)
-                    .and()
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withNewBlock()
-                        .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(), String.format(EMPTY_FUNCTION_TEXT,type.toInternalReference(), returnType.toInternalReference(),  returnType.toInternalReference(),type.toInternalReference())))
-                    .endBlock()
-                    .build());
-
             constructors.add(new MethodBuilder()
                     .withReturnType(inlineTypeRef)
                     .withName(EMPTY)

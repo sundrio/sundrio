@@ -268,7 +268,7 @@ public class ToMethod {
                     .withTypeRef(unwrapped.withDimensions(1))
                     .build();
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
             String methodName = "addTo" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
@@ -330,7 +330,7 @@ public class ToMethod {
                     .withTypeRef(unwrapped.withDimensions(1))
                     .build();
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
             String methodName = "removeFrom" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
@@ -477,7 +477,7 @@ public class ToMethod {
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(baseType.getDefinition().getParameters());
+            List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
             List<TypeRef> typeArguments = new ArrayList<TypeRef>();
             for (TypeRef arg : baseType.getArguments()) {
                 typeArguments.add(arg);
@@ -536,8 +536,7 @@ public class ToMethod {
                         .withReturnType(returnType)
                         .withArguments(constructor.getArguments())
                         .withName(ownName)
-                        //TODO: decide how to roll. Use sets or lists?
-                        .withParameters(new LinkedHashSet<TypeParamDef>(baseType.getParameters()))
+                        .withParameters(baseType.getParameters())
                         .withNewBlock()
                         .addNewStringStatementStatement("return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
                         .endBlock()
@@ -561,7 +560,7 @@ public class ToMethod {
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(baseType.getDefinition().getParameters());
+            List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
             List<TypeRef> typeArguments = new ArrayList<TypeRef>();
             for (TypeRef ignore : baseType.getArguments()) {
                 typeArguments.add(Q);

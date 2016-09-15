@@ -34,8 +34,8 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         return result;
     }
 
-    public static <T> LinkedHashSet<T> build(Set<? extends Builder<? extends T>> list) {
-        LinkedHashSet<T> result = new LinkedHashSet<T>();
+    public static <T> List<T> build(Set<? extends Builder<? extends T>> list) {
+        List<T> result = new ArrayList<T>();
         for (Builder<? extends T> builder : list) {
             result.add(builder.build());
         }

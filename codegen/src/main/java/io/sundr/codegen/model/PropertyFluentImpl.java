@@ -20,6 +20,8 @@ import io.sundr.builder.VisitableBuilder;
 import java.util.LinkedHashSet;
 import java.lang.String;
 import io.sundr.builder.Nested;
+
+import java.util.List;
 import java.util.Set;
 import java.lang.Object;
 
@@ -47,11 +49,11 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
 
-    public Set<ClassRef> getAnnotations(){
+    public List<ClassRef> getAnnotations(){
             return build(annotations);
     }
 
-    public A withAnnotations(Set<ClassRef> annotations){
+    public A withAnnotations(List<ClassRef> annotations){
             this.annotations.clear();
             if (annotations != null) {for (ClassRef item : annotations){this.addToAnnotations(item);}} return (A) this;
     }

@@ -18,7 +18,6 @@ package io.sundr.codegen.model;
 
 import io.sundr.codegen.utils.StringUtils;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,18 +39,18 @@ public class TypeDef extends ModifierSupport {
     private final String packageName;
     private final String name;
 
-    private final Set<ClassRef> annotations;
-    private final Set<ClassRef> extendsList;
-    private final Set<ClassRef> implementsList;
+    private final List<ClassRef> annotations;
+    private final List<ClassRef> extendsList;
+    private final List<ClassRef> implementsList;
     private final List<TypeParamDef> parameters;
 
-    private final Set<Property> properties;
-    private final Set<Method> constructors;
-    private final Set<Method> methods;
+    private final List<Property> properties;
+    private final List<Method> constructors;
+    private final List<Method> methods;
     private final TypeDef outerType;
-    private final Set<TypeDef> innerTypes;
+    private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, TypeDef outerType, Set<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<ClassRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
@@ -75,8 +74,8 @@ public class TypeDef extends ModifierSupport {
      * @param target
      * @return
      */
-    private static Set<Method> adaptConstructors(Set<Method> methods, TypeDef target) {
-        Set<Method> adapted = new LinkedHashSet<Method>();
+    private static List<Method> adaptConstructors(List<Method> methods, TypeDef target) {
+        List<Method> adapted = new ArrayList<Method>();
         for (Method m : methods) {
             adapted.add(new MethodBuilder(m)
                     .withName(null)
@@ -86,8 +85,8 @@ public class TypeDef extends ModifierSupport {
         return adapted;
     }
 
-    private static Set<TypeDef> setOuterType(Set<TypeDef> types, TypeDef outer) {
-        Set<TypeDef> updated = new LinkedHashSet<TypeDef>();
+    private static List<TypeDef> setOuterType(List<TypeDef> types, TypeDef outer) {
+        List<TypeDef> updated = new ArrayList<TypeDef>();
         for (TypeDef typeDef : types) {
             if (outer.equals(typeDef.getOuterType())) {
                 updated.add(typeDef);
@@ -149,7 +148,7 @@ public class TypeDef extends ModifierSupport {
         return kind;
     }
 
-    public Set<ClassRef> getAnnotations() {
+    public List<ClassRef> getAnnotations() {
         return annotations;
     }
 
@@ -161,11 +160,11 @@ public class TypeDef extends ModifierSupport {
         return name;
     }
 
-    public Set<ClassRef> getExtendsList() {
+    public List<ClassRef> getExtendsList() {
         return extendsList;
     }
 
-    public Set<ClassRef> getImplementsList() {
+    public List<ClassRef> getImplementsList() {
         return implementsList;
     }
 
@@ -173,15 +172,15 @@ public class TypeDef extends ModifierSupport {
         return parameters;
     }
 
-    public Set<Property> getProperties() {
+    public List<Property> getProperties() {
         return properties;
     }
 
-    public Set<Method> getConstructors() {
+    public List<Method> getConstructors() {
         return constructors;
     }
 
-    public Set<Method> getMethods() {
+    public List<Method> getMethods() {
         return methods;
     }
 
@@ -189,7 +188,7 @@ public class TypeDef extends ModifierSupport {
         return outerType;
     }
 
-    public Set<TypeDef> getInnerTypes() {
+    public List<TypeDef> getInnerTypes() {
         return innerTypes;
     }
 

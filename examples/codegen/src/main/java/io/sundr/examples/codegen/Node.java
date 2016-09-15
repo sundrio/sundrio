@@ -16,13 +16,19 @@
 
 package io.sundr.examples.codegen;
 
+public interface Node {
 
-import java.util.Map;
+    String DOT = ".";
+    String COMA = ",";
+    String SEMICOLN = ";";
+    String SPACE = " ";
 
-public interface Attributeable extends Node {
+    String LT = "<";
+    String GT = ">";
 
-    String ALSO_IMPORT = "ALSO_IMPORT";
-    String INIT = "INIT";
+    String EXTENDS = "extends";
+    String IMPLEMENTS = "implements";
 
-    Map<String, Object> getAttributes();
+    String JAVA_LANG = "java.lang";
+
 }

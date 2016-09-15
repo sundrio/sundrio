@@ -18,13 +18,13 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Editable;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class EditableProperty extends Property implements Editable<PropertyBuilder>{
 
 
-public EditableProperty( Set<ClassRef> annotations , TypeRef typeRef , String name , int modifiers , Map<String, Object> attributes ){
+public EditableProperty(List<ClassRef> annotations , TypeRef typeRef , String name , int modifiers , Map<String, Object> attributes ){
     super(annotations, typeRef, name, modifiers, attributes);
 }
 

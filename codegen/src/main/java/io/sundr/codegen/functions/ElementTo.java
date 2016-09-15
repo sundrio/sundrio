@@ -144,7 +144,7 @@ public class ElementTo {
             String name = variableElement.getSimpleName().toString();
 
             TypeRef type = MIRROR_TO_TYPEREF.apply(variableElement.asType());
-            Set<ClassRef> annotations = new LinkedHashSet<ClassRef>();
+            List<ClassRef> annotations = new ArrayList<ClassRef>();
             for (AnnotationMirror annotationMirror : variableElement.getAnnotationMirrors()) {
                 TypeRef annotationType = annotationMirror.getAnnotationType().accept(new TypeRefTypeVisitor(), 0);
                 if (annotationType instanceof ClassRef) {
@@ -177,7 +177,7 @@ public class ElementTo {
              for (VariableElement variableElement : executableElement.getParameters()) {
                  methodBuilder = methodBuilder.addToArguments(PROPERTY.apply(variableElement));
 
-                 Set<ClassRef> exceptionRefs = new LinkedHashSet<ClassRef>();
+                 List<ClassRef> exceptionRefs = new ArrayList<ClassRef>();
                  for (TypeMirror thrownType : executableElement.getThrownTypes()) {
                      if (thrownType instanceof ClassRef) {
                          exceptionRefs.add((ClassRef) thrownType);
@@ -186,7 +186,7 @@ public class ElementTo {
                  methodBuilder = methodBuilder.withExceptions(exceptionRefs);
              }
 
-             Set<ClassRef> annotationRefs = new LinkedHashSet<ClassRef>();
+             List<ClassRef> annotationRefs = new ArrayList<ClassRef>();
              for (AnnotationMirror annotationMirror : executableElement.getAnnotationMirrors()) {
                  TypeRef annotationType = MIRROR_TO_TYPEREF.apply(annotationMirror.getAnnotationType());
                  if (annotationType instanceof ClassRef) {
@@ -269,7 +269,7 @@ public class ElementTo {
                     .build();
 
 
-            Set<TypeDef> innerTypes = new LinkedHashSet<TypeDef>();
+            List<TypeDef> innerTypes = new ArrayList<TypeDef>();
             for (TypeElement innerElement : ElementFilter.typesIn(classElement.getEnclosedElements())) {
                 TypeDef innerType = TYPEDEF.apply(innerElement);
                 innerType = new TypeDefBuilder(innerType).withOuterType(baseType).build();
@@ -329,7 +329,7 @@ public class ElementTo {
     public static final Function<TypeElement, TypeDef> SHALLOW_TYPEDEF = new Function<TypeElement, TypeDef>() {
 
         public TypeDef apply(TypeElement classElement) {
-            Set<ClassRef> extendsList = new LinkedHashSet<ClassRef>();
+            List<ClassRef> extendsList = new ArrayList<ClassRef>();
 
             //Check SuperClass
             Kind kind = Kind.CLASS;

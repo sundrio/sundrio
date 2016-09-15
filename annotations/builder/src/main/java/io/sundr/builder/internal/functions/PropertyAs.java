@@ -69,12 +69,12 @@ public final class PropertyAs {
                 //nestedType = new TypeDefBuilder(nestedType).withInterfaces(nestedInterfaces.toArray(new TypeDef[nestedInterfaces.size()])).build();
                 //TypeDef nestedUnwrapped = new TypeDefBuilder(nestedType).withGenericTypes(new TypeDef[0]).build();
 
-                Set<Method> nestedMethods = new HashSet<Method>();
+                List<Method> nestedMethods = new ArrayList<Method>();
                 nestedMethods.add(ToMethod.AND.apply(item));
                 nestedMethods.add(ToMethod.END.apply(item));
 
-                Set<Property> properties = new HashSet<Property>();
-                Set<Method> constructors = new HashSet<Method>();
+                List<Property> properties = new ArrayList<Property>();
+                List<Method> constructors = new ArrayList<Method>();
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")
@@ -129,12 +129,12 @@ public final class PropertyAs {
                 }
 
 
-                Set<Method> nestedMethods = new HashSet<Method>();
+                List<Method> nestedMethods = new ArrayList<Method>();
                 nestedMethods.add(ToMethod.AND.apply(item));
                 nestedMethods.add(ToMethod.END.apply(item));
 
-                Set<Property> properties = new HashSet<Property>();
-                Set<Method> constructors = new HashSet<Method>();
+                List<Property> properties = new ArrayList<Property>();
+                List<Method> constructors = new ArrayList<Method>();
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")

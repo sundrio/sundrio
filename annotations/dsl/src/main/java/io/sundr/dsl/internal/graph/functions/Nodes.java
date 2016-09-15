@@ -134,7 +134,7 @@ public class Nodes {
 
     public static final Function<Node<TypeDef>, TypeDef> TO_ROOT = new Function<Node<TypeDef>, TypeDef>() {
         public TypeDef apply(Node<TypeDef> item) {
-            Set<ClassRef> interfaces = new LinkedHashSet<ClassRef>();
+            List<ClassRef> interfaces = new ArrayList<ClassRef>();
 
             for (Node<TypeDef> child : item.getTransitions()) {
                 ClassRef transitionInterface = TO_TRANSITION.apply(child);
@@ -149,7 +149,7 @@ public class Nodes {
                     .build();
 
             return new TypeDefBuilder(Generics.UNWRAP.apply(rootType))
-                    .withMethods(new LinkedHashSet<Method>())
+                    .withMethods(new ArrayList<Method>())
                     .build();
         }
     };
@@ -181,7 +181,7 @@ public class Nodes {
 
                     reCombinedType = new TypeDefBuilder(reCombinedType).accept(new TypedVisitor<TypeDefBuilder>() {
                         public void visit(TypeDefBuilder builder) {
-                            Set<ClassRef> updatedInterfaces = new LinkedHashSet<ClassRef>();
+                            List<ClassRef> updatedInterfaces = new ArrayList<ClassRef>();
                             for (ClassRef interfaceRef : builder.getExtendsList()) {
                                 if (interfaceRef.equals(selfRef)) {
                                     updatedInterfaces.add(selfRef.getDefinition().toReference(reCombinedRef));
