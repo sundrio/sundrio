@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -55,7 +56,7 @@ public final class PropertyAs {
 
             if (unwrapped instanceof ClassRef) {
                 TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
-                TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
+                ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType).toReference();
 
                 TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
                 TypeRef nestedRef = nestedType.toReference();
@@ -77,7 +78,7 @@ public final class PropertyAs {
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")
-                        .withTypeRef(builderType.toReference()).build());
+                        .withTypeRef(builderType).build());
 
                 constructors.add(new MethodBuilder()
                         .withName("")
@@ -298,7 +299,7 @@ public final class PropertyAs {
 
                 return new TypeDefBuilder(typeDef)
                         .withPackageName(outerInterface.getPackageName())
-                        .withName(captializeFirst(property.getName() + "Nested"))
+                        .withName(BuilderUtils.fullyQualifiedNameDiff(property) + captializeFirst(property.getName() + "Nested"))
                         .withParameters(parameters)
                         .build();
             }

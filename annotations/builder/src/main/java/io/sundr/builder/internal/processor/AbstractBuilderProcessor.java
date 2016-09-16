@@ -18,11 +18,14 @@ package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.model.AttributeSupportFluent;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
@@ -37,7 +40,13 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static io.sundr.builder.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
@@ -198,6 +207,53 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                         builder.withArguments(updatedArguments);
                     }
                 }).build();
+    }
+
+
+    /**
+     * Create a mapping from class name to {@link ClassRef}.
+     * @return
+     */
+    public void addCustomMappings(BuilderContext builderContext) {
+        DefinitionRepository definitionRepository = builderContext.getDefinitionRepository();
+
+        List<ClassRef> refs = new ArrayList<ClassRef>();
+        for (TypeDef typeDef : builderContext.getDefinitionRepository().getDefinitions()) {
+            refs.add(typeDef.toInternalReference());
+        }
+
+        //It's best to have predictable order, so that we can generate uniform code.
+        Collections.sort(refs, new Comparator<ClassRef>() {
+            @Override
+            public int compare(ClassRef o1, ClassRef o2) {
+                return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
+            }
+        });
+
+        for (ClassRef ref : refs) {
+            String key = ref.getName();
+
+            if (BuilderUtils.isBuildable(ref)) {
+
+                //Add the builder
+                String builderKey = key + "Builder";
+                if (!definitionRepository.customMappingExists(builderKey)) {
+                    definitionRepository.putCustomMapping(builderKey, ref.getDefinition().getFullyQualifiedName() + "Builder");
+                }
+
+                //Add the builder
+                String fluentKey = key + "Fluent";
+                if (!definitionRepository.customMappingExists(fluentKey)) {
+                    definitionRepository.putCustomMapping(fluentKey, ref.getDefinition().getFullyQualifiedName() + "Fluent");
+                }
+
+                //Add the builder
+                String fluentImplKey = key + "FluentImpl";
+                if (!definitionRepository.customMappingExists(fluentImplKey)) {
+                    definitionRepository.putCustomMapping(fluentImplKey, ref.getDefinition().getFullyQualifiedName() + "FluentImpl");
+                }
+            }
+        }
     }
 
     private static final String EMPTY_FUNCTION_TEXT = loadResourceQuietly(EMPTY_FUNCTION_SNIPPET);

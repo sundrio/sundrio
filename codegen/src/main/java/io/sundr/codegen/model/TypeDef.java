@@ -16,10 +16,13 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.builder.Visitor;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -244,6 +247,7 @@ public class TypeDef extends ModifierSupport {
         return new ClassRefBuilder()
                 .withDefinition(this)
                 .withArguments(actualArguments)
+                .withAttributes(getAttributes())
                 .build();
     }
 
@@ -269,6 +273,7 @@ public class TypeDef extends ModifierSupport {
         return new ClassRefBuilder()
                 .withDefinition(this)
                 .withArguments(arguments)
+                .withAttributes(getAttributes())
                 .build();
     }
 
@@ -295,20 +300,34 @@ public class TypeDef extends ModifierSupport {
         return imports;
     }
 
+
     /**
      * Create a mapping from class name to {@link ClassRef}.
      * @return
      */
-    public Map<String, ClassRef> getReferenceMap() {
+    private Map<String, ClassRef> getReferenceMap() {
         Map<String, ClassRef> mapping = new HashMap<String, ClassRef>();
-        for (ClassRef ref : getReferences()) {
-            mapping.put(ref.getDefinition().getName(), ref);
+        List<ClassRef> refs = getReferences();
+
+        //It's best to have predictable order, so that we can generate uniform code.
+        Collections.sort(refs, new Comparator<ClassRef>() {
+            @Override
+            public int compare(ClassRef o1, ClassRef o2) {
+                return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
+            }
+        });
+
+        for (ClassRef ref : refs) {
+            String key = ref.getDefinition().getName();
+            if (!mapping.containsKey(key)) {
+                mapping.put(key, ref);
+            }
         }
         return mapping;
     }
 
-    public Set<ClassRef> getReferences() {
-        final Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+    public List<ClassRef> getReferences() {
+        final List<ClassRef> refs = new ArrayList<ClassRef>();
 
         for (ClassRef i : implementsList) {
             refs.addAll(i.getReferences());

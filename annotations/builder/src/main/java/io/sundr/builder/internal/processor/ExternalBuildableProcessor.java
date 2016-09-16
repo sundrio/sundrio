@@ -24,6 +24,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
@@ -36,6 +37,9 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
@@ -85,7 +89,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         if (ctx == null) {
             return true;
         }
+
         generateLocalDependenciesIfNeeded();
+        addCustomMappings(ctx);
         for (TypeDef typeDef : ctx.getBuildableRepository().getBuildables()) {
             try {
                 generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),

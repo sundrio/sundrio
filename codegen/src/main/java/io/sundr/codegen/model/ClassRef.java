@@ -108,6 +108,28 @@ public class ClassRef extends TypeRef {
         return refs;
     }
 
+    /**
+     * Checks if the ref needs to be done by fully qualified name.
+     * Why? Because an other reference to a class with the same name but different package has been made already.
+     * @return
+     */
+    private boolean requiresFullyQualifiedName() {
+        Map<String, String> referenceMap = DefinitionRepository.getRepository().getReferenceMap();
+        if (referenceMap != null && referenceMap.containsKey(definition.getName())) {
+            String fqn = referenceMap.get(definition.getName());
+            if (!getDefinition().getFullyQualifiedName().equals(fqn)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getName() {
+        if (requiresFullyQualifiedName()) {
+            return getDefinition().getFullyQualifiedName();
+        }
+        return getDefinition().getName();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -137,7 +159,12 @@ public class ClassRef extends TypeRef {
         if (definition == null) {
             sb.append(UNKWNON);
         }
-        else if (definition.getOuterType() != null) {
+
+        if (requiresFullyQualifiedName()) {
+            sb.append(definition.getPackageName()).append(DOT);
+        }
+
+        if (definition.getOuterType() != null) {
             sb.append(definition.getOuterType().getName()).append(DOT).append(definition.getName());
         } else {
             sb.append(definition.getName());

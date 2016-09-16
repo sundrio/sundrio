@@ -79,9 +79,14 @@ public class Decendants {
                     ClassRef candidate = (ClassRef) unwrapped;
 
                     for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
-                        ClassRef collectionType = new ClassRefBuilder((ClassRef)baseType).withArguments(descendant.toInternalReference()).build();
-                        String propertyName = deCaptializeFirst(descendant.getName()) + property.getNameCapitalized();
+                        ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
+                                .build();
 
+                        ClassRef collectionType = new ClassRefBuilder((ClassRef)baseType)
+                                .withArguments(descendantRef)
+                                .build();
+
+                        String propertyName = deCaptializeFirst(descendant.getName()) + property.getNameCapitalized();
                         result.add(new PropertyBuilder(property)
                                 .withName(propertyName)
                                 .withTypeRef(collectionType)
@@ -93,11 +98,14 @@ public class Decendants {
             } else if (baseType instanceof  ClassRef) {
                 ClassRef candidate = (ClassRef) baseType;
                 for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
+                    ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
+                            .build();
+
                     String propertyName =  deCaptializeFirst(descendant.getName() + property.getNameCapitalized());
 
                     result.add(new PropertyBuilder(property)
                             .withName(propertyName)
-                            .withTypeRef(descendant.toReference())
+                            .withTypeRef(descendantRef)
                             .addToAttributes(DESCENDANT_OF, property)
                             .addToAttributes(BUILDABLE, true)
                             .build());

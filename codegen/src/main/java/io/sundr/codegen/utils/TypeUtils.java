@@ -17,8 +17,10 @@
 package io.sundr.codegen.utils;
 
 import io.sundr.Function;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.PrimitiveRef;
+import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
@@ -31,6 +33,9 @@ import javax.lang.model.element.Modifier;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+
+import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 
 
 public final class TypeUtils {
@@ -72,7 +77,7 @@ public final class TypeUtils {
     public static TypeParamDef getParamterDefinition(TypeRef typeRef, Collection<TypeParamDef> parameters) {
         String name;
         if (typeRef instanceof ClassRef) {
-            name = ((ClassRef)typeRef).getDefinition().getName();
+            name = ((ClassRef)typeRef).getName();
         } else if (typeRef instanceof TypeParamRef) {
             name = ((TypeParamRef)typeRef).getName();
         } else if (typeRef instanceof PrimitiveRef) {
@@ -198,4 +203,29 @@ public final class TypeUtils {
         return result;
     }
 
+
+    public static String fullyQualifiedNameDiff(TypeRef typeRef) {
+        Map<String, String> map = DefinitionRepository.getRepository().getReferenceMap();
+        if (typeRef instanceof ClassRef) {
+            ClassRef classRef = (ClassRef) typeRef;
+            if (!classRef.getName().equals(classRef.getDefinition().getName())) {
+                String importedName = map.get(classRef.getDefinition().getName());
+                return captializeFirst(TypeUtils.fullyQualifiedNameDiff(importedName, classRef.getFullyQualifiedName()));
+            }
+        }
+        return "";
+    }
+
+
+    public static String fullyQualifiedNameDiff(String left, String right) {
+        String[] lparts = left.split("\\.");
+        String[] rparts = right.split("\\.");
+
+        for (int l=lparts.length-1,r=rparts.length-1;l>=0 && r>=0;r--,l--) {
+            if (!lparts[l].equals(rparts[r])) {
+                return rparts[r];
+            }
+        }
+        return "other";
+    }
 }

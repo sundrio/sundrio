@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
@@ -24,6 +25,8 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.AttributeSupportFluent;
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
@@ -84,6 +87,8 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             return true;
         }
         generateLocalDependenciesIfNeeded();
+        addCustomMappings(ctx);
+
         for (TypeDef typeDef : ctx.getBuildableRepository().getBuildables()) {
             try {
                 generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
