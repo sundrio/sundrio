@@ -42,7 +42,6 @@ import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public final class PropertyAs {
 
@@ -59,7 +58,7 @@ public final class PropertyAs {
                 TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
 
                 TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
-                TypeRef nestedRef = classRefOf(nestedType);
+                TypeRef nestedRef = nestedType.toReference();
 
                 Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
                 for (ClassRef n : nestedType.getImplementsList()) {
@@ -78,7 +77,7 @@ public final class PropertyAs {
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")
-                        .withTypeRef(classRefOf(builderType)).build());
+                        .withTypeRef(builderType.toReference()).build());
 
                 constructors.add(new MethodBuilder()
                         .withName("")
@@ -121,7 +120,7 @@ public final class PropertyAs {
                 TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
 
                 TypeDef nestedType = NESTED_INTERFACE_TYPE.apply(item);
-                TypeRef nestedRef = classRefOf(nestedType);
+                TypeRef nestedRef = nestedType.toReference();
 
                 Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
                 for (ClassRef n : nestedType.getImplementsList()) {
@@ -138,14 +137,14 @@ public final class PropertyAs {
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")
-                        .withTypeRef(classRefOf(builderType)).build());
+                        .withTypeRef(builderType.toReference()).build());
 
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
                         .addNewArgument()
                         .withName("item")
-                        .withTypeRef(classRefOf(baseType))
+                        .withTypeRef(baseType.toReference())
                         .endArgument()
                         .withNewBlock()
                             .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this, item);")

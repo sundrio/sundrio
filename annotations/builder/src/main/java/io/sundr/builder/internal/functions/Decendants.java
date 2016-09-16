@@ -36,7 +36,6 @@ import java.util.Set;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.BUILDABLE;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 
@@ -98,7 +97,7 @@ public class Decendants {
 
                     result.add(new PropertyBuilder(property)
                             .withName(propertyName)
-                            .withTypeRef(classRefOf(descendant))
+                            .withTypeRef(descendant.toReference())
                             .addToAttributes(DESCENDANT_OF, property)
                             .addToAttributes(BUILDABLE, true)
                             .build());

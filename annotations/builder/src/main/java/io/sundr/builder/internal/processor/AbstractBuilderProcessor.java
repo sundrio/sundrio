@@ -37,13 +37,11 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import static io.sundr.builder.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
@@ -114,7 +112,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         TypeRef functionType = ctx.getFunctionInterface().toReference(type.toInternalReference(), returnType.toInternalReference());
 
         Property builderProperty = new PropertyBuilder()
-                .withTypeRef(classRefOf(TypeAs.BUILDER.apply(type)))
+                .withTypeRef(TypeAs.BUILDER.apply(type).toInternalReference())
                 .withName(BUILDER)
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                 .build();
@@ -155,7 +153,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .withName(EMPTY)
                 .addNewArgument()
                     .withName(ITEM)
-                    .withTypeRef(classRefOf(type))
+                    .withTypeRef(type.toReference())
                 .and()
                 .addNewArgument()
                 .withName(FUNCTION)
@@ -173,7 +171,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     .withName(EMPTY)
                     .addNewArgument()
                     .withName(ITEM)
-                    .withTypeRef(classRefOf(type))
+                    .withTypeRef(type.toReference())
                     .and()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withNewBlock()

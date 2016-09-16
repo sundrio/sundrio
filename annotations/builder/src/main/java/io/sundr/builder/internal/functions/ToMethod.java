@@ -73,7 +73,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 
 public class ToMethod {
@@ -567,8 +566,8 @@ public class ToMethod {
             }
             typeArguments.add(returnType);
 
-            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray());
-            ClassRef rewrapedImpl = classRefOf(nestedTypeImpl, typeArguments.toArray());
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
 
@@ -615,8 +614,8 @@ public class ToMethod {
             }
             typeArguments.add(returnType);
 
-            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray());
-            ClassRef rewrapedImpl = classRefOf(nestedTypeImpl, typeArguments.toArray());
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             String prefix = "edit";
             String methodNameBase = captializeFirst(property.getName());

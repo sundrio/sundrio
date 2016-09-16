@@ -33,7 +33,6 @@ import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableSuperClass;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableSuperClassRef;
 import static io.sundr.builder.internal.utils.BuilderUtils.getNextGeneric;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 
 public class TypeAs {
@@ -226,7 +225,7 @@ public class TypeAs {
 
     public static final Function<TypeRef, TypeRef> ARRAY_LIST_OF = new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
-            return classRefOf(Constants.ARRAY_LIST, item);
+            return Constants.ARRAY_LIST.toReference(item);
         }
 
     };

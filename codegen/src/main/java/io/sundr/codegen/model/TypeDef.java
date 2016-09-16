@@ -248,6 +248,15 @@ public class TypeDef extends ModifierSupport {
     }
 
     /**
+     * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     * @param arguments The arguments to be passed to the reference.
+     * @return
+     */
+    public ClassRef toReference(Collection<TypeRef> arguments) {
+        return toReference(arguments.toArray(new TypeRef[arguments.size()]));
+    }
+
+    /**
      * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties etc).
      * It uses as arguments the same 'letters' as the parameters definition.
      * @return

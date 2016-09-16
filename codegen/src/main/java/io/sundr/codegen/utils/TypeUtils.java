@@ -18,7 +18,6 @@ package io.sundr.codegen.utils;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
@@ -29,10 +28,10 @@ import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
 
 import javax.lang.model.element.Modifier;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+
 
 public final class TypeUtils {
     
@@ -107,27 +106,6 @@ public final class TypeUtils {
     public static TypeParamDef newTypeParamDef(String letter) {
         return new TypeParamDefBuilder().withName(letter).build();
     }
-
-    /**
-     * Create a {@link ClassRef} for the specified {@link TypeDef}.
-     * @param typeDef
-     * @return
-     */
-    public static ClassRef classRefOf(TypeDef typeDef, Object... arguments) {
-        List<TypeRef> acutalArguments = new ArrayList<TypeRef>();
-        for (Object a : arguments) {
-            if (a instanceof TypeRef) {
-                acutalArguments.add((TypeRef)a);
-            } else if (a instanceof TypeDef) {
-                acutalArguments.add(classRefOf((TypeDef)a));
-            }
-        }
-        return new ClassRefBuilder()
-                .withDefinition(typeDef)
-                .withArguments(acutalArguments)
-                .build();
-    }
-
 
     /**
      * Removes parameters from a TypeDef.
