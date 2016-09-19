@@ -241,6 +241,12 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     definitionRepository.putCustomMapping(builderKey, ref.getDefinition().getFullyQualifiedName() + "Builder");
                 }
 
+                //Add the editable
+                String editableKey = "Editable" + key;
+                if (!definitionRepository.customMappingExists(editableKey)) {
+                    definitionRepository.putCustomMapping(editableKey, "Editable" + ref.getDefinition().getFullyQualifiedName());
+                }
+
                 //Add the builder
                 String fluentKey = key + "Fluent";
                 if (!definitionRepository.customMappingExists(fluentKey)) {

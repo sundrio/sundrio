@@ -209,21 +209,22 @@ public class Sources {
 
             String fqn = boundPackage + "." + boundName;
             TypeDef knownDefinition = DefinitionRepository.getRepository().getDefinition(fqn);
-            if (knownDefinition == null) {
-                return new ClassRefBuilder()
-                        .withNewDefinition()
-                            .withPackageName(boundPackage)
-                            .withName(boundName)
-                        .endDefinition()
-                        .withArguments(arguments)
-                        .build();
+
+            if (knownDefinition != null) {
+                return arguments.isEmpty()
+                        ? new ClassRefBuilder().withDefinition(knownDefinition).build()
+                        : knownDefinition.toReference(arguments);
             } else if (classOrInterfaceType.getTypeArgs().isEmpty() && boundName.length() == 1)  {
                 //We are doing our best here to distinguish between class refs and type parameter refs.
                 return new TypeParamRefBuilder().withName(boundName).build();
-            } else if (arguments.size() > 0) {
-                return knownDefinition.toReference(arguments.toArray(new TypeRef[arguments.size()]));
             } else {
-                return new ClassRefBuilder().withDefinition(knownDefinition).build();
+                return new ClassRefBuilder()
+                        .withNewDefinition()
+                        .withPackageName(boundPackage)
+                        .withName(boundName)
+                        .endDefinition()
+                        .withArguments(arguments)
+                        .build();
             }
         }
     };

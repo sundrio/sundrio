@@ -42,6 +42,8 @@ public class DefinitionRepository {
     //Custom mappings
     private final ConcurrentMap<String, String> custom = new ConcurrentHashMap<String, String>();
 
+    private Map<String, String> snapshot;
+
     private DefinitionRepository() {
     }
 
@@ -108,7 +110,18 @@ public class DefinitionRepository {
        return definitions.values();
     }
 
+    public void updateReferenceMap() {
+        snapshot = getReferenceMapInternal();
+    }
+
     public Map<String, String> getReferenceMap() {
+        if (snapshot == null) {
+            snapshot = getReferenceMapInternal();
+        }
+        return snapshot;
+    }
+
+    private Map<String, String> getReferenceMapInternal() {
         Map<String, String> mapping = new HashMap<String, String>();
         List<ClassRef> refs = new ArrayList<ClassRef>();
         for (TypeDef typeDef : getDefinitions()) {

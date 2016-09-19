@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.FunctionFactory;
 import io.sundr.Function;
+import io.sundr.builder.annotations.IgnoreDescendants;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -71,8 +72,11 @@ public class Decendants {
     public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DESCENDANTS = FunctionFactory.wrap(new Function<Property, Set<Property>>() {
         public Set<Property> apply(Property property) {
             Set<Property> result = new LinkedHashSet<Property>();
-            TypeRef baseType = property.getTypeRef();
+            if (isNestingIgnored(property)) {
+                return result;
+            }
 
+            TypeRef baseType = property.getTypeRef();
             if (IS_COLLECTION.apply(baseType)) {
                 TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
                 if (unwrapped instanceof  ClassRef) {
@@ -127,6 +131,15 @@ public class Decendants {
             return false;
         } else if (candidate.isAssignableFrom(item)) {
             return true;
+        }
+        return false;
+    }
+
+    public static boolean isNestingIgnored(Property property) {
+        for (ClassRef classRef : property.getAnnotations()) {
+            if (classRef.getFullyQualifiedName().equals(IgnoreDescendants.class.getSimpleName())) {
+                return true;
+            }
         }
         return false;
     }
