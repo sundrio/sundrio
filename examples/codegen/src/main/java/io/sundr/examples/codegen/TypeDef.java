@@ -1,26 +1,27 @@
 /*
- * Copyright 2016 The original authors.
+ *      Copyright 2016 The original authors.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *      Licensed under the Apache License, Version 2.0 (the "License");
+ *      you may not use this file except in compliance with the License.
+ *      You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *          http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *      Unless required by applicable law or agreed to in writing, software
+ *      distributed under the License is distributed on an "AS IS" BASIS,
+ *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *      See the License for the specific language governing permissions and
+ *      limitations under the License.
  */
 
 package io.sundr.examples.codegen;
 
-import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,27 +29,30 @@ import java.util.Set;
 
 @Buildable
 public class TypeDef extends ModifierSupport {
+
     public static TypeDef OBJECT = new TypeDefBuilder()
             .withPackageName("java.lang")
             .withName("Object")
             .build();
 
+    public static ClassRef OBJECT_REF = OBJECT.toReference();
+
     private final Kind kind;
     private final String packageName;
     private final String name;
 
-    private final Set<ClassRef> annotations;
-    private final Set<ClassRef> extendsList;
-    private final Set<ClassRef> implementsList;
+    private final List<ClassRef> annotations;
+    private final List<ClassRef> extendsList;
+    private final List<ClassRef> implementsList;
     private final List<TypeParamDef> parameters;
 
-    private final Set<Property> properties;
-    private final Set<Method> constructors;
-    private final Set<Method> methods;
+    private final List<Property> properties;
+    private final List<Method> constructors;
+    private final List<Method> methods;
     private final TypeDef outerType;
-    private final Set<TypeDef> innerTypes;
+    private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, TypeDef outerType, Set<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<ClassRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
@@ -72,8 +76,8 @@ public class TypeDef extends ModifierSupport {
      * @param target
      * @return
      */
-    private static Set<Method> adaptConstructors(Set<Method> methods, TypeDef target) {
-        Set<Method> adapted = new LinkedHashSet<Method>();
+    private static List<Method> adaptConstructors(List<Method> methods, TypeDef target) {
+        List<Method> adapted = new ArrayList<Method>();
         for (Method m : methods) {
             adapted.add(new MethodBuilder(m)
                     .withName(null)
@@ -83,13 +87,13 @@ public class TypeDef extends ModifierSupport {
         return adapted;
     }
 
-    private static Set<TypeDef> setOuterType(Set<TypeDef> types, TypeDef outer) {
-        Set<TypeDef> updated = new LinkedHashSet<TypeDef>();
+    private static List<TypeDef> setOuterType(List<TypeDef> types, TypeDef outer) {
+        List<TypeDef> updated = new ArrayList<TypeDef>();
         for (TypeDef typeDef : types) {
-            if (typeDef.getOuterType().equals(outer)) {
+            if (outer.equals(typeDef.getOuterType())) {
                 updated.add(typeDef);
             } else {
-                updated.add(new TypeDefBuilder(typeDef).withOuterType(outer).build());
+                updated.add(new TypeDefBuilder(typeDef).withOuterType(outer).withPackageName(outer.getPackageName()).build());
             }
         }
         return updated;
@@ -146,7 +150,7 @@ public class TypeDef extends ModifierSupport {
         return kind;
     }
 
-    public Set<ClassRef> getAnnotations() {
+    public List<ClassRef> getAnnotations() {
         return annotations;
     }
 
@@ -158,11 +162,11 @@ public class TypeDef extends ModifierSupport {
         return name;
     }
 
-    public Set<ClassRef> getExtendsList() {
+    public List<ClassRef> getExtendsList() {
         return extendsList;
     }
 
-    public Set<ClassRef> getImplementsList() {
+    public List<ClassRef> getImplementsList() {
         return implementsList;
     }
 
@@ -170,15 +174,15 @@ public class TypeDef extends ModifierSupport {
         return parameters;
     }
 
-    public Set<Property> getProperties() {
+    public List<Property> getProperties() {
         return properties;
     }
 
-    public Set<Method> getConstructors() {
+    public List<Method> getConstructors() {
         return constructors;
     }
 
-    public Set<Method> getMethods() {
+    public List<Method> getMethods() {
         return methods;
     }
 
@@ -186,8 +190,24 @@ public class TypeDef extends ModifierSupport {
         return outerType;
     }
 
-    public Set<TypeDef> getInnerTypes() {
+    public List<TypeDef> getInnerTypes() {
         return innerTypes;
+    }
+
+    public boolean isClass() {
+        return kind == Kind.INTERFACE;
+    }
+
+    public boolean isInterface() {
+        return kind == Kind.INTERFACE;
+    }
+
+    public boolean isEnum() {
+        return kind == Kind.ENUM;
+    }
+
+    public boolean isAnnotation() {
+        return kind == Kind.ANNOTATION;
     }
 
     @Override
@@ -211,7 +231,7 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Creates a {@link ClassRef} for the current definition with the specified arguments.
-     * @param arguments The arguements to be passed to the reference.
+     * @param arguments The arguments to be passed to the reference.
      * @return
      */
     public ClassRef toReference(TypeRef... arguments) {
@@ -256,52 +276,115 @@ public class TypeDef extends ModifierSupport {
                 .build();
     }
 
-    public Set<ClassRef> getImports() {
-        final Set<ClassRef> imports = new LinkedHashSet<ClassRef>();
-        new TypeDefBuilder(this).accept(new TypedVisitor<ClassRefBuilder>() {
-            public void visit(ClassRefBuilder builder) {
-                imports.add(builder.build());
+    public Set<String> getImports() {
+        final Set<String> imports = new LinkedHashSet<String>();
+        for (ClassRef ref : getReferenceMap().values()) {
+            if (ref .getDefinition().getPackageName() == null || ref .getDefinition().getPackageName().isEmpty() ||  ref.getDefinition().getPackageName().equals(packageName)) {
+                continue;
+            } else {
+                imports.add(ref.getDefinition().getFullyQualifiedName());
             }
-        });
+        }
         return imports;
     }
+
+    /**
+     * Create a mapping from class name to {@link ClassRef}.
+     * @return
+     */
+    public Map<String, ClassRef> getReferenceMap() {
+        Map<String, ClassRef> mapping = new HashMap<String, ClassRef>();
+        for (ClassRef ref : getReferences()) {
+            mapping.put(ref.getDefinition().getName(), ref);
+        }
+        return mapping;
+    }
+
+    public Set<ClassRef> getReferences() {
+        final Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+
+        for (ClassRef i : implementsList) {
+            refs.addAll(i.getReferences());
+
+        }
+
+        for (ClassRef e : extendsList) {
+            refs.addAll(e.getReferences());
+        }
+
+        for (Property property : properties) {
+            refs.addAll(property.getReferences());
+        }
+
+        for (Method method : constructors) {
+            refs.addAll(method.getReferences());
+        }
+
+
+        for (Method method : methods) {
+            refs.addAll(method.getReferences());
+        }
+
+        for (TypeParamDef typeParamDef : parameters) {
+            for (ClassRef bound : typeParamDef.getBounds()) {
+                refs.addAll(bound.getReferences());
+            }
+        }
+
+        for (TypeDef innerType : innerTypes) {
+            refs.addAll(innerType.getReferences());
+        }
+
+        if (getAttributes().containsKey(ALSO_IMPORT)) {
+            Object obj = getAttributes().get(ALSO_IMPORT);
+            if (obj instanceof ClassRef) {
+                refs.add((ClassRef) obj);
+            } else if (obj instanceof Collection) {
+                refs.addAll((Collection<? extends ClassRef>) obj);
+            }
+        }
+        return refs;
+    }
+
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if (isPublic()) {
-            sb.append("public ");
+            sb.append(PUBLIC).append(SPACE);
         } else if (isProtected()) {
-            sb.append("protected ");
+            sb.append(PROTECTED).append(SPACE);
         } else if (isPrivate()) {
-            sb.append("private ");
+            sb.append(PRIVATE).append(SPACE);
         }
         if (isStatic()) {
-            sb.append("static ");
+            sb.append(STATIC).append(SPACE);
         }
-
+        if (isAbstract()) {
+            sb.append(ABSTRACT).append(SPACE);
+        }
         if (isFinal()) {
-            sb.append("final ");
+            sb.append(FINAL).append(SPACE);
         }
 
-        sb.append(kind.name().toLowerCase()).append(" ");
+        sb.append(kind.name().toLowerCase()).append(SPACE);
         sb.append(name);
 
         if (parameters != null && !parameters.isEmpty()) {
-            sb.append("<");
-            sb.append(StringUtils.join(parameters, ","));
-            sb.append(">");
+            sb.append(LT);
+            sb.append(StringUtils.join(parameters, COMA));
+            sb.append(GT);
         }
 
         if (extendsList != null && !extendsList.isEmpty()
                 && (extendsList.size() != 1 || !extendsList.contains(OBJECT.toReference()))) {
-            sb.append(" extends ");
-            sb.append(StringUtils.join(extendsList, ","));
+            sb.append(SPACE).append(EXTENDS).append(SPACE);
+            sb.append(StringUtils.join(extendsList, COMA));
         }
 
         if (implementsList != null && !implementsList.isEmpty()) {
-            sb.append(" implements ");
-            sb.append(StringUtils.join(implementsList, ","));
+            sb.append(SPACE).append(IMPLEMENTS).append(SPACE);
+            sb.append(StringUtils.join(implementsList, COMA));
         }
 
         return sb.toString();

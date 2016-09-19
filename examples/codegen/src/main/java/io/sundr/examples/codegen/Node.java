@@ -14,37 +14,21 @@
  *      limitations under the License.
  */
 
-package io.sundr.examples.shapes;
+package io.sundr.examples.codegen;
 
-import io.sundr.builder.annotations.Buildable;
-import io.sundr.examples.shapes.Shape;
+public interface Node {
 
-@Buildable
-public abstract class AbstractShape implements Shape {
+    String DOT = ".";
+    String COMA = ",";
+    String SEMICOLN = ";";
+    String SPACE = " ";
 
-    private final int x;
-    private final int y;
+    String LT = "<";
+    String GT = ">";
 
-    private String notes;
+    String EXTENDS = "extends";
+    String IMPLEMENTS = "implements";
 
-    public AbstractShape(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+    String JAVA_LANG = "java.lang";
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
 }

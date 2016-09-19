@@ -20,7 +20,6 @@ import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
 
 import java.util.List;
-import java.util.Set;
 
 public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, ModifierSupportFluent<A> {
 
@@ -41,9 +40,9 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, Mo
 
     public A removeFromAnnotations(ClassRef... items);
 
-    public Set<ClassRef> getAnnotations();
+    public List<ClassRef> getAnnotations();
 
-    public A withAnnotations(Set<ClassRef> annotations);
+    public A withAnnotations(List<ClassRef> annotations);
 
     public A withAnnotations(ClassRef... annotations);
 
@@ -55,9 +54,9 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, Mo
 
     public A removeFromExtendsList(ClassRef... items);
 
-    public Set<ClassRef> getExtendsList();
+    public List<ClassRef> getExtendsList();
 
-    public A withExtendsList(Set<ClassRef> extendsList);
+    public A withExtendsList(List<ClassRef> extendsList);
 
     public A withExtendsList(ClassRef... extendsList);
 
@@ -69,9 +68,9 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, Mo
 
     public A removeFromImplementsList(ClassRef... items);
 
-    public Set<ClassRef> getImplementsList();
+    public List<ClassRef> getImplementsList();
 
-    public A withImplementsList(Set<ClassRef> implementsList);
+    public A withImplementsList(List<ClassRef> implementsList);
 
     public A withImplementsList(ClassRef... implementsList);
 
@@ -97,9 +96,9 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, Mo
 
     public A removeFromProperties(Property... items);
 
-    public Set<Property> getProperties();
+    public List<Property> getProperties();
 
-    public A withProperties(Set<Property> properties);
+    public A withProperties(List<Property> properties);
 
     public A withProperties(Property... properties);
 
@@ -111,9 +110,9 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, Mo
 
     public A removeFromConstructors(Method... items);
 
-    public Set<Method> getConstructors();
+    public List<Method> getConstructors();
 
-    public A withConstructors(Set<Method> constructors);
+    public A withConstructors(List<Method> constructors);
 
     public A withConstructors(Method... constructors);
 
@@ -125,9 +124,9 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, Mo
 
     public A removeFromMethods(Method... items);
 
-    public Set<Method> getMethods();
+    public List<Method> getMethods();
 
-    public A withMethods(Set<Method> methods);
+    public A withMethods(List<Method> methods);
 
     public A withMethods(Method... methods);
 
@@ -149,9 +148,9 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends Fluent<A>, Mo
 
     public A removeFromInnerTypes(TypeDef... items);
 
-    public Set<TypeDef> getInnerTypes();
+    public List<TypeDef> getInnerTypes();
 
-    public A withInnerTypes(Set<TypeDef> innerTypes);
+    public A withInnerTypes(List<TypeDef> innerTypes);
 
     public A withInnerTypes(TypeDef... innerTypes);
 

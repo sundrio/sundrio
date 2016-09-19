@@ -16,19 +16,17 @@
 
 package io.sundr.codegen.model;
 
-import java.util.Map;
+import java.util.List;
 import java.lang.String;
 import io.sundr.builder.Nested;
-import java.util.Set;
-import java.lang.Object;
 
 public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupportFluent<A>{
 
 
     public A addToAnnotations(ClassRef... items);
     public A removeFromAnnotations(ClassRef... items);
-    public Set<ClassRef> getAnnotations();
-    public A withAnnotations(Set<ClassRef> annotations);
+    public List<ClassRef> getAnnotations();
+    public A withAnnotations(List<ClassRef> annotations);
     public A withAnnotations(ClassRef... annotations);
     public PropertyFluent.AnnotationsNested<A> addNewAnnotation();
     public PropertyFluent.AnnotationsNested<A> addNewAnnotationLike(ClassRef item);

@@ -104,11 +104,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return (A) this;
     }
 
-    public Set<ClassRef> getAnnotations() {
+    public List<ClassRef> getAnnotations() {
         return build(annotations);
     }
 
-    public A withAnnotations(Set<ClassRef> annotations) {
+    public A withAnnotations(List<ClassRef> annotations) {
         this.annotations.clear();
         if (annotations != null) {
             for (ClassRef item : annotations) {
@@ -154,11 +154,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return (A) this;
     }
 
-    public Set<ClassRef> getExtendsList() {
+    public List<ClassRef> getExtendsList() {
         return build(extendsList);
     }
 
-    public A withExtendsList(Set<ClassRef> extendsList) {
+    public A withExtendsList(List<ClassRef> extendsList) {
         this.extendsList.clear();
         if (extendsList != null) {
             for (ClassRef item : extendsList) {
@@ -204,11 +204,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return (A) this;
     }
 
-    public Set<ClassRef> getImplementsList() {
+    public List<ClassRef> getImplementsList() {
         return build(implementsList);
     }
 
-    public A withImplementsList(Set<ClassRef> implementsList) {
+    public A withImplementsList(List<ClassRef> implementsList) {
         this.implementsList.clear();
         if (implementsList != null) {
             for (ClassRef item : implementsList) {
@@ -304,11 +304,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return (A) this;
     }
 
-    public Set<Property> getProperties() {
+    public List<Property> getProperties() {
         return build(properties);
     }
 
-    public A withProperties(Set<Property> properties) {
+    public A withProperties(List<Property> properties) {
         this.properties.clear();
         if (properties != null) {
             for (Property item : properties) {
@@ -354,11 +354,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return (A) this;
     }
 
-    public Set<Method> getConstructors() {
+    public List<Method> getConstructors() {
         return build(constructors);
     }
 
-    public A withConstructors(Set<Method> constructors) {
+    public A withConstructors(List<Method> constructors) {
         this.constructors.clear();
         if (constructors != null) {
             for (Method item : constructors) {
@@ -404,11 +404,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return (A) this;
     }
 
-    public Set<Method> getMethods() {
+    public List<Method> getMethods() {
         return build(methods);
     }
 
-    public A withMethods(Set<Method> methods) {
+    public A withMethods(List<Method> methods) {
         this.methods.clear();
         if (methods != null) {
             for (Method item : methods) {
@@ -478,11 +478,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         return (A) this;
     }
 
-    public Set<TypeDef> getInnerTypes() {
+    public List<TypeDef> getInnerTypes() {
         return build(innerTypes);
     }
 
-    public A withInnerTypes(Set<TypeDef> innerTypes) {
+    public A withInnerTypes(List<TypeDef> innerTypes) {
         this.innerTypes.clear();
         if (innerTypes != null) {
             for (TypeDef item : innerTypes) {

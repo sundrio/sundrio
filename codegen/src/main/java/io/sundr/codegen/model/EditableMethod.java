@@ -20,12 +20,11 @@ import io.sundr.builder.Editable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class EditableMethod extends Method implements Editable<MethodBuilder>{
 
 
-public EditableMethod( Set<ClassRef> annotations , Set<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , boolean varArgPreferred , Set<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
+public EditableMethod( List<ClassRef> annotations , List<TypeParamDef> parameters , String name , TypeRef returnType , List<Property> arguments , boolean varArgPreferred , List<ClassRef> exceptions , Block block , int modifiers , Map<String, Object> attributes ){
     super(annotations, parameters, name, returnType, arguments, varArgPreferred, exceptions, block, modifiers, attributes);
 }
 

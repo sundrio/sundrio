@@ -44,10 +44,8 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -59,8 +57,8 @@ public class ClazzAs {
 
     public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
-            Set<Method> methods = new LinkedHashSet<Method>();
-            Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
+            List<Method> methods = new ArrayList<Method>();
+            List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
             TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
             TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
@@ -130,11 +128,13 @@ public class ClazzAs {
                     }
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
-                } else if (!descendants.isEmpty() && isCollection) {
+                } else if (!descendants.isEmpty()) {
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                        } else {
+                            methods.add(ToMethod.WITH.apply(descendant));
                         }
 
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
@@ -155,10 +155,10 @@ public class ClazzAs {
 
     public static final Function<TypeDef, TypeDef> FLUENT_IMPL = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
-            Set<Method> constructors = new LinkedHashSet<Method>();
-            Set<Method> methods = new LinkedHashSet<Method>();
-            Set<TypeDef> nestedClazzes = new LinkedHashSet<TypeDef>();
-            final Set<Property> properties = new LinkedHashSet<Property>();
+            List<Method> constructors = new ArrayList<Method>();
+            List<Method> methods = new ArrayList<Method>();
+            List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
+            final List<Property> properties = new ArrayList<Property>();
             TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
             final TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
@@ -266,19 +266,20 @@ public class ClazzAs {
                     properties.add(buildableField(toAdd));
                 } else if (descendants.isEmpty()) {
                     properties.add(toAdd);
-                } else if (isCollection) {
+                } else if (!descendants.isEmpty()) {
                     properties.add(buildableField(toAdd));
                     for (Property descendant : descendants) {
                         if (isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                        }  else {
+                            methods.add(ToMethod.WITH.apply(descendant));
                         }
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
                     }
-
                 } else {
                     properties.add(buildableField(toAdd));
                 }
@@ -319,9 +320,9 @@ public class ClazzAs {
 
             ClassRef fluent = TypeAs.FLUENT_REF.apply(item);
 
-            Set<Method> constructors = new LinkedHashSet<Method>();
-            Set<Method> methods = new LinkedHashSet<Method>();
-            final Set<Property> fields = new LinkedHashSet<Property>();
+            List<Method> constructors = new ArrayList<Method>();
+            List<Method> methods = new ArrayList<Method>();
+            final List<Property> fields = new ArrayList<Property>();
 
             Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
             Property validationEnabledProperty = new PropertyBuilder().withTypeRef(BOOLEAN_REF).withName("validationEnabled").build();
@@ -551,8 +552,8 @@ public class ClazzAs {
             TypeDef editableType = TypeAs.EDITABLE.apply(item);
             final TypeDef builderType = TypeAs.BUILDER.apply(item);
 
-            Set<Method> constructors = new LinkedHashSet<Method>();
-            Set<Method> methods = new LinkedHashSet<Method>();
+            List<Method> constructors = new ArrayList<Method>();
+            List<Method> methods = new ArrayList<Method>();
 
             for (Method constructor : item.getConstructors()) {
                 constructors.add(superConstructorOf(constructor, editableType));

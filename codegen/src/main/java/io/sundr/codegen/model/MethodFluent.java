@@ -1,10 +1,8 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-import java.util.Set;
+
 import java.util.List;
-import java.lang.Object;
-import java.util.Map;
 import java.lang.String;
 
 public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFluent<A>{
@@ -12,15 +10,15 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
 
     public A addToAnnotations(ClassRef... items);
     public A removeFromAnnotations(ClassRef... items);
-    public Set<ClassRef> getAnnotations();
-    public A withAnnotations(Set<ClassRef> annotations);
+    public List<ClassRef> getAnnotations();
+    public A withAnnotations(List<ClassRef> annotations);
     public A withAnnotations(ClassRef... annotations);
     public MethodFluent.AnnotationsNested<A> addNewAnnotation();
     public MethodFluent.AnnotationsNested<A> addNewAnnotationLike(ClassRef item);
     public A addToParameters(TypeParamDef... items);
     public A removeFromParameters(TypeParamDef... items);
-    public Set<TypeParamDef> getParameters();
-    public A withParameters(Set<TypeParamDef> parameters);
+    public List<TypeParamDef> getParameters();
+    public A withParameters(List<TypeParamDef> parameters);
     public A withParameters(TypeParamDef... parameters);
     public MethodFluent.ParametersNested<A> addNewParameter();
     public MethodFluent.ParametersNested<A> addNewParameterLike(TypeParamDef item);
@@ -39,8 +37,8 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A withVarArgPreferred(boolean varArgPreferred);
     public A addToExceptions(ClassRef... items);
     public A removeFromExceptions(ClassRef... items);
-    public Set<ClassRef> getExceptions();
-    public A withExceptions(Set<ClassRef> exceptions);
+    public List<ClassRef> getExceptions();
+    public A withExceptions(List<ClassRef> exceptions);
     public A withExceptions(ClassRef... exceptions);
     public MethodFluent.ExceptionsNested<A> addNewException();
     public MethodFluent.ExceptionsNested<A> addNewExceptionLike(ClassRef item);

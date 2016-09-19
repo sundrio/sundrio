@@ -37,6 +37,7 @@ import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -45,7 +46,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 
 public class BuilderUtils {
 
@@ -443,4 +449,17 @@ public class BuilderUtils {
     }
 
     private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"};
+
+    public static String fullyQualifiedNameDiff(Property property) {
+        TypeRef typeRef = property.getTypeRef();
+        Map<String, String> map = DefinitionRepository.getRepository().getReferenceMap();
+        if (typeRef instanceof ClassRef) {
+            ClassRef classRef = (ClassRef)  TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(typeRef);
+            String fqn = map.get(classRef.getDefinition().getName());
+            if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
+                return captializeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));
+            }
+        }
+        return "";
+    }
 }

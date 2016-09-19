@@ -16,11 +16,13 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.builder.Visitor;
 import io.sundr.codegen.utils.StringUtils;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -40,18 +42,18 @@ public class TypeDef extends ModifierSupport {
     private final String packageName;
     private final String name;
 
-    private final Set<ClassRef> annotations;
-    private final Set<ClassRef> extendsList;
-    private final Set<ClassRef> implementsList;
+    private final List<ClassRef> annotations;
+    private final List<ClassRef> extendsList;
+    private final List<ClassRef> implementsList;
     private final List<TypeParamDef> parameters;
 
-    private final Set<Property> properties;
-    private final Set<Method> constructors;
-    private final Set<Method> methods;
+    private final List<Property> properties;
+    private final List<Method> constructors;
+    private final List<Method> methods;
     private final TypeDef outerType;
-    private final Set<TypeDef> innerTypes;
+    private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, Set<ClassRef> annotations, Set<ClassRef> extendsList, Set<ClassRef> implementsList, List<TypeParamDef> parameters, Set<Property> properties, Set<Method> constructors, Set<Method> methods, TypeDef outerType, Set<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<ClassRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
@@ -75,8 +77,8 @@ public class TypeDef extends ModifierSupport {
      * @param target
      * @return
      */
-    private static Set<Method> adaptConstructors(Set<Method> methods, TypeDef target) {
-        Set<Method> adapted = new LinkedHashSet<Method>();
+    private static List<Method> adaptConstructors(List<Method> methods, TypeDef target) {
+        List<Method> adapted = new ArrayList<Method>();
         for (Method m : methods) {
             adapted.add(new MethodBuilder(m)
                     .withName(null)
@@ -86,8 +88,8 @@ public class TypeDef extends ModifierSupport {
         return adapted;
     }
 
-    private static Set<TypeDef> setOuterType(Set<TypeDef> types, TypeDef outer) {
-        Set<TypeDef> updated = new LinkedHashSet<TypeDef>();
+    private static List<TypeDef> setOuterType(List<TypeDef> types, TypeDef outer) {
+        List<TypeDef> updated = new ArrayList<TypeDef>();
         for (TypeDef typeDef : types) {
             if (outer.equals(typeDef.getOuterType())) {
                 updated.add(typeDef);
@@ -149,7 +151,7 @@ public class TypeDef extends ModifierSupport {
         return kind;
     }
 
-    public Set<ClassRef> getAnnotations() {
+    public List<ClassRef> getAnnotations() {
         return annotations;
     }
 
@@ -161,11 +163,11 @@ public class TypeDef extends ModifierSupport {
         return name;
     }
 
-    public Set<ClassRef> getExtendsList() {
+    public List<ClassRef> getExtendsList() {
         return extendsList;
     }
 
-    public Set<ClassRef> getImplementsList() {
+    public List<ClassRef> getImplementsList() {
         return implementsList;
     }
 
@@ -173,15 +175,15 @@ public class TypeDef extends ModifierSupport {
         return parameters;
     }
 
-    public Set<Property> getProperties() {
+    public List<Property> getProperties() {
         return properties;
     }
 
-    public Set<Method> getConstructors() {
+    public List<Method> getConstructors() {
         return constructors;
     }
 
-    public Set<Method> getMethods() {
+    public List<Method> getMethods() {
         return methods;
     }
 
@@ -189,7 +191,7 @@ public class TypeDef extends ModifierSupport {
         return outerType;
     }
 
-    public Set<TypeDef> getInnerTypes() {
+    public List<TypeDef> getInnerTypes() {
         return innerTypes;
     }
 
@@ -245,7 +247,17 @@ public class TypeDef extends ModifierSupport {
         return new ClassRefBuilder()
                 .withDefinition(this)
                 .withArguments(actualArguments)
+                .withAttributes(getAttributes())
                 .build();
+    }
+
+    /**
+     * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     * @param arguments The arguments to be passed to the reference.
+     * @return
+     */
+    public ClassRef toReference(Collection<TypeRef> arguments) {
+        return toReference(arguments.toArray(new TypeRef[arguments.size()]));
     }
 
     /**
@@ -261,6 +273,7 @@ public class TypeDef extends ModifierSupport {
         return new ClassRefBuilder()
                 .withDefinition(this)
                 .withArguments(arguments)
+                .withAttributes(getAttributes())
                 .build();
     }
 
@@ -287,20 +300,34 @@ public class TypeDef extends ModifierSupport {
         return imports;
     }
 
+
     /**
      * Create a mapping from class name to {@link ClassRef}.
      * @return
      */
-    public Map<String, ClassRef> getReferenceMap() {
+    private Map<String, ClassRef> getReferenceMap() {
         Map<String, ClassRef> mapping = new HashMap<String, ClassRef>();
-        for (ClassRef ref : getReferences()) {
-            mapping.put(ref.getDefinition().getName(), ref);
+        List<ClassRef> refs = getReferences();
+
+        //It's best to have predictable order, so that we can generate uniform code.
+        Collections.sort(refs, new Comparator<ClassRef>() {
+            @Override
+            public int compare(ClassRef o1, ClassRef o2) {
+                return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
+            }
+        });
+
+        for (ClassRef ref : refs) {
+            String key = ref.getDefinition().getName();
+            if (!mapping.containsKey(key)) {
+                mapping.put(key, ref);
+            }
         }
         return mapping;
     }
 
-    public Set<ClassRef> getReferences() {
-        final Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+    public List<ClassRef> getReferences() {
+        final List<ClassRef> refs = new ArrayList<ClassRef>();
 
         for (ClassRef i : implementsList) {
             refs.addAll(i.getReferences());

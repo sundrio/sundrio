@@ -25,7 +25,6 @@ import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

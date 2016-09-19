@@ -43,8 +43,10 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static io.sundr.dsl.internal.Constants.ORIGINAL_REF;
@@ -82,7 +84,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
                     }
 
                     //2nd step create dependency graph.
-                    Set<Method> methods = new LinkedHashSet<Method>();
+                    List<Method> methods = new ArrayList<Method>();
                     Set<Node<TypeDef>> graph = Nodes.TO_GRAPH.apply(genericAndScopeInterfaces);
 
                     for (Node<TypeDef> root : graph) {

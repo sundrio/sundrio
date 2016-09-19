@@ -32,6 +32,7 @@ import io.sundr.dsl.internal.visitors.TypeParamDefColletor;
 import io.sundr.dsl.internal.visitors.TypeParamRefColletor;
 
 import javax.lang.model.element.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,7 +67,7 @@ public class Combine {
             }
 
             Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
-            Set<ClassRef> interfaces = new LinkedHashSet<ClassRef>();
+            List<ClassRef> interfaces = new ArrayList<ClassRef>();
             Set<TypeDef> terminatingTypes = new LinkedHashSet<TypeDef>();
 
             ClassRef fallback = null;
@@ -129,7 +130,7 @@ public class Combine {
             }
 
             Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
-            Set<ClassRef> interfaces = new LinkedHashSet<ClassRef>();
+            List<ClassRef> interfaces = new ArrayList<ClassRef>();
             Set<TypeDef> terminatingTypes = new LinkedHashSet<TypeDef>();
 
             TypeDef fallback = null;
@@ -229,9 +230,9 @@ public class Combine {
         }
     };
 
-    public static final Function<Set<ClassRef>, String> CLASSREFS_TO_PACKAGE = new Function<Set<ClassRef>, String>() {
+    public static final Function<List<ClassRef>, String> CLASSREFS_TO_PACKAGE = new Function<List<ClassRef>,String>() {
 
-        public String apply(Set<ClassRef> types) {
+        public String apply(List<ClassRef> types) {
             Iterator<ClassRef> iterator = types.iterator();
             if (iterator.hasNext()) {
                 return  iterator.next().getDefinition().getPackageName();

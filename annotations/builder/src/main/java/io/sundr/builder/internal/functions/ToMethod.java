@@ -20,6 +20,7 @@ import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.Singularize;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
@@ -46,6 +47,7 @@ import java.util.TreeSet;
 
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.DESCENDANTS;
+import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.N_REF;
 import static io.sundr.builder.Constants.OUTER_CLASS;
@@ -72,7 +74,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
 import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 
 public class ToMethod {
@@ -118,15 +119,19 @@ public class ToMethod {
             } else if (isBuildable(unwraped) && !isAbstract(unwraped)) {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
                 String propertyName = property.getName();
-                String builderClass = builder.getName();
-                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "(" + propertyName + "); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
+                String builderClass = builder.toReference().getName();
+                if (property.getAttributes().containsKey(DESCENDANT_OF)) {
+                    Property descendantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
+                    propertyName = descendantOf.getName();
+                }
+                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "("+name+"); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
                 return statements;
             } else if (!descendants.isEmpty()) {
                 for (Property descendant : descendants) {
                     TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(descendant.getTypeRef());
                     TypeDef builder = BUILDER.apply(((ClassRef) dunwraped).getDefinition());
                     String propertyName = property.getName();
-                    String builderClass = builder.getName();
+                    String builderClass = builder.toReference().getName();
                     statements.add(new StringStatement("if (" + propertyName + " instanceof " + dunwraped + "){ this." + propertyName + "= new " + builderClass + "((" + dunwraped + ")" + propertyName + "); _visitables.add(this." + propertyName + ");}"));
 
                     alsoImport.add((ClassRef) dunwraped);
@@ -263,7 +268,7 @@ public class ToMethod {
                     .withTypeRef(unwrapped.withDimensions(1))
                     .build();
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
             String methodName = "addTo" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
@@ -277,11 +282,11 @@ public class ToMethod {
                         propertyName = ((Property)attrValue).getName();
                     }
                 }
-                String targetClass = targetType.getDefinition().getName();
+                String targetClass = targetType.getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
 
-                //We need to do it more elegantly
+                //We need to do it more
                 alsoImport.add(TypeAs.BUILDER.apply(targetType.getDefinition()).toInternalReference());
                 statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
@@ -291,7 +296,7 @@ public class ToMethod {
 
                     public String apply(Property item) {
                         TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
-                        String className = ((ClassRef) itemRef).getDefinition().getName();
+                        String className = ((ClassRef) itemRef).getName();
                         String addToMethodName = "addTo" + captializeFirst(item.getName());
                         return "if (item instanceof " + className + "){" + addToMethodName + "((" + className + ")item);}\n";
                     }
@@ -325,7 +330,7 @@ public class ToMethod {
                     .withTypeRef(unwrapped.withDimensions(1))
                     .build();
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
             String methodName = "removeFrom" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
@@ -340,7 +345,7 @@ public class ToMethod {
                         propertyName = ((Property)attrValue).getName();
                     }
                 }
-                String targetClass = targetType.getDefinition().getName();
+                String targetClass = targetType.getName();
                 parameters.addAll(targetType.getDefinition().getParameters());
                 String builderClass = targetClass + "Builder";
 
@@ -353,7 +358,7 @@ public class ToMethod {
                 statements.add(new StringStatement("for (" + targetType.toString() + " item : items) {" + StringUtils.join(descendants, new Function<Property, String>() {
                     public String apply(Property item) {
                         TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
-                        String className = ((ClassRef) itemRef).getDefinition().getName();
+                        String className = ((ClassRef) itemRef).getName();
                         String removeFromMethodName = "removeFrom" + captializeFirst(item.getName());
                         return "if (item instanceof " + className + "){" + removeFromMethodName + "((" + className + ")item);}\n";
                     }
@@ -472,7 +477,7 @@ public class ToMethod {
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(baseType.getDefinition().getParameters());
+            List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
             List<TypeRef> typeArguments = new ArrayList<TypeRef>();
             for (TypeRef arg : baseType.getArguments()) {
                 typeArguments.add(arg);
@@ -485,6 +490,8 @@ public class ToMethod {
 
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
             String prefix = isCollection ? "addNew" : "withNew";
+
+            prefix += TypeUtils.fullyQualifiedNameDiff(baseType);
             String methodName = prefix + captializeFirst(isCollection
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());
@@ -495,7 +502,7 @@ public class ToMethod {
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .withNewBlock()
-                    .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "();")
+                    .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "();")
                     .endBlock()
                     .build();
 
@@ -512,6 +519,8 @@ public class ToMethod {
             for (Method constructor : getInlineableConstructors(property)) {
                 boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
                 String ownPrefix = isCollection ? "addNew" : "withNew";
+
+                ownPrefix += BuilderUtils.fullyQualifiedNameDiff(property);
                 String ownName = ownPrefix + captializeFirst(isCollection
                         ? Singularize.FUNCTION.apply(property.getName())
                         : property.getName());
@@ -531,8 +540,7 @@ public class ToMethod {
                         .withReturnType(returnType)
                         .withArguments(constructor.getArguments())
                         .withName(ownName)
-                        //TODO: decide how to roll. Use sets or lists?
-                        .withParameters(new LinkedHashSet<TypeParamDef>(baseType.getParameters()))
+                        .withParameters(baseType.getParameters())
                         .withNewBlock()
                         .addNewStringStatementStatement("return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
                         .endBlock()
@@ -556,20 +564,21 @@ public class ToMethod {
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(baseType.getDefinition().getParameters());
+            List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
             List<TypeRef> typeArguments = new ArrayList<TypeRef>();
             for (TypeRef ignore : baseType.getArguments()) {
                 typeArguments.add(Q);
             }
             typeArguments.add(returnType);
 
-            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray());
-            ClassRef rewrapedImpl = classRefOf(nestedTypeImpl, typeArguments.toArray());
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
 
             String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
+            prefix += BuilderUtils.fullyQualifiedNameDiff(property);
             String methodName = prefix + captializeFirst(isCollection
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName()) + suffix;
@@ -584,7 +593,7 @@ public class ToMethod {
                     .withTypeRef(baseType)
                     .endArgument()
                     .withNewBlock()
-                    .addNewStringStatementStatement("return new " + rewrapedImpl.getDefinition().getName() + "(item);")
+                    .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(item);")
                     .endBlock()
                     .build();
 
@@ -611,10 +620,11 @@ public class ToMethod {
             }
             typeArguments.add(returnType);
 
-            ClassRef rewraped = classRefOf(nestedType, typeArguments.toArray());
-            ClassRef rewrapedImpl = classRefOf(nestedTypeImpl, typeArguments.toArray());
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             String prefix = "edit";
+            prefix += BuilderUtils.fullyQualifiedNameDiff(property);
             String methodNameBase = captializeFirst(property.getName());
             String methodName = prefix + methodNameBase;
 
@@ -657,8 +667,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> END = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-
-            String methodName = "end" + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
+            String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property) + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());
 
@@ -672,4 +681,5 @@ public class ToMethod {
                     .build();
         }
     });
+
 }

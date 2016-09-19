@@ -59,11 +59,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
 
-    public Set<ClassRef> getAnnotations(){
+    public List<ClassRef> getAnnotations(){
             return build(annotations);
     }
 
-    public A withAnnotations(Set<ClassRef> annotations){
+    public A withAnnotations(List<ClassRef> annotations){
             this.annotations.clear();
             if (annotations != null) {for (ClassRef item : annotations){this.addToAnnotations(item);}} return (A) this;
     }
@@ -88,11 +88,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);this.parameters.remove(builder);} return (A)this;
     }
 
-    public Set<TypeParamDef> getParameters(){
+    public List<TypeParamDef> getParameters(){
             return build(parameters);
     }
 
-    public A withParameters(Set<TypeParamDef> parameters){
+    public A withParameters(List<TypeParamDef> parameters){
             this.parameters.clear();
             if (parameters != null) {for (TypeParamDef item : parameters){this.addToParameters(item);}} return (A) this;
     }
@@ -175,11 +175,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.exceptions.remove(builder);} return (A)this;
     }
 
-    public Set<ClassRef> getExceptions(){
+    public List<ClassRef> getExceptions(){
             return build(exceptions);
     }
 
-    public A withExceptions(Set<ClassRef> exceptions){
+    public A withExceptions(List<ClassRef> exceptions){
             this.exceptions.clear();
             if (exceptions != null) {for (ClassRef item : exceptions){this.addToExceptions(item);}} return (A) this;
     }

@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -42,7 +43,6 @@ import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.codegen.utils.TypeUtils.classRefOf;
 
 public final class PropertyAs {
 
@@ -56,10 +56,10 @@ public final class PropertyAs {
 
             if (unwrapped instanceof ClassRef) {
                 TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
-                TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
+                ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType).toReference();
 
                 TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
-                TypeRef nestedRef = classRefOf(nestedType);
+                TypeRef nestedRef = nestedType.toReference();
 
                 Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
                 for (ClassRef n : nestedType.getImplementsList()) {
@@ -69,16 +69,16 @@ public final class PropertyAs {
                 //nestedType = new TypeDefBuilder(nestedType).withInterfaces(nestedInterfaces.toArray(new TypeDef[nestedInterfaces.size()])).build();
                 //TypeDef nestedUnwrapped = new TypeDefBuilder(nestedType).withGenericTypes(new TypeDef[0]).build();
 
-                Set<Method> nestedMethods = new HashSet<Method>();
+                List<Method> nestedMethods = new ArrayList<Method>();
                 nestedMethods.add(ToMethod.AND.apply(item));
                 nestedMethods.add(ToMethod.END.apply(item));
 
-                Set<Property> properties = new HashSet<Property>();
-                Set<Method> constructors = new HashSet<Method>();
+                List<Property> properties = new ArrayList<Property>();
+                List<Method> constructors = new ArrayList<Method>();
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")
-                        .withTypeRef(classRefOf(builderType)).build());
+                        .withTypeRef(builderType).build());
 
                 constructors.add(new MethodBuilder()
                         .withName("")
@@ -121,7 +121,7 @@ public final class PropertyAs {
                 TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
 
                 TypeDef nestedType = NESTED_INTERFACE_TYPE.apply(item);
-                TypeRef nestedRef = classRefOf(nestedType);
+                TypeRef nestedRef = nestedType.toReference();
 
                 Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
                 for (ClassRef n : nestedType.getImplementsList()) {
@@ -129,23 +129,23 @@ public final class PropertyAs {
                 }
 
 
-                Set<Method> nestedMethods = new HashSet<Method>();
+                List<Method> nestedMethods = new ArrayList<Method>();
                 nestedMethods.add(ToMethod.AND.apply(item));
                 nestedMethods.add(ToMethod.END.apply(item));
 
-                Set<Property> properties = new HashSet<Property>();
-                Set<Method> constructors = new HashSet<Method>();
+                List<Property> properties = new ArrayList<Property>();
+                List<Method> constructors = new ArrayList<Method>();
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")
-                        .withTypeRef(classRefOf(builderType)).build());
+                        .withTypeRef(builderType.toReference()).build());
 
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
                         .addNewArgument()
                         .withName("item")
-                        .withTypeRef(classRefOf(baseType))
+                        .withTypeRef(baseType.toReference())
                         .endArgument()
                         .withNewBlock()
                             .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this, item);")
@@ -299,7 +299,7 @@ public final class PropertyAs {
 
                 return new TypeDefBuilder(typeDef)
                         .withPackageName(outerInterface.getPackageName())
-                        .withName(captializeFirst(property.getName() + "Nested"))
+                        .withName(BuilderUtils.fullyQualifiedNameDiff(property) + captializeFirst(property.getName() + "Nested"))
                         .withParameters(parameters)
                         .build();
             }

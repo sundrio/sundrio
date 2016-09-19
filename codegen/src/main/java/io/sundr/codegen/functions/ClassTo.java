@@ -119,10 +119,10 @@ public class ClassTo {
                 return TypeDef.OBJECT;
             }
             Kind kind = KIND.apply(item);
-            Set<ClassRef> extendsList = new LinkedHashSet<ClassRef>();
-            Set<ClassRef> implementsList = new LinkedHashSet<ClassRef>();
-            Set<Property> properties = new LinkedHashSet<Property>();
-            Set<Method> methods = new LinkedHashSet<Method>();
+            List<ClassRef> extendsList = new ArrayList<ClassRef>();
+            List<ClassRef> implementsList = new ArrayList<ClassRef>();
+            List<Property> properties = new ArrayList<Property>();
+            List<Method> methods = new ArrayList<Method>();
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
             if (item.getSuperclass() != null && kind == Kind.INTERFACE) {
@@ -218,7 +218,7 @@ public class ClassTo {
             properties.add(new PropertyBuilder()
                     .withName(field.getName())
                     .withModifiers(field.getModifiers())
-                    .withAnnotations(new LinkedHashSet<ClassRef>(annotationRefs))
+                    .withAnnotations(annotationRefs)
                     .withTypeRef(TYPEREF.apply(field.getDeclaringClass()))
                     .build());
         }
@@ -243,7 +243,7 @@ public class ClassTo {
                         .build());
             }
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>();
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
             for (Type type : method.getGenericParameterTypes()) {
 
                 TypeParamDef typeParamDef = TYPEPARAMDEF.apply(type);
@@ -258,7 +258,7 @@ public class ClassTo {
                     .withReturnType(TYPEREF.apply(method.getReturnType()))
                     .withArguments(arguments)
                     .withParameters(parameters)
-                    .withAnnotations(new LinkedHashSet<ClassRef>(annotationRefs))
+                    .withAnnotations(annotationRefs)
                     .build());
         }
         return methods;

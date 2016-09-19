@@ -25,18 +25,18 @@ import java.util.Set;
 
 public class Property extends ModifierSupport {
 
-    private final Set<ClassRef> annotations;
+    private final List<ClassRef> annotations;
     private final TypeRef typeRef;
     private final String name;
 
-    public Property(Set<ClassRef> annotations, TypeRef typeRef, String name, int modifiers, Map<String, Object> attributes) {
+    public Property(List<ClassRef> annotations, TypeRef typeRef, String name, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.typeRef = typeRef;
         this.name = name;
     }
 
-    public Set<ClassRef> getAnnotations() {
+    public List<ClassRef> getAnnotations() {
         return annotations;
     }
 

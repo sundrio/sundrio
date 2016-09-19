@@ -314,11 +314,11 @@ public class Sources {
 
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
-                Set<ClassRef> extendsList = new LinkedHashSet<ClassRef>();
-                Set<ClassRef> implementsList = new LinkedHashSet<ClassRef>();
-                Set<Property> properties = new LinkedHashSet<Property>();
-                Set<Method> methods = new LinkedHashSet<Method>();
-                Set<Method> constructors = new LinkedHashSet<Method>();
+                List<ClassRef> extendsList = new ArrayList<ClassRef>();
+                List<ClassRef> implementsList = new ArrayList<ClassRef>();
+                List<Property> properties = new ArrayList<Property>();
+                List<Method> methods = new ArrayList<Method>();
+                List<Method> constructors = new ArrayList<Method>();
 
                 for (TypeParameter typeParameter: decl.getTypeParameters()) {
                     parameters.add(TYPEPARAMDEF.apply(typeParameter));
@@ -347,7 +347,7 @@ public class Sources {
                     } else if (bodyDeclaration instanceof MethodDeclaration) {
                         MethodDeclaration methodDeclaration = (MethodDeclaration) bodyDeclaration;
                         List<Property> arguments = new ArrayList<Property>();
-                        Set<ClassRef> exceptions = new LinkedHashSet<ClassRef>();
+                        List<ClassRef> exceptions = new ArrayList<ClassRef>();
 
                         for (ReferenceType referenceType : methodDeclaration.getThrows()) {
                             TypeRef exceptionRef = TYPEREF.apply(referenceType.getType());
@@ -358,7 +358,7 @@ public class Sources {
                         Boolean preferVarArg = false;
 
                         for (Parameter parameter : methodDeclaration.getParameters()) {
-                            Set<ClassRef> annotations = new LinkedHashSet<ClassRef>();
+                            List<ClassRef> annotations = new ArrayList<ClassRef>();
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
                                 annotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }
@@ -380,7 +380,7 @@ public class Sources {
                         }
 
 
-                        Set<TypeParamDef> typeParamDefs = new LinkedHashSet<TypeParamDef>();
+                        List<TypeParamDef> typeParamDefs = new ArrayList<TypeParamDef>();
                         for (TypeParameter typeParameter : methodDeclaration.getTypeParameters()) {
                             typeParamDefs.add(TYPEPARAMDEF.apply(typeParameter));
                         }
@@ -401,7 +401,7 @@ public class Sources {
                     } else if (bodyDeclaration instanceof ConstructorDeclaration) {
                         ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
                         List<Property> arguments = new ArrayList<Property>();
-                        Set<ClassRef> exceptions = new LinkedHashSet<ClassRef>();
+                        List<ClassRef> exceptions = new ArrayList<ClassRef>();
 
                         for (NameExpr nameExpr : constructorDeclaration.getThrows()) {
                             String name = nameExpr.getName();
@@ -412,7 +412,7 @@ public class Sources {
                             .endDefinition().build());
                         }
                         for (Parameter parameter : constructorDeclaration.getParameters()) {
-                            Set<ClassRef> annotations = new LinkedHashSet<ClassRef>();
+                            List<ClassRef> annotations = new ArrayList<ClassRef>();
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
                                 annotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }

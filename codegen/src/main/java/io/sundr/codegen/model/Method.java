@@ -33,16 +33,16 @@ public class Method extends ModifierSupport {
     public static final String VARARG = "...";
     public static final String THROWS = "throws";
 
-    private final Set<ClassRef> annotations;
-    private final Set<TypeParamDef> parameters;
+    private final List<ClassRef> annotations;
+    private final List<TypeParamDef> parameters;
     private final String name;
     private final TypeRef returnType;
     private final List<Property> arguments;
     private final boolean varArgPreferred;
-    private final Set<ClassRef> exceptions;
+    private final List<ClassRef> exceptions;
     private final Block block;
 
-    public Method(Set<ClassRef> annotations, Set<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, Set<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
+    public Method(List<ClassRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.parameters = parameters;
@@ -54,7 +54,7 @@ public class Method extends ModifierSupport {
         this.block = block;
     }
 
-    public Set<ClassRef> getAnnotations() {
+    public List<ClassRef> getAnnotations() {
         return annotations;
     }
 
@@ -62,7 +62,7 @@ public class Method extends ModifierSupport {
         return varArgPreferred;
     }
 
-    public Set<TypeParamDef> getParameters() {
+    public List<TypeParamDef> getParameters() {
         return parameters;
     }
 
@@ -79,7 +79,7 @@ public class Method extends ModifierSupport {
     }
 
 
-    public Set<ClassRef> getExceptions() {
+    public List<ClassRef> getExceptions() {
         return exceptions;
     }
 

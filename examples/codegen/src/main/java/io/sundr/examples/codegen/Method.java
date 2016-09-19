@@ -1,17 +1,17 @@
 /*
- * Copyright 2016 The original authors.
+ *      Copyright 2016 The original authors.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *      Licensed under the Apache License, Version 2.0 (the "License");
+ *      you may not use this file except in compliance with the License.
+ *      You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *          http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *      Unless required by applicable law or agreed to in writing, software
+ *      distributed under the License is distributed on an "AS IS" BASIS,
+ *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *      See the License for the specific language governing permissions and
+ *      limitations under the License.
  */
 
 package io.sundr.examples.codegen;
@@ -19,6 +19,8 @@ package io.sundr.examples.codegen;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.utils.StringUtils;
 
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,16 +29,22 @@ import static io.sundr.codegen.utils.StringUtils.join;
 
 @Buildable
 public class Method extends ModifierSupport {
-    private final Set<ClassRef> annotations;
-    private final Set<TypeParamDef> parameters;
+
+    public static final String OP = "(";
+    public static final String CP = ")";
+    public static final String VARARG = "...";
+    public static final String THROWS = "throws";
+
+    private final List<ClassRef> annotations;
+    private final List<TypeParamDef> parameters;
     private final String name;
     private final TypeRef returnType;
     private final List<Property> arguments;
     private final boolean varArgPreferred;
-    private final Set<ClassRef> exceptions;
+    private final List<ClassRef> exceptions;
     private final Block block;
 
-    public Method(Set<ClassRef> annotations, Set<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, Set<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
+    public Method(List<ClassRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.parameters = parameters;
@@ -48,7 +56,7 @@ public class Method extends ModifierSupport {
         this.block = block;
     }
 
-    public Set<ClassRef> getAnnotations() {
+    public List<ClassRef> getAnnotations() {
         return annotations;
     }
 
@@ -56,7 +64,7 @@ public class Method extends ModifierSupport {
         return varArgPreferred;
     }
 
-    public Set<TypeParamDef> getParameters() {
+    public List<TypeParamDef> getParameters() {
         return parameters;
     }
 
@@ -73,12 +81,48 @@ public class Method extends ModifierSupport {
     }
 
 
-    public Set<ClassRef> getExceptions() {
+    public List<ClassRef> getExceptions() {
         return exceptions;
     }
 
     public Block getBlock() {
         return block;
+    }
+
+
+    public Set<ClassRef> getReferences() {
+        Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+        if (returnType instanceof ClassRef) {
+            ClassRef classRef = (ClassRef)returnType;
+            refs.addAll(classRef.getReferences());
+        }
+
+        for (Property argument : arguments) {
+            refs.addAll(argument.getReferences());
+        }
+
+        for (ClassRef e : exceptions) {
+            refs.addAll(e.getReferences());
+        }
+
+        for (ClassRef a : getAnnotations()) {
+            refs.addAll(a.getReferences());
+        }
+
+        for (TypeParamDef typeParamDef : parameters) {
+            for (ClassRef bound : typeParamDef.getBounds()) {
+                refs.addAll(bound.getReferences());
+            }
+        }
+        if (getAttributes().containsKey(ALSO_IMPORT)) {
+            Object obj = getAttributes().get(ALSO_IMPORT);
+            if (obj instanceof ClassRef) {
+                refs.add((ClassRef) obj);
+            } else if (obj instanceof Collection) {
+                refs.addAll((Collection<? extends ClassRef>) obj);
+            }
+        }
+        return refs;
     }
 
     @Override
@@ -107,60 +151,65 @@ public class Method extends ModifierSupport {
         StringBuilder sb = new StringBuilder();
 
         if (isPublic()) {
-            sb.append("public ");
+            sb.append(PUBLIC).append(SPACE);
         } else if (isProtected()) {
-            sb.append("protected ");
+            sb.append(PROTECTED).append(SPACE);
         } else if (isPrivate()) {
-            sb.append("private ");
+            sb.append(PRIVATE).append(SPACE);
         }
 
         if (isSynchronized()) {
-            sb.append("synchronized ");
+            sb.append(SYNCHRONIZED).append(SPACE);
         }
 
         if (isStatic()) {
-            sb.append("static ");
+            sb.append(STATIC).append(SPACE);
+        }
+
+        if (isAbstract()) {
+            sb.append(ABSTRACT).append(SPACE);
         }
 
         if (isFinal()) {
-            sb.append("final ");
+            sb.append(FINAL).append(SPACE);
         }
 
+
         if (parameters != null && !parameters.isEmpty()) {
-            sb.append("<");
-            sb.append(StringUtils.join(parameters, ","));
-            sb.append(">");
+            sb.append(LT);
+            sb.append(StringUtils.join(parameters, COMA));
+            sb.append(GT);
         }
 
         if (name != null) {
             sb.append(returnType);
-            sb.append(" ").append(name);
+            sb.append(SPACE).append(name);
         } else {
             //This is a constructor
             sb.append(((ClassRef)returnType).getDefinition().getName());
         }
 
-        sb.append("(");
+        sb.append(OP);
         if (!varArgPreferred) {
-            sb.append(StringUtils.join(arguments, ","));
+            sb.append(StringUtils.join(arguments, COMA));
         } else if (!arguments.isEmpty()) {
             List<Property> args = arguments.subList(0, arguments.size() - 1);
             Property varArg = arguments.get(arguments.size() - 1);
-            sb.append(StringUtils.join(args, ","));
+            sb.append(StringUtils.join(args, COMA));
             if (!args.isEmpty()) {
-                sb.append(",");
+                sb.append(COMA);
             }
             if (varArg.getTypeRef().getDimensions() == 1) {
-                sb.append(varArg.getTypeRef().withDimensions(0)).append("... ");
+                sb.append(varArg.getTypeRef().withDimensions(0)).append(VARARG).append(SPACE);
             } else {
-                sb.append(varArg.getTypeRef().withDimensions(0)).append("... ");
+                sb.append(varArg.getTypeRef()).append(SPACE);
             }
             sb.append(varArg.getName());
         }
-        sb.append(")");
+        sb.append(CP);
 
         if (exceptions != null && !exceptions.isEmpty()) {
-            sb.append(" throws ").append(join(exceptions, ","));
+            sb.append(SPACE).append(THROWS).append(SPACE).append(join(exceptions, COMA));
         }
 
         return sb.toString();
