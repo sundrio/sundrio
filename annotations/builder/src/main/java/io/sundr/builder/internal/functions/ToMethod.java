@@ -119,7 +119,7 @@ public class ToMethod {
             } else if (isBuildable(unwraped) && !isAbstract(unwraped)) {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
                 String propertyName = property.getName();
-                String builderClass = builder.getName();
+                String builderClass = builder.toReference().getName();
                 if (property.getAttributes().containsKey(DESCENDANT_OF)) {
                     Property descendantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
                     propertyName = descendantOf.getName();
@@ -131,7 +131,7 @@ public class ToMethod {
                     TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(descendant.getTypeRef());
                     TypeDef builder = BUILDER.apply(((ClassRef) dunwraped).getDefinition());
                     String propertyName = property.getName();
-                    String builderClass = builder.getName();
+                    String builderClass = builder.toReference().getName();
                     statements.add(new StringStatement("if (" + propertyName + " instanceof " + dunwraped + "){ this." + propertyName + "= new " + builderClass + "((" + dunwraped + ")" + propertyName + "); _visitables.add(this." + propertyName + ");}"));
 
                     alsoImport.add((ClassRef) dunwraped);
