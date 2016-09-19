@@ -17,7 +17,6 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
-import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
@@ -25,8 +24,6 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.model.AttributeSupportFluent;
-import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
@@ -59,6 +56,9 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
+                if (buildable == null) {
+                    continue;
+                }
 
                 ctx = BuilderContextManager.create(elements, types, buildable.generateBuilderPackage(), buildable.builderPackage());
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
@@ -88,6 +88,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         }
         generateLocalDependenciesIfNeeded();
         addCustomMappings(ctx);
+        ctx.getDefinitionRepository().updateReferenceMap();
 
         for (TypeDef typeDef : ctx.getBuildableRepository().getBuildables()) {
             try {
