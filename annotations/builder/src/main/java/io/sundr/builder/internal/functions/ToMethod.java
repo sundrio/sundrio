@@ -578,7 +578,6 @@ public class ToMethod {
 
             String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
-            prefix += BuilderUtils.fullyQualifiedNameDiff(property);
             String methodName = prefix + captializeFirst(isCollection
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName()) + suffix;
