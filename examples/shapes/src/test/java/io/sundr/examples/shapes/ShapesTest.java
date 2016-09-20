@@ -16,6 +16,7 @@
 
 package io.sundr.examples.shapes;
 
+import io.sundr.builder.PathAwareTypedVisitor;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.Visitor;
 import io.sundr.examples.shapes.v1.Circle;
@@ -87,7 +88,7 @@ public class ShapesTest {
                 .and()
                 .build();
 
-        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
+        canvas = new CanvasBuilder(canvas).accept(new PathAwareTypedVisitor<CircleBuilder<Integer>>() {
             @Override
             public void visit(CircleBuilder<Integer> builder) {
                 builder.withRadius(100 + builder.getRadius());
