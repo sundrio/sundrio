@@ -81,6 +81,14 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     }
 
     public F accept(Visitor visitor) {
+        if (visitor instanceof PathAwareTypedVisitor) {
+            return acceptPathAware((PathAwareTypedVisitor) visitor);
+        } else {
+            return acceptInternal(visitor);
+        }
+    }
+
+    private F acceptInternal(Visitor visitor) {
         for (Visitable visitable : _visitables) {
             visitable.accept(visitor);
         }
@@ -89,5 +97,10 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
             visitor.visit(this);
         }
         return (F) this;
+    }
+
+
+    private F acceptPathAware(PathAwareTypedVisitor pathAwareTypedVisitor) {
+        return acceptInternal(pathAwareTypedVisitor.next(this));
     }
 }

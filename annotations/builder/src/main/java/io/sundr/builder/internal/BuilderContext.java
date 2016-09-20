@@ -49,6 +49,7 @@ public class BuilderContext {
     private final TypeDef visitableBuilderInterface;
     private final TypeDef visitorInterface;
     private final TypeDef typedVisitorInterface;
+    private final TypeDef pathAwareVisitorClass;
     private final TypeDef functionInterface;
     private final TypeDef inlineableBase;
     private final Boolean generateBuilderPackage;
@@ -75,6 +76,10 @@ public class BuilderContext {
                 .build();
 
         typedVisitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/TypedVisitor.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+                .build();
+
+        pathAwareVisitorClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/PathAwareTypedVisitor.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
@@ -170,6 +175,10 @@ public class BuilderContext {
 
     public TypeDef getTypedVisitorInterface() {
         return typedVisitorInterface;
+    }
+
+    public TypeDef getPathAwareVisitorClass() {
+        return pathAwareVisitorClass;
     }
 
     public TypeDef getInlineableBase() {
