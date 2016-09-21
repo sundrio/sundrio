@@ -551,6 +551,87 @@ public class ToMethod {
         }
     };
 
+    public static final Function<Property, Method> EDIT_OR_NEW = new Function<Property, Method>() {
+        public Method apply(Property property) {
+            ClassRef baseType = (ClassRef) property.getTypeRef();
+            ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType.getDefinition()).toReference();
+
+            //Let's reload the class from the repository if available....
+            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
+            if (propertyTypeDef != null) {
+                baseType = propertyTypeDef.toInternalReference();
+            }
+
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+
+            List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
+            List<TypeRef> typeArguments = new ArrayList<TypeRef>();
+            for (TypeRef ignore : baseType.getArguments()) {
+                typeArguments.add(Q);
+            }
+            typeArguments.add(returnType);
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+
+            String prefix = "editOrNew";
+            String methodNameBase = captializeFirst(property.getName());
+            String methodName = prefix + methodNameBase;
+
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
+                    .withReturnType(rewraped)
+                    .withName(methodName)
+                    .withNewBlock()
+                    .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): new " + builderType.getName() + "().build());")
+                    .endBlock()
+                    .build();
+
+        }
+    };
+
+    public static final Function<Property, Method> EDIT_OR_NEW_LIKE = new Function<Property, Method>() {
+        public Method apply(Property property) {
+            ClassRef baseType = (ClassRef) property.getTypeRef();
+            //Let's reload the class from the repository if available....
+            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
+            if (propertyTypeDef != null) {
+                baseType = propertyTypeDef.toInternalReference();
+            }
+
+            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+
+            List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
+            List<TypeRef> typeArguments = new ArrayList<TypeRef>();
+            for (TypeRef ignore : baseType.getArguments()) {
+                typeArguments.add(Q);
+            }
+            typeArguments.add(returnType);
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+
+            String prefix = "editOrNew";
+            String suffix = "Like";
+            String methodNameBase = captializeFirst(property.getName());
+            String methodName = prefix + methodNameBase + suffix;
+
+            return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
+                    .withReturnType(rewraped)
+                    .withName(methodName)
+                    .addNewArgument()
+                    .withName("item")
+                    .withTypeRef(baseType)
+                    .endArgument()
+                    .withNewBlock()
+                    .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get"+methodNameBase+"(): item);")
+                    .endBlock()
+                    .build();
+
+        }
+    };
+
     public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());

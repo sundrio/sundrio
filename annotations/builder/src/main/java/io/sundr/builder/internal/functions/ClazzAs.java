@@ -125,6 +125,8 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
                     if (!isCollection && !isArray) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
+                        methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
+                        methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
                     }
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
@@ -260,6 +262,8 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
                     if (!isCollection && !isArray) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
+                        methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
+                        methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
                     }
                     methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
