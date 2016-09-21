@@ -5,7 +5,18 @@
 
 Even though builder is a very common pattern and all modern IDEs are
 able to generate them on the fly, they tend to get messy when concepts
-like *inheritance* or *nesting* get into the picture.
+like *inheritance* or *nesting* get into the picture and they are not 
+that easy to keep up to date.
+
+This project provides annotation processors the provide teh following features:
+
+- Compile time builder generation.
+- Separation of the Fluent behavior from the Builder.
+- Support for hierarchical and nested builders.
+- Support for nesting builders.
+- Support for the Visitor Pattern (easily navigating complex structures).
+- Support for inlines (builder like objects that expose a custom function).
+- Support for Bean Validation (JSR 303)
 
 #### The builder interface
 All the generated builders implement the `Builder` interface which looks like:
@@ -76,6 +87,26 @@ Which you could use like:
 Square mySquare = new SquareBuilder().withX(0).withY(0).withSize(10).build();
 ```
 
+The builder can also be used to edit existing objects. For example let's
+change the size of existing Square:
+
+```java
+Square newSquare = new SquareBuilder(existingSquare).withSize(10).build();
+```
+
+This is quite handy, especially in cases where the target object are immutable.
+An alternative way of doing the above is to use the Editable version of the object
+which is also generated (by default).
+
+The Editable version will still be immutable, but will provide an edit()
+method which will return a builder for the editing the object. Also all builders, 
+will now return the editable version of the object.
+
+```java
+EditableSquare mySquare = new SquareBuilder().withX(0).withY(0).withSize(10).build();
+EditableSquare newSquare = mySquare.edit().withSize(10).done();
+```
+
 ### Builder Inheritance
 
 In the examples above, both `Circle` and `Square` are actually
@@ -117,6 +148,139 @@ As shown below:
           |  |
         CircleBuilder
 
+### Nested Builders
+
+Sometimes we want to create a builder for an object that contains fields
+that we also want to create builders for. 
+
+**Example**: 
+Let's add the Circle and Square objects we used above inside a Canvas object
+and see how using the CanvasBuilder would look like:
+
+    Canvas canvas = new CanvasBuilder()
+                        .withCircle(new CircleBuilder().withRadius(10)
+                                                       .withX(0)
+                                                       .withY(0)
+                                                       .build())
+                        .withSquare(new SrqureBuilder().withSize(5)
+                                                       .withX(10)
+                                                       .withY(10)
+                                                       .build()) 
+                        build();
+                                                                                                             
+There is nothing wrong with the snippet above, but it would look much nicer 
+like this:
+
+    Canvas canvas = new CanvasBuilder()
+                        .withNewCircle().withRadius(10)
+                                        .withX(0)
+                                        .withY(0)
+                                        .and()
+                        .withNewSquare().withSize(5)
+                                        .withX(10)
+                                        .withY(10)
+                                        .and() 
+                        build();
+
+It's even more handy when we want to edit one of the nesting objects:
+                                                            
+    Canvas canvas = new CanvasBuilder(oldCanvas)
+                        .editCircle()
+                            .withRadius(10)
+                        .and() 
+                        build();                                                            
+                                                                                                                                                                                                                                                 
+These are examples of what we call nested builders. Nested builders can also 
+support hierarchies and Collections. So if Canvas instead a single circle and
+a single square had a collection of shapes, the generated CanvasBuilder would be 
+used like this:
+
+    Canvas canvas = new CanvasBuilder()
+                        .addNewCircleShape().withRadius(10)
+                                        .withX(0)
+                                        .withY(0)
+                                        .and()
+                        .addNewSquareShape().withSize(5)
+                                        .withX(10)
+                                        .withY(10)
+                                        .and() 
+                        build();                                                                                                                                                                                                                          
+                  
+This is really handy, because you don't have keep track of which builders 
+are available, the structure of your generated builder guides you instead.
+                                                                        
+But what happens if we want to edit one of the circles now?
+
+When the object structure is getting more complex, the Visitors come to the rescue.
+
+### Visitor Pattern Support
+
+The visitor pattern in general allows to to perform an operation on objects
+without having to know how to reach these objects. In the nested builder case
+this is really handy as it allows us to edit complex object structure without having 
+to `know` and `couple` our code with the structure.
+  
+In the previous example let's assume that we want to move all circles to the right by 10.
+We will have to pass a visitor to the CanvasBuilder that will visit all the nested circle builders
+and perform the change.
+ 
+    Canvas canvas = new CanvasBuilder(oldCanvas).accept(new TypedVisitor<CircleBuilder>() {         
+            public void visit(CircleBuilder c) {
+                c.withX(c.getX() + 10);
+            }
+    }).build();
+
+Now let's do the same with all objects:
+
+    Canvas canvas = new CanvasBuilder(oldCanvas).accept(new TypedVisitor<ShapeFluent>() {         
+            public void visit(ShapeFluent s) {
+                s.withX(s.getX() + 10);
+            }
+    }).build();                          
+                          
+In the snippet above we choose to visit the ShapeFluent as its the common interface
+implemented by all shape builders. 
+
+What happens when we need to visit buildable objects that don't have something in common.
+For this case we can just use a plain visitor rather than a typed one:
+
+    Canvas canvas = new CanvasBuilder(oldCanvas).accept(new Visitor() {         
+            public void visit(Object o) {
+                if (o instanceof NotAShapeBuilder) {
+                    // perform some changes
+                } else if (o instanceof CircleBuilder) {
+                    // do something else ...
+                }
+            }
+    }).build();
+          
+In cases where we have more complex objects, we may want the visitor to know of the parent 
+of the visited objects or even the full path. In this case we can use a PathAwareTypedVisitor.
+
+But let's use an example. Assume that all shapes have a Color field, similar to the java.awt.Color:
+
+    public Color {
+        private final int red;
+        private final int grey;
+        private final int blue;
+        
+        //Not hard to image code...    
+    }
+                                                       
+And we want to increase the amount of red in all circle shapes in the Canvas.
+The challenge here is that we don't want to modify all color builders, but
+only those nested under circle objects. Here's how the PathAwareTypedVisitor helps:
+
+    Canvas canvas = new CanvasBuilder(oldCanvas).accept(new PathAwareTypedVisitor<ColorBuilder>() {         
+            public void visit(ColorBuilder c) {
+                if (getParent() instanceof CircleBuilder) {
+                    c.witRed(c.getRed() + 10);
+                }
+            }
+    }).build();
+
+PathAwareTypedVisitor has access to getParent() and getPath() methods, which provide
+all the required information about the path of the visitable object.                                                                                                                                                                                                                        
 
 ### Integration with Bean Validation
 
