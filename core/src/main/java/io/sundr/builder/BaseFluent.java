@@ -24,6 +24,8 @@ import java.util.Set;
 
 public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> {
 
+    private static final String VISIT = "visit";
+
     public final List<Visitable> _visitables = new ArrayList<Visitable>();
 
     public static <T> ArrayList<T> build(List<? extends Builder<? extends T>> list) {
@@ -62,12 +64,37 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
 
     private static <V, F> Boolean canVisit(V visitor, F fluent) {
+
+
         if (visitor instanceof TypedVisitor) {
-            return ((TypedVisitor) visitor).getType().isAssignableFrom(fluent.getClass());
+            if (!((TypedVisitor) visitor).getType().isAssignableFrom(fluent.getClass())) {
+                return false;
+            }
         }
 
+        if (visitor instanceof PathAwareTypedVisitor) {
+            PathAwareTypedVisitor pathAwareTypedVisitor = (PathAwareTypedVisitor) visitor;
+            Class parentType = pathAwareTypedVisitor.getParentType();
+            Class actaulParentType = pathAwareTypedVisitor.getActualParentType();
+            if (!parentType.isAssignableFrom(actaulParentType)) {
+                return false;
+            }
+        }
+
+        return hasCompatibleVisitMethod(visitor, fluent);
+    }
+
+    /**
+     * Checks if the specified visitor has a visit method compatible with the specified fluent.
+     * @param visitor
+     * @param fluent
+     * @param <V>
+     * @param <F>
+     * @return
+     */
+    private static <V,F> Boolean hasCompatibleVisitMethod(V visitor, F fluent) {
         for (Method method : visitor.getClass().getDeclaredMethods()) {
-            if (method.getParameterTypes().length != 1) {
+            if (!method.getName().equals(VISIT) || method.getParameterTypes().length != 1) {
                 continue;
             }
             Class visitorType = method.getParameterTypes()[0];
