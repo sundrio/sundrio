@@ -16,8 +16,27 @@
 
 package io.sundr.maven;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.maven.filter.Filters;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -44,20 +63,9 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 @Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VALIDATE)
 public class GenerateBomMojo extends AbstractSundrioMojo {
@@ -73,6 +81,15 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
     @Component
     private LifecycleTaskSegmentCalculator segmentCalculator;
+
+    @Component
+    private RepositorySystem aetherSystem;
+
+    @Parameter(defaultValue = "${repositorySystemSession}", readonly = true, required = true)
+    private RepositorySystemSession aetherSession;
+
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true, required = true)
+    private List<RemoteRepository> aetherRemoteRepositories;
 
     /**
      * Location of the localRepository repository.
@@ -146,30 +163,40 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         FileWriter writer = null;
         try {
             writer = new FileWriter(generatedBom);
-            Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
+            // Imported dependencies may have important additional information (eg. exclusions)
+            Map<Artifact, Dependency> dependencies = new LinkedHashMap<Artifact, Dependency>();
             Set<Artifact> plugins = new LinkedHashSet<Artifact>();
 
             Set<Artifact> ownModules = Filters.filter(getReactorArtifacts(), Filters.createModulesFilter(config));
 
             //We add first project management and unwrapped boms. (we don't resolve those).
-            Set<Artifact> dependencyManagementArtifacts =  config.isInheritDependencyManagement() ? getProjectDependencyManagement() : new LinkedHashSet<Artifact>();
+            Set<Artifact> dependencyManagementArtifacts = config.isInheritDependencyManagement() ? getProjectDependencyManagement() : new LinkedHashSet<Artifact>();
             Set<Artifact> pluginManagementArtifacts = config.isInheritPluginManagement() ? getProjectPluginManagement() : new LinkedHashSet<Artifact>();
 
             Set<Artifact> allDependencies = new LinkedHashSet<Artifact>(dependencyManagementArtifacts);
             allDependencies.addAll(getDependencies(getProjectDependencies())); //We resolve transitives here....
 
             //Populate dependencies
-            dependencies.addAll(ownModules);
-            dependencies.addAll(Filters.filter(allDependencies, Filters.createDependencyFilter(getSession(), config)));
+            dependencies.putAll(toDependencyMap(ownModules));
+            dependencies.putAll(toDependencyMap(Filters.filter(allDependencies, Filters.createDependencyFilter(getSession(), config))));
+
+            //Populate dependencies with imported boms.
+            ExternalBomResolver bomResolver = new ExternalBomResolver(getSession(), getArtifactHandler(), aetherSystem, aetherSession, aetherRemoteRepositories, getLog());
+            Map<Artifact, Dependency> externalDependencies = bomResolver.resolve(config);
+            dependencies.putAll(externalDependencies);
 
             //Populate plugins
             plugins.addAll(Filters.filter(ownModules, Filters.MAVEN_PLUGIN_FILTER));
             plugins.addAll(Filters.filter(pluginManagementArtifacts, Filters.createPluginFilter(getSession(), config)));
 
+            //Checking version mismatches.
+            MavenProject projectToGenerate = toGenerate(getProject(), config, dependencies.values(), plugins);
+            verifyBomDependencies(config, projectToGenerate);
+
             getLog().info("Generating BOM: " + config.getArtifactId());
             new CodeGeneratorBuilder<Model>()
                     .withWriter(writer)
-                    .withModel(toGenerate(getProject(), config, dependencies, plugins).getModel())
+                    .withModel(projectToGenerate.getModel())
                     .withTemplateResource(bomTemplateResource)
                     .withTemplateUrl(bomTemplateUrl)
                     .build().generate();
@@ -185,6 +212,45 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 }
             } catch (IOException e) {
                 throw new MojoExecutionException("Failed to close the generated bom writer", e);
+            }
+        }
+    }
+
+    private void verifyBomDependencies(BomConfig config, MavenProject project) throws MojoFailureException {
+        if (!config.isCheckMismatches()) {
+            return;
+        }
+
+        Map<String, Set<String>> versions = new TreeMap<String, Set<String>>();
+        Set<String> mismatches = new TreeSet<String>();
+        if (project.getDependencyManagement() != null && project.getDependencyManagement().getDependencies() != null) {
+            for (Dependency dependency : project.getDependencyManagement().getDependencies()) {
+                String key = dependencyKey(dependency);
+                String version = dependency.getVersion();
+                if (!versions.containsKey(key)) {
+                    versions.put(key, new TreeSet<String>());
+                }
+                for (String otherVersion : versions.get(key)) {
+                    if (!version.equals(otherVersion)) {
+                        mismatches.add(key);
+                        break;
+                    }
+                }
+                versions.get(key).add(version);
+            }
+        }
+
+        if (mismatches.size() > 0) {
+            StringBuilder message = new StringBuilder();
+            message.append("The BOM " + config.getArtifactId() + " contains multiple versions of the following dependencies:\n");
+            for (String key : mismatches) {
+                message.append(" - " + key + " versions " + versions.get(key) + "\n");
+            }
+
+            if (config.isFailOnMismatch()) {
+                throw new MojoFailureException(message.toString());
+            } else {
+                getLog().warn(message.toString());
             }
         }
     }
@@ -205,7 +271,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
      * @param config  The {@link io.sundr.maven.BomConfig}.
      * @return The build {@link org.apache.maven.project.MavenProject}.
      */
-    private static MavenProject toGenerate(MavenProject project, BomConfig config, Set<Artifact> dependencies, Set<Artifact> plugins) {
+    private static MavenProject toGenerate(MavenProject project, BomConfig config, Collection<Dependency> dependencies, Set<Artifact> plugins) {
         MavenProject toGenerate = project.clone();
         toGenerate.setGroupId(project.getGroupId());
         toGenerate.setArtifactId(config.getArtifactId());
@@ -220,8 +286,8 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         toGenerate.setDevelopers(project.getDevelopers());
 
         toGenerate.getModel().setDependencyManagement(new DependencyManagement());
-        for (Artifact artifact : dependencies) {
-            toGenerate.getDependencyManagement().addDependency(toDependency(artifact));
+        for (Dependency dependency : dependencies) {
+            toGenerate.getDependencyManagement().addDependency(dependency);
         }
 
         toGenerate.getModel().setBuild(new Build());
@@ -300,7 +366,8 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
         try {
             ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(new BomDependencyGraph(session.getProjects()));
-            ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(), reactorBuildStatus, builder);
+            ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(), projectIndex, Thread.currentThread().getContextClassLoader(),
+                    reactorBuildStatus, builder);
             List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);
             for (TaskSegment segment : segments) {
                 builder.buildProject(session, reactorContext, project, filterSegment(segment, goals));
@@ -345,7 +412,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
      */
     private Set<Artifact> getProjectDependencyManagement() {
         Set<Artifact> result = new LinkedHashSet<Artifact>();
-        DependencyManagement dependencyManagement =  getProject().getDependencyManagement();
+        DependencyManagement dependencyManagement = getProject().getDependencyManagement();
         if (dependencyManagement != null) {
             for (Dependency dependency : dependencyManagement.getDependencies()) {
                 result.add(toArtifact(dependency));
@@ -361,7 +428,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
      */
     private Set<Artifact> getProjectPluginManagement() {
         Set<Artifact> result = new LinkedHashSet<Artifact>();
-        PluginManagement pluginManagement =  getProject().getPluginManagement();
+        PluginManagement pluginManagement = getProject().getPluginManagement();
         if (pluginManagement != null) {
             for (Plugin plugin : pluginManagement.getPlugins()) {
                 result.add(toArtifact(plugin));
@@ -387,7 +454,8 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         Set<Artifact> testOnlyDependencies = allBut(testTransitives, nonTestTransitives);
 
         for (Artifact testOnly : testOnlyDependencies) {
-            result.add(new DefaultArtifact(testOnly.getGroupId(), testOnly.getArtifactId(), testOnly.getVersion(), Artifact.SCOPE_TEST, testOnly.getType(), testOnly.getClassifier(), testOnly.getArtifactHandler()));
+            result.add(new DefaultArtifact(testOnly.getGroupId(), testOnly.getArtifactId(), testOnly.getVersion(), Artifact.SCOPE_TEST, testOnly.getType(), testOnly.getClassifier(), testOnly
+                    .getArtifactHandler()));
         }
 
         result.addAll(resolve(projectDependencies));
@@ -408,11 +476,23 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
 
 
     private Artifact toArtifact(Dependency dependency) {
-        return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getScope(), dependency.getType(), dependency.getClassifier(), getArtifactHandler());
+        return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), dependency.getScope(), dependency.getType(), dependency.getClassifier(),
+                getArtifactHandler());
     }
 
     private Artifact toArtifact(Plugin plugin) {
         return new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, Constants.MAVEN_PLUGIN_TYPE, null, getArtifactHandler());
+    }
+
+    private static Map<Artifact, Dependency> toDependencyMap(Collection<Artifact> artifacts) {
+        Map<Artifact, Dependency> dependencyMap = new LinkedHashMap<Artifact, Dependency>();
+        if(artifacts!=null) {
+            for (Artifact artifact : artifacts) {
+                Dependency dependency = toDependency(artifact);
+                dependencyMap.put(artifact, dependency);
+            }
+        }
+        return dependencyMap;
     }
 
     private static Dependency toDependency(Artifact artifact) {
@@ -472,6 +552,10 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         Set<Artifact> result = new LinkedHashSet<Artifact>(source);
         result.removeAll(exclusions);
         return result;
+    }
+
+    private static String dependencyKey(Dependency dependency) {
+        return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getType() + ":" + dependency.getClassifier();
     }
 
 }

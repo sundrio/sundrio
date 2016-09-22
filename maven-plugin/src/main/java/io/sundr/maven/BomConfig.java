@@ -16,6 +16,8 @@
 
 package io.sundr.maven;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 public class BomConfig {
@@ -26,12 +28,16 @@ public class BomConfig {
     private ArtifactSet modules = new ArtifactSet();
     private ArtifactSet dependencies = new ArtifactSet();
     private ArtifactSet plugins = new ArtifactSet();
+    private List<BomImport> imports = new LinkedList<BomImport>();
     private GoalSet goals = new GoalSet();
     private boolean ignoreScope = true;
     private boolean excludeOptional = true;
 
     private boolean inheritDependencyManagement;
     private boolean inheritPluginManagement;
+
+    private boolean checkMismatches = true;
+    private boolean failOnMismatch = false;
 
     private Properties properties = new Properties();
 
@@ -67,6 +73,10 @@ public class BomConfig {
         return plugins;
     }
 
+    public List<BomImport> getImports() {
+        return imports;
+    }
+
     public GoalSet getGoals() {
         return goals;
     }
@@ -89,5 +99,13 @@ public class BomConfig {
 
     public boolean isInheritPluginManagement() {
         return inheritPluginManagement;
+    }
+
+    public boolean isCheckMismatches() {
+        return checkMismatches;
+    }
+
+    public boolean isFailOnMismatch() {
+        return failOnMismatch;
     }
 }
