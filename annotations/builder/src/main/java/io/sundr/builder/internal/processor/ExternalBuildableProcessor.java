@@ -93,8 +93,13 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         addCustomMappings(ctx);
         ctx.getDefinitionRepository().updateReferenceMap();
 
+        int total = ctx.getBuildableRepository().getBuildables().size();
+        int count = 0;
         for (TypeDef typeDef : ctx.getBuildableRepository().getBuildables()) {
             try {
+                double percentage = 100 * (count++) / total;
+                System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
+
                 generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
@@ -118,6 +123,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 throw new RuntimeException(e);
             }
         }
+        System.err.println("100%: Builder generation complete.");
         return true;
     }
 }
