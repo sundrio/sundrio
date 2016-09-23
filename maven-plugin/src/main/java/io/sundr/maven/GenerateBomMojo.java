@@ -164,6 +164,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         try {
             writer = new FileWriter(generatedBom);
             // Imported dependencies may have important additional information (eg. exclusions)
+            // Taking both the artifacts and their related dependencies
             Map<Artifact, Dependency> dependencies = new LinkedHashMap<Artifact, Dependency>();
             Set<Artifact> plugins = new LinkedHashSet<Artifact>();
 

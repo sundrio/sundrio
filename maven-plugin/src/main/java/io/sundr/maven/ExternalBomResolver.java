@@ -38,7 +38,7 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 
 /**
  * Resolves external BOMs and provides its managed dependencies.
- * Using Aether to get full information about the managed dependencies.
+ * Using Aether to get full information about the managed dependencies (including versions and transitive imports).
  */
 public class ExternalBomResolver {
 
@@ -64,6 +64,13 @@ public class ExternalBomResolver {
         this.logger = logger;
     }
 
+    /**
+     * Resolve all imports contained in the given configuration.
+     *
+     * @param config the Bom configuration
+     * @return all artifacts and related dependencies imported from external Boms
+     * @throws Exception in case of resolution failure
+     */
     public Map<Artifact, Dependency> resolve(BomConfig config) throws Exception {
         Map<Artifact, Dependency> dependencies = new LinkedHashMap<Artifact, Dependency>();
         if (config != null && config.getImports() != null) {

@@ -129,6 +129,95 @@
                                 </excludes>
                             </goals>
                         </bom>
+                        <bom>
+                            <artifactId>bom-test-7</artifactId>
+                            <name>Test Project :: Bom 7</name>
+                            <modules>
+                                <excludes>
+                                    <exclude>*:*</exclude>
+                                </excludes>
+                            </modules>
+                            <dependencies>
+                                <includes>
+                                    <include>io.sundr:*</include>
+                                </includes>
+                            </dependencies>
+                            <imports>
+                                <import>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-dependencies</artifactId>
+                                    <version>1.4.1.RELEASE</version>
+                                    <dependencyManagement>
+                                        <includes>
+                                            <include>*:*</include>
+                                        </includes>
+                                    </dependencyManagement>
+                                </import>
+                                <import>
+                                    <groupId>org.apache.camel</groupId>
+                                    <artifactId>camel-parent</artifactId>
+                                    <version>2.17.2</version>
+                                    <dependencyManagement>
+                                        <includes>
+                                            <include>*:*</include>
+                                        </includes>
+                                    </dependencyManagement>
+                                </import>
+                            </imports>
+                            <goals>
+                                <excludes>
+                                    <exclude>deploy</exclude>
+                                </excludes>
+                            </goals>
+                            <failOnMismatch>false</failOnMismatch>
+                        </bom>
+                        <bom>
+                            <artifactId>bom-test-8</artifactId>
+                            <name>Test Project :: Bom 8</name>
+                            <modules>
+                                <excludes>
+                                    <exclude>*:*</exclude>
+                                </excludes>
+                            </modules>
+                            <dependencies>
+                                <includes>
+                                    <include>io.sundr:*</include>
+                                </includes>
+                            </dependencies>
+                            <imports>
+                                <import>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-dependencies</artifactId>
+                                    <version>1.4.1.RELEASE</version>
+                                    <dependencyManagement>
+                                        <includes>
+                                            <include>*:*</include>
+                                        </includes>
+                                        <excludes>
+                                            <exclude>com.google.code.gson:gson</exclude>
+                                        </excludes>
+                                    </dependencyManagement>
+                                </import>
+                                <import>
+                                    <groupId>org.apache.camel</groupId>
+                                    <artifactId>camel-parent</artifactId>
+                                    <version>2.17.3</version>
+                                    <dependencyManagement>
+                                        <includes>
+                                            <include>org.apache.camel:*</include>
+                                        </includes>
+                                        <excludes>
+                                            <exclude>org.apache.camel:camel-h*</exclude>
+                                        </excludes>
+                                    </dependencyManagement>
+                                </import>
+                            </imports>
+                            <goals>
+                                <excludes>
+                                    <exclude>deploy</exclude>
+                                </excludes>
+                            </goals>
+                        </bom>
                     </boms>
                 </configuration>
                 <executions>
