@@ -137,7 +137,7 @@ public class Descendants {
 
     public static boolean isNestingIgnored(Property property) {
         for (ClassRef classRef : property.getAnnotations()) {
-            if (classRef.getFullyQualifiedName().equals(IgnoreDescendants.class.getSimpleName())) {
+            if (classRef.getFullyQualifiedName().equals(IgnoreDescendants.class.getName())) {
                 return true;
             }
         }
