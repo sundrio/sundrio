@@ -26,6 +26,8 @@ public class BomImport {
 
     private String version;
 
+    private String repository;
+
     private ArtifactSet dependencyManagement = new ArtifactSet();
 
     public BomImport() {
@@ -53,6 +55,14 @@ public class BomImport {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getRepository() {
+        return repository;
+    }
+
+    public void setRepository(String repository) {
+        this.repository = repository;
     }
 
     public ArtifactSet getDependencyManagement() {

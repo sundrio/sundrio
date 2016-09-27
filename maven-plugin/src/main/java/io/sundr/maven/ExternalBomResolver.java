@@ -102,10 +102,18 @@ public class ExternalBomResolver {
     private Map<Artifact, Dependency> resolveDependencies(BomImport bom) throws Exception {
         org.eclipse.aether.artifact.Artifact artifact = new org.eclipse.aether.artifact.DefaultArtifact(bom.getGroupId(), bom.getArtifactId(), "pom", bom.getVersion());
 
-        ArtifactRequest artifactRequest = new ArtifactRequest(artifact, remoteRepositories, null);
+        List<RemoteRepository> repositories = remoteRepositories;
+        if (bom.getRepository() != null) {
+            // Include the additional repository into the copy
+            repositories = new LinkedList<RemoteRepository>(repositories);
+            RemoteRepository repo = new RemoteRepository.Builder(bom.getArtifactId() + "-repository", "default", bom.getRepository()).build();
+            repositories.add(0, repo);
+        }
+
+        ArtifactRequest artifactRequest = new ArtifactRequest(artifact, repositories, null);
         system.resolveArtifact(session, artifactRequest); // To get an error when the artifact does not exist
 
-        ArtifactDescriptorRequest req = new ArtifactDescriptorRequest(artifact, remoteRepositories, null);
+        ArtifactDescriptorRequest req = new ArtifactDescriptorRequest(artifact, repositories, null);
         ArtifactDescriptorResult res = system.readArtifactDescriptor(session, req);
 
         Map<Artifact, Dependency> mavenDependencies = new LinkedHashMap<Artifact, Dependency>();
