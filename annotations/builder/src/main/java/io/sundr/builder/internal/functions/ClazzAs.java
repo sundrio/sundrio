@@ -89,7 +89,7 @@ public class ClazzAs {
                 boolean isCollection = isSet || isList;
                 boolean isAbstract = isAbstract(unwrapped);
 
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
+                Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
 
                 if (isArray) {
@@ -227,7 +227,7 @@ public class ClazzAs {
                             }
                         }).build();
 
-                Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
+                Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
 
                 if (isArray) {
@@ -698,7 +698,7 @@ public class ClazzAs {
             String name = property.getName();
             if (BuilderUtils.isPrimitive(property.getTypeRef())) {
                 statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").toString()));
-            } else if (property.getTypeRef() instanceof ClassRef && Decendants.isDescendant(type, ((ClassRef) property.getTypeRef()).getDefinition())) {
+            } else if (property.getTypeRef() instanceof ClassRef && Descendants.isDescendant(type, ((ClassRef) property.getTypeRef()).getDefinition())) {
                 statements.add(new StringStatement(new StringBuilder()
                         .append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
                         .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n")
