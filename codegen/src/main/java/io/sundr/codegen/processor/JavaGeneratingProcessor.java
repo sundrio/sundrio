@@ -53,7 +53,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      * @throws IOException
      */
    public void generateFromClazz(TypeDef model, JavaFileObject fileObject, String resourceName) throws IOException {
-        System.err.println("Generating:"+model.getFullyQualifiedName());
+        System.err.println("Generating: "+model.getFullyQualifiedName());
         new CodeGeneratorBuilder<TypeDef>()
                 .withContext(context)
                 .withModel(model)

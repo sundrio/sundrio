@@ -40,7 +40,7 @@ import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 
-public class Decendants {
+public class Descendants {
 
     public static final Function<TypeDef, Set<TypeDef>> BUILDABLE_DECENDANTS = FunctionFactory.cache(new Function<TypeDef, Set<TypeDef>>() {
         public Set<TypeDef> apply(TypeDef item) {
@@ -137,7 +137,7 @@ public class Decendants {
 
     public static boolean isNestingIgnored(Property property) {
         for (ClassRef classRef : property.getAnnotations()) {
-            if (classRef.getFullyQualifiedName().equals(IgnoreDescendants.class.getSimpleName())) {
+            if (classRef.getFullyQualifiedName().equals(IgnoreDescendants.class.getName())) {
                 return true;
             }
         }

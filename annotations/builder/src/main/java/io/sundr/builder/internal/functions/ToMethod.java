@@ -182,7 +182,7 @@ public class ToMethod {
                     return left.getName().compareTo(right.getName());
                 }
             });
-            descendants.addAll(Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property));
+            descendants.addAll(Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property));
 
             if (isMap(property.getTypeRef())) {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
@@ -272,7 +272,7 @@ public class ToMethod {
 
             String methodName = "addTo" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
-            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
+            Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 String propertyName = property.getName();
@@ -335,7 +335,7 @@ public class ToMethod {
             String methodName = "removeFrom" + property.getNameCapitalized();
             List<Statement> statements = new ArrayList<Statement>();
 
-            Set<Property> descendants = Decendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
+            Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 String propertyName = property.getName();
