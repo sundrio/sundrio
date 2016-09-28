@@ -44,6 +44,8 @@ boolean deployed3 = isDeployed("bom-test-3");
 boolean deployed4 = isDeployed("bom-test-4");
 boolean deployed5 = isDeployed("bom-test-5");
 boolean deployed6 = isDeployed("bom-test-6");
+boolean deployed7 = isDeployed("bom-test-7");
+boolean deployed8 = isDeployed("bom-test-8");
 
 boolean parent1 = hasParent("bom-test-1");
 boolean parent2 = hasParent("bom-test-2");
@@ -51,6 +53,8 @@ boolean parent3 = hasParent("bom-test-3");
 boolean parent4 = hasParent("bom-test-4");
 boolean parent5 = hasParent("bom-test-5");
 boolean parent6 = hasParent("bom-test-6");
+boolean parent7 = hasParent("bom-test-7");
+boolean parent8 = hasParent("bom-test-8");
 
 Set deps1 = findDependencies("bom-test-1");
 Set deps2 = findDependencies("bom-test-2");
@@ -58,6 +62,8 @@ Set deps3 = findDependencies("bom-test-3");
 Set deps4 = findDependencies("bom-test-4");
 Set deps5 = findDependencies("bom-test-5");
 Set deps6 = findDependencies("bom-test-6");
+Set deps7 = findDependencies("bom-test-7");
+Set deps8 = findDependencies("bom-test-8");
 
 
 return deployed1 && !parent1 && deps1.size() == 1 && deps1.contains("test:module1") &&
@@ -65,4 +71,6 @@ return deployed1 && !parent1 && deps1.size() == 1 && deps1.contains("test:module
       deployed3 && !parent3 && deps3.size() == 1 && deps3.contains("test:module2") &&
       deployed4 && !parent4 && deps4.size() == 1 && deps4.contains("test:module1") &&
       !deployed5 && !parent5 && deps5.size() == 2 && deps5.contains("test:module2") && deps5.contains("test:module1") &&
-      !deployed6 && !parent6 && deps6.size() == 3 && deps6.contains("test:module2") && deps6.contains("test:module1") && deps6.contains("io.sundr:sundr-core");
+      !deployed6 && !parent6 && deps6.size() == 3 && deps6.contains("test:module2") && deps6.contains("test:module1") && deps6.contains("io.sundr:sundr-core") &&
+      !deployed7 && !parent7 && deps7.size() > 800 && deps7.contains("org.springframework.boot:spring-boot-starter") && deps7.contains("org.apache.camel:camel-http") && deps7.contains("com.google.code.gson:gson") && deps7.contains("io.sundr:sundr-core") &&
+      !deployed8 && !parent8 && deps8.size() < 800 && deps8.contains("org.springframework.boot:spring-boot-starter") && deps8.contains("org.apache.camel:camel-cxf") && !deps8.contains("org.apache.camel:camel-http") && !deps8.contains("com.google.code.gson:gson") && deps8.contains("io.sundr:sundr-core");

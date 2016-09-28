@@ -17,12 +17,16 @@
 package io.sundr.maven.filter;
 
 import io.sundr.maven.BomConfig;
+import io.sundr.maven.BomImport;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Filters {
@@ -73,12 +77,32 @@ public class Filters {
         return new CompositeFilter(filters);
     }
 
+    public static ArtifactFilter createDependencyManagementFilter(MavenSession session, BomImport bomImport) {
+        final List<ArtifactFilter> filters = new LinkedList<ArtifactFilter>();
+        filters.add(new SystemFilter());
+        filters.add(new SessionArtifactFilter(session, false));
+        filters.add(new IncludesFilter(bomImport.getDependencyManagement().getIncludes()));
+        filters.add(new ExcludesFilter(bomImport.getDependencyManagement().getExcludes()));
+        return new CompositeFilter(filters);
+    }
+
     public static Set<Artifact> filter(Set<Artifact> artifacts, ArtifactFilter filter) {
         Set<Artifact> result = new LinkedHashSet<Artifact>();
         for (Artifact artifact : artifacts) {
             Artifact filtered = filter.apply(artifact);
             if (filtered != null) {
                 result.add(filtered);
+            }
+        }
+        return result;
+    }
+
+    public static <T> Map<Artifact, T> filter(Map<Artifact, T> dependencies, ArtifactFilter filter) {
+        Map<Artifact, T> result = new LinkedHashMap<Artifact, T>();
+        for (Map.Entry<Artifact, T> dependency : dependencies.entrySet()) {
+            Artifact filtered = filter.apply(dependency.getKey());
+            if (filtered != null) {
+                result.put(filtered, dependency.getValue());
             }
         }
         return result;
