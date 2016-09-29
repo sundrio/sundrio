@@ -141,7 +141,6 @@ public class ClassRef extends TypeRef {
         if (dimensions != classRef.dimensions) return false;
         if (definition != null ? !definition.equals(classRef.definition) : classRef.definition != null) return false;
         return arguments != null ? arguments.equals(classRef.arguments) : classRef.arguments == null;
-
     }
 
     @Override

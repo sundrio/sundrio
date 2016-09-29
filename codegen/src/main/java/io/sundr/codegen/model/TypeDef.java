@@ -16,7 +16,6 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Visitor;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -291,7 +290,11 @@ public class TypeDef extends ModifierSupport {
     public Set<String> getImports() {
         final Set<String> imports = new LinkedHashSet<String>();
         for (ClassRef ref : getReferenceMap().values()) {
-            if (ref .getDefinition().getPackageName() == null || ref .getDefinition().getPackageName().isEmpty() ||  ref.getDefinition().getPackageName().equals(packageName)) {
+            TypeDef definition = ref.getDefinition();
+            if (definition.getPackageName() == null ||
+                    definition.getPackageName().isEmpty() ||
+                    definition.getPackageName().equals(packageName) ||
+                    definition.getName().equals(name)) {
                 continue;
             } else {
                 imports.add(ref.getDefinition().getFullyQualifiedName());
