@@ -24,7 +24,7 @@ import java.util.Map;
 public class EditableTypeDef extends TypeDef implements Editable<TypeDefBuilder>{
 
 
-public EditableTypeDef(Kind kind , String packageName , String name , List<ClassRef> annotations , List<ClassRef> extendsList , List<ClassRef> implementsList , List<TypeParamDef> parameters , List<Property> properties , List<Method> constructors , List<Method> methods , TypeDef outerType , List<TypeDef> innerTypes , int modifiers , Map<String, Object> attributes ){
+public EditableTypeDef(Kind kind , String packageName , String name , List<AnnotationRef> annotations , List<ClassRef> extendsList , List<ClassRef> implementsList , List<TypeParamDef> parameters , List<Property> properties , List<Method> constructors , List<Method> methods , TypeDef outerType , List<TypeDef> innerTypes , int modifiers , Map<String, Object> attributes ){
     super(kind, packageName, name, annotations, extendsList, implementsList, parameters, properties, constructors, methods, outerType, innerTypes, modifiers, attributes);
 }
 

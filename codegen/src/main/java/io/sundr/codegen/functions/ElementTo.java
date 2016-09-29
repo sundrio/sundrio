@@ -21,6 +21,8 @@ import io.sundr.Function;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.converters.TypeRefTypeVisitor;
+import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -39,6 +41,7 @@ import io.sundr.codegen.model.VoidRef;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -51,8 +54,10 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.ElementFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.utils.ModelUtils.getClassName;
@@ -64,6 +69,8 @@ public class ElementTo {
     private static final String JAVA_PEFIX = "java.";
     private static final String JAVAX_PEFIX = "javax.";
     private static final String COM_SUN_PREFIX = "com.sun.";
+    private static final String EMPTY_PARENTHESIS = "()";
+    private static final String EMPTY = "";
 
     private static final Function<TypeMirror, Boolean> IS_JAVA_TYPE_MIRROR = new Function<TypeMirror, Boolean>() {
 
@@ -144,14 +151,9 @@ public class ElementTo {
             String name = variableElement.getSimpleName().toString();
 
             TypeRef type = MIRROR_TO_TYPEREF.apply(variableElement.asType());
-            List<ClassRef> annotations = new ArrayList<ClassRef>();
+            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
             for (AnnotationMirror annotationMirror : variableElement.getAnnotationMirrors()) {
-                TypeRef annotationType = annotationMirror.getAnnotationType().accept(new TypeRefTypeVisitor(), 0);
-                if (annotationType instanceof ClassRef) {
-                    annotations.add((ClassRef) annotationType);
-                } else {
-                    throw new IllegalStateException();
-                }
+                    annotations.add(ANNOTATION_REF.apply(annotationMirror));
             }
 
             return new PropertyBuilder()
@@ -188,14 +190,8 @@ public class ElementTo {
 
              List<ClassRef> annotationRefs = new ArrayList<ClassRef>();
              for (AnnotationMirror annotationMirror : executableElement.getAnnotationMirrors()) {
-                 TypeRef annotationType = MIRROR_TO_TYPEREF.apply(annotationMirror.getAnnotationType());
-                 if (annotationType instanceof ClassRef) {
-                     annotationRefs.add((ClassRef) annotationType);
-                 }
-                 methodBuilder.withAnnotations(annotationRefs);
+                 methodBuilder.withAnnotations(ANNOTATION_REF.apply(annotationMirror));
              }
-
-
              return methodBuilder.build();
          }
      };
@@ -298,12 +294,7 @@ public class ElementTo {
             }
 
             for (AnnotationMirror annotationMirror : classElement.getAnnotationMirrors()) {
-                TypeRef annotationType = MIRROR_TO_TYPEREF.apply(annotationMirror.getAnnotationType());
-                if (annotationType instanceof ClassRef) {
-                    builder.addToAnnotations((ClassRef) annotationType);
-                } else {
-                    throw new IllegalStateException("Annotation type: [" + annotationType + "] not mapped to a class ref.");
-                }
+                builder.addToAnnotations(ANNOTATION_REF.apply(annotationMirror));
             }
             return DefinitionRepository.getRepository().register(builder.build());
         }
@@ -355,6 +346,29 @@ public class ElementTo {
             .withFallbackPredicate(IS_JAVA_ELEMENT)
             .withMaximumRecursionLevel(10)
             .withMaximumNestingDepth(10);
+
+
+    private static Function<AnnotationMirror, AnnotationRef> ANNOTATION_REF = FunctionFactory.cache(new Function<AnnotationMirror, AnnotationRef>() {
+        @Override
+        public AnnotationRef apply(AnnotationMirror item) {
+            TypeRef annotationType = item.getAnnotationType().accept(new TypeRefTypeVisitor(), 0);
+            Map<String, Object> parameters = new HashMap<String, Object>();
+            if (annotationType instanceof ClassRef) {
+                for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
+                        : item.getElementValues().entrySet()) {
+                    String key = entry.getKey().toString().replace(EMPTY_PARENTHESIS, EMPTY);
+                    Object value = entry.getValue().getValue();
+                    parameters.put(key, value);
+                }
+                return new AnnotationRefBuilder()
+                        .withClassRef((ClassRef) annotationType)
+                        .withParameters(parameters)
+                        .build();
+            }
+
+            throw new IllegalStateException("Annotation type: ["+annotationType+"] is not a class reference.");
+        }
+    });
 
 
 }

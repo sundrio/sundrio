@@ -17,6 +17,7 @@
 package io.sundr.builder;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
@@ -39,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.codegen.functions.ClassTo.ANNOTATIONTYPEREF;
 import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 import static io.sundr.codegen.functions.ClassTo.TYPEREF;
 import static io.sundr.codegen.utils.TypeUtils.*;
@@ -86,8 +88,7 @@ public class Constants {
     public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
     public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
-    public static final TypeDef BUILDABLE_ANNOTATION = TYPEDEF.apply(Buildable.class);
-    public static final ClassRef BUILDABLE_ANNOTATION_REF = BUILDABLE_ANNOTATION.toInternalReference();
+    public static final AnnotationRef BUILDABLE_ANNOTATION = ANNOTATIONTYPEREF.apply(Buildable.class);
 
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
     public static final TypeDef OBJECT = TypeDef.OBJECT;

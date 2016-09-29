@@ -16,24 +16,22 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.VisitableBuilder;
 import io.sundr.builder.Nested;
+import java.lang.String;
+import io.sundr.builder.VisitableBuilder;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.List;
 import java.lang.Object;
-import java.util.LinkedHashSet;
-import java.lang.String;
 
 public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupportFluentImpl<A> implements MethodFluent<A>{
 
-    private Set<VisitableBuilder<? extends ClassRef,?>> annotations =  new LinkedHashSet<VisitableBuilder<? extends ClassRef,?>>();
-    private Set<VisitableBuilder<? extends TypeParamDef,?>> parameters =  new LinkedHashSet<VisitableBuilder<? extends TypeParamDef,?>>();
+    private List<VisitableBuilder<? extends AnnotationRef,?>> annotations =  new ArrayList<VisitableBuilder<? extends AnnotationRef,?>>();
+    private List<VisitableBuilder<? extends TypeParamDef,?>> parameters =  new ArrayList<VisitableBuilder<? extends TypeParamDef,?>>();
     private String name;
     private VisitableBuilder<? extends TypeRef,?> returnType;
     private List<VisitableBuilder<? extends Property,?>> arguments =  new ArrayList<VisitableBuilder<? extends Property,?>>();
     private boolean varArgPreferred;
-    private Set<VisitableBuilder<? extends ClassRef,?>> exceptions =  new LinkedHashSet<VisitableBuilder<? extends ClassRef,?>>();
+    private List<VisitableBuilder<? extends ClassRef,?>> exceptions =  new ArrayList<VisitableBuilder<? extends ClassRef,?>>();
     private VisitableBuilder<? extends Block,?> block;
 
     public MethodFluentImpl(){
@@ -51,32 +49,32 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             this.withAttributes(instance.getAttributes()); 
     }
 
-    public A addToAnnotations(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+    public A addToAnnotations(AnnotationRef... items){
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
     }
 
-    public A removeFromAnnotations(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
+    public A removeFromAnnotations(AnnotationRef... items){
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
 
-    public List<ClassRef> getAnnotations(){
+    public List<AnnotationRef> getAnnotations(){
             return build(annotations);
     }
 
-    public A withAnnotations(List<ClassRef> annotations){
+    public A withAnnotations(List<AnnotationRef> annotations){
             this.annotations.clear();
-            if (annotations != null) {for (ClassRef item : annotations){this.addToAnnotations(item);}} return (A) this;
+            if (annotations != null) {for (AnnotationRef item : annotations){this.addToAnnotations(item);}} return (A) this;
     }
 
-    public A withAnnotations(ClassRef... annotations){
-            this.annotations.clear(); if (annotations != null) {for (ClassRef item :annotations){ this.addToAnnotations(item);}} return (A) this;
+    public A withAnnotations(AnnotationRef... annotations){
+            this.annotations.clear(); if (annotations != null) {for (AnnotationRef item :annotations){ this.addToAnnotations(item);}} return (A) this;
     }
 
     public MethodFluent.AnnotationsNested<A> addNewAnnotation(){
             return new AnnotationsNestedImpl();
     }
 
-    public MethodFluent.AnnotationsNested<A> addNewAnnotationLike(ClassRef item){
+    public MethodFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item){
             return new AnnotationsNestedImpl(item);
     }
 
@@ -128,6 +126,66 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             if (returnType instanceof TypeParamRef){ this.returnType= new TypeParamRefBuilder((TypeParamRef)returnType); _visitables.add(this.returnType);}
             if (returnType instanceof ClassRef){ this.returnType= new ClassRefBuilder((ClassRef)returnType); _visitables.add(this.returnType);}
             return (A) this;
+    }
+
+    public A withVoidRefReturnType(VoidRef voidRefReturnType){
+            if (returnType!=null){ this.returnType= new VoidRefBuilder(voidRefReturnType); _visitables.add(this.returnType);} return (A) this;
+    }
+
+    public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnType(){
+            return new VoidRefReturnTypeNestedImpl();
+    }
+
+    public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(VoidRef item){
+            return new VoidRefReturnTypeNestedImpl(item);
+    }
+
+    public A withWildcardRefReturnType(WildcardRef wildcardRefReturnType){
+            if (returnType!=null){ this.returnType= new WildcardRefBuilder(wildcardRefReturnType); _visitables.add(this.returnType);} return (A) this;
+    }
+
+    public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnType(){
+            return new WildcardRefReturnTypeNestedImpl();
+    }
+
+    public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(WildcardRef item){
+            return new WildcardRefReturnTypeNestedImpl(item);
+    }
+
+    public A withPrimitiveRefReturnType(PrimitiveRef primitiveRefReturnType){
+            if (returnType!=null){ this.returnType= new PrimitiveRefBuilder(primitiveRefReturnType); _visitables.add(this.returnType);} return (A) this;
+    }
+
+    public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnType(){
+            return new PrimitiveRefReturnTypeNestedImpl();
+    }
+
+    public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(PrimitiveRef item){
+            return new PrimitiveRefReturnTypeNestedImpl(item);
+    }
+
+    public A withTypeParamRefReturnType(TypeParamRef typeParamRefReturnType){
+            if (returnType!=null){ this.returnType= new TypeParamRefBuilder(typeParamRefReturnType); _visitables.add(this.returnType);} return (A) this;
+    }
+
+    public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnType(){
+            return new TypeParamRefReturnTypeNestedImpl();
+    }
+
+    public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(TypeParamRef item){
+            return new TypeParamRefReturnTypeNestedImpl(item);
+    }
+
+    public A withClassRefReturnType(ClassRef classRefReturnType){
+            if (returnType!=null){ this.returnType= new ClassRefBuilder(classRefReturnType); _visitables.add(this.returnType);} return (A) this;
+    }
+
+    public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnType(){
+            return new ClassRefReturnTypeNestedImpl();
+    }
+
+    public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(ClassRef item){
+            return new ClassRefReturnTypeNestedImpl(item);
     }
 
     public A addToArguments(Property... items){
@@ -216,6 +274,14 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             return withNewBlockLike(getBlock());
     }
 
+    public MethodFluent.BlockNested<A> editOrNewBlock(){
+            return withNewBlockLike(getBlock() != null ? getBlock(): new BlockBuilder().build());
+    }
+
+    public MethodFluent.BlockNested<A> editOrNewBlockLike(Block item){
+            return withNewBlockLike(getBlock() != null ? getBlock(): item);
+    }
+
     public boolean equals(Object o){
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -233,22 +299,22 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
 
-    public class AnnotationsNestedImpl<N> extends ClassRefFluentImpl<MethodFluent.AnnotationsNested<N>> implements MethodFluent.AnnotationsNested<N>,Nested<N>{
+    public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<MethodFluent.AnnotationsNested<N>> implements MethodFluent.AnnotationsNested<N>,Nested<N>{
 
-            private final ClassRefBuilder builder;
+            private final AnnotationRefBuilder builder;
     
+            AnnotationsNestedImpl(AnnotationRef item){
+                    this.builder = new AnnotationRefBuilder(this, item);
+            }
             AnnotationsNestedImpl(){
-                    this.builder = new ClassRefBuilder(this);
-            }
-            AnnotationsNestedImpl(ClassRef item){
-                    this.builder = new ClassRefBuilder(this, item);
+                    this.builder = new AnnotationRefBuilder(this);
             }
     
-    public N endAnnotation(){
-            return and();
-    }
     public N and(){
             return (N) MethodFluentImpl.this.addToAnnotations(builder.build());
+    }
+    public N endAnnotation(){
+            return and();
     }
 
 }
@@ -256,18 +322,113 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
             private final TypeParamDefBuilder builder;
     
-            ParametersNestedImpl(){
-                    this.builder = new TypeParamDefBuilder(this);
-            }
             ParametersNestedImpl(TypeParamDef item){
                     this.builder = new TypeParamDefBuilder(this, item);
             }
+            ParametersNestedImpl(){
+                    this.builder = new TypeParamDefBuilder(this);
+            }
     
+    public N and(){
+            return (N) MethodFluentImpl.this.addToParameters(builder.build());
+    }
     public N endParameter(){
             return and();
     }
+
+}
+    public class VoidRefReturnTypeNestedImpl<N> extends VoidRefFluentImpl<MethodFluent.VoidRefReturnTypeNested<N>> implements MethodFluent.VoidRefReturnTypeNested<N>,Nested<N>{
+
+            private final VoidRefBuilder builder;
+    
+            VoidRefReturnTypeNestedImpl(VoidRef item){
+                    this.builder = new VoidRefBuilder(this, item);
+            }
+            VoidRefReturnTypeNestedImpl(){
+                    this.builder = new VoidRefBuilder(this);
+            }
+    
     public N and(){
-            return (N) MethodFluentImpl.this.addToParameters(builder.build());
+            return (N) MethodFluentImpl.this.withVoidRefReturnType(builder.build());
+    }
+    public N endVoidRefReturnType(){
+            return and();
+    }
+
+}
+    public class WildcardRefReturnTypeNestedImpl<N> extends WildcardRefFluentImpl<MethodFluent.WildcardRefReturnTypeNested<N>> implements MethodFluent.WildcardRefReturnTypeNested<N>,Nested<N>{
+
+            private final WildcardRefBuilder builder;
+    
+            WildcardRefReturnTypeNestedImpl(WildcardRef item){
+                    this.builder = new WildcardRefBuilder(this, item);
+            }
+            WildcardRefReturnTypeNestedImpl(){
+                    this.builder = new WildcardRefBuilder(this);
+            }
+    
+    public N and(){
+            return (N) MethodFluentImpl.this.withWildcardRefReturnType(builder.build());
+    }
+    public N endWildcardRefReturnType(){
+            return and();
+    }
+
+}
+    public class PrimitiveRefReturnTypeNestedImpl<N> extends PrimitiveRefFluentImpl<MethodFluent.PrimitiveRefReturnTypeNested<N>> implements MethodFluent.PrimitiveRefReturnTypeNested<N>,Nested<N>{
+
+            private final PrimitiveRefBuilder builder;
+    
+            PrimitiveRefReturnTypeNestedImpl(PrimitiveRef item){
+                    this.builder = new PrimitiveRefBuilder(this, item);
+            }
+            PrimitiveRefReturnTypeNestedImpl(){
+                    this.builder = new PrimitiveRefBuilder(this);
+            }
+    
+    public N and(){
+            return (N) MethodFluentImpl.this.withPrimitiveRefReturnType(builder.build());
+    }
+    public N endPrimitiveRefReturnType(){
+            return and();
+    }
+
+}
+    public class TypeParamRefReturnTypeNestedImpl<N> extends TypeParamRefFluentImpl<MethodFluent.TypeParamRefReturnTypeNested<N>> implements MethodFluent.TypeParamRefReturnTypeNested<N>,Nested<N>{
+
+            private final TypeParamRefBuilder builder;
+    
+            TypeParamRefReturnTypeNestedImpl(TypeParamRef item){
+                    this.builder = new TypeParamRefBuilder(this, item);
+            }
+            TypeParamRefReturnTypeNestedImpl(){
+                    this.builder = new TypeParamRefBuilder(this);
+            }
+    
+    public N and(){
+            return (N) MethodFluentImpl.this.withTypeParamRefReturnType(builder.build());
+    }
+    public N endTypeParamRefReturnType(){
+            return and();
+    }
+
+}
+    public class ClassRefReturnTypeNestedImpl<N> extends ClassRefFluentImpl<MethodFluent.ClassRefReturnTypeNested<N>> implements MethodFluent.ClassRefReturnTypeNested<N>,Nested<N>{
+
+            private final ClassRefBuilder builder;
+    
+            ClassRefReturnTypeNestedImpl(ClassRef item){
+                    this.builder = new ClassRefBuilder(this, item);
+            }
+            ClassRefReturnTypeNestedImpl(){
+                    this.builder = new ClassRefBuilder(this);
+            }
+    
+    public N and(){
+            return (N) MethodFluentImpl.this.withClassRefReturnType(builder.build());
+    }
+    public N endClassRefReturnType(){
+            return and();
     }
 
 }
@@ -275,18 +436,18 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
             private final PropertyBuilder builder;
     
-            ArgumentsNestedImpl(){
-                    this.builder = new PropertyBuilder(this);
-            }
             ArgumentsNestedImpl(Property item){
                     this.builder = new PropertyBuilder(this, item);
             }
+            ArgumentsNestedImpl(){
+                    this.builder = new PropertyBuilder(this);
+            }
     
-    public N endArgument(){
-            return and();
-    }
     public N and(){
             return (N) MethodFluentImpl.this.addToArguments(builder.build());
+    }
+    public N endArgument(){
+            return and();
     }
 
 }
@@ -294,18 +455,18 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
             private final ClassRefBuilder builder;
     
-            ExceptionsNestedImpl(){
-                    this.builder = new ClassRefBuilder(this);
-            }
             ExceptionsNestedImpl(ClassRef item){
                     this.builder = new ClassRefBuilder(this, item);
             }
+            ExceptionsNestedImpl(){
+                    this.builder = new ClassRefBuilder(this);
+            }
     
-    public N endException(){
-            return and();
-    }
     public N and(){
             return (N) MethodFluentImpl.this.addToExceptions(builder.build());
+    }
+    public N endException(){
+            return and();
     }
 
 }
@@ -313,18 +474,18 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
             private final BlockBuilder builder;
     
-            BlockNestedImpl(){
-                    this.builder = new BlockBuilder(this);
-            }
             BlockNestedImpl(Block item){
                     this.builder = new BlockBuilder(this, item);
             }
+            BlockNestedImpl(){
+                    this.builder = new BlockBuilder(this);
+            }
     
-    public N endBlock(){
-            return and();
-    }
     public N and(){
             return (N) MethodFluentImpl.this.withBlock(builder.build());
+    }
+    public N endBlock(){
+            return and();
     }
 
 }

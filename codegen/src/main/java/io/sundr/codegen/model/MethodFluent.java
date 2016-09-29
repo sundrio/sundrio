@@ -1,20 +1,21 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-
 import java.util.List;
+import java.lang.Object;
+import java.util.Map;
 import java.lang.String;
 
 public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFluent<A>{
 
 
-    public A addToAnnotations(ClassRef... items);
-    public A removeFromAnnotations(ClassRef... items);
-    public List<ClassRef> getAnnotations();
-    public A withAnnotations(List<ClassRef> annotations);
-    public A withAnnotations(ClassRef... annotations);
+    public A addToAnnotations(AnnotationRef... items);
+    public A removeFromAnnotations(AnnotationRef... items);
+    public List<AnnotationRef> getAnnotations();
+    public A withAnnotations(List<AnnotationRef> annotations);
+    public A withAnnotations(AnnotationRef... annotations);
     public MethodFluent.AnnotationsNested<A> addNewAnnotation();
-    public MethodFluent.AnnotationsNested<A> addNewAnnotationLike(ClassRef item);
+    public MethodFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item);
     public A addToParameters(TypeParamDef... items);
     public A removeFromParameters(TypeParamDef... items);
     public List<TypeParamDef> getParameters();
@@ -26,6 +27,21 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A withName(String name);
     public TypeRef getReturnType();
     public A withReturnType(TypeRef returnType);
+    public A withVoidRefReturnType(VoidRef voidRefReturnType);
+    public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnType();
+    public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(VoidRef item);
+    public A withWildcardRefReturnType(WildcardRef wildcardRefReturnType);
+    public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnType();
+    public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(WildcardRef item);
+    public A withPrimitiveRefReturnType(PrimitiveRef primitiveRefReturnType);
+    public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnType();
+    public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(PrimitiveRef item);
+    public A withTypeParamRefReturnType(TypeParamRef typeParamRefReturnType);
+    public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnType();
+    public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(TypeParamRef item);
+    public A withClassRefReturnType(ClassRef classRefReturnType);
+    public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnType();
+    public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(ClassRef item);
     public A addToArguments(Property... items);
     public A removeFromArguments(Property... items);
     public List<Property> getArguments();
@@ -47,31 +63,58 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public MethodFluent.BlockNested<A> withNewBlock();
     public MethodFluent.BlockNested<A> withNewBlockLike(Block item);
     public MethodFluent.BlockNested<A> editBlock();
+    public MethodFluent.BlockNested<A> editOrNewBlock();
+    public MethodFluent.BlockNested<A> editOrNewBlockLike(Block item);
 
-    public interface AnnotationsNested<N> extends Nested<N>,ClassRefFluent<MethodFluent.AnnotationsNested<N>>{
+    public interface AnnotationsNested<N> extends Nested<N>,AnnotationRefFluent<MethodFluent.AnnotationsNested<N>>{
 
 
-    public N endAnnotation();    public N and();
+    public N and();    public N endAnnotation();
 }
     public interface ParametersNested<N> extends Nested<N>,TypeParamDefFluent<MethodFluent.ParametersNested<N>>{
 
 
-    public N endParameter();    public N and();
+    public N and();    public N endParameter();
+}
+    public interface VoidRefReturnTypeNested<N> extends Nested<N>,VoidRefFluent<MethodFluent.VoidRefReturnTypeNested<N>>{
+
+
+    public N and();    public N endVoidRefReturnType();
+}
+    public interface WildcardRefReturnTypeNested<N> extends Nested<N>,WildcardRefFluent<MethodFluent.WildcardRefReturnTypeNested<N>>{
+
+
+    public N and();    public N endWildcardRefReturnType();
+}
+    public interface PrimitiveRefReturnTypeNested<N> extends Nested<N>,PrimitiveRefFluent<MethodFluent.PrimitiveRefReturnTypeNested<N>>{
+
+
+    public N and();    public N endPrimitiveRefReturnType();
+}
+    public interface TypeParamRefReturnTypeNested<N> extends Nested<N>,TypeParamRefFluent<MethodFluent.TypeParamRefReturnTypeNested<N>>{
+
+
+    public N and();    public N endTypeParamRefReturnType();
+}
+    public interface ClassRefReturnTypeNested<N> extends Nested<N>,ClassRefFluent<MethodFluent.ClassRefReturnTypeNested<N>>{
+
+
+    public N and();    public N endClassRefReturnType();
 }
     public interface ArgumentsNested<N> extends Nested<N>,PropertyFluent<MethodFluent.ArgumentsNested<N>>{
 
 
-    public N endArgument();    public N and();
+    public N and();    public N endArgument();
 }
     public interface ExceptionsNested<N> extends Nested<N>,ClassRefFluent<MethodFluent.ExceptionsNested<N>>{
 
 
-    public N endException();    public N and();
+    public N and();    public N endException();
 }
     public interface BlockNested<N> extends Nested<N>,BlockFluent<MethodFluent.BlockNested<N>>{
 
         
-    public N endBlock();    public N and();
+    public N and();    public N endBlock();
 }
 
 

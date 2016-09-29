@@ -101,7 +101,7 @@ public class BuilderUtils {
     public static Method findBuildableConstructor(TypeDef clazz) {
         //1st pass go for annotated method
         for (Method candidate : clazz.getConstructors()) {
-            if (candidate.getAnnotations().contains(Constants.BUILDABLE_ANNOTATION_REF)) {
+            if (candidate.getAnnotations().contains(Constants.BUILDABLE_ANNOTATION)) {
                 return candidate;
             }
         }

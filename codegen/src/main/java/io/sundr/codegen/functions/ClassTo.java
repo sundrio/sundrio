@@ -19,6 +19,8 @@ package io.sundr.codegen.functions;
 import io.sundr.FunctionFactory;
 import io.sundr.Function;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -47,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ClassTo {
@@ -108,6 +111,18 @@ public class ClassTo {
                 }
             }
             throw new IllegalArgumentException("Can't convert type:"+item+" to a TypeRef");
+        }
+    });
+
+    public static final Function<Class<? extends Annotation>, AnnotationRef> ANNOTATIONTYPEREF = FunctionFactory.cache(new Function<Class<? extends Annotation>, AnnotationRef>() {
+
+        @Override
+        public AnnotationRef apply(Class<? extends Annotation> item) {
+            //An annotation can't be a primitive or a void type, so its safe to cast.
+            ClassRef classRef = (ClassRef) TYPEREF.apply(item);
+            Map<String, Object> parameters;
+
+            return new AnnotationRefBuilder().withClassRef(classRef).build();
         }
     });
 
@@ -209,10 +224,9 @@ public class ClassTo {
     private static Set<Property> getProperties(Class item) {
         Set<Property> properties = new HashSet<Property>();
         for (Field field : item.getDeclaredFields()) {
-            List<ClassRef> annotationRefs = new ArrayList<ClassRef>();
+            List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
             for (Annotation annotation : field.getDeclaredAnnotations()) {
-                //An annotation can't be a primitive or a void type, so its safe to cast.
-                annotationRefs.add((ClassRef) TYPEREF.apply(annotation.annotationType()));
+                annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
             }
             field.getDeclaringClass();
             properties.add(new PropertyBuilder()
@@ -228,10 +242,9 @@ public class ClassTo {
     private static Set<Method> getMethods(Class item) {
         Set<Method> methods = new HashSet<Method>();
         for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
-            List<ClassRef> annotationRefs = new ArrayList<ClassRef>();
+            List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
             for (Annotation annotation : method.getDeclaredAnnotations()) {
-                //An annotation can't be a primitive or a void type, so its safe to cast.
-                annotationRefs.add((ClassRef) TYPEREF.apply(annotation.annotationType()));
+                annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
             }
 
             List<Property> arguments = new ArrayList<Property>();

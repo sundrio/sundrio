@@ -49,7 +49,7 @@ public class ClazzAsTest {
 
         Method constructor = new MethodBuilder()
                 .withReturnType(type.toReference())
-                .withAnnotations(Constants.BUILDABLE_ANNOTATION.toReference())
+                .withAnnotations(Constants.BUILDABLE_ANNOTATION)
                 .build();
 
         type = new TypeDefBuilder(type)
