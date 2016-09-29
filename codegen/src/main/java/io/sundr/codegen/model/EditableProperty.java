@@ -24,7 +24,7 @@ import java.util.Map;
 public class EditableProperty extends Property implements Editable<PropertyBuilder>{
 
 
-public EditableProperty(List<ClassRef> annotations , TypeRef typeRef , String name , int modifiers , Map<String, Object> attributes ){
+public EditableProperty(List<AnnotationRef> annotations , TypeRef typeRef , String name , int modifiers , Map<String, Object> attributes ){
     super(annotations, typeRef, name, modifiers, attributes);
 }
 

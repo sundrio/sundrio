@@ -18,10 +18,12 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.FunctionFactory;
 import io.sundr.Function;
+import io.sundr.builder.annotations.FilterDescendants;
 import io.sundr.builder.annotations.IgnoreDescendants;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.ClassRef;
 
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -32,7 +34,9 @@ import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERATED;
@@ -41,6 +45,8 @@ import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 
 public class Descendants {
+
+    private static final String VALUE = "value";
 
     public static final Function<TypeDef, Set<TypeDef>> BUILDABLE_DECENDANTS = FunctionFactory.cache(new Function<TypeDef, Set<TypeDef>>() {
         public Set<TypeDef> apply(TypeDef item) {
@@ -86,6 +92,10 @@ public class Descendants {
                         ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
                                 .build();
 
+                        if (isNestingFiltered(property, descendantRef)) {
+                            continue;
+                        }
+
                         ClassRef collectionType = new ClassRefBuilder((ClassRef)baseType)
                                 .withArguments(descendantRef)
                                 .build();
@@ -105,8 +115,11 @@ public class Descendants {
                     ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
                             .build();
 
-                    String propertyName =  deCaptializeFirst(descendant.getName() + property.getNameCapitalized());
+                    if (isNestingFiltered(property, descendantRef)) {
+                        continue;
+                    }
 
+                    String propertyName =  deCaptializeFirst(descendant.getName() + property.getNameCapitalized());
                     result.add(new PropertyBuilder(property)
                             .withName(propertyName)
                             .withTypeRef(descendantRef)
@@ -136,11 +149,33 @@ public class Descendants {
     }
 
     public static boolean isNestingIgnored(Property property) {
-        for (ClassRef classRef : property.getAnnotations()) {
-            if (classRef.getFullyQualifiedName().equals(IgnoreDescendants.class.getName())) {
+        for (AnnotationRef ref : property.getAnnotations()) {
+            if (ref.getClassRef().getFullyQualifiedName().equals(IgnoreDescendants.class.getName())) {
                 return true;
             }
         }
         return false;
     }
+
+
+   public static boolean isNestingFiltered(Property property, ClassRef classRef) {
+        for (AnnotationRef ref : property.getAnnotations()) {
+            if (ref.getClassRef().getFullyQualifiedName().equals(FilterDescendants.class.getName())) {
+                Map<String, Object> parameters = ref.getParameters();
+                Object value  = parameters == null ? null : parameters.get(VALUE);
+                if (value instanceof String && property.getTypeRef() instanceof ClassRef) {
+                    Pattern p = Pattern.compile((String) value);
+                    if (p.matcher(classRef.getFullyQualifiedName()).matches()) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
 }

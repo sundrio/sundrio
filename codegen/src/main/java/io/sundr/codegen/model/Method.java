@@ -33,7 +33,7 @@ public class Method extends ModifierSupport {
     public static final String VARARG = "...";
     public static final String THROWS = "throws";
 
-    private final List<ClassRef> annotations;
+    private final List<AnnotationRef> annotations;
     private final List<TypeParamDef> parameters;
     private final String name;
     private final TypeRef returnType;
@@ -42,7 +42,7 @@ public class Method extends ModifierSupport {
     private final List<ClassRef> exceptions;
     private final Block block;
 
-    public Method(List<ClassRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
+    public Method(List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.parameters = parameters;
@@ -54,7 +54,7 @@ public class Method extends ModifierSupport {
         this.block = block;
     }
 
-    public List<ClassRef> getAnnotations() {
+    public List<AnnotationRef> getAnnotations() {
         return annotations;
     }
 
@@ -103,8 +103,8 @@ public class Method extends ModifierSupport {
             refs.addAll(e.getReferences());
         }
 
-        for (ClassRef a : getAnnotations()) {
-            refs.addAll(a.getReferences());
+        for (AnnotationRef a : getAnnotations()) {
+            refs.addAll(a.getClassRef().getReferences());
         }
 
         for (TypeParamDef typeParamDef : parameters) {

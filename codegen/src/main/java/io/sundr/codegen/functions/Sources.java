@@ -43,6 +43,8 @@ import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 import io.sundr.builder.Function;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.BlockBuilder;
 import io.sundr.codegen.model.ClassRef;
@@ -273,16 +275,18 @@ public class Sources {
         }
     };
 
-    private static Function<AnnotationExpr, ClassRef> ANNOTATIONREF = new Function<AnnotationExpr, ClassRef>() {
+    private static Function<AnnotationExpr, AnnotationRef> ANNOTATIONREF = new Function<AnnotationExpr, AnnotationRef>() {
 
-        public ClassRef apply(AnnotationExpr annotation) {
+        public AnnotationRef apply(AnnotationExpr annotation) {
             String name = annotation.getName().getName();
             String packageName = PACKAGENAME.apply(annotation);
-            return new ClassRefBuilder()
-                    .withNewDefinition()
-                    .withName(name)
-                    .withPackageName(packageName)
-                    .endDefinition()
+            return new AnnotationRefBuilder()
+                    .withNewClassRef()
+                        .withNewDefinition()
+                            .withName(name)
+                            .withPackageName(packageName)
+                        .endDefinition()
+                    .endClassRef()
                     .build();
         }
     };
@@ -359,7 +363,7 @@ public class Sources {
                         Boolean preferVarArg = false;
 
                         for (Parameter parameter : methodDeclaration.getParameters()) {
-                            List<ClassRef> annotations = new ArrayList<ClassRef>();
+                            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
                                 annotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }
@@ -413,7 +417,7 @@ public class Sources {
                             .endDefinition().build());
                         }
                         for (Parameter parameter : constructorDeclaration.getParameters()) {
-                            List<ClassRef> annotations = new ArrayList<ClassRef>();
+                            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
                                 annotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }

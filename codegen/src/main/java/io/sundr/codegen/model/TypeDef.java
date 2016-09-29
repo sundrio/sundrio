@@ -42,7 +42,7 @@ public class TypeDef extends ModifierSupport {
     private final String packageName;
     private final String name;
 
-    private final List<ClassRef> annotations;
+    private final List<AnnotationRef> annotations;
     private final List<ClassRef> extendsList;
     private final List<ClassRef> implementsList;
     private final List<TypeParamDef> parameters;
@@ -53,7 +53,7 @@ public class TypeDef extends ModifierSupport {
     private final TypeDef outerType;
     private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, List<ClassRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
@@ -151,7 +151,7 @@ public class TypeDef extends ModifierSupport {
         return kind;
     }
 
-    public List<ClassRef> getAnnotations() {
+    public List<AnnotationRef> getAnnotations() {
         return annotations;
     }
 
@@ -329,9 +329,12 @@ public class TypeDef extends ModifierSupport {
     public List<ClassRef> getReferences() {
         final List<ClassRef> refs = new ArrayList<ClassRef>();
 
+        for (AnnotationRef a : annotations) {
+            refs.addAll(a.getClassRef().getReferences());
+        }
+
         for (ClassRef i : implementsList) {
             refs.addAll(i.getReferences());
-
         }
 
         for (ClassRef e : extendsList) {
