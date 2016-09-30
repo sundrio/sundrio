@@ -41,6 +41,8 @@ import java.util.regex.Pattern;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.BUILDABLE;
+import static io.sundr.builder.Constants.ORIGIN_TYPEDF;
+import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 
@@ -83,6 +85,8 @@ public class Descendants {
             }
 
             TypeRef baseType = property.getTypeRef();
+            TypeDef origin = (TypeDef) property.getAttributes().get(ORIGIN_TYPEDF);
+
             if (IS_COLLECTION.apply(baseType)) {
                 TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
                 if (unwrapped instanceof  ClassRef) {
@@ -93,6 +97,9 @@ public class Descendants {
                                 .build();
 
                         if (isNestingFiltered(property, descendantRef)) {
+                            continue;
+                        } else if (origin.getName().equals(descendant.getName()) && !origin.getPackageName().equals(descendant.getPackageName())) {
+                            //We don't want to have a class that references a descendant with the same name in an other package. It's an extreme case and will not work.
                             continue;
                         }
 
@@ -116,6 +123,9 @@ public class Descendants {
                             .build();
 
                     if (isNestingFiltered(property, descendantRef)) {
+                        continue;
+                    } else if (origin.getName().equals(descendant.getName()) && !origin.getPackageName().equals(descendant.getPackageName())) {
+                        //We don't want to have a class that references a descendant with the same name in an other package. It's an extreme case and will not work.
                         continue;
                     }
 

@@ -52,6 +52,7 @@ public class Constants {
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
+    public static final String ORIGIN_TYPEDF = "ORIGIN_TYPEDF";
     public static final String OUTER_INTERFACE = "OUTER_INTERFACE";
     public static final String OUTER_CLASS = "OUTER_CLASS";
 

@@ -76,6 +76,7 @@ public class ClazzAs {
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(0)
+                        .addToAttributes(ORIGIN_TYPEDF, item)
                         .addToAttributes(OUTER_INTERFACE, fluentType)
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
@@ -205,6 +206,7 @@ public class ClazzAs {
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
+                        .addToAttributes(ORIGIN_TYPEDF, item)
                         .addToAttributes(OUTER_INTERFACE, fluentType)
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
