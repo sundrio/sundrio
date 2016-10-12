@@ -101,38 +101,46 @@ public class ToMethod {
 
         private List<Statement> getStatements(Property property, List<ClassRef> alsoImport) {
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
-            String name = property.getName();
+            String argumentName = property.getName();
+            String fieldName = property.getName();
             TypeRef type = property.getTypeRef();
             TypeRef unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             List<Statement> statements = new ArrayList<Statement>();
             Set<Property> descendants = property.getAttributes().containsKey(DESCENDANTS) ? (Set<Property>) property.getAttributes().get(DESCENDANTS) : Collections.EMPTY_SET;
 
+            if (property.getAttributes().containsKey(DESCENDANT_OF)) {
+                Property descendantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
+                fieldName = descendantOf.getName();
+            }
+
+            if (isBuildable(unwraped)) {
+                if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
+                    statements.add(new StringStatement("_visitables.removeAll(this." + fieldName  + ");"));
+                } else {
+                    statements.add(new StringStatement("_visitables.remove(this." + fieldName + ");"));
+                }
+            }
+
             if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
-                statements.add(new StringStatement("this." + name + ".clear();"));
+                statements.add(new StringStatement("this." + fieldName + ".clear();"));
                 if (IS_MAP.apply(type)) {
-                    statements.add(new StringStatement("if (" + name + " != null) {this." + name + ".putAll(" + name + ");} return (" + returnType + ") this;"));
+                    statements.add(new StringStatement("if (" + argumentName + " != null) {this." + fieldName + ".putAll(" + argumentName + ");} return (" + returnType + ") this;"));
                 } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
                     String addToMethodName = "addTo" + property.getNameCapitalized();
-                    statements.add(new StringStatement("if (" + name + " != null) {for (" + unwraped.toString() + " item : " + name + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
+                    statements.add(new StringStatement("if (" + argumentName + " != null) {for (" + unwraped.toString() + " item : " + argumentName + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
                 }
                 return statements;
             } else if (isBuildable(unwraped) && !isAbstract(unwraped)) {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
-                String propertyName = property.getName();
                 String builderClass = builder.toReference().getName();
-                if (property.getAttributes().containsKey(DESCENDANT_OF)) {
-                    Property descendantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
-                    propertyName = descendantOf.getName();
-                }
-                statements.add(new StringStatement("if (" + propertyName + "!=null){ this." + propertyName + "= new " + builderClass + "("+name+"); _visitables.add(this." + propertyName + ");} return (" + returnType + ") this;"));
+                statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "("+argumentName+"); _visitables.add(this." + fieldName + ");} return (" + returnType + ") this;"));
                 return statements;
             } else if (!descendants.isEmpty()) {
                 for (Property descendant : descendants) {
                     TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(descendant.getTypeRef());
                     TypeDef builder = BUILDER.apply(((ClassRef) dunwraped).getDefinition());
-                    String propertyName = property.getName();
                     String builderClass = builder.toReference().getName();
-                    statements.add(new StringStatement("if (" + propertyName + " instanceof " + dunwraped + "){ this." + propertyName + "= new " + builderClass + "((" + dunwraped + ")" + propertyName + "); _visitables.add(this." + propertyName + ");}"));
+                    statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName + "= new " + builderClass + "((" + dunwraped + ")" + argumentName + "); _visitables.add(this." + fieldName + ");}"));
 
                     alsoImport.add((ClassRef) dunwraped);
                     alsoImport.add(builder.toInternalReference());
@@ -140,7 +148,7 @@ public class ToMethod {
                 statements.add(new StringStatement("return (" + returnType + ") this;"));
                 return statements;
             }
-            statements.add(new StringStatement("this." + property.getName() + "=" + property.getName() + "; return (" + returnType + ") this;"));
+            statements.add(new StringStatement("this." + fieldName + "=" + argumentName + "; return (" + returnType + ") this;"));
             return statements;
         }
     });
