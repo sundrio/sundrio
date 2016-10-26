@@ -28,6 +28,7 @@ import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.PrimitiveRef;
@@ -101,7 +102,7 @@ public class BuilderUtils {
     public static Method findBuildableConstructor(TypeDef clazz) {
         //1st pass go for annotated method
         for (Method candidate : clazz.getConstructors()) {
-            if (candidate.getAnnotations().contains(Constants.BUILDABLE_ANNOTATION)) {
+            if (hasBuildableAnnotation(candidate)) {
                 return candidate;
             }
         }
@@ -118,7 +119,15 @@ public class BuilderUtils {
         } else {
             throw new IllegalStateException("Could not find buildable constructor in: ["+clazz.getFullyQualifiedName()+"].");
         }
+    }
 
+    private static boolean hasBuildableAnnotation(Method method) {
+        for (AnnotationRef annotationRef : method.getAnnotations()) {
+            if (annotationRef.getClassRef().equals(Constants.BUILDABLE_ANNOTATION.getClassRef())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Method findGetter(TypeDef clazz, Property property) {
