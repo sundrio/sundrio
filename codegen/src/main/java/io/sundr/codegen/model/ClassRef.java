@@ -76,7 +76,11 @@ public class ClassRef extends TypeRef {
         } else if (other == null) {
             return false;
         } else if (other instanceof PrimitiveRef) {
-            if (!getDefinition().getPackageName().equals(JAVA_LANG)) {
+            if (getDefinition() == null) {
+                return false;
+            }
+
+            if (getDefinition() != null && !JAVA_LANG.equals(getDefinition().getPackageName())) {
                 return false;
             }
 
