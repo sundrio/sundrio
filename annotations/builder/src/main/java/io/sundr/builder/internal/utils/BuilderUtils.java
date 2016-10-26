@@ -450,11 +450,27 @@ public class BuilderUtils {
 
     private static final String[] GENERIC_NAMES = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S"};
 
-    public static String fullyQualifiedNameDiff(Property property) {
-        TypeRef typeRef = property.getTypeRef();
+
+    public static String fullyQualifiedNameDiff(TypeRef typeRef, TypeDef originType) {
         Map<String, String> map = DefinitionRepository.getRepository().getReferenceMap();
+        String currentPackage = originType != null ? originType.getPackageName() : null;
+
         if (typeRef instanceof ClassRef) {
             ClassRef classRef = (ClassRef)  TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(typeRef);
+
+            String candidateFqn = classRef.getFullyQualifiedName().replace(classRef.getDefinition().getPackageName(), currentPackage);
+
+            //If classRef is inside the current package.
+            if (candidateFqn.equals(classRef.getFullyQualifiedName())) {
+                return "";
+            }
+
+            //If candidate is imported and different that the actual name, do a diff
+            if (originType.getImports().contains(candidateFqn) && !classRef.getDefinition().getFullyQualifiedName().equals(candidateFqn)) {
+                return captializeFirst(TypeUtils.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
+            }
+
+            //If not then we compare against what has been found in the map.
             String fqn = map.get(classRef.getDefinition().getName());
             if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
                 return captializeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));

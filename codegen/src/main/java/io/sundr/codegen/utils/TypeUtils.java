@@ -204,19 +204,6 @@ public final class TypeUtils {
     }
 
 
-    public static String fullyQualifiedNameDiff(TypeRef typeRef) {
-        Map<String, String> map = DefinitionRepository.getRepository().getReferenceMap();
-        if (typeRef instanceof ClassRef) {
-            ClassRef classRef = (ClassRef) typeRef;
-            if (!classRef.getName().equals(classRef.getDefinition().getName())) {
-                String importedName = map.get(classRef.getDefinition().getName());
-                return captializeFirst(TypeUtils.fullyQualifiedNameDiff(importedName, classRef.getFullyQualifiedName()));
-            }
-        }
-        return "";
-    }
-
-
     public static String fullyQualifiedNameDiff(String left, String right) {
         String[] lparts = left.split("\\.");
         String[] rparts = right.split("\\.");

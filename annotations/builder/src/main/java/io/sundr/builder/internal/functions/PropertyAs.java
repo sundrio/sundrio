@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.model.ClassRef;
@@ -278,6 +279,8 @@ public final class PropertyAs {
 
         public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property property) {
+                TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+
                 TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
@@ -299,7 +302,7 @@ public final class PropertyAs {
 
                 return new TypeDefBuilder(typeDef)
                         .withPackageName(outerInterface.getPackageName())
-                        .withName(BuilderUtils.fullyQualifiedNameDiff(property) + captializeFirst(property.getName() + "Nested"))
+                        .withName(BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + captializeFirst(property.getName() + "Nested"))
                         .withParameters(parameters)
                         .build();
             }
