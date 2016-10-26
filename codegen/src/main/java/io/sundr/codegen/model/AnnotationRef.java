@@ -36,4 +36,23 @@ public class AnnotationRef extends AttributeSupport {
     public Map<String, Object> getParameters() {
         return parameters;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AnnotationRef that = (AnnotationRef) o;
+
+        if (classRef != null ? !classRef.equals(that.classRef) : that.classRef != null) return false;
+        return parameters != null ? parameters.equals(that.parameters) : that.parameters == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = classRef != null ? classRef.hashCode() : 0;
+        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
+        return result;
+    }
 }

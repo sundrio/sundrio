@@ -475,6 +475,9 @@ public class ToMethod {
     public static final Function<Property, Method> WITH_NEW_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+
+            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
             if (propertyTypeDef != null) {
@@ -499,7 +502,8 @@ public class ToMethod {
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
             String prefix = isCollection ? "addNew" : "withNew";
 
-            prefix += TypeUtils.fullyQualifiedNameDiff(baseType);
+
+            prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
             String methodName = prefix + captializeFirst(isCollection
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());
@@ -519,6 +523,8 @@ public class ToMethod {
 
     public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = new Function<Property, Set<Method>>() {
         public Set<Method> apply(Property property) {
+            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+
             TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
             TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
@@ -528,7 +534,7 @@ public class ToMethod {
                 boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
                 String ownPrefix = isCollection ? "addNew" : "withNew";
 
-                ownPrefix += BuilderUtils.fullyQualifiedNameDiff(property);
+                ownPrefix += BuilderUtils.fullyQualifiedNameDiff(baseType.toInternalReference(), originTypeDef);
                 String ownName = ownPrefix + captializeFirst(isCollection
                         ? Singularize.FUNCTION.apply(property.getName())
                         : property.getName());
@@ -690,6 +696,8 @@ public class ToMethod {
 
     public static final Function<Property, Method> EDIT_NESTED =new Function<Property, Method>() {
         public Method apply(Property property) {
+            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
@@ -712,7 +720,7 @@ public class ToMethod {
             ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             String prefix = "edit";
-            prefix += BuilderUtils.fullyQualifiedNameDiff(property);
+            prefix += BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef);
             String methodNameBase = captializeFirst(property.getName());
             String methodName = prefix + methodNameBase;
 
@@ -755,7 +763,8 @@ public class ToMethod {
 
     public static final Function<Property, Method> END = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property) + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
+            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+            String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());
 
