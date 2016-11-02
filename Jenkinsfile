@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@Library('github.com/iocanel/jenkins-workflow-library@master')
 node{
   ws{
     checkout scm
