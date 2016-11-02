@@ -1,4 +1,6 @@
 #!/usr/bin/groovy
+@Library('github.com/fabric8io/fabric8-pipeline-library@master')
+
 /**
  * Copyright (C) 2015 Red Hat, Inc.
  *
@@ -14,7 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Library('github.com/fabric8io/fabric8-pipeline-library@master')
 
 node{
   ws{
