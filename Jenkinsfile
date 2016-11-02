@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@Library('github.com/iocanel/jenkins-workflow-library@master')
+@Library('github.com/fabric8io/fabric8-pipeline-library@master')
+
 node{
   ws{
     checkout scm
