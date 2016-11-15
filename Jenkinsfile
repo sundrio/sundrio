@@ -18,7 +18,7 @@
 @Library('github.com/iocanel/jenkins-workflow-library@master')
 def project = 'sundrio'
 
-mavenNode {
+mavenNode(['image': 'maven:3.3.9-jdk-7']) {
   ws{
     checkout scm
     sh "git remote set-url origin git@github.com:sundrio/sundrio.git"
