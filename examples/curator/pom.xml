@@ -19,7 +19,7 @@
     <parent>
         <artifactId>sundr-pom</artifactId>
         <groupId>io.sundr</groupId>
-        <version>0.3.12-SNAPSHOT</version>
+        <version>sundrio-0.3.14</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
