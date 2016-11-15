@@ -18,6 +18,7 @@
 @Library('github.com/iocanel/jenkins-workflow-library@master')
 def project = 'sundrio'
 
+mavenNode.image = 'maven:3.3.9-jdk-7'
 mavenNode {
   ws{
     checkout scm
