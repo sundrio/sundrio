@@ -23,7 +23,7 @@ import java.util.Map;
 @Buildable
 public abstract class TypeRef extends AttributeSupport {
 
-    public TypeRef(Map<String, Object> attributes) {
+    public TypeRef(Map<AttributeKey, Object> attributes) {
         super(attributes);
     }
 

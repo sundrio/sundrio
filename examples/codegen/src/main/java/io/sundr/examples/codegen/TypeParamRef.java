@@ -26,7 +26,7 @@ public class TypeParamRef extends TypeRef {
     private final String name;
     private final int dimensions;
 
-    public TypeParamRef(String name,int dimensions, Map<String, Object> attributes) {
+    public TypeParamRef(String name,int dimensions, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.name = name;
         this.dimensions = dimensions;

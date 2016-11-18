@@ -18,7 +18,9 @@ package io.sundr.builder;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
@@ -52,21 +54,22 @@ public class Constants {
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
-    public static final String ORIGIN_TYPEDF = "ORIGIN_TYPEDF";
-    public static final String OUTER_INTERFACE = "OUTER_INTERFACE";
-    public static final String OUTER_CLASS = "OUTER_CLASS";
+    public static final AttributeKey<TypeDef> ORIGIN_TYPEDF = new AttributeKey<TypeDef>("ORIGIN_TYPEDF", TypeDef.class);
+    public static final AttributeKey<TypeDef> OUTER_INTERFACE =  new AttributeKey<TypeDef>("OUTER_INTERFACE", TypeDef.class);
+    public static final AttributeKey<TypeDef> OUTER_CLASS =  new AttributeKey<TypeDef>("OUTER_CLASS", TypeDef.class);
 
-    public static final String GENERIC_TYPE_REF = "GENERIC_TYPE_REF";
-    public static final String DESCENDANT_OF = "DESCENDANT_OF";
-    public static final String DESCENDANTS = "DESCENDANTS";
+    public static final AttributeKey<TypeParamRef> GENERIC_TYPE_REF = new AttributeKey<TypeParamRef>("GENERIC_TYPE_REF", TypeParamRef.class);
+    public static final AttributeKey<Property> DESCENDANT_OF = new AttributeKey<Property>("DESCENDANT_OF", Property.class);
 
-    public static final String VALIDATION_ENABLED = "VALIDATION_ENABLED";
-    public static final String EDIATABLE_ENABLED = "EDITABLE_ENABLED";
-    public static final String BUILDABLE = "BUILDABLE";
+    public static final AttributeKey<Set<Property>> DESCENDANTS = new AttributeKey<Set<Property>>("DESCENDANTS", Set.class);
 
-    public static final String INIT = "INIT";
+    public static final AttributeKey<Boolean> VALIDATION_ENABLED = new AttributeKey<Boolean>("VALIDATION_ENABLED", Boolean.class);
+    public static final AttributeKey<Boolean> EDIATABLE_ENABLED = new AttributeKey<Boolean>("EDITABLE_ENABLED", Boolean.class);
+    public static final AttributeKey<Boolean> BUILDABLE_ENABLED =  new AttributeKey<Boolean>("BUILDABLE_ENABLED", Boolean.class);
 
-    public static final String GENERATED = "GENERATED";
+    public static final AttributeKey<Boolean> GENERATED = new AttributeKey<Boolean>("GENERATED", Boolean.class);
+
+    public static final AttributeKey<Buildable> BUILDABLE =  new AttributeKey<Buildable>("BUILDABLE_ANNOTATION", Buildable.class);
 
     public static final String EMPTY = "";
 

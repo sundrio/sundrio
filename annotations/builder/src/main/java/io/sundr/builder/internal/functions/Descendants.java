@@ -40,9 +40,8 @@ import java.util.regex.Pattern;
 
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERATED;
-import static io.sundr.builder.Constants.BUILDABLE;
+import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.ORIGIN_TYPEDF;
-import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
 
@@ -62,7 +61,7 @@ public class Descendants {
 
             for (TypeDef type : repository.getBuildables()) {
 
-                if (type.getKind() == Kind.CLASS &&  !type.isAbstract() && isDescendant(type, item) && !type.equals(item) && !type.getAttributes().containsKey(GENERATED)) {
+                if (type.getKind() == Kind.CLASS &&  !type.isAbstract() && isDescendant(type, item) && !type.equals(item) && !type.hasAttribute(GENERATED)) {
                     result.add(type);
                 }
             }
@@ -85,7 +84,7 @@ public class Descendants {
             }
 
             TypeRef baseType = property.getTypeRef();
-            TypeDef origin = (TypeDef) property.getAttributes().get(ORIGIN_TYPEDF);
+            TypeDef origin = property.getAttribute(ORIGIN_TYPEDF);
 
             if (IS_COLLECTION.apply(baseType)) {
                 TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
@@ -112,7 +111,7 @@ public class Descendants {
                                 .withName(propertyName)
                                 .withTypeRef(collectionType)
                                 .addToAttributes(DESCENDANT_OF, property)
-                                .addToAttributes(BUILDABLE, true)
+                                .addToAttributes(BUILDABLE_ENABLED, true)
                                 .build());
                     }
                 }
@@ -134,7 +133,7 @@ public class Descendants {
                             .withName(propertyName)
                             .withTypeRef(descendantRef)
                             .addToAttributes(DESCENDANT_OF, property)
-                            .addToAttributes(BUILDABLE, true)
+                            .addToAttributes(BUILDABLE_ENABLED, true)
                             .build());
                 }
             }

@@ -18,9 +18,11 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Fluent;
 
-public interface ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends Fluent<A>,AttributeSupportFluent<A>{
+public interface ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends Fluent<A>, AttributeSupportFluent<A> {
 
 
-    public int getModifiers();    public A withModifiers(int modifiers);
+    public int getModifiers();
+
+    public A withModifiers(int modifiers);
 
 }

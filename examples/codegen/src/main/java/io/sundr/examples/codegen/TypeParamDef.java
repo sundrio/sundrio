@@ -19,7 +19,6 @@ package io.sundr.examples.codegen;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +28,7 @@ public class TypeParamDef extends AttributeSupport {
     private final String name;
     private final List<ClassRef> bounds;
 
-    public TypeParamDef(String name, List<ClassRef> bounds, Map<String, Object> attributes) {
+    public TypeParamDef(String name, List<ClassRef> bounds, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.name = name;
         this.bounds = bounds;

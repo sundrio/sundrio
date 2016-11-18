@@ -42,7 +42,7 @@ public class Method extends ModifierSupport {
     private final List<ClassRef> exceptions;
     private final Block block;
 
-    public Method(List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<String, Object> attributes) {
+    public Method(List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.parameters = parameters;
@@ -91,7 +91,7 @@ public class Method extends ModifierSupport {
     public Set<ClassRef> getReferences() {
         Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
         if (returnType instanceof ClassRef) {
-            ClassRef classRef = (ClassRef)returnType;
+            ClassRef classRef = (ClassRef) returnType;
             refs.addAll(classRef.getReferences());
         }
 
@@ -130,7 +130,8 @@ public class Method extends ModifierSupport {
 
         Method method = (Method) o;
 
-        if (parameters != null ? !parameters.equals(method.parameters) : method.parameters != null) return false;
+        if (parameters != null ? !parameters.equals(method.parameters) : method.parameters != null)
+            return false;
         if (name != null ? !name.equals(method.name) : method.name != null) return false;
         return arguments != null ? arguments.equals(method.arguments) : method.arguments == null;
 
@@ -184,7 +185,7 @@ public class Method extends ModifierSupport {
             sb.append(SPACE).append(name);
         } else {
             //This is a constructor
-            sb.append(((ClassRef)returnType).getDefinition().getName());
+            sb.append(((ClassRef) returnType).getDefinition().getName());
         }
 
         sb.append(OP);

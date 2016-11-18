@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BUILDABLE;
+import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
@@ -118,7 +119,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }
 
-                Buildable buildable = (Buildable) typeDef.getAttributes().get(BUILDABLE);
+                Buildable buildable = typeDef.getAttribute(BUILDABLE);
                 if (buildable != null) {
                     for (final Inline inline : buildable.inline()) {
                         generateFromClazz(inlineableOf(ctx, typeDef, inline),

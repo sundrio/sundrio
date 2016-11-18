@@ -45,6 +45,7 @@ import io.sundr.builder.Function;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.BlockBuilder;
 import io.sundr.codegen.model.ClassRef;
@@ -84,8 +85,6 @@ public class Sources {
 
     private static final String JAVA_LANG = "java.lang";
     private static final String SEPARATOR = ".";
-    public static final String INIT = "INIT";
-
 
     private static Function<Node, String> PACKAGENAME = new Function<Node, String>() {
 
@@ -346,7 +345,7 @@ public class Sources {
                                     .withName(var.getId().getName())
                                     .withTypeRef(typeRef)
                                     .withModifiers(fieldDeclaration.getModifiers())
-                                    .addToAttributes(INIT,  var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
+                                    .addToAttributes(Attributeable.INIT,  var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
                                     .build());
                         }
                     } else if (bodyDeclaration instanceof MethodDeclaration) {

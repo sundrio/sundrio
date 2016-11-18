@@ -32,7 +32,7 @@ public class Property extends ModifierSupport {
     private final TypeRef typeRef;
     private final String name;
 
-    public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, int modifiers, Map<String, Object> attributes) {
+    public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.typeRef = typeRef;

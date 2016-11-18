@@ -16,18 +16,23 @@
 
 package io.sundr.codegen.model;
 
-import java.lang.String;
 
-public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRefFluent<A> {
+public final class AttributeKey<T> {
 
+    private final String name;
+    private final Class<T> type;
 
-    public String getName();
+    public AttributeKey(String name, Class type) {
+        this.name = name;
+        this.type = type;
+    }
 
-    public A withName(String name);
+    public String getName() {
+        return name;
+    }
 
-    public int getDimensions();
-
-    public A withDimensions(int dimensions);
-
+    public Class<T> getType() {
+        return type;
+    }
 
 }

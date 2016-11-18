@@ -16,12 +16,17 @@
 
 package io.sundr.codegen.model;
 
+import java.util.Collection;
 import java.util.Map;
 
-public interface Attributeable extends Node{
+public interface Attributeable extends Node {
 
-    String ALSO_IMPORT = "ALSO_IMPORT";
-    String INIT = "INIT";
+    AttributeKey<Collection<ClassRef>> ALSO_IMPORT = new AttributeKey<Collection<ClassRef>>("ALSO_IMPORT", Collection.class);
+    AttributeKey<String> INIT = new AttributeKey<String>("INIT", String.class);
 
-    Map<String, Object> getAttributes();
+    Map<AttributeKey, Object> getAttributes();
+
+    <T> T getAttribute(AttributeKey<T> key);
+
+    <T> boolean hasAttribute(AttributeKey<T> key);
 }

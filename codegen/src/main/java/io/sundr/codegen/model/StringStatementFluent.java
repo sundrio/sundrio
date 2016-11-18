@@ -18,9 +18,11 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Fluent;
 
-public interface StringStatementFluent<A extends StringStatementFluent<A>> extends Fluent<A>{
+public interface StringStatementFluent<A extends StringStatementFluent<A>> extends Fluent<A> {
 
 
-    public String getData();    public A withData(String data);
+    public String getData();
+
+    public A withData(String data);
 
 }

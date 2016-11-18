@@ -20,19 +20,20 @@ import io.sundr.builder.Editable;
 
 import java.util.Map;
 
-public class EditableVoidRef extends VoidRef implements Editable<VoidRefBuilder>{
+public class EditableVoidRef extends VoidRef implements Editable<VoidRefBuilder> {
 
 
-public EditableVoidRef(){
-    super();
-}
-public EditableVoidRef( Map<String, Object> attributes ){
-    super(attributes);
-}
+    public EditableVoidRef() {
+        super();
+    }
 
-public VoidRefBuilder edit(){
-    return new VoidRefBuilder(this);
-}
+    public EditableVoidRef(Map<AttributeKey, Object> attributes) {
+        super(attributes);
+    }
+
+    public VoidRefBuilder edit() {
+        return new VoidRefBuilder(this);
+    }
 
 
 }

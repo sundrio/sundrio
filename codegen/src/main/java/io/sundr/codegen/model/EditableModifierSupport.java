@@ -20,16 +20,16 @@ import io.sundr.builder.Editable;
 
 import java.util.Map;
 
-public class EditableModifierSupport extends ModifierSupport implements Editable<ModifierSupportBuilder>{
+public class EditableModifierSupport extends ModifierSupport implements Editable<ModifierSupportBuilder> {
 
 
-public EditableModifierSupport( int modifiers , Map<String, Object> attributes ){
-    super(modifiers, attributes);
-}
+    public EditableModifierSupport(int modifiers, Map<AttributeKey, Object> attributes) {
+        super(modifiers, attributes);
+    }
 
-public ModifierSupportBuilder edit(){
-    return new ModifierSupportBuilder(this);
-}
+    public ModifierSupportBuilder edit() {
+        return new ModifierSupportBuilder(this);
+    }
 
 
 }

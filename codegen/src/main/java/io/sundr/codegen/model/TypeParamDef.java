@@ -26,7 +26,7 @@ public class TypeParamDef extends AttributeSupport {
     private final String name;
     private final List<ClassRef> bounds;
 
-    public TypeParamDef(String name, List<ClassRef> bounds, Map<String, Object> attributes) {
+    public TypeParamDef(String name, List<ClassRef> bounds, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.name = name;
         this.bounds = bounds;

@@ -83,7 +83,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> WITH = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
             return new MethodBuilder()
@@ -100,16 +100,16 @@ public class ToMethod {
         }
 
         private List<Statement> getStatements(Property property, List<ClassRef> alsoImport) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             String argumentName = property.getName();
             String fieldName = property.getName();
             TypeRef type = property.getTypeRef();
             TypeRef unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             List<Statement> statements = new ArrayList<Statement>();
-            Set<Property> descendants = property.getAttributes().containsKey(DESCENDANTS) ? (Set<Property>) property.getAttributes().get(DESCENDANTS) : Collections.EMPTY_SET;
+            Set<Property> descendants = property.hasAttribute(DESCENDANTS) ? property.getAttribute(DESCENDANTS) : Collections.EMPTY_SET;
 
-            if (property.getAttributes().containsKey(DESCENDANT_OF)) {
-                Property descendantOf = (Property) property.getAttributes().get(DESCENDANT_OF);
+            if (property.hasAttribute(DESCENDANT_OF)) {
+                Property descendantOf = (Property) property.getAttribute(DESCENDANT_OF);
                 fieldName = descendantOf.getName();
             }
 
@@ -155,7 +155,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> WITH_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ?  property.getAttribute(GENERIC_TYPE_REF) : T_REF;
 
             String methodName = "with" + property.getNameCapitalized();
             TypeRef unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
@@ -267,7 +267,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(final Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
 
@@ -284,10 +284,10 @@ public class ToMethod {
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 String propertyName = property.getName();
-                if (property.getAttributes().containsKey(Constants.DESCENDANT_OF)) {
-                    Object attrValue = property.getAttributes().get(Constants.DESCENDANT_OF);
-                    if (attrValue instanceof Property) {
-                        propertyName = ((Property)attrValue).getName();
+                if (property.hasAttribute(Constants.DESCENDANT_OF)) {
+                    Property attrValue = property.getAttribute(Constants.DESCENDANT_OF);
+                    if (attrValue != null) {
+                        propertyName = (attrValue).getName();
                     }
                 }
                 String targetClass = targetType.getName();
@@ -330,7 +330,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(final Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
             Property item = new PropertyBuilder(property)
@@ -347,9 +347,9 @@ public class ToMethod {
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 String propertyName = property.getName();
-                if (property.getAttributes().containsKey(Constants.DESCENDANT_OF)) {
-                    Object attrValue = property.getAttributes().get(Constants.DESCENDANT_OF);
-                    if (attrValue instanceof Property) {
+                if (property.hasAttribute(Constants.DESCENDANT_OF)) {
+                    Property attrValue = property.getAttribute(Constants.DESCENDANT_OF);
+                    if (attrValue != null) {
                         propertyName = ((Property)attrValue).getName();
                     }
                 }
@@ -392,7 +392,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> ADD_MAP_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? (TypeRef) property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             ClassRef mapType = (ClassRef) property.getTypeRef();
             Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
             String methodName = "addTo" + property.getNameCapitalized();
@@ -410,7 +410,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> ADD_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             ClassRef mapType = (ClassRef) property.getTypeRef();
             TypeRef keyType = mapType.getArguments().get(0);
             TypeRef valueType = mapType.getArguments().get(1);
@@ -435,7 +435,7 @@ public class ToMethod {
     public static final Function<Property, Method> REMOVE_MAP_FROM_MAP = FunctionFactory.cache(new Function<Property, Method>() {
 
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeRef mapType = property.getTypeRef();
             Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
             String methodName = "removeFrom" + property.getNameCapitalized();
@@ -454,7 +454,7 @@ public class ToMethod {
     public static final Function<Property, Method> REMOVE_FROM_MAP = FunctionFactory.cache(new Function<Property, Method>() {
 
         public Method apply(Property property) {
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             ClassRef mapType = (ClassRef) property.getTypeRef();
             TypeRef keyType = mapType.getArguments().get(0);
 
@@ -476,7 +476,7 @@ public class ToMethod {
         public Method apply(Property property) {
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
 
-            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
 
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
@@ -484,7 +484,7 @@ public class ToMethod {
                 baseType = propertyTypeDef.toInternalReference();
             }
 
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
@@ -523,9 +523,9 @@ public class ToMethod {
 
     public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = new Function<Property, Set<Method>>() {
         public Set<Method> apply(Property property) {
-            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
 
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
             TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             TypeDef baseType = BuilderContextManager.getContext().getBuildableRepository().getBuildable(unwrappedType);
@@ -576,7 +576,7 @@ public class ToMethod {
                 baseType = propertyTypeDef.toInternalReference();
             }
 
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
 
             List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
@@ -613,7 +613,7 @@ public class ToMethod {
                 baseType = propertyTypeDef.toInternalReference();
             }
 
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
 
             List<TypeParamDef> parameters = baseType.getDefinition().getParameters();
@@ -655,7 +655,7 @@ public class ToMethod {
                 baseType = propertyTypeDef.toInternalReference();
             }
 
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
@@ -696,7 +696,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> EDIT_NESTED =new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
 
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
             //Let's reload the class from the repository if available....
@@ -705,7 +705,7 @@ public class ToMethod {
                 baseType = propertyTypeDef.toInternalReference();
             }
 
-            TypeRef returnType = property.getAttributes().containsKey(GENERIC_TYPE_REF) ? (TypeRef) property.getAttributes().get(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? (TypeRef) property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
@@ -753,9 +753,9 @@ public class ToMethod {
         }
 
         private String getClassPrefix(Property property) {
-            Object memberOf = property.getAttributes().get(OUTER_CLASS);
-            if (memberOf instanceof TypeDef) {
-                return ((TypeDef) memberOf).getName() + ".this.";
+            TypeDef memberOf = property.getAttribute(OUTER_CLASS);
+            if (memberOf != null) {
+                return memberOf.getName() + ".this.";
             } else return "";
         }
 
@@ -763,7 +763,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> END = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef =  property.getAttribute(Constants.ORIGIN_TYPEDF);
             String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());

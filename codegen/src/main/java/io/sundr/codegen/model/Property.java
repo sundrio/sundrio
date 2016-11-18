@@ -29,7 +29,7 @@ public class Property extends ModifierSupport {
     private final TypeRef typeRef;
     private final String name;
 
-    public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, int modifiers, Map<String, Object> attributes) {
+    public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.annotations = annotations;
         this.typeRef = typeRef;
@@ -83,7 +83,8 @@ public class Property extends ModifierSupport {
 
         Property property = (Property) o;
 
-        if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null) return false;
+        if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null)
+            return false;
         return name != null ? name.equals(property.name) : property.name == null;
 
     }

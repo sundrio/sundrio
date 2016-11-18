@@ -21,15 +21,15 @@ import io.sundr.builder.Editable;
 import java.util.List;
 import java.util.Map;
 
-public class EditableClassRef extends ClassRef implements Editable<ClassRefBuilder>{
+public class EditableClassRef extends ClassRef implements Editable<ClassRefBuilder> {
 
 
-    public EditableClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<String,Object> attributes){
-            super(definition, fullyQualifiedName, dimensions, arguments, attributes);
+    public EditableClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<AttributeKey, Object> attributes) {
+        super(definition, fullyQualifiedName, dimensions, arguments, attributes);
     }
 
-    public ClassRefBuilder edit(){
-            return new ClassRefBuilder(this);
+    public ClassRefBuilder edit() {
+        return new ClassRefBuilder(this);
     }
 
 }

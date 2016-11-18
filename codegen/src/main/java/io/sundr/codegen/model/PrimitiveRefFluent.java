@@ -20,14 +20,16 @@ import java.util.Map;
 import java.lang.String;
 import java.lang.Object;
 
-public interface PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRefFluent<A>{
+public interface PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRefFluent<A> {
 
 
     public String getName();
-    public A withName(String name);
-    public int getDimensions();
-    public A withDimensions(int dimensions);
 
+    public A withName(String name);
+
+    public int getDimensions();
+
+    public A withDimensions(int dimensions);
 
 
 }

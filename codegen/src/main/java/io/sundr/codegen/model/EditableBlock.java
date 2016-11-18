@@ -20,16 +20,16 @@ import io.sundr.builder.Editable;
 
 import java.util.List;
 
-public class EditableBlock extends Block implements Editable<BlockBuilder>{
+public class EditableBlock extends Block implements Editable<BlockBuilder> {
 
 
-public EditableBlock( List<Statement> statements ){
-    super(statements);
-}
+    public EditableBlock(List<Statement> statements) {
+        super(statements);
+    }
 
-public BlockBuilder edit(){
-    return new BlockBuilder(this);
-}
+    public BlockBuilder edit() {
+        return new BlockBuilder(this);
+    }
 
 
 }

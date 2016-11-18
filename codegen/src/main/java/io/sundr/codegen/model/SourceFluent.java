@@ -21,13 +21,28 @@ import io.sundr.builder.Nested;
 
 import java.util.List;
 
-public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A>{
+public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A> {
 
 
-    public A addToTypes(TypeDef... items);    public A removeFromTypes(TypeDef... items);    public List<TypeDef> getTypes();    public A withTypes(List<TypeDef> types);    public A withTypes(TypeDef... types);    public TypesNested<A> addNewType();    public TypesNested<A> addNewTypeLike(TypeDef item);
-    public interface TypesNested<N> extends Nested<N>,TypeDefFluent<TypesNested<N>>{
-            public N endType();            public N and();        
-}
+    public A addToTypes(TypeDef... items);
+
+    public A removeFromTypes(TypeDef... items);
+
+    public List<TypeDef> getTypes();
+
+    public A withTypes(List<TypeDef> types);
+
+    public A withTypes(TypeDef... types);
+
+    public TypesNested<A> addNewType();
+
+    public TypesNested<A> addNewTypeLike(TypeDef item);
+
+    public interface TypesNested<N> extends Nested<N>, TypeDefFluent<TypesNested<N>> {
+        public N endType();
+
+        public N and();
+    }
 
 
 }

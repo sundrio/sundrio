@@ -21,13 +21,32 @@ import io.sundr.builder.Nested;
 
 import java.util.List;
 
-public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Fluent<A>,AttributeSupportFluent<A>{
+public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Fluent<A>, AttributeSupportFluent<A> {
 
 
-    public String getName();    public A withName(String name);    public A addToBounds(ClassRef... items);    public A removeFromBounds(ClassRef... items);    public List<ClassRef> getBounds();    public A withBounds(List<ClassRef> bounds);    public A withBounds(ClassRef... bounds);    public BoundsNested<A> addNewBound();    public BoundsNested<A> addNewBoundLike(ClassRef item);
-    public interface BoundsNested<N> extends Nested<N>,ClassRefFluent<BoundsNested<N>>{
-            public N endBound();            public N and();        
-}
+    public String getName();
+
+    public A withName(String name);
+
+    public A addToBounds(ClassRef... items);
+
+    public A removeFromBounds(ClassRef... items);
+
+    public List<ClassRef> getBounds();
+
+    public A withBounds(List<ClassRef> bounds);
+
+    public A withBounds(ClassRef... bounds);
+
+    public BoundsNested<A> addNewBound();
+
+    public BoundsNested<A> addNewBoundLike(ClassRef item);
+
+    public interface BoundsNested<N> extends Nested<N>, ClassRefFluent<BoundsNested<N>> {
+        public N endBound();
+
+        public N and();
+    }
 
 
 }

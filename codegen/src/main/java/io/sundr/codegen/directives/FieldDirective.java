@@ -16,6 +16,7 @@
 
 package io.sundr.codegen.directives;
 
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Property;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
@@ -24,6 +25,7 @@ import org.apache.velocity.runtime.parser.node.Node;
 import java.io.IOException;
 import java.io.Writer;
 
+import static io.sundr.codegen.model.Attributeable.INIT;
 public class FieldDirective extends Directive {
 
     @Override
@@ -52,8 +54,8 @@ public class FieldDirective extends Directive {
         if (field != null) {
             writer.append(field.toString());
 
-            if (field.getAttributes().get("INIT") != null) {
-                writer.append(" = ").append((String) field.getAttributes().get("INIT"));
+            if (field.getAttribute(INIT) != null) {
+                writer.append(" = ").append(field.getAttribute(INIT));
             }
         }
         writer.append(";");
