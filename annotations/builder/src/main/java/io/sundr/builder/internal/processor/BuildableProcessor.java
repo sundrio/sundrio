@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BUILDABLE;
+import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
@@ -60,7 +61,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     continue;
                 }
 
-                ctx = BuilderContextManager.create(elements, types, buildable.generateBuilderPackage(), buildable.builderPackage());
+                ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(), buildable.builderPackage());
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
                                 .addToAttributes(BUILDABLE, buildable)
                                 .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())
@@ -118,7 +119,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }
 
-                Buildable buildable = (Buildable) typeDef.getAttributes().get(BUILDABLE);
+                Buildable buildable = typeDef.getAttribute(BUILDABLE);
                 if (buildable != null) {
                     for (final Inline inline : buildable.inline()) {
                         generateFromClazz(inlineableOf(ctx, typeDef, inline),

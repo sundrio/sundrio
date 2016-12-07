@@ -20,17 +20,17 @@ import io.sundr.builder.Editable;
 
 public class EditableWildcardRef extends WildcardRef implements Editable<WildcardRefBuilder> {
 
-    public EditableWildcardRef(){
-            super();
-    }
-    public EditableWildcardRef(java.util.List<TypeRef> bounds,java.util.Map<String,Object> attributes){
-            super(bounds, attributes);
+    public EditableWildcardRef() {
+        super();
     }
 
-    public WildcardRefBuilder edit(){
-            return new WildcardRefBuilder(this);
+    public EditableWildcardRef(java.util.List<TypeRef> bounds, java.util.Map<AttributeKey, Object> attributes) {
+        super(bounds, attributes);
     }
 
+    public WildcardRefBuilder edit() {
+        return new WildcardRefBuilder(this);
+    }
 
 
 }

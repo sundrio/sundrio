@@ -23,7 +23,7 @@ public class AnnotationRef extends AttributeSupport {
     private final ClassRef classRef;
     private final Map<String, Object> parameters;
 
-    public AnnotationRef(ClassRef classRef, Map<String, Object> parameters, Map<String, Object> attributes) {
+    public AnnotationRef(ClassRef classRef, Map<String, Object> parameters, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.classRef = classRef;
         this.parameters = parameters;
@@ -44,7 +44,8 @@ public class AnnotationRef extends AttributeSupport {
 
         AnnotationRef that = (AnnotationRef) o;
 
-        if (classRef != null ? !classRef.equals(that.classRef) : that.classRef != null) return false;
+        if (classRef != null ? !classRef.equals(that.classRef) : that.classRef != null)
+            return false;
         return parameters != null ? parameters.equals(that.parameters) : that.parameters == null;
 
     }

@@ -23,7 +23,7 @@ public class PrimitiveRef extends TypeRef {
     private final String name;
     private final int dimensions;
 
-    public PrimitiveRef(String name, int dimensions, Map<String, Object> attributes) {
+    public PrimitiveRef(String name, int dimensions, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.name = name;
         this.dimensions = dimensions;
@@ -47,10 +47,10 @@ public class PrimitiveRef extends TypeRef {
         } else if (o == null) {
             return false;
         } else if (o instanceof ClassRef) {
-            if (!((ClassRef)o).getDefinition().getPackageName().equals(JAVA_LANG)) {
+            if (!((ClassRef) o).getDefinition().getPackageName().equals(JAVA_LANG)) {
                 return false;
             }
-            if(!((ClassRef)o).getDefinition().getName().toUpperCase().startsWith(name.toUpperCase())) {
+            if (!((ClassRef) o).getDefinition().getName().toUpperCase().startsWith(name.toUpperCase())) {
                 return false;
             }
             return true;
@@ -88,7 +88,7 @@ public class PrimitiveRef extends TypeRef {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(name);
-        for (int i=0;i<dimensions;i++) {
+        for (int i = 0; i < dimensions; i++) {
             sb.append("[]");
         }
         return sb.toString();

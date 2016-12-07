@@ -173,7 +173,6 @@ public final class TypeDefUtils {
                     .addToAttributes(END_SCOPE, endScope)
                     .addToAttributes(FILTER, filter)
                     .addToAttributes(CARDINALITY_MULTIPLE, multiple)
-                    .addToAttributes(TERMINATING_TYPES, isTerminal ? new LinkedHashSet<TypeRef>(Arrays.asList(returnType)) : Collections.emptySet())
                     .addToAttributes(METHOD_NAME, methodName)
                 .addToMethods(targetMethod)
                 .build();

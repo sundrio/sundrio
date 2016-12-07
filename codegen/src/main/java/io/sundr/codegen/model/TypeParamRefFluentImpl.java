@@ -19,46 +19,47 @@ package io.sundr.codegen.model;
 import java.lang.String;
 import java.lang.Object;
 
-public class TypeParamRefFluentImpl<A extends TypeParamRefFluent<A>> extends TypeRefFluentImpl<A> implements TypeParamRefFluent<A>{
+public class TypeParamRefFluentImpl<A extends TypeParamRefFluent<A>> extends TypeRefFluentImpl<A> implements TypeParamRefFluent<A> {
 
     private String name;
     private int dimensions;
 
-    public TypeParamRefFluentImpl(){
-    }
-    public TypeParamRefFluentImpl(TypeParamRef instance){
-            this.withName(instance.getName()); 
-            this.withDimensions(instance.getDimensions()); 
-            this.withAttributes(instance.getAttributes()); 
+    public TypeParamRefFluentImpl() {
     }
 
-    public String getName(){
-            return this.name;
+    public TypeParamRefFluentImpl(TypeParamRef instance) {
+        this.withName(instance.getName());
+        this.withDimensions(instance.getDimensions());
+        this.withAttributes(instance.getAttributes());
     }
 
-    public A withName(String name){
-            this.name=name; return (A) this;
+    public String getName() {
+        return this.name;
     }
 
-    public int getDimensions(){
-            return this.dimensions;
+    public A withName(String name) {
+        this.name = name;
+        return (A) this;
     }
 
-    public A withDimensions(int dimensions){
-            this.dimensions=dimensions; return (A) this;
+    public int getDimensions() {
+        return this.dimensions;
     }
 
-    public boolean equals(Object o){
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-            TypeParamRefFluentImpl that = (TypeParamRefFluentImpl) o;
-            if (name != null ? !name.equals(that.name) :that.name != null) return false;
-            if (dimensions != that.dimensions) return false;
-            return true;
+    public A withDimensions(int dimensions) {
+        this.dimensions = dimensions;
+        return (A) this;
     }
 
-
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        TypeParamRefFluentImpl that = (TypeParamRefFluentImpl) o;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (dimensions != that.dimensions) return false;
+        return true;
+    }
 
 
 }

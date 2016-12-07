@@ -27,10 +27,10 @@ public class VoidRef extends TypeRef {
     private static final String VOID = "void";
 
     public VoidRef() {
-        this(Collections.<String, Object>emptyMap());
+        this(Collections.<AttributeKey, Object>emptyMap());
     }
 
-    public VoidRef(Map<String, Object> attributes) {
+    public VoidRef(Map<AttributeKey, Object> attributes) {
         super(attributes);
     }
 

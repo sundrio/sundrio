@@ -52,7 +52,7 @@ public class TypeDef extends ModifierSupport {
     private final TypeDef outerType;
     private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
@@ -69,12 +69,8 @@ public class TypeDef extends ModifierSupport {
     }
 
     /**
-     * The method adapts constructor method to the current class.
-     * It unsets any name that may be presetn in the method.
-     * It also sets as a return type a reference to the current type.
-     * @param methods
-     * @param target
-     * @return
+     * The method adapts constructor method to the current class. It unsets any name that may be
+     * presetn in the method. It also sets as a return type a reference to the current type.
      */
     private static List<Method> adaptConstructors(List<Method> methods, TypeDef target) {
         List<Method> adapted = new ArrayList<Method>();
@@ -101,8 +97,6 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Returns the fully qualified name of the type.
-     *
-     * @return
      */
     public String getFullyQualifiedName() {
         StringBuilder sb = new StringBuilder();
@@ -217,7 +211,8 @@ public class TypeDef extends ModifierSupport {
 
         TypeDef typeDef = (TypeDef) o;
 
-        if (packageName != null ? !packageName.equals(typeDef.packageName) : typeDef.packageName != null) return false;
+        if (packageName != null ? !packageName.equals(typeDef.packageName) : typeDef.packageName != null)
+            return false;
         return name != null ? name.equals(typeDef.name) : typeDef.name == null;
 
     }
@@ -231,8 +226,8 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     *
      * @param arguments The arguments to be passed to the reference.
-     * @return
      */
     public ClassRef toReference(TypeRef... arguments) {
         List<TypeRef> actualArguments = new ArrayList<TypeRef>();
@@ -252,17 +247,16 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     *
      * @param arguments The arguments to be passed to the reference.
-     * @return
      */
     public ClassRef toReference(Collection<TypeRef> arguments) {
         return toReference(arguments.toArray(new TypeRef[arguments.size()]));
     }
 
     /**
-     * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties etc).
-     * It uses as arguments the same 'letters' as the parameters definition.
-     * @return
+     * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties
+     * etc). It uses as arguments the same 'letters' as the parameters definition.
      */
     public ClassRef toInternalReference() {
         List<TypeRef> arguments = new ArrayList<TypeRef>();
@@ -278,7 +272,6 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Creates a {@link ClassRef} without bounds.
-     * @return
      */
     public ClassRef toUnboundedReference() {
         return new ClassRefBuilder()
@@ -306,7 +299,6 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Create a mapping from class name to {@link ClassRef}.
-     * @return
      */
     private Map<String, ClassRef> getReferenceMap() {
         Map<String, ClassRef> mapping = new HashMap<String, ClassRef>();

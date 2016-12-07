@@ -24,13 +24,23 @@ import java.util.Map;
 @Buildable
 public class AttributeSupport implements Attributeable {
 
-    private final Map<String, Object> attributes;
+    private final Map<AttributeKey, Object> attributes;
 
-    public AttributeSupport(Map<String, Object> attributes) {
+    public AttributeSupport(Map<AttributeKey, Object> attributes) {
         this.attributes = attributes;
     }
 
-    public Map<String, Object> getAttributes() {
+    public Map<AttributeKey, Object> getAttributes() {
         return Collections.unmodifiableMap(attributes);
+    }
+
+    @Override
+    public <T> T getAttribute(AttributeKey<T> key) {
+        return (T) attributes.get(key);
+    }
+
+    @Override
+    public <T> boolean hasAttribute(AttributeKey<T> key) {
+        return attributes.containsKey(key);
     }
 }

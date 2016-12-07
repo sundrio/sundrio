@@ -176,7 +176,7 @@ public final class PropertyAs {
             public TypeDef apply(Property item) {
                 TypeDef shallowNestedType = SHALLOW_NESTED_TYPE.apply(item);
                 TypeDef nestedInterfaceType = NESTED_INTERFACE_TYPE.apply(item);
-                TypeDef outerClass = (TypeDef) item.getAttributes().get(OUTER_CLASS);
+                TypeDef outerClass = item.getAttribute(OUTER_CLASS);
 
                 TypeDef nested = new TypeDefBuilder(shallowNestedType)
                         .withPackageName(outerClass.getPackageName())
@@ -230,8 +230,8 @@ public final class PropertyAs {
 
         public static final Function<Property, TypeDef> NESTED_INTERFACE_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property item) {
-                TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item)).withOuterType((TypeDef) item.getAttributes().get(OUTER_INTERFACE)).build();
-                TypeDef outerInterface = (TypeDef) item.getAttributes().get(OUTER_INTERFACE);
+                TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item)).withOuterType(item.getAttribute(OUTER_INTERFACE)).build();
+                TypeDef outerInterface = item.getAttribute(OUTER_INTERFACE);
                 //Not a typical fluent
 
                 TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
@@ -279,7 +279,7 @@ public final class PropertyAs {
 
         public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property property) {
-                TypeDef originTypeDef = (TypeDef) property.getAttributes().get(Constants.ORIGIN_TYPEDF);
+                TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
 
                 TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
@@ -292,7 +292,7 @@ public final class PropertyAs {
                     }
                 }
 
-                TypeDef outerInterface = (TypeDef) property.getAttributes().get(OUTER_INTERFACE);
+                TypeDef outerInterface = property.getAttribute(OUTER_INTERFACE);
 
                 List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
                 for (TypeParamDef generic : typeDef.getParameters()) {

@@ -22,10 +22,10 @@ import java.util.Map;
 public class VoidRef extends TypeRef {
 
     public VoidRef() {
-        this(Collections.<String, Object>emptyMap());
+        this(Collections.<AttributeKey, Object>emptyMap());
     }
 
-    public VoidRef(Map<String, Object> attributes) {
+    public VoidRef(Map<AttributeKey, Object> attributes) {
         super(attributes);
     }
 

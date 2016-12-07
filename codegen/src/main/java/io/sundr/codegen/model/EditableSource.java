@@ -20,19 +20,20 @@ import io.sundr.builder.Editable;
 
 import java.util.List;
 
-public class EditableSource extends Source implements Editable<SourceBuilder>{
+public class EditableSource extends Source implements Editable<SourceBuilder> {
 
 
-public EditableSource(){
-    super();
-}
-public EditableSource( List<TypeDef> types ){
-    super(types);
-}
+    public EditableSource() {
+        super();
+    }
 
-public SourceBuilder edit(){
-    return new SourceBuilder(this);
-}
+    public EditableSource(List<TypeDef> types) {
+        super(types);
+    }
+
+    public SourceBuilder edit() {
+        return new SourceBuilder(this);
+    }
 
 
 }

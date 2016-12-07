@@ -14,20 +14,25 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen.model;
-
-import java.lang.String;
-
-public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRefFluent<A> {
+package io.sundr.examples.codegen;
 
 
-    public String getName();
+public final class AttributeKey<T> {
 
-    public A withName(String name);
+    private final String name;
+    private final Class<T> type;
 
-    public int getDimensions();
+    public AttributeKey(String name, Class type) {
+        this.name = name;
+        this.type = type;
+    }
 
-    public A withDimensions(int dimensions);
+    public String getName() {
+        return name;
+    }
 
+    public Class<T> getType() {
+        return type;
+    }
 
 }

@@ -18,41 +18,49 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class StringStatementBuilder extends StringStatementFluentImpl<StringStatementBuilder> implements VisitableBuilder<StringStatement,StringStatementBuilder>{
+public class StringStatementBuilder extends StringStatementFluentImpl<StringStatementBuilder> implements VisitableBuilder<StringStatement, StringStatementBuilder> {
 
-     StringStatementFluent<?> fluent;
+    StringStatementFluent<?> fluent;
 
-    public StringStatementBuilder(){
+    public StringStatementBuilder() {
         this.fluent = this;
     }
-    public StringStatementBuilder( StringStatementFluent<?> fluent ){
+
+    public StringStatementBuilder(StringStatementFluent<?> fluent) {
         this.fluent = fluent;
     }
-    public StringStatementBuilder( StringStatementFluent<?> fluent , StringStatement instance ){
-        this.fluent = fluent; fluent.withData(instance.getData()); 
+
+    public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance) {
+        this.fluent = fluent;
+        fluent.withData(instance.getData());
     }
-    public StringStatementBuilder( StringStatement instance ){
-        this.fluent = this; this.withData(instance.getData()); 
+
+    public StringStatementBuilder(StringStatement instance) {
+        this.fluent = this;
+        this.withData(instance.getData());
     }
 
-public EditableStringStatement build(){
-    EditableStringStatement buildable = new EditableStringStatement(fluent.getData());
-validate(buildable);
-return buildable;
+    public EditableStringStatement build() {
+        EditableStringStatement buildable = new EditableStringStatement(fluent.getData());
+        validate(buildable);
+        return buildable;
 
-}
-public boolean equals( Object o ){
-    
-if (this == o) return true;
-if (o == null || getClass() != o.getClass()) return false;
-if (!super.equals(o)) return false;
-StringStatementBuilder that = (StringStatementBuilder) o;
-if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
-return true;
+    }
 
-}
+    public boolean equals(Object o) {
 
-private <T> void validate(T item) {}
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        StringStatementBuilder that = (StringStatementBuilder) o;
+        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
+            return false;
+        return true;
+
+    }
+
+    private <T> void validate(T item) {
+    }
 
 
 }

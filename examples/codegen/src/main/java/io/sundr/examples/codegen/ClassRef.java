@@ -39,7 +39,7 @@ public class ClassRef extends TypeRef {
     private final int dimensions;
     private final List<TypeRef> arguments;
 
-    public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
+    public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.definition = definition != null ? definition : new TypeDefBuilder().build();
         this.dimensions = dimensions;

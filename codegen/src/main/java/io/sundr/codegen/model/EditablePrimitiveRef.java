@@ -20,16 +20,16 @@ import io.sundr.builder.Editable;
 
 import java.util.Map;
 
-public class EditablePrimitiveRef extends PrimitiveRef implements Editable<PrimitiveRefBuilder>{
+public class EditablePrimitiveRef extends PrimitiveRef implements Editable<PrimitiveRefBuilder> {
 
 
-public EditablePrimitiveRef( String name , int dimensions , Map<String, Object> attributes ){
-    super(name, dimensions, attributes);
-}
+    public EditablePrimitiveRef(String name, int dimensions, Map<AttributeKey, Object> attributes) {
+        super(name, dimensions, attributes);
+    }
 
-public PrimitiveRefBuilder edit(){
-    return new PrimitiveRefBuilder(this);
-}
+    public PrimitiveRefBuilder edit() {
+        return new PrimitiveRefBuilder(this);
+    }
 
 
 }

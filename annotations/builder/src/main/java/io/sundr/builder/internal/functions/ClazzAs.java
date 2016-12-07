@@ -21,6 +21,7 @@ import io.sundr.FunctionFactory;
 import io.sundr.Provider;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.CodegenContext;
@@ -44,6 +45,7 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -52,6 +54,7 @@ import java.util.Set;
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.codegen.model.Attributeable.INIT;
 
 public class ClazzAs {
 
@@ -114,7 +117,7 @@ public class ClazzAs {
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE, isBuildable).build();
+                    toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).build();
                     methods.add(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
@@ -215,16 +218,16 @@ public class ClazzAs {
                                 if (isArray || isList) {
                                     ClassRef listRef =  ARRAY_LIST.toReference(unwrapped);
                                     builder.addToAttributes(INIT, "new " + listRef+ "()")
-                                            .addToAttributes(ALSO_IMPORT, listRef);
+                                            .addToAttributes(ALSO_IMPORT, Arrays.asList(listRef));
                                 } else if (isSet) {
                                     ClassRef setRef = LINKED_HASH_SET.toReference(unwrapped);
                                     builder.addToAttributes(INIT, "new " + setRef + "()")
-                                            .addToAttributes(ALSO_IMPORT, setRef);
+                                            .addToAttributes(ALSO_IMPORT, Arrays.asList(setRef));
                                 } else if (isMap) {
                                     List<TypeRef> arguments = ((ClassRef)property.getTypeRef()).getArguments();
                                     ClassRef mapRef = LINKED_HASH_MAP.toReference(arguments.toArray(new TypeRef[arguments.size()]));
                                     builder.addToAttributes(INIT, "new " + mapRef  + "()")
-                                            .addToAttributes(ALSO_IMPORT, mapRef);
+                                            .addToAttributes(ALSO_IMPORT, Arrays.asList(mapRef));
                                 }
                             }
                         }).build();
@@ -479,28 +482,6 @@ public class ClazzAs {
                     })).build();
             methods.add(build);
 
-            //  private <T> void validate(T item) {}
-            final Boolean validationGloballyEnabled = item.getAttributes().containsKey(VALIDATION_ENABLED) && (Boolean) item.getAttributes().get(VALIDATION_ENABLED);
-            Method validate = new MethodBuilder()
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
-                    .withParameters(T)
-                    .withReturnType(Constants.VOID)
-                    .addNewArgument()
-                        .withName("item")
-                        .withTypeRef(T_REF)
-                    .endArgument()
-                    .withName("validate")
-                    .withBlock(new Block(new Provider<List<Statement>>() {
-                        @Override
-                        public List<Statement> get() {
-                            return toValidate(item,validationGloballyEnabled);
-                        }
-                    }))
-                    .addToAttributes(ALSO_IMPORT, validationGloballyEnabled ? Constants.VALIDATION_REFS : Collections.emptyList())
-                    .build();
-
-            methods.add(validate);
-
             Method equals = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
@@ -587,7 +568,7 @@ public class ClazzAs {
                             .withModifiers(TypeUtils.modifiersToInt(modifiers))
                             .withConstructors(constructors)
                             .withMethods(methods)
-                            .addToAttributes(BUILDABLE, true)
+                            .addToAttributes(BUILDABLE_ENABLED, true)
                             .addToAttributes(GENERATED, true) // We want to know that its a generated type...
                             .build())
             );
@@ -676,7 +657,10 @@ public class ClazzAs {
             target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
         }
 
-        statements.add(new StringStatement("validate(buildable);"));
+        BuilderContext context = BuilderContextManager.getContext();
+        if (context.isValidationEnabled()) {
+            statements.add(new StringStatement(context.getBuilderPackage() + ".ValidationUtils.validate(buildable);"));
+        }
         statements.add(new StringStatement("return buildable;"));
         return statements;
     }
@@ -716,23 +700,6 @@ public class ClazzAs {
         return statements;
     }
 
-
-    private static List<Statement> toValidate(TypeDef type, boolean enabled) {
-        List<Statement> statements = new ArrayList<Statement>();
-        if (enabled) {
-            statements.add(new StringStatement("if (!validationEnabled) { return; }"));
-            statements.add(new StringStatement("Validator validator = null;"));
-            statements.add(new StringStatement("try {"));
-            statements.add(new StringStatement("    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();"));
-            statements.add(new StringStatement("    validator = factory.getValidator();"));
-            statements.add(new StringStatement("} catch(ValidationException e) {return;}"));
-            statements.add(new StringStatement("Set<ConstraintViolation<T>> violations = validator.validate(item);"));
-            statements.add(new StringStatement("if (!violations.isEmpty()) {"));
-            statements.add(new StringStatement("throw new ConstraintViolationException(violations);"));
-            statements.add(new StringStatement(" }"));
-        }
-        return statements;
-    }
 
 
     private static Method superConstructorOf(Method constructor, TypeDef constructorType) {
@@ -776,15 +743,8 @@ public class ClazzAs {
 
     private static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
         List<ClassRef> result = new ArrayList<ClassRef>();
-        if (attributeable.getAttributes().containsKey(ALSO_IMPORT)) {
-            Object existingImports = attributeable.getAttributes().get(ALSO_IMPORT);
-            if (existingImports instanceof Collection) {
-                result.addAll((Collection<? extends ClassRef>) existingImports);
-            } else if (existingImports instanceof ClassRef) {
-                result.add((ClassRef) existingImports);
-            } else {
-                throw new IllegalStateException("Illegal value for ALSO_IMPORT attribute. Expected a Collection, but found :["+existingImports+"].");
-            }
+        if (attributeable.hasAttribute(ALSO_IMPORT)) {
+            result.addAll(attributeable.getAttribute(ALSO_IMPORT));
         }
         return result;
     }

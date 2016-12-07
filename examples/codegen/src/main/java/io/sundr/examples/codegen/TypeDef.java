@@ -52,7 +52,7 @@ public class TypeDef extends ModifierSupport {
     private final TypeDef outerType;
     private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<String, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;

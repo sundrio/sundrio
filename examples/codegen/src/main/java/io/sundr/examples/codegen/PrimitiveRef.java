@@ -17,7 +17,6 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class PrimitiveRef extends TypeRef {
     private final String name;
     private final int dimensions;
 
-    public PrimitiveRef(String name, int dimensions, Map<String, Object> attributes) {
+    public PrimitiveRef(String name, int dimensions, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.name = name;
         this.dimensions = dimensions;

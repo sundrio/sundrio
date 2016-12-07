@@ -32,10 +32,10 @@ public class WildcardRef extends TypeRef {
 
 
     public WildcardRef() {
-        this(Collections.<TypeRef>emptyList(), Collections.<String, Object>emptyMap());
+        this(Collections.<TypeRef>emptyList(), Collections.<AttributeKey, Object>emptyMap());
     }
 
-    public WildcardRef(List<TypeRef> bounds, Map<String, Object> attributes) {
+    public WildcardRef(List<TypeRef> bounds, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.bounds = bounds;
     }

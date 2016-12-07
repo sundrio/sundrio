@@ -20,11 +20,13 @@ import java.util.Map;
 
 public abstract class TypeRef extends AttributeSupport {
 
-    public TypeRef(Map<String, Object> attributes) {
+    public TypeRef(Map<AttributeKey, Object> attributes) {
         super(attributes);
     }
 
     public abstract boolean isAssignableFrom(TypeRef ref);
+
     public abstract int getDimensions();
+
     public abstract TypeRef withDimensions(int dimensions);
 }

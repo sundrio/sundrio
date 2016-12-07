@@ -38,7 +38,7 @@ public class ClassRef extends TypeRef {
     private final int dimensions;
     private final List<TypeRef> arguments;
 
-    public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<String, Object> attributes) {
+    public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.definition = definition != null ? definition : new TypeDefBuilder().build();
         this.dimensions = dimensions;
@@ -84,7 +84,7 @@ public class ClassRef extends TypeRef {
                 return false;
             }
 
-            if(!getDefinition().getName().toUpperCase().startsWith(((PrimitiveRef) other).getName().toUpperCase())) {
+            if (!getDefinition().getName().toUpperCase().startsWith(((PrimitiveRef) other).getName().toUpperCase())) {
                 return false;
             }
             return true;
@@ -105,7 +105,7 @@ public class ClassRef extends TypeRef {
         Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
         for (TypeRef argument : arguments) {
             if (argument instanceof ClassRef) {
-                refs.addAll(((ClassRef)argument).getReferences());
+                refs.addAll(((ClassRef) argument).getReferences());
             }
         }
         refs.add(this);
@@ -113,9 +113,8 @@ public class ClassRef extends TypeRef {
     }
 
     /**
-     * Checks if the ref needs to be done by fully qualified name.
-     * Why? Because an other reference to a class with the same name but different package has been made already.
-     * @return
+     * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
+     * to a class with the same name but different package has been made already.
      */
     private boolean requiresFullyQualifiedName() {
         Map<String, String> referenceMap = DefinitionRepository.getRepository().getReferenceMap();
@@ -143,7 +142,8 @@ public class ClassRef extends TypeRef {
         ClassRef classRef = (ClassRef) o;
 
         if (dimensions != classRef.dimensions) return false;
-        if (definition != null ? !definition.equals(classRef.definition) : classRef.definition != null) return false;
+        if (definition != null ? !definition.equals(classRef.definition) : classRef.definition != null)
+            return false;
         return arguments != null ? arguments.equals(classRef.arguments) : classRef.arguments == null;
     }
 
@@ -179,7 +179,7 @@ public class ClassRef extends TypeRef {
             sb.append(GT);
         }
 
-        for (int i=0;i<dimensions;i++) {
+        for (int i = 0; i < dimensions; i++) {
             sb.append(BRACKETS);
         }
         return sb.toString();

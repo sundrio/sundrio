@@ -26,7 +26,7 @@ public class AnnotationRef extends AttributeSupport {
     private final ClassRef classRef;
     private final Map<String, Object> parameters;
 
-    public AnnotationRef(ClassRef classRef, Map<String, Object> parameters, Map<String, Object> attributes) {
+    public AnnotationRef(ClassRef classRef, Map<String, Object> parameters, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.classRef = classRef;
         this.parameters = parameters;

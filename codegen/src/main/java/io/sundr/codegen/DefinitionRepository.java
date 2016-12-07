@@ -16,6 +16,10 @@
 
 package io.sundr.codegen;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
+import io.sundr.builder.BaseFluent;
+import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
@@ -70,21 +74,49 @@ public class DefinitionRepository {
     public TypeDef register(TypeDef definition, String... flags) {
         TypeDefBuilder builder = new TypeDefBuilder(definition);
         for (String flag : flags) {
+            builder.addToAttributes(new AttributeKey<Boolean>(flag, Boolean.class), true);
+        }
+        return register(builder.build());
+    }
+
+    public TypeDef register(TypeDef definition, AttributeKey<Boolean>... flags) {
+        TypeDefBuilder builder = new TypeDefBuilder(definition);
+        for (AttributeKey<Boolean> flag : flags) {
             builder.addToAttributes(flag, true);
         }
         return register(builder.build());
     }
 
 
-    public Set<TypeDef> getDefinitions(String... flags) {
 
+    public Set<TypeDef> getDefinitions(String... flags) {
         Set<TypeDef> result = new LinkedHashSet<TypeDef>();
         for (TypeDef candidate : definitions.values()) {
             boolean matches = true;
             for (String flag :flags) {
-                if (!candidate.getAttributes().containsKey(flag) || !((Boolean) candidate.getAttributes().get(flag))) {
+                AttributeKey<Boolean> attributeKey = new AttributeKey<Boolean>(flag, Boolean.class);
+                if (!candidate.hasAttribute(attributeKey) || !(candidate.getAttribute(attributeKey))) {
                    matches = false;
                    break;
+                }
+            }
+            if (matches) {
+                result.add(candidate);
+            }
+        }
+
+        return Collections.unmodifiableSet(result);
+    }
+
+    public Set<TypeDef> getDefinitions(AttributeKey<Boolean>... attributeKeys) {
+
+        Set<TypeDef> result = new LinkedHashSet<TypeDef>();
+        for (TypeDef candidate : definitions.values()) {
+            boolean matches = true;
+            for (AttributeKey<Boolean> attributeKey : attributeKeys) {
+                if (!candidate.hasAttribute(attributeKey) || !(candidate.getAttribute(attributeKey))) {
+                    matches = false;
+                    break;
                 }
             }
             if (matches) {

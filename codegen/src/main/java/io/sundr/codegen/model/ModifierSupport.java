@@ -31,7 +31,7 @@ public class ModifierSupport extends AttributeSupport {
 
     private final int modifiers;
 
-    public ModifierSupport(int modifiers, Map<String, Object> attributes) {
+    public ModifierSupport(int modifiers, Map<AttributeKey, Object> attributes) {
         super(attributes);
         this.modifiers = modifiers;
     }
