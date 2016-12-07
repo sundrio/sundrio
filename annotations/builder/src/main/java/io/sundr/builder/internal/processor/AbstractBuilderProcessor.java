@@ -56,53 +56,69 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
     void generateLocalDependenciesIfNeeded() {
         BuilderContext context = BuilderContextManager.getContext();
-        if (context.getGenerateBuilderPackage() && !Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getBuilderPackage())) {
             try {
-                generateFromClazz(context.getVisitableInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
-                generateFromClazz(context.getVisitorInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
-                generateFromClazz(context.getTypedVisitorInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
+                if (context.getGenerateBuilderPackage() && !Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getBuilderPackage())) {
 
-                generateFromClazz(context.getPathAwareVisitorClass(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
+                    generateFromClazz(context.getVisitableInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                    generateFromClazz(context.getVisitorInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                    generateFromClazz(context.getTypedVisitorInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
 
-                generateFromClazz(context.getVisitableBuilderInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
-                generateFromClazz(context.getBuilderInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
+                    generateFromClazz(context.getPathAwareVisitorClass(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
 
-                generateFromClazz(context.getFluentInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
+                    generateFromClazz(context.getVisitableBuilderInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                    generateFromClazz(context.getBuilderInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
 
-                generateFromClazz(context.getBaseFluentClass(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
+                    generateFromClazz(context.getFluentInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
 
-                generateFromClazz(context.getNestedInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
-                generateFromClazz(context.getEditableInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
+                    generateFromClazz(context.getBaseFluentClass(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
 
-                generateFromClazz(context.getFunctionInterface(),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                );
+                    generateFromClazz(context.getNestedInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                    generateFromClazz(context.getEditableInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+
+                    generateFromClazz(context.getFunctionInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                }
+
+                if (context.isValidationEnabled() &&  !classExists(context.getBuilderPackage() + ".ValidationUtils") ) {
+                    generateFromClazz(context.getValidationUtils(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                }
             } catch (Exception e) {
                 //
             }
-        }
     }
 
+
+    static boolean classExists(String c) {
+       try {
+           Class.forName(c);
+           return true;
+       } catch (Exception e) {
+           return false;
+       }
+    }
 
     static TypeDef inlineableOf(BuilderContext ctx, TypeDef type, Inline inline) {
         final String inlineableName = !inline.name().isEmpty()

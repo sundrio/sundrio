@@ -22,19 +22,33 @@ import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.ReplacePackage;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Sources;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
+import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.TypeUtils;
 
+import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static io.sundr.builder.Constants.INLINEABLE;
+import static io.sundr.builder.Constants.SET;
+import static io.sundr.builder.Constants.T;
+import static io.sundr.builder.Constants.T_REF;
+import static io.sundr.builder.Constants.VALIDATE_SNIPPET;
+import static io.sundr.builder.Constants.VOID;
+import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 
 public class BuilderContext {
+
+    private static final String VALIDATE_BODY_TEXT = loadResourceQuietly(VALIDATE_SNIPPET);
 
     private final Elements elements;
     private final Types types;
@@ -52,15 +66,18 @@ public class BuilderContext {
     private final TypeDef pathAwareVisitorClass;
     private final TypeDef functionInterface;
     private final TypeDef inlineableBase;
+    private final TypeDef validationUtils;
     private final Boolean generateBuilderPackage;
+    private final Boolean validationEnabled;
     private final String builderPackage;
     private final Inline[] inlineables;
     private final BuildableRepository buildableRepository;
 
     
-    public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, String builderPackage, Inline... inlineables) {
+    public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, Boolean validationEnabled, String builderPackage, Inline... inlineables) {
         this.elements = elements;
         this.types = types;
+        this.validationEnabled = validationEnabled;
         this.codegenContext = CodegenContext.create(elements, types);
         this.generateBuilderPackage = generateBuilderPackage;
         this.builderPackage = builderPackage;
@@ -119,6 +136,34 @@ public class BuilderContext {
         inlineableBase = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Inlineable.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
+
+        validationUtils = new TypeDefBuilder()
+                .withName("ValidationUtils")
+                .withPackageName(builderPackage)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
+                .addNewMethod()
+                    .withName("validate")
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+                    .withReturnType(VOID)
+                    .withParameters(T)
+                    .addNewArgument()
+                        .withTypeRef(T_REF)
+                        .withName("item")
+                    .endArgument()
+                    .withNewBlock()
+                        .withStatements(new StringStatement(VALIDATE_BODY_TEXT))
+                    .endBlock()
+                .addToAttributes(ALSO_IMPORT, Arrays.<ClassRef>asList(
+                        SET.toReference(),
+                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("Validator").and().build(),
+                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ValidatorFactory").and().build(),
+                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("Validation").and().build(),
+                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ValidationException").and().build(),
+                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ConstraintViolation").and().build(),
+                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ConstraintViolationException").and().build()
+                        ))
+                .endMethod()
+                .build();
     }
 
     public Elements getElements() {
@@ -131,6 +176,10 @@ public class BuilderContext {
 
     public Boolean getGenerateBuilderPackage() {
         return generateBuilderPackage;
+    }
+
+    public Boolean isValidationEnabled() {
+        return validationEnabled;
     }
 
     public String getBuilderPackage() {
@@ -200,6 +249,10 @@ public class BuilderContext {
 
     public Inline[] getInlineables() {
         return inlineables;
+    }
+
+    public TypeDef getValidationUtils() {
+        return validationUtils;
     }
 
     public BuildableRepository getBuildableRepository() {

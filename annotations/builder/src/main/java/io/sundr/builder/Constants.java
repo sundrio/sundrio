@@ -172,6 +172,7 @@ public class Constants {
     public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";
     public static final String SIMPLE_ARRAY_GETTER_SNIPPET = "snippets/simple-array-getter.txt";
     public static final String BUILDABLE_ARRAY_GETTER_SNIPPET = "snippets/buildable-array-getter.txt";
+    public static final String VALIDATE_SNIPPET = "snippets/validate.txt";
     public static final String EMPTY_FUNCTION_SNIPPET = "snippets/empty-function.txt";
 
     public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};

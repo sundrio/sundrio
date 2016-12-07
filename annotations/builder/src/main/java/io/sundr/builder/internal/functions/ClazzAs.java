@@ -21,6 +21,7 @@ import io.sundr.FunctionFactory;
 import io.sundr.Provider;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.CodegenContext;
@@ -481,28 +482,6 @@ public class ClazzAs {
                     })).build();
             methods.add(build);
 
-            //  private <T> void validate(T item) {}
-            final Boolean validationGloballyEnabled = item.hasAttribute(VALIDATION_ENABLED) && item.getAttribute(VALIDATION_ENABLED);
-            Method validate = new MethodBuilder()
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
-                    .withParameters(T)
-                    .withReturnType(Constants.VOID)
-                    .addNewArgument()
-                        .withName("item")
-                        .withTypeRef(T_REF)
-                    .endArgument()
-                    .withName("validate")
-                    .withBlock(new Block(new Provider<List<Statement>>() {
-                        @Override
-                        public List<Statement> get() {
-                            return toValidate(item,validationGloballyEnabled);
-                        }
-                    }))
-                    .addToAttributes(ALSO_IMPORT, validationGloballyEnabled ? Constants.VALIDATION_REFS : Collections.<ClassRef>emptyList())
-                    .build();
-
-            methods.add(validate);
-
             Method equals = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
@@ -678,7 +657,10 @@ public class ClazzAs {
             target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
         }
 
-        statements.add(new StringStatement("validate(buildable);"));
+        BuilderContext context = BuilderContextManager.getContext();
+        if (context.isValidationEnabled()) {
+            statements.add(new StringStatement(context.getBuilderPackage() + ".ValidationUtils.validate(buildable);"));
+        }
         statements.add(new StringStatement("return buildable;"));
         return statements;
     }
@@ -718,23 +700,6 @@ public class ClazzAs {
         return statements;
     }
 
-
-    private static List<Statement> toValidate(TypeDef type, boolean enabled) {
-        List<Statement> statements = new ArrayList<Statement>();
-        if (enabled) {
-            statements.add(new StringStatement("if (!validationEnabled) { return; }"));
-            statements.add(new StringStatement("Validator validator = null;"));
-            statements.add(new StringStatement("try {"));
-            statements.add(new StringStatement("    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();"));
-            statements.add(new StringStatement("    validator = factory.getValidator();"));
-            statements.add(new StringStatement("} catch(ValidationException e) {return;}"));
-            statements.add(new StringStatement("Set<ConstraintViolation<T>> violations = validator.validate(item);"));
-            statements.add(new StringStatement("if (!violations.isEmpty()) {"));
-            statements.add(new StringStatement("throw new ConstraintViolationException(violations);"));
-            statements.add(new StringStatement(" }"));
-        }
-        return statements;
-    }
 
 
     private static Method superConstructorOf(Method constructor, TypeDef constructorType) {
