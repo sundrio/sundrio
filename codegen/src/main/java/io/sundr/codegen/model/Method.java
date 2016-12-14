@@ -19,6 +19,7 @@ package io.sundr.codegen.model;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import static io.sundr.codegen.utils.StringUtils.join;
 
 public class Method extends ModifierSupport {
 
+    private final List<String> comments;
     private final List<AnnotationRef> annotations;
     private final List<TypeParamDef> parameters;
     private final String name;
@@ -37,8 +39,9 @@ public class Method extends ModifierSupport {
     private final List<ClassRef> exceptions;
     private final Block block;
 
-    public Method(List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<AttributeKey, Object> attributes) {
+    public Method(List<String> comments, List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
+        this.comments = comments != null ? comments : Collections.<String>emptyList();
         this.annotations = annotations;
         this.parameters = parameters;
         this.name = name;
@@ -47,6 +50,10 @@ public class Method extends ModifierSupport {
         this.varArgPreferred = varArgPreferred;
         this.exceptions = exceptions;
         this.block = block;
+    }
+
+    public List<String> getComments() {
+        return comments;
     }
 
     public List<AnnotationRef> getAnnotations() {
@@ -140,9 +147,21 @@ public class Method extends ModifierSupport {
         return result;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+
+        if (!comments.isEmpty()) {
+            sb.append(NEWLINE).append(OC).append(NEWLINE);
+            for (String c : comments) {
+                sb.append(SPACE).append(STAR).append(SPACE).append(c).append(NEWLINE);
+            }
+            sb.append(SPACE).append(CC).append(NEWLINE);
+        }
 
         for (AnnotationRef annotationRef: annotations) {
             sb.append(annotationRef.toString()).append(SPACE);
