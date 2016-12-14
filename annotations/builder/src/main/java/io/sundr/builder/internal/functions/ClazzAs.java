@@ -102,14 +102,14 @@ public class ClazzAs {
                 if (isArray) {
                     Property asList = arrayAsList(toAdd);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-                    methods.add(ToMethod.GETTER_ARRAY.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
                     toAdd = asList;
                 } else if (isSet || isList) {
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
-                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                 } else if (isMap) {
@@ -117,11 +117,11 @@ public class ClazzAs {
                     methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
-                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
                     toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).build();
-                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
@@ -241,14 +241,14 @@ public class ClazzAs {
                 if (isArray) {
                     Property asList = arrayAsList(toAdd);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-                    methods.add(ToMethod.GETTER_ARRAY.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
                     toAdd = asList;
                 } else if (isSet || isList) {
                     methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
-                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                 } else if (isMap) {
@@ -256,10 +256,10 @@ public class ClazzAs {
                     methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
-                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    methods.add(ToMethod.GETTER.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
