@@ -18,9 +18,9 @@ package io.sundr.builder.internal.functions;
 
 import io.sundr.FunctionFactory;
 import io.sundr.Function;
-import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.*;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -210,7 +210,7 @@ public class TypeAs {
 
     public static final Function<TypeRef, TypeRef> LIST_OF = FunctionFactory.cache(new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
-            return Constants.LIST.toReference(item);
+            return Collections.LIST.toReference(item);
             //TODO: Need a home for: .withDefaultImplementation(Constants.ARRAY_LIST)
         }
 
@@ -225,7 +225,7 @@ public class TypeAs {
 
     public static final Function<TypeRef, TypeRef> ARRAY_LIST_OF = new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef item) {
-            return Constants.ARRAY_LIST.toReference(item);
+            return Collections.ARRAY_LIST.toReference(item);
         }
 
     };
@@ -234,7 +234,7 @@ public class TypeAs {
         public TypeRef apply(TypeRef type) {
             if (type instanceof ClassRef) {
                 ClassRef classRef = (ClassRef) type;
-                if (CollectionTypes.IS_COLLECTION.apply(classRef)) {
+                if (Collections.IS_COLLECTION.apply(classRef)) {
                     return classRef.getArguments().get(0);
                 }
             }

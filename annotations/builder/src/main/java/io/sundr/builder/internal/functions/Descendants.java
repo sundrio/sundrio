@@ -43,7 +43,7 @@ import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.ORIGIN_TYPEDF;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
-import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
+import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 
 public class Descendants {
 

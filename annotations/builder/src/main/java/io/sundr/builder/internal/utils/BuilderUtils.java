@@ -23,7 +23,6 @@ import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.functions.CollectionTypes;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
@@ -31,7 +30,6 @@ import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
@@ -57,15 +55,6 @@ import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 public class BuilderUtils {
 
     private BuilderUtils() {}
-
-    public static boolean isAbstract(TypeRef  typeRef) {
-        DefinitionRepository repository =  BuilderContextManager.getContext().getDefinitionRepository();
-        TypeDef def = repository.getDefinition(typeRef);
-        if (def == null && typeRef instanceof ClassRef) {
-            def = ((ClassRef)typeRef).getDefinition();
-        }
-        return def != null ? def.isAbstract() : false;
-    }
 
     public static boolean isBuildable(TypeRef  typeRef) {
         BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
@@ -343,49 +332,7 @@ public class BuilderUtils {
         return result;
     }
 
-    public static boolean isPrimitive(TypeRef type) {
-        return type instanceof PrimitiveRef;
-    }
 
-    public static boolean isMap(TypeRef type) {
-       return CollectionTypes.IS_MAP.apply(type);
-    }
-
-    public static boolean isList(TypeRef type) {
-        return CollectionTypes.IS_LIST.apply(type);
-    }
-
-    public static boolean isSet(TypeRef type) {
-        return CollectionTypes.IS_SET.apply(type);
-    }
-
-    public static boolean isCollection(TypeRef type) {
-        return CollectionTypes.IS_COLLECTION.apply(type);
-    }
-
-    public static boolean isBoolean(TypeRef type) {
-        if (type instanceof PrimitiveRef) {
-            return ((PrimitiveRef)type).getName().equals("boolean");
-        } else if (!(type instanceof ClassRef)) {
-            return false;
-        } else {
-            return ((ClassRef)type).getDefinition().equals(Constants.BOOLEAN);
-        }
-    }
-
-
-    public static boolean isArray(TypeRef type) {
-
-        if (type instanceof ClassRef) {
-            return ((ClassRef)type).getDimensions() > 0;
-        } else if (type instanceof PrimitiveRef) {
-            return ((PrimitiveRef)type).getDimensions() > 0;
-        } else if (type instanceof TypeParamRef) {
-            return ((TypeParamRef)type).getDimensions() > 0;
-        } else {
-            return false;
-        }
-    }
 
     public static TypeParamDef getNextGeneric(TypeDef type, TypeParamDef... excluded) {
         return getNextGeneric(type, Arrays.asList(excluded));
