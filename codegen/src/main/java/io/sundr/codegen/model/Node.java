@@ -30,6 +30,10 @@ public interface Node {
     String EQ = "=";
     String GT = ">";
 
+    String OC = "/**";
+    String STAR = "*";
+    String CC = "*/";
+
     String OP = "(";
     String CP = ")";
     String VARARG = "...";

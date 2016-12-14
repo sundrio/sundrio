@@ -185,9 +185,11 @@ public class ToMethod {
             List<Method> methods = new ArrayList<Method>();
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
-            String methodName = prefix + property.getNameCapitalized();
-            final List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
-            final List<Statement> statements = new ArrayList<Statement>();
+            String getterName = prefix + property.getNameCapitalized();
+            String builderName = "build" + property.getNameCapitalized();
+            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+            List<String> comments = new ArrayList<String>();
+            List<Statement> statements = new ArrayList<Statement>();
             boolean isNested = false;
 
             TreeSet<Property> descendants = new TreeSet<Property>(new Comparator<Property>() {
@@ -202,6 +204,7 @@ public class ToMethod {
             } else if (isBuildable(unwrapped)) {
                 isNested = true;
                 annotations.add(DEPRECATED_ANNOTATION);
+                comments.add("This method has been deprecated, please use method "+builderName+" instead.");
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
@@ -210,6 +213,7 @@ public class ToMethod {
             } else if (!descendants.isEmpty()) {
                 isNested = true;
                 annotations.add(DEPRECATED_ANNOTATION);
+                comments.add("This method has been deprecated, please use method "+builderName+" instead.");
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
@@ -221,9 +225,10 @@ public class ToMethod {
 
 
             Method getter = new MethodBuilder()
+                    .withComments(comments)
                     .withAnnotations(annotations)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(methodName)
+                    .withName(getterName)
                     .withReturnType(property.getTypeRef())
                     .withArguments(new Property[]{})
                     .withNewBlock()
@@ -235,6 +240,7 @@ public class ToMethod {
             if (isNested) {
                 methods.add(new MethodBuilder(getter)
                         .removeFromAnnotations(DEPRECATED_ANNOTATION)
+                        .withComments()
                         .withName("build" + property.getNameCapitalized())
                         .build());
             }
@@ -246,8 +252,13 @@ public class ToMethod {
     public static final Function<Property, List<Method>> GETTER_ARRAY = FunctionFactory.cache(new Function<Property, List<Method>>() {
         public List<Method> apply(Property property) {
             List<Method> methods = new ArrayList<Method>();
+            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+            List<String> comments = new ArrayList<String>();
+
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
-            String methodName = prefix + property.getNameCapitalized();
+            String getterName = prefix + property.getNameCapitalized();
+            String builderName = "build" + property.getNameCapitalized();
+
             TypeRef type = property.getTypeRef();
             Boolean isBuildable = isBuildable(type);
             TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
@@ -259,13 +270,14 @@ public class ToMethod {
                     property.getName()
             );
 
-            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
             if (isBuildable) {
                 annotations.add(DEPRECATED_ANNOTATION);
+                comments.add("This method has been deprecated, please use method "+builderName+" instead.");
             }
             Method getter =  new MethodBuilder()
+                    .withComments(comments)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(methodName)
+                    .withName(getterName)
                     .withReturnType(property.getTypeRef())
                     .withArguments()
                     .withNewBlock()
@@ -277,7 +289,8 @@ public class ToMethod {
             if (isBuildable) {
                 methods.add(new MethodBuilder(getter)
                         .removeFromAnnotations(DEPRECATED_ANNOTATION)
-                        .withName("build" + property.getNameCapitalized())
+                        .withComments()
+                        .withName(builderName)
                         .build());
             }
             return methods;
