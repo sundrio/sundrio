@@ -22,6 +22,7 @@ import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.Singularize;
+import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
@@ -46,6 +47,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
+import static io.sundr.builder.Constants.DEPRECATED_ANNOTATION;
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
@@ -183,6 +185,7 @@ public class ToMethod {
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
+            final List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
             final List<Statement> statements = new ArrayList<Statement>();
 
             TreeSet<Property> descendants = new TreeSet<Property>(new Comparator<Property>() {
@@ -195,12 +198,14 @@ public class ToMethod {
             if (isMap(property.getTypeRef())) {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
             } else if (isBuildable(unwrapped)) {
+                annotations.add(DEPRECATED_ANNOTATION);
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
                     statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
             } else if (!descendants.isEmpty()) {
+                annotations.add(DEPRECATED_ANNOTATION);
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
@@ -211,6 +216,7 @@ public class ToMethod {
             }
 
             return new MethodBuilder()
+                    .withAnnotations(annotations)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
                     .withReturnType(property.getTypeRef())
@@ -237,6 +243,10 @@ public class ToMethod {
                     property.getName()
             );
 
+            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+            if (isBuildable) {
+                annotations.add(DEPRECATED_ANNOTATION);
+            }
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)

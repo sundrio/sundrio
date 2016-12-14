@@ -27,6 +27,7 @@ import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
+import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
@@ -45,6 +46,8 @@ import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
+
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -703,7 +706,15 @@ public class ClazzAs {
 
 
     private static Method superConstructorOf(Method constructor, TypeDef constructorType) {
+        List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+        for (AnnotationRef candidate : constructor.getAnnotations()) {
+            if (!candidate.getClassRef().equals(BUILDABLE_ANNOTATION.getClassRef())) {
+                annotations.add(candidate);
+            }
+        }
+
         return new MethodBuilder(constructor)
+                .withAnnotations(annotations)
                 .withReturnType(constructorType.toReference())
                 .withNewBlock()
                 .addNewStringStatementStatement("super(" + StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
