@@ -180,13 +180,15 @@ public class ToMethod {
 
     });
 
-    public static final Function<Property, Method> GETTER = FunctionFactory.cache(new Function<Property, Method>() {
-        public Method apply(final Property property) {
+    public static final Function<Property, List<Method>> GETTER = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(final Property property) {
+            List<Method> methods = new ArrayList<Method>();
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             final List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
             final List<Statement> statements = new ArrayList<Statement>();
+            boolean isNested = false;
 
             TreeSet<Property> descendants = new TreeSet<Property>(new Comparator<Property>() {
                 public int compare(Property left, Property right) {
@@ -198,6 +200,7 @@ public class ToMethod {
             if (isMap(property.getTypeRef())) {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
             } else if (isBuildable(unwrapped)) {
+                isNested = true;
                 annotations.add(DEPRECATED_ANNOTATION);
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
@@ -205,6 +208,7 @@ public class ToMethod {
                     statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
             } else if (!descendants.isEmpty()) {
+                isNested = true;
                 annotations.add(DEPRECATED_ANNOTATION);
                 if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
@@ -215,7 +219,8 @@ public class ToMethod {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
             }
 
-            return new MethodBuilder()
+
+            Method getter = new MethodBuilder()
                     .withAnnotations(annotations)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
@@ -225,11 +230,22 @@ public class ToMethod {
                     .withStatements(statements)
                     .endBlock()
                     .build();
+
+            methods.add(getter);
+            if (isNested) {
+                methods.add(new MethodBuilder(getter)
+                        .removeFromAnnotations(DEPRECATED_ANNOTATION)
+                        .withName("build" + property.getNameCapitalized())
+                        .build());
+            }
+
+            return methods;
         }
     });
 
-    public static final Function<Property, Method> GETTER_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
-        public Method apply(Property property) {
+    public static final Function<Property, List<Method>> GETTER_ARRAY = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(Property property) {
+            List<Method> methods = new ArrayList<Method>();
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String methodName = prefix + property.getNameCapitalized();
             TypeRef type = property.getTypeRef();
@@ -247,7 +263,7 @@ public class ToMethod {
             if (isBuildable) {
                 annotations.add(DEPRECATED_ANNOTATION);
             }
-            return new MethodBuilder()
+            Method getter =  new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withName(methodName)
                     .withReturnType(property.getTypeRef())
@@ -256,6 +272,15 @@ public class ToMethod {
                     .addNewStringStatementStatement(body)
                     .endBlock()
                     .build();
+
+            methods.add(getter);
+            if (isBuildable) {
+                methods.add(new MethodBuilder(getter)
+                        .removeFromAnnotations(DEPRECATED_ANNOTATION)
+                        .withName("build" + property.getNameCapitalized())
+                        .build());
+            }
+            return methods;
         }
     });
 
