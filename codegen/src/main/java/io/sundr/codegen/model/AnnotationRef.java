@@ -44,16 +44,36 @@ public class AnnotationRef extends AttributeSupport {
 
         AnnotationRef that = (AnnotationRef) o;
 
-        if (classRef != null ? !classRef.equals(that.classRef) : that.classRef != null)
-            return false;
-        return parameters != null ? parameters.equals(that.parameters) : that.parameters == null;
+        if (!classRef.equals(that.classRef)) return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = classRef != null ? classRef.hashCode() : 0;
-        result = 31 * result + (parameters != null ? parameters.hashCode() : 0);
-        return result;
+        return classRef.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(AT).append(classRef.toString());
+
+        if (parameters != null && parameters.size() > 0) {
+            sb.append(OP);
+            boolean first = true;
+            for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(SPACE).append(COMA);
+                }
+
+                sb.append(entry.getKey()).append(SPACE).append(EQ).append(SPACE).append(entry.getValue());
+
+            }
+            sb.append(CP);
+        }
+        return sb.toString();
     }
 }

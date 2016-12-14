@@ -28,11 +28,6 @@ import static io.sundr.codegen.utils.StringUtils.join;
 
 public class Method extends ModifierSupport {
 
-    public static final String OP = "(";
-    public static final String CP = ")";
-    public static final String VARARG = "...";
-    public static final String THROWS = "throws";
-
     private final List<AnnotationRef> annotations;
     private final List<TypeParamDef> parameters;
     private final String name;
@@ -148,6 +143,10 @@ public class Method extends ModifierSupport {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+
+        for (AnnotationRef annotationRef: annotations) {
+            sb.append(annotationRef.toString()).append(SPACE);
+        }
 
         if (isPublic()) {
             sb.append(PUBLIC).append(SPACE);
