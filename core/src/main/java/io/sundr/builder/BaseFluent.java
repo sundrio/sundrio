@@ -91,7 +91,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
      * @return
      */
     private static <V,F> Boolean hasCompatibleVisitMethod(V visitor, F fluent) {
-        for (Method method : visitor.getClass().getDeclaredMethods()) {
+        for (Method method : visitor.getClass().getMethods()) {
             if (!method.getName().equals(VISIT) || method.getParameterTypes().length != 1) {
                 continue;
             }
