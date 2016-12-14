@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static io.sundr.builder.Constants.INLINEABLE;
-import static io.sundr.builder.Constants.SET;
+import static io.sundr.codegen.functions.Collections.SET;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VALIDATE_SNIPPET;

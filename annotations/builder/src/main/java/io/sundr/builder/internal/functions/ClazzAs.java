@@ -26,6 +26,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
@@ -47,7 +48,6 @@ import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -86,12 +86,12 @@ public class ClazzAs {
                         .build();
 
                 boolean isBuildable = isBuildable(unwrapped);
-                boolean isArray = isArray(toAdd.getTypeRef());
-                boolean isSet = isSet(toAdd.getTypeRef());
-                boolean isList = isList(toAdd.getTypeRef());
-                boolean isMap = isMap(toAdd.getTypeRef());
+                boolean isArray = TypeUtils.isArray(toAdd.getTypeRef());
+                boolean isSet = TypeUtils.isSet(toAdd.getTypeRef());
+                boolean isList = TypeUtils.isList(toAdd.getTypeRef());
+                boolean isMap = TypeUtils.isMap(toAdd.getTypeRef());
                 boolean isCollection = isSet || isList;
-                boolean isAbstract = isAbstract(unwrapped);
+                boolean isAbstract = TypeUtils.isAbstract(unwrapped);
 
                 Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
@@ -136,7 +136,7 @@ public class ClazzAs {
                     nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
                 } else if (!descendants.isEmpty()) {
                     for (Property descendant : descendants) {
-                        if (isCollection(descendant.getTypeRef())) {
+                        if (TypeUtils.isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         } else {
@@ -200,12 +200,12 @@ public class ClazzAs {
 
 
                 final boolean isBuildable = isBuildable(unwrapped);
-                final boolean isArray = isArray(property.getTypeRef());
-                final boolean isSet = isSet(property.getTypeRef());
-                final boolean isList = isList(property.getTypeRef());
-                final boolean isMap = isMap(property.getTypeRef());
+                final boolean isArray = TypeUtils.isArray(property.getTypeRef());
+                final boolean isSet = TypeUtils.isSet(property.getTypeRef());
+                final boolean isList = TypeUtils.isList(property.getTypeRef());
+                final boolean isMap = TypeUtils.isMap(property.getTypeRef());
                 final boolean isCollection = isSet || isList;
-                final boolean isAbstract = isAbstract(unwrapped);
+                final boolean isAbstract = TypeUtils.isAbstract(unwrapped);
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
@@ -216,16 +216,16 @@ public class ClazzAs {
                         .accept(new TypedVisitor<PropertyBuilder>() {
                             public void visit(PropertyBuilder builder) {
                                 if (isArray || isList) {
-                                    ClassRef listRef =  ARRAY_LIST.toReference(unwrapped);
+                                    ClassRef listRef =  Collections.ARRAY_LIST.toReference(unwrapped);
                                     builder.addToAttributes(INIT, "new " + listRef+ "()")
                                             .addToAttributes(ALSO_IMPORT, Arrays.asList(listRef));
                                 } else if (isSet) {
-                                    ClassRef setRef = LINKED_HASH_SET.toReference(unwrapped);
+                                    ClassRef setRef = Collections.LINKED_HASH_SET.toReference(unwrapped);
                                     builder.addToAttributes(INIT, "new " + setRef + "()")
                                             .addToAttributes(ALSO_IMPORT, Arrays.asList(setRef));
                                 } else if (isMap) {
                                     List<TypeRef> arguments = ((ClassRef)property.getTypeRef()).getArguments();
-                                    ClassRef mapRef = LINKED_HASH_MAP.toReference(arguments.toArray(new TypeRef[arguments.size()]));
+                                    ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments.toArray(new TypeRef[arguments.size()]));
                                     builder.addToAttributes(INIT, "new " + mapRef  + "()")
                                             .addToAttributes(ALSO_IMPORT, Arrays.asList(mapRef));
                                 }
@@ -278,7 +278,7 @@ public class ClazzAs {
                 } else if (!descendants.isEmpty()) {
                     properties.add(buildableField(toAdd));
                     for (Property descendant : descendants) {
-                        if (isCollection(descendant.getTypeRef())) {
+                        if (TypeUtils.isCollection(descendant.getTypeRef())) {
                             methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
                             methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }  else {
@@ -631,7 +631,7 @@ public class ClazzAs {
                 .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
                 .append(StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
                     public String apply(Property item) {
-                        String prefix = isBoolean(item.getTypeRef()) ? "is" : "get";
+                        String prefix = TypeUtils.isBoolean(item.getTypeRef()) ? "is" : "get";
                         //String cast = genericTypes.contains(item.getTypeRef().getFullyQualifiedName()) ? "("+item.getType().getFullyQualifiedName()+")" : "";
                         return "fluent." + prefix + item.getNameCapitalized() + "()";
                     }
@@ -682,7 +682,7 @@ public class ClazzAs {
 
         for (Property property : properties) {
             String name = property.getName();
-            if (BuilderUtils.isPrimitive(property.getTypeRef())) {
+            if (TypeUtils.isPrimitive(property.getTypeRef())) {
                 statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").toString()));
             } else if (property.getTypeRef() instanceof ClassRef && Descendants.isDescendant(type, ((ClassRef) property.getTypeRef()).getDefinition())) {
                 statements.add(new StringStatement(new StringBuilder()
@@ -722,15 +722,15 @@ public class ClazzAs {
         ClassRef builderType = TypeAs.VISITABLE_BUILDER.apply(unwrapped);
 
 
-        if (isList(classRef)) {
-            ClassRef listRef =  ARRAY_LIST.toReference(builderType);
-            return new PropertyBuilder(property).withTypeRef(LIST.toReference(builderType))
+        if (TypeUtils.isList(classRef)) {
+            ClassRef listRef =  Collections.ARRAY_LIST.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(builderType))
                     .addToAttributes(INIT, " new " + listRef + "()")
                     .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
                     .build();
-        } else if (isSet(classRef)) {
-            ClassRef setRef = LINKED_HASH_SET.toReference(builderType);
-            return new PropertyBuilder(property).withTypeRef(SET.toReference(builderType))
+        } else if (TypeUtils.isSet(classRef)) {
+            ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
                     .addToAttributes(INIT, " new " + setRef+ "()")
                     .addToAttributes(ALSO_IMPORT,  alsoImport(property, setRef, builderType))
                     .build();

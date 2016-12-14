@@ -457,7 +457,7 @@ public class Sources {
         //To be more accurate we need to check if there is a matching type parameter definition
         //and if so, return a reference to that (rather than consider it a class).
         private TypeRef checkAgainstTypeParamRef(TypeRef typeRef, Collection<TypeParamDef> parameters) {
-            TypeParamDef parameterDef = TypeUtils.getParamterDefinition(typeRef, parameters);
+            TypeParamDef parameterDef = TypeUtils.getParameterDefinition(typeRef, parameters);
             if (parameterDef != null) {
                 return parameterDef.toReference();
             }
