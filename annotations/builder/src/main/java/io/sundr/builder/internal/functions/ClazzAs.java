@@ -229,7 +229,7 @@ public class ClazzAs {
                                             .addToAttributes(ALSO_IMPORT, Arrays.asList(setRef));
                                 } else if (isMap) {
                                     List<TypeRef> arguments = ((ClassRef)property.getTypeRef()).getArguments();
-                                    ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments.toArray(new TypeRef[arguments.size()]));
+                                    ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments);
                                     builder.addToAttributes(INIT, "new " + mapRef  + "()")
                                             .addToAttributes(ALSO_IMPORT, Arrays.asList(mapRef));
                                 }

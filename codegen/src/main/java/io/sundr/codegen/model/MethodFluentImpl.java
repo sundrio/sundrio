@@ -17,9 +17,12 @@
 package io.sundr.codegen.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import io.sundr.builder.Builder;
 import io.sundr.builder.Nested;
+import io.sundr.builder.Predicate;
 import io.sundr.builder.VisitableBuilder;
 
 public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupportFluentImpl<A> implements MethodFluent<A>{
@@ -54,12 +57,36 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (String item : items) {this.comments.add(item);} return (A)this;
     }
 
+    public A addAllToComments(Collection<String> items){
+            for (String item : items) {this.comments.add(item);} return (A)this;
+    }
+
     public A removeFromComments(String... items){
+            for (String item : items) {this.comments.remove(item);} return (A)this;
+    }
+
+    public A removeAllFromComments(Collection<String> items){
             for (String item : items) {this.comments.remove(item);} return (A)this;
     }
 
     public List<String> getComments(){
             return this.comments;
+    }
+
+    public String getComment(int index){
+            return this.comments.get(index);
+    }
+
+    public String getFirstComment(){
+            return this.comments.get(0);
+    }
+
+    public String getLastComment(){
+            return this.comments.get(comments.size() - 1);
+    }
+
+    public String getMatchingComment(Predicate<String> predicate){
+            for (String item: comments) { if(predicate.apply(item)){return item;} } return null;
     }
 
     public A withComments(List<String> comments){
@@ -71,7 +98,15 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             this.comments.clear(); if (comments != null) {for (String item :comments){ this.addToComments(item);}} return (A) this;
     }
 
+    public Boolean hasComments(){
+            return comments!= null && !comments.isEmpty();
+    }
+
     public A addToAnnotations(AnnotationRef... items){
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+    }
+
+    public A addAllToAnnotations(Collection<AnnotationRef> items){
             for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
     }
 
@@ -79,12 +114,36 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
 
-    @Deprecated public List<AnnotationRef> getAnnotations(){
+    public A removeAllFromAnnotations(Collection<AnnotationRef> items){
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
+    }
+
+    
+/**
+ * This method has been deprecated, please use method buildAnnotations instead.
+ */
+@Deprecated public List<AnnotationRef> getAnnotations(){
             return build(annotations);
     }
 
     public List<AnnotationRef> buildAnnotations(){
             return build(annotations);
+    }
+
+    public AnnotationRef buildAnnotation(int index){
+            return this.annotations.get(index).build();
+    }
+
+    public AnnotationRef buildFirstAnnotation(){
+            return this.annotations.get(0).build();
+    }
+
+    public AnnotationRef buildLastAnnotation(){
+            return this.annotations.get(annotations.size() - 1).build();
+    }
+
+    public AnnotationRef buildMatchingAnnotation(Predicate<Builder<? extends AnnotationRef>> predicate){
+            for (Builder<? extends AnnotationRef> item: annotations) { if(predicate.apply(item)){return item.build();} } return null;
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
@@ -95,6 +154,10 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A withAnnotations(AnnotationRef... annotations){
             this.annotations.clear(); if (annotations != null) {for (AnnotationRef item :annotations){ this.addToAnnotations(item);}} return (A) this;
+    }
+
+    public Boolean hasAnnotations(){
+            return annotations!= null && !annotations.isEmpty();
     }
 
     public MethodFluent.AnnotationsNested<A> addNewAnnotation(){
@@ -109,16 +172,44 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder);} return (A)this;
     }
 
+    public A addAllToParameters(Collection<TypeParamDef> items){
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder);} return (A)this;
+    }
+
     public A removeFromParameters(TypeParamDef... items){
             for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);this.parameters.remove(builder);} return (A)this;
     }
 
-    @Deprecated public List<TypeParamDef> getParameters(){
+    public A removeAllFromParameters(Collection<TypeParamDef> items){
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);this.parameters.remove(builder);} return (A)this;
+    }
+
+    
+/**
+ * This method has been deprecated, please use method buildParameters instead.
+ */
+@Deprecated public List<TypeParamDef> getParameters(){
             return build(parameters);
     }
 
     public List<TypeParamDef> buildParameters(){
             return build(parameters);
+    }
+
+    public TypeParamDef buildParameter(int index){
+            return this.parameters.get(index).build();
+    }
+
+    public TypeParamDef buildFirstParameter(){
+            return this.parameters.get(0).build();
+    }
+
+    public TypeParamDef buildLastParameter(){
+            return this.parameters.get(parameters.size() - 1).build();
+    }
+
+    public TypeParamDef buildMatchingParameter(Predicate<Builder<? extends TypeParamDef>> predicate){
+            for (Builder<? extends TypeParamDef> item: parameters) { if(predicate.apply(item)){return item.build();} } return null;
     }
 
     public A withParameters(List<TypeParamDef> parameters){
@@ -129,6 +220,10 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A withParameters(TypeParamDef... parameters){
             this.parameters.clear(); if (parameters != null) {for (TypeParamDef item :parameters){ this.addToParameters(item);}} return (A) this;
+    }
+
+    public Boolean hasParameters(){
+            return parameters!= null && !parameters.isEmpty();
     }
 
     public MethodFluent.ParametersNested<A> addNewParameter(){
@@ -147,7 +242,15 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             this.name=name; return (A) this;
     }
 
-    @Deprecated public TypeRef getReturnType(){
+    public Boolean hasName(){
+            return this.name!=null;
+    }
+
+    
+/**
+ * This method has been deprecated, please use method buildReturnType instead.
+ */
+@Deprecated public TypeRef getReturnType(){
             return this.returnType!=null?this.returnType.build():null;
     }
 
@@ -163,6 +266,10 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             if (returnType instanceof TypeParamRef){ this.returnType= new TypeParamRefBuilder((TypeParamRef)returnType); _visitables.add(this.returnType);}
             if (returnType instanceof ClassRef){ this.returnType= new ClassRefBuilder((ClassRef)returnType); _visitables.add(this.returnType);}
             return (A) this;
+    }
+
+    public Boolean hasReturnType(){
+            return this.returnType!=null;
     }
 
     public A withVoidRefReturnType(VoidRef voidRefReturnType){
@@ -234,16 +341,44 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
     }
 
+    public A addAllToArguments(Collection<Property> items){
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+    }
+
     public A removeFromArguments(Property... items){
             for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.remove(builder);this.arguments.remove(builder);} return (A)this;
     }
 
-    @Deprecated public List<Property> getArguments(){
+    public A removeAllFromArguments(Collection<Property> items){
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.remove(builder);this.arguments.remove(builder);} return (A)this;
+    }
+
+    
+/**
+ * This method has been deprecated, please use method buildArguments instead.
+ */
+@Deprecated public List<Property> getArguments(){
             return build(arguments);
     }
 
     public List<Property> buildArguments(){
             return build(arguments);
+    }
+
+    public Property buildArgument(int index){
+            return this.arguments.get(index).build();
+    }
+
+    public Property buildFirstArgument(){
+            return this.arguments.get(0).build();
+    }
+
+    public Property buildLastArgument(){
+            return this.arguments.get(arguments.size() - 1).build();
+    }
+
+    public Property buildMatchingArgument(Predicate<Builder<? extends Property>> predicate){
+            for (Builder<? extends Property> item: arguments) { if(predicate.apply(item)){return item.build();} } return null;
     }
 
     public A withArguments(List<Property> arguments){
@@ -254,6 +389,10 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A withArguments(Property... arguments){
             this.arguments.clear(); if (arguments != null) {for (Property item :arguments){ this.addToArguments(item);}} return (A) this;
+    }
+
+    public Boolean hasArguments(){
+            return arguments!= null && !arguments.isEmpty();
     }
 
     public MethodFluent.ArgumentsNested<A> addNewArgument(){
@@ -272,7 +411,15 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             this.varArgPreferred=varArgPreferred; return (A) this;
     }
 
+    public Boolean hasVarArgPreferred(){
+            return true;
+    }
+
     public A addToExceptions(ClassRef... items){
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.exceptions.add(builder);} return (A)this;
+    }
+
+    public A addAllToExceptions(Collection<ClassRef> items){
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.exceptions.add(builder);} return (A)this;
     }
 
@@ -280,12 +427,36 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.exceptions.remove(builder);} return (A)this;
     }
 
-    @Deprecated public List<ClassRef> getExceptions(){
+    public A removeAllFromExceptions(Collection<ClassRef> items){
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.exceptions.remove(builder);} return (A)this;
+    }
+
+    
+/**
+ * This method has been deprecated, please use method buildExceptions instead.
+ */
+@Deprecated public List<ClassRef> getExceptions(){
             return build(exceptions);
     }
 
     public List<ClassRef> buildExceptions(){
             return build(exceptions);
+    }
+
+    public ClassRef buildException(int index){
+            return this.exceptions.get(index).build();
+    }
+
+    public ClassRef buildFirstException(){
+            return this.exceptions.get(0).build();
+    }
+
+    public ClassRef buildLastException(){
+            return this.exceptions.get(exceptions.size() - 1).build();
+    }
+
+    public ClassRef buildMatchingException(Predicate<Builder<? extends ClassRef>> predicate){
+            for (Builder<? extends ClassRef> item: exceptions) { if(predicate.apply(item)){return item.build();} } return null;
     }
 
     public A withExceptions(List<ClassRef> exceptions){
@@ -298,6 +469,10 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             this.exceptions.clear(); if (exceptions != null) {for (ClassRef item :exceptions){ this.addToExceptions(item);}} return (A) this;
     }
 
+    public Boolean hasExceptions(){
+            return exceptions!= null && !exceptions.isEmpty();
+    }
+
     public MethodFluent.ExceptionsNested<A> addNewException(){
             return new ExceptionsNestedImpl();
     }
@@ -306,7 +481,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             return new ExceptionsNestedImpl(item);
     }
 
-    @Deprecated public Block getBlock(){
+    
+/**
+ * This method has been deprecated, please use method buildBlock instead.
+ */
+@Deprecated public Block getBlock(){
             return this.block!=null?this.block.build():null;
     }
 
@@ -317,6 +496,10 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     public A withBlock(Block block){
             _visitables.remove(this.block);
             if (block!=null){ this.block= new BlockBuilder(block); _visitables.add(this.block);} return (A) this;
+    }
+
+    public Boolean hasBlock(){
+            return this.block!=null;
     }
 
     public MethodFluent.BlockNested<A> withNewBlock(){
