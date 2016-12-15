@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static io.sundr.builder.Constants.BOOLEAN_REF;
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.DEPRECATED_ANNOTATION;
 import static io.sundr.builder.Constants.DESCENDANTS;
@@ -73,6 +74,7 @@ import static io.sundr.codegen.utils.TypeUtils.isBoolean;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.utils.TypeUtils.isList;
 import static io.sundr.codegen.utils.TypeUtils.isMap;
+import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
 import static io.sundr.codegen.utils.TypeUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
@@ -178,6 +180,32 @@ public class ToMethod {
                     .build();
         }
 
+    });
+
+    public static final Function<Property, Method> HAS = FunctionFactory.cache(new Function<Property, Method>() {
+        public Method apply(final Property property) {
+            String prefix =  "has";
+            String methodName = prefix + property.getNameCapitalized();
+            List<Statement> statements = new ArrayList<Statement>();
+
+            if (isPrimitive(property.getTypeRef())) {
+                statements.add(new StringStatement("return true;"));
+            } else if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
+                statements.add(new StringStatement("return " + property.getName() + "!= null && !"+property.getName()+".isEmpty();"));
+            } else {
+                statements.add(new StringStatement("return this." + property.getName() + "!=null;"));
+            }
+
+           return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withName(methodName)
+                    .withReturnType(BOOLEAN_REF)
+                    .withArguments()
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
+                    .build();
+        }
     });
 
     public static final Function<Property, List<Method>> GETTER = FunctionFactory.cache(new Function<Property, List<Method>>() {
