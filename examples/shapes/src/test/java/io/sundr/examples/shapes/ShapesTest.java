@@ -222,4 +222,21 @@ public class ShapesTest {
         Square square = (Square) canvas.getShapes().get(1);
         Assert.assertEquals("square1", square.getNotes());
     }
+
+    @Test
+    public void testHas() {
+        CanvasBuilder builder = new CanvasBuilder()
+                .addNewCircleShape(0, 0, 10)
+                .addNewSquareShape()
+                    .withY(10)
+                    .withY(20)
+                    .withHeight(30)
+                .endSquareShape();
+
+
+
+        Assert.assertTrue(builder.hasShapes());
+        builder.withShapes();
+        Assert.assertFalse(builder.hasShapes());
+    }
 }

@@ -47,7 +47,6 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -124,6 +123,7 @@ public class ClazzAs {
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
+                methods.add(ToMethod.HAS.apply(toAdd));
 
                 if (isMap) {
                     //
@@ -155,6 +155,7 @@ public class ClazzAs {
             }
 
             return new TypeDefBuilder(fluentType)
+                    .withAnnotations()
                     .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
                     .build();
@@ -263,6 +264,8 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
 
+                methods.add(ToMethod.HAS.apply(toAdd));
+
                 if (isMap) {
                     properties.add(toAdd);
                 } else if (isBuildable && !isAbstract) {
@@ -312,6 +315,7 @@ public class ClazzAs {
             methods.add(equals);
 
             return new TypeDefBuilder(fluentImplType)
+                    .withAnnotations()
                     .withConstructors(constructors)
                     .withProperties(properties)
                     .withInnerTypes(nestedClazzes)
@@ -500,6 +504,7 @@ public class ClazzAs {
             methods.add(equals);
 
             return new TypeDefBuilder(builderType)
+                    .withAnnotations()
                     .withModifiers(TypeUtils.modifiersToInt(modifiers))
                     .withProperties(fields)
                     .withConstructors(constructors)
@@ -516,7 +521,9 @@ public class ClazzAs {
                     : new Modifier[]{Modifier.PUBLIC};
 
             final TypeDef editable = EDITABLE.apply(item);
-            return new TypeDefBuilder(BUILDER.apply(item)).accept(new TypedVisitor<MethodBuilder>() {
+            return new TypeDefBuilder(BUILDER.apply(item))
+                    .withAnnotations()
+                    .accept(new TypedVisitor<MethodBuilder>() {
                 public void visit(MethodBuilder builder) {
                     if (builder.getName() != null && builder.getName().equals("build")) {
                         builder.withModifiers(TypeUtils.modifiersToInt(modifiers));
@@ -568,6 +575,7 @@ public class ClazzAs {
             //We need to treat the editable classes as buildables themselves.
             return CodegenContext.getContext().getDefinitionRepository().register(
                     BuilderContextManager.getContext().getBuildableRepository().register(new TypeDefBuilder(editableType)
+                            .withAnnotations()
                             .withModifiers(TypeUtils.modifiersToInt(modifiers))
                             .withConstructors(constructors)
                             .withMethods(methods)

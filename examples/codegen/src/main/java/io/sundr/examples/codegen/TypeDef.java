@@ -350,6 +350,10 @@ public class TypeDef extends ModifierSupport {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        for (AnnotationRef annotationRef: annotations) {
+            sb.append(annotationRef.toString()).append(SPACE);
+        }
+
         if (isPublic()) {
             sb.append(PUBLIC).append(SPACE);
         } else if (isProtected()) {

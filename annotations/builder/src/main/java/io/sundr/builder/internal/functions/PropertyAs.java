@@ -102,6 +102,7 @@ public final class PropertyAs {
                         .build());
 
                 return new TypeDefBuilder(nestedType)
+                        .withAnnotations()
                         .withProperties(properties)
                         .withMethods(nestedMethods)
                         .withConstructors(constructors)
@@ -162,6 +163,7 @@ public final class PropertyAs {
                         .build());
 
                 return new TypeDefBuilder(nestedType)
+                        .withAnnotations()
                         .withProperties(properties)
                         .withMethods(nestedMethods)
                         .withConstructors(constructors)
