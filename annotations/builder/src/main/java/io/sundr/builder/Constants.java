@@ -101,6 +101,11 @@ public class Constants {
     public static final TypeDef GENERIC_ARRAY_TYPE = TYPEDEF.apply(GenericArrayType.class);
     public static final TypeDef PARAMETERIZED_TYPE = TYPEDEF.apply(ParameterizedType.class);
 
+    public static final TypeRef INT_REF = TYPEREF.apply(int.class);
+
+
+    public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), T);
+
     public static final TypeDef BUILDER = typeGenericOf(TYPEDEF.apply(Builder.class), T);
     public static final TypeDef BASE_FLUENT = typeGenericOf(TYPEDEF.apply(BaseFluent.class), T);
     public static final TypeDef EDITABLE = typeGenericOf(TYPEDEF.apply(Editable.class), T);
