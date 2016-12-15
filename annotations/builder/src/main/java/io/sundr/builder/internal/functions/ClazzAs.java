@@ -102,12 +102,12 @@ public class ClazzAs {
                     Property asList = arrayAsList(toAdd);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                     methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
-                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
-                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
+                    methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(asList));
+                    methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
                     toAdd = asList;
                 } else if (isSet || isList) {
-                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
-                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
+                    methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
+                    methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
@@ -140,8 +140,8 @@ public class ClazzAs {
                 } else if (!descendants.isEmpty()) {
                     for (Property descendant : descendants) {
                         if (TypeUtils.isCollection(descendant.getTypeRef())) {
-                            methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
-                            methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                            methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
+                            methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         } else {
                             methods.add(ToMethod.WITH.apply(descendant));
                         }
@@ -243,12 +243,12 @@ public class ClazzAs {
                     Property asList = arrayAsList(toAdd);
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                     methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
-                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(asList));
-                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
+                    methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(asList));
+                    methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
                     toAdd = asList;
                 } else if (isSet || isList) {
-                    methods.add(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
-                    methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
+                    methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
+                    methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
@@ -285,8 +285,8 @@ public class ClazzAs {
                     properties.add(buildableField(toAdd));
                     for (Property descendant : descendants) {
                         if (TypeUtils.isCollection(descendant.getTypeRef())) {
-                            methods.add(ToMethod.ADD_TO_COLLECTION.apply(descendant));
-                            methods.add(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                            methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
+                            methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
                         }  else {
                             methods.add(ToMethod.WITH.apply(descendant));
                         }

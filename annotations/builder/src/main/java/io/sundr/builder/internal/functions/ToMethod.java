@@ -64,6 +64,7 @@ import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
+import static io.sundr.codegen.functions.Collections.COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_LIST;
 import static io.sundr.codegen.functions.Collections.IS_MAP;
@@ -512,9 +513,12 @@ public class ToMethod {
         }
     });
 
+    public static final Function<Property, List<Method>> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(final Property property) {
+            List<Method> methods = new ArrayList<Method>();
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
 
-    public static final Function<Property, Method> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
-        public Method apply(final Property property) {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
@@ -526,7 +530,9 @@ public class ToMethod {
 
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
-            String methodName = "addTo" + property.getNameCapitalized();
+            String addVarargMethodName = "addTo" + property.getNameCapitalized();
+            String addAllMethodName = "addAllTo" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef) + property.getNameCapitalized();
+
             List<Statement> statements = new ArrayList<Statement>();
             Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
@@ -561,10 +567,10 @@ public class ToMethod {
                 statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".add(item);} return (" + returnType + ")this;"));
             }
 
-            return new MethodBuilder()
+            Method addVaragToCollection = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withParameters(parameters)
-                    .withName(methodName)
+                    .withName(addVarargMethodName)
                     .withReturnType(returnType)
                     .withArguments(item)
                     .withVarArgPreferred(true)
@@ -573,11 +579,33 @@ public class ToMethod {
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
+
+
+            Method addAllToCollection = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
+                    .withName(addAllMethodName)
+                    .withReturnType(returnType)
+                    .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
+                    .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+                    .build();
+
+            methods.add(addVaragToCollection);
+            methods.add(addAllToCollection);
+
+            return methods;
         }
     });
 
-    public static final Function<Property, Method> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
-        public Method apply(final Property property) {
+    public static final Function<Property, List<Method>> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(final Property property) {
+            List<Method> methods = new ArrayList<Method>();
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
@@ -588,7 +616,9 @@ public class ToMethod {
 
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
-            String methodName = "removeFrom" + property.getNameCapitalized();
+            String removeVarargMethodName = "removeFrom" + property.getNameCapitalized();
+            String removeAllMethdoName = "removeAllFrom" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef) + property.getNameCapitalized();
+
             List<Statement> statements = new ArrayList<Statement>();
 
             Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
@@ -624,9 +654,9 @@ public class ToMethod {
                 statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
             }
 
-            return new MethodBuilder()
+            Method removeVarargFromCollection = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(methodName)
+                    .withName(removeVarargMethodName)
                     .withParameters(parameters)
                     .withReturnType(returnType)
                     .withArguments(item)
@@ -635,6 +665,24 @@ public class ToMethod {
                     .withStatements(statements)
                     .endBlock()
                     .build();
+
+
+            Method removeAllFromCollection = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
+                    .withName(removeAllMethdoName)
+                    .withReturnType(returnType)
+                    .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
+                    .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+                    .build();
+
+            methods.add(removeVarargFromCollection);
+            methods.add(removeAllFromCollection);
+
+            return methods;
         }
     });
 

@@ -17,6 +17,7 @@
 package io.sundr.codegen.functions;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,6 +34,7 @@ import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 
 public class Collections {
 
+    public static final TypeDef COLLECTION = TYPEDEF.apply(Collection.class);
     public static final TypeDef MAP = TYPEDEF.apply(Map.class);
     public static final TypeDef LINKED_HASH_MAP = TYPEDEF.apply(LinkedHashMap.class);
     public static final TypeDef LIST = TYPEDEF.apply(List.class);
