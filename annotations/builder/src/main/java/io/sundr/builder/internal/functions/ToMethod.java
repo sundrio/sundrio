@@ -792,8 +792,8 @@ public class ToMethod {
             typeArguments.add(returnType);
 
 
-            ClassRef rewraped = nestedType.toReference(typeArguments.toArray(new TypeRef[typeArguments.size()]));
-            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments.toArray(new TypeRef[typeArguments.size()]));
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
             String prefix = isCollection ? "addNew" : "withNew";

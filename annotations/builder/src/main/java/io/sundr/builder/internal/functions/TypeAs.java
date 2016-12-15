@@ -68,7 +68,7 @@ public class TypeAs {
                     .withName(item.getName() + "Fluent")
                     .withPackageName(item.getPackageName())
                     .withParameters(parameters)
-                    .withExtendsList(superClass.toReference(superClassParameters.toArray(new TypeRef[superClassParameters.size()])))
+                    .withExtendsList(superClass.toReference(superClassParameters))
                     .withImplementsList()
                     .withInnerTypes()
                     .build();
@@ -105,7 +105,7 @@ public class TypeAs {
                     .withName(item.getName() + "FluentImpl")
                     .withPackageName(item.getPackageName())
                     .withParameters(parameters)
-                    .withExtendsList(superClass.toReference(superClassParameters.toArray(new TypeRef[superClassParameters.size()])))
+                    .withExtendsList(superClass.toReference(superClassParameters))
                     .withImplementsList(SHALLOW_FLUENT.apply(item).toInternalReference())
                     .withInnerTypes()
                     .build();
@@ -137,7 +137,7 @@ public class TypeAs {
                 parameters.add(param.toReference());
             }
             parameters.add(Q);
-           return SHALLOW_FLUENT.apply(item).toReference(parameters.toArray(new TypeRef[parameters.size()]));
+           return SHALLOW_FLUENT.apply(item).toReference(parameters);
         }
     };
 
@@ -157,7 +157,7 @@ public class TypeAs {
                     .withName(item.getName() + "Builder")
                     .withParameters(item.getParameters())
                     .withInnerTypes()
-                    .withExtendsList(fluent.toReference(parameters.toArray(new TypeRef[parameters.size()])))
+                    .withExtendsList(fluent.toReference(parameters))
                     .withImplementsList(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(item.toInternalReference(), builder.toInternalReference()))
                     .build();
 
