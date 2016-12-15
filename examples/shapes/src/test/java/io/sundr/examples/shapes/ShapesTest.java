@@ -16,6 +16,9 @@
 
 package io.sundr.examples.shapes;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import io.sundr.builder.PathAwareTypedVisitor;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.Visitor;
@@ -24,8 +27,6 @@ import io.sundr.examples.shapes.v1.CircleBuilder;
 import io.sundr.examples.shapes.v1.EditableCircle;
 import io.sundr.examples.shapes.v1.Square;
 import io.sundr.examples.shapes.v1.SquareBuilder;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class ShapesTest {
 
@@ -221,5 +222,22 @@ public class ShapesTest {
         Assert.assertEquals("circle1", circle.getNotes());
         Square square = (Square) canvas.getShapes().get(1);
         Assert.assertEquals("square1", square.getNotes());
+    }
+
+    @Test
+    public void testHas() {
+        CanvasBuilder builder = new CanvasBuilder()
+                .addNewCircleShape(0, 0, 10)
+                .addNewSquareShape()
+                    .withY(10)
+                    .withY(20)
+                    .withHeight(30)
+                .endSquareShape();
+
+
+
+        Assert.assertTrue(builder.hasShapes());
+        builder.withShapes();
+        Assert.assertFalse(builder.hasShapes());
     }
 }

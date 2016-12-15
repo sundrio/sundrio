@@ -19,9 +19,12 @@ package io.sundr.builder.internal.functions;
 import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
+import io.sundr.builder.PathAwareTypedVisitor;
+import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.Singularize;
+import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
@@ -33,6 +36,8 @@ import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.model.WildcardRef;
+import io.sundr.codegen.model.WildcardRefBuilder;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -45,20 +50,25 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static io.sundr.builder.Constants.BOOLEAN_REF;
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
+import static io.sundr.builder.Constants.DEPRECATED_ANNOTATION;
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
+import static io.sundr.builder.Constants.INT_REF;
 import static io.sundr.builder.Constants.N_REF;
 import static io.sundr.builder.Constants.OUTER_CLASS;
+import static io.sundr.builder.Constants.PREDICATE;
 import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
-import static io.sundr.builder.internal.functions.CollectionTypes.IS_COLLECTION;
-import static io.sundr.builder.internal.functions.CollectionTypes.IS_LIST;
-import static io.sundr.builder.internal.functions.CollectionTypes.IS_MAP;
-import static io.sundr.builder.internal.functions.CollectionTypes.IS_SET;
+import static io.sundr.codegen.functions.Collections.COLLECTION;
+import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
+import static io.sundr.codegen.functions.Collections.IS_LIST;
+import static io.sundr.codegen.functions.Collections.IS_MAP;
+import static io.sundr.codegen.functions.Collections.IS_SET;
 import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
@@ -66,14 +76,16 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
-import static io.sundr.builder.internal.utils.BuilderUtils.isAbstract;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBoolean;
+import static io.sundr.codegen.utils.TypeUtils.isAbstract;
+import static io.sundr.codegen.utils.TypeUtils.isBoolean;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.builder.internal.utils.BuilderUtils.isList;
-import static io.sundr.builder.internal.utils.BuilderUtils.isMap;
-import static io.sundr.builder.internal.utils.BuilderUtils.isSet;
+import static io.sundr.codegen.utils.TypeUtils.isList;
+import static io.sundr.codegen.utils.TypeUtils.isMap;
+import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
+import static io.sundr.codegen.utils.TypeUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 
 public class ToMethod {
@@ -82,6 +94,7 @@ public class ToMethod {
     private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
 
     public static final Function<Property, Method> WITH = FunctionFactory.cache(new Function<Property, Method>() {
+
         public Method apply(Property property) {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
@@ -178,12 +191,46 @@ public class ToMethod {
 
     });
 
-    public static final Function<Property, Method> GETTER = FunctionFactory.cache(new Function<Property, Method>() {
+    public static final Function<Property, Method> HAS = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(final Property property) {
-            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-            String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
+            String prefix =  "has";
             String methodName = prefix + property.getNameCapitalized();
-            final List<Statement> statements = new ArrayList<Statement>();
+            List<Statement> statements = new ArrayList<Statement>();
+
+            if (isPrimitive(property.getTypeRef())) {
+                statements.add(new StringStatement("return true;"));
+            } else if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
+                statements.add(new StringStatement("return " + property.getName() + "!= null && !"+property.getName()+".isEmpty();"));
+            } else {
+                statements.add(new StringStatement("return this." + property.getName() + "!=null;"));
+            }
+
+           return new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withName(methodName)
+                    .withReturnType(BOOLEAN_REF)
+                    .withArguments()
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
+                    .build();
+        }
+    });
+
+    public static final Function<Property, List<Method>> GETTER = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(final Property property) {
+            List<Method> methods = new ArrayList<Method>();
+            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+
+            String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
+            String getterName = prefix + property.getNameCapitalized();
+            String builderName = "build" + property.getNameCapitalized();
+            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+            List<String> comments = new ArrayList<String>();
+            List<Statement> statements = new ArrayList<Statement>();
+            boolean isNested = false;
+            boolean isList = isList(property.getTypeRef());
+            boolean isSet = isSet(property.getTypeRef());
 
             TreeSet<Property> descendants = new TreeSet<Property>(new Comparator<Property>() {
                 public int compare(Property left, Property right) {
@@ -195,13 +242,19 @@ public class ToMethod {
             if (isMap(property.getTypeRef())) {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
             } else if (isBuildable(unwrapped)) {
-                if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
+                isNested = true;
+                annotations.add(DEPRECATED_ANNOTATION);
+                comments.add("This method has been deprecated, please use method "+builderName+" instead.");
+                if (isList || isSet) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
                     statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
             } else if (!descendants.isEmpty()) {
-                if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
+                isNested = true;
+                annotations.add(DEPRECATED_ANNOTATION);
+                comments.add("This method has been deprecated, please use method "+builderName+" instead.");
+                if (isList || isSet) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {
                     statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
@@ -210,22 +263,150 @@ public class ToMethod {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
             }
 
-            return new MethodBuilder()
+
+            Method getter = new MethodBuilder()
+                    .withComments(comments)
+                    .withAnnotations(annotations)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(methodName)
+                    .withName(getterName)
                     .withReturnType(property.getTypeRef())
                     .withArguments(new Property[]{})
                     .withNewBlock()
                     .withStatements(statements)
                     .endBlock()
                     .build();
+
+            methods.add(getter);
+            if (isNested) {
+                methods.add(new MethodBuilder(getter)
+                        .removeFromAnnotations(DEPRECATED_ANNOTATION)
+                        .withComments()
+                        .withName("build" + property.getNameCapitalized())
+                        .build());
+
+                if (isList) {
+                    methods.add(new MethodBuilder()
+                            .withComments()
+                            .withAnnotations()
+                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                            .withName("build" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                            .withReturnType(unwrapped)
+                            .addNewArgument()
+                            .withName("index")
+                            .withTypeRef(INT_REF)
+                            .endArgument()
+                            .withNewBlock()
+                            .withStatements(new StringStatement("return this." + property.getName() + ".get(index).build();"))
+                            .endBlock()
+                            .build());
+
+                    methods.add(new MethodBuilder()
+                            .withComments()
+                            .withAnnotations()
+                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                            .withName("buildFirst" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                            .withReturnType(unwrapped)
+                            .withNewBlock()
+                            .withStatements(new StringStatement("return this." + property.getName() + ".get(0).build();"))
+                            .endBlock()
+                            .build());
+
+                    methods.add(new MethodBuilder()
+                            .withComments()
+                            .withAnnotations()
+                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                            .withName("buildLast" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                            .withReturnType(unwrapped)
+                            .withNewBlock()
+                            .withStatements(new StringStatement("return this." + property.getName() + ".get(" + property.getName() + ".size() - 1).build();"))
+                            .endBlock()
+                            .build());
+
+                    TypeRef builderRef = BuilderContextManager.getContext().getBuilderInterface().toReference(new WildcardRefBuilder().withBounds(unwrapped).build());
+                    methods.add(new MethodBuilder()
+                            .withComments()
+                            .withAnnotations()
+                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                            .withName("buildMatching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                            .addNewArgument()
+                            .withName("predicate")
+                            .withTypeRef(PREDICATE.toReference(builderRef))
+                            .endArgument()
+                            .withReturnType(unwrapped)
+                            .withNewBlock()
+                            .withStatements(new StringStatement("for ("+builderRef+" item: "+property.getName()+") { if(predicate.apply(item)){return item.build();} } return null;"))
+                            .endBlock()
+                            .build());
+                }
+            } else if (isList) {
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations(annotations)
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName(prefix +  Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .withReturnType(unwrapped)
+                        .addNewArgument()
+                            .withName("index")
+                            .withTypeRef(INT_REF)
+                        .endArgument()
+                        .withNewBlock()
+                        .withStatements(new StringStatement("return this." + property.getName() + ".get(index);"))
+                        .endBlock()
+                        .build());
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations(annotations)
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName(prefix + "First" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .withReturnType(unwrapped)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("return this." + property.getName() + ".get(0);"))
+                        .endBlock()
+                        .build());
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations(annotations)
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName(prefix + "Last" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .withReturnType(unwrapped)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("return this." + property.getName() + ".get(" + property.getName() + ".size() - 1);"))
+                        .endBlock()
+                        .build());
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations(annotations)
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName(prefix + "Matching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .addNewArgument()
+                            .withName("predicate")
+                            .withTypeRef(PREDICATE.toReference(unwrapped))
+                        .endArgument()
+                        .withReturnType(unwrapped)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("for ("+unwrapped+" item: "+property.getName()+") { if(predicate.apply(item)){return item;} } return null;"))
+                        .endBlock()
+                        .build());
+            }
+
+            return methods;
         }
     });
 
-    public static final Function<Property, Method> GETTER_ARRAY = FunctionFactory.cache(new Function<Property, Method>() {
-        public Method apply(Property property) {
+    public static final Function<Property, List<Method>> GETTER_ARRAY = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(Property property) {
+            List<Method> methods = new ArrayList<Method>();
+            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+            List<String> comments = new ArrayList<String>();
+
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
-            String methodName = prefix + property.getNameCapitalized();
+            String getterName = prefix + property.getNameCapitalized();
+            String builderName = "build" + property.getNameCapitalized();
+            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             TypeRef type = property.getTypeRef();
             Boolean isBuildable = isBuildable(type);
             TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
@@ -237,15 +418,83 @@ public class ToMethod {
                     property.getName()
             );
 
-            return new MethodBuilder()
+            if (isBuildable) {
+                annotations.add(DEPRECATED_ANNOTATION);
+                comments.add("This method has been deprecated, please use method "+builderName+" instead.");
+            }
+            Method getter =  new MethodBuilder()
+                    .withComments(comments)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(methodName)
+                    .withName(getterName)
                     .withReturnType(property.getTypeRef())
                     .withArguments()
                     .withNewBlock()
                     .addNewStringStatementStatement(body)
                     .endBlock()
                     .build();
+
+            methods.add(getter);
+            if (isBuildable) {
+                methods.add(new MethodBuilder(getter)
+                        .removeFromAnnotations(DEPRECATED_ANNOTATION)
+                        .withComments()
+                        .withName(builderName)
+                        .build());
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName("build" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .withReturnType(unwrapped)
+                        .addNewArgument()
+                        .withName("index")
+                        .withTypeRef(INT_REF)
+                        .endArgument()
+                        .withNewBlock()
+                        .withStatements(new StringStatement("return this." + property.getName() + ".get(index).build();"))
+                        .endBlock()
+                        .build());
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName("buildFirst" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .withReturnType(unwrapped)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("return this." + property.getName() + ".get(0).build();"))
+                        .endBlock()
+                        .build());
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName("buildLast" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .withReturnType(unwrapped)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("return this." + property.getName() + ".get(" + property.getName() + ".size() - 1).build();"))
+                        .endBlock()
+                        .build());
+
+                TypeRef builderRef = BuilderContextManager.getContext().getBuilderInterface().toReference(new WildcardRefBuilder().withBounds(unwrapped).build());
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName("buildMatching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .addNewArgument()
+                        .withName("predicate")
+                        .withTypeRef(PREDICATE.toReference(builderRef))
+                        .endArgument()
+                        .withReturnType(unwrapped)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("for ("+builderRef+" item: "+property.getName()+") { if(predicate.apply(item)){return item.build();} } return null;"))
+                        .endBlock()
+                        .build());
+            }
+            return methods;
         }
     });
 
@@ -264,9 +513,12 @@ public class ToMethod {
         }
     });
 
+    public static final Function<Property, List<Method>> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(final Property property) {
+            List<Method> methods = new ArrayList<Method>();
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
 
-    public static final Function<Property, Method> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
-        public Method apply(final Property property) {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
@@ -278,7 +530,9 @@ public class ToMethod {
 
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
-            String methodName = "addTo" + property.getNameCapitalized();
+            String addVarargMethodName = "addTo" + property.getNameCapitalized();
+            String addAllMethodName = "addAllTo" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef) + property.getNameCapitalized();
+
             List<Statement> statements = new ArrayList<Statement>();
             Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
@@ -313,10 +567,10 @@ public class ToMethod {
                 statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".add(item);} return (" + returnType + ")this;"));
             }
 
-            return new MethodBuilder()
+            Method addVaragToCollection = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withParameters(parameters)
-                    .withName(methodName)
+                    .withName(addVarargMethodName)
                     .withReturnType(returnType)
                     .withArguments(item)
                     .withVarArgPreferred(true)
@@ -325,11 +579,33 @@ public class ToMethod {
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
+
+
+            Method addAllToCollection = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
+                    .withName(addAllMethodName)
+                    .withReturnType(returnType)
+                    .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
+                    .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+                    .build();
+
+            methods.add(addVaragToCollection);
+            methods.add(addAllToCollection);
+
+            return methods;
         }
     });
 
-    public static final Function<Property, Method> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, Method>() {
-        public Method apply(final Property property) {
+    public static final Function<Property, List<Method>> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(final Property property) {
+            List<Method> methods = new ArrayList<Method>();
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
@@ -340,7 +616,9 @@ public class ToMethod {
 
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
-            String methodName = "removeFrom" + property.getNameCapitalized();
+            String removeVarargMethodName = "removeFrom" + property.getNameCapitalized();
+            String removeAllMethdoName = "removeAllFrom" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef) + property.getNameCapitalized();
+
             List<Statement> statements = new ArrayList<Statement>();
 
             Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
@@ -376,9 +654,9 @@ public class ToMethod {
                 statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
             }
 
-            return new MethodBuilder()
+            Method removeVarargFromCollection = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(methodName)
+                    .withName(removeVarargMethodName)
                     .withParameters(parameters)
                     .withReturnType(returnType)
                     .withArguments(item)
@@ -387,6 +665,24 @@ public class ToMethod {
                     .withStatements(statements)
                     .endBlock()
                     .build();
+
+
+            Method removeAllFromCollection = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
+                    .withName(removeAllMethdoName)
+                    .withReturnType(returnType)
+                    .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
+                    .withNewBlock()
+                    .withStatements(statements)
+                    .endBlock()
+                    .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+                    .build();
+
+            methods.add(removeVarargFromCollection);
+            methods.add(removeAllFromCollection);
+
+            return methods;
         }
     });
 
@@ -496,8 +792,8 @@ public class ToMethod {
             typeArguments.add(returnType);
 
 
-            ClassRef rewraped = nestedType.toReference(typeArguments.toArray(new TypeRef[typeArguments.size()]));
-            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments.toArray(new TypeRef[typeArguments.size()]));
+            ClassRef rewraped = nestedType.toReference(typeArguments);
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
             String prefix = isCollection ? "addNew" : "withNew";

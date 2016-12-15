@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static io.sundr.builder.Constants.INLINEABLE;
-import static io.sundr.builder.Constants.SET;
+import static io.sundr.codegen.functions.Collections.SET;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VALIDATE_SNIPPET;
@@ -54,6 +54,8 @@ public class BuilderContext {
     private final Types types;
     private final CodegenContext codegenContext;
 
+    private final TypeDef functionClass;
+    private final TypeDef predicateClass;
     private final TypeDef baseFluentClass;
     private final TypeDef fluentInterface;
     private final TypeDef builderInterface;
@@ -87,6 +89,14 @@ public class BuilderContext {
 
         ClassTo.TYPEDEF.apply(ArrayList.class);
 
+        functionClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+                .build();
+
+
+        predicateClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Predicate.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+                .build();
 
         visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
@@ -186,6 +196,15 @@ public class BuilderContext {
         return builderPackage;
     }
 
+
+    public TypeDef getFunctionClass() {
+        return functionClass;
+    }
+
+    public TypeDef getPredicateClass() {
+        return predicateClass;
+    }
+
     public TypeDef getBaseFluentClass() {
         return baseFluentClass;
     }
@@ -232,6 +251,11 @@ public class BuilderContext {
 
     public TypeDef getInlineableBase() {
         return inlineableBase;
+    }
+
+
+    public Boolean getValidationEnabled() {
+        return validationEnabled;
     }
 
     public TypeDef getInlineableInterface(Inline inline) {

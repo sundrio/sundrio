@@ -17,6 +17,7 @@
 package io.sundr.builder;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
@@ -34,12 +35,8 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.codegen.functions.ClassTo.ANNOTATIONTYPEREF;
@@ -93,22 +90,21 @@ public class Constants {
     public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
     public static final AnnotationRef BUILDABLE_ANNOTATION = ANNOTATIONTYPEREF.apply(Buildable.class);
+    public static final AnnotationRef DEPRECATED_ANNOTATION = ANNOTATIONTYPEREF.apply(Deprecated.class);
 
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
     public static final TypeDef OBJECT = TypeDef.OBJECT;
-    public static final TypeDef MAP = TYPEDEF.apply(Map.class);
-    public static final TypeDef LINKED_HASH_MAP = TYPEDEF.apply(LinkedHashMap.class);
-    public static final TypeDef LIST = TYPEDEF.apply(List.class);
-    public static final TypeDef ARRAY_LIST = TYPEDEF.apply(ArrayList.class);
-
-    public static final TypeDef SET = TYPEDEF.apply(Set.class);
-    public static final TypeDef LINKED_HASH_SET = TYPEDEF.apply(LinkedHashSet.class);
 
     public static final TypeDef ARRAY = TYPEDEF.apply(Array.class);
     public static final TypeDef TYPE = TYPEDEF.apply(Type.class);
     public static final TypeDef TYPE_VARIABLE = TYPEDEF.apply(TypeVariable.class);
     public static final TypeDef GENERIC_ARRAY_TYPE = TYPEDEF.apply(GenericArrayType.class);
     public static final TypeDef PARAMETERIZED_TYPE = TYPEDEF.apply(ParameterizedType.class);
+
+    public static final TypeRef INT_REF = TYPEREF.apply(int.class);
+
+
+    public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), T);
 
     public static final TypeDef BUILDER = typeGenericOf(TYPEDEF.apply(Builder.class), T);
     public static final TypeDef BASE_FLUENT = typeGenericOf(TYPEDEF.apply(BaseFluent.class), T);
@@ -155,7 +151,7 @@ public class Constants {
             .withName("ConstraintViolationException")
             .build().toInternalReference();
 
-    public static List<ClassRef> VALIDATION_REFS = Arrays.<ClassRef>asList(VALIDATION, VALIDATOR, VALIDATOR_FACTORY, VALIDATION_EXCEPTION, CONSTRAIN_VIOLATION, CONSTRAIN_VIOLATION_EXCEPTION, SET.toInternalReference());
+    public static List<ClassRef> VALIDATION_REFS = Arrays.<ClassRef>asList(VALIDATION, VALIDATOR, VALIDATOR_FACTORY, VALIDATION_EXCEPTION, CONSTRAIN_VIOLATION, CONSTRAIN_VIOLATION_EXCEPTION, Collections.SET.toInternalReference());
 
 
     public static final String DEFAULT_SOURCEFILE_TEMPLATE_LOCATION = "templates/builder/sourcefile.vm";

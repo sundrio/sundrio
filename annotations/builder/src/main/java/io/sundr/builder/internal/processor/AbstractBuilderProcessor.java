@@ -59,6 +59,14 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
             try {
                 if (context.getGenerateBuilderPackage() && !Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getBuilderPackage())) {
 
+                    generateFromClazz(context.getFluentInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+
+                    generateFromClazz(context.getPredicateClass(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+
                     generateFromClazz(context.getVisitableInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
@@ -211,6 +219,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         }
 
         return new TypeDefBuilder(shallowInlineType)
+                .withAnnotations()
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                 .withConstructors(constructors)
                 .addToProperties(builderProperty, functionProperty)

@@ -18,9 +18,9 @@ package io.sundr.codegen.utils;
 
 import io.sundr.Function;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.PrimitiveRef;
-import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
@@ -35,10 +35,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-
 
 public final class TypeUtils {
+
+    private static final String BOOLEAN = "boolean";
+    private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
+    private static final String OTHER = "other";
+    private static final String DOT_REGEX = "\\.";
     
     private TypeUtils() {
         //Utility Class
@@ -74,7 +77,7 @@ public final class TypeUtils {
         return false;
     }
 
-    public static TypeParamDef getParamterDefinition(TypeRef typeRef, Collection<TypeParamDef> parameters) {
+    public static TypeParamDef getParameterDefinition(TypeRef typeRef, Collection<TypeParamDef> parameters) {
         String name;
         if (typeRef instanceof ClassRef) {
             name = ((ClassRef)typeRef).getName();
@@ -205,14 +208,106 @@ public final class TypeUtils {
 
 
     public static String fullyQualifiedNameDiff(String left, String right) {
-        String[] lparts = left.split("\\.");
-        String[] rparts = right.split("\\.");
+        String[] lparts = left.split(DOT_REGEX);
+        String[] rparts = right.split(DOT_REGEX);
 
         for (int l=lparts.length-1,r=rparts.length-1;l>=0 && r>=0;r--,l--) {
             if (!lparts[l].equals(rparts[r])) {
                 return rparts[r];
             }
         }
-        return "other";
+        return OTHER;
+    }
+
+    /**
+     * Checks a {@link TypeRef} is of an abstract type.
+     * @param   typeRef The type to check.
+     * @return  True if its an abstract type.
+     */
+    public static boolean isAbstract(TypeRef  typeRef) {
+        DefinitionRepository repository =  DefinitionRepository.getRepository();
+        TypeDef def = repository.getDefinition(typeRef);
+        if (def == null && typeRef instanceof ClassRef) {
+            def = ((ClassRef)typeRef).getDefinition();
+        }
+        return def != null ? def.isAbstract() : false;
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a primitive type.
+     * @param type  The type to check.
+     * @return      True if its a primitive type.
+     */
+    public static boolean isPrimitive(TypeRef type) {
+        return type instanceof PrimitiveRef;
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link Map}.
+     * @param type  The type to check.
+     * @return      True if its a Map.
+     */
+    public static boolean isMap(TypeRef type) {
+        return Collections.IS_MAP.apply(type);
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link java.util.List}.
+     * @param type  The type to check.
+     * @return      True if its a List.
+     */
+    public static boolean isList(TypeRef type) {
+        return Collections.IS_LIST.apply(type);
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link java.util.Set}.
+     * @param type  The type to check.
+     * @return      True if its a Set.
+     */
+    public static boolean isSet(TypeRef type) {
+        return Collections.IS_SET.apply(type);
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link Collection}.
+     * @param type  The type to check.
+     * @return      True if its a Collection.
+     */
+    public static boolean isCollection(TypeRef type) {
+        return Collections.IS_COLLECTION.apply(type);
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link Boolean} or boolean.
+     * @param type  The type to check.
+     * @return      True if its a {@link Boolean} or boolean.
+     */
+    public static boolean isBoolean(TypeRef type) {
+        if (type instanceof PrimitiveRef) {
+            return BOOLEAN.equals(((PrimitiveRef)type).getName());
+        } else if (!(type instanceof ClassRef)) {
+            return false;
+        } else {
+            return JAVA_LANG_BOOLEAN.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
+        }
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is an array.
+     * @param type  The type to check.
+     * @return      True if its an array.B
+     */
+    public static boolean isArray(TypeRef type) {
+
+        if (type instanceof ClassRef) {
+            return ((ClassRef)type).getDimensions() > 0;
+        } else if (type instanceof PrimitiveRef) {
+            return ((PrimitiveRef)type).getDimensions() > 0;
+        } else if (type instanceof TypeParamRef) {
+            return ((TypeParamRef)type).getDimensions() > 0;
+        } else {
+            return false;
+        }
     }
 }

@@ -133,7 +133,7 @@ public class ElementTo {
 
             return new TypeParamDefBuilder()
                     .withName(item.getSimpleName().toString())
-                    .withBounds(typeRefs.toArray(new ClassRef[typeRefs.size()]))
+                    .withBounds(typeRefs)
                     .build();
         }
 
@@ -247,7 +247,7 @@ public class ElementTo {
                 }
 
                 TypeParamDef genericType = new TypeParamDefBuilder().withName(typeParameter.getSimpleName().toString())
-                        .withBounds(genericBounds.toArray(new ClassRef[genericBounds.size()]))
+                        .withBounds(genericBounds)
                         .build();
 
                 genericTypes.add(genericType);
@@ -259,9 +259,9 @@ public class ElementTo {
                     .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
                     .withPackageName(getPackageName(classElement))
                     .withName(getClassName(classElement))
-                    .withParameters(genericTypes.toArray(new TypeParamDef[genericTypes.size()]))
+                    .withParameters(genericTypes)
                     .withExtendsList(superClassType instanceof ClassRef ? (ClassRef) superClassType : null)
-                    .withImplementsList(interfaces.toArray(new ClassRef[interfaces.size()]))
+                    .withImplementsList(interfaces)
                     .build();
 
 

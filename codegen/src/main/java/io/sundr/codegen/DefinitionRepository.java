@@ -16,9 +16,6 @@
 
 package io.sundr.codegen;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
-import io.sundr.builder.BaseFluent;
 import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;

@@ -102,6 +102,7 @@ public final class PropertyAs {
                         .build());
 
                 return new TypeDefBuilder(nestedType)
+                        .withAnnotations()
                         .withProperties(properties)
                         .withMethods(nestedMethods)
                         .withConstructors(constructors)
@@ -162,6 +163,7 @@ public final class PropertyAs {
                         .build());
 
                 return new TypeDefBuilder(nestedType)
+                        .withAnnotations()
                         .withProperties(properties)
                         .withMethods(nestedMethods)
                         .withConstructors(constructors)
@@ -207,7 +209,7 @@ public final class PropertyAs {
                 List<TypeRef> pivotParameters = new ArrayList<TypeRef>(superClassParameters);
                 pivotParameters.add(N.toReference());
 
-                ClassRef nestedInterfaceRef = nestedInterfaceType.toReference(pivotParameters.toArray(new TypeParamRef[pivotParameters.size()]));
+                ClassRef nestedInterfaceRef = nestedInterfaceType.toReference(pivotParameters);
                 superClassParameters.add(nestedInterfaceRef);
 
                 ClassRef superClassFluent = new ClassRefBuilder()
@@ -255,7 +257,7 @@ public final class PropertyAs {
                 parameters.add(N);
                 List<TypeRef> pivotParameters = new ArrayList<TypeRef>(superClassParameters);
                 pivotParameters.add(N.toReference());
-                superClassParameters.add(nested.toReference(pivotParameters.toArray(new TypeParamRef[pivotParameters.size()])));
+                superClassParameters.add(nested.toReference(pivotParameters));
 
                 //CircleFluent<T, CircleShapesNested<T, N>>
                 ClassRef superClassFluent = new ClassRefBuilder()

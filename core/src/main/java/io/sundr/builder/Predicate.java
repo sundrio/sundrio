@@ -14,34 +14,8 @@
  *      limitations under the License.
  */
 
-package io.sundr.examples.codegen;
+package io.sundr.builder;
 
-public interface Node {
-
-    String DOT = ".";
-    String COMA = ",";
-    String SEMICOLN = ";";
-    String SPACE = " ";
-    String NEWLINE = "\n";
-
-    String AT = "@";
-
-    String LT = "<";
-    String EQ = "=";
-    String GT = ">";
-
-    String OC = "/**";
-    String STAR = "*";
-    String CC = "*/";
-
-    String OP = "(";
-    String CP = ")";
-    String VARARG = "...";
-    String THROWS = "throws";
-
-    String EXTENDS = "extends";
-    String IMPLEMENTS = "implements";
-
-    String JAVA_LANG = "java.lang";
-
+public interface Predicate<I> {
+    boolean apply(I item);
 }

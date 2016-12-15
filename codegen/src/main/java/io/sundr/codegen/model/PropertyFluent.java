@@ -16,113 +16,92 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Nested;
-
+import java.util.Collection;
 import java.util.List;
-import java.lang.String;
 
-public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupportFluent<A> {
+import io.sundr.builder.Builder;
+import io.sundr.builder.Nested;
+import io.sundr.builder.Predicate;
+
+public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupportFluent<A>{
 
 
     public A addToAnnotations(AnnotationRef... items);
-
+    public A addAllToAnnotations(Collection<AnnotationRef> items);
     public A removeFromAnnotations(AnnotationRef... items);
-
-    public List<AnnotationRef> getAnnotations();
-
+    public A removeAllFromAnnotations(Collection<AnnotationRef> items);
+    
+/**
+ * This method has been deprecated, please use method buildAnnotations instead.
+ */
+@Deprecated public List<AnnotationRef> getAnnotations();
+    public List<AnnotationRef> buildAnnotations();
+    public AnnotationRef buildAnnotation(int index);
+    public AnnotationRef buildFirstAnnotation();
+    public AnnotationRef buildLastAnnotation();
+    public AnnotationRef buildMatchingAnnotation(Predicate<Builder<? extends AnnotationRef>> predicate);
     public A withAnnotations(List<AnnotationRef> annotations);
-
     public A withAnnotations(AnnotationRef... annotations);
-
+    public Boolean hasAnnotations();
     public PropertyFluent.AnnotationsNested<A> addNewAnnotation();
-
     public PropertyFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item);
 
-    public TypeRef getTypeRef();
-
+/**
+ * This method has been deprecated, please use method buildTypeRef instead.
+ */
+@Deprecated public TypeRef getTypeRef();
+    public TypeRef buildTypeRef();
     public A withTypeRef(TypeRef typeRef);
-
+    public Boolean hasTypeRef();
     public A withVoidRefTypeRef(VoidRef voidRefTypeRef);
-
     public PropertyFluent.VoidRefTypeRefNested<A> withNewVoidRefTypeRef();
-
     public PropertyFluent.VoidRefTypeRefNested<A> withNewVoidRefTypeRefLike(VoidRef item);
-
     public A withWildcardRefTypeRef(WildcardRef wildcardRefTypeRef);
-
     public PropertyFluent.WildcardRefTypeRefNested<A> withNewWildcardRefTypeRef();
-
     public PropertyFluent.WildcardRefTypeRefNested<A> withNewWildcardRefTypeRefLike(WildcardRef item);
-
     public A withPrimitiveRefTypeRef(PrimitiveRef primitiveRefTypeRef);
-
     public PropertyFluent.PrimitiveRefTypeRefNested<A> withNewPrimitiveRefTypeRef();
-
     public PropertyFluent.PrimitiveRefTypeRefNested<A> withNewPrimitiveRefTypeRefLike(PrimitiveRef item);
-
     public A withTypeParamRefTypeRef(TypeParamRef typeParamRefTypeRef);
-
     public PropertyFluent.TypeParamRefTypeRefNested<A> withNewTypeParamRefTypeRef();
-
     public PropertyFluent.TypeParamRefTypeRefNested<A> withNewTypeParamRefTypeRefLike(TypeParamRef item);
-
     public A withClassRefTypeRef(ClassRef classRefTypeRef);
-
     public PropertyFluent.ClassRefTypeRefNested<A> withNewClassRefTypeRef();
-
     public PropertyFluent.ClassRefTypeRefNested<A> withNewClassRefTypeRefLike(ClassRef item);
-
     public String getName();
-
     public A withName(String name);
+    public Boolean hasName();
 
-    public interface AnnotationsNested<N> extends Nested<N>, AnnotationRefFluent<PropertyFluent.AnnotationsNested<N>> {
-
-
-        public N and();
-
-        public N endAnnotation();
-    }
-
-    public interface VoidRefTypeRefNested<N> extends Nested<N>, VoidRefFluent<PropertyFluent.VoidRefTypeRefNested<N>> {
+    public interface AnnotationsNested<N> extends Nested<N>,AnnotationRefFluent<PropertyFluent.AnnotationsNested<N>>{
 
 
-        public N and();
-
-        public N endVoidRefTypeRef();
-    }
-
-    public interface WildcardRefTypeRefNested<N> extends Nested<N>, WildcardRefFluent<PropertyFluent.WildcardRefTypeRefNested<N>> {
+    public N and();    public N endAnnotation();
+}
+    public interface VoidRefTypeRefNested<N> extends Nested<N>,VoidRefFluent<PropertyFluent.VoidRefTypeRefNested<N>>{
 
 
-        public N and();
-
-        public N endWildcardRefTypeRef();
-    }
-
-    public interface PrimitiveRefTypeRefNested<N> extends Nested<N>, PrimitiveRefFluent<PropertyFluent.PrimitiveRefTypeRefNested<N>> {
+    public N and();    public N endVoidRefTypeRef();
+}
+    public interface WildcardRefTypeRefNested<N> extends Nested<N>,WildcardRefFluent<PropertyFluent.WildcardRefTypeRefNested<N>>{
 
 
-        public N and();
-
-        public N endPrimitiveRefTypeRef();
-    }
-
-    public interface TypeParamRefTypeRefNested<N> extends Nested<N>, TypeParamRefFluent<PropertyFluent.TypeParamRefTypeRefNested<N>> {
+    public N and();    public N endWildcardRefTypeRef();
+}
+    public interface PrimitiveRefTypeRefNested<N> extends Nested<N>,PrimitiveRefFluent<PropertyFluent.PrimitiveRefTypeRefNested<N>>{
 
 
-        public N and();
-
-        public N endTypeParamRefTypeRef();
-    }
-
-    public interface ClassRefTypeRefNested<N> extends Nested<N>, ClassRefFluent<PropertyFluent.ClassRefTypeRefNested<N>> {
+    public N and();    public N endPrimitiveRefTypeRef();
+}
+    public interface TypeParamRefTypeRefNested<N> extends Nested<N>,TypeParamRefFluent<PropertyFluent.TypeParamRefTypeRefNested<N>>{
 
 
-        public N and();
+    public N and();    public N endTypeParamRefTypeRef();
+}
+    public interface ClassRefTypeRefNested<N> extends Nested<N>,ClassRefFluent<PropertyFluent.ClassRefTypeRefNested<N>>{
 
-        public N endClassRefTypeRef();
-    }
+        
+    public N and();    public N endClassRefTypeRef();
+}
 
 
 }

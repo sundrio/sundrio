@@ -17,6 +17,7 @@
 package io.sundr.dsl.internal.utils;
 
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
@@ -145,7 +146,14 @@ public final class TypeDefUtils {
         TypeParamDef paremeterType = Generics.MAP.apply(returnType);
 
         Method sourceMethod = ElementTo.METHOD.apply(executableElement);
+        List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+        for (AnnotationRef candidate : sourceMethod.getAnnotations()) {
+            if (!candidate.getClassRef().getFullyQualifiedName().startsWith("io.sundr")) {
+                annotations.add(candidate);
+            }
+        }
         Method targetMethod = new MethodBuilder(sourceMethod)
+                .withAnnotations(annotations)
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                 .withReturnType(paremeterType.toReference())
                 .withName(methodName)

@@ -28,7 +28,7 @@
     <groupId>io.sundr</groupId>
     <artifactId>sundr-pom</artifactId>
     <packaging>pom</packaging>
-    <version>0.3.12-SNAPSHOT</version>
+    <version>0.3.13-SNAPSHOT</version>
     <name>Sundrio :: POM</name>
     
     <description>Code generation tools and annotation processors for Builder, Fluent APIs and DSLs.</description>

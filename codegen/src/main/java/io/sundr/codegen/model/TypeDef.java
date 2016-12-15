@@ -250,8 +250,29 @@ public class TypeDef extends ModifierSupport {
      *
      * @param arguments The arguments to be passed to the reference.
      */
+    public ClassRef toReference(List<TypeRef> arguments) {
+        List<TypeRef> actualArguments = new ArrayList<TypeRef>();
+        for (int i = 0; i < parameters.size(); i++) {
+            if (i < arguments.size()) {
+                actualArguments.add(arguments.get(i));
+            } else {
+                actualArguments.add(new WildcardRef());
+            }
+        }
+        return new ClassRefBuilder()
+                .withDefinition(this)
+                .withArguments(actualArguments)
+                .withAttributes(getAttributes())
+                .build();
+    }
+
+    /**
+     * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     *
+     * @param arguments The arguments to be passed to the reference.
+     */
     public ClassRef toReference(Collection<TypeRef> arguments) {
-        return toReference(arguments.toArray(new TypeRef[arguments.size()]));
+        return toReference(arguments);
     }
 
     /**
@@ -374,6 +395,10 @@ public class TypeDef extends ModifierSupport {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+        for (AnnotationRef annotationRef: annotations) {
+            sb.append(annotationRef.toString()).append(SPACE);
+        }
+
         if (isPublic()) {
             sb.append(PUBLIC).append(SPACE);
         } else if (isProtected()) {
