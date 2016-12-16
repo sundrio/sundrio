@@ -22,6 +22,7 @@ import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
@@ -102,7 +103,7 @@ public class Constants {
     public static final TypeDef PARAMETERIZED_TYPE = TYPEDEF.apply(ParameterizedType.class);
 
     public static final TypeRef INT_REF = TYPEREF.apply(int.class);
-
+    public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(INT_REF).build();
 
     public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), T);
 
