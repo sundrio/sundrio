@@ -36,14 +36,30 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
             this.withStatements(instance.getStatements()); 
     }
 
+    public A addToStatements(int index,Statement item){
+            if (item instanceof StringStatement){addToStringStatementStatements(index, (StringStatement)item);}
+
+            return (A)this;
+    }
+
+    public A setToStatements(int index,Statement item){
+            if (item instanceof StringStatement){setToStringStatementStatements(index, (StringStatement)item);}
+
+            return (A)this;
+    }
+
     public A addToStatements(Statement... items){
-            for (Statement item : items) {if (item instanceof StringStatement){addToStringStatementStatements((StringStatement)item);}
-} return (A)this;
+            for (Statement item : items) { 
+            if (item instanceof StringStatement){addToStringStatementStatements((StringStatement)item);}
+
+            } return (A)this;
     }
 
     public A addAllToStatements(Collection<Statement> items){
-            for (Statement item : items) {if (item instanceof StringStatement){addToStringStatementStatements((StringStatement)item);}
-} return (A)this;
+            for (Statement item : items) { 
+            if (item instanceof StringStatement){addToStringStatementStatements((StringStatement)item);}
+
+            } return (A)this;
     }
 
     public A removeFromStatements(Statement... items){
@@ -97,6 +113,14 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
             return statements!= null && !statements.isEmpty();
     }
 
+    public A addToStringStatementStatements(int index,StringStatement item){
+            StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.add(builder);this.statements.add(builder); return (A)this;
+    }
+
+    public A setToStringStatementStatements(int index,StringStatement item){
+            StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.add(builder);this.statements.add(builder); return (A)this;
+    }
+
     public A addToStringStatementStatements(StringStatement... items){
             for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.add(builder);this.statements.add(builder);} return (A)this;
     }
@@ -113,16 +137,20 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
             for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.remove(builder);this.statements.remove(builder);} return (A)this;
     }
 
-    public BlockFluent.StringStatementStatementsNested<A> addNewStringStatementStatement(){
+    public StringStatementStatementsNested<A> addNewStringStatementStatement(){
             return new StringStatementStatementsNestedImpl();
     }
 
-    public BlockFluent.StringStatementStatementsNested<A> addNewStringStatementStatementLike(StringStatement item){
-            return new StringStatementStatementsNestedImpl(item);
+    public StringStatementStatementsNested<A> addNewStringStatementStatementLike(StringStatement item){
+            return new StringStatementStatementsNestedImpl(-1, item);
     }
 
-    public A addNewStringStatementStatement(String data){
+    public A addNewStringStatementStatement(final String data){
             return (A)addToStringStatementStatements(new StringStatement(data));
+    }
+
+    public A addNewStringStatementStatement(final String data,final Object[] parameters){
+            return (A)addToStringStatementStatements(new StringStatement(data, parameters));
     }
 
     public boolean equals(Object o){
@@ -134,19 +162,22 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     }
 
 
-    public class StringStatementStatementsNestedImpl<N> extends StringStatementFluentImpl<BlockFluent.StringStatementStatementsNested<N>> implements BlockFluent.StringStatementStatementsNested<N>,Nested<N>{
+    public class StringStatementStatementsNestedImpl<N> extends StringStatementFluentImpl<StringStatementStatementsNested<N>> implements StringStatementStatementsNested<N>,Nested<N>{
 
             private final StringStatementBuilder builder;
+        private final int index;
     
-            StringStatementStatementsNestedImpl(StringStatement item){
+            StringStatementStatementsNestedImpl(int index,StringStatement item){
+                    this.index = index;
                     this.builder = new StringStatementBuilder(this, item);
             }
             StringStatementStatementsNestedImpl(){
+                    this.index = -1;
                     this.builder = new StringStatementBuilder(this);
             }
     
     public N and(){
-            return (N) BlockFluentImpl.this.addToStringStatementStatements(builder.build());
+            return (N) BlockFluentImpl.this.addToStringStatementStatements(index, builder.build());
     }
     public N endStringStatementStatement(){
             return and();

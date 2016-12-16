@@ -36,22 +36,46 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             this.withAttributes(instance.getAttributes()); 
     }
 
+    public A addToBounds(int index,TypeRef item){
+            if (item instanceof VoidRef){addToVoidRefBounds(index, (VoidRef)item);}
+ else if (item instanceof WildcardRef){addToWildcardRefBounds(index, (WildcardRef)item);}
+ else if (item instanceof PrimitiveRef){addToPrimitiveRefBounds(index, (PrimitiveRef)item);}
+ else if (item instanceof TypeParamRef){addToTypeParamRefBounds(index, (TypeParamRef)item);}
+ else if (item instanceof ClassRef){addToClassRefBounds(index, (ClassRef)item);}
+
+            return (A)this;
+    }
+
+    public A setToBounds(int index,TypeRef item){
+            if (item instanceof VoidRef){setToVoidRefBounds(index, (VoidRef)item);}
+ else if (item instanceof WildcardRef){setToWildcardRefBounds(index, (WildcardRef)item);}
+ else if (item instanceof PrimitiveRef){setToPrimitiveRefBounds(index, (PrimitiveRef)item);}
+ else if (item instanceof TypeParamRef){setToTypeParamRefBounds(index, (TypeParamRef)item);}
+ else if (item instanceof ClassRef){setToClassRefBounds(index, (ClassRef)item);}
+
+            return (A)this;
+    }
+
     public A addToBounds(TypeRef... items){
-            for (TypeRef item : items) {if (item instanceof VoidRef){addToVoidRefBounds((VoidRef)item);}
+            for (TypeRef item : items) { 
+            if (item instanceof VoidRef){addToVoidRefBounds((VoidRef)item);}
  else if (item instanceof WildcardRef){addToWildcardRefBounds((WildcardRef)item);}
  else if (item instanceof PrimitiveRef){addToPrimitiveRefBounds((PrimitiveRef)item);}
  else if (item instanceof TypeParamRef){addToTypeParamRefBounds((TypeParamRef)item);}
  else if (item instanceof ClassRef){addToClassRefBounds((ClassRef)item);}
-} return (A)this;
+
+            } return (A)this;
     }
 
     public A addAllToBounds(Collection<TypeRef> items){
-            for (TypeRef item : items) {if (item instanceof VoidRef){addToVoidRefBounds((VoidRef)item);}
+            for (TypeRef item : items) { 
+            if (item instanceof VoidRef){addToVoidRefBounds((VoidRef)item);}
  else if (item instanceof WildcardRef){addToWildcardRefBounds((WildcardRef)item);}
  else if (item instanceof PrimitiveRef){addToPrimitiveRefBounds((PrimitiveRef)item);}
  else if (item instanceof TypeParamRef){addToTypeParamRefBounds((TypeParamRef)item);}
  else if (item instanceof ClassRef){addToClassRefBounds((ClassRef)item);}
-} return (A)this;
+
+            } return (A)this;
     }
 
     public A removeFromBounds(TypeRef... items){
@@ -114,6 +138,14 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             return bounds!= null && !bounds.isEmpty();
     }
 
+    public A addToVoidRefBounds(int index,VoidRef item){
+            VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
+    public A setToVoidRefBounds(int index,VoidRef item){
+            VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
     public A addToVoidRefBounds(VoidRef... items){
             for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
     }
@@ -130,12 +162,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
     }
 
-    public WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBound(){
+    public VoidRefBoundsNested<A> addNewVoidRefBound(){
             return new VoidRefBoundsNestedImpl();
     }
 
-    public WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBoundLike(VoidRef item){
-            return new VoidRefBoundsNestedImpl(item);
+    public VoidRefBoundsNested<A> addNewVoidRefBoundLike(VoidRef item){
+            return new VoidRefBoundsNestedImpl(-1, item);
+    }
+
+    public A addToWildcardRefBounds(int index,WildcardRef item){
+            WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
+    public A setToWildcardRefBounds(int index,WildcardRef item){
+            WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
     }
 
     public A addToWildcardRefBounds(WildcardRef... items){
@@ -154,12 +194,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
     }
 
-    public WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBound(){
+    public WildcardRefBoundsNested<A> addNewWildcardRefBound(){
             return new WildcardRefBoundsNestedImpl();
     }
 
-    public WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBoundLike(WildcardRef item){
-            return new WildcardRefBoundsNestedImpl(item);
+    public WildcardRefBoundsNested<A> addNewWildcardRefBoundLike(WildcardRef item){
+            return new WildcardRefBoundsNestedImpl(-1, item);
+    }
+
+    public A addToPrimitiveRefBounds(int index,PrimitiveRef item){
+            PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
+    public A setToPrimitiveRefBounds(int index,PrimitiveRef item){
+            PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
     }
 
     public A addToPrimitiveRefBounds(PrimitiveRef... items){
@@ -178,12 +226,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
     }
 
-    public WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound(){
+    public PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound(){
             return new PrimitiveRefBoundsNestedImpl();
     }
 
-    public WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBoundLike(PrimitiveRef item){
-            return new PrimitiveRefBoundsNestedImpl(item);
+    public PrimitiveRefBoundsNested<A> addNewPrimitiveRefBoundLike(PrimitiveRef item){
+            return new PrimitiveRefBoundsNestedImpl(-1, item);
+    }
+
+    public A addToTypeParamRefBounds(int index,TypeParamRef item){
+            TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
+    public A setToTypeParamRefBounds(int index,TypeParamRef item){
+            TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
     }
 
     public A addToTypeParamRefBounds(TypeParamRef... items){
@@ -202,12 +258,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
     }
 
-    public WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBound(){
+    public TypeParamRefBoundsNested<A> addNewTypeParamRefBound(){
             return new TypeParamRefBoundsNestedImpl();
     }
 
-    public WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBoundLike(TypeParamRef item){
-            return new TypeParamRefBoundsNestedImpl(item);
+    public TypeParamRefBoundsNested<A> addNewTypeParamRefBoundLike(TypeParamRef item){
+            return new TypeParamRefBoundsNestedImpl(-1, item);
+    }
+
+    public A addToClassRefBounds(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
+    public A setToClassRefBounds(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
     }
 
     public A addToClassRefBounds(ClassRef... items){
@@ -226,12 +290,12 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
     }
 
-    public WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBound(){
+    public ClassRefBoundsNested<A> addNewClassRefBound(){
             return new ClassRefBoundsNestedImpl();
     }
 
-    public WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBoundLike(ClassRef item){
-            return new ClassRefBoundsNestedImpl(item);
+    public ClassRefBoundsNested<A> addNewClassRefBoundLike(ClassRef item){
+            return new ClassRefBoundsNestedImpl(-1, item);
     }
 
     public boolean equals(Object o){
@@ -244,95 +308,110 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     }
 
 
-    public class VoidRefBoundsNestedImpl<N> extends VoidRefFluentImpl<WildcardRefFluent.VoidRefBoundsNested<N>> implements WildcardRefFluent.VoidRefBoundsNested<N>,Nested<N>{
+    public class VoidRefBoundsNestedImpl<N> extends VoidRefFluentImpl<VoidRefBoundsNested<N>> implements VoidRefBoundsNested<N>,Nested<N>{
 
             private final VoidRefBuilder builder;
-    
-            VoidRefBoundsNestedImpl(VoidRef item){
+        private final int index;
+
+            VoidRefBoundsNestedImpl(int index,VoidRef item){
+                    this.index = index;
                     this.builder = new VoidRefBuilder(this, item);
             }
             VoidRefBoundsNestedImpl(){
+                    this.index = -1;
                     this.builder = new VoidRefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) WildcardRefFluentImpl.this.addToVoidRefBounds(builder.build());
+            return (N) WildcardRefFluentImpl.this.addToVoidRefBounds(index, builder.build());
     }
     public N endVoidRefBound(){
             return and();
     }
 
 }
-    public class WildcardRefBoundsNestedImpl<N> extends WildcardRefFluentImpl<WildcardRefFluent.WildcardRefBoundsNested<N>> implements WildcardRefFluent.WildcardRefBoundsNested<N>,Nested<N>{
+    public class WildcardRefBoundsNestedImpl<N> extends WildcardRefFluentImpl<WildcardRefBoundsNested<N>> implements WildcardRefBoundsNested<N>,Nested<N>{
 
             private final WildcardRefBuilder builder;
-    
-            WildcardRefBoundsNestedImpl(WildcardRef item){
+        private final int index;
+
+            WildcardRefBoundsNestedImpl(int index,WildcardRef item){
+                    this.index = index;
                     this.builder = new WildcardRefBuilder(this, item);
             }
             WildcardRefBoundsNestedImpl(){
+                    this.index = -1;
                     this.builder = new WildcardRefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) WildcardRefFluentImpl.this.addToWildcardRefBounds(builder.build());
+            return (N) WildcardRefFluentImpl.this.addToWildcardRefBounds(index, builder.build());
     }
     public N endWildcardRefBound(){
             return and();
     }
 
 }
-    public class PrimitiveRefBoundsNestedImpl<N> extends PrimitiveRefFluentImpl<WildcardRefFluent.PrimitiveRefBoundsNested<N>> implements WildcardRefFluent.PrimitiveRefBoundsNested<N>,Nested<N>{
+    public class PrimitiveRefBoundsNestedImpl<N> extends PrimitiveRefFluentImpl<PrimitiveRefBoundsNested<N>> implements PrimitiveRefBoundsNested<N>,Nested<N>{
 
             private final PrimitiveRefBuilder builder;
-    
-            PrimitiveRefBoundsNestedImpl(PrimitiveRef item){
+        private final int index;
+
+            PrimitiveRefBoundsNestedImpl(int index,PrimitiveRef item){
+                    this.index = index;
                     this.builder = new PrimitiveRefBuilder(this, item);
             }
             PrimitiveRefBoundsNestedImpl(){
+                    this.index = -1;
                     this.builder = new PrimitiveRefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) WildcardRefFluentImpl.this.addToPrimitiveRefBounds(builder.build());
+            return (N) WildcardRefFluentImpl.this.addToPrimitiveRefBounds(index, builder.build());
     }
     public N endPrimitiveRefBound(){
             return and();
     }
 
 }
-    public class TypeParamRefBoundsNestedImpl<N> extends TypeParamRefFluentImpl<WildcardRefFluent.TypeParamRefBoundsNested<N>> implements WildcardRefFluent.TypeParamRefBoundsNested<N>,Nested<N>{
+    public class TypeParamRefBoundsNestedImpl<N> extends TypeParamRefFluentImpl<TypeParamRefBoundsNested<N>> implements TypeParamRefBoundsNested<N>,Nested<N>{
 
             private final TypeParamRefBuilder builder;
-    
-            TypeParamRefBoundsNestedImpl(TypeParamRef item){
+        private final int index;
+
+            TypeParamRefBoundsNestedImpl(int index,TypeParamRef item){
+                    this.index = index;
                     this.builder = new TypeParamRefBuilder(this, item);
             }
             TypeParamRefBoundsNestedImpl(){
+                    this.index = -1;
                     this.builder = new TypeParamRefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) WildcardRefFluentImpl.this.addToTypeParamRefBounds(builder.build());
+            return (N) WildcardRefFluentImpl.this.addToTypeParamRefBounds(index, builder.build());
     }
     public N endTypeParamRefBound(){
             return and();
     }
 
 }
-    public class ClassRefBoundsNestedImpl<N> extends ClassRefFluentImpl<WildcardRefFluent.ClassRefBoundsNested<N>> implements WildcardRefFluent.ClassRefBoundsNested<N>,Nested<N>{
+    public class ClassRefBoundsNestedImpl<N> extends ClassRefFluentImpl<ClassRefBoundsNested<N>> implements ClassRefBoundsNested<N>,Nested<N>{
 
             private final ClassRefBuilder builder;
+        private final int index;
     
-            ClassRefBoundsNestedImpl(ClassRef item){
+            ClassRefBoundsNestedImpl(int index,ClassRef item){
+                    this.index = index;
                     this.builder = new ClassRefBuilder(this, item);
             }
             ClassRefBoundsNestedImpl(){
+                    this.index = -1;
                     this.builder = new ClassRefBuilder(this);
             }
     
     public N and(){
-            return (N) WildcardRefFluentImpl.this.addToClassRefBounds(builder.build());
+            return (N) WildcardRefFluentImpl.this.addToClassRefBounds(index, builder.build());
     }
     public N endClassRefBound(){
             return and();

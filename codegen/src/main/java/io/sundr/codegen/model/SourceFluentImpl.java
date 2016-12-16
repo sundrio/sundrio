@@ -36,6 +36,14 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
             this.withTypes(instance.getTypes()); 
     }
 
+    public A addToTypes(int index,TypeDef item){
+            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.types.add(builder); return (A)this;
+    }
+
+    public A setToTypes(int index,TypeDef item){
+            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.types.add(builder); return (A)this;
+    }
+
     public A addToTypes(TypeDef... items){
             for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.types.add(builder);} return (A)this;
     }
@@ -94,12 +102,12 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
             return types!= null && !types.isEmpty();
     }
 
-    public SourceFluent.TypesNested<A> addNewType(){
+    public TypesNested<A> addNewType(){
             return new TypesNestedImpl();
     }
 
-    public SourceFluent.TypesNested<A> addNewTypeLike(TypeDef item){
-            return new TypesNestedImpl(item);
+    public TypesNested<A> addNewTypeLike(TypeDef item){
+            return new TypesNestedImpl(-1, item);
     }
 
     public boolean equals(Object o){
@@ -111,19 +119,22 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     }
 
 
-    public class TypesNestedImpl<N> extends TypeDefFluentImpl<SourceFluent.TypesNested<N>> implements SourceFluent.TypesNested<N>,Nested<N>{
+    public class TypesNestedImpl<N> extends TypeDefFluentImpl<TypesNested<N>> implements TypesNested<N>,Nested<N>{
 
             private final TypeDefBuilder builder;
+        private final int index;
     
-            TypesNestedImpl(TypeDef item){
+            TypesNestedImpl(int index,TypeDef item){
+                    this.index = index;
                     this.builder = new TypeDefBuilder(this, item);
             }
             TypesNestedImpl(){
+                    this.index = -1;
                     this.builder = new TypeDefBuilder(this);
             }
     
     public N and(){
-            return (N) SourceFluentImpl.this.addToTypes(builder.build());
+            return (N) SourceFluentImpl.this.addToTypes(index, builder.build());
     }
     public N endType(){
             return and();
