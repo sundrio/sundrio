@@ -31,6 +31,15 @@ public class StringStatement implements Statement {
         };
     }
 
+    public StringStatement(final String data, final Object... parameters) {
+        this.provider = new Provider<String>() {
+            @Override
+            public String get() {
+                return String.format(data, parameters);
+            }
+        };
+    }
+
     public StringStatement(Provider<String> provider) {
         this.provider = provider;
     }
