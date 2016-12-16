@@ -371,8 +371,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A setToArguments(int index,Property item){
         PropertyBuilder builder = new PropertyBuilder(item);
-        _visitables.set(index >= 0 ? index : _visitables.size(), builder);
-        this.arguments.set(index >= 0 ? index : arguments.size(), builder);
+        if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+        if (index < 0 || index >= arguments.size()) { arguments.add(builder); } else { arguments.set(index, builder);}
         return (A) this;
     }
 
