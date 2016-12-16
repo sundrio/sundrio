@@ -57,6 +57,7 @@ import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.INIT;
+import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 
 public class ClazzAs {
 
@@ -93,7 +94,7 @@ public class ClazzAs {
                 boolean isList = TypeUtils.isList(toAdd.getTypeRef());
                 boolean isMap = TypeUtils.isMap(toAdd.getTypeRef());
                 boolean isCollection = isSet || isList;
-                boolean isAbstract = TypeUtils.isAbstract(unwrapped);
+                boolean isAbstract = isAbstract(unwrapped);
 
                 Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
@@ -132,9 +133,9 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
                     if (isList || isArray) {
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
-                        methods.add(ToMethod.EDIT_AT_INDEX_NESTED.apply(toAdd));
+                        methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
                     } else if (!isSet) {
-                        methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
+                        methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
                     }
@@ -215,7 +216,7 @@ public class ClazzAs {
                 final boolean isList = TypeUtils.isList(property.getTypeRef());
                 final boolean isMap = TypeUtils.isMap(property.getTypeRef());
                 final boolean isCollection = isSet || isList;
-                final boolean isAbstract = TypeUtils.isAbstract(unwrapped);
+                final boolean isAbstract = isAbstract(unwrapped);
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
@@ -224,6 +225,7 @@ public class ClazzAs {
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
                         .accept(new TypedVisitor<PropertyBuilder>() {
+
                             public void visit(PropertyBuilder builder) {
                                 if (isArray || isList) {
                                     ClassRef listRef =  Collections.ARRAY_LIST.toReference(unwrapped);
@@ -279,10 +281,9 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
                     if (isList || isArray) {
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
-                        methods.add(ToMethod.EDIT_AT_INDEX_NESTED.apply(toAdd));
-                    }
-                    if (!isCollection && !isArray) {
-                        methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
+                        methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
+                    } else if (!isSet) {
+                        methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
                     }
@@ -745,47 +746,5 @@ public class ClazzAs {
                 }, ", ") + ");")
                 .endBlock()
                 .build();
-    }
-
-    private static Property buildableField(Property property) {
-        TypeRef typeRef = property.getTypeRef();
-        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(typeRef);
-        ClassRef classRef = (ClassRef) typeRef;
-        ClassRef builderType = TypeAs.VISITABLE_BUILDER.apply(unwrapped);
-
-
-        if (TypeUtils.isList(classRef)) {
-            ClassRef listRef =  Collections.ARRAY_LIST.toReference(builderType);
-            return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(builderType))
-                    .addToAttributes(INIT, " new " + listRef + "()")
-                    .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
-                    .build();
-        } else if (TypeUtils.isSet(classRef)) {
-            ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
-            return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
-                    .addToAttributes(INIT, " new " + setRef+ "()")
-                    .addToAttributes(ALSO_IMPORT,  alsoImport(property, setRef, builderType))
-                    .build();
-        } else {
-            return new PropertyBuilder(property).withTypeRef(builderType)
-                    .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
-                    .build();
-        }
-    }
-
-    private static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
-        List<ClassRef> result = new ArrayList<ClassRef>();
-        if (attributeable.hasAttribute(ALSO_IMPORT)) {
-            result.addAll(attributeable.getAttribute(ALSO_IMPORT));
-        }
-        return result;
-    }
-
-    private static List<ClassRef> alsoImport(Attributeable attributeable, ClassRef... refs) {
-        List<ClassRef> result = alsoImportAsList(attributeable);
-        for (ClassRef ref : refs) {
-            result.add(ref);
-        }
-        return result;
     }
 }

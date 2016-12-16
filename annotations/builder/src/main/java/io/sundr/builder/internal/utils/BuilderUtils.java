@@ -23,14 +23,19 @@ import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
@@ -41,16 +46,22 @@ import io.sundr.codegen.utils.TypeUtils;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 
 public class BuilderUtils {
 
@@ -433,5 +444,51 @@ public class BuilderUtils {
             }
         }
         return "";
+    }
+
+    public static ClassRef buildableRef(TypeRef typeRef) {
+        ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(typeRef);
+        return isAbstract(unwrapped) || unwrapped.getDefinition().getKind() == Kind.INTERFACE ? TypeAs.VISITABLE_BUILDER.apply(unwrapped) : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
+    }
+
+    public static Property buildableField(Property property) {
+        TypeRef typeRef = property.getTypeRef();
+        ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(typeRef);
+        ClassRef classRef = (ClassRef) typeRef;
+        ClassRef builderType = isAbstract(unwrapped) ||  unwrapped.getDefinition().getKind() == Kind.INTERFACE  ? TypeAs.VISITABLE_BUILDER.apply(unwrapped) : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
+
+        if (TypeUtils.isList(classRef)) {
+            ClassRef listRef =  Collections.ARRAY_LIST.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(builderType))
+                    .addToAttributes(INIT, " new " + listRef + "()")
+                    .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
+                    .build();
+        } else if (TypeUtils.isSet(classRef)) {
+            ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
+                    .addToAttributes(INIT, " new " + setRef+ "()")
+                    .addToAttributes(ALSO_IMPORT,  alsoImport(property, setRef, builderType))
+                    .build();
+        } else {
+            return new PropertyBuilder(property).withTypeRef(builderType)
+                    .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
+                    .build();
+        }
+    }
+
+    private static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
+        List<ClassRef> result = new ArrayList<ClassRef>();
+        if (attributeable.hasAttribute(ALSO_IMPORT)) {
+            result.addAll(attributeable.getAttribute(ALSO_IMPORT));
+        }
+        return result;
+    }
+
+    private static List<ClassRef> alsoImport(Attributeable attributeable, ClassRef... refs) {
+        List<ClassRef> result = alsoImportAsList(attributeable);
+        for (ClassRef ref : refs) {
+            result.add(ref);
+        }
+        return result;
     }
 }
