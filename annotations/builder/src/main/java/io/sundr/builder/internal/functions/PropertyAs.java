@@ -20,6 +20,7 @@ import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -27,17 +28,22 @@ import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.Statement;
+import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.utils.TypeUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.INDEX;
+import static io.sundr.builder.Constants.INT_REF;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
@@ -53,6 +59,9 @@ public final class PropertyAs {
     public static final Function<Property, TypeDef> NESTED_CLASS = new Function<Property, TypeDef>() {
 
         public TypeDef apply(Property item) {
+            boolean isArray = TypeUtils.isArray(item.getTypeRef());
+            boolean isList = TypeUtils.isList(item.getTypeRef());
+
             TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item.getTypeRef());
 
             if (unwrapped instanceof ClassRef) {
@@ -76,28 +85,38 @@ public final class PropertyAs {
 
                 List<Property> properties = new ArrayList<Property>();
                 List<Method> constructors = new ArrayList<Method>();
+                List<Statement> statementsWithItem = new ArrayList<Statement>();
+                List<Statement> statementsWithoutItem = new ArrayList<Statement>();
 
                 properties.add(new PropertyBuilder()
                         .withName("builder")
                         .withTypeRef(builderType).build());
 
+                List<Property> arguments = new ArrayList<Property>();
+                if (isArray || isList) {
+                    arguments.add(INDEX);
+                    properties.add(INDEX);
+                    statementsWithItem.add(new StringStatement("this.index = index;"));
+                    statementsWithoutItem.add(new StringStatement("this.index = -1;"));
+                }
+                arguments.add(new PropertyBuilder().withName("item").withTypeRef(unwrapped).build());
+
+                statementsWithItem.add(new StringStatement("this.builder = new " + builderType.getName() + "(this, item);"));
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
-                        .addNewArgument()
-                        .withName("item")
-                        .withTypeRef(unwrapped)
-                        .endArgument()
+                        .withArguments(arguments)
                         .withNewBlock()
-                            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this, item);")
+                            .withStatements(statementsWithItem)
                         .endBlock()
                         .build());
 
+                statementsWithoutItem.add(new StringStatement("this.builder = new " + builderType.getName() + "(this);"));
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
                         .withNewBlock()
-                            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this);")
+                            .withStatements(statementsWithoutItem)
                         .endBlock()
                         .build());
 
