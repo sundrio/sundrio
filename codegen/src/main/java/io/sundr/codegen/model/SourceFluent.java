@@ -27,6 +27,8 @@ import io.sundr.builder.Predicate;
 public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A>{
 
 
+    public A addToTypes(int index, TypeDef item);
+    public A setToTypes(int index, TypeDef item);
     public A addToTypes(TypeDef... items);
     public A addAllToTypes(Collection<TypeDef> items);
     public A removeFromTypes(TypeDef... items);
@@ -44,10 +46,10 @@ public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A>{
     public A withTypes(List<TypeDef> types);
     public A withTypes(TypeDef... types);
     public Boolean hasTypes();
-    public SourceFluent.TypesNested<A> addNewType();
-    public SourceFluent.TypesNested<A> addNewTypeLike(TypeDef item);
+    public TypesNested<A> addNewType();
+    public TypesNested<A> addNewTypeLike(TypeDef item);
 
-    public interface TypesNested<N> extends Nested<N>,TypeDefFluent<SourceFluent.TypesNested<N>>{
+    public interface TypesNested<N> extends Nested<N>,TypeDefFluent<TypesNested<N>>{
 
         
     public N and();    public N endType();

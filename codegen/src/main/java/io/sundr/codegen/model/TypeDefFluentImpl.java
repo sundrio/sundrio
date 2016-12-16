@@ -95,6 +95,14 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return this.name!=null;
     }
 
+    public A addToAnnotations(int index,AnnotationRef item){
+            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder); return (A)this;
+    }
+
+    public A setToAnnotations(int index,AnnotationRef item){
+            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder); return (A)this;
+    }
+
     public A addToAnnotations(AnnotationRef... items){
             for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
     }
@@ -153,12 +161,20 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return annotations!= null && !annotations.isEmpty();
     }
 
-    public TypeDefFluent.AnnotationsNested<A> addNewAnnotation(){
+    public AnnotationsNested<A> addNewAnnotation(){
             return new AnnotationsNestedImpl();
     }
 
-    public TypeDefFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item){
-            return new AnnotationsNestedImpl(item);
+    public AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item){
+            return new AnnotationsNestedImpl(-1, item);
+    }
+
+    public A addToExtendsList(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.extendsList.add(builder); return (A)this;
+    }
+
+    public A setToExtendsList(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.extendsList.add(builder); return (A)this;
     }
 
     public A addToExtendsList(ClassRef... items){
@@ -177,7 +193,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.extendsList.remove(builder);} return (A)this;
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildExtendsList instead.
  */
@@ -219,12 +235,20 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return extendsList!= null && !extendsList.isEmpty();
     }
 
-    public TypeDefFluent.ExtendsListNested<A> addNewExtendsList(){
+    public ExtendsListNested<A> addNewExtendsList(){
             return new ExtendsListNestedImpl();
     }
 
-    public TypeDefFluent.ExtendsListNested<A> addNewExtendsListLike(ClassRef item){
-            return new ExtendsListNestedImpl(item);
+    public ExtendsListNested<A> addNewExtendsListLike(ClassRef item){
+            return new ExtendsListNestedImpl(-1, item);
+    }
+
+    public A addToImplementsList(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.implementsList.add(builder); return (A)this;
+    }
+
+    public A setToImplementsList(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.implementsList.add(builder); return (A)this;
     }
 
     public A addToImplementsList(ClassRef... items){
@@ -243,7 +267,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.implementsList.remove(builder);} return (A)this;
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildImplementsList instead.
  */
@@ -285,12 +309,20 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return implementsList!= null && !implementsList.isEmpty();
     }
 
-    public TypeDefFluent.ImplementsListNested<A> addNewImplementsList(){
+    public ImplementsListNested<A> addNewImplementsList(){
             return new ImplementsListNestedImpl();
     }
 
-    public TypeDefFluent.ImplementsListNested<A> addNewImplementsListLike(ClassRef item){
-            return new ImplementsListNestedImpl(item);
+    public ImplementsListNested<A> addNewImplementsListLike(ClassRef item){
+            return new ImplementsListNestedImpl(-1, item);
+    }
+
+    public A addToParameters(int index,TypeParamDef item){
+            TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder); return (A)this;
+    }
+
+    public A setToParameters(int index,TypeParamDef item){
+            TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder); return (A)this;
     }
 
     public A addToParameters(TypeParamDef... items){
@@ -309,7 +341,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);this.parameters.remove(builder);} return (A)this;
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildParameters instead.
  */
@@ -351,12 +383,20 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return parameters!= null && !parameters.isEmpty();
     }
 
-    public TypeDefFluent.ParametersNested<A> addNewParameter(){
+    public ParametersNested<A> addNewParameter(){
             return new ParametersNestedImpl();
     }
 
-    public TypeDefFluent.ParametersNested<A> addNewParameterLike(TypeParamDef item){
-            return new ParametersNestedImpl(item);
+    public ParametersNested<A> addNewParameterLike(TypeParamDef item){
+            return new ParametersNestedImpl(-1, item);
+    }
+
+    public A addToProperties(int index,Property item){
+            PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.properties.add(builder); return (A)this;
+    }
+
+    public A setToProperties(int index,Property item){
+            PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.properties.add(builder); return (A)this;
     }
 
     public A addToProperties(Property... items){
@@ -375,7 +415,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.remove(builder);this.properties.remove(builder);} return (A)this;
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildProperties instead.
  */
@@ -417,12 +457,20 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return properties!= null && !properties.isEmpty();
     }
 
-    public TypeDefFluent.PropertiesNested<A> addNewProperty(){
+    public PropertiesNested<A> addNewProperty(){
             return new PropertiesNestedImpl();
     }
 
-    public TypeDefFluent.PropertiesNested<A> addNewPropertyLike(Property item){
-            return new PropertiesNestedImpl(item);
+    public PropertiesNested<A> addNewPropertyLike(Property item){
+            return new PropertiesNestedImpl(-1, item);
+    }
+
+    public A addToConstructors(int index,Method item){
+            MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.constructors.add(builder); return (A)this;
+    }
+
+    public A setToConstructors(int index,Method item){
+            MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.constructors.add(builder); return (A)this;
     }
 
     public A addToConstructors(Method... items){
@@ -441,7 +489,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.remove(builder);this.constructors.remove(builder);} return (A)this;
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildConstructors instead.
  */
@@ -483,12 +531,20 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return constructors!= null && !constructors.isEmpty();
     }
 
-    public TypeDefFluent.ConstructorsNested<A> addNewConstructor(){
+    public ConstructorsNested<A> addNewConstructor(){
             return new ConstructorsNestedImpl();
     }
 
-    public TypeDefFluent.ConstructorsNested<A> addNewConstructorLike(Method item){
-            return new ConstructorsNestedImpl(item);
+    public ConstructorsNested<A> addNewConstructorLike(Method item){
+            return new ConstructorsNestedImpl(-1, item);
+    }
+
+    public A addToMethods(int index,Method item){
+            MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.methods.add(builder); return (A)this;
+    }
+
+    public A setToMethods(int index,Method item){
+            MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.methods.add(builder); return (A)this;
     }
 
     public A addToMethods(Method... items){
@@ -507,7 +563,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.remove(builder);this.methods.remove(builder);} return (A)this;
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildMethods instead.
  */
@@ -549,15 +605,15 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return methods!= null && !methods.isEmpty();
     }
 
-    public TypeDefFluent.MethodsNested<A> addNewMethod(){
+    public MethodsNested<A> addNewMethod(){
             return new MethodsNestedImpl();
     }
 
-    public TypeDefFluent.MethodsNested<A> addNewMethodLike(Method item){
-            return new MethodsNestedImpl(item);
+    public MethodsNested<A> addNewMethodLike(Method item){
+            return new MethodsNestedImpl(-1, item);
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildOuterType instead.
  */
@@ -578,24 +634,32 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return this.outerType!=null;
     }
 
-    public TypeDefFluent.OuterTypeNested<A> withNewOuterType(){
+    public OuterTypeNested<A> withNewOuterType(){
             return new OuterTypeNestedImpl();
     }
 
-    public TypeDefFluent.OuterTypeNested<A> withNewOuterTypeLike(TypeDef item){
+    public OuterTypeNested<A> withNewOuterTypeLike(TypeDef item){
             return new OuterTypeNestedImpl(item);
     }
 
-    public TypeDefFluent.OuterTypeNested<A> editOuterType(){
+    public OuterTypeNested<A> editOuterType(){
             return withNewOuterTypeLike(getOuterType());
     }
 
-    public TypeDefFluent.OuterTypeNested<A> editOrNewOuterType(){
+    public OuterTypeNested<A> editOrNewOuterType(){
             return withNewOuterTypeLike(getOuterType() != null ? getOuterType(): new TypeDefBuilder().build());
     }
 
-    public TypeDefFluent.OuterTypeNested<A> editOrNewOuterTypeLike(TypeDef item){
+    public OuterTypeNested<A> editOrNewOuterTypeLike(TypeDef item){
             return withNewOuterTypeLike(getOuterType() != null ? getOuterType(): item);
+    }
+
+    public A addToInnerTypes(int index,TypeDef item){
+            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.innerTypes.add(builder); return (A)this;
+    }
+
+    public A setToInnerTypes(int index,TypeDef item){
+            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.innerTypes.add(builder); return (A)this;
     }
 
     public A addToInnerTypes(TypeDef... items){
@@ -614,7 +678,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.remove(builder);this.innerTypes.remove(builder);} return (A)this;
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildInnerTypes instead.
  */
@@ -656,12 +720,12 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return innerTypes!= null && !innerTypes.isEmpty();
     }
 
-    public TypeDefFluent.InnerTypesNested<A> addNewInnerType(){
+    public InnerTypesNested<A> addNewInnerType(){
             return new InnerTypesNestedImpl();
     }
 
-    public TypeDefFluent.InnerTypesNested<A> addNewInnerTypeLike(TypeDef item){
-            return new InnerTypesNestedImpl(item);
+    public InnerTypesNested<A> addNewInnerTypeLike(TypeDef item){
+            return new InnerTypesNestedImpl(-1, item);
     }
 
     public boolean equals(Object o){
@@ -685,140 +749,161 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-    public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<TypeDefFluent.AnnotationsNested<N>> implements TypeDefFluent.AnnotationsNested<N>,Nested<N>{
+    public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<AnnotationsNested<N>> implements AnnotationsNested<N>,Nested<N>{
 
             private final AnnotationRefBuilder builder;
-    
-            AnnotationsNestedImpl(AnnotationRef item){
+        private final int index;
+
+            AnnotationsNestedImpl(int index,AnnotationRef item){
+                    this.index = index;
                     this.builder = new AnnotationRefBuilder(this, item);
             }
             AnnotationsNestedImpl(){
+                    this.index = -1;
                     this.builder = new AnnotationRefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToAnnotations(builder.build());
+            return (N) TypeDefFluentImpl.this.addToAnnotations(index, builder.build());
     }
     public N endAnnotation(){
             return and();
     }
 
 }
-    public class ExtendsListNestedImpl<N> extends ClassRefFluentImpl<TypeDefFluent.ExtendsListNested<N>> implements TypeDefFluent.ExtendsListNested<N>,Nested<N>{
+    public class ExtendsListNestedImpl<N> extends ClassRefFluentImpl<ExtendsListNested<N>> implements ExtendsListNested<N>,Nested<N>{
 
             private final ClassRefBuilder builder;
-    
-            ExtendsListNestedImpl(ClassRef item){
+        private final int index;
+
+            ExtendsListNestedImpl(int index,ClassRef item){
+                    this.index = index;
                     this.builder = new ClassRefBuilder(this, item);
             }
             ExtendsListNestedImpl(){
+                    this.index = -1;
                     this.builder = new ClassRefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToExtendsList(builder.build());
+            return (N) TypeDefFluentImpl.this.addToExtendsList(index, builder.build());
     }
     public N endExtendsList(){
             return and();
     }
 
 }
-    public class ImplementsListNestedImpl<N> extends ClassRefFluentImpl<TypeDefFluent.ImplementsListNested<N>> implements TypeDefFluent.ImplementsListNested<N>,Nested<N>{
+    public class ImplementsListNestedImpl<N> extends ClassRefFluentImpl<ImplementsListNested<N>> implements ImplementsListNested<N>,Nested<N>{
 
             private final ClassRefBuilder builder;
-    
-            ImplementsListNestedImpl(ClassRef item){
+        private final int index;
+
+            ImplementsListNestedImpl(int index,ClassRef item){
+                    this.index = index;
                     this.builder = new ClassRefBuilder(this, item);
             }
             ImplementsListNestedImpl(){
+                    this.index = -1;
                     this.builder = new ClassRefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToImplementsList(builder.build());
+            return (N) TypeDefFluentImpl.this.addToImplementsList(index, builder.build());
     }
     public N endImplementsList(){
             return and();
     }
 
 }
-    public class ParametersNestedImpl<N> extends TypeParamDefFluentImpl<TypeDefFluent.ParametersNested<N>> implements TypeDefFluent.ParametersNested<N>,Nested<N>{
+    public class ParametersNestedImpl<N> extends TypeParamDefFluentImpl<ParametersNested<N>> implements ParametersNested<N>,Nested<N>{
 
             private final TypeParamDefBuilder builder;
-    
-            ParametersNestedImpl(TypeParamDef item){
+        private final int index;
+
+            ParametersNestedImpl(int index,TypeParamDef item){
+                    this.index = index;
                     this.builder = new TypeParamDefBuilder(this, item);
             }
             ParametersNestedImpl(){
+                    this.index = -1;
                     this.builder = new TypeParamDefBuilder(this);
             }
-    
+
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToParameters(builder.build());
+            return (N) TypeDefFluentImpl.this.addToParameters(index, builder.build());
     }
     public N endParameter(){
             return and();
     }
 
 }
-    public class PropertiesNestedImpl<N> extends PropertyFluentImpl<TypeDefFluent.PropertiesNested<N>> implements TypeDefFluent.PropertiesNested<N>,Nested<N>{
+    public class PropertiesNestedImpl<N> extends PropertyFluentImpl<PropertiesNested<N>> implements PropertiesNested<N>,Nested<N>{
 
             private final PropertyBuilder builder;
-    
-            PropertiesNestedImpl(Property item){
+        private final int index;
+
+            PropertiesNestedImpl(int index,Property item){
+                    this.index = index;
                     this.builder = new PropertyBuilder(this, item);
             }
             PropertiesNestedImpl(){
+                    this.index = -1;
                     this.builder = new PropertyBuilder(this);
             }
-    
+
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToProperties(builder.build());
+            return (N) TypeDefFluentImpl.this.addToProperties(index, builder.build());
     }
     public N endProperty(){
             return and();
     }
 
 }
-    public class ConstructorsNestedImpl<N> extends MethodFluentImpl<TypeDefFluent.ConstructorsNested<N>> implements TypeDefFluent.ConstructorsNested<N>,Nested<N>{
+    public class ConstructorsNestedImpl<N> extends MethodFluentImpl<ConstructorsNested<N>> implements ConstructorsNested<N>,Nested<N>{
 
             private final MethodBuilder builder;
-    
-            ConstructorsNestedImpl(Method item){
+        private final int index;
+
+            ConstructorsNestedImpl(int index,Method item){
+                    this.index = index;
                     this.builder = new MethodBuilder(this, item);
             }
             ConstructorsNestedImpl(){
+                    this.index = -1;
                     this.builder = new MethodBuilder(this);
             }
-    
+
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToConstructors(builder.build());
+            return (N) TypeDefFluentImpl.this.addToConstructors(index, builder.build());
     }
     public N endConstructor(){
             return and();
     }
 
 }
-    public class MethodsNestedImpl<N> extends MethodFluentImpl<TypeDefFluent.MethodsNested<N>> implements TypeDefFluent.MethodsNested<N>,Nested<N>{
+    public class MethodsNestedImpl<N> extends MethodFluentImpl<MethodsNested<N>> implements MethodsNested<N>,Nested<N>{
 
             private final MethodBuilder builder;
-    
-            MethodsNestedImpl(Method item){
+        private final int index;
+
+            MethodsNestedImpl(int index,Method item){
+                    this.index = index;
                     this.builder = new MethodBuilder(this, item);
             }
             MethodsNestedImpl(){
+                    this.index = -1;
                     this.builder = new MethodBuilder(this);
             }
-    
+
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToMethods(builder.build());
+            return (N) TypeDefFluentImpl.this.addToMethods(index, builder.build());
     }
     public N endMethod(){
             return and();
     }
 
 }
-    public class OuterTypeNestedImpl<N> extends TypeDefFluentImpl<TypeDefFluent.OuterTypeNested<N>> implements TypeDefFluent.OuterTypeNested<N>,Nested<N>{
+    public class OuterTypeNestedImpl<N> extends TypeDefFluentImpl<OuterTypeNested<N>> implements OuterTypeNested<N>,Nested<N>{
 
             private final TypeDefBuilder builder;
 
@@ -837,19 +922,22 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 }
-    public class InnerTypesNestedImpl<N> extends TypeDefFluentImpl<TypeDefFluent.InnerTypesNested<N>> implements TypeDefFluent.InnerTypesNested<N>,Nested<N>{
+    public class InnerTypesNestedImpl<N> extends TypeDefFluentImpl<InnerTypesNested<N>> implements InnerTypesNested<N>,Nested<N>{
 
             private final TypeDefBuilder builder;
+        private final int index;
     
-            InnerTypesNestedImpl(TypeDef item){
+            InnerTypesNestedImpl(int index,TypeDef item){
+                    this.index = index;
                     this.builder = new TypeDefBuilder(this, item);
             }
             InnerTypesNestedImpl(){
+                    this.index = -1;
                     this.builder = new TypeDefBuilder(this);
             }
     
     public N and(){
-            return (N) TypeDefFluentImpl.this.addToInnerTypes(builder.build());
+            return (N) TypeDefFluentImpl.this.addToInnerTypes(index, builder.build());
     }
     public N endInnerType(){
             return and();

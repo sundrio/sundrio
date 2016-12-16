@@ -26,6 +26,8 @@ import io.sundr.builder.Predicate;
 public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFluent<A>{
 
 
+    public A addToBounds(int index, TypeRef item);
+    public A setToBounds(int index, TypeRef item);
     public A addToBounds(TypeRef... items);
     public A addAllToBounds(Collection<TypeRef> items);
     public A removeFromBounds(TypeRef... items);
@@ -43,58 +45,68 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
     public A withBounds(List<TypeRef> bounds);
     public A withBounds(TypeRef... bounds);
     public Boolean hasBounds();
+    public A addToVoidRefBounds(int index, VoidRef item);
+    public A setToVoidRefBounds(int index, VoidRef item);
     public A addToVoidRefBounds(VoidRef... items);
     public A addAllToVoidRefBounds(Collection<VoidRef> items);
     public A removeFromVoidRefBounds(VoidRef... items);
     public A removeAllFromVoidRefBounds(Collection<VoidRef> items);
-    public WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBound();
-    public WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBoundLike(VoidRef item);
+    public VoidRefBoundsNested<A> addNewVoidRefBound();
+    public VoidRefBoundsNested<A> addNewVoidRefBoundLike(VoidRef item);
+    public A addToWildcardRefBounds(int index, WildcardRef item);
+    public A setToWildcardRefBounds(int index, WildcardRef item);
     public A addToWildcardRefBounds(WildcardRef... items);
     public A addAllToWildcardRefBounds(Collection<WildcardRef> items);
     public A removeFromWildcardRefBounds(WildcardRef... items);
     public A removeAllFromWildcardRefBounds(Collection<WildcardRef> items);
-    public WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBound();
-    public WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBoundLike(WildcardRef item);
+    public WildcardRefBoundsNested<A> addNewWildcardRefBound();
+    public WildcardRefBoundsNested<A> addNewWildcardRefBoundLike(WildcardRef item);
+    public A addToPrimitiveRefBounds(int index, PrimitiveRef item);
+    public A setToPrimitiveRefBounds(int index, PrimitiveRef item);
     public A addToPrimitiveRefBounds(PrimitiveRef... items);
     public A addAllToPrimitiveRefBounds(Collection<PrimitiveRef> items);
     public A removeFromPrimitiveRefBounds(PrimitiveRef... items);
     public A removeAllFromPrimitiveRefBounds(Collection<PrimitiveRef> items);
-    public WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound();
-    public WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBoundLike(PrimitiveRef item);
+    public PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound();
+    public PrimitiveRefBoundsNested<A> addNewPrimitiveRefBoundLike(PrimitiveRef item);
+    public A addToTypeParamRefBounds(int index, TypeParamRef item);
+    public A setToTypeParamRefBounds(int index, TypeParamRef item);
     public A addToTypeParamRefBounds(TypeParamRef... items);
     public A addAllToTypeParamRefBounds(Collection<TypeParamRef> items);
     public A removeFromTypeParamRefBounds(TypeParamRef... items);
     public A removeAllFromTypeParamRefBounds(Collection<TypeParamRef> items);
-    public WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBound();
-    public WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBoundLike(TypeParamRef item);
+    public TypeParamRefBoundsNested<A> addNewTypeParamRefBound();
+    public TypeParamRefBoundsNested<A> addNewTypeParamRefBoundLike(TypeParamRef item);
+    public A addToClassRefBounds(int index, ClassRef item);
+    public A setToClassRefBounds(int index, ClassRef item);
     public A addToClassRefBounds(ClassRef... items);
     public A addAllToClassRefBounds(Collection<ClassRef> items);
     public A removeFromClassRefBounds(ClassRef... items);
     public A removeAllFromClassRefBounds(Collection<ClassRef> items);
-    public WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBound();
-    public WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBoundLike(ClassRef item);
+    public ClassRefBoundsNested<A> addNewClassRefBound();
+    public ClassRefBoundsNested<A> addNewClassRefBoundLike(ClassRef item);
 
-    public interface VoidRefBoundsNested<N> extends Nested<N>,VoidRefFluent<WildcardRefFluent.VoidRefBoundsNested<N>>{
+    public interface VoidRefBoundsNested<N> extends Nested<N>,VoidRefFluent<VoidRefBoundsNested<N>>{
 
 
     public N and();    public N endVoidRefBound();
 }
-    public interface WildcardRefBoundsNested<N> extends Nested<N>,WildcardRefFluent<WildcardRefFluent.WildcardRefBoundsNested<N>>{
+    public interface WildcardRefBoundsNested<N> extends Nested<N>,WildcardRefFluent<WildcardRefBoundsNested<N>>{
 
 
     public N and();    public N endWildcardRefBound();
 }
-    public interface PrimitiveRefBoundsNested<N> extends Nested<N>,PrimitiveRefFluent<WildcardRefFluent.PrimitiveRefBoundsNested<N>>{
+    public interface PrimitiveRefBoundsNested<N> extends Nested<N>,PrimitiveRefFluent<PrimitiveRefBoundsNested<N>>{
 
 
     public N and();    public N endPrimitiveRefBound();
 }
-    public interface TypeParamRefBoundsNested<N> extends Nested<N>,TypeParamRefFluent<WildcardRefFluent.TypeParamRefBoundsNested<N>>{
+    public interface TypeParamRefBoundsNested<N> extends Nested<N>,TypeParamRefFluent<TypeParamRefBoundsNested<N>>{
 
 
     public N and();    public N endTypeParamRefBound();
 }
-    public interface ClassRefBoundsNested<N> extends Nested<N>,ClassRefFluent<WildcardRefFluent.ClassRefBoundsNested<N>>{
+    public interface ClassRefBoundsNested<N> extends Nested<N>,ClassRefFluent<ClassRefBoundsNested<N>>{
 
         
     public N and();    public N endClassRefBound();

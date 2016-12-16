@@ -16,18 +16,16 @@
 
 package io.sundr.codegen.model;
 
-import java.lang.String;
-
-public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRefFluent<A> {
+public interface TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRefFluent<A>{
 
 
     public String getName();
-
     public A withName(String name);
-
+    public Boolean hasName();
     public int getDimensions();
-
     public A withDimensions(int dimensions);
+    public Boolean hasDimensions();
+
 
 
 }

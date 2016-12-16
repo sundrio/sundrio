@@ -16,11 +16,10 @@
 
 package io.sundr.codegen.model;
 
-import java.util.Map;
-import java.lang.String;
-import java.lang.Object;
+public interface VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A>{
 
-public interface VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A> {
+
+
 
 
 }

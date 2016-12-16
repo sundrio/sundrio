@@ -29,6 +29,8 @@ public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Att
     public String getName();
     public A withName(String name);
     public Boolean hasName();
+    public A addToBounds(int index, ClassRef item);
+    public A setToBounds(int index, ClassRef item);
     public A addToBounds(ClassRef... items);
     public A addAllToBounds(Collection<ClassRef> items);
     public A removeFromBounds(ClassRef... items);
@@ -46,10 +48,10 @@ public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Att
     public A withBounds(List<ClassRef> bounds);
     public A withBounds(ClassRef... bounds);
     public Boolean hasBounds();
-    public TypeParamDefFluent.BoundsNested<A> addNewBound();
-    public TypeParamDefFluent.BoundsNested<A> addNewBoundLike(ClassRef item);
+    public BoundsNested<A> addNewBound();
+    public BoundsNested<A> addNewBoundLike(ClassRef item);
 
-    public interface BoundsNested<N> extends Nested<N>,ClassRefFluent<TypeParamDefFluent.BoundsNested<N>>{
+    public interface BoundsNested<N> extends Nested<N>,ClassRefFluent<BoundsNested<N>>{
 
         
     public N and();    public N endBound();

@@ -50,6 +50,14 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
             return this.name!=null;
     }
 
+    public A addToBounds(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
+    public A setToBounds(int index,ClassRef item){
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+    }
+
     public A addToBounds(ClassRef... items){
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
     }
@@ -108,12 +116,12 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
             return bounds!= null && !bounds.isEmpty();
     }
 
-    public TypeParamDefFluent.BoundsNested<A> addNewBound(){
+    public BoundsNested<A> addNewBound(){
             return new BoundsNestedImpl();
     }
 
-    public TypeParamDefFluent.BoundsNested<A> addNewBoundLike(ClassRef item){
-            return new BoundsNestedImpl(item);
+    public BoundsNested<A> addNewBoundLike(ClassRef item){
+            return new BoundsNestedImpl(-1, item);
     }
 
     public boolean equals(Object o){
@@ -127,19 +135,22 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     }
 
 
-    public class BoundsNestedImpl<N> extends ClassRefFluentImpl<TypeParamDefFluent.BoundsNested<N>> implements TypeParamDefFluent.BoundsNested<N>,Nested<N>{
+    public class BoundsNestedImpl<N> extends ClassRefFluentImpl<BoundsNested<N>> implements BoundsNested<N>,Nested<N>{
 
             private final ClassRefBuilder builder;
+        private final int index;
     
-            BoundsNestedImpl(ClassRef item){
+            BoundsNestedImpl(int index,ClassRef item){
+                    this.index = index;
                     this.builder = new ClassRefBuilder(this, item);
             }
             BoundsNestedImpl(){
+                    this.index = -1;
                     this.builder = new ClassRefBuilder(this);
             }
     
     public N and(){
-            return (N) TypeParamDefFluentImpl.this.addToBounds(builder.build());
+            return (N) TypeParamDefFluentImpl.this.addToBounds(index, builder.build());
     }
     public N endBound(){
             return and();
