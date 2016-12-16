@@ -578,14 +578,14 @@ public class ToMethod {
                 addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
                         .withParameters(parameters)
                         .editBlock()
-                        .withStatements(new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + propertyName + ".add(builder); return (" + returnType + ")this;"))
+                        .withStatements(new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this." + propertyName + ".add(index >= 0 ? index : "+propertyName+".size(), builder); return (" + returnType + ")this;"))
                         .endBlock()
                         .build();
 
                 setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex)
                         .withParameters(parameters)
                         .editBlock()
-                        .withStatements(new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + propertyName + ".add(builder); return (" + returnType + ")this;"))
+                        .withStatements(new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.set(index >= 0 ? index : _visitables.size(), builder);this." + propertyName + ".set(index >= 0 ? index : "+propertyName+".size(), builder); return (" + returnType + ")this;"))
                         .endBlock()
                         .build();
 
@@ -1053,6 +1053,32 @@ public class ToMethod {
         }
     };
 
+    public static final Function<Property, Method> WITH_NEW_LIKE_NESTED_AT_INDEX = new Function<Property, Method>() {
+
+        @Override
+        public Method apply(Property property) {
+            Method method = WITH_NEW_LIKE_NESTED.apply(property);
+
+            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
+            TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+
+            List<TypeRef> typeArguments = new ArrayList<TypeRef>();
+            for (TypeRef ignore : baseType.getArguments()) {
+                typeArguments.add(Q);
+            }
+            typeArguments.add(returnType);
+            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
+
+            return new MethodBuilder(method)
+                    .addToArguments(0, INDEX)
+                    .editBlock()
+                        .withStatements(new StringStatement("return new " + rewrapedImpl.getName() + "(index, item);"))
+                    .endBlock()
+                    .build();
+        }
+    };
+
     public static final Function<Property, Method> EDIT_NESTED =new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
@@ -1092,6 +1118,20 @@ public class ToMethod {
                     .endBlock()
                     .build();
 
+        }
+    };
+
+    public static final Function<Property, Method> EDIT_AT_INDEX_NESTED = new Function<Property, Method>() {
+        public Method apply(Property property) {
+            String suffix = Singularize.FUNCTION.apply(captializeFirst(property.getName()));
+            Method method = EDIT_NESTED.apply(property);
+
+            return new MethodBuilder(method)
+                    .withArguments(INDEX)
+                    .editBlock()
+                        .withStatements(new StringStatement("return addNew" + suffix + "Like(index, build" + suffix + "(index));"))
+                    .endBlock()
+                    .build();
         }
     };
 

@@ -130,7 +130,10 @@ public class ClazzAs {
                 } else if (isBuildable && !isAbstract) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
-                    if (!isCollection && !isArray) {
+                    if (isList || isArray) {
+                        methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
+                        methods.add(ToMethod.EDIT_AT_INDEX_NESTED.apply(toAdd));
+                    } else if (!isSet) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
@@ -146,6 +149,9 @@ public class ClazzAs {
                             methods.add(ToMethod.WITH.apply(descendant));
                         }
 
+                        if (isList || isArray) {
+                            methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(descendant));
+                        }
                         methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
@@ -271,6 +277,10 @@ public class ClazzAs {
                 } else if (isBuildable && !isAbstract) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
+                    if (isList || isArray) {
+                        methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
+                        methods.add(ToMethod.EDIT_AT_INDEX_NESTED.apply(toAdd));
+                    }
                     if (!isCollection && !isArray) {
                         methods.add(ToMethod.EDIT_NESTED.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
@@ -294,6 +304,9 @@ public class ClazzAs {
                         methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
                         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
                         nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
+                        if (isList || isArray) {
+                            methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(descendant));
+                        }
                     }
                 } else {
                     properties.add(buildableField(toAdd));

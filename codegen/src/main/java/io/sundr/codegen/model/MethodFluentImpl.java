@@ -361,12 +361,19 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             return new ClassRefReturnTypeNestedImpl(item);
     }
 
-    public A addToArguments(int index,Property item){
-            PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.arguments.add(builder); return (A)this;
+    public A addToArguments(int index, Property item) {
+        PropertyBuilder builder = new PropertyBuilder(item);
+        _visitables.add(index >= 0 ? index : _visitables.size(), builder);
+        this.arguments.add(index >= 0 ? index : arguments.size(), builder);
+        return (A) this;
+
     }
 
     public A setToArguments(int index,Property item){
-            PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.arguments.add(builder); return (A)this;
+        PropertyBuilder builder = new PropertyBuilder(item);
+        _visitables.set(index >= 0 ? index : _visitables.size(), builder);
+        this.arguments.set(index >= 0 ? index : arguments.size(), builder);
+        return (A) this;
     }
 
     public A addToArguments(Property... items){
