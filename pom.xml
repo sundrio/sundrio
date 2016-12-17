@@ -72,7 +72,7 @@
 
         <compiler.plugin.version>3.2</compiler.plugin.version>
         <invoker.plugin.version>2.0.0</invoker.plugin.version>
-        <release.plugin.version>2.5.1</release.plugin.version>
+        <release.plugin.version>2.5.3</release.plugin.version>
     </properties>
 
     <modules>
