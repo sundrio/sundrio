@@ -17,9 +17,11 @@
 package io.sundr.codegen.converters;
 
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDefBuilder;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
@@ -38,6 +40,16 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
     public TypeDefBuilder visit(Element e) {
         String name = e.getSimpleName().toString();
         builder.withName(name);
+        if (e.getKind() == ElementKind.INTERFACE) {
+            builder.withKind(Kind.INTERFACE);
+        } else if (e.getKind() == ElementKind.ENUM) {
+            builder.withKind(Kind.ENUM);
+        }else if (e.getKind() == ElementKind.ANNOTATION_TYPE) {
+            builder.withKind(Kind.ANNOTATION);
+        } else  {
+            builder.withKind(Kind.CLASS);
+        }
+
         if (e.getEnclosingElement() instanceof PackageElement) {
             String packageName = e.getEnclosingElement().toString();
             builder.withPackageName(packageName);
