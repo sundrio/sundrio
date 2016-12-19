@@ -218,6 +218,50 @@
                                 </excludes>
                             </goals>
                         </bom>
+                        <bom>
+                            <artifactId>bom-test-9</artifactId>
+                            <name>Test Project :: Bom 9</name>
+                            <modules>
+                                <excludes>
+                                    <exclude>*:*</exclude>
+                                </excludes>
+                            </modules>
+                            <dependencies>
+                                <includes>
+                                    <include>io.sundr:*</include>
+                                </includes>
+                            </dependencies>
+                            <imports>
+                                <import>
+                                    <groupId>org.springframework.boot</groupId>
+                                    <artifactId>spring-boot-dependencies</artifactId>
+                                    <version>1.4.2.RELEASE</version>
+                                    <dependencyManagement>
+                                        <includes>
+                                            <include>*:*</include>
+                                        </includes>
+                                        <excludes>
+                                            <exclude>com.google.code.gson:gson</exclude>
+                                        </excludes>
+                                    </dependencyManagement>
+                                </import>
+                            </imports>
+                            <overrides>
+                                <override>
+                                    <dependencies>
+                                        <includes>
+                                            <include>org.apache.activemq:*</include>
+                                        </includes>
+                                    </dependencies>
+                                    <version>5.2.0</version>
+                                </override>
+                            </overrides>
+                            <goals>
+                                <excludes>
+                                    <exclude>deploy</exclude>
+                                </excludes>
+                            </goals>
+                        </bom>
                     </boms>
                 </configuration>
                 <executions>

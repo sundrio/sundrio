@@ -35,7 +35,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
+import io.sundr.maven.filter.ArtifactFilter;
+import io.sundr.maven.filter.CompositeFilter;
+import io.sundr.maven.filter.ExcludesFilter;
 import io.sundr.maven.filter.Filters;
+import io.sundr.maven.filter.IncludesFilter;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -190,6 +194,9 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
             plugins.addAll(Filters.filter(ownModules, Filters.MAVEN_PLUGIN_FILTER));
             plugins.addAll(Filters.filter(pluginManagementArtifacts, Filters.createPluginFilter(getSession(), config)));
 
+            //Apply overrides
+            applyOverrides(config, dependencies);
+
             //Checking version mismatches.
             MavenProject projectToGenerate = toGenerate(getProject(), config, dependencies.values(), plugins);
             verifyBomDependencies(config, projectToGenerate);
@@ -252,6 +259,25 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
                 throw new MojoFailureException(message.toString());
             } else {
                 getLog().warn(message.toString());
+            }
+        }
+    }
+
+    private void applyOverrides(BomConfig config, Map<Artifact, Dependency> dependencies) {
+        if (config.getOverrides() != null) {
+            for (VersionOverride override : config.getOverrides()) {
+                List<ArtifactFilter> filters = new LinkedList<ArtifactFilter>();
+                filters.add(new IncludesFilter(override.getDependencies().getIncludes()));
+                filters.add(new ExcludesFilter(override.getDependencies().getExcludes()));
+                CompositeFilter filter = new CompositeFilter(filters);
+
+                for (Map.Entry<Artifact, Dependency> entry : dependencies.entrySet()) {
+                    if (filter.apply(entry.getKey()) != null) {
+                        getLog().debug("Changing version of dependency " + dependencyKey(entry.getValue()) + " to " + override.getVersion());
+                        entry.getKey().setVersion(override.getVersion());
+                        entry.getValue().setVersion(override.getVersion());
+                    }
+                }
             }
         }
     }
