@@ -57,9 +57,9 @@ import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.INDEX;
 import static io.sundr.builder.Constants.N_REF;
 import static io.sundr.builder.Constants.OUTER_CLASS;
-import static io.sundr.builder.Constants.PREDICATE;
 import static io.sundr.builder.Constants.Q;
 import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
+import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.codegen.functions.Collections.COLLECTION;
@@ -84,6 +84,7 @@ import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
 import static io.sundr.codegen.utils.TypeUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
+import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 
 public class ToMethod {
@@ -220,6 +221,7 @@ public class ToMethod {
             List<Method> methods = new ArrayList<Method>();
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
 
+            TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
             String getterName = prefix + property.getNameCapitalized();
             String builderName = "build" + property.getNameCapitalized();
@@ -276,6 +278,8 @@ public class ToMethod {
 
             methods.add(getter);
             if (isNested) {
+                TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
+
                 methods.add(new MethodBuilder(getter)
                         .removeFromAnnotations(DEPRECATED_ANNOTATION)
                         .withComments()
@@ -317,7 +321,6 @@ public class ToMethod {
                             .endBlock()
                             .build());
 
-                    TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
                     methods.add(new MethodBuilder()
                             .withComments()
                             .withAnnotations()
@@ -325,7 +328,7 @@ public class ToMethod {
                             .withName("buildMatching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
                             .addNewArgument()
                             .withName("predicate")
-                            .withTypeRef(PREDICATE.toReference(builderRef))
+                            .withTypeRef(predicate.toReference(builderRef))
                             .endArgument()
                             .withReturnType(unwrapped)
                             .withNewBlock()
@@ -376,7 +379,7 @@ public class ToMethod {
                         .withName(prefix + "Matching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
                         .addNewArgument()
                         .withName("predicate")
-                        .withTypeRef(PREDICATE.toReference(unwrapped))
+                        .withTypeRef(predicate.toReference(unwrapped))
                         .endArgument()
                         .withReturnType(unwrapped)
                         .withNewBlock()
@@ -399,6 +402,8 @@ public class ToMethod {
             String getterName = prefix + property.getNameCapitalized();
             String builderName = "build" + property.getNameCapitalized();
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+            TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
+
             TypeRef type = property.getTypeRef();
             Boolean isBuildable = isBuildable(type);
             TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
@@ -427,6 +432,8 @@ public class ToMethod {
 
             methods.add(getter);
             if (isBuildable) {
+                TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
+
                 methods.add(new MethodBuilder(getter)
                         .removeFromAnnotations(DEPRECATED_ANNOTATION)
                         .withComments()
@@ -467,7 +474,6 @@ public class ToMethod {
                         .endBlock()
                         .build());
 
-                TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
                 methods.add(new MethodBuilder()
                         .withComments()
                         .withAnnotations()
@@ -475,7 +481,7 @@ public class ToMethod {
                         .withName("buildMatching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
                         .addNewArgument()
                         .withName("predicate")
-                        .withTypeRef(PREDICATE.toReference(builderRef))
+                        .withTypeRef(predicate.toReference(builderRef))
                         .endArgument()
                         .withReturnType(unwrapped)
                         .withNewBlock()
@@ -1090,6 +1096,9 @@ public class ToMethod {
             List<Method> methods = new ArrayList<Method>();
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
             ClassRef unwrapped = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
+            TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
+
             TypeDef builderType = TypeAs.BUILDER.apply(unwrapped.getDefinition());
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((unwrapped).getDefinition().getFullyQualifiedName());
@@ -1161,12 +1170,11 @@ public class ToMethod {
                         .endBlock()
                         .build());
 
-                TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
                 methods.add(new MethodBuilder(base)
                         .withName("editMatching" + suffix)
                         .addNewArgument()
                             .withName("predicate")
-                            .withTypeRef(PREDICATE.toReference(builderRef))
+                            .withTypeRef(predicate.toReference(builderRef))
                         .endArgument()
                         .editBlock()
                         .withStatements(
