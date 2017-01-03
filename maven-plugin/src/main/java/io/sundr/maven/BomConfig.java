@@ -29,6 +29,7 @@ public class BomConfig {
     private ArtifactSet dependencies = new ArtifactSet();
     private ArtifactSet plugins = new ArtifactSet();
     private List<BomImport> imports = new LinkedList<BomImport>();
+    private List<VersionOverride> overrides = new LinkedList<VersionOverride>();
     private GoalSet goals = new GoalSet();
     private boolean ignoreScope = true;
     private boolean excludeOptional = true;
@@ -75,6 +76,10 @@ public class BomConfig {
 
     public List<BomImport> getImports() {
         return imports;
+    }
+
+    public List<VersionOverride> getOverrides() {
+        return overrides;
     }
 
     public GoalSet getGoals() {
