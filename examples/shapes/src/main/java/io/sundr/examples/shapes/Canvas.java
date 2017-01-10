@@ -18,6 +18,7 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
+import io.sundr.resourcecify.annotations.Resourcecify;
 
 import java.util.ArrayList;
 import java.util.Collections;

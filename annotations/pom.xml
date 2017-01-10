@@ -30,6 +30,7 @@
     <modules>
         <module>builder</module>
         <module>dsl</module>
+        <module>resourcecify</module>
     </modules>
 
 </project>
