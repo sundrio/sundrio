@@ -28,16 +28,25 @@ public class AttributeSupport implements Attributeable {
     }
 
     public Map<AttributeKey, Object> getAttributes() {
+        if (attributes == null) {
+            return null;
+        }
         return Collections.unmodifiableMap(attributes);
     }
 
     @Override
     public <T> T getAttribute(AttributeKey<T> key) {
+        if (attributes == null) {
+            return null;
+        }
         return (T) attributes.get(key);
     }
 
     @Override
     public <T> boolean hasAttribute(AttributeKey<T> key) {
+        if (attributes == null) {
+            return false;
+        }
         return attributes.containsKey(key);
     }
 }

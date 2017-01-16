@@ -34,7 +34,6 @@ import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.WildcardRefBuilder;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -74,6 +73,7 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
+import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.isArray;
 import static io.sundr.codegen.utils.TypeUtils.isBoolean;
@@ -125,19 +125,17 @@ public class ToMethod {
                 fieldName = descendantOf.getName();
             }
 
-            if (isBuildable(unwraped)) {
-                if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
-                    statements.add(new StringStatement("_visitables.removeAll(this." + fieldName + ");"));
-                } else {
-                    statements.add(new StringStatement("_visitables.remove(this." + fieldName + ");"));
-                }
+            if (isBuildable(unwraped) && !IS_COLLECTION.apply(type) && !IS_MAP.apply(type)) {
+                statements.add(new StringStatement("_visitables.remove(this." + fieldName + ");"));
             }
 
             if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
-                statements.add(new StringStatement("this." + fieldName + ".clear();"));
+
                 if (IS_MAP.apply(type)) {
+                    statements.add(new StringStatement("if (this." + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(LAZY_INIT) + ";} else {this." + fieldName + ".clear();}"));
                     statements.add(new StringStatement("if (" + argumentName + " != null) {this." + fieldName + ".putAll(" + argumentName + ");} return (" + returnType + ") this;"));
                 } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
+                    statements.add(new StringStatement("if (this." + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(LAZY_INIT) + ";} else {_visitables.removeAll(this."+fieldName+"); this." + fieldName + ".clear();}"));
                     String addToMethodName = "addTo" + property.getNameCapitalized();
                     statements.add(new StringStatement("if (" + argumentName + " != null) {for (" + unwraped.toString() + " item : " + argumentName + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
                 }
@@ -552,7 +550,9 @@ public class ToMethod {
                     .addToArguments(INDEX)
                     .addToArguments(unwrappedProperty)
                     .withNewBlock()
-                    .withStatements(new StringStatement("this." + propertyName + ".add(index, item); return (" + returnType + ")this;"))
+                    .withStatements(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
+                                    new StringStatement("this." + propertyName + ".add(index, item);"),
+                                    new StringStatement("return (" + returnType + ")this;"))
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
@@ -581,12 +581,15 @@ public class ToMethod {
 
                 //We need to do it more
                 alsoImport.add(TypeAs.BUILDER.apply(targetType.getDefinition()).toInternalReference());
+                statements.add(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"));
                 statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
 
                 addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
                         .withParameters(parameters)
                         .editBlock()
-                        .withStatements(new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this." + propertyName + ".add(index >= 0 ? index : " + propertyName + ".size(), builder); return (" + returnType + ")this;"))
+                        .withStatements(
+                                new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
+                                new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this." + propertyName + ".add(index >= 0 ? index : " + propertyName + ".size(), builder); return (" + returnType + ")this;"))
                         .endBlock()
                         .build();
 
@@ -594,6 +597,7 @@ public class ToMethod {
                         .withParameters(parameters)
                         .editBlock()
                         .withStatements(
+                                new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
                                 new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
                                 new StringStatement("if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}"),
                                 new StringStatement("if (index < 0 || index >= " + propertyName + ".size()) { " + propertyName + ".add(builder); } else { " + propertyName + ".set(index, builder);}"),
@@ -711,7 +715,7 @@ public class ToMethod {
 
                 //We need to do it more elegantly
                 alsoImport.add(TypeAs.BUILDER.apply(targetType.getDefinition()).toInternalReference());
-                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);this." + propertyName + ".remove(builder);} return (" + returnType + ")this;"));
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);if (this." + propertyName + " != null) {this."+propertyName+".remove(builder);}} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
@@ -725,7 +729,7 @@ public class ToMethod {
                 }, " else ") + "} return (" + returnType + ")this;"));
 
             } else {
-                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
+                statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {if (this."+property.getName()+"!= null){ this." + property.getName() + ".remove(item);}} return (" + returnType + ")this;"));
             }
 
             Method removeVarargFromCollection = new MethodBuilder()
@@ -815,7 +819,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(mapProperty)
                     .withNewBlock()
-                    .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {this." + property.getName() + ".remove(key);}} return (" + returnType + ")this;")
+                    .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {if (this."+property.getName()+" != null){this." + property.getName() + ".remove(key);}}} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
         }
@@ -836,7 +840,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(keyProperty)
                     .withNewBlock()
-                    .addNewStringStatementStatement("if(key != null) {this." + property.getName() + ".remove(key);} return (" + returnType + ")this;")
+                    .addNewStringStatementStatement("if(key != null && this."+property.getName()+" != null) {this." + property.getName() + ".remove(key);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
         }

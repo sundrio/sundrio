@@ -476,7 +476,7 @@ public class BuilderUtils {
         }
     }
 
-    private static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
+    public static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
         List<ClassRef> result = new ArrayList<ClassRef>();
         if (attributeable.hasAttribute(ALSO_IMPORT)) {
             result.addAll(attributeable.getAttribute(ALSO_IMPORT));
@@ -484,7 +484,7 @@ public class BuilderUtils {
         return result;
     }
 
-    private static List<ClassRef> alsoImport(Attributeable attributeable, ClassRef... refs) {
+    public static List<ClassRef> alsoImport(Attributeable attributeable, ClassRef... refs) {
         List<ClassRef> result = alsoImportAsList(attributeable);
         for (ClassRef ref : refs) {
             result.add(ref);
