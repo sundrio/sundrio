@@ -23,6 +23,7 @@ import io.sundr.builder.annotations.IgnoreDescendants;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.ClassRef;
 
@@ -112,6 +113,7 @@ public class Descendants {
                                 .withTypeRef(collectionType)
                                 .addToAttributes(DESCENDANT_OF, property)
                                 .addToAttributes(BUILDABLE_ENABLED, true)
+                                .accept(new InitEnricher())
                                 .build());
                     }
                 }
@@ -134,6 +136,7 @@ public class Descendants {
                             .withTypeRef(descendantRef)
                             .addToAttributes(DESCENDANT_OF, property)
                             .addToAttributes(BUILDABLE_ENABLED, true)
+                            .accept(new InitEnricher())
                             .build());
                 }
             }

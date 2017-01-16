@@ -25,6 +25,7 @@ public interface Attributeable extends Node {
 
     AttributeKey<Collection<ClassRef>> ALSO_IMPORT = new AttributeKey<Collection<ClassRef>>("ALSO_IMPORT", Collection.class);
     AttributeKey<String> INIT = new AttributeKey<String>("INIT", String.class);
+    AttributeKey<String> LAZY_INIT = new AttributeKey<String>("LAZY_INIT", String.class);
 
 
     Map<AttributeKey, Object> getAttributes();

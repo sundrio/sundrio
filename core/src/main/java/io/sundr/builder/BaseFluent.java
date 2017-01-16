@@ -29,6 +29,9 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     public final List<Visitable> _visitables = new ArrayList<Visitable>();
 
     public static <T> ArrayList<T> build(List<? extends Builder<? extends T>> list) {
+        if (list == null) {
+            return null;
+        }
         ArrayList<T> result = new ArrayList<T>();
         for (Builder<? extends T> builder : list) {
             result.add(builder.build());
@@ -36,9 +39,13 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         return result;
     }
 
-    public static <T> List<T> build(Set<? extends Builder<? extends T>> list) {
+    public static <T> List<T> build(Set<? extends Builder<? extends T>> set) {
+        if (set == null) {
+            return null;
+        }
+
         List<T> result = new ArrayList<T>();
-        for (Builder<? extends T> builder : list) {
+        for (Builder<? extends T> builder : set) {
             result.add(builder.build());
         }
         return result;
@@ -48,7 +55,9 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         ArrayList<T> result = new ArrayList<T>();
 
         for (List<? extends T> list : lists) {
-            result.addAll(list);
+            if (list != null) {
+                result.addAll(list);
+            }
         }
         return result;
     }
@@ -57,7 +66,9 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         LinkedHashSet<T> result = new LinkedHashSet<T>();
 
         for (Set<? extends T> set : sets) {
-            result.addAll(set);
+            if (set != null) {
+                result.addAll(set);
+            }
         }
         return result;
     }

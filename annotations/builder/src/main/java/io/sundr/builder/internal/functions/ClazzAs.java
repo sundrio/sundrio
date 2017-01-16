@@ -24,6 +24,7 @@ import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
@@ -55,8 +56,6 @@ import java.util.Set;
 
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
-import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
-import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 
 public class ClazzAs {
@@ -97,7 +96,7 @@ public class ClazzAs {
                 boolean isAbstract = isAbstract(unwrapped);
 
                 Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
-                toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
+                toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
 
                 if (isArray) {
                     Property asList = arrayAsList(toAdd);
@@ -120,7 +119,7 @@ public class ClazzAs {
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 } else {
-                    toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).build();
+                    toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).accept(new InitEnricher()).build();
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
@@ -224,25 +223,7 @@ public class ClazzAs {
                         .addToAttributes(OUTER_INTERFACE, fluentType)
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
-                        .accept(new TypedVisitor<PropertyBuilder>() {
-
-                            public void visit(PropertyBuilder builder) {
-                                if (isArray || isList) {
-                                    ClassRef listRef =  Collections.ARRAY_LIST.toReference(unwrapped);
-                                    builder.addToAttributes(INIT, "new " + listRef+ "()")
-                                            .addToAttributes(ALSO_IMPORT, Arrays.asList(listRef));
-                                } else if (isSet) {
-                                    ClassRef setRef = Collections.LINKED_HASH_SET.toReference(unwrapped);
-                                    builder.addToAttributes(INIT, "new " + setRef + "()")
-                                            .addToAttributes(ALSO_IMPORT, Arrays.asList(setRef));
-                                } else if (isMap) {
-                                    List<TypeRef> arguments = ((ClassRef)property.getTypeRef()).getArguments();
-                                    ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments);
-                                    builder.addToAttributes(INIT, "new " + mapRef  + "()")
-                                            .addToAttributes(ALSO_IMPORT, Arrays.asList(mapRef));
-                                }
-                            }
-                        }).build();
+                        .accept(new InitEnricher()).build();
 
                 Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
