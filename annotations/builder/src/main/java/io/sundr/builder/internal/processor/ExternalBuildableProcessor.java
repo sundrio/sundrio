@@ -103,6 +103,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
+                generateFromClazz(ClazzAs.FLUENT_IMPL.apply(typeDef),
+                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+
                 if (generated.editableEnabled()) {
                     generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
