@@ -8,7 +8,7 @@ able to generate them on the fly, they tend to get messy when concepts
 like *inheritance* or *nesting* get into the picture and they are not 
 that easy to keep up to date.
 
-This project provides annotation processors the provide teh following features:
+This project provides annotation processors the provide the following features:
 
 - Compile time builder generation.
 - Separation of the Fluent behavior from the Builder.
