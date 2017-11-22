@@ -16,16 +16,13 @@
 
 package io.sundr.codegen.converters;
 
-import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.PrimitiveRefBuilder;
 import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRefBuilder;
 
-import javax.lang.model.element.ElementVisitor;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ErrorType;
@@ -35,22 +32,12 @@ import javax.lang.model.type.NullType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import javax.lang.model.type.TypeVisitor;
-import javax.lang.model.type.UnionType;
 import javax.lang.model.type.WildcardType;
+import javax.lang.model.util.AbstractTypeVisitor6;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
-
-
-    public TypeRef visit(TypeMirror t, Integer dimension) {
-        return null;
-    }
-
-    public TypeRef visit(TypeMirror t) {
-        return null;
-    }
+public class TypeRefTypeVisitor extends AbstractTypeVisitor6<TypeRef, Integer> {
 
     public TypeRef visitPrimitive(PrimitiveType t, Integer dimension) {
         return new PrimitiveRefBuilder()
@@ -105,10 +92,6 @@ public class TypeRefTypeVisitor implements TypeVisitor<TypeRef, Integer> {
     }
 
     public TypeRef visitUnknown(TypeMirror t, Integer dimension) {
-        return null;
-    }
-
-    public TypeRef visitUnion(UnionType t, Integer dimension) {
         return null;
     }
 
