@@ -1,0 +1,94 @@
+workflows:
+  version: 2
+  multiple-java-versions:
+    jobs:
+      - checkout_code
+      - update_dependencies:
+          requires:
+            - checkout_code
+      - java-7:
+          requires:
+            - update_dependencies
+      - java-8:
+          requires:
+            - update_dependencies
+
+version: 2
+
+job_defaults: &job_defaults
+  working_directory: /src
+
+  docker:
+    - image: openjdk:8-jdk
+
+mvn_job_defaults: &mvn_job_defaults
+  <<: *job_defaults
+
+  steps:
+    - restore_cache:
+        key: code-repo-{{ .Environment.CIRCLE_SHA1 }}-{{ .Environment.CIRCLE_TAG }}
+
+    - restore_cache:
+        keys:
+          - dependencies-{{ checksum "pom.xml" }}-{{ checksum "annotations/pom.xml" }}-{{ checksum "codegen/pom.xml" }}-{{ checksum "core/pom.xml" }}-{{ checksum "examples/pom.xml" }}-{{ checksum "maven-plugin/pom.xml" }}
+
+    - run:
+        name: Run Maven build
+        command: ./mvnw -B -U clean install
+
+    - run:
+        name: Save test results
+        command: |
+          mkdir -p ~/junit/
+          find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit/ \;
+        when: always
+
+    - store_test_results:
+        path: ~/junit
+
+    - store_artifacts:
+        path: ~/junit
+
+jobs:
+  checkout_code:
+    <<: *job_defaults
+
+    steps:
+      - checkout
+
+      - save_cache:
+          key: code-repo-{{ .Environment.CIRCLE_SHA1 }}-{{ .Environment.CIRCLE_TAG }}
+          paths:
+            - /src
+
+  update_dependencies:
+    <<: *job_defaults
+
+    steps:
+      - restore_cache:
+          keys:
+            - code-repo-{{ .Environment.CIRCLE_SHA1 }}-{{ .Environment.CIRCLE_TAG }}
+
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "pom.xml" }}-{{ checksum "annotations/pom.xml" }}-{{ checksum "codegen/pom.xml" }}-{{ checksum "core/pom.xml" }}-{{ checksum "examples/pom.xml" }}-{{ checksum "maven-plugin/pom.xml" }}
+            - dependencies-
+
+      - run:
+          name: Update dependencies
+          command: |
+            ./mvnw -B -U -DskipTests package dependency:go-offline
+
+      - save_cache:
+          key: dependencies-{{ checksum "pom.xml" }}-{{ checksum "annotations/pom.xml" }}-{{ checksum "codegen/pom.xml" }}-{{ checksum "core/pom.xml" }}-{{ checksum "examples/pom.xml" }}-{{ checksum "maven-plugin/pom.xml" }}
+          paths:
+            - /root/.m2
+
+  java-7:
+    <<: *mvn_job_defaults
+
+    docker:
+      - image: openjdk:7-jdk
+
+  java-8:
+    <<: *mvn_job_defaults
