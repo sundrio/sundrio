@@ -65,7 +65,7 @@ public class ModifierSupport extends AttributeSupport {
     }
 
     public boolean isTransient() {
-        return Modifier.isSynchronized(modifiers);
+        return Modifier.isTransient(modifiers);
     }
 
     public int getModifiers() {
