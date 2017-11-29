@@ -40,6 +40,10 @@ public final class TypeUtils {
 
     private static final String BOOLEAN = "boolean";
     private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
+    private static final String JAVA_UTIL_OPTIONAL = "java.util.Optional";
+    private static final String JAVA_UTIL_OPTIONAL_INT = "java.util.OptionalInt";
+    private static final String JAVA_UTIL_OPTIONAL_DOUBLE = "java.util.OptionalDouble";
+    private static final String JAVA_UTIL_OPTIONAL_LONG = "java.util.OptionalLong";
     private static final String OTHER = "other";
     private static final String DOT_REGEX = "\\.";
     
@@ -309,5 +313,57 @@ public final class TypeUtils {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link java.util.Optional}.
+     * @param type  The type to check.
+     * @return      True if its a {@link java.util.Optional}.
+     */
+    public static boolean isOptional(TypeRef type) {
+        if (!(type instanceof ClassRef)) {
+            return false;
+        }
+
+        return JAVA_UTIL_OPTIONAL.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link java.util.OptionalInt}.
+     * @param type  The type to check.
+     * @return      True if its a {@link java.util.OptionalInt}.
+     */
+    public static boolean isOptionalInt(TypeRef type) {
+        if (!(type instanceof ClassRef)) {
+            return false;
+        }
+
+        return JAVA_UTIL_OPTIONAL_INT.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link java.util.OptionalDouble}.
+     * @param type  The type to check.
+     * @return      True if its a {@link java.util.OptionalDouble}.
+     */
+    public static boolean isOptionalDouble(TypeRef type) {
+        if (!(type instanceof ClassRef)) {
+            return false;
+        }
+
+        return JAVA_UTIL_OPTIONAL_DOUBLE.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
+    }
+
+    /**
+     * Checks if a {@link TypeRef} is a {@link java.util.OptionalLong}.
+     * @param type  The type to check.
+     * @return      True if its a {@link java.util.OptionalLong}.
+     */
+    public static boolean isOptionalLong(TypeRef type) {
+        if (!(type instanceof ClassRef)) {
+            return false;
+        }
+
+        return JAVA_UTIL_OPTIONAL_LONG.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
     }
 }

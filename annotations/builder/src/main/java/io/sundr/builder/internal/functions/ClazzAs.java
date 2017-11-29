@@ -27,9 +27,7 @@ import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
@@ -49,7 +47,6 @@ import io.sundr.codegen.utils.TypeUtils;
 import javax.lang.model.element.Modifier;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -71,7 +68,7 @@ public class ClazzAs {
             final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
 
             for (Property property : item.getProperties()) {
-                final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+                final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
                 if (property.isStatic()) {
                     continue;
                 }
@@ -81,7 +78,7 @@ public class ClazzAs {
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(0)
-                        .addToAttributes(ORIGIN_TYPEDF, item)
+                        .addToAttributes(ORIGIN_TYPEDEF, item)
                         .addToAttributes(OUTER_INTERFACE, fluentType)
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
@@ -92,8 +89,11 @@ public class ClazzAs {
                 boolean isSet = TypeUtils.isSet(toAdd.getTypeRef());
                 boolean isList = TypeUtils.isList(toAdd.getTypeRef());
                 boolean isMap = TypeUtils.isMap(toAdd.getTypeRef());
-                boolean isCollection = isSet || isList;
                 boolean isAbstract = isAbstract(unwrapped);
+                boolean isOptional = TypeUtils.isOptional(toAdd.getTypeRef())
+                    || TypeUtils.isOptionalInt(toAdd.getTypeRef())
+                    || TypeUtils.isOptionalDouble(toAdd.getTypeRef())
+                    || TypeUtils.isOptionalLong(toAdd.getTypeRef());
 
                 Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
                 toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
@@ -118,6 +118,9 @@ public class ClazzAs {
                     methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
+                } else if (isOptional) {
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
+                    methods.addAll(ToMethod.WITH_OPTIONAL.apply(toAdd));
                 } else {
                     toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).accept(new InitEnricher()).build();
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
@@ -199,7 +202,7 @@ public class ClazzAs {
             constructors.add(instanceConstructor);
 
             for (final Property property : item.getProperties()) {
-                final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+                final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
                 if (property.isStatic()) {
                     continue;
@@ -214,12 +217,15 @@ public class ClazzAs {
                 final boolean isSet = TypeUtils.isSet(property.getTypeRef());
                 final boolean isList = TypeUtils.isList(property.getTypeRef());
                 final boolean isMap = TypeUtils.isMap(property.getTypeRef());
-                final boolean isCollection = isSet || isList;
                 final boolean isAbstract = isAbstract(unwrapped);
+                boolean isOptional = TypeUtils.isOptional(property.getTypeRef())
+                    || TypeUtils.isOptionalInt(property.getTypeRef())
+                    || TypeUtils.isOptionalDouble(property.getTypeRef())
+                    || TypeUtils.isOptionalLong(property.getTypeRef());
 
                 Property toAdd = new PropertyBuilder(property)
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
-                        .addToAttributes(ORIGIN_TYPEDF, item)
+                        .addToAttributes(ORIGIN_TYPEDEF, item)
                         .addToAttributes(OUTER_INTERFACE, fluentType)
                         .addToAttributes(OUTER_CLASS, fluentImplType)
                         .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
@@ -248,6 +254,9 @@ public class ClazzAs {
                     methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));
+                } else if (isOptional) {
+                    methods.addAll(ToMethod.WITH_OPTIONAL.apply(toAdd));
+                    methods.addAll(ToMethod.GETTER.apply(toAdd));
                 } else {
                     methods.addAll(ToMethod.GETTER.apply(toAdd));
                     methods.add(ToMethod.WITH.apply(toAdd));

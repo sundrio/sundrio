@@ -29,6 +29,7 @@ import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.functions.Optionals;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
@@ -58,6 +59,7 @@ import java.util.Set;
 
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
@@ -254,7 +256,7 @@ public class BuilderUtils {
 
     public static Set<Method> getInlineableConstructors(Property property) {
         Set<Method> result = new HashSet<Method>();
-        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
         if (unwrapped instanceof ClassRef) {
             for (Method candidate : ((ClassRef)unwrapped).getDefinition().getConstructors()) {
@@ -423,7 +425,7 @@ public class BuilderUtils {
         String currentPackage = originType != null ? originType.getPackageName() : null;
 
         if (typeRef instanceof ClassRef) {
-            ClassRef classRef = (ClassRef)  TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(typeRef);
+            ClassRef classRef = (ClassRef)  TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
 
             String candidateFqn = classRef.getFullyQualifiedName().replace(classRef.getDefinition().getPackageName(), currentPackage);
 
@@ -447,13 +449,13 @@ public class BuilderUtils {
     }
 
     public static ClassRef buildableRef(TypeRef typeRef) {
-        ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(typeRef);
+        ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
         return isAbstract(unwrapped) || unwrapped.getDefinition().getKind() == Kind.INTERFACE ? TypeAs.VISITABLE_BUILDER.apply(unwrapped) : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
     }
 
     public static Property buildableField(Property property) {
         TypeRef typeRef = property.getTypeRef();
-        ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(typeRef);
+        ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
         ClassRef classRef = (ClassRef) typeRef;
         ClassRef builderType = isAbstract(unwrapped) ||  unwrapped.getDefinition().getKind() == Kind.INTERFACE  ? TypeAs.VISITABLE_BUILDER.apply(unwrapped) : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
 
@@ -463,17 +465,48 @@ public class BuilderUtils {
                     .addToAttributes(INIT, " new " + listRef + "()")
                     .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
                     .build();
-        } else if (TypeUtils.isSet(classRef)) {
+        }
+
+        if (TypeUtils.isSet(classRef)) {
             ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
                     .addToAttributes(INIT, " new " + setRef+ "()")
                     .addToAttributes(ALSO_IMPORT,  alsoImport(property, setRef, builderType))
                     .build();
-        } else {
-            return new PropertyBuilder(property).withTypeRef(builderType)
+        }
+
+        if (TypeUtils.isOptionalLong(classRef)) {
+            ClassRef optionalRef = Optionals.OPTIONAL_LONG.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(optionalRef)
+                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .build();
+        }
+
+        if (TypeUtils.isOptionalDouble(classRef)) {
+            ClassRef optionalRef = Optionals.OPTIONAL_DOUBLE.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(optionalRef)
+                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .build();
+        }
+
+        if (TypeUtils.isOptionalInt(classRef)) {
+            ClassRef optionalRef = Optionals.OPTIONAL_INT.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(optionalRef)
+                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .build();
+        }
+
+        if (TypeUtils.isOptional(classRef)) {
+            ClassRef optionalRef = Optionals.OPTIONAL.toReference(builderType);
+            return new PropertyBuilder(property).withTypeRef(optionalRef)
+                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .addToAttributes(ALSO_IMPORT,  alsoImport(property, optionalRef, builderType))
+                .build();
+        }
+
+        return new PropertyBuilder(property).withTypeRef(builderType)
                     .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
                     .build();
-        }
     }
 
     public static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
@@ -486,9 +519,7 @@ public class BuilderUtils {
 
     public static List<ClassRef> alsoImport(Attributeable attributeable, ClassRef... refs) {
         List<ClassRef> result = alsoImportAsList(attributeable);
-        for (ClassRef ref : refs) {
-            result.add(ref);
-        }
+        result.addAll(Arrays.asList(refs));
         return result;
     }
 }

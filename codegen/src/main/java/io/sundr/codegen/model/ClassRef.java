@@ -26,7 +26,7 @@ import java.util.Set;
 
 public class ClassRef extends TypeRef {
 
-    public static final String UNKWNON = "<unkwnon>";
+    public static final String UNKNOWN = "<unknown>";
     public static final String BRACKETS = "[]";
 
     public static final ClassRef OBJECT = new ClassRefBuilder()
@@ -160,7 +160,7 @@ public class ClassRef extends TypeRef {
         StringBuilder sb = new StringBuilder();
         TypeDef definition = getDefinition();
         if (definition == null) {
-            sb.append(UNKWNON);
+            sb.append(UNKNOWN);
         }
 
         if (requiresFullyQualifiedName()) {

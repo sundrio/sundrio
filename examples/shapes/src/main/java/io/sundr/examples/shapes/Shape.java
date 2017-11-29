@@ -16,11 +16,12 @@
 
 package io.sundr.examples.shapes;
 
+import java.util.Optional;
+
 public interface Shape {
 
     int getX();
     int getY();
 
-    String getNotes();
-    void setNotes(String notes);
+    Optional<String> getNotes();
 }

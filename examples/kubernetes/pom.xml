@@ -55,6 +55,11 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>builder-annotations</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

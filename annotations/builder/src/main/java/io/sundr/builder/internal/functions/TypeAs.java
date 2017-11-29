@@ -257,7 +257,29 @@ public class TypeAs {
         }
     };
 
+    public static final Function<TypeRef, TypeRef> UNWRAP_OPTIONAL_OF = new Function<TypeRef, TypeRef>() {
+        public TypeRef apply(TypeRef type) {
+            if (type instanceof ClassRef) {
+                ClassRef classRef = (ClassRef) type;
+                if (TypeUtils.isOptional(classRef)) {
+                    return classRef.getArguments().get(0);
+                }
 
+                if (TypeUtils.isOptionalInt(classRef)) {
+                    return new TypeDefBuilder().withPackageName("java.lang").withName("Integer").build().toReference();
+                }
+
+                if (TypeUtils.isOptionalLong(classRef)) {
+                    return new TypeDefBuilder().withPackageName("java.lang").withName("Long").build().toReference();
+                }
+
+                if (TypeUtils.isOptionalDouble(classRef)) {
+                    return new TypeDefBuilder().withPackageName("java.lang").withName("Double").build().toReference();
+                }
+            }
+            return type;
+        }
+    };
 
     public static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(new Function<TypeRef, TypeRef>() {
         public TypeRef apply(TypeRef type) {

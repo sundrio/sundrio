@@ -28,6 +28,11 @@ import io.sundr.examples.shapes.v1.EditableCircle;
 import io.sundr.examples.shapes.v1.Square;
 import io.sundr.examples.shapes.v1.SquareBuilder;
 
+import java.util.Optional;
+import java.util.OptionalInt;
+
+import static java.util.Optional.empty;
+
 public class ShapesTest {
 
     @Test
@@ -219,9 +224,9 @@ public class ShapesTest {
                 .build();
 
         Circle circle = (Circle) canvas.getShapes().get(0);
-        Assert.assertEquals("circle1", circle.getNotes());
+        Assert.assertEquals(Optional.of("circle1"), circle.getNotes());
         Square square = (Square) canvas.getShapes().get(1);
-        Assert.assertEquals("square1", square.getNotes());
+        Assert.assertEquals(Optional.of("square1"), square.getNotes());
     }
 
     @Test

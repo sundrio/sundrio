@@ -17,7 +17,9 @@
 package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
-import io.sundr.examples.shapes.Shape;
+
+import java.util.Optional;
+import java.util.OptionalInt;
 
 @Buildable
 public abstract class AbstractShape implements Shape {
@@ -25,7 +27,9 @@ public abstract class AbstractShape implements Shape {
     private final int x;
     private final int y;
 
-    private String notes;
+    private Optional<String> notes;
+
+    private OptionalInt count;
 
     public AbstractShape(int x, int y) {
         this.x = x;
@@ -40,11 +44,19 @@ public abstract class AbstractShape implements Shape {
         return y;
     }
 
-    public String getNotes() {
+    public Optional<String> getNotes() {
         return notes;
     }
 
-    public void setNotes(String notes) {
+    public void setNotes(Optional<String> notes) {
         this.notes = notes;
+    }
+
+    public OptionalInt getCount() {
+        return count;
+    }
+
+    public void setCount(OptionalInt count) {
+        this.count = count;
     }
 }

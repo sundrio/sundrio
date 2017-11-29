@@ -16,29 +16,31 @@
 
 package io.sundr.builder.internal.visitors;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
+import io.sundr.Function;
 import io.sundr.builder.TypedVisitor;
-import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.functions.TypeAs;
-import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.Collections;
+import io.sundr.codegen.functions.Optionals;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.TypeUtils;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.codegen.model.Attributeable.INIT;
+import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 
 
 public class InitEnricher extends TypedVisitor<PropertyBuilder> {
@@ -46,7 +48,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
     @Override
     public void visit(PropertyBuilder builder) {
         TypeRef typeRef = builder.buildTypeRef();
-        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF).apply(typeRef);
+        TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(typeRef);
         boolean isBuildable = isBuildable(unwrapped);
         boolean hasDescendants = false;
 
@@ -57,7 +59,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
         Property parent = (Property) builder.getAttributes().get(DESCENDANT_OF);
         if (parent != null) {
             typeRef = parent.getTypeRef();
-            unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF).apply(typeRef);
+            unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(typeRef);
         } else if (builder.getAttributes().containsKey(DESCENDANTS) && !((Collection)builder.getAttributes().get(DESCENDANTS)).isEmpty()) {
             hasDescendants = true;
         }
@@ -74,6 +76,10 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
         boolean isSet = TypeUtils.isSet(typeRef);
         boolean isList = TypeUtils.isList(typeRef);
         boolean isMap = TypeUtils.isMap(typeRef);
+        boolean isOptional = TypeUtils.isOptional(typeRef);
+        boolean isOptionalInt = TypeUtils.isOptionalInt(typeRef);
+        boolean isOptionalDouble = TypeUtils.isOptionalDouble(typeRef);
+        boolean isOptionalLong = TypeUtils.isOptionalLong(typeRef);
 
         if (isArray || isList) {
             ClassRef listRef = Collections.ARRAY_LIST.toReference(targetType);
@@ -87,6 +93,58 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
             ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments);
             builder.addToAttributes(LAZY_INIT, "new " + mapRef + "()")
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, mapRef));
+        } else if (isOptional) {
+            final ClassRef ref = new ClassRefBuilder(Optionals.OPTIONAL.toReference()).withArguments(java.util.Collections.EMPTY_LIST).build();
+            builder.addToAttributes(INIT, ref + ".empty()")
+                    .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
+                        @Override
+                        public String apply(List<String> arguments) {
+                            if (arguments.size() != 1) {
+                                throw new IllegalArgumentException("Optional initializer only accepts one argument");
+                            }
+                            return ref + ".of(" + arguments.get(0) + ")";
+                        }
+                    })
+                    .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
+        } else if (isOptionalDouble) {
+            final ClassRef ref = Optionals.OPTIONAL_DOUBLE.toReference();
+            builder.addToAttributes(INIT, ref + ".empty()")
+                    .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
+                        @Override
+                        public String apply(List<String> arguments) {
+                            if (arguments.size() != 1) {
+                                throw new IllegalArgumentException("Optional initializer only accepts one argument");
+                            }
+                            return ref + ".of(" + arguments.get(0) + ")";
+                        }
+                    })
+                    .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
+        } else if (isOptionalInt) {
+            final ClassRef ref = Optionals.OPTIONAL_INT.toReference();
+            builder.addToAttributes(INIT, ref + ".empty()")
+                    .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
+                        @Override
+                        public String apply(List<String> arguments) {
+                            if (arguments.size() != 1) {
+                                throw new IllegalArgumentException("Optional initializer only accepts one argument");
+                            }
+                            return ref + ".of(" + arguments.get(0) + ")";
+                        }
+                    })
+                    .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
+        } else if (isOptionalLong) {
+            final ClassRef ref = Optionals.OPTIONAL_LONG.toReference();
+            builder.addToAttributes(INIT, ref + ".empty()")
+                    .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
+                        @Override
+                        public String apply(List<String> arguments) {
+                            if (arguments.size() != 1) {
+                                throw new IllegalArgumentException("Optional initializer only accepts one argument");
+                            }
+                            return ref + ".of(" + arguments.get(0) + ")";
+                        }
+                    })
+                    .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
         }
     }
 }

@@ -20,7 +20,6 @@ import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -33,7 +32,6 @@ import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -43,7 +41,6 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.INDEX;
-import static io.sundr.builder.Constants.INT_REF;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
@@ -300,7 +297,7 @@ public final class PropertyAs {
 
         public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property property) {
-                TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+                TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
                 TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
