@@ -95,7 +95,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, mapRef));
         } else if (isOptional) {
             final ClassRef ref = new ClassRefBuilder(Optionals.OPTIONAL.toReference()).withArguments(java.util.Collections.EMPTY_LIST).build();
-            builder.addToAttributes(INIT, ref + ".empty()")
+            builder.addToAttributes(INIT,  "Optional.empty()")
                     .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
                         @Override
                         public String apply(List<String> arguments) {
@@ -108,7 +108,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
         } else if (isOptionalDouble) {
             final ClassRef ref = Optionals.OPTIONAL_DOUBLE.toReference();
-            builder.addToAttributes(INIT, ref + ".empty()")
+            builder.addToAttributes(INIT, "OptionalDouble.empty()")
                     .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
                         @Override
                         public String apply(List<String> arguments) {
@@ -121,7 +121,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
         } else if (isOptionalInt) {
             final ClassRef ref = Optionals.OPTIONAL_INT.toReference();
-            builder.addToAttributes(INIT, ref + ".empty()")
+            builder.addToAttributes(INIT, "OptionalInt.empty()")
                     .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
                         @Override
                         public String apply(List<String> arguments) {
@@ -134,7 +134,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
         } else if (isOptionalLong) {
             final ClassRef ref = Optionals.OPTIONAL_LONG.toReference();
-            builder.addToAttributes(INIT, ref + ".empty()")
+            builder.addToAttributes(INIT, "OptionalLong.empty()")
                     .addToAttributes(INIT_FUNCTION, new Function<List<String>, String>() {
                         @Override
                         public String apply(List<String> arguments) {

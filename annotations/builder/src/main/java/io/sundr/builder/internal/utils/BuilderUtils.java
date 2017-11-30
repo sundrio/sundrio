@@ -482,28 +482,28 @@ public class BuilderUtils {
         if (TypeUtils.isOptionalLong(classRef)) {
             ClassRef optionalRef = Optionals.OPTIONAL_LONG.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(optionalRef)
-                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .addToAttributes(INIT, " OptionalLong.empty()")
                 .build();
         }
 
         if (TypeUtils.isOptionalDouble(classRef)) {
             ClassRef optionalRef = Optionals.OPTIONAL_DOUBLE.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(optionalRef)
-                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .addToAttributes(INIT, " OptionalDouble.empty()")
                 .build();
         }
 
         if (TypeUtils.isOptionalInt(classRef)) {
             ClassRef optionalRef = Optionals.OPTIONAL_INT.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(optionalRef)
-                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .addToAttributes(INIT, " OptionalInt.empty()")
                 .build();
         }
 
         if (TypeUtils.isOptional(classRef)) {
             ClassRef optionalRef = Optionals.OPTIONAL.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(optionalRef)
-                .addToAttributes(INIT, " " + optionalRef + ".empty()")
+                .addToAttributes(INIT, " Optional.empty()")
                 .addToAttributes(ALSO_IMPORT,  alsoImport(property, optionalRef, builderType))
                 .build();
         }
