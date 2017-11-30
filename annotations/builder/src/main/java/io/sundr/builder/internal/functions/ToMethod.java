@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -61,6 +62,7 @@ import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.codegen.functions.Collections.COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_LIST;
@@ -73,6 +75,8 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
+import static io.sundr.codegen.model.Attributeable.INIT;
+import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.isArray;
@@ -80,6 +84,10 @@ import static io.sundr.codegen.utils.TypeUtils.isBoolean;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.utils.TypeUtils.isList;
 import static io.sundr.codegen.utils.TypeUtils.isMap;
+import static io.sundr.codegen.utils.TypeUtils.isOptional;
+import static io.sundr.codegen.utils.TypeUtils.isOptionalDouble;
+import static io.sundr.codegen.utils.TypeUtils.isOptionalInt;
+import static io.sundr.codegen.utils.TypeUtils.isOptionalLong;
 import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
 import static io.sundr.codegen.utils.TypeUtils.isSet;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
@@ -116,16 +124,16 @@ public class ToMethod {
             String argumentName = property.getName();
             String fieldName = property.getName();
             TypeRef type = property.getTypeRef();
-            TypeRef unwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+            TypeRef unwrapped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
             List<Statement> statements = new ArrayList<Statement>();
             Set<Property> descendants = property.hasAttribute(DESCENDANTS) ? property.getAttribute(DESCENDANTS) : Collections.EMPTY_SET;
 
             if (property.hasAttribute(DESCENDANT_OF)) {
-                Property descendantOf = (Property) property.getAttribute(DESCENDANT_OF);
+                Property descendantOf = property.getAttribute(DESCENDANT_OF);
                 fieldName = descendantOf.getName();
             }
 
-            if (isBuildable(unwraped) && !IS_COLLECTION.apply(type) && !IS_MAP.apply(type)) {
+            if (isBuildable(unwrapped) && !IS_COLLECTION.apply(type) && !IS_MAP.apply(type)) {
                 statements.add(new StringStatement("_visitables.remove(this." + fieldName + ");"));
             }
 
@@ -137,17 +145,21 @@ public class ToMethod {
                 } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
                     statements.add(new StringStatement("if (this." + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(LAZY_INIT) + ";} else {_visitables.removeAll(this."+fieldName+"); this." + fieldName + ".clear();}"));
                     String addToMethodName = "addTo" + property.getNameCapitalized();
-                    statements.add(new StringStatement("if (" + argumentName + " != null) {for (" + unwraped.toString() + " item : " + argumentName + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
+                    statements.add(new StringStatement("if (" + argumentName + " != null) {for (" + unwrapped.toString() + " item : " + argumentName + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
                 }
                 return statements;
-            } else if (isBuildable(unwraped) && !isAbstract(unwraped)) {
-                TypeDef builder = BUILDER.apply(((ClassRef) unwraped).getDefinition());
+            }
+
+            if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
+                TypeDef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition());
                 String builderClass = builder.toReference().getName();
                 statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "(" + argumentName + "); _visitables.add(this." + fieldName + ");} return (" + returnType + ") this;"));
                 return statements;
-            } else if (!descendants.isEmpty()) {
+            }
+
+            if (!descendants.isEmpty()) {
                 for (Property descendant : descendants) {
-                    TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(descendant.getTypeRef());
+                    TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(descendant.getTypeRef());
                     TypeDef builder = BUILDER.apply(((ClassRef) dunwraped).getDefinition());
                     String builderClass = builder.toReference().getName();
                     statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName + "= new " + builderClass + "((" + dunwraped + ")" + argumentName + "); _visitables.add(this." + fieldName + ");}"));
@@ -158,6 +170,13 @@ public class ToMethod {
                 statements.add(new StringStatement("return (" + returnType + ") this;"));
                 return statements;
             }
+
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
+            if (isOptional(originTypeDef.toReference())) {
+                statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + " = java.util.Optional.of(" + argumentName + "); } else { this." + fieldName + " = java.util.Optional.empty(); } return (" + returnType + ") this;"));
+                return statements;
+            }
+
             statements.add(new StringStatement("this." + fieldName + "=" + argumentName + "; return (" + returnType + ") this;"));
             return statements;
         }
@@ -188,6 +207,52 @@ public class ToMethod {
 
     });
 
+    public static final Function<Property, List<Method>> WITH_OPTIONAL = FunctionFactory.cache(new Function<Property, List<Method>>() {
+        public List<Method> apply(final Property property) {
+            List<Method> methods = new ArrayList<Method>();
+            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
+
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
+            String methodName = "with" + property.getNameCapitalized();
+            String fieldName = property.getName();
+            String optionalSource = fieldName;                  //The expression we assign to the filed (from optional if applicable).
+            String source = fieldName;                          //The expression we assign to the field from no optional.
+
+            if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
+                TypeDef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition());
+                optionalSource = "Optional.of(new " + builder.getName() + "(" + fieldName + ".get()))";
+                source = "new " + builder.getName() + "(" + fieldName + ")";
+            }
+
+            methods.add(
+                new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withName(methodName)
+                    .withReturnType(returnType)
+                    .withArguments(property)
+                    .withNewBlock()
+                    .addNewStringStatementStatement("this." + fieldName + " = " + optionalSource + "; return (" + returnType + ") this;")
+                    .endBlock()
+                    .build()
+            );
+
+            Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped).build();
+            methods.add(
+                new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withName(methodName)
+                    .withReturnType(returnType)
+                    .withArguments(genericProperty)
+                    .withNewBlock()
+                    .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(INIT) + "; } else { this." + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; }; return (" + returnType + ") this;")
+                    .endBlock()
+                    .build()
+            );
+
+            return methods;
+        }
+    });
+
     public static final Function<Property, Method> HAS = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(final Property property) {
             String prefix = "has";
@@ -197,9 +262,11 @@ public class ToMethod {
             if (isPrimitive(property.getTypeRef())) {
                 statements.add(new StringStatement("return true;"));
             } else if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
-                statements.add(new StringStatement("return " + property.getName() + "!= null && !" + property.getName() + ".isEmpty();"));
+                statements.add(new StringStatement("return " + property.getName() + " != null && !" + property.getName() + ".isEmpty();"));
+            } else if (isOptional(property.getTypeRef())|| isOptionalInt(property.getTypeRef()) || isOptionalLong(property.getTypeRef()) || isOptionalDouble(property.getTypeRef())) {
+                statements.add(new StringStatement("return " + property.getName() + " != null && " + property.getName() + ".isPresent();"));
             } else {
-                statements.add(new StringStatement("return this." + property.getName() + "!=null;"));
+                statements.add(new StringStatement("return this." + property.getName() + " != null;"));
             }
 
             return new MethodBuilder()
@@ -217,7 +284,7 @@ public class ToMethod {
     public static final Function<Property, List<Method>> GETTER = FunctionFactory.cache(new Function<Property, List<Method>>() {
         public List<Method> apply(final Property property) {
             List<Method> methods = new ArrayList<Method>();
-            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
             TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
             String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
@@ -227,8 +294,10 @@ public class ToMethod {
             List<String> comments = new ArrayList<String>();
             List<Statement> statements = new ArrayList<Statement>();
             boolean isNested = false;
+            boolean isMap = isMap(property.getTypeRef());
             boolean isList = isList(property.getTypeRef());
             boolean isSet = isSet(property.getTypeRef());
+            boolean isOptional = isOptional(property.getTypeRef());
 
             TreeSet<Property> descendants = new TreeSet<Property>(new Comparator<Property>() {
                 public int compare(Property left, Property right) {
@@ -237,7 +306,7 @@ public class ToMethod {
             });
             descendants.addAll(Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property));
 
-            if (isMap(property.getTypeRef())) {
+            if (isMap) {
                 statements.add(new StringStatement("return this." + property.getName() + ";"));
             } else if (isBuildable(unwrapped)) {
                 isNested = true;
@@ -245,6 +314,8 @@ public class ToMethod {
                 comments.add("This method has been deprecated, please use method " + builderName + " instead.");
                 if (isList || isSet) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
+                } else if (isOptional) {
+                    statements.add(new StringStatement("return ("+property.getTypeRef()+") (this." + property.getName() + "!=null && this."+property.getName()+".isPresent() ?this." + property.getName() + ".get().build():Optional.empty());"));
                 } else {
                     statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
@@ -510,7 +581,7 @@ public class ToMethod {
         public List<Method> apply(final Property property) {
             List<Method> methods = new ArrayList<Method>();
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
@@ -682,7 +753,7 @@ public class ToMethod {
         public List<Method> apply(final Property property) {
             List<Method> methods = new ArrayList<Method>();
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
@@ -850,7 +921,7 @@ public class ToMethod {
         public Method apply(Property property) {
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
 
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
@@ -878,9 +949,9 @@ public class ToMethod {
 
 
             prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
-            String methodName = prefix + captializeFirst(isCollection
-                    ? Singularize.FUNCTION.apply(property.getName())
-                    : property.getName());
+            String methodName = prefix + (isCollection
+                    ? Singularize.FUNCTION.apply(property.getNameCapitalized())
+                    : property.getNameCapitalized());
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -897,7 +968,7 @@ public class ToMethod {
 
     public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = new Function<Property, Set<Method>>() {
         public Set<Method> apply(Property property) {
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
@@ -909,9 +980,9 @@ public class ToMethod {
                 String ownPrefix = isCollection ? "addNew" : "withNew";
 
                 ownPrefix += BuilderUtils.fullyQualifiedNameDiff(baseType.toInternalReference(), originTypeDef);
-                String ownName = ownPrefix + captializeFirst(isCollection
-                        ? Singularize.FUNCTION.apply(property.getName())
-                        : property.getName());
+                String ownName = ownPrefix + (isCollection
+                        ? Singularize.FUNCTION.apply(property.getNameCapitalized())
+                        : property.getNameCapitalized());
 
                 String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
                 String delegateName = delegatePrefix + captializeFirst(property.getName());
@@ -942,7 +1013,9 @@ public class ToMethod {
     public static final Function<Property, Method> EDIT_OR_NEW = new Function<Property, Method>() {
         public Method apply(Property property) {
             ClassRef baseType = (ClassRef) property.getTypeRef();
-            ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType.getDefinition()).toReference();
+            ClassRef unwrappedType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(baseType);
+
+            ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(unwrappedType.getDefinition()).toReference();
 
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
@@ -962,16 +1035,20 @@ public class ToMethod {
             ClassRef rewraped = nestedType.toReference(typeArguments);
 
             String prefix = "editOrNew";
-            String methodNameBase = captializeFirst(property.getName());
+            String methodNameBase = property.getNameCapitalized();
             String methodName = prefix + methodNameBase;
 
+            String statement =
+                    isOptional(baseType)
+                            ?  "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null  && get"+methodNameBase+"().isPresent() ? get" + methodNameBase + "().get() : new " + builderType.getName() + "().build());"
+                            : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): new " + builderType.getName() + "().build());";
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withParameters(parameters)
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .withNewBlock()
-                    .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): new " + builderType.getName() + "().build());")
+                    .addNewStringStatementStatement(statement)
                     .endBlock()
                     .build();
 
@@ -981,8 +1058,9 @@ public class ToMethod {
     public static final Function<Property, Method> EDIT_OR_NEW_LIKE = new Function<Property, Method>() {
         public Method apply(Property property) {
             ClassRef baseType = (ClassRef) property.getTypeRef();
+            ClassRef unwrappedType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(baseType);
             //Let's reload the class from the repository if available....
-            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
+            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((unwrappedType).getDefinition().getFullyQualifiedName());
             if (propertyTypeDef != null) {
                 baseType = propertyTypeDef.toInternalReference();
             }
@@ -1000,8 +1078,12 @@ public class ToMethod {
 
             String prefix = "editOrNew";
             String suffix = "Like";
-            String methodNameBase = captializeFirst(property.getName());
+            String methodNameBase = property.getNameCapitalized();
             String methodName = prefix + methodNameBase + suffix;
+
+            String statement = isOptional(property.getTypeRef())
+                    ? "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null && get"+methodNameBase+"().isPresent() ? get" + methodNameBase + "().get(): item);"
+                    : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): item);";
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -1013,7 +1095,7 @@ public class ToMethod {
                     .withTypeRef(baseType)
                     .endArgument()
                     .withNewBlock()
-                    .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): item);")
+                    .addNewStringStatementStatement(statement)
                     .endBlock()
                     .build();
 
@@ -1022,7 +1104,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
-            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            ClassRef baseType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
             if (propertyTypeDef != null) {
@@ -1047,9 +1129,9 @@ public class ToMethod {
 
             String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
-            String methodName = prefix + captializeFirst(isCollection
-                    ? Singularize.FUNCTION.apply(property.getName())
-                    : property.getName()) + suffix;
+            String methodName = prefix + (isCollection
+                    ? Singularize.FUNCTION.apply(property.getNameCapitalized())
+                    : property.getNameCapitalized()) + suffix;
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -1098,8 +1180,8 @@ public class ToMethod {
     public static final Function<Property, List<Method>> EDIT_NESTED = new Function<Property, List<Method>>() {
         public List<Method> apply(Property property) {
             List<Method> methods = new ArrayList<Method>();
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
-            ClassRef unwrapped = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
+            ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
             TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
             TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
 
@@ -1126,15 +1208,19 @@ public class ToMethod {
 
             String prefix = "edit";
             prefix += BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef);
-            String methodNameBase = captializeFirst(property.getName());
+            String methodNameBase = property.getNameCapitalized();
             String methodName = prefix + methodNameBase;
+
+            String statement = isOptional(property.getTypeRef())
+                    ? "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "().orElse(null) : null);"
+                    : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "());";
 
             Method base =  new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(rewraped)
                     .withName(methodName)
                     .withNewBlock()
-                    .addNewStringStatementStatement("return withNew" + methodNameBase + "Like(get" + methodNameBase + "());")
+                    .addNewStringStatementStatement(statement)
                     .endBlock()
                     .build();
 
@@ -1208,7 +1294,7 @@ public class ToMethod {
             boolean isSet = TypeUtils.isSet(property.getTypeRef());
 
             String prefix = isArray || isList ? "setTo" : "with";
-            String withMethodName = prefix + captializeFirst(property.getName());
+            String withMethodName = prefix + property.getNameCapitalized();
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -1234,7 +1320,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> END = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
             String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
                     ? Singularize.FUNCTION.apply(property.getName())
                     : property.getName());

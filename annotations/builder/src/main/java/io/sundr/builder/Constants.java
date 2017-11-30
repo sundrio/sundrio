@@ -52,7 +52,7 @@ public class Constants {
 
     public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
 
-    public static final AttributeKey<TypeDef> ORIGIN_TYPEDF = new AttributeKey<TypeDef>("ORIGIN_TYPEDF", TypeDef.class);
+    public static final AttributeKey<TypeDef> ORIGIN_TYPEDEF = new AttributeKey<TypeDef>("ORIGIN_TYPEDEF", TypeDef.class);
     public static final AttributeKey<TypeDef> OUTER_INTERFACE =  new AttributeKey<TypeDef>("OUTER_INTERFACE", TypeDef.class);
     public static final AttributeKey<TypeDef> OUTER_CLASS =  new AttributeKey<TypeDef>("OUTER_CLASS", TypeDef.class);
 

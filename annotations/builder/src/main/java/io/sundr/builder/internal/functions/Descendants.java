@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
-import static io.sundr.builder.Constants.ORIGIN_TYPEDF;
+import static io.sundr.builder.Constants.ORIGIN_TYPEDEF;
 import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
 import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 
@@ -85,7 +85,7 @@ public class Descendants {
             }
 
             TypeRef baseType = property.getTypeRef();
-            TypeDef origin = property.getAttribute(ORIGIN_TYPEDF);
+            TypeDef origin = property.getAttribute(ORIGIN_TYPEDEF);
 
             if (IS_COLLECTION.apply(baseType)) {
                 TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);

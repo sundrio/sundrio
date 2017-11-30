@@ -20,12 +20,12 @@ import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.ModifierSupport;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.Statement;
@@ -33,22 +33,22 @@ import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.TypeUtils;
 
+import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.INDEX;
-import static io.sundr.builder.Constants.INT_REF;
 import static io.sundr.builder.Constants.N;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
 
 public final class PropertyAs {
@@ -62,7 +62,7 @@ public final class PropertyAs {
             boolean isArray = TypeUtils.isArray(item.getTypeRef());
             boolean isList = TypeUtils.isList(item.getTypeRef());
 
-            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item.getTypeRef());
+            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
 
             if (unwrapped instanceof ClassRef) {
                 TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
@@ -135,7 +135,8 @@ public final class PropertyAs {
         public TypeDef apply(Property item) {
 
 
-            TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
+            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
+            //TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
 
             if (unwrapped instanceof ClassRef) {
                 TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
@@ -183,6 +184,7 @@ public final class PropertyAs {
 
                 return new TypeDefBuilder(nestedType)
                         .withAnnotations()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                         .withProperties(properties)
                         .withMethods(nestedMethods)
                         .withConstructors(constructors)
@@ -206,7 +208,7 @@ public final class PropertyAs {
                         .build();
 
                 //Not a typical fluent
-                TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
+                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
                 if (typeDef == null) {
@@ -255,7 +257,8 @@ public final class PropertyAs {
                 TypeDef outerInterface = item.getAttribute(OUTER_INTERFACE);
                 //Not a typical fluent
 
-                TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
+                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
+                //TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
                 if (typeDef == null) {
@@ -300,9 +303,10 @@ public final class PropertyAs {
 
         public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
             public TypeDef apply(Property property) {
-                TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDF);
+                TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
-                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+
+                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
                 if (typeDef == null) {

@@ -40,9 +40,10 @@ public class Collections {
     public static final TypeDef LIST = TYPEDEF.apply(List.class);
     public static final TypeDef ARRAY_LIST = TYPEDEF.apply(ArrayList.class);
     public static final TypeDef SET = TYPEDEF.apply(Set.class);
-    public static final TypeDef LINKED_HASH_SET = TYPEDEF.apply(LinkedHashSet.class);    public static final Function<TypeRef, Boolean> IS_LIST = FunctionFactory.cache(new Function<TypeRef, Boolean>() {
+    public static final TypeDef LINKED_HASH_SET = TYPEDEF.apply(LinkedHashSet.class);
 
-    public Boolean apply(TypeRef type) {
+    public static final Function<TypeRef, Boolean> IS_LIST = FunctionFactory.cache(new Function<TypeRef, Boolean>() {
+        public Boolean apply(TypeRef type) {
            return TypeUtils.isInstanceOf(type, LIST, IS_LIST);
         }
     });
