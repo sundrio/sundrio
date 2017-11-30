@@ -425,24 +425,28 @@ public class BuilderUtils {
         String currentPackage = originType != null ? originType.getPackageName() : null;
 
         if (typeRef instanceof ClassRef) {
-            ClassRef classRef = (ClassRef)  TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
+            TypeRef unwrapped =   TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
 
-            String candidateFqn = classRef.getFullyQualifiedName().replace(classRef.getDefinition().getPackageName(), currentPackage);
+            if (unwrapped instanceof ClassRef) {
+                ClassRef classRef = (ClassRef) unwrapped;
 
-            //If classRef is inside the current package.
-            if (candidateFqn.equals(classRef.getFullyQualifiedName())) {
-                return "";
-            }
+                String candidateFqn = classRef.getFullyQualifiedName().replace(classRef.getDefinition().getPackageName(), currentPackage);
 
-            //If candidate is imported and different that the actual name, do a diff
-            if (originType.getImports().contains(candidateFqn) && !classRef.getDefinition().getFullyQualifiedName().equals(candidateFqn)) {
-                return captializeFirst(TypeUtils.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
-            }
+                //If classRef is inside the current package.
+                if (candidateFqn.equals(classRef.getFullyQualifiedName())) {
+                    return "";
+                }
 
-            //If not then we compare against what has been found in the map.
-            String fqn = map.get(classRef.getDefinition().getName());
-            if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
-                return captializeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));
+                //If candidate is imported and different that the actual name, do a diff
+                if (originType.getImports().contains(candidateFqn) && !classRef.getDefinition().getFullyQualifiedName().equals(candidateFqn)) {
+                    return captializeFirst(TypeUtils.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
+                }
+
+                //If not then we compare against what has been found in the map.
+                String fqn = map.get(classRef.getDefinition().getName());
+                if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
+                    return captializeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));
+                }
             }
         }
         return "";
