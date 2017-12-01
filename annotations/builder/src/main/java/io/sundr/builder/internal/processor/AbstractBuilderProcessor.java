@@ -242,7 +242,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
     /**
      * Create a mapping from class name to {@link ClassRef}.
-     * @return
+     * @param builderContext    The builder context.
      */
     public void addCustomMappings(BuilderContext builderContext) {
         DefinitionRepository definitionRepository = builderContext.getDefinitionRepository();

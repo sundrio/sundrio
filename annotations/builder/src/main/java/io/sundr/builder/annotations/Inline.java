@@ -17,13 +17,12 @@
 package io.sundr.builder.annotations;
 
 /**
- * Annotation to mark that a {@link Builder} wrapper should be generated, for inlining the builder into a DSL.
+ * Annotation to mark that a {@link io.sundr.builder.Builder} wrapper should be generated, for inlining the builder into a DSL.
  */
 public @interface Inline {
 
     /**
-     * The name of the inline build method.
-     * @return
+     * @return The name of the inline build method.
      */
     String value();
 
@@ -39,8 +38,7 @@ public @interface Inline {
     String name() default "";
 
     /**
-     * The suffix of the inlinable.
-     * @return
+     * @return The suffix of the inlinable.
      */
     String suffix() default "";
 

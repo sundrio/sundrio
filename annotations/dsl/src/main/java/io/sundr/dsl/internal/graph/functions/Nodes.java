@@ -108,7 +108,7 @@ public class Nodes {
 
 
     /**
-     * {@Function} that accepts a {@link NodeContext} and finds which classes can follow next.
+     * {@link Function} that accepts a {@link NodeContext} and finds which classes can follow next.
      */
     public static final Function<NodeContext, Set<TypeDef>> TO_NEXT = new Function<NodeContext, Set<TypeDef>>() {
         public Set<TypeDef> apply(NodeContext context) {

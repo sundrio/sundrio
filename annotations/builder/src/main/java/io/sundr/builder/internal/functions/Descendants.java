@@ -73,9 +73,6 @@ public class Descendants {
 
     /**
      * Find all buildable descendant equivalents of a property.
-     *
-     * @param property
-     * @return
      */
     public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DESCENDANTS = FunctionFactory.wrap(new Function<Property, Set<Property>>() {
         public Set<Property> apply(Property property) {

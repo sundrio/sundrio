@@ -236,7 +236,7 @@ public class BuilderUtils {
      * Checks if there is a default constructor available.
      *
      * @param item The clazz to check.
-     * @return
+     * @return     True if default constructor is found, false otherwise.
      */
     public static boolean hasDefaultConstructor(TypeDef item) {
         if (item == null) {
