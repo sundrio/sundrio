@@ -171,12 +171,6 @@ public class ToMethod {
                 return statements;
             }
 
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
-            if (isOptional(originTypeDef.toReference())) {
-                statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + " = java.util.Optional.of(" + argumentName + "); } else { this." + fieldName + " = java.util.Optional.empty(); } return (" + returnType + ") this;"));
-                return statements;
-            }
-
             statements.add(new StringStatement("this." + fieldName + "=" + argumentName + "; return (" + returnType + ") this;"));
             return statements;
         }
