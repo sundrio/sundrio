@@ -38,13 +38,11 @@ import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,26 +60,28 @@ import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
+import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
+import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
+import static io.sundr.builder.internal.functions.TypeAs.combine;
+import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.functions.Collections.COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_LIST;
 import static io.sundr.codegen.functions.Collections.IS_MAP;
 import static io.sundr.codegen.functions.Collections.IS_SET;
-import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
-import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
-import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
-import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
-import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
-import static io.sundr.builder.internal.functions.TypeAs.combine;
-import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
 import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
+import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.isArray;
 import static io.sundr.codegen.utils.TypeUtils.isBoolean;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.utils.TypeUtils.isList;
 import static io.sundr.codegen.utils.TypeUtils.isMap;
 import static io.sundr.codegen.utils.TypeUtils.isOptional;
@@ -90,8 +90,6 @@ import static io.sundr.codegen.utils.TypeUtils.isOptionalInt;
 import static io.sundr.codegen.utils.TypeUtils.isOptionalLong;
 import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
 import static io.sundr.codegen.utils.TypeUtils.isSet;
-import static io.sundr.codegen.utils.StringUtils.captializeFirst;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 
@@ -917,7 +915,7 @@ public class ToMethod {
 
     public static final Function<Property, Method> WITH_NEW_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
-            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            ClassRef baseType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
@@ -970,7 +968,7 @@ public class ToMethod {
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
-            TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
+            TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
             TypeDef baseType = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrappedType);
 
             for (Method constructor : getInlineableConstructors(property)) {
@@ -1179,7 +1177,7 @@ public class ToMethod {
         public List<Method> apply(Property property) {
             List<Method> methods = new ArrayList<Method>();
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
-            ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
+            ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
             TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
             TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
 
