@@ -1320,8 +1320,8 @@ public class ToMethod {
         public Method apply(Property property) {
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
             String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
-                    ? Singularize.FUNCTION.apply(property.getName())
-                    : property.getName());
+                    ? Singularize.FUNCTION.apply(property.getNameCapitalized())
+                    : property.getNameCapitalized());
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
