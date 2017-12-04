@@ -739,7 +739,7 @@ public class ToMethod {
                 public String apply(Property item) {
                     TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
                     String className = ((ClassRef) itemRef).getName();
-                    String methodName = prefix + captializeFirst(item.getName());
+                    String methodName = prefix + item.getNameCapitalized();
                     return "if (item instanceof " + className + "){" + methodName + "(" + (useIndex ? "index, " : "") + "(" + className + ")item);}\n";
                 }
             }, " else "));
@@ -791,7 +791,7 @@ public class ToMethod {
                     public String apply(Property item) {
                         TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
                         String className = ((ClassRef) itemRef).getName();
-                        String removeFromMethodName = "removeFrom" + captializeFirst(item.getName());
+                        String removeFromMethodName = "removeFrom" + item.getNameCapitalized();
                         return "if (item instanceof " + className + "){" + removeFromMethodName + "((" + className + ")item);}\n";
                     }
                 }, " else ") + "} return (" + returnType + ")this;"));
@@ -1224,7 +1224,7 @@ public class ToMethod {
 
 
             if (isList(property.getTypeRef()) || isArray(property.getTypeRef())) {
-                String suffix = Singularize.FUNCTION.apply(captializeFirst(property.getName()));
+                String suffix = Singularize.FUNCTION.apply(property.getNameCapitalized());
                 methods.add(new MethodBuilder(base)
                         .withArguments(INDEX)
                         .withName("edit" + suffix)
