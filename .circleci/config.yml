@@ -6,9 +6,6 @@ workflows:
       - update_dependencies:
           requires:
             - checkout_code
-      - java-7:
-          requires:
-            - update_dependencies
       - java-8:
           requires:
             - update_dependencies
@@ -84,11 +81,6 @@ jobs:
           paths:
             - /root/.m2
 
-  java-7:
-    <<: *mvn_job_defaults
-
-    docker:
-      - image: openjdk:7-jdk
 
   java-8:
     <<: *mvn_job_defaults
