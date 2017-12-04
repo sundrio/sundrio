@@ -208,7 +208,7 @@ public class ToMethod {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
             String fieldName = property.getName();
-            String optionalSource = fieldName;                  //The expression we assign to the filed (from optional if applicable).
+            String optionalSource = fieldName;                  //The expression we assign to the field (from optional if applicable).
             String source = fieldName;                          //The expression we assign to the field from no optional.
             String prepareSource="";
             String prepareOptionalSource="";
@@ -228,7 +228,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(property)
                     .withNewBlock()
-                        .addNewStringStatementStatement(prepareOptionalSource + "this." + fieldName + " = " + optionalSource + "; return (" + returnType + ") this;")
+                        .addNewStringStatementStatement("if (" + fieldName + " == null || !" + fieldName + ".isPresent()) { this." + fieldName + " = " + property.getAttribute(INIT) + "; } else {" + prepareOptionalSource + " this." + fieldName + " = " + optionalSource + "; } return (" + returnType + ") this;")
                     .endBlock()
                     .build()
             );
@@ -241,7 +241,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(genericProperty)
                     .withNewBlock()
-                        .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(INIT) + "; } else {" + prepareSource + " this." + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; }; return (" + returnType + ") this;")
+                        .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(INIT) + "; } else {" + prepareSource + " this." + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; } return (" + returnType + ") this;")
                     .endBlock()
                     .build()
             );
@@ -294,7 +294,7 @@ public class ToMethod {
             boolean isMap = isMap(property.getTypeRef());
             boolean isList = isList(property.getTypeRef());
             boolean isSet = isSet(property.getTypeRef());
-            boolean isOptional = isOptional(property.getTypeRef());
+            boolean isOptional = isOptional(property.getTypeRef()) || isOptionalDouble(property.getTypeRef()) || isOptionalInt(property.getTypeRef()) || isOptionalLong(property.getTypeRef());
 
             TreeSet<Property> descendants = new TreeSet<Property>(new Comparator<Property>() {
                 public int compare(Property left, Property right) {
@@ -312,7 +312,7 @@ public class ToMethod {
                 if (isList || isSet) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else if (isOptional) {
-                    statements.add(new StringStatement("return ("+property.getTypeRef()+") (this." + property.getName() + "!=null && this."+property.getName()+".isPresent() ?this." + property.getName() + ".get().build():Optional.empty());"));
+                    statements.add(new StringStatement("return ("+property.getTypeRef()+") (this." + property.getName() + "!=null && this."+property.getName()+".isPresent() ? " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList("this." + property.getName() + ".get().build()")) + " : " + property.getAttribute(INIT) + ");"));
                 } else {
                     statements.add(new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
                 }
