@@ -597,9 +597,7 @@ public class ClazzAs {
     public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
 
-            List<Property> fields = new ArrayList<Property>();
             List<Property> arguments = new ArrayList<Property>();
-
             List<Property> parentFields = new ArrayList<Property>();
             List<Property> ownFields = new ArrayList<Property>();
 
@@ -685,7 +683,7 @@ public class ClazzAs {
                     statements.add(new StringStatement("this." + p.getName() + " = " + p.getName() + ";"));
                 }
             } else {
-                for (Property p : fields) {
+                for (Property p : ownFields) {
                     statements.add(new StringStatement("this." + p.getName() + " = " + p.getName() + ";"));
                 }
             }
@@ -716,6 +714,7 @@ public class ClazzAs {
                     .withMethods(getters)
                     .addToImplementsList(item.toInternalReference())
                     .withExtendsList(extendsList)
+                    .addToAttributes(item.getAttributes())
                     .build();
         }
     });
