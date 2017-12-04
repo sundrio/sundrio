@@ -971,7 +971,7 @@ public class ToMethod {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
             TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-            TypeDef baseType = BuilderContextManager.getContext().getBuildableRepository().getBuildable(unwrappedType);
+            TypeDef baseType = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrappedType);
 
             for (Method constructor : getInlineableConstructors(property)) {
                 boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
