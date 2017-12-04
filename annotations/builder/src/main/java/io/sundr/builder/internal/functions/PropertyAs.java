@@ -327,7 +327,7 @@ public final class PropertyAs {
 
                 return new TypeDefBuilder(typeDef)
                         .withPackageName(outerInterface.getPackageName())
-                        .withName(BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + captializeFirst(property.getName() + "Nested"))
+                        .withName(BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + property.getNameCapitalized() + "Nested")
                         .withParameters(parameters)
                         .build();
             }
