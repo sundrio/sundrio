@@ -31,6 +31,7 @@ import io.sundr.codegen.model.TypeRef;
 
 import javax.lang.model.element.Modifier;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -370,13 +371,25 @@ public final class TypeUtils {
     }
 
     public static void visitParents(TypeDef type, List<TypeDef> types) {
+        visitParents(type, types, new ArrayList<>());
+    }
+
+    public static void visitParents(TypeDef type, List<TypeDef> types, List<TypeDef> visited) {
         if (JAVA_LANG_OBJECT.equals(type.getFullyQualifiedName())) {
             return;
         }
 
-        for (TypeRef ref : type.isInterface() ? type.getImplementsList() : type.getExtendsList()) {
+        if (visited.contains(type)) {
+            return;
+        }
+
+        visited.add(type);
+        List<TypeRef> allRefs = new ArrayList<>();
+        allRefs.addAll(type.getImplementsList());
+        allRefs.addAll(type.getExtendsList());
+        for (TypeRef ref : allRefs) {
             TypeDef parent = DefinitionRepository.getRepository().getDefinition(ref);
-            visitParents(parent, types);
+            visitParents(parent, types, visited);
         }
         types.add(type);
     }
