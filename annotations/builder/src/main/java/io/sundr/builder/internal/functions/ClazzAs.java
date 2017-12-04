@@ -30,7 +30,6 @@ import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
@@ -598,7 +597,6 @@ public class ClazzAs {
     public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
 
-
             List<Property> fields = new ArrayList<Property>();
             List<Property> arguments = new ArrayList<Property>();
 
@@ -626,7 +624,6 @@ public class ClazzAs {
 
 
             for (TypeDef t : types) {
-
                 for (Method method : t.getMethods()) {
                     if (isGetter(method)) {
                         String name = method.getName();
@@ -665,12 +662,18 @@ public class ClazzAs {
                 }
             }
 
+            //This list is used verify that visited arguments are aligned with superclass constructor arguments.
+            //This shouldn't be needed, but there are cases that visited arguments are miscalculated, So....
+            List<Property> allArguments = new ArrayList<>();
             List<Statement> statements = new ArrayList<Statement>();
             if (superClass != null) {
                 Method constructor = findBuildableConstructor(superClass);
+                if (constructor != null) {
+                    allArguments.addAll(constructor.getArguments());
+                }
                 StringBuilder sb = new StringBuilder();
                 sb.append("super(");
-                sb.append(StringUtils.join(constructor.getArguments(), new Function<Property, String>(){
+                sb.append(StringUtils.join(allArguments, new Function<Property, String>(){
                     @Override
                     public String apply(Property item) {
                         return item.getName();
@@ -687,11 +690,17 @@ public class ClazzAs {
                 }
             }
 
+            for (Property a : arguments) {
+                if (!allArguments.contains(a)) {
+                    allArguments.add(a);
+                }
+            }
+
             //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
             //The processor instead explicitly generates fluent and builder for the new pojo.
             Method constructor = new MethodBuilder()
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
-                    .withArguments(arguments)
+                    .withArguments(allArguments)
                     .withNewBlock()
                         .withStatements(statements)
                     .endBlock()
