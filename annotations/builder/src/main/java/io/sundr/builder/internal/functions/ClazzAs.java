@@ -57,6 +57,7 @@ import java.util.Set;
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
+import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 
 public class ClazzAs {
 
@@ -689,6 +690,7 @@ public class ClazzAs {
             //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
             //The processor instead explicitly generates fluent and builder for the new pojo.
             Method constructor = new MethodBuilder()
+                    .withModifiers(modifiersToInt(Modifier.PUBLIC))
                     .withArguments(arguments)
                     .withNewBlock()
                         .withStatements(statements)
@@ -698,6 +700,7 @@ public class ClazzAs {
             
             return new TypeDefBuilder()
                     .withPackageName(item.getPackageName())
+                    .withModifiers(modifiersToInt(Modifier.PUBLIC))
                     .withName(pojoName)
                     .withProperties(ownFields)
                     .withConstructors(constructor)
