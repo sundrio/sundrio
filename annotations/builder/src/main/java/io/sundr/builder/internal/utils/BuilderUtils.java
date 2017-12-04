@@ -57,6 +57,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.BOOLEAN_REF;
+import static io.sundr.builder.Constants.PRIMITIVES;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
@@ -154,6 +156,25 @@ public class BuilderUtils {
             if (isApplicableSetterOf(method, property)) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public static boolean isGetter(Method method) {
+        if (method.isPrivate() || method.isStatic()) {
+            return false;
+        }
+
+        if (!method.getArguments().isEmpty()) {
+            return false;
+        }
+
+        if (method.getName().startsWith("get")) {
+            return true;
+        }
+
+        if (method.getName().startsWith("is") && (method.getReturnType().equals(BOOLEAN_REF) || method.getReturnType().equals(PRIMITIVES[0]))) {
+            return true;
         }
         return false;
     }
