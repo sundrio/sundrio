@@ -33,12 +33,14 @@ import javax.lang.model.element.Modifier;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
 public final class TypeUtils {
 
     private static final String BOOLEAN = "boolean";
+    private static final String JAVA_LANG_OBJECT = "java.lang.Object";
     private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
     private static final String JAVA_UTIL_OPTIONAL = "java.util.Optional";
     private static final String JAVA_UTIL_OPTIONAL_INT = "java.util.OptionalInt";
@@ -365,5 +367,17 @@ public final class TypeUtils {
         }
 
         return JAVA_UTIL_OPTIONAL_LONG.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
+    }
+
+    public static void visitParents(TypeDef type, List<TypeDef> types) {
+        if (JAVA_LANG_OBJECT.equals(type.getFullyQualifiedName())) {
+            return;
+        }
+
+        for (TypeRef ref : type.isInterface() ? type.getImplementsList() : type.getExtendsList()) {
+            TypeDef parent = DefinitionRepository.getRepository().getDefinition(ref);
+            visitParents(parent, types);
+        }
+        types.add(type);
     }
 }

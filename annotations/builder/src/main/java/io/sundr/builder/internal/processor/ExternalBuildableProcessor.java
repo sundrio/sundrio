@@ -100,6 +100,12 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 double percentage = 100 * (count++) / total;
                 System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
 
+                if (typeDef.isInterface()) {
+                    typeDef = ClazzAs.POJO.apply(typeDef);
+                    generateFromClazz(typeDef,
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                }
+
                 generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 

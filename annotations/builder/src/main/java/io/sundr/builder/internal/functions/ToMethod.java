@@ -171,12 +171,6 @@ public class ToMethod {
                 return statements;
             }
 
-            TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
-            if (isOptional(originTypeDef.toReference())) {
-                statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + " = java.util.Optional.of(" + argumentName + "); } else { this." + fieldName + " = java.util.Optional.empty(); } return (" + returnType + ") this;"));
-                return statements;
-            }
-
             statements.add(new StringStatement("this." + fieldName + "=" + argumentName + "; return (" + returnType + ") this;"));
             return statements;
         }
@@ -217,11 +211,15 @@ public class ToMethod {
             String fieldName = property.getName();
             String optionalSource = fieldName;                  //The expression we assign to the filed (from optional if applicable).
             String source = fieldName;                          //The expression we assign to the field from no optional.
+            String prepareSource="";
+            String prepareOptionalSource="";
 
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition());
-                optionalSource = "Optional.of(new " + builder.getName() + "(" + fieldName + ".get()))";
-                source = "new " + builder.getName() + "(" + fieldName + ")";
+                prepareSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + "); _visitables.add(b);";
+                prepareOptionalSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + ".get()); _visitables.add(b);";
+                optionalSource = "Optional.of(b)";
+                source = "b";
             }
 
             methods.add(
@@ -231,7 +229,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(property)
                     .withNewBlock()
-                    .addNewStringStatementStatement("this." + fieldName + " = " + optionalSource + "; return (" + returnType + ") this;")
+                        .addNewStringStatementStatement(prepareOptionalSource + "this." + fieldName + " = " + optionalSource + "; return (" + returnType + ") this;")
                     .endBlock()
                     .build()
             );
@@ -244,7 +242,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(genericProperty)
                     .withNewBlock()
-                    .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(INIT) + "; } else { this." + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; }; return (" + returnType + ") this;")
+                        .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(INIT) + "; } else {" + prepareSource + " this." + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; }; return (" + returnType + ") this;")
                     .endBlock()
                     .build()
             );

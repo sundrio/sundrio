@@ -21,13 +21,16 @@ import io.sundr.FunctionFactory;
 import io.sundr.Provider;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.codegen.CodegenContext;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
@@ -590,6 +593,121 @@ public class ClazzAs {
         }
     });
 
+
+    public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
+        public TypeDef apply(TypeDef item) {
+
+
+            List<Property> fields = new ArrayList<Property>();
+            List<Property> arguments = new ArrayList<Property>();
+
+            List<Property> parentFields = new ArrayList<Property>();
+            List<Property> ownFields = new ArrayList<Property>();
+
+            List<Method> getters = new ArrayList<Method>();
+            List<TypeDef> types = new ArrayList<TypeDef>();
+            TypeUtils.visitParents(item, types);
+
+            String pojoName = "Default" + item.getName();
+            TypeDef superClass = null;
+            List<ClassRef> extendsList = new ArrayList<>();
+
+            for (AnnotationRef r : item.getAnnotations()) {
+                if (r.getClassRef().getFullyQualifiedName().equals(Pojo.class.getTypeName())) {
+                    pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
+                    String superClassName = String.valueOf(r.getParameters().getOrDefault("superClass",""));
+                    if (!superClassName.isEmpty()) {
+                        superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
+                        extendsList.add(superClass.toInternalReference());
+                    }
+                }
+            }
+
+
+            for (TypeDef t : types) {
+
+                for (Method method : t.getMethods()) {
+                    if (isGetter(method)) {
+                        String name = method.getName();
+                        if (name.startsWith("get")) {
+                            name = name.substring(3);
+                        } else if (name.startsWith("is")) {
+                            name = name.substring(2);
+                        }
+
+                        name = name.substring(0, 1).toLowerCase() + name.substring(1);
+
+                        arguments.add(new PropertyBuilder()
+                                .withName(name)
+                                .withTypeRef(method.getReturnType())
+                                .withModifiers(TypeUtils.modifiersToInt())
+                                .build());
+
+                        Property field = new PropertyBuilder()
+                                .withName(name)
+                                .withTypeRef(method.getReturnType())
+                                .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+                                .build();
+
+                        if (!t.getFullyQualifiedName().equals(item.getFullyQualifiedName())) {
+                            parentFields.add(field);
+                        } else {
+                            ownFields.add(field);
+                            getters.add(new MethodBuilder(method)
+                                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                                    .withNewBlock()
+                                    .withStatements(new StringStatement("return this." + name + ";"))
+                                    .endBlock()
+                                    .build());
+                        }
+                    }
+                }
+            }
+
+            List<Statement> statements = new ArrayList<Statement>();
+            if (superClass != null) {
+                Method constructor = findBuildableConstructor(superClass);
+                StringBuilder sb = new StringBuilder();
+                sb.append("super(");
+                sb.append(StringUtils.join(constructor.getArguments(), new Function<Property, String>(){
+                    @Override
+                    public String apply(Property item) {
+                        return item.getName();
+                    }
+                }, ", "));
+                sb.append(");");
+                statements.add(new StringStatement(sb.toString()));
+                for (Property p : ownFields) {
+                    statements.add(new StringStatement("this." + p.getName() + " = " + p.getName() + ";"));
+                }
+            } else {
+                for (Property p : fields) {
+                    statements.add(new StringStatement("this." + p.getName() + " = " + p.getName() + ";"));
+                }
+            }
+
+            //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
+            //The processor instead explicitly generates fluent and builder for the new pojo.
+            Method constructor = new MethodBuilder()
+                    .withArguments(arguments)
+                    .withNewBlock()
+                        .withStatements(statements)
+                    .endBlock()
+                    .build();
+
+            
+            return new TypeDefBuilder()
+                    .withPackageName(item.getPackageName())
+                    .withName(pojoName)
+                    .withProperties(ownFields)
+                    .withConstructors(constructor)
+                    .withMethods(getters)
+                    .addToImplementsList(item.toInternalReference())
+                    .withExtendsList(extendsList)
+                    .build();
+        }
+    });
+
     private static Property arrayAsList(Property property) {
         return new PropertyBuilder(property)
                 .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(property.getTypeRef())))
@@ -647,7 +765,6 @@ public class ClazzAs {
                 .append(StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
                     public String apply(Property item) {
                         String prefix = TypeUtils.isBoolean(item.getTypeRef()) ? "is" : "get";
-                        //String cast = genericTypes.contains(item.getTypeRef().getFullyQualifiedName()) ? "("+item.getType().getFullyQualifiedName()+")" : "";
                         return "fluent." + prefix + item.getNameCapitalized() + "()";
                     }
                 }, ","))
@@ -656,20 +773,23 @@ public class ClazzAs {
 
 
         TypeDef target = clazz;
+        List<TypeDef> parents = new ArrayList<TypeDef>();
+        TypeUtils.visitParents(target, parents);
+        for (TypeDef c : parents) {
+            if (!isBuildable(c)) {
+                continue;
+            }
 
-        //Iterate parent objects and check for properties with setters but not ctor arguments.
-        while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
-            for (Property property : target.getProperties()) {
-                if (!hasBuildableConstructorWithArgument(target, property) && hasSetter(target, property)) {
+            for (Property property : c.getProperties()) {
+                if (!hasBuildableConstructorWithArgument(c, property) && hasSetter(c, property)) {
                     String setterName = "set" + property.getNameCapitalized();
-                    String getterName = BuilderUtils.findGetter(target, property).getName();
+                    String getterName = BuilderUtils.findGetter(c, property).getName();
                     statements.add(new StringStatement(new StringBuilder()
                             .append("buildable.").append(setterName).append("(fluent.").append(getterName).append("());")
                             .toString()));
 
                 }
             }
-            target = BuilderContextManager.getContext().getBuildableRepository().getBuildable(target.getExtendsList().iterator().next());
         }
 
         BuilderContext context = BuilderContextManager.getContext();

@@ -28,7 +28,7 @@
     <groupId>io.sundr</groupId>
     <artifactId>sundr-pom</artifactId>
     <packaging>pom</packaging>
-    <version>0.6-SNAPSHOT</version>
+    <version>0.7-SNAPSHOT</version>
     <name>Sundrio :: POM</name>
     
     <description>Code generation tools and annotation processors for Builder, Fluent APIs and DSLs.</description>
@@ -98,8 +98,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${compiler.plugin.version}</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

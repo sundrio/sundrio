@@ -17,6 +17,8 @@ This project provides annotation processors the provide the following features:
 - Support for the Visitor Pattern (easily navigating complex structures).
 - Support for inlines (builder like objects that expose a custom function).
 - Support for Bean Validation (JSR 303)
+- Support for JDK8 Optional types.
+- Support for generating Pojos and Builders from interfaces.
 
 #### The builder interface
 All the generated builders implement the `Builder` interface which looks like:
@@ -364,3 +366,38 @@ want to generate builders.
 public class MyExternalCase {
 }
 ```
+### Generating Pojos
+
+When the `@Buildable` annotation is added to an interface the processor will generate a Pojo and then Fleunt and Builder
+for the Pojo, as if the Pojo itself was annotated with @Buildable. The Pojo name will be named after the interface and
+will be prefix with the literal `Default`.
+
+To select a custom name for the Pojo, you can use the `@Pojo` annotation:
+
+```java
+@Pojo(name="MyReact")
+@Buildable
+public interface Rectangle {
+    
+}
+```
+
+With the @Pojo annotation one can also specify the super class of the generated pojo:
+
+```java
+@Pojo(name="MyReact", superClass="AbstractShape")
+@Buildable
+public interface Rectangle {
+    
+}
+```
+
+in which case the generated class will look like:
+```java
+public class MyRect extends AbstractShape implements Rectangle {
+    
+}
+```
+    
+    
+

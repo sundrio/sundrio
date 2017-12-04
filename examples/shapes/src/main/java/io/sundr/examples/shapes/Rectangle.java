@@ -16,6 +16,11 @@
 
 package io.sundr.examples.shapes;
 
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.Pojo;
+
+@Buildable
+@Pojo(name = "MyRect", superClass = AbstractShape.class)
 public interface Rectangle extends Shape {
 
     int getWidth();

@@ -19,6 +19,7 @@ package io.sundr.builder.internal.processor;
 import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
+import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
@@ -97,6 +98,12 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             try {
                 double percentage = 100 * (count++) / total;
                 System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
+
+                if (typeDef.isInterface()) {
+                    typeDef = ClazzAs.POJO.apply(typeDef);
+                    generateFromClazz(typeDef,
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                }
 
                 generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
