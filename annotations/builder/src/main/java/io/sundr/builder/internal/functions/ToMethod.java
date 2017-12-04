@@ -21,6 +21,7 @@ import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Singularize;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
@@ -969,7 +970,7 @@ public class ToMethod {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
             TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
-            TypeDef baseType = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrappedType);
+            TypeDef baseType = DefinitionRepository.getRepository().getDefinition(unwrappedType);
 
             for (Method constructor : getInlineableConstructors(property)) {
                 boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
@@ -981,7 +982,7 @@ public class ToMethod {
                         : property.getNameCapitalized());
 
                 String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
-                String delegateName = delegatePrefix + captializeFirst(property.getName());
+                String delegateName = delegatePrefix + property.getNameCapitalized();
 
                 String args = StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
                     public String apply(Property item) {

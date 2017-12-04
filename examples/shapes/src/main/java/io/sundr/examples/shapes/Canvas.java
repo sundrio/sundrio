@@ -18,9 +18,7 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
-import io.sundr.resourcecify.annotations.Resourcecify;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,12 +29,24 @@ import java.util.List;
 public class Canvas {
 
     private final List<Shape> shapes;
+    private final Artist artist;
+    private final Date date;
 
-    public Canvas(List<Shape> shapes) {
+    public Canvas(List<Shape> shapes, Artist artist, Date date) {
         this.shapes = Collections.unmodifiableList(shapes);
+        this.artist = artist;
+        this.date = date;
     }
 
     public List<Shape> getShapes() {
         return shapes;
+    }
+
+    public Artist getArtist() {
+        return artist;
+    }
+
+    public Date getDate() {
+        return date;
     }
 }
