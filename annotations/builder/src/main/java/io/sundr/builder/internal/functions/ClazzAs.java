@@ -130,6 +130,7 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH.apply(toAdd));
                 }
                 methods.add(ToMethod.HAS.apply(toAdd));
+                methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
 
                 if (isMap) {
                     //
@@ -144,7 +145,6 @@ public class ClazzAs {
                         methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
                     }
-                    methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                     nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
                 } else if (!descendants.isEmpty()) {
                     for (Property descendant : descendants) {
@@ -266,7 +266,7 @@ public class ClazzAs {
                 }
 
                 methods.add(ToMethod.HAS.apply(toAdd));
-
+                methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
                 if (isMap) {
                     properties.add(toAdd);
                 } else if (isBuildable && !isAbstract) {
@@ -280,7 +280,7 @@ public class ClazzAs {
                         methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
                         methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
                     }
-                    methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
+
                     nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
                     properties.add(buildableField(toAdd));
                 } else if (descendants.isEmpty()) {

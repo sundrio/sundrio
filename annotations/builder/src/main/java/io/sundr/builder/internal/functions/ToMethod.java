@@ -982,7 +982,7 @@ public class ToMethod {
                         : property.getNameCapitalized());
 
                 String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
-                String delegateName = delegatePrefix + captializeFirst(property.getName());
+                String delegateName = delegatePrefix + property.getNameCapitalized();
 
                 String args = StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
                     public String apply(Property item) {
