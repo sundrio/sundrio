@@ -173,7 +173,7 @@ public class BuilderUtils {
             return true;
         }
 
-        if (method.getName().startsWith("is") && (method.getReturnType().equals(BOOLEAN_REF) || method.getReturnType().equals(PRIMITIVES[0]))) {
+        if (method.getName().startsWith("is") && (method.getReturnType().equals(BOOLEAN_REF) || method.getReturnType().toString().equals("boolean"))) {
             return true;
         }
         return false;
