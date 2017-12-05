@@ -79,6 +79,7 @@ import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.compact;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.isArray;
@@ -946,9 +947,9 @@ public class ToMethod {
 
 
             prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
-            String methodName = prefix + (isCollection
+            String methodName = compact(prefix + (isCollection
                     ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-                    : property.getNameCapitalized());
+                    : property.getNameCapitalized()));
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -1126,9 +1127,9 @@ public class ToMethod {
 
             String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
-            String methodName = prefix + (isCollection
+            String methodName = compact(prefix + (isCollection
                     ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-                    : property.getNameCapitalized()) + suffix;
+                    : property.getNameCapitalized()) + suffix);
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))

@@ -23,8 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -219,5 +221,40 @@ public final class StringUtils {
      */
     public static final String toFieldName(String name) {
         return compact(prefixKeywords(name));
+    }
+
+
+    /**
+     * Converts a name of an interface or abstract class to Pojo name.
+     * Remove leading "I" and "Abstract" or trailing "Interface".
+     * @param name      The name to convert.
+     * @param prefix    The prefix to use if needed.
+     * @param suffix    The suffix to user if needed.
+     * @return          The converted name, if a conversion actually happened or the original name prefixed and suffixed otherwise.
+     */
+    public static final String toPojoName(String name, String prefix, String suffix) {
+        LinkedList<String> parts = new LinkedList<>(Arrays.asList(name.split(SPLITTER_REGEX)));
+        if (parts.isEmpty()) {
+            return prefix + name + suffix;
+        }
+
+        if (parts.getFirst().equals("I")) {
+            parts.removeFirst();
+        }
+
+        if (parts.getFirst().equals("Abstract")) {
+            parts.removeFirst();
+        }
+
+        if (parts.getLast().equals("Interface")) {
+            parts.removeLast();
+        }
+
+        String candidate = join(parts, "");
+        if (name.equals(candidate)) {
+            return prefix + name + suffix;
+        }
+
+        return candidate;
     }
 }

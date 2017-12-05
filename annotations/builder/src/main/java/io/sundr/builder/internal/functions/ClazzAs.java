@@ -605,7 +605,8 @@ public class ClazzAs {
             List<TypeDef> types = new ArrayList<TypeDef>();
             TypeUtils.visitParents(item, types);
 
-            String pojoName = "Default" + item.getName();
+            String pojoName = StringUtils.toPojoName(item.getName(), "Default", "");
+
             TypeDef superClass = null;
             List<ClassRef> extendsList = new ArrayList<>();
 
