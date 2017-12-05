@@ -22,6 +22,7 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.DefinitionRepository;
@@ -39,6 +40,7 @@ import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -290,6 +292,23 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 }
             }
         }
+    }
+
+    public void generatePojos(BuilderContext builderContext) {
+        for (TypeDef typeDef : builderContext.getBuildableRepository().getBuildables()) {
+            try {
+                if (typeDef.isInterface()) {
+                    typeDef = ClazzAs.POJO.apply(typeDef);
+                    builderContext.getDefinitionRepository().register(typeDef);
+                    builderContext.getBuildableRepository().register(typeDef);
+                    generateFromClazz(typeDef,
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
     private static final String EMPTY_FUNCTION_TEXT = loadResourceQuietly(EMPTY_FUNCTION_SNIPPET);
