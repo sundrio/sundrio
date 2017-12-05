@@ -640,7 +640,7 @@ public class ClazzAs {
                                 .build());
 
                         Property field = new PropertyBuilder()
-                                .withName(name)
+                                .withName(StringUtils.toFieldName(name))
                                 .withTypeRef(method.getReturnType())
                                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                                 .build();
@@ -650,7 +650,7 @@ public class ClazzAs {
                         getters.add(new MethodBuilder(method)
                                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                                 .withNewBlock()
-                                .withStatements(new StringStatement("return this." + name + ";"))
+                                .withStatements(new StringStatement("return this." + StringUtils.toFieldName(name) + ";"))
                                 .endBlock()
                                 .build());
 
@@ -664,7 +664,7 @@ public class ClazzAs {
                 if (constructor != null) {
                     //Remove properties set by superclass
                     for (Property p : constructor.getArguments()) {
-                        String name = p.getName();
+                        String name = StringUtils.toFieldName(p.getName());
                         for (Property f : fields) {
                             if (name.equals(f.getName())) {
                                 fields.remove(f);
@@ -689,7 +689,7 @@ public class ClazzAs {
                 sb.append(StringUtils.join(constructor.getArguments(), new Function<Property, String>(){
                     @Override
                     public String apply(Property item) {
-                        return item.getName();
+                        return StringUtils.toFieldName(item.getName());
                     }
                 }, ", "));
                 sb.append(");");
@@ -711,6 +711,12 @@ public class ClazzAs {
                     .withNewBlock()
                         .withStatements(statements)
                     .endBlock()
+                    .accept(new TypedVisitor<PropertyBuilder>() {
+                        @Override
+                        public void visit(PropertyBuilder b) {
+                            b.withName(StringUtils.toFieldName(b.getName()));
+                        }
+                    })
                     .build();
 
             
