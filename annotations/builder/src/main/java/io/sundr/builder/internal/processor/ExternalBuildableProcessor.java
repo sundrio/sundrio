@@ -102,6 +102,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
                 if (typeDef.isInterface()) {
                     typeDef = ClazzAs.POJO.apply(typeDef);
+                    ctx.getDefinitionRepository().register(typeDef);
+                    ctx.getBuildableRepository().register(typeDef);
                     generateFromClazz(typeDef,
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }

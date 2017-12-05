@@ -23,8 +23,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public final class StringUtils {
+
+    private static final String SPLITTER_REGEX = "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])";
+
+    /**
+     * Remove repeating strings that are appearing in the name.
+     * This is done by splitting words (camel case) and using each word once.
+     * @param name  The name to compact.
+     * @return      The compact name.
+     */
+    public static final String compact(String name) {
+        Set<String> parts = new LinkedHashSet<String>();
+        for (String part : name.split(SPLITTER_REGEX)) {
+            parts.add(part);
+        }
+        return join(parts,"");
+    }
 
     public static final class ToString<X> implements Function<X, String> {
         public String apply(X item) {

@@ -194,7 +194,7 @@ public class Combine {
 
             final String prefix = StringUtils.getPrefix(types, toString);
 
-            return  toInterfaceName(prefix + compact(StringUtils.join(types, new Function<TypeDef, String>() {
+            return  toInterfaceName(prefix + StringUtils.compact(StringUtils.join(types, new Function<TypeDef, String>() {
                 public String apply(TypeDef item) {
                     String str = stripPrefix(stripSuffix(item.getName()));
                     if (str.length() > prefix.length()) {
@@ -217,7 +217,7 @@ public class Combine {
 
             final String prefix = StringUtils.getPrefix(types, toString);
 
-            return  toInterfaceName(prefix + compact(StringUtils.join(types, new Function<ClassRef, String>() {
+            return  toInterfaceName(prefix + StringUtils.compact(StringUtils.join(types, new Function<ClassRef, String>() {
                 public String apply(ClassRef item) {
                     String str = stripPrefix(stripSuffix(item.getDefinition().getName()));
                     if (str.length() > prefix.length()) {
@@ -241,21 +241,6 @@ public class Combine {
         }
     };
 
-
-
-    /**
-     * Remove repeating strings that are appearing in the name.
-     * This is done by splitting words (camel case) and using each word once.
-     * @param name  The name to compact.
-     * @return      The compact name.
-     */
-    private static final String compact(String name) {
-        Set<String> parts = new LinkedHashSet<String>();
-        for (String part : name.split(SPLITTER_REGEX)) {
-            parts.add(part);
-        }
-        return StringUtils.join(parts,"");
-    }
 
     private static boolean canBeExcluded(TypeDef candidate, Iterable<TypeDef> provided) {
         Set<TypeDef> allOther = new LinkedHashSet<TypeDef>();
@@ -356,5 +341,4 @@ public class Combine {
 
     private static Map<String, TypeDef> combinations = new HashMap<String, TypeDef>();
 
-    private static final String SPLITTER_REGEX = "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])";
 }
