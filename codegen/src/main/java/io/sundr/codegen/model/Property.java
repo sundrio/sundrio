@@ -22,6 +22,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Property extends ModifierSupport {
 
@@ -49,10 +51,10 @@ public class Property extends ModifierSupport {
     }
 
     public String getNameCapitalized() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(name.replaceAll("_", "").substring(0, 1).toUpperCase());
-        sb.append(name.replaceAll("_", "").substring(1));
-        return sb.toString();
+        return Stream.of(name.split("[^a-zA-Z0-9]"))
+            .filter(s -> s != null && s.length() > 0)
+            .map(v -> Character.toUpperCase(v.charAt(0)) + v.substring(1))
+            .collect(Collectors.joining());
     }
 
     public Set<ClassRef> getReferences() {
