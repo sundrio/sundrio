@@ -23,12 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public final class StringUtils {
 
@@ -65,16 +67,9 @@ public final class StringUtils {
     }
 
     public static <T> String join(Iterable<T> items, Function<T, String> function, String delimiter) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (T item : items) {
-            if (!first) {
-                sb.append(delimiter);
-            }
-            sb.append(function.apply(item));
-            first = false;
-        }
-        return sb.toString();
+        return StreamSupport.stream(items.spliterator(), false)
+            .map(function::apply)
+            .collect(Collectors.joining(delimiter));
     }
 
     public static <T> String join(T[] items, String delimiter) {
@@ -82,16 +77,9 @@ public final class StringUtils {
     }
 
     public static <T> String join(T[] items, Function<T, String> function, String delimiter) {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (T item : items) {
-            if (!first) {
-                sb.append(delimiter);
-            }
-            sb.append(function.apply(item));
-            first = false;
-        }
-        return sb.toString();
+        return Stream.of(items)
+            .map(function::apply)
+            .collect(Collectors.joining(delimiter));
     }
 
     public static <T> String getPrefix(Iterable<T> items, Function<T, String> function) {
