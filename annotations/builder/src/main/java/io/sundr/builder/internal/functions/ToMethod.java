@@ -79,7 +79,7 @@ import static io.sundr.codegen.functions.Collections.IS_SET;
 import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
-import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 import static io.sundr.codegen.utils.StringUtils.compact;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
@@ -1345,7 +1345,7 @@ public class ToMethod {
     public static final Function<Property, Method> END = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
-            String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + captializeFirst(IS_COLLECTION.apply(property.getTypeRef())
+            String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + capitalizeFirst(IS_COLLECTION.apply(property.getTypeRef())
                     ? Singularize.FUNCTION.apply(property.getNameCapitalized())
                     : property.getNameCapitalized());
 

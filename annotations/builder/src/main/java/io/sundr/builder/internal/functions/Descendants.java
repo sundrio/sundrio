@@ -44,7 +44,7 @@ import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.ORIGIN_TYPEDEF;
 import static io.sundr.codegen.utils.StringUtils.compact;
-import static io.sundr.codegen.utils.StringUtils.deCaptializeFirst;
+import static io.sundr.codegen.utils.StringUtils.deCapitalizeFirst;
 import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 
 public class Descendants {
@@ -105,7 +105,7 @@ public class Descendants {
                                 .withArguments(descendantRef)
                                 .build();
 
-                        String propertyName = compact(deCaptializeFirst(descendant.getName()) + property.getNameCapitalized());
+                        String propertyName = compact(deCapitalizeFirst(descendant.getName()) + property.getNameCapitalized());
                         result.add(new PropertyBuilder(property)
                                 .withName(propertyName)
                                 .withTypeRef(collectionType)
@@ -128,7 +128,7 @@ public class Descendants {
                         continue;
                     }
 
-                    String propertyName =  compact(deCaptializeFirst(descendant.getName() + property.getNameCapitalized()));
+                    String propertyName =  compact(deCapitalizeFirst(descendant.getName() + property.getNameCapitalized()));
                     result.add(new PropertyBuilder(property)
                             .withName(propertyName)
                             .withTypeRef(descendantRef)

@@ -52,11 +52,11 @@ public final class StringUtils {
         return str == null || str.isEmpty();
     }
 
-    public static String captializeFirst(String str) {
+    public static String capitalizeFirst(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    public static String deCaptializeFirst(String str) {
+    public static String deCapitalizeFirst(String str) {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
@@ -102,15 +102,15 @@ public final class StringUtils {
         while (true) {
             boolean first = true;
             for (T item : items) {
-                String currnetItem = function.apply(item);
+                String currentItem = function.apply(item);
                 if (first) {
                     first = false;
-                    if (currnetItem.length() > length) {
-                        current = currnetItem.substring(0, length);
+                    if (currentItem.length() > length) {
+                        current = currentItem.substring(0, length);
                     } else {
                         return prefix;
                     }
-                } else if (!currnetItem.startsWith(current)) {
+                } else if (!currentItem.startsWith(current)) {
                     return prefix;
                 }
             }
