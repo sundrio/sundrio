@@ -602,6 +602,7 @@ public class ClazzAs {
             List<Property> fields = new CopyOnWriteArrayList<>();
             List<Method> getters = new CopyOnWriteArrayList<>();
 
+            List<Property> constructorArgs = new ArrayList<>();
             List<TypeDef> types = new ArrayList<TypeDef>();
             TypeUtils.visitParents(item, types);
 
@@ -663,6 +664,7 @@ public class ClazzAs {
             if (superClass != null) {
                 Method constructor = findBuildableConstructor(superClass);
                 if (constructor != null) {
+                    constructorArgs.addAll(constructor.getArguments());
                     //Remove properties set by superclass
                     for (Property p : constructor.getArguments()) {
                         String name = StringUtils.toFieldName(p.getName());
@@ -704,11 +706,20 @@ public class ClazzAs {
                 }
             }
 
+
+            //We can't just rely on what getters are present in the superclass.
+            //We NEED to make sure that the superclass constructor arguments are in place and then add everything else.
+            for (Property p : arguments) {
+                if (!constructorArgs.contains(p)) {
+                    constructorArgs.add(p);
+                }
+            }
+
             //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
             //The processor instead explicitly generates fluent and builder for the new pojo.
             Method constructor = new MethodBuilder()
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
-                    .withArguments(arguments)
+                    .withArguments(constructorArgs)
                     .withNewBlock()
                         .withStatements(statements)
                     .endBlock()
