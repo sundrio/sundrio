@@ -35,7 +35,13 @@ public class TypeDef extends ModifierSupport {
             .withName("Object")
             .build();
 
+    public static TypeDef ENUM = new TypeDefBuilder()
+            .withPackageName("java.lang")
+            .withName("Enum")
+            .build();
+
     public static ClassRef OBJECT_REF = OBJECT.toReference();
+    public static ClassRef ENUM_REF = ENUM.toReference();
 
     private final Kind kind;
     private final String packageName;
@@ -197,7 +203,7 @@ public class TypeDef extends ModifierSupport {
     }
 
     public boolean isEnum() {
-        return kind == Kind.ENUM;
+        return kind == Kind.ENUM || (kind == Kind.CLASS && extendsList.contains(ENUM_REF));
     }
 
     public boolean isAnnotation() {

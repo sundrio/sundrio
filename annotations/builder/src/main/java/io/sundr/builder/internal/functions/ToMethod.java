@@ -79,6 +79,7 @@ import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.compact;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.isArray;
@@ -946,9 +947,9 @@ public class ToMethod {
 
 
             prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
-            String methodName = prefix + (isCollection
+            String methodName = compact(prefix + (isCollection
                     ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-                    : property.getNameCapitalized());
+                    : property.getNameCapitalized()));
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -966,6 +967,10 @@ public class ToMethod {
     public static final Function<Property, Set<Method>> WITH_NESTED_INLINE = new Function<Property, Set<Method>>() {
         public Set<Method> apply(Property property) {
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
+
+            if (originTypeDef.isEnum()) {
+                return Collections.emptySet();
+            }
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
@@ -1126,9 +1131,9 @@ public class ToMethod {
 
             String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
-            String methodName = prefix + (isCollection
+            String methodName = compact(prefix + (isCollection
                     ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-                    : property.getNameCapitalized()) + suffix;
+                    : property.getNameCapitalized()) + suffix);
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))

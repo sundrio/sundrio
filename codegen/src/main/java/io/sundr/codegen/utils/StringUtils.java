@@ -23,8 +23,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public final class StringUtils {
+
+    private static final String SPLITTER_REGEX = "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])";
+
+    private static final List<String> KEYWORDS = Arrays.asList("abstract", "continue", "for", "new", "switch", "assert", "default", "goto", "package", "synchronized", "boolean", "do", "if", "private", "this", "break", "double", "implements", "protected", "throw", "byte", "else", "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", "native", "super", "while");
+
 
     public static final class ToString<X> implements Function<X, String> {
         public String apply(X item) {
@@ -174,5 +185,76 @@ public final class StringUtils {
                 is.close();
             }
         }
+    }
+
+    /**
+     * Remove repeating strings that are appearing in the name.
+     * This is done by splitting words (camel case) and using each word once.
+     * @param name  The name to compact.
+     * @return      The compact name.
+     */
+    public static final String compact(String name) {
+        Set<String> parts = new LinkedHashSet<String>();
+        for (String part : name.split(SPLITTER_REGEX)) {
+            parts.add(part);
+        }
+        return join(parts,"");
+    }
+
+
+    /**
+     * Adds an underscore to the specified String, if its a Java Keyword.
+     * @param name  The specified string.
+     * @return      The specified string if not a keyword, the string prefixed with underscore otherwise.
+     */
+    public static final String prefixKeywords(String name) {
+        if (KEYWORDS.contains(name)) {
+            return "_" + name;
+        }
+        else return name;
+    }
+
+    /**
+     * Converts the string into a safe field name.
+     * @param name  The field name.
+     * @return      The safe field name.
+     */
+    public static final String toFieldName(String name) {
+        return compact(prefixKeywords(name));
+    }
+
+
+    /**
+     * Converts a name of an interface or abstract class to Pojo name.
+     * Remove leading "I" and "Abstract" or trailing "Interface".
+     * @param name      The name to convert.
+     * @param prefix    The prefix to use if needed.
+     * @param suffix    The suffix to user if needed.
+     * @return          The converted name, if a conversion actually happened or the original name prefixed and suffixed otherwise.
+     */
+    public static final String toPojoName(String name, String prefix, String suffix) {
+        LinkedList<String> parts = new LinkedList<>(Arrays.asList(name.split(SPLITTER_REGEX)));
+        if (parts.isEmpty()) {
+            return prefix + name + suffix;
+        }
+
+        if (parts.getFirst().equals("I")) {
+            parts.removeFirst();
+        }
+
+        if (parts.getFirst().equals("Abstract")) {
+            parts.removeFirst();
+        }
+
+        if (parts.getLast().equals("Interface")) {
+            parts.removeLast();
+        }
+
+        String candidate = join(parts, "");
+        if (name.equals(candidate)) {
+            return prefix + name + suffix;
+        }
+
+        return candidate;
     }
 }

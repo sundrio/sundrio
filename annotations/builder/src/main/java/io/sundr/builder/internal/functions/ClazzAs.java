@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
@@ -597,17 +598,15 @@ public class ClazzAs {
     public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
 
-            List<Property> fields = new ArrayList<Property>();
-            List<Property> arguments = new ArrayList<Property>();
+            List<Property> arguments = new CopyOnWriteArrayList<>();
+            List<Property> fields = new CopyOnWriteArrayList<>();
+            List<Method> getters = new CopyOnWriteArrayList<>();
 
-            List<Property> parentFields = new ArrayList<Property>();
-            List<Property> ownFields = new ArrayList<Property>();
-
-            List<Method> getters = new ArrayList<Method>();
             List<TypeDef> types = new ArrayList<TypeDef>();
             TypeUtils.visitParents(item, types);
 
-            String pojoName = "Default" + item.getName();
+            String pojoName = StringUtils.toPojoName(item.getName(), "Default", "");
+
             TypeDef superClass = null;
             List<ClassRef> extendsList = new ArrayList<>();
 
@@ -642,46 +641,61 @@ public class ClazzAs {
                                 .build());
 
                         Property field = new PropertyBuilder()
-                                .withName(name)
+                                .withName(StringUtils.toFieldName(name))
                                 .withTypeRef(method.getReturnType())
                                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                                 .build();
 
-                        if (!t.getFullyQualifiedName().equals(item.getFullyQualifiedName())) {
-                            parentFields.add(field);
-                        } else {
-                            ownFields.add(field);
-                            getters.add(new MethodBuilder(method)
-                                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                                    .withNewBlock()
-                                    .withStatements(new StringStatement("return this." + name + ";"))
-                                    .endBlock()
-                                    .build());
-                        }
+                        fields.add(field);
+
+                        getters.add(new MethodBuilder(method)
+                                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                                .withNewBlock()
+                                .withStatements(new StringStatement("return this." + StringUtils.toFieldName(name) + ";"))
+                                .endBlock()
+                                .build());
+
                     }
                 }
             }
 
-            //This list is used verify that visited arguments are aligned with superclass constructor arguments.
-            //This shouldn't be needed, but there are cases that visited arguments are miscalculated, So....
-            List<Property> allArguments = new ArrayList<>();
             List<Statement> statements = new ArrayList<Statement>();
             if (superClass != null) {
                 Method constructor = findBuildableConstructor(superClass);
                 if (constructor != null) {
-                    allArguments.addAll(constructor.getArguments());
+                    //Remove properties set by superclass
+                    for (Property p : constructor.getArguments()) {
+                        String name = StringUtils.toFieldName(p.getName());
+                        for (Property f : fields) {
+                            if (name.equals(f.getName())) {
+                                fields.remove(f);
+                            }
+                        }
+                    }
+
+                    //Remove getters provided by superclass.
+                    for (Method method : superClass.getMethods()) {
+                        if (isGetter(method)) {
+                            for (Method m : getters) {
+                                if (m.getName().equals(method.getName())) {
+                                    getters.remove(m);
+                                }
+                            }
+                        }
+                    }
                 }
+
                 StringBuilder sb = new StringBuilder();
                 sb.append("super(");
-                sb.append(StringUtils.join(allArguments, new Function<Property, String>(){
+                sb.append(StringUtils.join(constructor.getArguments(), new Function<Property, String>(){
                     @Override
                     public String apply(Property item) {
-                        return item.getName();
+                        return StringUtils.toFieldName(item.getName());
                     }
                 }, ", "));
                 sb.append(");");
                 statements.add(new StringStatement(sb.toString()));
-                for (Property p : ownFields) {
+                for (Property p : fields) {
                     statements.add(new StringStatement("this." + p.getName() + " = " + p.getName() + ";"));
                 }
             } else {
@@ -690,20 +704,20 @@ public class ClazzAs {
                 }
             }
 
-            for (Property a : arguments) {
-                if (!allArguments.contains(a)) {
-                    allArguments.add(a);
-                }
-            }
-
             //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
             //The processor instead explicitly generates fluent and builder for the new pojo.
             Method constructor = new MethodBuilder()
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
-                    .withArguments(allArguments)
+                    .withArguments(arguments)
                     .withNewBlock()
                         .withStatements(statements)
                     .endBlock()
+                    .accept(new TypedVisitor<PropertyBuilder>() {
+                        @Override
+                        public void visit(PropertyBuilder b) {
+                            b.withName(StringUtils.toFieldName(b.getName()));
+                        }
+                    })
                     .build();
 
             
@@ -711,11 +725,12 @@ public class ClazzAs {
                     .withPackageName(item.getPackageName())
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
                     .withName(pojoName)
-                    .withProperties(ownFields)
+                    .withProperties(fields)
                     .withConstructors(constructor)
                     .withMethods(getters)
                     .addToImplementsList(item.toInternalReference())
                     .withExtendsList(extendsList)
+                    .addToAttributes(item.getAttributes())
                     .build();
         }
     });

@@ -173,7 +173,7 @@ public class BuilderUtils {
             return true;
         }
 
-        if (method.getName().startsWith("is") && (method.getReturnType().equals(BOOLEAN_REF) || method.getReturnType().equals(PRIMITIVES[0]))) {
+        if (method.getName().startsWith("is") && (method.getReturnType().equals(BOOLEAN_REF) || method.getReturnType().toString().equals("boolean"))) {
             return true;
         }
         return false;
@@ -301,6 +301,10 @@ public class BuilderUtils {
 
     public static boolean isInlineable(Method method) {
         if (method.getArguments().size() == 0 || method.getArguments().size() > 5) {
+            return false;
+        }
+
+        if (method.isPrivate()) {
             return false;
         }
 
