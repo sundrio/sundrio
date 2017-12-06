@@ -304,6 +304,10 @@ public class BuilderUtils {
             return false;
         }
 
+        if (method.isPrivate()) {
+            return false;
+        }
+
         for (Property argument : method.getArguments()) {
             if (!(argument.getTypeRef() instanceof ClassRef)) {
                 continue;

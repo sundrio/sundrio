@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.examples.codegen.Kind.CLASS;
+
 @Buildable
 public class TypeDef extends ModifierSupport {
 
@@ -35,7 +37,14 @@ public class TypeDef extends ModifierSupport {
             .withName("Object")
             .build();
 
+    public static TypeDef ENUM = new TypeDefBuilder()
+            .withPackageName("java.lang")
+            .withName("Enum")
+            .build();
+
     public static ClassRef OBJECT_REF = OBJECT.toReference();
+    public static ClassRef ENUM_REF = ENUM.toReference();
+
 
     private final Kind kind;
     private final String packageName;
@@ -54,7 +63,7 @@ public class TypeDef extends ModifierSupport {
 
     public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
-        this.kind = kind != null ? kind : Kind.CLASS;
+        this.kind = kind != null ? kind : CLASS;
         this.packageName = packageName;
         this.name = name;
         this.annotations = annotations;
@@ -203,7 +212,7 @@ public class TypeDef extends ModifierSupport {
     }
 
     public boolean isEnum() {
-        return kind == Kind.ENUM;
+        return kind == Kind.ENUM || (kind == Kind.CLASS && extendsList.contains(ENUM_REF));
     }
 
     public boolean isAnnotation() {

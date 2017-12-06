@@ -968,6 +968,10 @@ public class ToMethod {
         public Set<Method> apply(Property property) {
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
+            if (originTypeDef.isEnum()) {
+                return Collections.emptySet();
+            }
+
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             Set<Method> result = new LinkedHashSet<Method>();
             TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
