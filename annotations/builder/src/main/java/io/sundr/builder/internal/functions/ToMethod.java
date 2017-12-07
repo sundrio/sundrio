@@ -951,7 +951,7 @@ public class ToMethod {
 
 
             prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
-            String methodName = compact(prefix + (isCollection
+            String methodName = (prefix + (isCollection
                     ? Singularize.FUNCTION.apply(property.getNameCapitalized())
                     : property.getNameCapitalized()));
 
@@ -1150,7 +1150,7 @@ public class ToMethod {
 
             String prefix = isCollection ? "addNew" : "withNew";
             String suffix = "Like";
-            String methodName = compact(prefix + (isCollection
+            String methodName = (prefix + (isCollection
                     ? Singularize.FUNCTION.apply(property.getNameCapitalized())
                     : property.getNameCapitalized()) + suffix);
 
@@ -1213,18 +1213,15 @@ public class ToMethod {
             TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
             TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
 
-            TypeDef builderType = TypeAs.BUILDER.apply(unwrapped.getDefinition());
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((unwrapped).getDefinition().getFullyQualifiedName());
             if (propertyTypeDef != null) {
                 unwrapped = propertyTypeDef.toInternalReference();
             }
 
-            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? (TypeRef) property.getAttribute(GENERIC_TYPE_REF) : T_REF;
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
-            TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
-            Set<TypeParamDef> parameters = new LinkedHashSet<TypeParamDef>(unwrapped.getDefinition().getParameters());
             List<TypeRef> typeArguments = new ArrayList<TypeRef>();
             for (TypeRef ignore : unwrapped.getArguments()) {
                 typeArguments.add(Q);
@@ -1232,7 +1229,6 @@ public class ToMethod {
             typeArguments.add(returnType);
 
             ClassRef rewraped = nestedType.toReference(typeArguments);
-            ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
             String prefix = "edit";
             prefix += BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef);
