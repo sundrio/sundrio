@@ -469,7 +469,9 @@ public class BuilderUtils {
 
                 //If not then we compare against what has been found in the map.
                 String fqn = map.get(classRef.getDefinition().getName());
-                if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
+                if (fqn == null) {
+                    System.out.println("Warning: Expected to find class with name:" + classRef.getDefinition().getName());
+                } else if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
                     return captializeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));
                 }
             }
