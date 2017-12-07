@@ -32,8 +32,10 @@ import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.Statement;
@@ -747,8 +749,9 @@ public class ClazzAs {
     });
 
     private static Property arrayAsList(Property property) {
+        TypeRef unwrapped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getTypeRef());
         return new PropertyBuilder(property)
-                .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(property.getTypeRef())))
+                .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(unwrapped)))
                 .build();
     }
 

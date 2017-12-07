@@ -218,7 +218,7 @@ public final class TypeUtils {
         String[] lparts = left.split(DOT_REGEX);
         String[] rparts = right.split(DOT_REGEX);
 
-        for (int l=lparts.length-1,r=rparts.length-1;l>=0 && r>=0;r--,l--) {
+        for (int l = lparts.length - 1, r = rparts.length - 1; l >= 0 && r >= 0; r--, l--) {
             if (!lparts[l].equals(rparts[r])) {
                 return rparts[r];
             }

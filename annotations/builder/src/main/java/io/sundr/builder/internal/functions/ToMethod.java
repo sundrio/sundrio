@@ -62,6 +62,7 @@ import static io.sundr.builder.Constants.T;
 import static io.sundr.builder.Constants.T_REF;
 import static io.sundr.builder.Constants.VOID;
 import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.BOXED_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
@@ -582,7 +583,7 @@ public class ToMethod {
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-            final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+            final TypeRef unwrapped = BOXED_OF.apply(TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
 
             Property item = new PropertyBuilder(property)
@@ -754,7 +755,7 @@ public class ToMethod {
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-            final TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef());
+            final TypeRef unwrapped = BOXED_OF.apply(TypeAs.combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
             List<ClassRef> alsoImport = new ArrayList<ClassRef>();
             Property item = new PropertyBuilder(property)
                     .withName("items")
