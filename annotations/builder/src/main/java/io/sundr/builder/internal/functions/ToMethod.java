@@ -578,7 +578,7 @@ public class ToMethod {
     public static final Function<Property, List<Method>> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
         public List<Method> apply(final Property property) {
             List<Method> methods = new ArrayList<Method>();
-            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeRef baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
@@ -738,7 +738,7 @@ public class ToMethod {
             return new StringStatement(StringUtils.join(descendants, new Function<Property, String>() {
 
                 public String apply(Property item) {
-                    TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item.getTypeRef());
+                    TypeRef itemRef = TypeAs.combine(UNWRAP_COLLECTION_OF, ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
                     String className = ((ClassRef) itemRef).getName();
                     String methodName = prefix + item.getNameCapitalized();
                     return "if (item instanceof " + className + "){" + methodName + "(" + (useIndex ? "index, " : "") + "(" + className + ")item);}\n";
@@ -750,7 +750,7 @@ public class ToMethod {
     public static final Function<Property, List<Method>> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
         public List<Method> apply(final Property property) {
             List<Method> methods = new ArrayList<Method>();
-            ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
+            TypeRef baseType = TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
@@ -835,8 +835,8 @@ public class ToMethod {
 
     public static final Function<Property, Method> ADD_MAP_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
-            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? (TypeRef) property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-            ClassRef mapType = (ClassRef) property.getTypeRef();
+            TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
+            TypeRef mapType =  property.getTypeRef();
             Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
             String methodName = "addTo" + property.getNameCapitalized();
             return new MethodBuilder()
@@ -854,6 +854,9 @@ public class ToMethod {
     public static final Function<Property, Method> ADD_TO_MAP = FunctionFactory.cache(new Function<Property, Method>() {
         public Method apply(Property property) {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
+            if (!(property.getTypeRef() instanceof ClassRef)) {
+                throw new IllegalStateException("Expected Map type and found:" + property.getTypeRef());
+            }
             ClassRef mapType = (ClassRef) property.getTypeRef();
             TypeRef keyType = mapType.getArguments().get(0);
             TypeRef valueType = mapType.getArguments().get(1);
@@ -1015,9 +1018,14 @@ public class ToMethod {
     public static final Function<Property, Method> EDIT_OR_NEW = new Function<Property, Method>() {
         public Method apply(Property property) {
             ClassRef baseType = (ClassRef) property.getTypeRef();
-            ClassRef unwrappedType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(baseType);
 
-            ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(unwrappedType.getDefinition()).toReference();
+            TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(baseType);
+            if (!(unwrappedType instanceof ClassRef)) {
+                throw new IllegalStateException("Expected Editable/Buildable type and found:" +unwrappedType);
+            }
+
+            ClassRef unwrappedClassRef = (ClassRef) unwrappedType;
+            ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(unwrappedClassRef.getDefinition()).toReference();
 
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
@@ -1059,10 +1067,17 @@ public class ToMethod {
 
     public static final Function<Property, Method> EDIT_OR_NEW_LIKE = new Function<Property, Method>() {
         public Method apply(Property property) {
+            TypeRef unwrappedType = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
+
+            if (!(unwrappedType instanceof ClassRef)) {
+                throw new IllegalStateException("Expected Editable/Buildable type and found:" +unwrappedType);
+            }
+
+            ClassRef unwrappedClassRef = (ClassRef) unwrappedType;
             ClassRef baseType = (ClassRef) property.getTypeRef();
-            ClassRef unwrappedType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(baseType);
+
             //Let's reload the class from the repository if available....
-            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((unwrappedType).getDefinition().getFullyQualifiedName());
+            TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrappedClassRef.getDefinition().getFullyQualifiedName());
             if (propertyTypeDef != null) {
                 baseType = propertyTypeDef.toInternalReference();
             }
@@ -1106,6 +1121,9 @@ public class ToMethod {
 
     public static final Function<Property, Method> WITH_NEW_LIKE_NESTED = new Function<Property, Method>() {
         public Method apply(Property property) {
+            if (!(property.getTypeRef() instanceof ClassRef)) {
+                throw new IllegalStateException("Expected Nestable / Buildable type and found:" + property.getTypeRef());
+            }
             ClassRef baseType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
             //Let's reload the class from the repository if available....
             TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((baseType).getDefinition().getFullyQualifiedName());
@@ -1158,6 +1176,10 @@ public class ToMethod {
         public Method apply(Property property) {
             Method method = WITH_NEW_LIKE_NESTED.apply(property);
 
+            if (!(property.getTypeRef() instanceof ClassRef)) {
+                throw new IllegalStateException("Expected Nestable / Buildable type and found:" + property.getTypeRef());
+            }
+
             ClassRef baseType = (ClassRef) TypeAs.UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
@@ -1183,6 +1205,9 @@ public class ToMethod {
         public List<Method> apply(Property property) {
             List<Method> methods = new ArrayList<Method>();
             TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
+            if (!(property.getTypeRef() instanceof ClassRef)) {
+                throw new IllegalStateException("Expected Nestable / Buildable type and found:" + property.getTypeRef());
+            }
             ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
             TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
             TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
