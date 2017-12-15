@@ -23,7 +23,6 @@ import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
@@ -58,13 +57,12 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BOOLEAN_REF;
-import static io.sundr.builder.Constants.PRIMITIVES;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.INIT;
-import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 
 public class BuilderUtils {
@@ -464,7 +462,7 @@ public class BuilderUtils {
 
                 //If candidate is imported and different that the actual name, do a diff
                 if (originType.getImports().contains(candidateFqn) && !classRef.getDefinition().getFullyQualifiedName().equals(candidateFqn)) {
-                    return captializeFirst(TypeUtils.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
+                    return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
                 }
 
                 //If not then we compare against what has been found in the map.
@@ -472,7 +470,7 @@ public class BuilderUtils {
                 if (fqn == null) {
                     System.out.println("Warning: Expected to find class with name:" + classRef.getDefinition().getName());
                 } else if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
-                    return captializeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));
+                    return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));
                 }
             }
         }

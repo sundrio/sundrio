@@ -47,9 +47,7 @@ import io.sundr.dsl.internal.type.functions.Merge;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -57,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.sundr.codegen.utils.StringUtils.captializeFirst;
+import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.CLASSES;
@@ -264,7 +262,7 @@ public final class TypeDefUtils {
         if (name.endsWith(INTERFACE_SUFFIX)) {
             return name;
         }
-        return captializeFirst(name) + INTERFACE_SUFFIX;
+        return capitalizeFirst(name) + INTERFACE_SUFFIX;
     }
 
     public static boolean isVoid(ExecutableElement executableElement) {
