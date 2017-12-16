@@ -32,10 +32,13 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
@@ -63,14 +66,32 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 ctx = BuilderContextManager.create(elements, types, generated.validationEnabled(), generated.generateBuilderPackage(), generated.builderPackage());
 
                 for (String name : generated.value()) {
-                    TypeElement typeElement = elements.getTypeElement(name);
-                    TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
-                            .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
-                            .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
-                            .build();
+                    PackageElement packageElement = elements.getPackageElement(name);
+                    List<TypeElement> typeElements = new ArrayList<>();
 
-                    ctx.getDefinitionRepository().register(b);
-                    ctx.getBuildableRepository().register(b);
+                    if (packageElement != null) {
+                        for (Element e : packageElement.getEnclosedElements()) {
+                            if (e instanceof TypeElement) {
+                                typeElements.add((TypeElement) e);
+                            }
+                        }
+                    } else {
+                        TypeElement e = elements.getTypeElement(name);
+                        if (e != null) {
+                            typeElements.add(e);
+                        }
+                    }
+
+
+                    for (TypeElement typeElement : typeElements) {
+                        TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
+                                .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
+                                .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
+                                .build();
+
+                        ctx.getDefinitionRepository().register(b);
+                        ctx.getBuildableRepository().register(b);
+                    }
                 }
 
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
