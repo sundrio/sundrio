@@ -138,11 +138,14 @@ public class ClassTo {
             List<ClassRef> implementsList = new ArrayList<ClassRef>();
             List<Property> properties = new ArrayList<Property>();
             List<Method> methods = new ArrayList<Method>();
+            List<Method> constructors = new ArrayList<Method>();
             List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
             if (item.getSuperclass() != null && kind == Kind.INTERFACE) {
                 extendsList.add((ClassRef) TYPEREF.apply(item.getSuperclass()));
             }
+
+            constructors.addAll(getConstructors(item));
             methods.addAll(getMethods(item));
             properties.addAll(getProperties(item));
 
@@ -173,6 +176,7 @@ public class ClassTo {
                     .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
                     .withModifiers(item.getModifiers())
                     .withParameters(parameters)
+                    .withConstructors(constructors)
                     .withMethods(methods)
                     .withProperties(properties)
                     .withExtendsList(extendsList)
@@ -237,6 +241,43 @@ public class ClassTo {
                     .build());
         }
         return properties;
+    }
+
+    private static Set<Method> getConstructors(Class item) {
+        Set<Method> constructors = new HashSet<Method>();
+        for (java.lang.reflect.Constructor constructor : item.getDeclaredConstructors()) {
+            List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
+            for (Annotation annotation : constructor.getDeclaredAnnotations()) {
+                annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
+            }
+
+            List<Property> arguments = new ArrayList<Property>();
+            for (int i = 1; i <= constructor.getGenericParameterTypes().length; i++) {
+                Type argumentType = constructor.getGenericParameterTypes()[i - 1];
+                arguments.add(new PropertyBuilder()
+                        .withName(ARGUMENT_PREFIX + i)
+                        .withTypeRef(TYPEREF.apply(argumentType))
+                        .build());
+            }
+
+            List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+            for (Type type : constructor.getGenericParameterTypes()) {
+
+                TypeParamDef typeParamDef = TYPEPARAMDEF.apply(type);
+                if (typeParamDef != null) {
+                    parameters.add(typeParamDef);
+                }
+            }
+
+            constructors.add(new MethodBuilder()
+                    .withName(constructor.getName())
+                    .withModifiers(constructor.getModifiers())
+                    .withArguments(arguments)
+                    .withParameters(parameters)
+                    .withAnnotations(annotationRefs)
+                    .build());
+        }
+        return constructors;
     }
 
     private static Set<Method> getMethods(Class item) {
