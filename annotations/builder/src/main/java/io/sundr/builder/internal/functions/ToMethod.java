@@ -847,6 +847,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(mapProperty)
                     .withNewBlock()
+                    .addNewStringStatementStatement("if(this."+property.getName()+" == null && map != null) { this." + property.getName() + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList()) + "; }")
                     .addNewStringStatementStatement("if(map != null) { this." + property.getName() + ".putAll(map);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
@@ -873,6 +874,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(new Property[]{keyProperty, valueProperty})
                     .withNewBlock()
+                    .addNewStringStatementStatement("if(this."+property.getName()+" == null && key != null && value != null) { this." + property.getName() + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList()) + "; }")
                     .addNewStringStatementStatement("if(key != null && value != null) {this." + property.getName() + ".put(key, value);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
@@ -893,6 +895,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(mapProperty)
                     .withNewBlock()
+                    .addNewStringStatementStatement("if(this." + property.getName() + " == null) { return (" + returnType + ") this; }")
                     .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {if (this."+property.getName()+" != null){this." + property.getName() + ".remove(key);}}} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
@@ -914,6 +917,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(keyProperty)
                     .withNewBlock()
+                    .addNewStringStatementStatement("if(this." + property.getName() + " == null) { return (" + returnType + ") this; }")
                     .addNewStringStatementStatement("if(key != null && this."+property.getName()+" != null) {this." + property.getName() + ".remove(key);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
