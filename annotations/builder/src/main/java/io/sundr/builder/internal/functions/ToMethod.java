@@ -40,6 +40,7 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -141,12 +142,12 @@ public class ToMethod {
             if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
 
                 if (IS_MAP.apply(type)) {
-                    statements.add(new StringStatement("if (this." + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(LAZY_INIT) + ";} else {this." + fieldName + ".clear();}"));
-                    statements.add(new StringStatement("if (" + argumentName + " != null) {this." + fieldName + ".putAll(" + argumentName + ");} return (" + returnType + ") this;"));
+                    statements.add(new StringStatement("if (" + fieldName + " == null) { this." + fieldName + " =  null;} else {this." + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Arrays.asList(fieldName)) + ";} return (" + returnType + ") this;"));
                 } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
-                    statements.add(new StringStatement("if (this." + fieldName + " == null) { this." + fieldName + " = " + property.getAttribute(LAZY_INIT) + ";} else {_visitables.removeAll(this."+fieldName+"); this." + fieldName + ".clear();}"));
+                    statements.add(new StringStatement("if (this." + fieldName + " != null) { _visitables.removeAll(this." + fieldName + ");}"));
+
                     String addToMethodName = "addTo" + property.getNameCapitalized();
-                    statements.add(new StringStatement("if (" + argumentName + " != null) {for (" + unwrapped.toString() + " item : " + argumentName + "){this." + addToMethodName + "(item);}} return (" + returnType + ") this;"));
+                    statements.add(new StringStatement("if (" + argumentName + " != null) {this."+fieldName+" = "+property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList())+"; for (" + unwrapped.toString() + " item : " + argumentName + "){this." + addToMethodName + "(item);}} else { this."+fieldName+" = null;} return (" + returnType + ") this;"));
                 }
                 return statements;
             }

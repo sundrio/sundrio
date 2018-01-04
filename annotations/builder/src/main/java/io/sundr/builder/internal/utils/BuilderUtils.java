@@ -62,6 +62,7 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.INIT;
+import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 
@@ -491,7 +492,7 @@ public class BuilderUtils {
         if (TypeUtils.isList(classRef)) {
             ClassRef listRef =  Collections.ARRAY_LIST.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(builderType))
-                    .addToAttributes(INIT, " new " + listRef + "()")
+                    .addToAttributes(LAZY_INIT, " new " + listRef + "()")
                     .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
                     .build();
         }
@@ -499,7 +500,7 @@ public class BuilderUtils {
         if (TypeUtils.isSet(classRef)) {
             ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
-                    .addToAttributes(INIT, " new " + setRef+ "()")
+                    .addToAttributes(LAZY_INIT, " new " + setRef+ "()")
                     .addToAttributes(ALSO_IMPORT,  alsoImport(property, setRef, builderType))
                     .build();
         }
