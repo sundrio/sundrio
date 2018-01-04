@@ -27,6 +27,7 @@ public class MapTest {
     private final AttributeKey key1 = new AttributeKey("key1", String.class);
     private final AttributeKey key2 = new AttributeKey("key2", String.class);
 
+
     @Test
     public void testWithMap() {
         Map<AttributeKey, Object> map = new HashMap<>();
@@ -34,7 +35,7 @@ public class MapTest {
         map.put(key1, "value1");
         map.put(key2, "value2");
         AttributeSupport attributeSupport = new AttributeSupportBuilder()
-                .addToAttributes(map)
+                .withAttributes(map)
                 .build();
 
         assertEquals("value1", attributeSupport.getAttributes().get(key1));
@@ -50,5 +51,27 @@ public class MapTest {
 
         assertEquals("value1", attributeSupport.getAttributes().get(key1));
         assertEquals("value2", attributeSupport.getAttributes().get(key2));
+    }
+
+    @Test
+    public void testRemoveFromMap() {
+        AttributeSupport attributeSupport = new AttributeSupportBuilder()
+                .removeFromAttributes(key1)
+                .build();
+
+        assertNull(attributeSupport.getAttributes());
+    }
+
+    @Test
+    public void testRemoveMapFromMap() {
+        Map<AttributeKey, Object> map = new HashMap<>();
+
+        map.put(key1, "value1");
+        map.put(key2, "value2");
+        AttributeSupport attributeSupport = new AttributeSupportBuilder()
+                .removeFromAttributes(map)
+                .build();
+
+        assertNull(attributeSupport.getAttributes());
     }
 }

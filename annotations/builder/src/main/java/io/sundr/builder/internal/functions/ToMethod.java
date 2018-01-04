@@ -895,6 +895,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(mapProperty)
                     .withNewBlock()
+                    .addNewStringStatementStatement("if(this." + property.getName() + " == null) { return (" + returnType + ") this; }")
                     .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {if (this."+property.getName()+" != null){this." + property.getName() + ".remove(key);}}} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
@@ -916,6 +917,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(keyProperty)
                     .withNewBlock()
+                    .addNewStringStatementStatement("if(this." + property.getName() + " == null) { return (" + returnType + ") this; }")
                     .addNewStringStatementStatement("if(key != null && this."+property.getName()+" != null) {this." + property.getName() + ".remove(key);} return (" + returnType + ")this;")
                     .endBlock()
                     .build();
