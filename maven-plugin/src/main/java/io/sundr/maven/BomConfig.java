@@ -16,9 +16,12 @@
 
 package io.sundr.maven;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+
+import org.apache.maven.model.Dependency;
 
 public class BomConfig {
 
@@ -27,6 +30,7 @@ public class BomConfig {
     private String description = "Generated Bom";
     private ArtifactSet modules = new ArtifactSet();
     private ArtifactSet dependencies = new ArtifactSet();
+    private List<Dependency> extraDependencies = new ArrayList<>();
     private ArtifactSet plugins = new ArtifactSet();
     private List<BomImport> imports = new LinkedList<BomImport>();
     private List<VersionOverride> overrides = new LinkedList<VersionOverride>();
@@ -60,6 +64,10 @@ public class BomConfig {
 
     public String getDescription() {
         return description;
+    }
+
+    public List<Dependency> getExtraDependencies() {
+        return extraDependencies;
     }
 
     public ArtifactSet getModules() {
