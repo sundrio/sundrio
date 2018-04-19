@@ -316,6 +316,9 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         for (Dependency dependency : dependencies) {
             toGenerate.getDependencyManagement().addDependency(dependency);
         }
+        for (Dependency dependency : config.getExtraDependencies()) {
+            toGenerate.getDependencyManagement().addDependency(dependency);
+        }
 
         toGenerate.getModel().setBuild(new Build());
         if (!plugins.isEmpty()) {
