@@ -21,8 +21,14 @@ import io.sundr.codegen.directives.FieldDirective;
 import io.sundr.codegen.directives.MethodDirective;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.ParserPoolImpl;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
+import org.apache.velocity.runtime.log.NullLogChute;
+import org.apache.velocity.runtime.resource.ResourceManagerImpl;
+import org.apache.velocity.runtime.resource.ResourceCacheImpl;
+import org.apache.velocity.util.introspection.Uberspect;
+import org.apache.velocity.util.introspection.UberspectImpl;
 
 public class CodeGeneratorContext {
 
@@ -39,12 +45,19 @@ public class CodeGeneratorContext {
 
         this.velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "string");
         this.velocityEngine.setProperty("string.resource.loader.class", StringResourceLoader.class.getName());
+        //We are going to use shading so we need to make sure that the following configuration will be shade friendly...
+        this.velocityEngine.setProperty(RuntimeConstants.RESOURCE_MANAGER_CLASS, ResourceManagerImpl.class.getName());
+        this.velocityEngine.setProperty(RuntimeConstants.RESOURCE_MANAGER_CACHE_CLASS, ResourceCacheImpl.class.getName());
+        this.velocityEngine.setProperty(RuntimeConstants.PARSER_POOL_CLASS, ParserPoolImpl.class.getName());
+        this.velocityEngine.setProperty(RuntimeConstants.UBERSPECT_CLASSNAME, UberspectImpl.class.getName());
+        this.velocityEngine.setProperty("runtime.log.logsystem.class", NullLogChute.class.getName());
         this.velocityEngine.init();
 
         //Load standard directives
         this.velocityEngine.loadDirective(ClassDirective.class.getCanonicalName());
         this.velocityEngine.loadDirective(MethodDirective.class.getCanonicalName());
         this.velocityEngine.loadDirective(FieldDirective.class.getCanonicalName());
+
     }
 
     public VelocityEngine getVelocityEngine() {

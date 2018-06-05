@@ -19,7 +19,7 @@
     <parent>
         <artifactId>sundr-pom</artifactId>
         <groupId>io.sundr</groupId>
-        <version>0.7.8-SNAPSHOT</version>
+        <version>0.8-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -27,6 +27,42 @@
     <artifactId>sundr-codegen</artifactId>
     <name>Sundrio :: Code generation</name>
 
+    <build>
+      <plugins>
+         <plugin>
+           <artifactId>maven-shade-plugin</artifactId>
+           <version>3.1.1</version>
+           <executions>
+             <execution>
+               <phase>package</phase>
+               <goals>
+                 <goal>shade</goal>
+               </goals>
+               <configuration>
+                 <filters>
+                <filter>
+                  <artifact>org.apache.velocity:velocity</artifact>
+                  <excludes>
+                    <exclude>org/apache/velocity/runtime/defaults/directive.properties</exclude>                   
+                  </excludes>
+                </filter>
+              </filters>
+                 <relocations>
+                   <relocation>
+                     <pattern>com.github.javaparser</pattern>
+                     <shadedPattern>io.sundr.shaded.com.github.javaparser</shadedPattern>
+                   </relocation>
+                   <relocation>
+                     <pattern>org.apache.velocity</pattern>
+                     <shadedPattern>io.sundr.shaded.org.apache.velocity</shadedPattern>
+                   </relocation>
+                 </relocations>
+               </configuration>
+             </execution>
+           </executions>
+         </plugin>
+      </plugins>
+    </build>
     <dependencies>
         <dependency>
             <groupId>io.sundr</groupId>
