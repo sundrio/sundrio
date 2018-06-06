@@ -22,14 +22,14 @@ import io.sundr.builder.annotations.Buildable;
 @Buildable(generateBuilderPackage = true, builderPackage = "io.sundr.examples.kubernetes.domain")
 public class EnvVar {
 
-  private final String _name;
+  private final String $name;
 
   private final java.util.Optional<String> _value;
 
   private final java.util.Optional<EnvVarSource> _valueFrom;
 
-  public EnvVar(String _name, java.util.Optional<String> _value, java.util.Optional<EnvVarSource> _valueFrom) {
-    this._name = _name;
+  public EnvVar(String $name, java.util.Optional<String> _value, java.util.Optional<EnvVarSource> _valueFrom) {
+    this.$name = $name;
     this._value = _value;
     this._valueFrom = _valueFrom;
   }
@@ -37,8 +37,8 @@ public class EnvVar {
   /*
    * Name of the environment variable. Must be a C_IDENTIFIER.
    */
-  public String getName() {
-    return this._name;
+  public String get$Name() {
+    return this.$name;
   }
 
   /*

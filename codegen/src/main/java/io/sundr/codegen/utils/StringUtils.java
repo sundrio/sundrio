@@ -54,12 +54,38 @@ public final class StringUtils {
         return str == null || str.isEmpty();
     }
 
+    public static int indexOfAlphabetic(String str) {
+        if (str == null || str.isEmpty()) {
+            return -1;
+        }
+        for (int i = 0; i < str.length(); i++) {
+            if (Character.isAlphabetic(str.charAt(i))) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public static String capitalizeFirst(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
+        int first = indexOfAlphabetic(str);
+        if (first < 0) {
+            return str;
+        } else if (first == 0) {
+            return str.substring(0, 0 + 1).toUpperCase() + str.substring(0 + 1);
+        } else {
+            return str.substring(0, first) + str.substring(first, first + 1).toUpperCase() + str.substring(first + 1);
+        }
     }
 
     public static String deCapitalizeFirst(String str) {
-        return str.substring(0, 1).toLowerCase() + str.substring(1);
+        int first = indexOfAlphabetic(str);
+        if (first < 0) {
+            return str;
+        } else if (first == 0) {
+            return str.substring(0, 0 + 1).toLowerCase() + str.substring(0 + 1);
+        } else {
+            return str.substring(0, first) + str.substring(first, first + 1).toLowerCase() + str.substring(first + 1);
+        }
     }
 
     public static <T> String join(Iterable<T> items, String delimiter) {

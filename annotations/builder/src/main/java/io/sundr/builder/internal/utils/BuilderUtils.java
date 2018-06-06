@@ -136,8 +136,15 @@ public class BuilderUtils {
     public static Method findGetter(TypeDef clazz, Property property) {
         TypeDef current = clazz;
         while (current!= null && !current.equals(TypeDef.OBJECT)) {
+            //1st pass strict
             for (Method method : current.getMethods()) {
-                if (isApplicableGetterOf(method, property)) {
+                if (isApplicableGetterOf(method, property, true)) {
+                    return method;
+                }
+            }
+            //2nd pass relaxed
+            for (Method method : current.getMethods()) {
+                if (isApplicableGetterOf(method, property, false)) {
                     return method;
                 }
             }
@@ -200,27 +207,63 @@ public class BuilderUtils {
     }
 
     private static boolean isApplicableGetterOf(Method method, Property property) {
+        return isApplicableGetterOf(method, property, false);
+    }
+
+   /**
+    * Returns true if method is a getter of property.
+    * In strict mode it will not strip non-alphanumeric characters.
+    */
+    private static boolean isApplicableGetterOf(Method method, Property property, boolean strict) {
         if (!method.getReturnType().isAssignableFrom(property.getTypeRef())) {
             return false;
         }
 
-        if (method.getName().endsWith("get" + property.getNameCapitalized())) {
+        String capitalized = capitalizeFirst(property.getName());
+        if (method.getName().endsWith("get" + capitalized)) {
             return true;
         }
 
-        if (method.getName().endsWith("is" + property.getNameCapitalized())) {
+        if (method.getName().endsWith("is" + capitalized)) {
             return true;
+        }
+        
+        if (!strict) {
+            if (method.getName().endsWith("get" + property.getNameCapitalized())) {
+                return true;
+            }
+
+            if (method.getName().endsWith("is" + property.getNameCapitalized())) {
+                return true;
+            }
         }
         return false;
     }
 
 
     private static boolean isApplicableSetterOf(Method method, Property property) {
+        return isApplicableSetterOf(method, property, false);
+    }
+    
+   /**
+    * Returns true if method is a getter of property.
+    * In strict mode it will not strip non-alphanumeric characters.
+    */
+    private static boolean isApplicableSetterOf(Method method, Property property, boolean strict) {
         if (method.getArguments().size() != 1) {
             return false;
-        } else if (!method.getArguments().get(0).getTypeRef().equals(property.getTypeRef())) {
+        }
+
+        if (!method.getArguments().get(0).getTypeRef().equals(property.getTypeRef())) {
             return false;
-        } else if (method.getName().endsWith("set" + property.getNameCapitalized())) {
+        }
+
+        String capitalized = capitalizeFirst(property.getName());
+        if (method.getName().endsWith("set" + capitalized)) {
+            return true;
+        }
+
+        if (!strict && method.getName().endsWith("set" + property.getNameCapitalized())) {
             return true;
         }
         return false;
