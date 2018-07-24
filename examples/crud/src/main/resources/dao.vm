@@ -1,0 +1,4 @@
+package ${model.packageName};
+
+public interface ${model.name}Dao extends Dao<${model.name}> {
+}

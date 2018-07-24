@@ -123,14 +123,14 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 double percentage = 100 * (count++) / total;
                 System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
 
-                generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
+                generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                 if (typeDef.isInterface()) {
                     continue;
                 }
 
-                generateFromClazz(ClazzAs.FLUENT_IMPL.apply(typeDef),
+                generateFromResources(ClazzAs.FLUENT_IMPL.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                 if (typeDef.isAbstract()) {
@@ -138,19 +138,19 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 }
                  
                 if (generated.editableEnabled()) {
-                    generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
+                    generateFromResources(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
-                    generateFromClazz(ClazzAs.EDITABLE.apply(typeDef),
+                    generateFromResources(ClazzAs.EDITABLE.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 } else {
-                    generateFromClazz(ClazzAs.BUILDER.apply(typeDef),
+                    generateFromResources(ClazzAs.BUILDER.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }
 
 
                 for (final Inline inline : generated.inline()) {
-                    generateFromClazz(inlineableOf(ctx, typeDef, inline),
+                    generateFromResources(inlineableOf(ctx, typeDef, inline),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }
             } catch (IOException e) {

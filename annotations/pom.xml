@@ -31,6 +31,7 @@
         <module>builder</module>
         <module>dsl</module>
         <module>resourcecify</module>
+        <module>transform</module>
     </modules>
 
 </project>

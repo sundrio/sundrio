@@ -19,7 +19,6 @@ package io.sundr.builder.internal.processor;
 import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
-import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
@@ -40,7 +39,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BUILDABLE;
-import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
@@ -101,14 +99,14 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                 double percentage = 100 * (count++) / total;
                 System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
 
-                generateFromClazz(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
+                generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                 if (typeDef.isInterface()) {
                     continue;
                 }
 
-                generateFromClazz(ClazzAs.FLUENT_IMPL.apply(typeDef),
+                generateFromResources(ClazzAs.FLUENT_IMPL.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
                 if (typeDef.isAbstract()) {
@@ -116,20 +114,20 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                 }
 
                 if (typeDef.getAttributes().containsKey(EDIATABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDIATABLE_ENABLED)) {
-                    generateFromClazz(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
+                    generateFromResources(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
-                    generateFromClazz(ClazzAs.EDITABLE.apply(typeDef),
+                    generateFromResources(ClazzAs.EDITABLE.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 } else {
-                    generateFromClazz(ClazzAs.BUILDER.apply(typeDef),
+                    generateFromResources(ClazzAs.BUILDER.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }
 
                 Buildable buildable = typeDef.getAttribute(BUILDABLE);
                 if (buildable != null) {
                     for (final Inline inline : buildable.inline()) {
-                        generateFromClazz(inlineableOf(ctx, typeDef, inline),
+                        generateFromResources(inlineableOf(ctx, typeDef, inline),
                                 Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                     }
                 }

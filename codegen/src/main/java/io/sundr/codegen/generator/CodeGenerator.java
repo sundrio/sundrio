@@ -39,20 +39,22 @@ public class CodeGenerator<M> {
     private final M model;
     private final String templateResource;
     private final URL templateUrl;
+    private final String templateContent;
     private final Template template;
     private final Set<Class<? extends Directive>> directives;
 
-    public CodeGenerator(CodeGeneratorContext context, M model, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives) {
+    public CodeGenerator(CodeGeneratorContext context, M model, Writer writer, URL templateUrl, String templateResource, String templateContent, Set<Class<? extends Directive>> directives) {
         this.context = context != null ? context : new CodeGeneratorContext();
         this.model = model;
         this.writer = writer;
         this.templateResource = templateResource;
         this.templateUrl = templateUrl;
+        this.templateContent = templateContent;
         this.directives = directives;
 
         StringResourceRepository repo = StringResourceLoader.getRepository();
         try {
-            repo.putStringResource(TEMPLATE, templateUrl != null ? loadResource(templateUrl) : loadResource(templateResource));
+            repo.putStringResource(TEMPLATE, templateContent != null ? templateContent : (templateUrl != null ? loadResource(templateUrl) : loadResource(templateResource)));
         } catch (Exception e) {
             throw new RuntimeException(TEMPLATE_READER_FAILURE, e);
         }
@@ -65,8 +67,8 @@ public class CodeGenerator<M> {
         this.context.getVelocityContext().put(MODEL, model);
     }
 
-    public CodeGenerator(M model, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives) {
-        this(new CodeGeneratorContext(), model, writer, templateUrl, templateResource, directives);
+    public CodeGenerator(M model, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives, String templateContent) {
+        this(new CodeGeneratorContext(), model, writer, templateUrl, templateResource, templateContent, directives);
     }
 
 
@@ -84,6 +86,10 @@ public class CodeGenerator<M> {
 
     public URL getTemplateUrl() {
         return templateUrl;
+    }
+
+    public String getTemplateContent() {
+        return templateContent;
     }
 
     public Template getTemplate() {

@@ -55,57 +55,57 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
             try {
                 if (context.getGenerateBuilderPackage() && !Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getBuilderPackage())) {
 
-                    generateFromClazz(context.getFluentInterface(),
+                    generateFromResources(context.getFluentInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromClazz(context.getPredicateClass(),
+                    generateFromResources(context.getPredicateClass(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromClazz(context.getVisitableInterface(),
+                    generateFromResources(context.getVisitableInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
-                    generateFromClazz(context.getVisitorInterface(),
+                    generateFromResources(context.getVisitorInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
-                    generateFromClazz(context.getTypedVisitorInterface(),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                    );
-
-                    generateFromClazz(context.getPathAwareVisitorClass(),
+                    generateFromResources(context.getTypedVisitorInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromClazz(context.getVisitableBuilderInterface(),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                    );
-                    generateFromClazz(context.getBuilderInterface(),
+                    generateFromResources(context.getPathAwareVisitorClass(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromClazz(context.getFluentInterface(),
+                    generateFromResources(context.getVisitableBuilderInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                    generateFromResources(context.getBuilderInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromClazz(context.getBaseFluentClass(),
+                    generateFromResources(context.getFluentInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromClazz(context.getNestedInterface(),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                    );
-                    generateFromClazz(context.getEditableInterface(),
+                    generateFromResources(context.getBaseFluentClass(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromClazz(context.getFunctionInterface(),
+                    generateFromResources(context.getNestedInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+                    generateFromResources(context.getEditableInterface(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
+
+                    generateFromResources(context.getFunctionInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
                 }
 
                 if (context.isValidationEnabled() &&  !classExists(context.getBuilderPackage() + ".ValidationUtils") ) {
-                    generateFromClazz(context.getValidationUtils(),
+                    generateFromResources(context.getValidationUtils(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
                 }
@@ -295,7 +295,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     typeDef = ClazzAs.POJO.apply(typeDef);
                     builderContext.getDefinitionRepository().register(typeDef);
                     builderContext.getBuildableRepository().register(typeDef);
-                    generateFromClazz(typeDef,
+                    generateFromResources(typeDef,
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
                 }
             } catch (IOException e) {
