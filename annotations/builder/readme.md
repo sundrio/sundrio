@@ -19,6 +19,7 @@ This project provides annotation processors the provide the following features:
 - Support for Bean Validation (JSR 303)
 - Support for JDK8 Optional types.
 - Support for generating Pojos and Builders from interfaces.
+- Support generating Builders for 3rd party classes.
 
 #### The builder interface
 All the generated builders implement the `Builder` interface which looks like:
@@ -340,7 +341,7 @@ to `true`. This will result in generating the base interfaces
 themselves in the generated source directory, eliminating all runtime
 dependencies to this too. The target package can be set with
 `builderPackage`. If not given, the default `io.sundr.builder` is
-used.
+used (in this case sundr-core needs to be on the classpath).
 
 ```java
 package my.demo
@@ -352,6 +353,14 @@ public class Demo {
     }
 }
 ```
+
+#### Using a generated builder package from an other artifact.
+If you've generated the builder package say in artifact A and you have artifact B depend on A, you can reuse the builder 
+package from A, so no need to also generate it inside B.
+
+If this is TOO complicated, just remember that sundrio generated builders need on runtime some classes (BaseFluent, Visitor etc).
+These classes can come from `sundr-core` or any other artifact that had them generated. It doesn't matter where these classes come from, 
+as long as point sundrio to them (as shown above).
 
 ### Generating Builders and Fluents for 3rd party classes
 
@@ -366,6 +375,22 @@ want to generate builders.
 public class MyExternalCase {
 }
 ```
+
+### Referencing existing Buildables
+
+We've already mentioned the case, where we have multiple modules generating builders. If these modules depende on each other
+it is likely that the builders themselves depend on each other (after all the generated builders are meant to be hierarchical).
+
+Since, builder generation happens via annotation processors and annotation information are not retained inside classes, we do need a way
+to let sundrio know about `know buildables` This is done using the `refs` attribute on the `@Buildable` annotation.
+
+For example if our buildable classes depend on a buildable class, say `ObjectMeta` that lives in an other artifact, we can express
+that `ObjectMeta` is buildalbe using:
+
+    @Buildable(refs = {
+        @BuildableReference(ObjectMeta.class)
+    })
+
 ### Generating Pojos
 
 When the `@Buildable` annotation is added to an interface the processor will generate a Pojo and then Fleunt and Builder
