@@ -376,6 +376,8 @@ public class MyExternalCase {
 }
 ```
 
+Note: if your project needs both `@Buildable` and `@ExternalBuilders` please make sure you configure them the same.
+
 ### Referencing existing Buildables
 
 We've already mentioned the case, where we have multiple modules generating builders. If these modules depende on each other
