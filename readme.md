@@ -2,10 +2,21 @@
 
 [![CircleCI](https://circleci.com/gh/sundrio/sundrio/tree/master.svg?style=svg)](https://circleci.com/gh/sundrio/sundrio/tree/master)
 
+# Overview
+
+Writing things like:
+
+- Nested Builders
+- Domain Specific Languages
+- and more...
+
+is a great experience the first time, but a real burden from there after.
+This project was created to generate the boilerplate on compile time for you.
+
 # Features
 
 - [Builder Generator](annotations/builder/readme.md)
-- [Experimental DSL Generator](annotations/dsl/readme.md)
+- [DSL Generator](annotations/dsl/readme.md)
 - [Maven Bom Generator](maven-plugin/readme.md)
 
 
