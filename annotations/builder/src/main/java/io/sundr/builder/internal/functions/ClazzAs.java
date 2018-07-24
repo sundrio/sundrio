@@ -43,8 +43,8 @@ import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.utils.Getters;
-import io.sundr.codegen.utils.Setters;
+import io.sundr.codegen.utils.Getter;
+import io.sundr.codegen.utils.Setter;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -78,7 +78,7 @@ public class ClazzAs {
                 if (property.isStatic()) {
                     continue;
                 }
-                if (!hasBuildableConstructorWithArgument(item, property) && !Setters.hasOrInheritsSetter(item, property)) {
+                if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
                     continue;
                 }
 
@@ -213,7 +213,7 @@ public class ClazzAs {
                 if (property.isStatic()) {
                     continue;
                 }
-                if (!hasBuildableConstructorWithArgument(item, property) && !Setters.hasOrInheritsSetter(item, property)) {
+                if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
                     continue;
                 }
 
@@ -627,15 +627,8 @@ public class ClazzAs {
 
             for (TypeDef t : types) {
                 for (Method method : t.getMethods()) {
-                    if (Getters.isGetter(method)) {
-                        String name = method.getName();
-                        if (name.startsWith("get")) {
-                            name = name.substring(3);
-                        } else if (name.startsWith("is")) {
-                            name = name.substring(2);
-                        }
-
-                        name = name.substring(0, 1).toLowerCase() + name.substring(1);
+                    if (Getter.is(method)) {
+                        String name = Getter.propertyName(method);
 
                         arguments.add(new PropertyBuilder()
                                 .withName(name)
@@ -679,7 +672,7 @@ public class ClazzAs {
 
                     //Remove getters provided by superclass.
                     for (Method method : superClass.getMethods()) {
-                        if (Getters.isGetter(method)) {
+                        if (Getter.is(method)) {
                             for (Method m : getters) {
                                 if (m.getName().equals(method.getName())) {
                                     getters.remove(m);
@@ -768,7 +761,7 @@ public class ClazzAs {
         }
 
         for (Property property : constructor.getArguments()) {
-            Method getter = Getters.findGetter(clazz, property);
+            Method getter = Getter.find(clazz, property);
             if (getter != null) {
                 String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() + ")" : "";
                 statements.add(new StringStatement(new StringBuilder().append(ref).append(".with").append(property.getNameCapitalized()).append("(").append(cast).append("instance.").append(getter.getName()).append("()); ").toString()));
@@ -781,9 +774,9 @@ public class ClazzAs {
         //Iterate parent objects and check for properties with setters but not ctor arguments.
         while (target != null && !io.sundr.codegen.Constants.OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
             for (Property property : target.getProperties()) {
-                if (!hasBuildableConstructorWithArgument(target, property) && Setters.hasSetter(target, property)) {
+                if (!hasBuildableConstructorWithArgument(target, property) && Setter.has(target, property)) {
                     String withName = "with" + property.getNameCapitalized();
-                    String getterName = Getters.findGetter(target, property).getName();
+                    String getterName = Getter.find(target, property).getName();
                     statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.").append(getterName).append("());\n").toString()));
                 }
             }
@@ -805,8 +798,7 @@ public class ClazzAs {
                 .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
                 .append(StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
                     public String apply(Property item) {
-                        String prefix = TypeUtils.isBoolean(item.getTypeRef()) ? "is" : "get";
-                        return "fluent." + prefix + item.getNameCapitalized() + "()";
+                        return "fluent." + Getter.name(item) + "()";
                     }
                 }, ","))
                 .append(");")
@@ -822,9 +814,9 @@ public class ClazzAs {
             }
 
             for (Property property : c.getProperties()) {
-                if (!hasBuildableConstructorWithArgument(c, property) && Setters.hasSetter(c, property)) {
+                if (!hasBuildableConstructorWithArgument(c, property) && Setter.has(c, property)) {
                     String setterName = "set" + property.getNameCapitalized();
-                    String getterName = Getters.findGetter(c, property).getName();
+                    String getterName = Getter.name(property);
                     statements.add(new StringStatement(new StringBuilder()
                             .append("buildable.").append(setterName).append("(fluent.").append(getterName).append("());")
                             .toString()));

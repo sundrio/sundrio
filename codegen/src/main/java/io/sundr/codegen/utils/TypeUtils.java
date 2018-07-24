@@ -17,6 +17,7 @@
 package io.sundr.codegen.utils;
 
 import io.sundr.Function;
+import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.ClassRef;
@@ -40,9 +41,7 @@ import java.util.Map;
 
 public final class TypeUtils {
 
-    private static final String BOOLEAN = "boolean";
     private static final String JAVA_LANG_OBJECT = "java.lang.Object";
-    private static final String JAVA_LANG_BOOLEAN = "java.lang.Boolean";
     private static final String JAVA_UTIL_OPTIONAL = "java.util.Optional";
     private static final String JAVA_UTIL_OPTIONAL_INT = "java.util.OptionalInt";
     private static final String JAVA_UTIL_OPTIONAL_DOUBLE = "java.util.OptionalDouble";
@@ -292,11 +291,11 @@ public final class TypeUtils {
      */
     public static boolean isBoolean(TypeRef type) {
         if (type instanceof PrimitiveRef) {
-            return BOOLEAN.equals(((PrimitiveRef)type).getName());
+            return Constants.PRIMITIVE_BOOLEAN_REF.equals(type);
         } else if (!(type instanceof ClassRef)) {
             return false;
         } else {
-            return JAVA_LANG_BOOLEAN.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
+            return Constants.BOOLEAN_REF.equals(type);
         }
     }
 

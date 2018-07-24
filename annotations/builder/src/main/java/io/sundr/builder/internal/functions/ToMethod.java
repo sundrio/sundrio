@@ -35,6 +35,7 @@ import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.utils.Getter;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
@@ -286,8 +287,8 @@ public class ToMethod {
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
             TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
-            String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
-            String getterName = prefix + property.getNameCapitalized();
+            String prefix = Getter.prefix(property);
+            String getterName = Getter.name(property);
             String builderName = "build" + property.getNameCapitalized();
             List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
             List<String> comments = new ArrayList<String>();
@@ -466,8 +467,8 @@ public class ToMethod {
             List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
             List<String> comments = new ArrayList<String>();
 
-            String prefix = isBoolean(property.getTypeRef()) ? "is" : "get";
-            String getterName = prefix + property.getNameCapitalized();
+            String prefix = Getter.prefix(property);
+            String getterName = Getter.name(property);
             String builderName = "build" + property.getNameCapitalized();
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
             TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);

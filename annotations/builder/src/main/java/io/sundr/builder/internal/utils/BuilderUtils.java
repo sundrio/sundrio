@@ -40,7 +40,6 @@ import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.utils.Setters;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Element;

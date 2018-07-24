@@ -48,8 +48,12 @@ public class Constants {
     public static final TypeParamDef V = newTypeParamDef("V");
     public static final VoidRef VOID = new VoidRef();
     public static final WildcardRef Q = new WildcardRef();
+
     public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
     public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
+
+    public static final TypeRef PRIMITIVE_BOOLEAN_REF = TYPEREF.apply(boolean.class);
+
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
     public static final TypeDef OBJECT = TypeDef.OBJECT;
     public static final TypeDef ARRAY = TYPEDEF.apply(Array.class);
@@ -59,7 +63,9 @@ public class Constants {
     public static final TypeDef PARAMETERIZED_TYPE = TYPEDEF.apply(ParameterizedType.class);
     public static final TypeRef INT_REF = TYPEREF.apply(int.class);
     public static final TypeDef BOXED_VOID = TYPEDEF.apply(Void.class);
+
     public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
+
     public static TypeRef[] PRIMITIVE_TYPES =
             {TYPEREF.apply(boolean.class),
                     TYPEREF.apply(byte.class), TYPEREF.apply(char.class),
