@@ -32,10 +32,8 @@ import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.Statement;
@@ -313,7 +311,7 @@ public class ClazzAs {
             Method equals = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
-                    .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
+                    .addNewArgument().withName("o").withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
                     .withBlock(new Block(new Provider<List<Statement>>() {
                         @Override
@@ -351,7 +349,7 @@ public class ClazzAs {
             final List<Property> fields = new ArrayList<Property>();
 
             Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
-            Property validationEnabledProperty = new PropertyBuilder().withTypeRef(BOOLEAN_REF).withName("validationEnabled").build();
+            Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").build();
 
             fields.add(fluentProperty);
             fields.add(validationEnabledProperty);
@@ -366,7 +364,7 @@ public class ClazzAs {
             Method validationConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
-                        .withTypeRef(BOOLEAN_REF)
+                        .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
                         .withName("validationEnabled")
                     .and()
                     .withNewBlock()
@@ -398,7 +396,7 @@ public class ClazzAs {
                     .withName("fluent")
                     .and()
                     .addNewArgument()
-                    .withTypeRef(BOOLEAN_REF)
+                    .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
                     .withName("validationEnabled")
                     .and()
                     .withNewBlock()
@@ -437,7 +435,7 @@ public class ClazzAs {
                     .withTypeRef(instanceRef)
                     .withName("instance").and()
                     .addNewArgument()
-                    .withTypeRef(BOOLEAN_REF)
+                    .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
                     .withName("validationEnabled")
                     .and()
                     .withBlock(new Block(new Provider<List<Statement>>() {
@@ -466,7 +464,7 @@ public class ClazzAs {
                     .withTypeRef(instanceRef)
                     .withName("instance").and()
                     .addNewArgument()
-                    .withTypeRef(BOOLEAN_REF)
+                    .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
                     .withName("validationEnabled")
                     .and()
                     .withBlock(new Block(new Provider<List<Statement>>() {
@@ -502,7 +500,7 @@ public class ClazzAs {
             Method equals = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
-                    .addNewArgument().withName("o").withTypeRef(Constants.OBJECT.toReference()).endArgument()
+                    .addNewArgument().withName("o").withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument()
                     .withName("equals")
                     .withBlock(new Block(new Provider<List<Statement>>() {
                         @Override
@@ -779,7 +777,7 @@ public class ClazzAs {
 
         TypeDef target = clazz;
         //Iterate parent objects and check for properties with setters but not ctor arguments.
-        while (target != null && !OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
+        while (target != null && !io.sundr.codegen.Constants.OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
             for (Property property : target.getProperties()) {
                 if (!hasBuildableConstructorWithArgument(target, property) && hasSetter(target, property)) {
                     String withName = "with" + property.getNameCapitalized();

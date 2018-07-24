@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.INDEX;
-import static io.sundr.builder.Constants.N;
+import static io.sundr.codegen.Constants.N;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;

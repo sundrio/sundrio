@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.sundr.builder.Constants.BOOLEAN_REF;
+import static io.sundr.codegen.Constants.BOOLEAN_REF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;

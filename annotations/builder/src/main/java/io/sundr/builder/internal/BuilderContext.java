@@ -39,10 +39,10 @@ import java.util.Arrays;
 
 import static io.sundr.builder.Constants.INLINEABLE;
 import static io.sundr.codegen.functions.Collections.SET;
-import static io.sundr.builder.Constants.T;
-import static io.sundr.builder.Constants.T_REF;
+import static io.sundr.codegen.Constants.T;
+import static io.sundr.codegen.Constants.T_REF;
 import static io.sundr.builder.Constants.VALIDATE_SNIPPET;
-import static io.sundr.builder.Constants.VOID;
+import static io.sundr.codegen.Constants.VOID;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 

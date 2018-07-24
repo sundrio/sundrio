@@ -18,7 +18,6 @@ package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
-import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -26,7 +25,6 @@ import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.AttributeSupportFluent;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
@@ -44,13 +42,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import static io.sundr.builder.Constants.EMPTY;
+import static io.sundr.codegen.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 

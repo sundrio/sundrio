@@ -25,25 +25,14 @@ import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRef;
-import io.sundr.codegen.model.WildcardRef;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import static io.sundr.codegen.functions.ClassTo.ANNOTATIONTYPEREF;
 import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
-import static io.sundr.codegen.functions.ClassTo.TYPEREF;
-import static io.sundr.codegen.utils.TypeUtils.*;
 import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
 
 public class Constants {
@@ -69,56 +58,24 @@ public class Constants {
 
     public static final AttributeKey<Buildable> BUILDABLE =  new AttributeKey<Buildable>("BUILDABLE_ANNOTATION", Buildable.class);
 
-    public static final String EMPTY = "";
-
-    public static final TypeParamDef F = newTypeParamDef("F");
-    public static final TypeParamDef I = newTypeParamDef("I");
-    public static final TypeParamDef O = newTypeParamDef("O");
-    public static final TypeParamDef B = newTypeParamDef("B");
-    
-    public static final TypeParamDef T = newTypeParamDef("T");
-    public static final TypeParamRef T_REF = newTypeParamRef("T");
-    
-    public static final TypeParamDef N = newTypeParamDef("N");
-    public static final TypeParamRef N_REF = newTypeParamRef("N");
-
-    public static final TypeParamDef V = newTypeParamDef("V");
-
-    public static final VoidRef VOID = new VoidRef();
-    public static final WildcardRef Q = new WildcardRef();
-
-    public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
-    public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
-
     public static final AnnotationRef BUILDABLE_ANNOTATION = ANNOTATIONTYPEREF.apply(Buildable.class);
     public static final AnnotationRef DEPRECATED_ANNOTATION = ANNOTATIONTYPEREF.apply(Deprecated.class);
 
-    public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
-    public static final TypeDef OBJECT = TypeDef.OBJECT;
+    public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(io.sundr.codegen.Constants.INT_REF).build();
 
-    public static final TypeDef ARRAY = TYPEDEF.apply(Array.class);
-    public static final TypeDef TYPE = TYPEDEF.apply(Type.class);
-    public static final TypeDef TYPE_VARIABLE = TYPEDEF.apply(TypeVariable.class);
-    public static final TypeDef GENERIC_ARRAY_TYPE = TYPEDEF.apply(GenericArrayType.class);
-    public static final TypeDef PARAMETERIZED_TYPE = TYPEDEF.apply(ParameterizedType.class);
+    public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), io.sundr.codegen.Constants.T);
 
-    public static final TypeRef INT_REF = TYPEREF.apply(int.class);
-    public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(INT_REF).build();
-
-    public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), T);
-
-    public static final TypeDef BUILDER = typeGenericOf(TYPEDEF.apply(Builder.class), T);
-    public static final TypeDef BASE_FLUENT = typeGenericOf(TYPEDEF.apply(BaseFluent.class), T);
-    public static final TypeDef EDITABLE = typeGenericOf(TYPEDEF.apply(Editable.class), T);
-    public static final TypeDef FLUENT = typeGenericOf(TYPEDEF.apply(Fluent.class), T);
-    public static final TypeDef FUNCTION = typeGenericOf(TYPEDEF.apply(Function.class), I, O);
-    public static final TypeDef INLINEABLE = typeGenericOf(TYPEDEF.apply(Inlineable.class), T);
-    public static final TypeDef NESTED = typeGenericOf(TYPEDEF.apply(Nested.class), N);
-    public static final TypeDef VISITOR = typeGenericOf(TYPEDEF.apply(Visitor.class), V);
-    public static final TypeDef TYPED_VISITOR = typeGenericOf(TYPEDEF.apply(TypedVisitor.class), V);
+    public static final TypeDef BUILDER = typeGenericOf(TYPEDEF.apply(Builder.class), io.sundr.codegen.Constants.T);
+    public static final TypeDef BASE_FLUENT = typeGenericOf(TYPEDEF.apply(BaseFluent.class), io.sundr.codegen.Constants.T);
+    public static final TypeDef EDITABLE = typeGenericOf(TYPEDEF.apply(Editable.class), io.sundr.codegen.Constants.T);
+    public static final TypeDef FLUENT = typeGenericOf(TYPEDEF.apply(Fluent.class), io.sundr.codegen.Constants.T);
+    public static final TypeDef FUNCTION = typeGenericOf(TYPEDEF.apply(Function.class), io.sundr.codegen.Constants.I, io.sundr.codegen.Constants.O);
+    public static final TypeDef INLINEABLE = typeGenericOf(TYPEDEF.apply(Inlineable.class), io.sundr.codegen.Constants.T);
+    public static final TypeDef NESTED = typeGenericOf(TYPEDEF.apply(Nested.class), io.sundr.codegen.Constants.N);
+    public static final TypeDef VISITOR = typeGenericOf(TYPEDEF.apply(Visitor.class), io.sundr.codegen.Constants.V);
+    public static final TypeDef TYPED_VISITOR = typeGenericOf(TYPEDEF.apply(TypedVisitor.class), io.sundr.codegen.Constants.V);
     public static final TypeDef VISITABLE = TYPEDEF.apply(Visitable.class);
-    public static final TypeDef VISITABLE_BUILDER = typeGenericOf(TYPEDEF.apply(VisitableBuilder.class), T, V);
-    public static final TypeDef BOXED_VOID = TYPEDEF.apply(Void.class);
+    public static final TypeDef VISITABLE_BUILDER = typeGenericOf(TYPEDEF.apply(VisitableBuilder.class), io.sundr.codegen.Constants.T, io.sundr.codegen.Constants.V);
 
 
     //The classes below are created programmatically rather than by class to avoid bringing in more deps
@@ -172,16 +129,4 @@ public class Constants {
     public static final String VALIDATE_SNIPPET = "snippets/validate.txt";
     public static final String EMPTY_FUNCTION_SNIPPET = "snippets/empty-function.txt";
 
-    public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
-
-    public static TypeRef[] PRIMITIVE_TYPES =
-            {TYPEREF.apply(boolean.class),
-                    TYPEREF.apply(byte.class), TYPEREF.apply(char.class),
-                    TYPEREF.apply(short.class), TYPEREF.apply(int.class), TYPEREF.apply(long.class),
-                    TYPEREF.apply(double.class), TYPEREF.apply(float.class)};
-
-    public static TypeRef[] BOXED_PRIMITIVE_TYPES = {TYPEREF.apply(Boolean.class),
-            TYPEREF.apply(Byte.class), TYPEREF.apply(Character.class),
-            TYPEREF.apply(Short.class), TYPEREF.apply(Integer.class), TYPEREF.apply(Long.class),
-            TYPEREF.apply(Double.class), TYPEREF.apply(Float.class)};
 }
