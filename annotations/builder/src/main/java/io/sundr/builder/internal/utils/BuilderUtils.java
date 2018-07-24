@@ -17,7 +17,6 @@
 package io.sundr.builder.internal.utils;
 
 
-import io.sundr.SundrException;
 import io.sundr.builder.Constants;
 import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
@@ -41,6 +40,7 @@ import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.utils.Setters;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Element;
@@ -56,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.sundr.codegen.Constants.BOOLEAN_REF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
@@ -133,147 +132,11 @@ public class BuilderUtils {
         return false;
     }
 
-    public static Method findGetter(TypeDef clazz, Property property) {
-        TypeDef current = clazz;
-        while (current!= null && !current.equals(TypeDef.OBJECT)) {
-            //1st pass strict
-            for (Method method : current.getMethods()) {
-                if (isApplicableGetterOf(method, property, true)) {
-                    return method;
-                }
-            }
-            //2nd pass relaxed
-            for (Method method : current.getMethods()) {
-                if (isApplicableGetterOf(method, property, false)) {
-                    return method;
-                }
-            }
-            if (!current.getExtendsList().iterator().hasNext()) {
-                break;
-            }
-            String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
-            current = DefinitionRepository.getRepository().getDefinition(fqn);
-        }
-        throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getFullyQualifiedName());
-    }
-
-    public static boolean hasSetter(TypeDef clazz, Property property) {
-        for (Method method : clazz.getMethods()) {
-            if (isApplicableSetterOf(method, property)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isGetter(Method method) {
-        if (method.isPrivate() || method.isStatic()) {
-            return false;
-        }
-
-        if (!method.getArguments().isEmpty()) {
-            return false;
-        }
-
-        if (method.getName().startsWith("get")) {
-            return true;
-        }
-
-        if (method.getName().startsWith("is") && (method.getReturnType().equals(BOOLEAN_REF) || method.getReturnType().toString().equals("boolean"))) {
-            return true;
-        }
-        return false;
-    }
-
-
-    public static boolean hasOrInheritsSetter(TypeDef clazz, Property property) {
-        TypeDef current = clazz;
-        //Iterate parent objects and check for properties with setters but not ctor arguments.
-        while (current!= null && !current.equals(TypeDef.OBJECT)) {
-            for (Method method : current.getMethods()) {
-                if (isApplicableSetterOf(method, property)) {
-                    return true;
-                }
-            }
-
-            if (!current.getExtendsList().isEmpty()) {
-                String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
-                current = DefinitionRepository.getRepository().getDefinition(fqn);
-            } else {
-                current = null;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isApplicableGetterOf(Method method, Property property) {
-        return isApplicableGetterOf(method, property, false);
-    }
-
-   /**
-    * Returns true if method is a getter of property.
-    * In strict mode it will not strip non-alphanumeric characters.
-    */
-    private static boolean isApplicableGetterOf(Method method, Property property, boolean strict) {
-        if (!method.getReturnType().isAssignableFrom(property.getTypeRef())) {
-            return false;
-        }
-
-        String capitalized = capitalizeFirst(property.getName());
-        if (method.getName().endsWith("get" + capitalized)) {
-            return true;
-        }
-
-        if (method.getName().endsWith("is" + capitalized)) {
-            return true;
-        }
-        
-        if (!strict) {
-            if (method.getName().endsWith("get" + property.getNameCapitalized())) {
-                return true;
-            }
-
-            if (method.getName().endsWith("is" + property.getNameCapitalized())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    private static boolean isApplicableSetterOf(Method method, Property property) {
-        return isApplicableSetterOf(method, property, false);
-    }
-    
-   /**
-    * Returns true if method is a getter of property.
-    * In strict mode it will not strip non-alphanumeric characters.
-    */
-    private static boolean isApplicableSetterOf(Method method, Property property, boolean strict) {
-        if (method.getArguments().size() != 1) {
-            return false;
-        }
-
-        if (!method.getArguments().get(0).getTypeRef().equals(property.getTypeRef())) {
-            return false;
-        }
-
-        String capitalized = capitalizeFirst(property.getName());
-        if (method.getName().endsWith("set" + capitalized)) {
-            return true;
-        }
-
-        if (!strict && method.getName().endsWith("set" + property.getNameCapitalized())) {
-            return true;
-        }
-        return false;
-    }
-
 
     /**
      * Checks if method has a specific argument.
      * @param method        The method.
-     * @param property      The arguement.
+     * @param property      The argument.
      * @return              True if matching argument if found.
      */
     public static boolean methodHasArgument(Method method, Property property) {
