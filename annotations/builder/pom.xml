@@ -33,7 +33,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <compilerArgument>-proc:none</compilerArgument>
+                    <annotationProcessors>
+                        <processor>io.sundr.resourcecify.internal.processor.ResourcecifyProcessor</processor>
+                    </annotationProcessors>
                 </configuration>
             </plugin>
         </plugins>
@@ -50,6 +52,18 @@
             <groupId>io.sundr</groupId>
             <artifactId>sundr-codegen</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>resourcecify-annotations</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

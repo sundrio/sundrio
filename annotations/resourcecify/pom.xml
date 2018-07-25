@@ -41,17 +41,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.sundr</groupId>
-            <artifactId>sundr-core</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>io.sundr</groupId>
-            <artifactId>sundr-codegen</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
     </dependencies>
-
 </project>

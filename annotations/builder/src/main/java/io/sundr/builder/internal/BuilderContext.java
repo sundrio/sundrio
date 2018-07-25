@@ -21,6 +21,7 @@ import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.ReplacePackage;
 import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -47,8 +48,6 @@ import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 
 public class BuilderContext {
-
-    private static final String VALIDATE_BODY_TEXT = loadResourceQuietly(VALIDATE_SNIPPET);
 
     private final Elements elements;
     private final Types types;
@@ -147,32 +146,9 @@ public class BuilderContext {
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        validationUtils = new TypeDefBuilder()
-                .withName("ValidationUtils")
-                .withPackageName(builderPackage)
-                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
-                .addNewMethod()
-                    .withName("validate")
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-                    .withReturnType(VOID)
-                    .withParameters(T)
-                    .addNewArgument()
-                        .withTypeRef(T_REF)
-                        .withName("item")
-                    .endArgument()
-                    .withNewBlock()
-                        .withStatements(new StringStatement(VALIDATE_BODY_TEXT))
-                    .endBlock()
-                .addToAttributes(ALSO_IMPORT, Arrays.<ClassRef>asList(
-                        SET.toReference(),
-                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("Validator").and().build(),
-                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ValidatorFactory").and().build(),
-                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("Validation").and().build(),
-                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ValidationException").and().build(),
-                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ConstraintViolation").and().build(),
-                        new ClassRefBuilder().withNewDefinition().withPackageName("javax.validation").withName("ConstraintViolationException").and().build()
-                        ))
-                .endMethod()
+        validationUtils = new TypeDefBuilder(Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(BuilderContext.class.getResourceAsStream("/io/sundr/builder/internal/resources/ValidationUtils.java")))
+                .accept(new ReplacePackage("io.sundr.builder.internal.resources", builderPackage))
+                .withAnnotations(new ArrayList<>())
                 .build();
     }
 

@@ -32,6 +32,7 @@ import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
@@ -337,6 +338,7 @@ public class ClazzAs {
 
     public static final Function<TypeDef, TypeDef> BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(final TypeDef item) {
+            final boolean validationEnabled = item.hasAttribute(VALIDATION_ENABLED) ? item.getAttribute(VALIDATION_ENABLED) : false;
             final Modifier[] modifiers = item.isAbstract()
                     ? new Modifier[]{Modifier.PUBLIC, Modifier.ABSTRACT}
                     : new Modifier[]{Modifier.PUBLIC};
@@ -353,6 +355,8 @@ public class ClazzAs {
             Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
             Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").build();
 
+
+
             fields.add(fluentProperty);
             fields.add(validationEnabledProperty);
 
@@ -363,7 +367,7 @@ public class ClazzAs {
                     .endBlock()
                     .build();
 
-            Method validationConstructor = new MethodBuilder()
+            Method validationEnabledConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
                         .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
@@ -378,6 +382,8 @@ public class ClazzAs {
                     }))
                     .endBlock()
                     .build();
+
+
 
 
             Method fluentConstructor = new MethodBuilder()
@@ -427,7 +433,7 @@ public class ClazzAs {
 
 
 
-            Method instanceAndFluentAndValidationCosntructor = new MethodBuilder()
+            Method instanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
                     .withTypeRef(fluent)
@@ -459,8 +465,7 @@ public class ClazzAs {
                     .endBlock()
                     .build();
 
-
-            Method instanceAndValidationConstructor = new MethodBuilder()
+            Method instanceAndValidationEnabledConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
                     .withTypeRef(instanceRef)
@@ -478,14 +483,17 @@ public class ClazzAs {
                         }
                     })).build();
 
+
+
+
             constructors.add(emptyConstructor);
-            constructors.add(validationConstructor);
+            constructors.add(validationEnabledConstructor);
             constructors.add(fluentConstructor);
             constructors.add(fluentAndValidationConstructor);
             constructors.add(instanceAndFluentCosntructor);
-            constructors.add(instanceAndFluentAndValidationCosntructor);
+            constructors.add(instanceAndFluentAndValidationEnabledCosntructor);
             constructors.add(instanceConstructor);
-            constructors.add(instanceAndValidationConstructor);
+            constructors.add(instanceAndValidationEnabledConstructor);
 
             Method build = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(modifiers))
@@ -512,6 +520,86 @@ public class ClazzAs {
                     })).build();
 
             methods.add(equals);
+
+
+            if (validationEnabled) {
+                ClassRef validatorRef = new ClassRefBuilder()
+                        .withNewDefinition()
+                        .withPackageName("javax.validation")
+                        .withName("Validator")
+                        .endDefinition()
+                        .build();
+
+                Property validatorProperty = new PropertyBuilder()
+                        .withName("validator")
+                        .withTypeRef(validatorRef)
+                        .build();
+
+                fields.add(validatorProperty);
+                Method validatorConstructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .addNewArgument()
+                        .withTypeRef(validatorRef)
+                        .withName("validator")
+                    .and()
+                    .withNewBlock()
+                    .addToStatements(new StringStatement(new Provider<String>() {
+                        @Override
+                        public String get() {
+                            return hasDefaultConstructor(item) ? "this(new " + item.getName() + "(), true);" : "this.fluent = this; this.validator=validator; \n this.validationEnabled = validator != null;";
+                        }
+                    }))
+                    .endBlock()
+                    .build();
+
+
+            Method instanceAndFluentAndValidatorCosntructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .addNewArgument()
+                    .withTypeRef(fluent)
+                    .withName("fluent")
+                    .and()
+                    .addNewArgument()
+                    .withTypeRef(instanceRef)
+                    .withName("instance").and()
+                    .addNewArgument()
+                    .withTypeRef(validatorRef)
+                    .withName("validator")
+                    .and()
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            List<Statement> instanceAndFluentConstructorStatements = toInstanceConstructorBody(item, "fluent");
+                            instanceAndFluentConstructorStatements.add(new StringStatement("this.validator = validator;"));
+                            instanceAndFluentConstructorStatements.add(new StringStatement("this.validationEnabled = validator != null; "));
+                            return instanceAndFluentConstructorStatements;
+                        }
+                    })).build();
+
+            Method instanceAndValidatorConstructor = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .addNewArgument()
+                    .withTypeRef(instanceRef)
+                    .withName("instance").and()
+                    .addNewArgument()
+                    .withTypeRef(validatorRef)
+                    .withName("validator")
+                    .and()
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            List<Statement> statements = toInstanceConstructorBody(item, "this");
+                            statements.add(new StringStatement("this.validator = validator; "));
+                            statements.add(new StringStatement("this.validationEnabled = validator != null; "));
+                            return statements;
+                        }
+                    })).build();
+
+
+                constructors.add(validatorConstructor);
+                constructors.add(instanceAndFluentAndValidatorCosntructor);
+                constructors.add(instanceAndValidatorConstructor);
+            }
 
             return new TypeDefBuilder(builderType)
                     .withAnnotations()
@@ -827,7 +915,7 @@ public class ClazzAs {
 
         BuilderContext context = BuilderContextManager.getContext();
         if (context.isValidationEnabled()) {
-            statements.add(new StringStatement(context.getBuilderPackage() + ".ValidationUtils.validate(buildable);"));
+            statements.add(new StringStatement("if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable, validator);}"));
         }
         statements.add(new StringStatement("return buildable;"));
         return statements;

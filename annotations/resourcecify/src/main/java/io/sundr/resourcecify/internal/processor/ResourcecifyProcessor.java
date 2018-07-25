@@ -20,6 +20,8 @@ import com.sun.tools.javac.code.Symbol;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -27,15 +29,14 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 
-import io.sundr.codegen.utils.IOUtils;
 import io.sundr.resourcecify.annotations.Resourcecify;
 
-import static io.sundr.codegen.utils.ModelUtils.getPackageName;
 
 @SupportedAnnotationTypes("io.sundr.resourcecify.annotations.Resourcecify")
 public class ResourcecifyProcessor extends AbstractProcessor {
@@ -61,7 +62,7 @@ public class ResourcecifyProcessor extends AbstractProcessor {
                         String sourceFileName = sourceFile.getName();
 
                         FileObject target = filer.createResource(StandardLocation.CLASS_OUTPUT, packageName, sourceFileName, s);
-                        IOUtils.copy(source, target);
+                        copy(source, target);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -73,4 +74,43 @@ public class ResourcecifyProcessor extends AbstractProcessor {
         return false;
     }
 
+
+    //
+    //
+    // The utilities below are duplicate. We have them here so that this processor doesn't depend on any other sundrio module (avoid cyclic refs).
+    //
+    //
+    public static String getPackageName(Element element) {
+        return getPackageElement(element).getQualifiedName().toString();
+    }
+
+    public static PackageElement getPackageElement(Element element) {
+        if (element instanceof PackageElement) {
+            return (PackageElement) element;
+        } else {
+            return getPackageElement(element.getEnclosingElement());
+        }
+    }
+
+    /**
+     * Copy one {@link FileObject} into an other.
+     * @param source    The source {@link FileObject}.
+     * @param target    The target {@link FileObject}.
+     * @throws IOException
+     */
+    public static void copy(FileObject source, FileObject target) throws IOException {
+        InputStream in = source.openInputStream();
+        OutputStream out = target.openOutputStream();
+        try {
+            byte[] buffer = new byte[1024];
+            int len = in.read(buffer);
+            while (len != -1) {
+                out.write(buffer, 0, len);
+                len = in.read(buffer);
+            }
+        } finally {
+            in.close();
+            out.close();
+        }
+    }
 }
