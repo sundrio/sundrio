@@ -44,25 +44,4 @@ public class IOUtils {
     }
 
 
-    /**
-     * Copy one {@link FileObject} into an other.
-     * @param source    The source {@link FileObject}.
-     * @param target    The target {@link FileObject}.
-     * @throws IOException
-     */
-    public static void copy(FileObject source, FileObject target) throws IOException {
-        InputStream in = source.openInputStream();
-        OutputStream out = target.openOutputStream();
-        try {
-            byte[] buffer = new byte[1024];
-            int len = in.read(buffer);
-            while (len != -1) {
-                out.write(buffer, 0, len);
-                len = in.read(buffer);
-            }
-        } finally {
-            in.close();
-            out.close();
-        }
-    }
 }
