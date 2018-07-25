@@ -72,12 +72,14 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
 } return (A)this;
     }
 
-    
-/**
- * This method has been deprecated, please use method buildStatements instead.
- */
-@Deprecated public List<Statement> getStatements(){
-            return build(statements);
+
+    /**
+     * This method has been deprecated, please use method buildStatements instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Statement> getStatements() {
+        return build(statements);
     }
 
     public List<Statement> buildStatements(){

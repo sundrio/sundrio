@@ -41,11 +41,13 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A addAllToAnnotations(Collection<AnnotationRef> items);
     public A removeFromAnnotations(AnnotationRef... items);
     public A removeAllFromAnnotations(Collection<AnnotationRef> items);
-    
-/**
- * This method has been deprecated, please use method buildAnnotations instead.
- */
-@Deprecated public List<AnnotationRef> getAnnotations();
+
+    /**
+     * This method has been deprecated, please use method buildAnnotations instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<AnnotationRef> getAnnotations();
     public List<AnnotationRef> buildAnnotations();
     public AnnotationRef buildAnnotation(int index);
     public AnnotationRef buildFirstAnnotation();
@@ -63,10 +65,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A removeFromExtendsList(ClassRef... items);
     public A removeAllFromExtendsList(Collection<ClassRef> items);
 
-/**
- * This method has been deprecated, please use method buildExtendsList instead.
- */
-@Deprecated public List<ClassRef> getExtendsList();
+    /**
+     * This method has been deprecated, please use method buildExtendsList instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<ClassRef> getExtendsList();
     public List<ClassRef> buildExtendsList();
     public ClassRef buildExtendsList(int index);
     public ClassRef buildFirstExtendsList();
@@ -84,10 +88,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A removeFromImplementsList(ClassRef... items);
     public A removeAllFromImplementsList(Collection<ClassRef> items);
 
-/**
- * This method has been deprecated, please use method buildImplementsList instead.
- */
-@Deprecated public List<ClassRef> getImplementsList();
+    /**
+     * This method has been deprecated, please use method buildImplementsList instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<ClassRef> getImplementsList();
     public List<ClassRef> buildImplementsList();
     public ClassRef buildImplementsList(int index);
     public ClassRef buildFirstImplementsList();
@@ -105,10 +111,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A removeFromParameters(TypeParamDef... items);
     public A removeAllFromParameters(Collection<TypeParamDef> items);
 
-/**
- * This method has been deprecated, please use method buildParameters instead.
- */
-@Deprecated public List<TypeParamDef> getParameters();
+    /**
+     * This method has been deprecated, please use method buildParameters instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeParamDef> getParameters();
     public List<TypeParamDef> buildParameters();
     public TypeParamDef buildParameter(int index);
     public TypeParamDef buildFirstParameter();
@@ -126,10 +134,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A removeFromProperties(Property... items);
     public A removeAllFromProperties(Collection<Property> items);
 
-/**
- * This method has been deprecated, please use method buildProperties instead.
- */
-@Deprecated public List<Property> getProperties();
+    /**
+     * This method has been deprecated, please use method buildProperties instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Property> getProperties();
     public List<Property> buildProperties();
     public Property buildProperty(int index);
     public Property buildFirstProperty();
@@ -147,10 +157,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A removeFromConstructors(Method... items);
     public A removeAllFromConstructors(Collection<Method> items);
 
-/**
- * This method has been deprecated, please use method buildConstructors instead.
- */
-@Deprecated public List<Method> getConstructors();
+    /**
+     * This method has been deprecated, please use method buildConstructors instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Method> getConstructors();
     public List<Method> buildConstructors();
     public Method buildConstructor(int index);
     public Method buildFirstConstructor();
@@ -168,10 +180,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A removeFromMethods(Method... items);
     public A removeAllFromMethods(Collection<Method> items);
 
-/**
- * This method has been deprecated, please use method buildMethods instead.
- */
-@Deprecated public List<Method> getMethods();
+    /**
+     * This method has been deprecated, please use method buildMethods instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Method> getMethods();
     public List<Method> buildMethods();
     public Method buildMethod(int index);
     public Method buildFirstMethod();
@@ -183,10 +197,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public MethodsNested<A> addNewMethod();
     public MethodsNested<A> addNewMethodLike(Method item);
 
-/**
- * This method has been deprecated, please use method buildOuterType instead.
- */
-@Deprecated public TypeDef getOuterType();
+    /**
+     * This method has been deprecated, please use method buildOuterType instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public TypeDef getOuterType();
     public TypeDef buildOuterType();
     public A withOuterType(TypeDef outerType);
     public Boolean hasOuterType();
@@ -202,10 +218,12 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public A removeFromInnerTypes(TypeDef... items);
     public A removeAllFromInnerTypes(Collection<TypeDef> items);
 
-/**
- * This method has been deprecated, please use method buildInnerTypes instead.
- */
-@Deprecated public List<TypeDef> getInnerTypes();
+    /**
+     * This method has been deprecated, please use method buildInnerTypes instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeDef> getInnerTypes();
     public List<TypeDef> buildInnerTypes();
     public TypeDef buildInnerType(int index);
     public TypeDef buildFirstInnerType();

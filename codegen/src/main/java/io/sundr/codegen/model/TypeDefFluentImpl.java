@@ -119,12 +119,14 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
 
-    
-/**
- * This method has been deprecated, please use method buildAnnotations instead.
- */
-@Deprecated public List<AnnotationRef> getAnnotations(){
-            return build(annotations);
+
+    /**
+     * This method has been deprecated, please use method buildAnnotations instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<AnnotationRef> getAnnotations() {
+        return build(annotations);
     }
 
     public List<AnnotationRef> buildAnnotations(){
@@ -194,11 +196,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildExtendsList instead.
- */
-@Deprecated public List<ClassRef> getExtendsList(){
-            return build(extendsList);
+    /**
+     * This method has been deprecated, please use method buildExtendsList instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<ClassRef> getExtendsList() {
+        return build(extendsList);
     }
 
     public List<ClassRef> buildExtendsList(){
@@ -268,11 +272,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildImplementsList instead.
- */
-@Deprecated public List<ClassRef> getImplementsList(){
-            return build(implementsList);
+    /**
+     * This method has been deprecated, please use method buildImplementsList instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<ClassRef> getImplementsList() {
+        return build(implementsList);
     }
 
     public List<ClassRef> buildImplementsList(){
@@ -342,11 +348,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildParameters instead.
- */
-@Deprecated public List<TypeParamDef> getParameters(){
-            return build(parameters);
+    /**
+     * This method has been deprecated, please use method buildParameters instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeParamDef> getParameters() {
+        return build(parameters);
     }
 
     public List<TypeParamDef> buildParameters(){
@@ -416,11 +424,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildProperties instead.
- */
-@Deprecated public List<Property> getProperties(){
-            return build(properties);
+    /**
+     * This method has been deprecated, please use method buildProperties instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Property> getProperties() {
+        return build(properties);
     }
 
     public List<Property> buildProperties(){
@@ -490,11 +500,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildConstructors instead.
- */
-@Deprecated public List<Method> getConstructors(){
-            return build(constructors);
+    /**
+     * This method has been deprecated, please use method buildConstructors instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Method> getConstructors() {
+        return build(constructors);
     }
 
     public List<Method> buildConstructors(){
@@ -564,11 +576,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildMethods instead.
- */
-@Deprecated public List<Method> getMethods(){
-            return build(methods);
+    /**
+     * This method has been deprecated, please use method buildMethods instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Method> getMethods() {
+        return build(methods);
     }
 
     public List<Method> buildMethods(){
@@ -614,11 +628,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildOuterType instead.
- */
-@Deprecated public TypeDef getOuterType(){
-            return this.outerType!=null?this.outerType.build():null;
+    /**
+     * This method has been deprecated, please use method buildOuterType instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public TypeDef getOuterType() {
+        return this.outerType != null ? this.outerType.build() : null;
     }
 
     public TypeDef buildOuterType(){
@@ -679,11 +695,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
 
-/**
- * This method has been deprecated, please use method buildInnerTypes instead.
- */
-@Deprecated public List<TypeDef> getInnerTypes(){
-            return build(innerTypes);
+    /**
+     * This method has been deprecated, please use method buildInnerTypes instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeDef> getInnerTypes() {
+        return build(innerTypes);
     }
 
     public List<TypeDef> buildInnerTypes(){

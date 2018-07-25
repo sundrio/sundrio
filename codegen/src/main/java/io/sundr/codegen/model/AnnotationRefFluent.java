@@ -23,11 +23,12 @@ import io.sundr.builder.Nested;
 public interface AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends AttributeSupportFluent<A>{
 
 
-    
-/**
- * This method has been deprecated, please use method buildClassRef instead.
- */
-@Deprecated public ClassRef getClassRef();
+    /**
+     * This method has been deprecated, please use method buildClassRef instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public ClassRef getClassRef();
     public ClassRef buildClassRef();
     public A withClassRef(ClassRef classRef);
     public Boolean hasClassRef();
@@ -46,7 +47,7 @@ public interface AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends A
 
     public interface ClassRefNested<N> extends Nested<N>,ClassRefFluent<ClassRefNested<N>>{
 
-        
+
     public N and();    public N endClassRef();
 }
 

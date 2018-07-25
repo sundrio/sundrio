@@ -46,11 +46,12 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A addAllToAnnotations(Collection<AnnotationRef> items);
     public A removeFromAnnotations(AnnotationRef... items);
     public A removeAllFromAnnotations(Collection<AnnotationRef> items);
-    
-/**
- * This method has been deprecated, please use method buildAnnotations instead.
- */
-@Deprecated public List<AnnotationRef> getAnnotations();
+
+    /**
+     * This method has been deprecated, please use method buildAnnotations instead.
+     */
+    @Deprecated
+    public List<AnnotationRef> getAnnotations();
     public List<AnnotationRef> buildAnnotations();
     public AnnotationRef buildAnnotation(int index);
     public AnnotationRef buildFirstAnnotation();
@@ -68,10 +69,11 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A removeFromParameters(TypeParamDef... items);
     public A removeAllFromParameters(Collection<TypeParamDef> items);
 
-/**
- * This method has been deprecated, please use method buildParameters instead.
- */
-@Deprecated public List<TypeParamDef> getParameters();
+    /**
+     * This method has been deprecated, please use method buildParameters instead.
+     */
+    @Deprecated
+    public List<TypeParamDef> getParameters();
     public List<TypeParamDef> buildParameters();
     public TypeParamDef buildParameter(int index);
     public TypeParamDef buildFirstParameter();
@@ -86,10 +88,11 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A withName(String name);
     public Boolean hasName();
 
-/**
- * This method has been deprecated, please use method buildReturnType instead.
- */
-@Deprecated public TypeRef getReturnType();
+    /**
+     * This method has been deprecated, please use method buildReturnType instead.
+     */
+    @Deprecated
+    public TypeRef getReturnType();
     public TypeRef buildReturnType();
     public A withReturnType(TypeRef returnType);
     public Boolean hasReturnType();
@@ -115,10 +118,11 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A removeFromArguments(Property... items);
     public A removeAllFromArguments(Collection<Property> items);
 
-/**
- * This method has been deprecated, please use method buildArguments instead.
- */
-@Deprecated public List<Property> getArguments();
+    /**
+     * This method has been deprecated, please use method buildArguments instead.
+     */
+    @Deprecated
+    public List<Property> getArguments();
     public List<Property> buildArguments();
     public Property buildArgument(int index);
     public Property buildFirstArgument();
@@ -139,10 +143,11 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A removeFromExceptions(ClassRef... items);
     public A removeAllFromExceptions(Collection<ClassRef> items);
 
-/**
- * This method has been deprecated, please use method buildExceptions instead.
- */
-@Deprecated public List<ClassRef> getExceptions();
+    /**
+     * This method has been deprecated, please use method buildExceptions instead.
+     */
+    @Deprecated
+    public List<ClassRef> getExceptions();
     public List<ClassRef> buildExceptions();
     public ClassRef buildException(int index);
     public ClassRef buildFirstException();
@@ -154,10 +159,11 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public ExceptionsNested<A> addNewException();
     public ExceptionsNested<A> addNewExceptionLike(ClassRef item);
 
-/**
- * This method has been deprecated, please use method buildBlock instead.
- */
-@Deprecated public Block getBlock();
+    /**
+     * This method has been deprecated, please use method buildBlock instead.
+     */
+    @Deprecated
+    public Block getBlock();
     public Block buildBlock();
     public A withBlock(Block block);
     public Boolean hasBlock();

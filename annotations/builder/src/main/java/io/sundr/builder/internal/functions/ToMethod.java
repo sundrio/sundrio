@@ -312,6 +312,7 @@ public class ToMethod {
                 isNested = true;
                 annotations.add(DEPRECATED_ANNOTATION);
                 comments.add("This method has been deprecated, please use method " + builderName + " instead.");
+                comments.add("@return The buildable object.");
                 if (isList || isSet) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else if (isOptional) {
@@ -323,6 +324,7 @@ public class ToMethod {
                 isNested = true;
                 annotations.add(DEPRECATED_ANNOTATION);
                 comments.add("This method has been deprecated, please use method " + builderName + " instead.");
+                comments.add("@return The buildable object.");
                 if (isList || isSet) {
                     statements.add(new StringStatement("return build(" + property.getName() + ");"));
                 } else {

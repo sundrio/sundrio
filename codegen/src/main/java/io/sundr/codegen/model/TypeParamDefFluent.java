@@ -35,11 +35,13 @@ public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Att
     public A addAllToBounds(Collection<ClassRef> items);
     public A removeFromBounds(ClassRef... items);
     public A removeAllFromBounds(Collection<ClassRef> items);
-    
-/**
- * This method has been deprecated, please use method buildBounds instead.
- */
-@Deprecated public List<ClassRef> getBounds();
+
+    /**
+     * This method has been deprecated, please use method buildBounds instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<ClassRef> getBounds();
     public List<ClassRef> buildBounds();
     public ClassRef buildBound(int index);
     public ClassRef buildFirstBound();

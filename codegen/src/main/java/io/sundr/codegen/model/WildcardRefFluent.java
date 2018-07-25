@@ -32,11 +32,14 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
     public A addAllToBounds(Collection<TypeRef> items);
     public A removeFromBounds(TypeRef... items);
     public A removeAllFromBounds(Collection<TypeRef> items);
-    
-/**
- * This method has been deprecated, please use method buildBounds instead.
- */
-@Deprecated public List<TypeRef> getBounds();
+
+    /**
+     * This method has been deprecated, please use method buildBounds instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeRef> getBounds();
+
     public List<TypeRef> buildBounds();
     public TypeRef buildBound(int index);
     public TypeRef buildFirstBound();

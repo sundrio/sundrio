@@ -135,7 +135,7 @@ public class Getter {
     }
 
     /**
-     * Return the property name for the specified getter {@Method method}.
+     * Return the property name for the specified getter {@link Method method}.
      * @param method    The method.
      * @return          The name.
      */

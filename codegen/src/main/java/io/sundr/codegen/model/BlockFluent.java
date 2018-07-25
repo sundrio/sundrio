@@ -33,11 +33,13 @@ public interface BlockFluent<A extends BlockFluent<A>> extends Fluent<A>{
     public A addAllToStatements(Collection<Statement> items);
     public A removeFromStatements(Statement... items);
     public A removeAllFromStatements(Collection<Statement> items);
-    
-/**
- * This method has been deprecated, please use method buildStatements instead.
- */
-@Deprecated public List<Statement> getStatements();
+
+    /**
+     * This method has been deprecated, please use method buildStatements instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Statement> getStatements();
     public List<Statement> buildStatements();
     public Statement buildStatement(int index);
     public Statement buildFirstStatement();

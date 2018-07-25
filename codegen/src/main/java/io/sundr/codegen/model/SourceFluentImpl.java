@@ -60,12 +60,14 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
             for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.remove(builder);this.types.remove(builder);} return (A)this;
     }
 
-    
-/**
- * This method has been deprecated, please use method buildTypes instead.
- */
-@Deprecated public List<TypeDef> getTypes(){
-            return build(types);
+
+    /**
+     * This method has been deprecated, please use method buildTypes instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeDef> getTypes() {
+        return build(types);
     }
 
     public List<TypeDef> buildTypes(){

@@ -65,12 +65,14 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
 
-    
-/**
- * This method has been deprecated, please use method buildAnnotations instead.
- */
-@Deprecated public List<AnnotationRef> getAnnotations(){
-            return build(annotations);
+
+    /**
+     * This method has been deprecated, please use method buildAnnotations instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<AnnotationRef> getAnnotations() {
+        return build(annotations);
     }
 
     public List<AnnotationRef> buildAnnotations(){
@@ -116,11 +118,13 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
 
-/**
- * This method has been deprecated, please use method buildTypeRef instead.
- */
-@Deprecated public TypeRef getTypeRef(){
-            return this.typeRef!=null?this.typeRef.build():null;
+    /**
+     * This method has been deprecated, please use method buildTypeRef instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public TypeRef getTypeRef() {
+        return this.typeRef != null ? this.typeRef.build() : null;
     }
 
     public TypeRef buildTypeRef(){

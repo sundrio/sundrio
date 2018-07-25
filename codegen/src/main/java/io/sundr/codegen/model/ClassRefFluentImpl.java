@@ -45,6 +45,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     /**
      * This method has been deprecated, please use method buildDefinition instead.
+     * @return The buildable object.
      */
     @Deprecated
     public TypeDef getDefinition() {
@@ -158,11 +159,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     }
 
 
-/**
- * This method has been deprecated, please use method buildArguments instead.
- */
-@Deprecated public List<TypeRef> getArguments(){
-            return build(arguments);
+    /**
+     * This method has been deprecated, please use method buildArguments instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeRef> getArguments() {
+        return build(arguments);
     }
 
     public List<TypeRef> buildArguments(){

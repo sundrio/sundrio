@@ -106,7 +106,7 @@ public final class TypeUtils {
     /**
      * Creates a new generic TypeParamRef.
      * @param letter       The letter of the type.
-     * @return
+     * @return             The param reference.
      */
     public static TypeParamRef newTypeParamRef(String letter) {
         return new TypeParamRefBuilder().withName(letter).build();
@@ -115,7 +115,7 @@ public final class TypeUtils {
     /**
      * Creates a new TypeParamDef.
      * @param letter       The letter of the type.
-     * @return
+     * @return             The param definition.
      */
     public static TypeParamDef newTypeParamDef(String letter) {
         return new TypeParamDefBuilder().withName(letter).build();
@@ -124,7 +124,7 @@ public final class TypeUtils {
     /**
      * Removes parameters from a TypeDef.
      * @param base       The base type.
-     * @return
+     * @return           The unwraped TypeDef.
      */
     public static TypeDef unwrapGeneric(TypeDef base) {
         return new TypeDefBuilder(base).withParameters().build();
@@ -135,7 +135,7 @@ public final class TypeUtils {
      *
      * @param base          The base type.
      * @param parameters    The parameter types.
-     * @return
+     * @return              The generic type.
      */
     public static TypeDef typeGenericOf(TypeDef base, TypeParamDef... parameters) {
         return new TypeDefBuilder(base)
@@ -148,7 +148,7 @@ public final class TypeUtils {
      *
      * @param base       The base type.
      * @param superClass The super type.
-     * @return
+     * @return           The updated type definition.
      */
     public static TypeDef typeExtends(TypeDef base, ClassRef superClass) {
         return new TypeDefBuilder(base)
@@ -161,7 +161,7 @@ public final class TypeUtils {
      *
      * @param base       The base type.
      * @param superClass The super type.
-     * @return
+     * @return           The updated type definition.
      */
     public static TypeDef typeImplements(TypeDef base, ClassRef... superClass) {
         return new TypeDefBuilder(base)

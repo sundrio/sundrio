@@ -37,7 +37,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
      * @param model                     The model of the class to generate.
      * @param resourceName              The template to use.
-     * @throws IOException
+     * @throws IOException              If it fails to create the source file.
      */
     public void generateFromResources(TypeDef model, String resourceName) throws IOException {
         try {
@@ -55,7 +55,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      * @param model        The model of the class to generate.
      * @param fileObject   Where to save the generated class.
      * @param resourceName The template to use.
-     * @throws IOException
+     * @throws IOException If it fails to create the source file.
      */
    public void generateFromResources(TypeDef model, JavaFileObject fileObject, String resourceName) throws IOException {
         System.err.println("Generating: "+model.getFullyQualifiedName());
@@ -73,8 +73,8 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      /**
      * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
      * @param model                     The model of the class to generate.
-     * @param content              The template to use.
-     * @throws IOException
+     * @param content                   The template to use.
+     * @throws IOException              If it fails to create the source file.
      */
     public void generateFromStringTemplate(TypeDef model, String content) throws IOException {
         try {
@@ -87,10 +87,10 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
     /**
      * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
      *
-     * @param model        The model of the class to generate.
-     * @param fileObject   Where to save the generated class.
-     * @param content The template to use.
-     * @throws IOException
+     * @param model         The model of the class to generate.
+     * @param fileObject    Where to save the generated class.
+     * @param content       The template to use.
+     * @throws IOException  If it fails to create the source file.
      */
    public void generateFromStringTemplate(TypeDef model, JavaFileObject fileObject, String content) throws IOException {
         System.err.println("Generating: "+model.getFullyQualifiedName());
@@ -106,9 +106,9 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
     /**
      * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
      *
-     * @param model        The model of the class to generate.
-     * @param content The template to use.
-     * @throws IOException
+     * @param model         The model of the class to generate.
+     * @param content       The template to use.
+     * @throws IOException  If it fails to create the source file.
      */
    public void generateFromStringTemplateAndDetermineOutput(TypeDef model, String content) throws IOException {
         System.err.println("Generating: "+model.getFullyQualifiedName());

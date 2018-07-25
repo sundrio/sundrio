@@ -26,11 +26,12 @@ import io.sundr.builder.Predicate;
 public interface ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A>{
 
 
-    
-/**
- * This method has been deprecated, please use method buildDefinition instead.
- */
-@Deprecated public TypeDef getDefinition();
+    /**
+     * This method has been deprecated, please use method buildDefinition instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public TypeDef getDefinition();
     public A withDefinition(TypeDef definition);
     public Boolean hasDefinition();
     public DefinitionNested<A> withNewDefinition();
@@ -48,10 +49,12 @@ public interface ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFlue
     public A removeFromArguments(TypeRef... items);
     public A removeAllFromArguments(Collection<TypeRef> items);
 
-/**
- * This method has been deprecated, please use method buildArguments instead.
- */
-@Deprecated public List<TypeRef> getArguments();
+    /**
+     * This method has been deprecated, please use method buildArguments instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeRef> getArguments();
     public List<TypeRef> buildArguments();
     public TypeRef buildArgument(int index);
     public TypeRef buildFirstArgument();

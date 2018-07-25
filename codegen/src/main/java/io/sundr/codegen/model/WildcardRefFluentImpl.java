@@ -96,12 +96,14 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 } return (A)this;
     }
 
-    
-/**
- * This method has been deprecated, please use method buildBounds instead.
- */
-@Deprecated public List<TypeRef> getBounds(){
-            return build(bounds);
+
+    /**
+     * This method has been deprecated, please use method buildBounds instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeRef> getBounds() {
+        return build(bounds);
     }
 
     public List<TypeRef> buildBounds(){

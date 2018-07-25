@@ -35,12 +35,15 @@ public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends A
             this.withAttributes(instance.getAttributes()); 
     }
 
-    
-/**
- * This method has been deprecated, please use method buildClassRef instead.
- */
-@Deprecated public ClassRef getClassRef(){
-            return this.classRef!=null?this.classRef.build():null;
+
+    /**
+     * This method has been deprecated, please use method buildClassRef instead.
+     *
+     * @return The buildable object.
+     */
+    @Deprecated
+    public ClassRef getClassRef() {
+        return this.classRef != null ? this.classRef.build() : null;
     }
 
     public ClassRef buildClassRef(){

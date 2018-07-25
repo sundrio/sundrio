@@ -73,7 +73,7 @@
         <compiler.plugin.version>3.6.0</compiler.plugin.version>
         <invoker.plugin.version>2.0.0</invoker.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
-        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
+        <!--maven.javadoc.failOnError>false</maven.javadoc.failOnError-->
     </properties>
 
     <modules>

@@ -33,11 +33,13 @@ public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A>{
     public A addAllToTypes(Collection<TypeDef> items);
     public A removeFromTypes(TypeDef... items);
     public A removeAllFromTypes(Collection<TypeDef> items);
-    
-/**
- * This method has been deprecated, please use method buildTypes instead.
- */
-@Deprecated public List<TypeDef> getTypes();
+
+    /**
+     * This method has been deprecated, please use method buildTypes instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeDef> getTypes();
     public List<TypeDef> buildTypes();
     public TypeDef buildType(int index);
     public TypeDef buildFirstType();

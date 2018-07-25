@@ -134,12 +134,14 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
             for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
     }
 
-    
-/**
- * This method has been deprecated, please use method buildAnnotations instead.
- */
-@Deprecated public List<AnnotationRef> getAnnotations(){
-            return build(annotations);
+
+    /**
+     * This method has been deprecated, please use method buildAnnotations instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<AnnotationRef> getAnnotations() {
+        return build(annotations);
     }
 
     public List<AnnotationRef> buildAnnotations(){
@@ -209,11 +211,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
 
-/**
- * This method has been deprecated, please use method buildParameters instead.
- */
-@Deprecated public List<TypeParamDef> getParameters(){
-            return build(parameters);
+    /**
+     * This method has been deprecated, please use method buildParameters instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<TypeParamDef> getParameters() {
+        return build(parameters);
     }
 
     public List<TypeParamDef> buildParameters(){
@@ -271,11 +275,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
 
-/**
- * This method has been deprecated, please use method buildReturnType instead.
- */
-@Deprecated public TypeRef getReturnType(){
-            return this.returnType!=null?this.returnType.build():null;
+    /**
+     * This method has been deprecated, please use method buildReturnType instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public TypeRef getReturnType() {
+        return this.returnType != null ? this.returnType.build() : null;
     }
 
     public TypeRef buildReturnType(){
@@ -393,11 +399,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
 
-/**
- * This method has been deprecated, please use method buildArguments instead.
- */
-@Deprecated public List<Property> getArguments(){
-            return build(arguments);
+    /**
+     * This method has been deprecated, please use method buildArguments instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<Property> getArguments() {
+        return build(arguments);
     }
 
     public List<Property> buildArguments(){
@@ -479,11 +487,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
 
-/**
- * This method has been deprecated, please use method buildExceptions instead.
- */
-@Deprecated public List<ClassRef> getExceptions(){
-            return build(exceptions);
+    /**
+     * This method has been deprecated, please use method buildExceptions instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<ClassRef> getExceptions() {
+        return build(exceptions);
     }
 
     public List<ClassRef> buildExceptions(){
@@ -529,11 +539,12 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
 
-/**
- * This method has been deprecated, please use method buildBlock instead.
- */
-@Deprecated public Block getBlock(){
-            return this.block!=null?this.block.build():null;
+    /**
+     * This method has been deprecated, please use method buildBlock instead.
+     */
+    @Deprecated
+    public Block getBlock() {
+        return this.block != null ? this.block.build() : null;
     }
 
     public Block buildBlock(){

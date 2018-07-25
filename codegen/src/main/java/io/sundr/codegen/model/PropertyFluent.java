@@ -32,11 +32,12 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
     public A addAllToAnnotations(Collection<AnnotationRef> items);
     public A removeFromAnnotations(AnnotationRef... items);
     public A removeAllFromAnnotations(Collection<AnnotationRef> items);
-    
-/**
- * This method has been deprecated, please use method buildAnnotations instead.
- */
-@Deprecated public List<AnnotationRef> getAnnotations();
+
+    /**
+     * This method has been deprecated, please use method buildAnnotations instead.
+     */
+    @Deprecated
+    public List<AnnotationRef> getAnnotations();
     public List<AnnotationRef> buildAnnotations();
     public AnnotationRef buildAnnotation(int index);
     public AnnotationRef buildFirstAnnotation();
@@ -48,10 +49,11 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
     public AnnotationsNested<A> addNewAnnotation();
     public AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item);
 
-/**
- * This method has been deprecated, please use method buildTypeRef instead.
- */
-@Deprecated public TypeRef getTypeRef();
+    /**
+     * This method has been deprecated, please use method buildTypeRef instead.
+     */
+    @Deprecated
+    public TypeRef getTypeRef();
     public TypeRef buildTypeRef();
     public A withTypeRef(TypeRef typeRef);
     public Boolean hasTypeRef();

@@ -74,12 +74,14 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
     }
 
-    
-/**
- * This method has been deprecated, please use method buildBounds instead.
- */
-@Deprecated public List<ClassRef> getBounds(){
-            return build(bounds);
+
+    /**
+     * This method has been deprecated, please use method buildBounds instead.
+     * @return The buildable object.
+     */
+    @Deprecated
+    public List<ClassRef> getBounds() {
+        return build(bounds);
     }
 
     public List<ClassRef> buildBounds(){
