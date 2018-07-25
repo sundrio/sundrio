@@ -19,8 +19,12 @@ package io.sundr.examples.validation;
 import org.junit.Test;
 
 import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 public class AddressValidationTest {
+
+    Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test(expected = ConstraintViolationException.class)
     public void testWithNullStreet() {
@@ -49,6 +53,15 @@ public class AddressValidationTest {
                 .build();
     }
 
+
+    @Test
+    public void testWithExplicitlySkippingValidation() {
+        Address address = new AddressBuilder(false).withStreet("Sesame")
+                .withNumber(1)
+                .withZipCode("1234567")
+                .build();
+    }
+
     @Test
     public void testWithValid() {
         Address address = new AddressBuilder().withStreet("Sesame")
@@ -57,4 +70,13 @@ public class AddressValidationTest {
                 .build();
     }
 
+
+    @Test
+    public void testWithValidWithOwnValidator() {
+        Address address = new AddressBuilder(validator)
+                .withStreet("Sesame")
+                .withNumber(1)
+                .withZipCode("1234")
+                .build();
+    }
 }
