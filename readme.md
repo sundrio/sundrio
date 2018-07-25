@@ -18,6 +18,7 @@ This project was created to generate the boilerplate on compile time for you.
 
 - [Builder Generator](annotations/builder/readme.md)
 - [DSL Generator](annotations/dsl/readme.md)
+- [Velocity Transformer](annotations/transform/readme.md)
 - [Maven Bom Generator](maven-plugin/readme.md)
 
 

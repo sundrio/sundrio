@@ -18,6 +18,7 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
+import io.sundr.transform.annotations.VelocityTransformation;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.List;
         @Inline(type = Createable.class, value = "create", prefix = "Createable"),
         @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
 })
+@VelocityTransformation("transformation.vm") //This is just used to demonstrate how we can use velocity transformations.
 public class Canvas {
 
     private final List<Shape> shapes;

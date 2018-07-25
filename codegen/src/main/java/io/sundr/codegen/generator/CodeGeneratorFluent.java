@@ -31,6 +31,7 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
     private M model;
     private Writer writer;
     private String templateResource;
+    private String templateContent;
     private URL templateUrl;
     private Set<Class<? extends org.apache.velocity.runtime.directive.Directive>> directives = new LinkedHashSet();
 
@@ -76,7 +77,14 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
     }
 
 
+    public T withTemplateContent(String templateContent) {
+        this.templateContent = templateContent;
+        return (T) this;
+    }
 
+    public String getTemplateContent() {
+        return this.templateContent;
+    }
 
     public T withTemplateUrl(URL templateUrl) {
         this.templateUrl = templateUrl;

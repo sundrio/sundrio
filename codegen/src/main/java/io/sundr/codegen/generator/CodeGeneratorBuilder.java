@@ -27,11 +27,12 @@ public class CodeGeneratorBuilder<M> extends CodeGeneratorFluent<M, CodeGenerato
         withModel(instance.getModel());
         withWriter(instance.getWriter());
         withTemplateResource(instance.getTemplateResource());
+        withTemplateContent(instance.getTemplateContent());
         withTemplateUrl(instance.getTemplateUrl());
         withDirectives(instance.getDirectives());
     }
     
     public CodeGenerator build() {
-       return new CodeGenerator(getContext(),  getModel(), getWriter(), getTemplateUrl(), getTemplateResource(), getDirectives() );
+       return new CodeGenerator(getContext(),  getModel(), getWriter(), getTemplateUrl(), getTemplateResource(), getTemplateContent(), getDirectives() );
     }
 }
