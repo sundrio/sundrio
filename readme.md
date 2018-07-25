@@ -16,10 +16,14 @@ This project was created to generate the boilerplate on compile time for you.
 
 # Features
 
-- [Builder Generator](annotations/builder/readme.md)
-- [DSL Generator](annotations/dsl/readme.md)
-- [Velocity Transformer](annotations/transform/readme.md)
-- [Maven Bom Generator](maven-plugin/readme.md)
+- Java compile time generators (annotation processors)
+    - [Builder Generator](annotations/builder/readme.md)
+    - [DSL Generator](annotations/dsl/readme.md)
+    - [Velocity Transformer](annotations/transform/readme.md)
+    - [Resourceify](annotations/resourcecify/readme.md)
+
+- Maven tooling generators
+    - [Maven Bom Generator](maven-plugin/readme.md)
 
 
 # Projects using sundrio
