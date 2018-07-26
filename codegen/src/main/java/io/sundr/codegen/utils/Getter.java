@@ -111,6 +111,16 @@ public class Getter {
             if (method.getName().endsWith(IS_PREFIX + property.getNameCapitalized())) {
                 return true;
             }
+
+
+            //Some frameworks/tools consider valid getters cases like: get$ref() (e.g. jsonschema2pojo).
+            if (method.getName().endsWith(GET_PREFIX + property.getName()) && !Character.isAlphabetic(property.getName().charAt(0))) {
+                return true;
+            }
+
+            if (method.getName().endsWith(IS_PREFIX + property.getName()) && !Character.isAlphabetic(property.getName().charAt(0))) {
+                return true;
+            }
         }
         return false;
     }
