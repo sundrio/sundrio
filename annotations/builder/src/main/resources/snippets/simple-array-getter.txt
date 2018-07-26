@@ -1,6 +1,7 @@
-%s result = new %s[%s.size()];
-int index=0;
-for (%s item : %s) {
-    result[index++]=item;
+List<%s> result = new ArrayList<>();
+if (%s != null) {
+  for (%s item : %s) {
+      result.add(item);
+  }
 }
-return result;
+return result.toArray(new %s[result.size()]);

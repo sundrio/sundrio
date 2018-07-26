@@ -196,7 +196,8 @@ public class ToMethod {
                     .withArguments(arrayProperty)
                     .withVarArgPreferred(true)
                     .withNewBlock()
-                    .addNewStringStatementStatement("this." + property.getName() + ".clear(); if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
+                    .addNewStringStatementStatement("if (this." + property.getName() + " != null) {this." + property.getName() + ".clear();}")
+                    .addNewStringStatementStatement("if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :" + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
                     .endBlock()
                     .build();
         }
@@ -479,7 +480,8 @@ public class ToMethod {
             Boolean isBuildable = isBuildable(type);
             TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
             String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,
-                    type.toString(),
+                    targetType.toString(),
+                    property.getName(),
                     targetType.toString(),
                     property.getName(),
                     targetType.toString(),
@@ -639,7 +641,8 @@ public class ToMethod {
                     .addToArguments(INDEX)
                     .addToArguments(unwrappedProperty)
                     .withNewBlock()
-                    .withStatements(new StringStatement("this." + propertyName + ".set(index, item); return (" + returnType + ")this;"))
+                    .withStatements(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
+                            new StringStatement("this." + propertyName + ".set(index, item); return (" + returnType + ")this;"))
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
@@ -700,6 +703,7 @@ public class ToMethod {
                         .build();
 
             } else {
+                statements.add(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"));
                 statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName() + ".add(item);} return (" + returnType + ")this;"));
             }
 

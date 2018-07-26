@@ -1,5 +1,7 @@
 List<%s> result = new ArrayList<>();
-for (%s builder : %s) {
-    result.add(builder.build());
+if (%s != null) {
+  for (%s builder : %s) {
+      result.add(builder.build());
+  }
 }
 return result.toArray(new %s[result.size()]);
