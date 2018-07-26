@@ -63,6 +63,9 @@ public final class ValidationUtils {
         if (v == null) {
             v = getValidator();
         }
+        if (v == null) {
+           return;
+        }
         Set<ConstraintViolation<T>> violations = v.validate(item);
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder("Constraint Validations: ");
