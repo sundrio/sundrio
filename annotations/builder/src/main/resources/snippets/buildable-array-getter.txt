@@ -1,7 +1,10 @@
-List<%s> result = new ArrayList<>();
-if (%s != null) {
-  for (%s builder : %s) {
-      result.add(builder.build());
-  }
+int size = %s != null ? %s.size() : 0;
+%s result = new %s[size];
+if (size == 0) {
+   return result;
 }
-return result.toArray(new %s[result.size()]);
+int index = 0;
+for (%s builder : %s) {
+    result[index++]=builder.build();
+}
+return result;

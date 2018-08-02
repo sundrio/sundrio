@@ -78,6 +78,7 @@ import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_LIST;
 import static io.sundr.codegen.functions.Collections.IS_MAP;
 import static io.sundr.codegen.functions.Collections.IS_SET;
+import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
@@ -470,7 +471,6 @@ public class ToMethod {
             List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
             List<String> comments = new ArrayList<String>();
 
-            String prefix = Getter.prefix(property);
             String getterName = Getter.name(property);
             String builderName = "build" + property.getNameCapitalized();
             TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF).apply(property.getTypeRef());
@@ -480,10 +480,10 @@ public class ToMethod {
             Boolean isBuildable = isBuildable(type);
             TypeRef targetType = isBuildable ? VISITABLE_BUILDER.apply(type) : TypeAs.UNWRAP_ARRAY_OF.apply(type);
             String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,
-                    targetType.toString(),
                     property.getName(),
-                    targetType.toString(),
                     property.getName(),
+                    type.toString(),
+                    unwrapped.toString(),
                     targetType.toString(),
                     property.getName()
             );
@@ -501,9 +501,11 @@ public class ToMethod {
                     .withNewBlock()
                     .addNewStringStatementStatement(body)
                     .endBlock()
+                    .addToAttributes(ALSO_IMPORT, isBuildable ? Arrays.asList(Constants.VISITABLE_BUILDER_REF) : Collections.EMPTY_LIST)
                     .build();
 
             methods.add(getter);
+
             if (isBuildable) {
                 TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
 

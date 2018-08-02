@@ -1,7 +1,11 @@
-List<%s> result = new ArrayList<>();
-if (%s != null) {
-  for (%s item : %s) {
-      result.add(item);
-  }
+//This needs to work with primitives, so we use arrays.
+int size = %s != null ? %s.size() : 0;
+%s result = new %s[size];
+if (size == 0) {
+   return result;
 }
-return result.toArray(new %s[result.size()]);
+int index = 0;
+for (%s item : %s) {
+    result[index++]=item;
+}
+return result;
