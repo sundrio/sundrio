@@ -26,6 +26,7 @@ import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.codegen.model.TypeRef;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,6 +77,8 @@ public class Constants {
     public static final TypeDef TYPED_VISITOR = typeGenericOf(TYPEDEF.apply(TypedVisitor.class), io.sundr.codegen.Constants.V);
     public static final TypeDef VISITABLE = TYPEDEF.apply(Visitable.class);
     public static final TypeDef VISITABLE_BUILDER = typeGenericOf(TYPEDEF.apply(VisitableBuilder.class), io.sundr.codegen.Constants.T, io.sundr.codegen.Constants.V);
+    public static final TypeRef VISITABLE_BUILDER_REF = VISITABLE_BUILDER.toInternalReference();
+
 
 
     //The classes below are created programmatically rather than by class to avoid bringing in more deps

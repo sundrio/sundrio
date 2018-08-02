@@ -36,5 +36,6 @@
         <module>validation</module>
         <module>kubernetes</module>
         <module>crud</module>
+        <module>arrays</module>
     </modules>
 </project>
