@@ -914,8 +914,10 @@ public class ClazzAs {
         }
 
         BuilderContext context = BuilderContextManager.getContext();
-        if (context.isValidationEnabled()) {
+        if (context.isExternalvalidatorSupported()) {
             statements.add(new StringStatement("if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable, validator);}"));
+        } else if (context.isValidationEnabled()) {
+            statements.add(new StringStatement("if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable);}"));
         }
         statements.add(new StringStatement("return buildable;"));
         return statements;

@@ -30,6 +30,8 @@ import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.TypeUtils;
+import javax.validation.Validator;
+import java.lang.reflect.Method;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
@@ -70,6 +72,7 @@ public class BuilderContext {
     private final TypeDef validationUtils;
     private final Boolean generateBuilderPackage;
     private final Boolean validationEnabled;
+    private final Boolean externalValidatorSupported;
     private final String builderPackage;
     private final Inline[] inlineables;
     private final BuildableRepository buildableRepository;
@@ -150,6 +153,19 @@ public class BuilderContext {
                 .accept(new ReplacePackage("io.sundr.builder.internal.resources", builderPackage))
                 .withAnnotations(new ArrayList<>())
                 .build();
+
+        this.externalValidatorSupported = hasValidatorArg(builderPackage + ".ValidationUtils");
+    }
+
+    private static boolean hasValidatorArg(String c) {
+        try {
+        Method m = Class.forName(c).getMethod("validate", Object.class, Validator.class);
+        return true;
+        } catch (ClassNotFoundException e) {
+        return true; 
+        } catch (NoSuchMethodException e) {
+        return false;
+        }
     }
 
     public Elements getElements() {
@@ -166,6 +182,10 @@ public class BuilderContext {
 
     public Boolean isValidationEnabled() {
         return validationEnabled;
+    }
+
+    public Boolean isExternalvalidatorSupported() {
+        return validationEnabled && externalValidatorSupported;
     }
 
     public String getBuilderPackage() {
