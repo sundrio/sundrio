@@ -399,6 +399,8 @@ When the `@Buildable` annotation is added to an interface the processor will gen
 for the Pojo, as if the Pojo itself was annotated with @Buildable. The Pojo name will be named after the interface and
 will be prefix with the literal `Default`.
 
+Note: If you don't need to generate a Pojo then there is no need to annotate an interface. If this is the case just annotate the concrete implementations.
+
 To select a custom name for the Pojo, you can use the `@Pojo` annotation:
 
 ```java
