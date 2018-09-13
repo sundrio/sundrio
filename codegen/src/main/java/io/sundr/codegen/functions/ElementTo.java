@@ -253,7 +253,6 @@ public class ElementTo {
                 genericTypes.add(genericType);
             }
 
-
             TypeDef baseType = new TypeDefBuilder()
                     .withKind(kind)
                     .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
@@ -262,8 +261,8 @@ public class ElementTo {
                     .withParameters(genericTypes)
                     .withExtendsList(superClassType instanceof ClassRef ? (ClassRef) superClassType : null)
                     .withImplementsList(interfaces)
+                    .withOuterType(classElement.getEnclosingElement() instanceof TypeElement ? TYPEDEF.apply((TypeElement) classElement.getEnclosingElement()) : null)
                     .build();
-
 
             List<TypeDef> innerTypes = new ArrayList<TypeDef>();
             for (TypeElement innerElement : ElementFilter.typesIn(classElement.getEnclosedElements())) {
@@ -337,6 +336,7 @@ public class ElementTo {
                     .withPackageName(getPackageName(classElement))
                     .withName(getClassName(classElement))
                     .withExtendsList(extendsList)
+                    .withOuterType(classElement.getEnclosingElement() instanceof TypeElement ? SHALLOW_TYPEDEF.apply((TypeElement) classElement.getEnclosingElement()) : null)
                     .build();
         }
     };

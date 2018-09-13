@@ -219,6 +219,8 @@ public class TypeDef extends ModifierSupport {
 
         if (packageName != null ? !packageName.equals(typeDef.packageName) : typeDef.packageName != null)
             return false;
+        if (outerType != null ? !outerType.equals(typeDef.outerType) : typeDef.outerType != null)
+            return false;
         return name != null ? name.equals(typeDef.name) : typeDef.name == null;
 
     }
@@ -226,6 +228,7 @@ public class TypeDef extends ModifierSupport {
     @Override
     public int hashCode() {
         int result = packageName != null ? packageName.hashCode() : 0;
+        result = 31 * result + (outerType != null ? outerType.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
