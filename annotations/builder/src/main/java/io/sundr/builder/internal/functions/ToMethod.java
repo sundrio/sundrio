@@ -608,7 +608,6 @@ public class ToMethod {
             String setMethodName = "setTo" + property.getNameCapitalized();
             String addAllMethodName = "addAllTo" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef) + property.getNameCapitalized();
 
-            List<Statement> statements = new ArrayList<Statement>();
             Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
 
             String propertyName = property.getName();
@@ -650,6 +649,11 @@ public class ToMethod {
                     .build();
 
 
+            List<Statement> statements = new ArrayList<Statement>();
+
+            List<Statement> varArgInit = new ArrayList<Statement>();
+            List<Statement> collectionInit = new ArrayList<Statement>();
+
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 final ClassRef targetType = (ClassRef) unwrapped;
 
@@ -686,6 +690,9 @@ public class ToMethod {
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
+                varArgInit.add(new StringStatement(" if (items != null && items.length > 0 && this." + propertyName + "== null) {this." + propertyName + " = new ArrayList<VisitableBuilder<? extends " + targetType + ",?>>();}"));
+                collectionInit.add(new StringStatement(" if (items != null && items.size() > 0 && this." + propertyName + "== null) {this." + propertyName + " = new ArrayList<VisitableBuilder<? extends " + targetType + ",?>>();}"));
+
                 statements.add(new StringStatement("for (" + targetType.toString() + " item : items) { "));
                 statements.add(createAddToDescendants("addTo", descendants, false));
                 statements.add(new StringStatement("} return (" + returnType + ")this;"));
@@ -718,6 +725,7 @@ public class ToMethod {
                     .withArguments(item)
                     .withVarArgPreferred(true)
                     .withNewBlock()
+                    .addAllToStatements(varArgInit)
                     .addAllToStatements(statements)
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
@@ -731,6 +739,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
                     .withNewBlock()
+                    .addAllToStatements(collectionInit)
                     .addAllToStatements(statements)
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
