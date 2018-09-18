@@ -695,6 +695,7 @@ public class ToMethod {
 
                 statements.add(new StringStatement("for (" + targetType.toString() + " item : items) { "));
                 statements.add(createAddToDescendants("addTo", descendants, false));
+                statements.add(createAddToDescendantsFallback(targetType.getName(), propertyName));
                 statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
                 addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
@@ -764,7 +765,13 @@ public class ToMethod {
                 }
             }, " else "));
         }
+
+        private Statement createAddToDescendantsFallback(String type, String name) {
+            return new StringStatement("else { try { VisitableBuilder<? extends "+type+",?> builder = (VisitableBuilder<? extends "+type+",?>) Class.forName(item.getClass().getName() + \"Builder\").getConstructor(item.getClass()).newInstance(item); _visitables.add(builder);this."+name+".add(builder); }catch(Exception e)  {throw new IllegalStateException(e);}} ");
+        }
     });
+
+
 
     public static final Function<Property, List<Method>> REMOVE_FROM_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
         public List<Method> apply(final Property property) {
@@ -814,7 +821,10 @@ public class ToMethod {
                         String removeFromMethodName = "removeFrom" + item.getNameCapitalized();
                         return "if (item instanceof " + className + "){" + removeFromMethodName + "((" + className + ")item);}\n";
                     }
-                }, " else ") + "} return (" + returnType + ")this;"));
+                }, " else ")));
+
+                statements.add(createRemoveFromDescendantsFallback(targetType.getName(), property.getName()));
+                statements.add(new StringStatement( "} return (" + returnType + ")this;"));
 
             } else {
                 statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {if (this."+property.getName()+"!= null){ this." + property.getName() + ".remove(item);}} return (" + returnType + ")this;"));
@@ -849,6 +859,10 @@ public class ToMethod {
             methods.add(removeAllFromCollection);
 
             return methods;
+        }
+
+        private Statement createRemoveFromDescendantsFallback(String type, String name) {
+            return new StringStatement("else { try { VisitableBuilder<? extends "+type+",?> builder = (VisitableBuilder<? extends "+type+",?>) Class.forName(item.getClass().getName() + \"Builder\").getConstructor(item.getClass()).newInstance(item); _visitables.remove(builder);this."+name+".remove(builder); }catch(Exception e)  {throw new IllegalStateException(e);}} ");
         }
     });
 
