@@ -687,20 +687,20 @@ public class ToMethod {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
                 statements.add(new StringStatement("for (" + targetType.toString() + " item : items) { "));
-                statements.add(createAddToDescendants("addTo", descendants, targetType, returnType, false));
+                statements.add(createAddToDescendants("addTo", descendants, false));
                 statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
                 addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
                         .withParameters(parameters)
                         .editBlock()
-                        .withStatements(createAddToDescendants("addTo", descendants, targetType, returnType, true), new StringStatement("return (" + returnType + ")this;"))
+                        .withStatements(createAddToDescendants("addTo", descendants, true), new StringStatement("return (" + returnType + ")this;"))
                         .endBlock()
                         .build();
 
                 setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex)
                         .withParameters(parameters)
                         .editBlock()
-                        .withStatements(createAddToDescendants("setTo", descendants, targetType, returnType, true), new StringStatement("return (" + returnType + ")this;"))
+                        .withStatements(createAddToDescendants("setTo", descendants, true), new StringStatement("return (" + returnType + ")this;"))
                         .endBlock()
                         .build();
 
@@ -718,7 +718,7 @@ public class ToMethod {
                     .withArguments(item)
                     .withVarArgPreferred(true)
                     .withNewBlock()
-                    .withStatements(statements)
+                    .addAllToStatements(statements)
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
@@ -731,7 +731,7 @@ public class ToMethod {
                     .withReturnType(returnType)
                     .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
                     .withNewBlock()
-                    .withStatements(statements)
+                    .addAllToStatements(statements)
                     .endBlock()
                     .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                     .build();
@@ -744,7 +744,7 @@ public class ToMethod {
             return methods;
         }
 
-        private Statement createAddToDescendants(final String prefix, Set<Property> descendants, TypeRef targetType, TypeRef returnType, final boolean useIndex) {
+        private Statement createAddToDescendants(final String prefix, Set<Property> descendants, final boolean useIndex) {
             return new StringStatement(StringUtils.join(descendants, new Function<Property, String>() {
 
                 public String apply(Property item) {
