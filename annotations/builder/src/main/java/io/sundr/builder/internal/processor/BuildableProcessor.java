@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
@@ -24,6 +25,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
@@ -40,6 +42,7 @@ import java.util.Set;
 
 import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
+import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
@@ -60,12 +63,17 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     continue;
                 }
 
-                ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(), buildable.builderPackage());
+                ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.lazyCollectionInitEnabled(), buildable.generateBuilderPackage(), buildable.builderPackage());
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
                                 .addToAttributes(BUILDABLE, buildable)
                                 .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())
                                 .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
-                                .build();
+                                .accept(new Visitor<PropertyBuilder>() {
+                                    @Override
+                                    public void visit(PropertyBuilder builder) {
+                                       builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
+                                    }
+                                }).build();
 
                     ctx.getDefinitionRepository().register(b);
                     ctx.getBuildableRepository().register(b);
@@ -75,7 +83,12 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                             .addToAttributes(BUILDABLE, buildable)
                             .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())
                             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
-                            .build();
+                            .accept(new Visitor<PropertyBuilder>() {
+                                @Override
+                                public void visit(PropertyBuilder builder) {
+                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
+                                }
+                            }).build();
 
                     ctx.getDefinitionRepository().register(r);
                     ctx.getBuildableRepository().register(r);

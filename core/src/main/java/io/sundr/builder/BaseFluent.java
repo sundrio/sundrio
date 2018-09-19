@@ -28,6 +28,22 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
     public final List<Visitable> _visitables = new ArrayList<Visitable>();
 
+
+    public static <T> VisitableBuilder<T, ?> builderOf(T item) {
+        if (item instanceof Editable) {
+            Object editor = ((Editable) item).edit();
+            if (editor instanceof VisitableBuilder) {
+                return (VisitableBuilder<T, ?>) editor;
+            }
+        }
+
+        try {
+            return  (VisitableBuilder<T, ?>) Class.forName(item.getClass().getName() + "Builder").getConstructor(item.getClass()).newInstance(item);
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to create builder for: " + item.getClass(), e);
+        }
+    }
+
     public static <T> ArrayList<T> build(List<? extends Builder<? extends T>> list) {
         if (list == null) {
             return null;

@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
@@ -24,6 +25,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
@@ -42,6 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
+import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
@@ -63,7 +66,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 if (generated == null) {
                     continue;
                 }
-                ctx = BuilderContextManager.create(elements, types, generated.validationEnabled(), generated.generateBuilderPackage(), generated.builderPackage());
+                ctx = BuilderContextManager.create(elements, types, generated.validationEnabled(), generated.lazyCollectionInitEnabled(), generated.generateBuilderPackage(), generated.builderPackage());
 
                 for (String name : generated.value()) {
                     PackageElement packageElement = elements.getPackageElement(name);
@@ -84,10 +87,16 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
 
                     for (TypeElement typeElement : typeElements) {
+                        final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
                                 .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
                                 .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
-                                .build();
+                                                            .accept(new Visitor<PropertyBuilder>() {
+                                @Override
+                                public void visit(PropertyBuilder builder) {
+                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionEnabled);
+                                }
+                            }).build();
 
                         ctx.getDefinitionRepository().register(b);
                         ctx.getBuildableRepository().register(b);
@@ -95,10 +104,16 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 }
 
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
+                    final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
                     TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
                             .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
                             .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
-                            .build();
+                                                        .accept(new Visitor<PropertyBuilder>() {
+                                @Override
+                                public void visit(PropertyBuilder builder) {
+                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionEnabled);
+                                }
+                            }).build();
 
                     ctx.getDefinitionRepository().register(r);
                     ctx.getBuildableRepository().register(r);
