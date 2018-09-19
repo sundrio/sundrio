@@ -24,9 +24,10 @@ public class TriangleTest {
 
     @Test
     public void testAddingTriangle() {
+        Triangle triangle = new Triangle(0,0,1);
 
         Canvas canvas = new CanvasBuilder()
-               .addToShapes(new Triangle<Integer>(0,0, 1))
+               .addToShapes(triangle)
               .accept(new Visitor<TriangleBuilder<Integer>>() {
                   @Override
                   public void visit(TriangleBuilder<Integer> builder) {
@@ -38,5 +39,49 @@ public class TriangleTest {
         Assert.assertFalse(canvas.getShapes().isEmpty());
         Assert.assertEquals(canvas.getShapes().get(0).getX(), 10);
 
+        //Now let's 'revert' the change so that we can remove the item.
+        //Reverting is needed in this case so that equals() on Triagnle returns true.
+        canvas = new CanvasBuilder(canvas)
+                .accept(new Visitor<TriangleBuilder>() {
+                    @Override
+                    public void visit(TriangleBuilder builder) {
+                       builder.withX(0).withY(0);
+                    }
+                })
+                .build();
+
+        Assert.assertFalse(canvas.getShapes().isEmpty());
+        Assert.assertEquals(canvas.getShapes().get(0).getX(), 0);
+
+        canvas = new CanvasBuilder(canvas)
+                .removeFromShapes(triangle)
+                .build();
+
+        Assert.assertTrue(canvas.getShapes().isEmpty());
+    }
+
+    @Test
+    public void testAddingTriangleBuilder() {
+        TriangleBuilder<Integer> triangle = new TriangleBuilder<Integer>().withSize(1);
+
+        Canvas canvas = new CanvasBuilder()
+                .addToShapes(triangle)
+                .accept(new Visitor<TriangleBuilder<Integer>>() {
+                    @Override
+                    public void visit(TriangleBuilder<Integer> builder) {
+                        builder.withX(10).withY(10);
+                    }
+                })
+                .build();
+
+        Assert.assertFalse(canvas.getShapes().isEmpty());
+        Assert.assertEquals(canvas.getShapes().get(0).getX(), 10);
+
+        //Note: The visitor is actually mutating the original triangle builder instance. So no need to revert the change.
+        canvas = new CanvasBuilder(canvas)
+                .removeFromShapes(triangle)
+                .build();
+
+        Assert.assertTrue(canvas.getShapes().isEmpty());
     }
 }
