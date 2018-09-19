@@ -21,32 +21,20 @@ import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.ReplacePackage;
 import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.functions.Sources;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.TypeUtils;
 import javax.validation.Validator;
 import java.lang.reflect.Method;
 
-import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static io.sundr.builder.Constants.INLINEABLE;
-import static io.sundr.codegen.functions.Collections.SET;
-import static io.sundr.codegen.Constants.T;
-import static io.sundr.codegen.Constants.T_REF;
-import static io.sundr.builder.Constants.VALIDATE_SNIPPET;
-import static io.sundr.codegen.Constants.VOID;
-import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 
 public class BuilderContext {
@@ -72,16 +60,18 @@ public class BuilderContext {
     private final TypeDef validationUtils;
     private final Boolean generateBuilderPackage;
     private final Boolean validationEnabled;
+    private final Boolean lazyCollectionsEnabled;
     private final Boolean externalValidatorSupported;
     private final String builderPackage;
     private final Inline[] inlineables;
     private final BuildableRepository buildableRepository;
 
     
-    public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, Boolean validationEnabled, String builderPackage, Inline... inlineables) {
+    public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, Boolean validationEnabled, Boolean lazyCollectionsEnabled, String builderPackage, Inline... inlineables) {
         this.elements = elements;
         this.types = types;
         this.validationEnabled = validationEnabled;
+        this.lazyCollectionsEnabled = lazyCollectionsEnabled;
         this.codegenContext = CodegenContext.create(elements, types);
         this.generateBuilderPackage = generateBuilderPackage;
         this.builderPackage = builderPackage;

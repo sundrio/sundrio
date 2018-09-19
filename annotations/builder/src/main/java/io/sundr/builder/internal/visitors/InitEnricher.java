@@ -35,6 +35,7 @@ import java.util.List;
 
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
+import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.INIT;
@@ -84,16 +85,19 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
         if (isArray || isList) {
             ClassRef listRef = Collections.ARRAY_LIST.toReference(targetType);
             builder.addToAttributes(LAZY_INIT, "new " + listRef + "()")
+                    .addToAttributes(INIT , builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED) && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null : builder.getAttributes().get(LAZY_INIT))
                     .addToAttributes(INIT_FUNCTION, new Construct(Collections.ARRAY_LIST, targetType))
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, listRef));
         } else if (isSet) {
             ClassRef setRef = Collections.LINKED_HASH_SET.toReference(unwrapped);
             builder.addToAttributes(LAZY_INIT, "new " + setRef + "()")
+                    .addToAttributes(INIT , builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED) && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null : builder.getAttributes().get(LAZY_INIT))
                     .addToAttributes(INIT_FUNCTION, new Construct(Collections.LINKED_HASH_SET, unwrapped))
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, setRef));
         } else if (isMap) {
             ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments);
             builder.addToAttributes(LAZY_INIT, "new " + mapRef + "()")
+                    .addToAttributes(INIT , builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED) && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null : builder.getAttributes().get(LAZY_INIT))
                     .addToAttributes(INIT_FUNCTION, new Construct(Collections.LINKED_HASH_MAP, arguments))
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, mapRef));
         } else if (isOptional) {

@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
@@ -398,6 +399,7 @@ public class BuilderUtils {
             ClassRef listRef =  Collections.ARRAY_LIST.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(builderType))
                     .addToAttributes(LAZY_INIT, " new " + listRef + "()")
+                    .addToAttributes(INIT , property.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && property.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED) ? null : " new " + listRef +  "()" )
                     .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
                     .build();
         }
@@ -406,6 +408,7 @@ public class BuilderUtils {
             ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
             return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
                     .addToAttributes(LAZY_INIT, " new " + setRef+ "()")
+                    .addToAttributes(INIT , property.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && property.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED) ? null : " new " + setRef +  "()" )
                     .addToAttributes(ALSO_IMPORT,  alsoImport(property, setRef, builderType))
                     .build();
         }

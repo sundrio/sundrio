@@ -52,6 +52,7 @@ public class Constants {
     public static final AttributeKey<Set<Property>> DESCENDANTS = new AttributeKey<Set<Property>>("DESCENDANTS", Set.class);
 
     public static final AttributeKey<Boolean> VALIDATION_ENABLED = new AttributeKey<Boolean>("VALIDATION_ENABLED", Boolean.class);
+    public static final AttributeKey<Boolean> LAZY_COLLECTIONS_INIT_ENABLED = new AttributeKey<Boolean>("LAZY_COLELCTIONS_INIT_ENABLED", Boolean.class);
     public static final AttributeKey<Boolean> EDIATABLE_ENABLED = new AttributeKey<Boolean>("EDITABLE_ENABLED", Boolean.class);
     public static final AttributeKey<Boolean> BUILDABLE_ENABLED =  new AttributeKey<Boolean>("BUILDABLE_ENABLED", Boolean.class);
 
