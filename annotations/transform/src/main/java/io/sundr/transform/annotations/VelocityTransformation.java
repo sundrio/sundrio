@@ -20,6 +20,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Map;
 
 /**
  * Annotation, that marks that we want to transform the annotated class using a Velocity template.
@@ -50,4 +51,11 @@ public @interface VelocityTransformation {
      * @return
      */
     boolean gather() default false;
+
+
+    /**
+     * An external array of parameters, to pass to the transformation.
+     * @return
+     */
+    String[] paremters() default {};
 }

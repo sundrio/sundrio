@@ -32,20 +32,23 @@ public class CodeGenerator<M> {
 
     private static final String TEMPLATE = "template";
     private static final String MODEL = "model";
+    private static final String PAREMETERS = "parameters";
     private static final String TEMPLATE_READER_FAILURE = "Failed to read template.";
 
     private final CodeGeneratorContext context;
     private final Writer writer;
     private final M model;
+    private final String[] parameters;
     private final String templateResource;
     private final URL templateUrl;
     private final String templateContent;
     private final Template template;
     private final Set<Class<? extends Directive>> directives;
 
-    public CodeGenerator(CodeGeneratorContext context, M model, Writer writer, URL templateUrl, String templateResource, String templateContent, Set<Class<? extends Directive>> directives) {
+    public CodeGenerator(CodeGeneratorContext context, M model, String[] parameters, Writer writer, URL templateUrl, String templateResource, String templateContent, Set<Class<? extends Directive>> directives) {
         this.context = context != null ? context : new CodeGeneratorContext();
         this.model = model;
+        this.parameters = parameters;
         this.writer = writer;
         this.templateResource = templateResource;
         this.templateUrl = templateUrl;
@@ -65,10 +68,11 @@ public class CodeGenerator<M> {
 
         this.template = this.context.getVelocityEngine().getTemplate(TEMPLATE);
         this.context.getVelocityContext().put(MODEL, model);
+        this.context.getVelocityContext().put(PAREMETERS, parameters);
     }
 
-    public CodeGenerator(M model, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives, String templateContent) {
-        this(new CodeGeneratorContext(), model, writer, templateUrl, templateResource, templateContent, directives);
+    public CodeGenerator(M model, String[] parameters, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives, String templateContent) {
+        this(new CodeGeneratorContext(), model, parameters, writer, templateUrl, templateResource, templateContent, directives);
     }
 
 
@@ -78,6 +82,10 @@ public class CodeGenerator<M> {
 
     public M getModel() {
         return model;
+    }
+
+    public String[] getParameters() {
+        return parameters;
     }
 
     public String getTemplateResource() {

@@ -29,6 +29,7 @@ import java.util.Set;
 public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> implements Fluent<T> {
     private CodeGeneratorContext context;
     private M model;
+    private String[] parameters;
     private Writer writer;
     private String templateResource;
     private String templateContent;
@@ -65,7 +66,14 @@ public class CodeGeneratorFluent<M, T extends CodeGeneratorFluent<M, T>> impleme
         return this.model;
     }
 
+    public T withParameters(String... parameters) {
+        this.parameters = parameters;
+        return (T) this;
+    }
 
+    public String[] getParameters() {
+        return this.parameters;
+    }
 
     public T withTemplateResource(String templateResource) {
         this.templateResource = templateResource;

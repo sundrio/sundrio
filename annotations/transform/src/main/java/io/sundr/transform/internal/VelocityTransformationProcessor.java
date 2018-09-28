@@ -120,7 +120,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
                         generateFromStringTemplate(annotated, transformation.outputPath(), readTemplate(filer, null, transformation.value()));
                     } else {
                         for (TypeDef typeDef : annotated.values()) {
-                            generateFromStringTemplate(typeDef, transformation.outputPath(), readTemplate(filer, typeDef.getPackageName(), transformation.value()));
+                            generateFromStringTemplate(typeDef, transformation.paremters(), transformation.outputPath(), readTemplate(filer, typeDef.getPackageName(), transformation.value()));
                         }
                     }
                 } catch (IOException e) {
