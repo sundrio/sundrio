@@ -27,5 +27,27 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.SOURCE)
 public @interface VelocityTransformation {
+
+    /**
+     * The name of a classpath resource containing the template.
+     * @return The name of the template.
+     */
     String value();
+
+
+    /**
+     * The relative path of the file that will be generated.
+     * When this option is omitted the output file is determined by the fully qualified name of the generated class.
+     * Apparently, the option is required for resources (where fqcn is not available).
+     * @return
+     */
+    String outputPath() default "";
+
+
+    /**
+     * Flag to mark that the the specified template will gather all annotated resources, instead of being applied individually to every single one of them.
+     * When gather is used the model feed to the template will be a map FQCN -> TypeDef (where TypeDef is the representation of the class).
+     * @return
+     */
+    boolean gather() default false;
 }

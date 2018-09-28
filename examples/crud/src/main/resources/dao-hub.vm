@@ -1,0 +1,7 @@
+package io.sundr.examples.crud;
+
+public interface DaoHub {
+#foreach ($e in $model.entrySet())
+    public ${e.value.name} get${e.value.name}();
+#end
+}

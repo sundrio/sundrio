@@ -20,7 +20,10 @@ import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 
 @VelocityTransformations(
-        {@VelocityTransformation("/dao.vm")}
+        {
+                @VelocityTransformation("/dao.vm"),
+                @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
+        }
 )
 public class Address {
 
