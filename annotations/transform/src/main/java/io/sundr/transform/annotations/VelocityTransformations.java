@@ -30,32 +30,28 @@ import java.lang.annotation.Target;
 public @interface VelocityTransformations {
 
     /**
-     * A list of transformations to apply.
-     * @return
+     * @return a list of transformations to apply.
      */
     VelocityTransformation[] value();
 
     /**
-     * A list of packages for selecting transformation target.
+     * @return a list of packages for selecting transformation target.
      * Classes that match the package and regex will be selected.
-     * @return
      */
     PackageSelector[] packages() default {};
 
     /**
-     * A list of annotations to use for selecting transformation target.
+     * @return a list of annotations to use for selecting transformation target.
      * Classes annotated with the annotations will be selected.
      * Note: This only works for local classes and NOT for dependencies.
      * If you need to transform 3rd party classes prefer the resource selector.
      * You can also specify the package selector if you are specify the package explicitly.
-     * @return
      */
     AnnotationSelector[] annotations() default {};
 
     /**
-     * A list of resources to use for selecting transformation target.
+     * @return a list of resources to use for selecting transformation target.
      * These resources are expected to contain one FQCN per line.
-     * @return
      */
     ResourceSelector[] resources() default {};
 
