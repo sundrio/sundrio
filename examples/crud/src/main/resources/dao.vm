@@ -1,4 +1,7 @@
 package ${model.packageName};
 
+/**
+ * A DAO for #pluralize(${model.name}).
+ **/
 public interface ${model.name}Dao extends Dao<${model.name}> {
 }

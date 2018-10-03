@@ -29,6 +29,8 @@ import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 import org.apache.velocity.runtime.resource.ResourceCacheImpl;
 import org.apache.velocity.util.introspection.Uberspect;
 import org.apache.velocity.util.introspection.UberspectImpl;
+import io.sundr.codegen.directives.PluralizeDirective;
+import io.sundr.codegen.directives.SingularizeDirective;
 
 public class CodeGeneratorContext {
 
@@ -57,7 +59,9 @@ public class CodeGeneratorContext {
         this.velocityEngine.loadDirective(ClassDirective.class.getCanonicalName());
         this.velocityEngine.loadDirective(MethodDirective.class.getCanonicalName());
         this.velocityEngine.loadDirective(FieldDirective.class.getCanonicalName());
-
+        //Load utility directives
+        this.velocityEngine.loadDirective(PluralizeDirective.class.getCanonicalName());
+        this.velocityEngine.loadDirective(SingularizeDirective.class.getCanonicalName());
     }
 
     public VelocityEngine getVelocityEngine() {
