@@ -20,6 +20,7 @@ import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.generator.CodeGeneratorContext;
 import io.sundr.codegen.model.TypeDef;
+import javax.annotation.processing.Filer;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.FilerException;
@@ -105,23 +106,16 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      * @param content       The template to use.
      * @throws IOException  If it fails to create the source file.
      */
-    public void generateFromStringTemplate(TypeDef model, String[] parameterss, String content) throws IOException {
-        try (StringWriter writer = new StringWriter()) {
-            new CodeGeneratorBuilder<TypeDef>()
-                    .withContext(context)
-                    .withModel(model)
-                    .withParameters(parameterss)
-                    .withWriter(writer)
-                    .withTemplateContent(content)
-                    .build()
-                    .generate();
-
-            ByteArrayInputStream bis = new ByteArrayInputStream(writer.toString().getBytes());
-            TypeDef newModel = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(bis);
-
+    public void generateFromStringTemplate(TypeDef model, String[] parameters, String content) throws IOException {
+        TypeDef newModel = createTypeFromTemplate(model, parameters, content);
+        if (processingEnv.getElementUtils().getTypeElement(newModel.getFullyQualifiedName()) != null) {
+            System.err.println("Skipping: " + newModel.getFullyQualifiedName()+ ". Class already exists.");
+            return;
+        } else {
             generateFromStringTemplate(model, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()), content);
         }
     }
+
 
     /**
      * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
@@ -145,6 +139,13 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      * @throws IOException  If it fails to create the source file.
      */
     public <T> void generateFromStringTemplate(T model, String[] parameters, FileObject fileObject, String content) throws IOException {
+        if  (fileObject.getName().endsWith(SOURCE_SUFFIX)) {
+            TypeDef newModel = createTypeFromTemplate(model, parameters, content);
+            if (processingEnv.getElementUtils().getTypeElement(newModel.getFullyQualifiedName()) != null) {
+                System.err.println("Skipping: " + fileObject.getName()+ ". File already exists.");
+                return;
+            }
+        }
         System.err.println("Generating: "+fileObject.getName());
         new CodeGeneratorBuilder<T>()
                 .withContext(context)
@@ -186,6 +187,27 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
             generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(fqcn), content);
         } else {
             generateFromStringTemplate(model, parameters, processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", outputPath), content);
+        }
+    }
+
+    /**
+     * Generate a {@link TypeDef} from the specified model, parameters and template. 
+     */
+    public <T> TypeDef createTypeFromTemplate(T model, String[] parameters, String content) {
+        try (StringWriter writer = new StringWriter()) {
+            new CodeGeneratorBuilder<T>()
+                    .withContext(context)
+                    .withModel(model)
+                    .withParameters(parameters)
+                    .withWriter(writer)
+                    .withTemplateContent(content)
+                    .build()
+                    .generate();
+
+            ByteArrayInputStream bis = new ByteArrayInputStream(writer.toString().getBytes());
+            return Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(bis);
+        } catch (IOException e) {
+            return null;
         }
     }
 }
