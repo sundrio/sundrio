@@ -38,5 +38,6 @@
         <module>crud</module>
         <module>arrays</module>
         <module>shapes-extension</module>
+        <module>kubernetes-swagger</module>
     </modules>
 </project>
