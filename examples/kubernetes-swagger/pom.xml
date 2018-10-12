@@ -15,13 +15,11 @@
        limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>examples</artifactId>
         <groupId>io.sundr</groupId>
-        <version>0.12-SNAPSHOT</version>
+        <version>0.13.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -70,7 +68,7 @@
                 <invokerPackage>${generator.package.name}</invokerPackage>
                 <ensureUniqueParams>true</ensureUniqueParams>
                 <sourceFolder>src/main/java</sourceFolder>
-                <localVariablePrefix></localVariablePrefix>
+                <localVariablePrefix />
                 <serializableModel>false</serializableModel>
                 <bigDecimalAsString>false</bigDecimalAsString>
                 <fullJavaUtil>false</fullJavaUtil>
