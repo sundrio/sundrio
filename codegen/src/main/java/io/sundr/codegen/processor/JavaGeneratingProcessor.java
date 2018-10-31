@@ -112,7 +112,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
             System.err.println("Skipping: " + newModel.getFullyQualifiedName()+ ". Class already exists.");
             return;
         } else {
-            generateFromStringTemplate(model, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()), content);
+            generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()), content);
         }
     }
 
