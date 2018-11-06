@@ -221,6 +221,8 @@ public class ElementTo {
                 kind = Kind.INTERFACE;
             } else if (classElement.getKind() == ElementKind.CLASS) {
                 kind = Kind.CLASS;
+            } else if (classElement.getKind() == ElementKind.ANNOTATION_TYPE) {
+                kind = Kind.ANNOTATION;
             }
 
             for (TypeMirror interfaceTypeMirrror : classElement.getInterfaces()) {
@@ -328,6 +330,8 @@ public class ElementTo {
             } else if (classElement.getKind() == ElementKind.CLASS) {
                 kind = Kind.CLASS;
                 extendsList.add(TypeDef.OBJECT_REF);
+            } else if (classElement.getKind() == ElementKind.ANNOTATION_TYPE) {
+                kind = Kind.ANNOTATION;
             }
 
             return new TypeDefBuilder()

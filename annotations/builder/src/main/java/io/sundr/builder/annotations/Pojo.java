@@ -25,6 +25,40 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Pojo {
 
-    String name();
+    /**
+     * The class name of the generated Pojo.
+     * @return The class name, or empty (default) if the name is to be the implicitly specified.
+     */
+    String name() default "";
+
+    /**
+     * The prefix to add to the annotated class in order to create the pojo name.
+     * @return  The prefix.
+     */
+    String prefix() default "";
+
+    /**
+     * The suffix to add to the annotated class in order to create the pojo name.
+     * @return  The suffix.
+     */
+    String suffix() default "";
+
+
+    /**
+     * The relative path the pojo will be generated.
+     * @return The relative path.
+     */
+    String relativePath() default "";
+
+    /**
+     * The super class to add to the generated pojo.
+     * @return the super class.
+     */
     Class superClass() default Object.class;
+
+    /**
+     * An array of interface to add to the Pojo.
+     * @return  The interface array.
+     */
+    Class[] interfaces() default {};
 }

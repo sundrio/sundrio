@@ -30,6 +30,7 @@ import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -51,11 +52,18 @@ import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.Modifier;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Pattern;
 
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
@@ -696,43 +704,100 @@ public class ClazzAs {
             List<TypeDef> types = new ArrayList<TypeDef>();
             TypeUtils.visitParents(item, types);
 
-            String pojoName = StringUtils.toPojoName(item.getName(), "Default", "");
-
             TypeDef superClass = null;
             List<ClassRef> extendsList = new ArrayList<>();
+            List<ClassRef> implementsList = new ArrayList<>();
 
+            String pojoName = StringUtils.toPojoName(item.getName(), "Default", "");
+
+            String relativePath = ".";
+
+            AnnotationRef pojoRef = null;
             for (AnnotationRef r : item.getAnnotations()) {
                 if (r.getClassRef().getFullyQualifiedName().equals(Pojo.class.getTypeName())) {
-                    pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
+                    pojoRef = r;
+                    Map<String, Object> params = r.getParameters();
+
+                    if (params.containsKey("name")) {
+                        pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
+                    }
+                    else if (params.containsKey("prefix")  || params.containsKey("suffix")) {
+                        String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
+                        String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
+                        pojoName = StringUtils.toPojoName(item.getName(), prefix, suffix);
+                    } else if (params.containsKey("relativePath")) {
+                        //When the package is different and there is no name clash, just use the same name unless explicitly specified.
+                        pojoName = item.getName();
+                    }
+
                     String superClassName = String.valueOf(r.getParameters().getOrDefault("superClass",""));
                     if (!superClassName.isEmpty()) {
+                        superClassName = superClassName.replaceAll("\\.class$", "");
                         superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
-                        extendsList.add(superClass.toInternalReference());
+                        if (superClass != null) {
+                            extendsList.add(superClass.toInternalReference());
+                        }
+                    }
+                    if (item.isInterface()) {
+                        implementsList.add(item.toInternalReference());
+                    }
+                    Arrays.asList(r.getParameters().getOrDefault("interfaces", new Object[]{})).stream()
+                            .map(String::valueOf)
+                            .map(s -> s.replaceAll("\\.class$", ""))
+                            .map(n -> DefinitionRepository.getRepository().getDefinition(n))
+                            .filter(d -> d != null)
+                            .map(d -> d.toInternalReference())
+                            .forEach(ref -> implementsList.add(ref));
+
+                    if (params.containsKey("relativePath")) {
+                        relativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
                     }
                 }
             }
 
 
+            Set<TypeDef> alsoGenerate = new HashSet<>();
             for (TypeDef t : types) {
                 for (Method method : t.getMethods()) {
-                    if (Getter.is(method)) {
-                        String name = Getter.propertyName(method);
+                    //We need all getters and all annotation methods.
+                    if (Getter.is(method) || t.equals(item)) {
+                        String name = Getter.propertyNameSafe(method);
+                        TypeRef returnType = method.getReturnType();
+                        //If return type is an annotation also convert the annotation.
+                        if (method.getReturnType() instanceof ClassRef) {
+                            ClassRef ref = (ClassRef) method.getReturnType();
+                            if (ref.getDefinition().isAnnotation()) {
 
+                                AnnotationRef inheritedPojoRed = new AnnotationRefBuilder(pojoRef)
+                                        .removeFromParameters("name")
+                                        .build();
+
+                                TypeDef p = hasPojoAnnotation(ref.getDefinition())
+                                        ? POJO.apply(ref.getDefinition())
+                                        : POJO.apply(new TypeDefBuilder(ref.getDefinition()).withAnnotations(inheritedPojoRed).build());
+
+                                alsoGenerate.add(p);
+                                //create a reference and apply dimension
+                                returnType = new ClassRefBuilder(p.toInternalReference())
+                                        .withDimensions(ref.getDimensions())
+                                        .build();
+                            }
+                        }
                         arguments.add(new PropertyBuilder()
                                 .withName(name)
-                                .withTypeRef(method.getReturnType())
+                                .withTypeRef(returnType)
                                 .withModifiers(TypeUtils.modifiersToInt())
                                 .build());
 
                         Property field = new PropertyBuilder()
                                 .withName(StringUtils.toFieldName(name))
-                                .withTypeRef(method.getReturnType())
+                                .withTypeRef(returnType)
                                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                                 .build();
 
-                        fields.add(field);
 
-                        getters.add(new MethodBuilder(method)
+                        fields.add(field);
+                        getters.add(new MethodBuilder(Getter.forProperty(field))
                                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                                 .withNewBlock()
                                 .withStatements(new StringStatement("return this." + StringUtils.toFieldName(name) + ";"))
@@ -816,18 +881,34 @@ public class ClazzAs {
 
             
             return new TypeDefBuilder()
-                    .withPackageName(item.getPackageName())
+                    .withPackageName(relativePackage(item.getPackageName(), relativePath))
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
                     .withName(pojoName)
                     .withProperties(fields)
                     .withConstructors(constructor)
                     .withMethods(getters)
-                    .addToImplementsList(item.toInternalReference())
+                    .withImplementsList(implementsList)
                     .withExtendsList(extendsList)
                     .addToAttributes(item.getAttributes())
+                    .addToAttributes(ALSO_GENERATE, alsoGenerate)
                     .build();
         }
     });
+
+    private static boolean hasPojoAnnotation(TypeDef typeDef) {
+        return typeDef.getAnnotations().stream()
+                .filter(a -> a.getClassRef().getDefinition().getFullyQualifiedName().equals(Pojo.class.getTypeName()))
+                .findAny().isPresent();
+    }
+    private static String relativePackage(String pkg, String relativePath) {
+        if (relativePath == null || relativePath.isEmpty() || relativePath.equals(".")) {
+           return pkg;
+        }
+        Path pkgPath = Paths.get(pkg.replaceAll(Pattern.quote("."), File.separator));
+        String newPath = pkgPath.resolve(relativePath).normalize().toString();
+
+        return newPath.replaceAll(Pattern.quote(File.separator), ".").replaceAll("\\.$", "");
+    }
 
     private static Property arrayAsList(Property property) {
         TypeRef unwrapped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getTypeRef());

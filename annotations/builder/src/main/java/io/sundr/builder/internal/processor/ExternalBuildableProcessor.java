@@ -141,7 +141,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
                         Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
-                if (typeDef.isInterface()) {
+                if (typeDef.isInterface() || typeDef.isAnnotation()) {
                     continue;
                 }
 

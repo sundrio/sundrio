@@ -171,6 +171,33 @@ public class Getter {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
+
+    /**
+     * Return the property name for the specified getter {@link Method method}.
+     * This method will not check if the method is an actual getter and will return the method name if not.
+     * @param method    The method.
+     * @return          The name, or the method name if method is not a typical getter..
+     */
+    public static String propertyNameSafe(Method method) {
+        if (!is(method)) {
+            return method.getName();
+        }
+        String name = method.getName();
+
+        if (name.startsWith(GET_PREFIX)) {
+            return name.substring(GET_PREFIX.length());
+        } else if (name.startsWith(IS_PREFIX)) {
+            return name.substring(IS_PREFIX.length());
+        } else if (name.startsWith(SHOULD_PREFIX)) {
+            name = name.substring(SHOULD_PREFIX.length());
+        }
+
+        if (name.length() == 1) {
+            return name.toUpperCase();
+        }
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
     public static String prefix(Property property) {
         return TypeUtils.isBoolean(property.getTypeRef()) ? IS_PREFIX : GET_PREFIX;
     }

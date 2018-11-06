@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static io.sundr.builder.Constants.ALSO_GENERATE;
 import static io.sundr.codegen.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
@@ -291,12 +292,20 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     public void generatePojos(BuilderContext builderContext) {
         for (TypeDef typeDef : builderContext.getBuildableRepository().getBuildables()) {
             try {
-                if (typeDef.isInterface()) {
+                if (typeDef.isInterface() || typeDef.isAnnotation()) {
                     typeDef = ClazzAs.POJO.apply(typeDef);
                     builderContext.getDefinitionRepository().register(typeDef);
                     builderContext.getBuildableRepository().register(typeDef);
                     generateFromResources(typeDef,
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+
+                    if (typeDef.hasAttribute(ALSO_GENERATE)) {
+                        for (TypeDef also : typeDef.getAttribute(ALSO_GENERATE)) {
+                             builderContext.getDefinitionRepository().register(also);
+                             builderContext.getBuildableRepository().register(also);
+                            generateFromResources(also, Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                        }
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

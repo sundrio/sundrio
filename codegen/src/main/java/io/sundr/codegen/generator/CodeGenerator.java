@@ -32,7 +32,7 @@ public class CodeGenerator<M> {
 
     private static final String TEMPLATE = "template";
     private static final String MODEL = "model";
-    private static final String PAREMETERS = "parameters";
+    private static final String PARAMETERS = "parameters";
     private static final String TEMPLATE_READER_FAILURE = "Failed to read template.";
 
     private final CodeGeneratorContext context;
@@ -68,7 +68,7 @@ public class CodeGenerator<M> {
 
         this.template = this.context.getVelocityEngine().getTemplate(TEMPLATE);
         this.context.getVelocityContext().put(MODEL, model);
-        this.context.getVelocityContext().put(PAREMETERS, parameters);
+        this.context.getVelocityContext().put(PARAMETERS, parameters);
     }
 
     public CodeGenerator(M model, String[] parameters, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives, String templateContent) {
