@@ -906,7 +906,7 @@ public class ClazzAs {
             if (enableStaticBuilder) {
                 Method staticBuilder = new MethodBuilder()
                         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-                        .withName("newBuilder")
+                        .withName(extendsList.isEmpty() ? "newBuilder" : "new" + pojoBuilder.getName()) //avoid clashes in case of inheritance
                         .withReturnType(pojoBuilder.toInternalReference())
                         .withNewBlock()
                         .addNewStringStatementStatement("return new "+ pojoBuilder.getFullyQualifiedName()+"();")
@@ -919,7 +919,7 @@ public class ClazzAs {
             if (enableStaticMapper) {
                 Method staticMapper = new MethodBuilder()
                         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-                        .withName("from")
+                        .withName(extendsList.isEmpty() ? "from" : "from" + item.getName()) //avoid clashes in case of inheritance
                         .addNewArgument()
                         .withName("instance")
                         .withTypeRef(item.toInternalReference())
@@ -977,6 +977,7 @@ public class ClazzAs {
             String trimmedName = m.getName().replaceAll("^get", "").replaceAll("^is", "");
             if (m.getReturnType() instanceof ClassRef)  {
                 ClassRef ref = (ClassRef) m.getReturnType();
+                Boolean hasSuperClass = ref.getDefinition().getExtendsList().isEmpty();
                 if (ref.getDefinition().isAnnotation())  {
                    TypeDef generatedType = pojo.getProperties()
                            .stream()
@@ -993,10 +994,12 @@ public class ClazzAs {
                             sb.append(".addAllTo").append(StringUtils.capitalizeFirst(trimmedName)).append("(")
                                     .append("Arrays.asList(")
                                     .append("instance.").append(m.getName()).append("())")
-                                    .append(".stream().map(i ->").append(generatedType.getName()).append(".from(i)).collect(Collectors.toList()))");
+                                    .append(".stream().map(i ->").append(generatedType.getName())
+                                    .append(!hasSuperClass ? ".from(i))" : ".from" + source.getName()+"(i))")
+                                    .append(".collect(Collectors.toList()))");
                         } else {
                             sb.append(".with").append(StringUtils.capitalizeFirst(trimmedName)).append("(")
-                                    .append(generatedType.getName()).append(".from(")
+                                    .append(generatedType.getName()).append(!hasSuperClass ? ".from(" : ".from" + source.getName()+"(")
                                     .append("instance.").append(m.getName()).append("()")
                                     .append(")")
                                     .append(")");
