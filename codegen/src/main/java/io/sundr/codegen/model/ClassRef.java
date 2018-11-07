@@ -17,6 +17,7 @@
 package io.sundr.codegen.model;
 
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.PackageScope;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
@@ -117,6 +118,14 @@ public class ClassRef extends TypeRef {
      * to a class with the same name but different package has been made already.
      */
     private boolean requiresFullyQualifiedName() {
+        String currentPackage = PackageScope.get();
+        if (currentPackage != null) {
+            String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(),currentPackage);
+            if (!conflictingFQCN.equals(getFullyQualifiedName()) && DefinitionRepository.getRepository().getDefinition(conflictingFQCN) != null) {
+                return true;
+            }
+        }
+
         Map<String, String> referenceMap = DefinitionRepository.getRepository().getReferenceMap();
         if (referenceMap != null && referenceMap.containsKey(definition.getName())) {
             String fqn = referenceMap.get(definition.getName());

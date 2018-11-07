@@ -61,4 +61,19 @@ public @interface Pojo {
      * @return  The interface array.
      */
     Class[] interfaces() default {};
+
+
+    /**
+     * Flag to include static builder method in the generated pojo.
+     * @return  True, if static builder should be included false, otherwise.
+     */
+    boolean withStaticBuilderMethod() default true;
+
+
+    /**
+     * Flag to include static mapping methods in the generated pojo.
+     * The mapper just maps the source interface/annotation to the generated pojo.
+     * @return  True, if static mapper should be included false, otherwise.
+     */
+    boolean withStaticMappingMethod() default true;
 }

@@ -14,18 +14,22 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.codegen;
 
-import io.sundr.Provider;
-import io.sundr.builder.Fluent;
+public class PackageScope {
 
-public interface StringStatementFluent<A extends StringStatementFluent<A>> extends Fluent<A>{
+    private static String pkg;
 
+    public static void set(String pkg) {
+        PackageScope.pkg = pkg;
+    }
 
-    public Provider<String> getProvider();
-    public A withProvider(Provider<String> provider);
-    public Boolean hasProvider();
+    public static String get() {
+        return PackageScope.pkg;
+    }
 
-
+    public static void clear() {
+        PackageScope.pkg = null;
+    }
 
 }

@@ -16,6 +16,8 @@
 
 package io.sundr.codegen.generator;
 
+import io.sundr.codegen.PackageScope;
+import io.sundr.codegen.model.TypeDef;
 import org.apache.velocity.Template;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
@@ -109,6 +111,13 @@ public class CodeGenerator<M> {
     }
 
     public void generate() throws IOException {
-        GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
+        if (model instanceof TypeDef) {
+            TypeDef typeDef = (TypeDef) model;
+            PackageScope.set(typeDef.getPackageName());
+            GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
+            PackageScope.clear();
+        }  else {
+            GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
+        }
     }
 }

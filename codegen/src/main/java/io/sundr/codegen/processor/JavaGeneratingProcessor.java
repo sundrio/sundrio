@@ -40,20 +40,6 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
     protected CodeGeneratorContext context = new CodeGeneratorContext();
 
     /**
-     * Create a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
-     * @param model                     The model of the class to generate.
-     * @param content                   The template to use.
-     * @throws IOException              If it fails to create the source file.
-     */
-    public void createFromStringTemplate(TypeDef model, String content) throws IOException {
-        try {
-            generateFromStringTemplate(model, processingEnv.getFiler().createSourceFile(model.getFullyQualifiedName()), content);
-        } catch (FilerException e) {
-            //TODO: Need to avoid dublicate interfaces here.
-        }
-    }
-
-    /**
      * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
      * @param model                     The model of the class to generate.
      * @param resourceName              The template to use.
@@ -95,17 +81,6 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      * @param content       The template to use.
      * @throws IOException  If it fails to create the source file.
      */
-    public void generateFromStringTemplate(TypeDef model, String content) throws IOException {
-        generateFromStringTemplate(model, new String[0], content);
-    }
-
-    /**
-     * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
-     *
-     * @param model         The model of the class to generate.
-     * @param content       The template to use.
-     * @throws IOException  If it fails to create the source file.
-     */
     public void generateFromStringTemplate(TypeDef model, String[] parameters, String content) throws IOException {
         TypeDef newModel = createTypeFromTemplate(model, parameters, content);
         if (processingEnv.getElementUtils().getTypeElement(newModel.getFullyQualifiedName()) != null) {
@@ -114,19 +89,6 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
         } else {
             generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()), content);
         }
-    }
-
-
-    /**
-     * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
-     *
-     * @param model         The model of the class to generate.
-     * @param fileObject    Where to save the generated class.
-     * @param content       The template to use.
-     * @throws IOException  If it fails to create the source file.
-     */
-    public <T> void generateFromStringTemplate(T model,  FileObject fileObject, String content) throws IOException {
-        generateFromStringTemplate(model, new String[0], fileObject, content);
     }
 
     /**

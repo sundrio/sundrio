@@ -32,6 +32,7 @@ import io.sundr.codegen.model.TypeRef;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.sundr.codegen.functions.ClassTo.ANNOTATIONTYPEREF;
 import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
@@ -65,6 +66,10 @@ public class Constants {
 
     public static final AnnotationRef BUILDABLE_ANNOTATION = ANNOTATIONTYPEREF.apply(Buildable.class);
     public static final AnnotationRef DEPRECATED_ANNOTATION = ANNOTATIONTYPEREF.apply(Deprecated.class);
+
+
+    public static final ClassRef ARRAYS = TYPEDEF.apply(Arrays.class).toInternalReference();
+    public static final ClassRef COLLECTORS = TYPEDEF.apply(Collectors.class).toInternalReference();
 
     public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(io.sundr.codegen.Constants.INT_REF).build();
 

@@ -16,23 +16,39 @@
 
 package io.sundr.examples.codegen;
 
+import io.sundr.Provider;
 import io.sundr.builder.annotations.Buildable;
 
-@Buildable
 public class StringStatement implements Statement {
 
-    private final String data;
+    private final Provider<String> provider;
+    private final Object[] parameters;
 
-    public StringStatement(String data) {
-        this.data = data;
+    @Buildable
+    public StringStatement(Provider<String> provider) {
+        this.provider = provider;
+        this.parameters = new Object[]{};
     }
 
-    public String getData() {
-        return data;
+    public StringStatement(Provider<String> provider, Object[] parameters) {
+        this.provider = provider;
+        this.parameters = parameters;
+    }
+
+    public StringStatement(final String data) {
+        this(() -> data, new Object[]{});
+    }
+
+    public StringStatement(final String data, final Object... parameters) {
+        this(() -> String.format(data, parameters));
+    }
+
+    public Provider<String> getProvider() {
+        return provider;
     }
 
     @Override
     public String toString() {
-        return data;
+        return provider.get();
     }
 }

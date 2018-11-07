@@ -16,6 +16,7 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.codegen.PackageScope;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -444,7 +445,6 @@ public class TypeDef extends ModifierSupport {
             sb.append(SPACE).append(IMPLEMENTS).append(SPACE);
             sb.append(StringUtils.join(implementsList, COMA));
         }
-
         return sb.toString();
     }
 }
