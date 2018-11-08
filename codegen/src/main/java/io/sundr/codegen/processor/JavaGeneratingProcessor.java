@@ -64,6 +64,10 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
      * @throws IOException If it fails to create the source file.
      */
     public void generateFromResources(TypeDef model, JavaFileObject fileObject, String resourceName) throws IOException {
+        if (classExists(model)) {
+            System.err.println("Skipping: " + model.getFullyQualifiedName()+ ". Class already exists.");
+            return;
+        }
         System.err.println("Generating: "+model.getFullyQualifiedName());
         new CodeGeneratorBuilder<TypeDef>()
                 .withContext(context)
@@ -86,9 +90,12 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
         if (processingEnv.getElementUtils().getTypeElement(newModel.getFullyQualifiedName()) != null) {
             System.err.println("Skipping: " + newModel.getFullyQualifiedName()+ ". Class already exists.");
             return;
-        } else {
-            generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()), content);
         }
+        if (classExists(newModel)) {
+            System.err.println("Skipping: " + newModel.getFullyQualifiedName()+ ". Class already exists.");
+            return;
+        }
+        generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()), content);
     }
 
     /**
@@ -105,6 +112,10 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
             TypeDef newModel = createTypeFromTemplate(model, parameters, content);
             if (processingEnv.getElementUtils().getTypeElement(newModel.getFullyQualifiedName()) != null) {
                 System.err.println("Skipping: " + fileObject.getName()+ ". File already exists.");
+                return;
+            }
+            if (classExists(newModel)) {
+                System.err.println("Skipping: " + newModel.getFullyQualifiedName()+ ". Class already exists.");
                 return;
             }
         }
@@ -171,5 +182,19 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    /**
+     * Checks if class already exists.
+     * @param typeDef   The type definition to check if exists.
+     * @return  True if class can be found, false otherwise.
+     */
+    private static boolean classExists(TypeDef typeDef) {
+       try {
+        Class.forName(typeDef.getFullyQualifiedName());
+        return true;
+       } catch (ClassNotFoundException e) {
+           return false;
+       }
     }
 }
