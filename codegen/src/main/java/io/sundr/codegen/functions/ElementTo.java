@@ -334,12 +334,17 @@ public class ElementTo {
                 kind = Kind.ANNOTATION;
             }
 
+            Set<Method> allMethods = new LinkedHashSet<Method>();
+
+            for (ExecutableElement method : ElementFilter.methodsIn(classElement.getEnclosedElements())) {
+            }
             return new TypeDefBuilder()
                     .withKind(kind)
                     .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
                     .withPackageName(getPackageName(classElement))
                     .withName(getClassName(classElement))
                     .withExtendsList(extendsList)
+                    .addAllToMethods(allMethods)
                     .withOuterType(classElement.getEnclosingElement() instanceof TypeElement ? SHALLOW_TYPEDEF.apply((TypeElement) classElement.getEnclosingElement()) : null)
                     .build();
         }

@@ -29,6 +29,7 @@ import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.Attributeable;
@@ -610,13 +611,13 @@ public class ClazzAs {
                 constructors.add(instanceAndValidatorConstructor);
             }
 
-            return new TypeDefBuilder(builderType)
+            return BuilderContextManager.getContext().getDefinitionRepository().register(new TypeDefBuilder(builderType)
                     .withAnnotations()
                     .withModifiers(TypeUtils.modifiersToInt(modifiers))
                     .withProperties(fields)
                     .withConstructors(constructors)
                     .withMethods(methods)
-                    .build();
+                    .build());
         }
 
     });
@@ -740,8 +741,20 @@ public class ClazzAs {
                     if (!superClassName.isEmpty()) {
                         superClassName = superClassName.replaceAll("\\.class$", "");
                         superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
+                        if  (superClass == null) {
+                            superClass = new TypeDefBuilder(ElementTo.TYPEDEF.apply(BuilderContextManager.getContext().getElements().getTypeElement(superClassName)))
+                                    .addToAnnotations(BUILDABLE_ANNOTATION)
+                                    .build();
+
+                            BuilderContextManager.getContext().getDefinitionRepository().register(superClass);
+                            BuilderContextManager.getContext().getBuildableRepository().register(superClass);
+                        }
                         if (superClass != null) {
-                            extendsList.add(superClass.toInternalReference());
+                            ClassRef superClassRef = superClass.toInternalReference();
+                            extendsList.add(superClassRef);
+                            BuilderUtils.findBuildableReferences(superClassRef)
+                                    .stream()
+                                    .forEach(b -> BuilderContextManager.getContext().getBuildableRepository().register(b.getDefinition()));
                         }
                     }
                     if (item.isInterface()) {
@@ -776,13 +789,15 @@ public class ClazzAs {
                             ClassRef ref = (ClassRef) method.getReturnType();
                             if (ref.getDefinition().isAnnotation()) {
 
-                                AnnotationRef inheritedPojoRed = new AnnotationRefBuilder(pojoRef)
+                                AnnotationRef inheritedPojoRef = new AnnotationRefBuilder(pojoRef)
                                         .removeFromParameters("name")
+                                        .removeFromParameters("superClass")
+                                        .removeFromParameters("interfaces")
                                         .build();
 
                                 TypeDef p = hasPojoAnnotation(ref.getDefinition())
                                         ? POJO.apply(ref.getDefinition())
-                                        : POJO.apply(new TypeDefBuilder(ref.getDefinition()).withAnnotations(inheritedPojoRed).build());
+                                        : POJO.apply(new TypeDefBuilder(ref.getDefinition()).withAnnotations(inheritedPojoRef).build());
 
                                 alsoGenerate.add(p);
                                 //create a reference and apply dimension
@@ -901,7 +916,7 @@ public class ClazzAs {
                     .build();
 
 
-            TypeDef pojoBuilder = TypeAs.SHALLOW_BUILDER.apply(generatedPojo);
+            TypeDef pojoBuilder = TypeAs.BUILDER.apply(generatedPojo);
 
             if (enableStaticBuilder) {
                 Method staticBuilder = new MethodBuilder()
@@ -977,7 +992,13 @@ public class ClazzAs {
             String trimmedName = m.getName().replaceAll("^get", "").replaceAll("^is", "");
             if (m.getReturnType() instanceof ClassRef)  {
                 ClassRef ref = (ClassRef) m.getReturnType();
-                Boolean hasSuperClass = ref.getDefinition().getExtendsList().isEmpty();
+                Boolean hasSuperClass = pojo.getProperties()
+                .stream()
+                .filter(p -> p.getTypeRef() instanceof ClassRef && p.getName().equals(Getter.propertyNameSafe(m)))
+                        .map(p -> ((ClassRef)p.getTypeRef()).getDefinition())
+                        .flatMap(c -> c.getExtendsList().stream())
+                        .count() > 0;
+
                 if (ref.getDefinition().isAnnotation())  {
                    TypeDef generatedType = pojo.getProperties()
                            .stream()

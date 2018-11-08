@@ -120,9 +120,11 @@ public class ClassRef extends TypeRef {
     private boolean requiresFullyQualifiedName() {
         String currentPackage = PackageScope.get();
         if (currentPackage != null) {
-            String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(),currentPackage);
-            if (!conflictingFQCN.equals(getFullyQualifiedName()) && DefinitionRepository.getRepository().getDefinition(conflictingFQCN) != null) {
-                return true;
+            if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
+                String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(), currentPackage);
+                if (!conflictingFQCN.equals(getFullyQualifiedName()) && DefinitionRepository.getRepository().getDefinition(conflictingFQCN) != null) {
+                    return true;
+                }
             }
         }
 

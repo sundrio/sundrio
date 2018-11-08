@@ -60,6 +60,8 @@ public class Constants {
     public static final AttributeKey<Boolean> EDIATABLE_ENABLED = new AttributeKey<Boolean>("EDITABLE_ENABLED", Boolean.class);
     public static final AttributeKey<Boolean> BUILDABLE_ENABLED =  new AttributeKey<Boolean>("BUILDABLE_ENABLED", Boolean.class);
 
+    public static final AttributeKey<Boolean> SKIP =  new AttributeKey<Boolean>("SKIP", Boolean.class);
+
     public static final AttributeKey<Boolean> GENERATED = new AttributeKey<Boolean>("GENERATED", Boolean.class);
 
     public static final AttributeKey<Buildable> BUILDABLE =  new AttributeKey<Buildable>("BUILDABLE_ANNOTATION", Buildable.class);

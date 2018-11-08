@@ -38,6 +38,9 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
     }
 
     public TypeDefBuilder visit(Element e) {
+        if (e instanceof TypeElement) {
+            return new TypeDefBuilder(ElementTo.TYPEDEF.apply((TypeElement) e));
+        }
         String name = e.getSimpleName().toString();
         builder.withName(name);
         if (e.getKind() == ElementKind.INTERFACE) {

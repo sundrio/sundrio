@@ -18,6 +18,7 @@ package io.sundr.builder.internal.utils;
 
 
 import io.sundr.builder.Constants;
+import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
@@ -31,11 +32,13 @@ import io.sundr.codegen.functions.Optionals;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
@@ -77,6 +80,50 @@ public class BuilderUtils {
     public static boolean isBuildable(TypeDef  typeDef) {
         BuildableRepository repository =  BuilderContextManager.getContext().getBuildableRepository();
         return repository.isBuildable(typeDef);
+    }
+
+    /**
+     * Checks if {@link ClassRef} is buildable.
+     * @param ref       The reference.
+     * @return          True if buildable repository contains the ref or builder for the reference is present.
+     */
+    public static boolean isBuildable(ClassRef ref) {
+        if (BuilderContextManager.getContext().getBuildableRepository().isBuildable(ref)) {
+            return true;
+        }
+
+        String builderFQCN = ref.getDefinition().getFullyQualifiedName() + "Builder";
+        TypeDef builder = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(builderFQCN);
+        if (builder == null) {
+            return false;
+        }
+
+        return builder.getMethods()
+                .stream()
+                .filter(m -> "build".equals(m.getName()))
+                .filter(m -> m.getReturnType().isAssignableFrom(ref))
+                .count() > 0;
+    }
+
+    /**
+     * Returns all references of a {@link ClassRef} that are considered buildable.
+     * @param ref       The reference.
+     * @return          The list with all detected references.
+     */
+    public static List<ClassRef> findBuildableReferences(ClassRef ref) {
+        List<ClassRef>  result = new ArrayList<>();
+        TypeDef def = new TypeDefBuilder(ref.getDefinition())
+                .accept(new TypedVisitor<ClassRefBuilder>() {
+                    @Override
+                    public void visit(ClassRefBuilder builder) {
+                        ClassRef candidate = builder.build();
+                        if (isBuildable(candidate)) {
+                            result.add(candidate);
+                        }
+                    }
+                })
+                .build();
+        return result;
     }
 
     public static ClassRef findBuildableSuperClassRef(TypeDef clazz) {
