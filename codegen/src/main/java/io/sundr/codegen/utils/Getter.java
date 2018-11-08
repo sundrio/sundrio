@@ -24,6 +24,7 @@ import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
 
 import static io.sundr.codegen.Constants.BOOLEAN_REF;
+import static io.sundr.codegen.Constants.VOID;
 import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 
 public class Getter {
@@ -32,19 +33,46 @@ public class Getter {
     public static final String IS_PREFIX = "is";
     public static final String SHOULD_PREFIX = "should";
 
+
+    /**
+     * Find the getter of the specified property in the type.
+     * @param clazz         The class.
+     * @param property      The property.
+     * @return              The getter method if found. Throws exception if no getter is matched.
+     */
     public static Method find(TypeDef clazz, Property property) {
+        return find(clazz, property, false);
+    }
+
+    /**
+     * Find the getter of the specified property in the type.
+     * @param clazz                 The class.
+     * @param property              The property.
+     * @param acceptPrefixless      Flag to accept prefixless getters.
+     * @return                      The getter method if found. Throws exception if no getter is matched.
+     */
+    public static Method find(TypeDef clazz, Property property, boolean acceptPrefixless) {
         TypeDef current = clazz;
         while (current!= null && !current.equals(TypeDef.OBJECT)) {
             //1st pass strict
             for (Method method : current.getMethods()) {
-                if (isApplicable(method, property, true)) {
+                if (isApplicable(method, property, true, false)) {
                     return method;
                 }
             }
             //2nd pass relaxed
             for (Method method : current.getMethods()) {
-                if (isApplicable(method, property, false)) {
+                if (isApplicable(method, property, false, false)) {
                     return method;
+                }
+            }
+
+            //3nd pass more relaxed
+            if (acceptPrefixless) {
+                for (Method method : current.getMethods()) {
+                    if (isApplicable(method, property, false, true)) {
+                        return method;
+                    }
                 }
             }
             if (!current.getExtendsList().iterator().hasNext()) {
@@ -56,7 +84,22 @@ public class Getter {
         throw new SundrException("No getter found for property: " + property.getName() + " on class: " + clazz.getFullyQualifiedName());
     }
 
+    /**
+     * Checks if the specified method is a getter.
+     * @param method    The specified method.
+     * @return          True if getter, false otherwise.
+     */
     public static boolean is(Method method) {
+       return is(method, false);
+    }
+
+    /**
+     * Checks if the specified method is a getter.
+     * @param method                The method.
+     * @param acceptPrefixless     Flag to enable support of prefixless getters.
+     * @return
+     */
+    public static boolean is(Method method, boolean acceptPrefixless) {
         int length = method.getName().length();
 
         if (method.isPrivate() || method.isStatic()) {
@@ -65,6 +108,14 @@ public class Getter {
 
         if (!method.getArguments().isEmpty()) {
             return false;
+        }
+
+        if (method.getReturnType().equals(VOID)) {
+            return false;
+        }
+
+        if (acceptPrefixless) {
+            return true;
         }
 
         if (method.getName().startsWith(GET_PREFIX)) {
@@ -82,14 +133,14 @@ public class Getter {
     }
 
     private static boolean isApplicable(Method method, Property property) {
-        return isApplicable(method, property, false);
+        return isApplicable(method, property, false, false);
     }
 
     /**
     * Returns true if method is a getter of property.
     * In strict mode it will not strip non-alphanumeric characters.
     */
-    private static boolean isApplicable(Method method, Property property, boolean strict) {
+    private static boolean isApplicable(Method method, Property property, boolean strict, boolean acceptPrefixless) {
         if (!method.getReturnType().isAssignableFrom(property.getTypeRef())) {
             return false;
         }
@@ -100,6 +151,14 @@ public class Getter {
         }
 
         if (method.getName().endsWith(IS_PREFIX + capitalized)) {
+            return true;
+        }
+
+        if (method.getName().endsWith(SHOULD_PREFIX + capitalized)) {
+            return true;
+        }
+
+        if (acceptPrefixless && method.getName().endsWith(property.getName())) {
             return true;
         }
 
@@ -121,6 +180,11 @@ public class Getter {
             if (method.getName().endsWith(IS_PREFIX + property.getName()) && !Character.isAlphabetic(property.getName().charAt(0))) {
                 return true;
             }
+
+            if (method.getName().endsWith(SHOULD_PREFIX + property.getName()) && !Character.isAlphabetic(property.getName().charAt(0))) {
+                return true;
+            }
+
         }
         return false;
     }

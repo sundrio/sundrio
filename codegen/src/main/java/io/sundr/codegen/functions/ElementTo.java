@@ -53,12 +53,15 @@ import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.ElementFilter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.sundr.codegen.utils.ModelUtils.getClassName;
 import static io.sundr.codegen.utils.ModelUtils.getPackageName;
@@ -366,7 +369,7 @@ public class ElementTo {
                 for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry
                         : item.getElementValues().entrySet()) {
                     String key = entry.getKey().toString().replace(EMPTY_PARENTHESIS, EMPTY);
-                    Object value = entry.getValue().getValue();
+                    Object value = mapAnnotationValue(entry.getValue().getValue());
                     parameters.put(key, value);
                 }
                 return new AnnotationRefBuilder()
@@ -379,5 +382,21 @@ public class ElementTo {
         }
     });
 
+    private static Object mapAnnotationValue(Object value) {
+        if (value instanceof Collection) {
+         return ((Collection)value).stream()
+                 .map(ElementTo::mapAnnotationValue)
+                 .collect(Collectors.toList());
+        } else if (value instanceof AnnotationMirror) {
+            return ANNOTATION_REF.apply((AnnotationMirror) value);
+        } else if (value instanceof AnnotationValue){
+           return  ((AnnotationValue) value).getValue();
+        } else if (value instanceof TypeMirror) {
+            return MIRROR_TO_TYPEREF.apply((TypeMirror) value);
+        }
+        else {
+            return value;
+        }
+    }
 
 }

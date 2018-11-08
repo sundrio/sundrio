@@ -66,9 +66,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
+import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 
@@ -710,7 +712,7 @@ public class ClazzAs {
             TypeDef superClass = null;
             List<ClassRef> extendsList = new ArrayList<>();
             List<ClassRef> implementsList = new ArrayList<>();
-            List<ClassRef> alsoImports = new ArrayList<>();
+            List<ClassRef> additionalImports = new ArrayList<>();
 
             String pojoName = StringUtils.toPojoName(item.getName(), "Default", "");
 
@@ -719,6 +721,7 @@ public class ClazzAs {
             AnnotationRef pojoRef = null;
             boolean enableStaticBuilder = true;
             boolean enableStaticMapper = true;
+            final List mappters = new ArrayList();
 
             for (AnnotationRef r : item.getAnnotations()) {
                 if (r.getClassRef().getFullyQualifiedName().equals(Pojo.class.getTypeName())) {
@@ -737,7 +740,11 @@ public class ClazzAs {
                         pojoName = item.getName();
                     }
 
-                    String superClassName = String.valueOf(r.getParameters().getOrDefault("superClass",""));
+                    if (params.containsKey("adapter"))  {
+                        mappters.addAll((List) params.getOrDefault("adapter", new ArrayList<>()));
+                    }
+
+                    String superClassName = TypeUtils.toClassName(r.getParameters().getOrDefault("superClass",""));
                     if (!superClassName.isEmpty()) {
                         superClassName = superClassName.replaceAll("\\.class$", "");
                         superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
@@ -752,9 +759,11 @@ public class ClazzAs {
                         if (superClass != null) {
                             ClassRef superClassRef = superClass.toInternalReference();
                             extendsList.add(superClassRef);
+                            BuilderContextManager.getContext().getBuildableRepository().register(superClassRef.getDefinition());
                             BuilderUtils.findBuildableReferences(superClassRef)
                                     .stream()
                                     .forEach(b -> BuilderContextManager.getContext().getBuildableRepository().register(b.getDefinition()));
+
                         }
                     }
                     if (item.isInterface()) {
@@ -772,12 +781,14 @@ public class ClazzAs {
                         relativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
                     }
                     enableStaticBuilder = !"false".equals(String.valueOf(params.get("withStaticBuilderMethod")));
-                    enableStaticMapper = !"false".equals(String.valueOf(params.get("withStaticMappingMethod")));
+                    enableStaticMapper = !"false".equals(String.valueOf(params.get("withStaticAdapterMethod")));
                 }
             }
 
 
-            Set<TypeDef> alsoGenerate = new HashSet<>();
+            Set<TypeDef> additionalBuildables = new HashSet<>();
+            Set<TypeDef> additionalTypes = new HashSet<>();
+
             for (TypeDef t : types) {
                 for (Method method : t.getMethods()) {
                     //We need all getters and all annotation methods.
@@ -799,7 +810,7 @@ public class ClazzAs {
                                         ? POJO.apply(ref.getDefinition())
                                         : POJO.apply(new TypeDefBuilder(ref.getDefinition()).withAnnotations(inheritedPojoRef).build());
 
-                                alsoGenerate.add(p);
+                                additionalBuildables.add(p);
                                 //create a reference and apply dimension
                                 returnType = new ClassRefBuilder(p.toInternalReference())
                                         .withDimensions(ref.getDimensions())
@@ -912,7 +923,7 @@ public class ClazzAs {
                     .withImplementsList(implementsList)
                     .withExtendsList(extendsList)
                     .addToAttributes(item.getAttributes())
-                    .addToAttributes(ALSO_GENERATE, alsoGenerate)
+
                     .build();
 
 
@@ -931,10 +942,9 @@ public class ClazzAs {
                 additionalMethods.add(staticBuilder);
             }
 
-            if (enableStaticMapper) {
                 Method staticMapper = new MethodBuilder()
                         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-                        .withName(extendsList.isEmpty() ? "from" : "from" + item.getName()) //avoid clashes in case of inheritance
+                        .withName(extendsList.isEmpty() ? "adapt" : "adapt" + item.getName()) //avoid clashes in case of inheritance
                         .addNewArgument()
                         .withName("instance")
                         .withTypeRef(item.toInternalReference())
@@ -945,22 +955,75 @@ public class ClazzAs {
                         .endBlock()
                         .build();
 
+            if (enableStaticMapper && hasArrayFields(item)) {
                 item.getMethods()
                         .stream()
                         .filter(m -> m.getReturnType() instanceof ClassRef && ((ClassRef)m.getReturnType()).getDimensions() > 0)
                         .findAny().ifPresent(m -> {
-                    alsoImports.add(ARRAYS);
-                    alsoImports.add(COLLECTORS);
+                    additionalImports.add(ARRAYS);
+                    additionalImports.add(COLLECTORS);
                 });
                 additionalMethods.add(staticMapper);
             }
 
+            for (Object o : mappters) {
+                if (o instanceof AnnotationRef) {
+                    AnnotationRef r = (AnnotationRef) o;
+                    String name = String.valueOf(r.getParameters().getOrDefault("name", ""));
+                    String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
+                    String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
+                    String mapperRelativePath = "";
+
+                    if (StringUtils.isNullOrEmpty(name) && StringUtils.isNullOrEmpty(prefix) && StringUtils.isNullOrEmpty(suffix)) {
+                        suffix = "Adapter";
+                    }
+
+                    if (r.getParameters().containsKey("relativePath")) {
+                        mapperRelativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
+                    }
+
+                    String mapperPackage = relativePackage(item.getPackageName(), mapperRelativePath);
+
+                    List<ClassRef> mapperImports = new ArrayList<>();
+                    if (hasArrayFields(item)) {
+                        mapperImports.add(ARRAYS);
+                        mapperImports.add(COLLECTORS);
+                    }
+                    mapperImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
+                    mapperImports.addAll(generatedPojo.getProperties().stream()
+                            .filter(p -> p.getTypeRef() instanceof ClassRef)
+                            .map(p -> (ClassRef) p.getTypeRef())
+                            .filter(c -> !mapperPackage.equals(c.getDefinition().getPackageName()))
+                            .collect(Collectors.toList()));
+
+
+                    TypeDef mapper = new TypeDefBuilder()
+                            .withModifiers(modifiersToInt(Modifier.PUBLIC))
+                            .withPackageName(mapperPackage)
+                            .withName(!StringUtils.isNullOrEmpty(name) ? name : StringUtils.toPojoName(generatedPojo.getName(), prefix, suffix))
+                            .addToMethods(staticMapper)
+                            .addToAttributes(ALSO_IMPORT, mapperImports)
+                            .build();
+
+                    additionalTypes.add(mapper);
+                }
+            }
+
             return DefinitionRepository.getRepository().register(new TypeDefBuilder(generatedPojo)
                     .addAllToMethods(additionalMethods)
-                    .addToAttributes(Attributeable.ALSO_IMPORT, alsoImports)
+                    .addToAttributes(ALSO_IMPORT, additionalImports)
+                    .addToAttributes(ADDITIONAL_BUILDABLES, additionalBuildables)
+                    .addToAttributes(ADDITIONAL_TYPES, additionalTypes)
                     .build());
         }
     });
+
+    private static boolean hasArrayFields(TypeDef item) {
+          return item.getMethods()
+                        .stream()
+                        .filter(m -> m.getReturnType() instanceof ClassRef && ((ClassRef)m.getReturnType()).getDimensions() > 0)
+                        .findAny().isPresent();
+    }
 
     private static boolean hasPojoAnnotation(TypeDef typeDef) {
         return typeDef.getAnnotations().stream()
@@ -1011,17 +1074,27 @@ public class ClazzAs {
                            .orElse(null);
 
                     if (generatedType != null) {
+                        Method ctor = BuilderUtils.findBuildableConstructor(generatedType);
                         if (m.getReturnType().getDimensions() > 0) {
                             sb.append(".addAllTo").append(StringUtils.capitalizeFirst(trimmedName)).append("(")
                                     .append("Arrays.asList(")
                                     .append("instance.").append(m.getName()).append("())")
-                                    .append(".stream().map(i ->").append(generatedType.getName())
-                                    .append(!hasSuperClass ? ".from(i))" : ".from" + source.getName()+"(i))")
+                                    .append(".stream().map(i ->")
+                                    .append("new ").append(generatedType.getName()).append("(")
+                                    .append(ctor.getArguments().stream()
+                                            .map(p -> Getter.find(((ClassRef) m.getReturnType()).getDefinition(), p, true))
+                                            .map(g -> g.getName())
+                                        .map(s -> "i."+s+"()").collect(Collectors.joining(", ")))
+                                    .append(")")
+                                    .append(")")
                                     .append(".collect(Collectors.toList()))");
                         } else {
                             sb.append(".with").append(StringUtils.capitalizeFirst(trimmedName)).append("(")
-                                    .append(generatedType.getName()).append(!hasSuperClass ? ".from(" : ".from" + source.getName()+"(")
-                                    .append("instance.").append(m.getName()).append("()")
+                                    .append("new ").append(generatedType.getName()).append("(")
+                                    .append(ctor.getArguments().stream()
+                                            .map(p -> Getter.find(((ClassRef) m.getReturnType()).getDefinition(), p, true))
+                                            .map(g -> g.getName())
+                                            .map(s -> "instance."+m.getName()+"()."+s+"()").collect(Collectors.joining(", ")))
                                     .append(")")
                                     .append(")");
                         }

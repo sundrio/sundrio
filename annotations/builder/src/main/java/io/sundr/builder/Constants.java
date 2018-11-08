@@ -53,7 +53,8 @@ public class Constants {
 
     public static final AttributeKey<Set<Property>> DESCENDANTS = new AttributeKey<Set<Property>>("DESCENDANTS", Set.class);
 
-    public static final AttributeKey<Set<TypeDef>> ALSO_GENERATE = new AttributeKey<Set<TypeDef>>("GENERATED", Set.class);
+    public static final AttributeKey<Set<TypeDef>> ADDITIONAL_BUILDABLES = new AttributeKey<Set<TypeDef>>("ADDITIONAL_BUILDERS", Set.class);
+    public static final AttributeKey<Set<TypeDef>> ADDITIONAL_TYPES = new AttributeKey<Set<TypeDef>>("ADDITIONAL_TYPES", Set.class);
 
     public static final AttributeKey<Boolean> VALIDATION_ENABLED = new AttributeKey<Boolean>("VALIDATION_ENABLED", Boolean.class);
     public static final AttributeKey<Boolean> LAZY_COLLECTIONS_INIT_ENABLED = new AttributeKey<Boolean>("LAZY_COLELCTIONS_INIT_ENABLED", Boolean.class);

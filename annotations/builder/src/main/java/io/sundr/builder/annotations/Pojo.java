@@ -72,8 +72,15 @@ public @interface Pojo {
 
     /**
      * Flag to include static mapping methods in the generated pojo.
-     * The mapper just maps the source interface/annotation to the generated pojo.
-     * @return  True, if static mapper should be included false, otherwise.
+     * The adapter just maps the source interface/annotation to the generated pojo.
+     * @return  True, if static adapter should be included false, otherwise.
      */
-    boolean withStaticMappingMethod() default true;
+    boolean withStaticAdapterMethod() default true;
+
+
+    /**
+     * Adapter configuration
+     * @return  The adapter configuration.
+     */
+    Adapter[] adapter() default {};
 }

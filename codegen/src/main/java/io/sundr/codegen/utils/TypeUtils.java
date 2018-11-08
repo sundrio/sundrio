@@ -369,6 +369,24 @@ public final class TypeUtils {
         return JAVA_UTIL_OPTIONAL_LONG.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
     }
 
+
+    /***
+      *  A utility that tries to get a fully qualified class name from an unknown object.
+      * @param o    The object.
+     * @return      The classname if found or the string representation of the object.
+     */
+    public static String toClassName(Object o) {
+        if (o instanceof String)  {
+            return (String) o;
+        } else if (o instanceof ClassRef) {
+           return  ((ClassRef) o).getFullyQualifiedName();
+        } else if (o instanceof TypeDef) {
+           return ((TypeDef) o).getFullyQualifiedName();
+        } else {
+            return String.valueOf(o);
+        }
+    }
+
     public static void visitParents(TypeDef type, List<TypeDef> types) {
         visitParents(type, types, new ArrayList<>());
     }
