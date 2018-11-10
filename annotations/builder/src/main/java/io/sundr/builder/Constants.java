@@ -17,6 +17,7 @@
 package io.sundr.builder;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Pojo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.AnnotationRef;
@@ -66,6 +67,7 @@ public class Constants {
     public static final AttributeKey<Boolean> GENERATED = new AttributeKey<Boolean>("GENERATED", Boolean.class);
 
     public static final AttributeKey<Buildable> BUILDABLE =  new AttributeKey<Buildable>("BUILDABLE_ANNOTATION", Buildable.class);
+    public static final AttributeKey<ExternalBuildables> EXTERNAL_BUILDABLE =  new AttributeKey<ExternalBuildables>("EXTERMAL_BUILDABLE", ExternalBuildables.class);
 
     public static final AnnotationRef BUILDABLE_ANNOTATION = ANNOTATIONTYPEREF.apply(Buildable.class);
     public static final AnnotationRef DEPRECATED_ANNOTATION = ANNOTATIONTYPEREF.apply(Deprecated.class);
@@ -88,8 +90,6 @@ public class Constants {
     public static final TypeDef VISITOR = typeGenericOf(TYPEDEF.apply(Visitor.class), io.sundr.codegen.Constants.V);
     public static final TypeDef TYPED_VISITOR = typeGenericOf(TYPEDEF.apply(TypedVisitor.class), io.sundr.codegen.Constants.V);
     public static final TypeDef VISITABLE = TYPEDEF.apply(Visitable.class);
-    public static final TypeDef VISITABLE_BUILDER = typeGenericOf(TYPEDEF.apply(VisitableBuilder.class), io.sundr.codegen.Constants.T, io.sundr.codegen.Constants.V);
-    public static final TypeRef VISITABLE_BUILDER_REF = VISITABLE_BUILDER.toInternalReference();
 
 
 

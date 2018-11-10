@@ -40,10 +40,12 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
+import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
@@ -58,7 +60,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
         ExternalBuildables generated = null;
         BuilderContext ctx = null;
-
+        Set<TypeDef> buildables = new HashSet<>();
         //First pass register all externals
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
@@ -89,6 +91,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     for (TypeElement typeElement : typeElements) {
                         final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
+                                .addToAttributes(EXTERNAL_BUILDABLE, generated)
                                 .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
                                 .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
                                                             .accept(new Visitor<PropertyBuilder>() {
@@ -100,12 +103,14 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
                         ctx.getDefinitionRepository().register(b);
                         ctx.getBuildableRepository().register(b);
+                        buildables.add(b);
                     }
                 }
 
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
                     final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
                     TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
+                            .addToAttributes(EXTERNAL_BUILDABLE, generated)
                             .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
                             .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
                                                         .accept(new Visitor<PropertyBuilder>() {
@@ -117,6 +122,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
                     ctx.getDefinitionRepository().register(r);
                     ctx.getBuildableRepository().register(r);
+                    buildables.add(r);
                 }
             }
         }
@@ -128,50 +134,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         generateLocalDependenciesIfNeeded();
         addCustomMappings(ctx);
         ctx.getDefinitionRepository().updateReferenceMap();
-        generatePojos(ctx);
-
-
-        int total = ctx.getBuildableRepository().getBuildables().size();
-        int count = 0;
-        for (TypeDef typeDef : ctx.getBuildableRepository().getBuildables()) {
-            try {
-                double percentage = 100 * (count++) / total;
-                System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
-
-                generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-                if (typeDef.isInterface() || typeDef.isAnnotation()) {
-                    continue;
-                }
-
-                generateFromResources(ClazzAs.FLUENT_IMPL.apply(typeDef),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-                if (typeDef.isAbstract()) {
-                    continue;
-                }
-                 
-                if (generated.editableEnabled()) {
-                    generateFromResources(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-                    generateFromResources(ClazzAs.EDITABLE.apply(typeDef),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-                } else {
-                    generateFromResources(ClazzAs.BUILDER.apply(typeDef),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-                }
-
-
-                for (final Inline inline : generated.inline()) {
-                    generateFromResources(inlineableOf(ctx, typeDef, inline),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        generateBuildables(ctx, buildables);
+        generatePojos(ctx, buildables);
         System.err.println("100%: Builder generation complete.");
         return true;
     }

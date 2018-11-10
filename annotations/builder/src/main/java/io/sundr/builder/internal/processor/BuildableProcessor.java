@@ -38,6 +38,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.BUILDABLE;
@@ -56,6 +57,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         BuilderContext ctx = null;
 
         //First pass register all buildables
+        Set<TypeDef> buildables = new HashSet<>();
         for (TypeElement typeElement : annotations) {
             for (Element element : env.getElementsAnnotatedWith(typeElement)) {
                 Buildable buildable = element.getAnnotation(Buildable.class);
@@ -77,6 +79,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
 
                     ctx.getDefinitionRepository().register(b);
                     ctx.getBuildableRepository().register(b);
+                    buildables.add(b);
 
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
                     TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
@@ -92,6 +95,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
 
                     ctx.getDefinitionRepository().register(r);
                     ctx.getBuildableRepository().register(r);
+                    buildables.add(r);
                 }
             }
         }
@@ -103,52 +107,9 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         addCustomMappings(ctx);
 
         ctx.getDefinitionRepository().updateReferenceMap();
-        generatePojos(ctx);
-
-        int total = ctx.getBuildableRepository().getBuildables().size();
-        int count = 0;
-        for (TypeDef typeDef : ctx.getBuildableRepository().getBuildables()) {
-            try {
-                double percentage = 100 * (count++) / total;
-                System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
-
-                generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-                if (typeDef.isInterface() || typeDef.isAnnotation()) {
-                    continue;
-                }
-
-                generateFromResources(ClazzAs.FLUENT_IMPL.apply(typeDef),
-                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-                if (typeDef.isAbstract()) {
-                    continue;
-                }
-
-                if (typeDef.getAttributes().containsKey(EDIATABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDIATABLE_ENABLED)) {
-                    generateFromResources(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-                    generateFromResources(ClazzAs.EDITABLE.apply(typeDef),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-                } else {
-                    generateFromResources(ClazzAs.BUILDER.apply(typeDef),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-                }
-
-                Buildable buildable = typeDef.getAttribute(BUILDABLE);
-                if (buildable != null) {
-                    for (final Inline inline : buildable.inline()) {
-                        generateFromResources(inlineableOf(ctx, typeDef, inline),
-                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        generateBuildables(ctx, buildables);
+        generatePojos(ctx, buildables);
         System.err.println("100%: Builder generation complete.");
-        return true;
+        return false;
     }
 }

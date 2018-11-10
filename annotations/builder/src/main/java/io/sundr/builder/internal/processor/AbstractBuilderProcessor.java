@@ -18,6 +18,8 @@ package io.sundr.builder.internal.processor;
 
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -42,10 +44,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static io.sundr.builder.Constants.ADDITIONAL_BUILDABLES;
 import static io.sundr.builder.Constants.ADDITIONAL_TYPES;
+import static io.sundr.builder.Constants.BUILDABLE;
+import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
+import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.codegen.Constants.EMPTY;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
@@ -290,8 +297,68 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         }
     }
 
-    public void generatePojos(BuilderContext builderContext) {
-        for (TypeDef typeDef : builderContext.getBuildableRepository().getBuildables()) {
+    public void generateBuildables(BuilderContext ctx, Set<TypeDef> buildables) {
+        int total = ctx.getBuildableRepository().getBuildables().size();
+        int count = 0;
+        for (TypeDef typeDef : buildables) {
+            try {
+                double percentage = 100 * (count++) / total;
+                System.err.println(Math.round(percentage)+"%: " + typeDef.getFullyQualifiedName());
+
+                generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
+                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+
+                if (typeDef.isInterface() || typeDef.isAnnotation()) {
+                    continue;
+                }
+
+                generateFromResources(ClazzAs.FLUENT_IMPL.apply(typeDef),
+                        Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+
+                if (typeDef.isAbstract()) {
+                    continue;
+                }
+
+                if (typeDef.getAttributes().containsKey(EDIATABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDIATABLE_ENABLED)) {
+                    generateFromResources(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+
+                    generateFromResources(ClazzAs.EDITABLE.apply(typeDef),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                } else {
+                    generateFromResources(ClazzAs.BUILDER.apply(typeDef),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                }
+
+                Buildable buildable = typeDef.getAttribute(BUILDABLE);
+                ExternalBuildables externalBuildables = typeDef.getAttribute(EXTERNAL_BUILDABLE);
+                if (buildable != null) {
+                    for (final Inline inline : buildable.inline()) {
+                        generateFromResources(inlineableOf(ctx, typeDef, inline),
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                    }
+                } else if (externalBuildables != null) {
+                    for (final Inline inline : externalBuildables.inline()) {
+                        generateFromResources(inlineableOf(ctx, typeDef, inline),
+                                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * Returns true if pojos where generated.
+     * @param builderContext    The builder context.
+     * @param buildables        The set of buildables.
+     * @return                  True if sources were generated,false otherwise.
+     */
+    public void generatePojos(BuilderContext builderContext, Set<TypeDef> buildables) {
+        Set<TypeDef> additonalBuildables = new HashSet<>();
+        Set<TypeDef> additionalTypes = new HashSet<>();
+        for (TypeDef typeDef : buildables) {
             try {
                 if (typeDef.isInterface() || typeDef.isAnnotation()) {
                     typeDef = ClazzAs.POJO.apply(typeDef);
@@ -299,12 +366,14 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     builderContext.getBuildableRepository().register(typeDef);
                     generateFromResources(typeDef,
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                    additonalBuildables.add(typeDef);
 
                     if (typeDef.hasAttribute(ADDITIONAL_BUILDABLES)) {
                         for (TypeDef also : typeDef.getAttribute(ADDITIONAL_BUILDABLES)) {
                              builderContext.getDefinitionRepository().register(also);
                              builderContext.getBuildableRepository().register(also);
-                            generateFromResources(also, Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                             generateFromResources(also, Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                             additonalBuildables.add(also);
                         }
                     }
 
@@ -312,6 +381,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                         for (TypeDef also : typeDef.getAttribute(ADDITIONAL_TYPES)) {
                              builderContext.getDefinitionRepository().register(also);
                             generateFromResources(also, Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+                            additionalTypes.add(also);
                         }
                     }
                 }
@@ -319,7 +389,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 throw new RuntimeException(e);
             }
         }
-
+        generateBuildables(builderContext, additonalBuildables);
     }
 
     private static final String EMPTY_FUNCTION_TEXT = loadResourceQuietly(EMPTY_FUNCTION_SNIPPET);
