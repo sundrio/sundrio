@@ -501,7 +501,7 @@ public class ToMethod {
                     .withNewBlock()
                     .addNewStringStatementStatement(body)
                     .endBlock()
-                    .addToAttributes(ALSO_IMPORT, isBuildable ? Arrays.asList(Constants.VISITABLE_BUILDER_REF) : Collections.EMPTY_LIST)
+                    .addToAttributes(ALSO_IMPORT, isBuildable ? Arrays.asList(BuilderContextManager.getContext().getVisitableBuilderInterface().toInternalReference()) : Collections.EMPTY_LIST)
                     .build();
 
             methods.add(getter);
