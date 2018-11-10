@@ -92,6 +92,11 @@ public class Method extends ModifierSupport {
 
     public Set<ClassRef> getReferences() {
         Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+
+        for (AnnotationRef annotationRef : annotations) {
+            refs.addAll(annotationRef.getReferences());
+        }
+
         if (returnType instanceof ClassRef) {
             ClassRef classRef = (ClassRef) returnType;
             refs.addAll(classRef.getReferences());

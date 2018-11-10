@@ -59,6 +59,11 @@ public class Property extends ModifierSupport {
 
     public Set<ClassRef> getReferences() {
         Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+
+        for (AnnotationRef annotationRef : annotations) {
+            refs.addAll(annotationRef.getReferences());
+        }
+
         if (typeRef instanceof ClassRef) {
             ClassRef classRef = (ClassRef) typeRef;
             refs.addAll(classRef.getReferences());

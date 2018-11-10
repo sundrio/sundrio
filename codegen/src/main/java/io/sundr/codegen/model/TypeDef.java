@@ -17,6 +17,7 @@
 package io.sundr.codegen.model;
 
 import io.sundr.codegen.PackageScope;
+import io.sundr.codegen.annotations.ResourceSelector;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -356,7 +357,7 @@ public class TypeDef extends ModifierSupport {
         final List<ClassRef> refs = new ArrayList<ClassRef>();
 
         for (AnnotationRef a : annotations) {
-            refs.addAll(a.getClassRef().getReferences());
+            refs.addAll(a.getReferences());
         }
 
         for (ClassRef i : implementsList) {
