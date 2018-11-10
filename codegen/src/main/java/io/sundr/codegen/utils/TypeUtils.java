@@ -35,8 +35,14 @@ import javax.lang.model.element.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static io.sundr.codegen.model.TypeDef.OBJECT;
 
 
 public final class TypeUtils {
@@ -369,6 +375,49 @@ public final class TypeUtils {
         return JAVA_UTIL_OPTIONAL_LONG.equals(((ClassRef)type).getDefinition().getFullyQualifiedName());
     }
 
+    /**
+     * Check if method exists on the specified type.
+     * @param typeDef   The type.
+     * @param method    The method name.
+     * @return          True if method is found, false otherwise.
+     */
+    public static boolean hasMethod(TypeDef typeDef, String method) {
+       return unrollHierarchy(typeDef)
+       .stream()
+       .flatMap(h -> h.getMethods().stream())
+       .filter(m -> method.equals(m.getName()))
+       .findAny()
+       .isPresent();
+    }
+
+    /**
+     * Checks if property exists on the specified type.
+     * @param typeDef   The type.
+     * @param property  The property name.
+     * @return          True if method is found, false otherwise.
+     */
+    public static boolean hasProperty(TypeDef typeDef, String property) {
+       return unrollHierarchy(typeDef)
+       .stream()
+       .flatMap(h -> h.getProperties().stream())
+       .filter(p -> property.equals(p.getName()))
+       .findAny()
+       .isPresent();
+    }
+    /**
+     * Unrolls the hierararchy of a specified type.
+     * @param typeDef       The specified type.
+     * @return              A set that contains all the hierarching (including the specified type).
+     */
+    public static Set<TypeDef> unrollHierarchy(TypeDef typeDef) {
+        if (OBJECT.equals(typeDef)) {
+            return new HashSet<>();
+        }
+        Set<TypeDef> hierarchy = new HashSet<>();
+        hierarchy.add(typeDef);
+        hierarchy.addAll(typeDef.getExtendsList().stream().flatMap(s -> unrollHierarchy(s.getDefinition()).stream()).collect(Collectors.toSet()));
+        return hierarchy;
+    }
 
     /***
       *  A utility that tries to get a fully qualified class name from an unknown object.
@@ -392,7 +441,7 @@ public final class TypeUtils {
     }
 
     public static void visitParents(TypeDef type, List<TypeDef> types, List<TypeDef> visited) {
-        if (JAVA_LANG_OBJECT.equals(type.getFullyQualifiedName())) {
+        if (type == null || JAVA_LANG_OBJECT.equals(type.getFullyQualifiedName())) {
             return;
         }
 

@@ -21,6 +21,7 @@ import io.sundr.FunctionFactory;
 import io.sundr.Provider;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -32,7 +33,6 @@ import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
-import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -337,13 +337,13 @@ public class ClazzAs {
 
             methods.add(equals);
 
-            return new TypeDefBuilder(fluentImplType)
+            return BuilderContextManager.getContext().getDefinitionRepository().register(new TypeDefBuilder(fluentImplType)
                     .withAnnotations()
                     .withConstructors(constructors)
                     .withProperties(properties)
                     .withInnerTypes(nestedClazzes)
                     .withMethods(methods)
-                    .build();
+                    .build());
         }
     });
 
@@ -366,8 +366,6 @@ public class ClazzAs {
 
             Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
             Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").build();
-
-
 
             fields.add(fluentProperty);
             fields.add(validationEnabledProperty);
@@ -713,17 +711,22 @@ public class ClazzAs {
             List<ClassRef> extendsList = new ArrayList<>();
             List<ClassRef> implementsList = new ArrayList<>();
             List<ClassRef> additionalImports = new ArrayList<>();
+            List<AnnotationRef> annotationRefs = new ArrayList<>();
 
             String pojoName = StringUtils.toPojoName(item.getName(), "Default", "");
-
             String relativePath = ".";
 
             AnnotationRef pojoRef = null;
             boolean enableStaticBuilder = true;
-            boolean enableStaticMapper = true;
-            final List mappters = new ArrayList();
+            boolean enableStaticAdapter = true;
+            final List adapters = new ArrayList();
 
             for (AnnotationRef r : item.getAnnotations()) {
+                if (r.getClassRef().getFullyQualifiedName().equals(Buildable.class.getTypeName())) {
+                    if (!annotationRefs.contains(r)) {
+                        annotationRefs.add(r);
+                    }
+                }
                 if (r.getClassRef().getFullyQualifiedName().equals(Pojo.class.getTypeName())) {
                     pojoRef = r;
                     Map<String, Object> params = r.getParameters();
@@ -741,16 +744,17 @@ public class ClazzAs {
                     }
 
                     if (params.containsKey("adapter"))  {
-                        mappters.addAll((List) params.getOrDefault("adapter", new ArrayList<>()));
+                        adapters.addAll((List) params.getOrDefault("adapter", new ArrayList<>()));
                     }
 
                     String superClassName = TypeUtils.toClassName(r.getParameters().getOrDefault("superClass",""));
                     if (!superClassName.isEmpty()) {
                         superClassName = superClassName.replaceAll("\\.class$", "");
                         superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
+
+
                         if  (superClass == null) {
                             superClass = new TypeDefBuilder(ElementTo.TYPEDEF.apply(BuilderContextManager.getContext().getElements().getTypeElement(superClassName)))
-                                    .addToAnnotations(BUILDABLE_ANNOTATION)
                                     .build();
 
                             BuilderContextManager.getContext().getDefinitionRepository().register(superClass);
@@ -781,7 +785,7 @@ public class ClazzAs {
                         relativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
                     }
                     enableStaticBuilder = !"false".equals(String.valueOf(params.get("withStaticBuilderMethod")));
-                    enableStaticMapper = !"false".equals(String.valueOf(params.get("withStaticAdapterMethod")));
+                    enableStaticAdapter = !"false".equals(String.valueOf(params.get("withStaticAdapterMethod")));
                 }
             }
 
@@ -808,7 +812,11 @@ public class ClazzAs {
 
                                 TypeDef p = hasPojoAnnotation(ref.getDefinition())
                                         ? POJO.apply(ref.getDefinition())
-                                        : POJO.apply(new TypeDefBuilder(ref.getDefinition()).withAnnotations(inheritedPojoRef).build());
+                                        : POJO.apply(new TypeDefBuilder(ref.getDefinition())
+                                        .withAnnotations(annotationRefs)
+                                        .addToAnnotations(inheritedPojoRef)
+                                        .withAttributes(item.getAttributes())
+                                        .build());
 
                                 additionalBuildables.add(p);
                                 //create a reference and apply dimension
@@ -917,17 +925,17 @@ public class ClazzAs {
                     .withPackageName(relativePackage(item.getPackageName(), relativePath))
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
                     .withName(pojoName)
+                    .withAnnotations(annotationRefs)
                     .withProperties(fields)
                     .withConstructors(constructor)
                     .withMethods(getters)
                     .withImplementsList(implementsList)
                     .withExtendsList(extendsList)
                     .addToAttributes(item.getAttributes())
-
                     .build();
 
 
-            TypeDef pojoBuilder = TypeAs.BUILDER.apply(generatedPojo);
+            TypeDef pojoBuilder = BUILDER.apply(generatedPojo);
 
             if (enableStaticBuilder) {
                 Method staticBuilder = new MethodBuilder()
@@ -942,20 +950,35 @@ public class ClazzAs {
                 additionalMethods.add(staticBuilder);
             }
 
-                Method staticMapper = new MethodBuilder()
+                Method staticAdapter = new MethodBuilder()
                         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-                        .withName(extendsList.isEmpty() ? "adapt" : "adapt" + item.getName()) //avoid clashes in case of inheritance
+                        .withName("adapt")
                         .addNewArgument()
                         .withName("instance")
                         .withTypeRef(item.toInternalReference())
                         .endArgument()
                         .withReturnType(generatedPojo.toInternalReference())
                         .withNewBlock()
-                        .addToStatements(new StringStatement(() -> staticMapperBody(generatedPojo, item)))
+                        .addNewStringStatementStatement("return newBuilder(instance).build();")
                         .endBlock()
                         .build();
 
-            if (enableStaticMapper && hasArrayFields(item)) {
+            Method staticAdaptingBuilder = new MethodBuilder()
+                    .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+                    .withName("newBuilder")
+                    .addNewArgument()
+                    .withName("instance")
+                    .withTypeRef(item.toInternalReference())
+                    .endArgument()
+                    .withReturnType(pojoBuilder.toInternalReference())
+                    .withNewBlock()
+                    .addToStatements(new StringStatement(() -> staticAdapterBody(generatedPojo, pojoBuilder, item, false)))
+                    .endBlock()
+                    .build();
+
+
+
+            if (enableStaticAdapter && hasArrayFields(item)) {
                 item.getMethods()
                         .stream()
                         .filter(m -> m.getReturnType() instanceof ClassRef && ((ClassRef)m.getReturnType()).getDimensions() > 0)
@@ -963,16 +986,19 @@ public class ClazzAs {
                     additionalImports.add(ARRAYS);
                     additionalImports.add(COLLECTORS);
                 });
-                additionalMethods.add(staticMapper);
+                additionalMethods.add(staticAdapter);
+                additionalMethods.add(staticAdaptingBuilder);
             }
 
-            for (Object o : mappters) {
+            for (Object o : adapters) {
                 if (o instanceof AnnotationRef) {
                     AnnotationRef r = (AnnotationRef) o;
                     String name = String.valueOf(r.getParameters().getOrDefault("name", ""));
                     String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
                     String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
                     String mapperRelativePath = "";
+
+                    List<Method> adapterMethods = new ArrayList<>();
 
                     if (StringUtils.isNullOrEmpty(name) && StringUtils.isNullOrEmpty(prefix) && StringUtils.isNullOrEmpty(suffix)) {
                         suffix = "Adapter";
@@ -997,11 +1023,34 @@ public class ClazzAs {
                             .collect(Collectors.toList()));
 
 
+                    if (superClass != null && !superClass.isAbstract() && isBuildable(superClass)) {
+                        TypeDef superClassDef = superClass;
+                        TypeDef superClassBuilder = BUILDER.apply(superClass);
+
+                        Method staticSuperClassAdaptingBuilder = new MethodBuilder()
+                                .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+                                .withName("newBuilder")
+                                .addNewArgument()
+                                .withName("instance")
+                                .withTypeRef(superClassDef.toInternalReference())
+                                .endArgument()
+                                .withReturnType(pojoBuilder.toInternalReference())
+                                .withNewBlock()
+                                .addToStatements(new StringStatement(() -> staticAdapterBody(superClassDef, pojoBuilder, superClassDef, false)))
+                                .endBlock()
+                                .build();
+
+                        adapterMethods.add(staticSuperClassAdaptingBuilder);
+                    }
+
+                    adapterMethods.add(staticAdapter);
+                    adapterMethods.add(staticAdaptingBuilder);
+
                     TypeDef mapper = new TypeDefBuilder()
                             .withModifiers(modifiersToInt(Modifier.PUBLIC))
                             .withPackageName(mapperPackage)
                             .withName(!StringUtils.isNullOrEmpty(name) ? name : StringUtils.toPojoName(generatedPojo.getName(), prefix, suffix))
-                            .addToMethods(staticMapper)
+                            .withMethods(adapterMethods)
                             .addToAttributes(ALSO_IMPORT, mapperImports)
                             .build();
 
@@ -1047,12 +1096,13 @@ public class ClazzAs {
                 .build();
     }
 
-    private static String staticMapperBody(TypeDef pojo, TypeDef source) {
+
+    private static String staticAdapterBody(TypeDef pojo, TypeDef pojoBuilder, TypeDef source, boolean returnBuilder) {
         StringBuilder sb = new StringBuilder();
-        sb.append("return new ").append(pojo.getName()).append("Builder()");
+        sb.append("return new ").append(pojoBuilder.getName()).append("()");
 
         for (Method m : source.getMethods()) {
-            String trimmedName = m.getName().replaceAll("^get", "").replaceAll("^is", "");
+            String trimmedName = StringUtils.deCapitalizeFirst(m.getName().replaceAll("^get", "").replaceAll("^is", ""));
             if (m.getReturnType() instanceof ClassRef)  {
                 ClassRef ref = (ClassRef) m.getReturnType();
                 Boolean hasSuperClass = pojo.getProperties()
@@ -1102,9 +1152,17 @@ public class ClazzAs {
                     }
                 }
             }
-            sb.append(".with").append(StringUtils.capitalizeFirst(trimmedName)).append("(").append("instance.").append(m.getName()).append("())");
+            String withMethod = "with" + (StringUtils.capitalizeFirst(trimmedName));
+
+            if (TypeUtils.hasProperty(pojo, trimmedName)) {
+                sb.append(".").append(withMethod).append("(").append("instance.").append(m.getName()).append("())");
+            }
         }
-        sb.append(".build();");
+        if (returnBuilder) {
+            sb.append(".build();");
+        } else {
+            sb.append(";");
+        }
         return sb.toString();
     }
 
