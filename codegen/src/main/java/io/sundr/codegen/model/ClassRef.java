@@ -172,18 +172,17 @@ public class ClassRef extends TypeRef {
         TypeDef definition = getDefinition();
         if (definition == null) {
             sb.append(UNKNOWN);
-        }
-
-        if (requiresFullyQualifiedName()) {
-            sb.append(definition.getPackageName()).append(DOT);
-        }
-
-        if (definition.getOuterType() != null) {
-            sb.append(definition.getOuterType().getName()).append(DOT).append(definition.getName());
         } else {
-            sb.append(definition.getName());
-        }
+            if (requiresFullyQualifiedName()) {
+                sb.append(definition.getPackageName()).append(DOT);
+            }
 
+            if (definition.getOuterType() != null) {
+                sb.append(definition.getOuterType().getName()).append(DOT).append(definition.getName());
+            } else {
+                sb.append(definition.getName());
+            }
+        }
         if (arguments.size() > 0) {
             sb.append(LT);
             sb.append(StringUtils.join(arguments, COMA));
