@@ -353,7 +353,6 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
      * Returns true if pojos where generated.
      * @param builderContext    The builder context.
      * @param buildables        The set of buildables.
-     * @return                  True if sources were generated,false otherwise.
      */
     public void generatePojos(BuilderContext builderContext, Set<TypeDef> buildables) {
         Set<TypeDef> additonalBuildables = new HashSet<>();
