@@ -22,6 +22,7 @@ import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.PrimitiveRef;
+import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
@@ -404,6 +405,19 @@ public final class TypeUtils {
        .findAny()
        .isPresent();
     }
+
+    /**
+     * All properties (including inherited).
+     * @param typeDef   The type.
+     * @return          A list with all properties.
+     */
+    public static List<Property> allProperties(TypeDef typeDef) {
+        return unrollHierarchy(typeDef)
+                .stream()
+                .flatMap(h -> h.getProperties().stream())
+                .collect(Collectors.toList());
+    }
+
     /**
      * Unrolls the hierararchy of a specified type.
      * @param typeDef       The specified type.

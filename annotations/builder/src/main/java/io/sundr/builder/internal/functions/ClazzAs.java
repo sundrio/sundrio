@@ -1008,18 +1008,18 @@ public class ClazzAs {
                         mapperRelativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
                     }
 
-                    String mapperPackage = relativePackage(item.getPackageName(), mapperRelativePath);
+                    String adapterPackage = relativePackage(item.getPackageName(), mapperRelativePath);
 
-                    List<ClassRef> mapperImports = new ArrayList<>();
+                    List<ClassRef> adapterImports = new ArrayList<>();
                     if (hasArrayFields(item)) {
-                        mapperImports.add(ARRAYS);
-                        mapperImports.add(COLLECTORS);
+                        adapterImports.add(ARRAYS);
+                        adapterImports.add(COLLECTORS);
                     }
-                    mapperImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
-                    mapperImports.addAll(generatedPojo.getProperties().stream()
+                    adapterImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
+                    adapterImports.addAll(TypeUtils.allProperties(generatedPojo).stream()
                             .filter(p -> p.getTypeRef() instanceof ClassRef)
                             .map(p -> (ClassRef) p.getTypeRef())
-                            .filter(c -> !mapperPackage.equals(c.getDefinition().getPackageName()))
+                            .filter(c -> !adapterPackage.equals(c.getDefinition().getPackageName()))
                             .collect(Collectors.toList()));
 
 
@@ -1048,10 +1048,10 @@ public class ClazzAs {
 
                     TypeDef mapper = new TypeDefBuilder()
                             .withModifiers(modifiersToInt(Modifier.PUBLIC))
-                            .withPackageName(mapperPackage)
+                            .withPackageName(adapterPackage)
                             .withName(!StringUtils.isNullOrEmpty(name) ? name : StringUtils.toPojoName(generatedPojo.getName(), prefix, suffix))
                             .withMethods(adapterMethods)
-                            .addToAttributes(ALSO_IMPORT, mapperImports)
+                            .addToAttributes(ALSO_IMPORT, adapterImports)
                             .build();
 
                     additionalTypes.add(mapper);
@@ -1113,7 +1113,7 @@ public class ClazzAs {
                         .count() > 0;
 
                 if (ref.getDefinition().isAnnotation())  {
-                   TypeDef generatedType = pojo.getProperties()
+                   TypeDef generatedType = TypeUtils.allProperties(pojo)
                            .stream()
                            .filter(p -> p.getName().equals(m.getName()))
                            .map(p -> p.getTypeRef())
