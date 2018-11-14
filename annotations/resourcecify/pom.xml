@@ -39,10 +39,18 @@
         </plugins>
     </build>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-        </dependency>
-    </dependencies>
+    <profiles>
+        <profile>
+             <id>jdk9</id>
+             <activation>
+                 <jdk>[1,1.9)</jdk>
+             </activation>
+             <dependencies>
+                 <dependency>
+                     <groupId>com.sun</groupId>
+                     <artifactId>tools</artifactId>
+                 </dependency>
+             </dependencies>
+        </profile>
+    </profiles>
 </project>
