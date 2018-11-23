@@ -719,6 +719,8 @@ public class ClazzAs {
             AnnotationRef pojoRef = null;
             boolean enableStaticBuilder = true;
             boolean enableStaticAdapter = true;
+            boolean mutable = false;
+
             final List adapters = new ArrayList();
 
             for (AnnotationRef r : item.getAnnotations()) {
@@ -731,6 +733,9 @@ public class ClazzAs {
                     pojoRef = r;
                     Map<String, Object> params = r.getParameters();
 
+                    if (params.containsKey("mutable")) {
+                        mutable = Boolean.parseBoolean(String.valueOf(r.getParameters().getOrDefault("mutable", false)));
+                    }
                     if (params.containsKey("name")) {
                         pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
                     }
@@ -834,7 +839,7 @@ public class ClazzAs {
                         Property field = new PropertyBuilder()
                                 .withName(StringUtils.toFieldName(name))
                                 .withTypeRef(returnType)
-                                .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+                            .withModifiers(mutable ? TypeUtils.modifiersToInt(Modifier.PRIVATE) : TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                                 .build();
 
 
@@ -896,6 +901,11 @@ public class ClazzAs {
                 }
             }
 
+            List<Method> constructors = new ArrayList();
+
+            Method emptyConstructor = new MethodBuilder()
+                .withModifiers(modifiersToInt(Modifier.PUBLIC))
+                .build();
 
             //We can't just rely on what getters are present in the superclass.
             //We NEED to make sure that the superclass constructor arguments are in place and then add everything else.
@@ -907,7 +917,7 @@ public class ClazzAs {
 
             //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
             //The processor instead explicitly generates fluent and builder for the new pojo.
-            Method constructor = new MethodBuilder()
+            Method buildableConstructor = new MethodBuilder()
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
                     .withArguments(constructorArgs)
                     .withNewBlock()
@@ -921,13 +931,19 @@ public class ClazzAs {
                     })
                     .build();
 
+
+            if (mutable) {
+                constructors.add(emptyConstructor);
+            }
+            constructors.add(buildableConstructor);
+
             TypeDef generatedPojo = new TypeDefBuilder()
                     .withPackageName(relativePackage(item.getPackageName(), relativePath))
                     .withModifiers(modifiersToInt(Modifier.PUBLIC))
                     .withName(pojoName)
                     .withAnnotations(annotationRefs)
                     .withProperties(fields)
-                    .withConstructors(constructor)
+                    .withConstructors(constructors)
                     .withMethods(getters)
                     .withImplementsList(implementsList)
                     .withExtendsList(extendsList)
