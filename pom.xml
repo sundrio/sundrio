@@ -44,8 +44,8 @@
         <connection>scm:git:git://github.com/sundrio/sundrio.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/sundrio/sundrio.git</developerConnection>
         <url>http://github.com/sundrio/sundrio</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <developers>
         <developer>
@@ -76,6 +76,7 @@
         <compiler.plugin.version>3.6.0</compiler.plugin.version>
         <invoker.plugin.version>2.0.0</invoker.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
+        <surefire.plugin.version>3.0.0-M3</surefire.plugin.version>
         <!--maven.javadoc.failOnError>false</maven.javadoc.failOnError-->
     </properties>
 
@@ -89,6 +90,16 @@
     </modules>
     
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire.plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
