@@ -20,7 +20,6 @@ import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.generator.CodeGeneratorContext;
 import io.sundr.codegen.model.TypeDef;
-import javax.annotation.processing.Filer;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.FilerException;
@@ -28,7 +27,6 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.regex.Pattern;
@@ -156,7 +154,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
         } else if (outputPath == null || outputPath.isEmpty()) {
             throw new IllegalArgumentException("Please specify either an outout path or a model that implies one (e.g. a class definition).");
         } else if (outputPath.endsWith(SOURCE_SUFFIX)) {
-            String fqcn = outputPath.substring(0 , outputPath.length() - SOURCE_SUFFIX.length()).replaceAll(Pattern.quote(File.separator), ".");
+            String fqcn = outputPath.substring(0 , outputPath.length() - SOURCE_SUFFIX.length()).replaceAll("/|\\\\", ".");
             generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(fqcn), content);
         } else {
             generateFromStringTemplate(model, parameters, processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", outputPath), content);

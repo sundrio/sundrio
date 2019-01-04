@@ -51,7 +51,7 @@ public class BuilderGeneratorTest {
                 .endConstructor()
                 .build();
 
-        File tmp = new File("/tmp");
+        File tmp = new File(System.getProperty("java.io.tmpdir"));
         generate(type, tmp, "CircleFluent.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
         generate(type, tmp, "CircleBuilder.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 

@@ -46,6 +46,9 @@
         <module>module2</module>
     </modules>
 
+    <properties>
+        <bomTemplateUrl>file://${project.basedir}/custom.xml.vm</bomTemplateUrl>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -53,7 +56,7 @@
                 <artifactId>sundr-maven-plugin</artifactId>
                 <version>@pom.version@</version>
                 <configuration>
-                    <bomTemplateUrl>file://${project.basedir}/custom.xml.vm</bomTemplateUrl>
+                    <bomTemplateUrl>${bomTemplateUrl}</bomTemplateUrl>
                     <boms>
                         <bom>
                             <artifactId>bom-test-1</artifactId>
@@ -280,6 +283,17 @@
             <id>test-profile</id>
             <properties>
                 <key1>value1</key1>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <bomTemplateUrl>file:///${project.basedir}/custom.xml.vm</bomTemplateUrl>
             </properties>
         </profile>
     </profiles>
