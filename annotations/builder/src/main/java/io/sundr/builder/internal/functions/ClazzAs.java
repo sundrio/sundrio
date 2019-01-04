@@ -1099,10 +1099,10 @@ public class ClazzAs {
         if (relativePath == null || relativePath.isEmpty() || relativePath.equals(".")) {
            return pkg;
         }
-        Path pkgPath = Paths.get(pkg.replaceAll(Pattern.quote("."), File.separator));
+        Path pkgPath = Paths.get(pkg.replaceAll(Pattern.quote("."), "/"));
         String newPath = pkgPath.resolve(relativePath).normalize().toString();
 
-        return newPath.replaceAll(Pattern.quote(File.separator), ".").replaceAll("\\.$", "");
+        return newPath.replaceAll("/|\\\\", ".").replaceAll("\\.$", "");
     }
 
     private static Property arrayAsList(Property property) {
