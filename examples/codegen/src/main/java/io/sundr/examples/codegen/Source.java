@@ -29,7 +29,7 @@ public class Source {
         this(Collections.EMPTY_LIST);
     }
 
-    @Buildable
+    @Buildable(lazyCollectionInitEnabled=false)
     public Source(List<TypeDef> types) {
         this.types = types;
     }

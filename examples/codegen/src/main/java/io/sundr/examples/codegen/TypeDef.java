@@ -21,15 +21,15 @@ import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static io.sundr.examples.codegen.Kind.CLASS;
-
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class TypeDef extends ModifierSupport {
 
     public static TypeDef OBJECT = new TypeDefBuilder()
@@ -45,11 +45,11 @@ public class TypeDef extends ModifierSupport {
     public static ClassRef OBJECT_REF = OBJECT.toReference();
     public static ClassRef ENUM_REF = ENUM.toReference();
 
-
     private final Kind kind;
     private final String packageName;
     private final String name;
 
+    private final List<String> comments;
     private final List<AnnotationRef> annotations;
     private final List<ClassRef> extendsList;
     private final List<ClassRef> implementsList;
@@ -61,11 +61,12 @@ public class TypeDef extends ModifierSupport {
     private final TypeDef outerType;
     private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<String> comments, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
-        this.kind = kind != null ? kind : CLASS;
+        this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
         this.name = name;
+        this.comments = comments;
         this.annotations = annotations;
         this.extendsList = extendsList;
         this.implementsList = implementsList;
@@ -78,12 +79,8 @@ public class TypeDef extends ModifierSupport {
     }
 
     /**
-     * The method adapts constructor method to the current class.
-     * It unsets any name that may be presetn in the method.
-     * It also sets as a return type a reference to the current type.
-     * @param methods
-     * @param target
-     * @return
+     * The method adapts constructor method to the current class. It unsets any name that may be
+     * presetn in the method. It also sets as a return type a reference to the current type.
      */
     private static List<Method> adaptConstructors(List<Method> methods, TypeDef target) {
         List<Method> adapted = new ArrayList<Method>();
@@ -110,8 +107,6 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Returns the fully qualified name of the type.
-     *
-     * @return
      */
     public String getFullyQualifiedName() {
         StringBuilder sb = new StringBuilder();
@@ -157,6 +152,10 @@ public class TypeDef extends ModifierSupport {
 
     public Kind getKind() {
         return kind;
+    }
+
+    public List<String> getComments() {
+        return comments;
     }
 
     public List<AnnotationRef> getAnnotations() {
@@ -219,7 +218,7 @@ public class TypeDef extends ModifierSupport {
         return kind == Kind.ANNOTATION;
     }
 
-        @Override
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -244,8 +243,8 @@ public class TypeDef extends ModifierSupport {
 
     /**
      * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     *
      * @param arguments The arguments to be passed to the reference.
-     * @return
      */
     public ClassRef toReference(TypeRef... arguments) {
         List<TypeRef> actualArguments = new ArrayList<TypeRef>();
@@ -259,13 +258,43 @@ public class TypeDef extends ModifierSupport {
         return new ClassRefBuilder()
                 .withDefinition(this)
                 .withArguments(actualArguments)
+                .withAttributes(getAttributes())
                 .build();
     }
 
     /**
-     * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties etc).
-     * It uses as arguments the same 'letters' as the parameters definition.
-     * @return
+     * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     *
+     * @param arguments The arguments to be passed to the reference.
+     */
+    public ClassRef toReference(List<TypeRef> arguments) {
+        List<TypeRef> actualArguments = new ArrayList<TypeRef>();
+        for (int i = 0; i < parameters.size(); i++) {
+            if (i < arguments.size()) {
+                actualArguments.add(arguments.get(i));
+            } else {
+                actualArguments.add(new WildcardRef());
+            }
+        }
+        return new ClassRefBuilder()
+                .withDefinition(this)
+                .withArguments(actualArguments)
+                .withAttributes(getAttributes())
+                .build();
+    }
+
+    /**
+     * Creates a {@link ClassRef} for the current definition with the specified arguments.
+     *
+     * @param arguments The arguments to be passed to the reference.
+     */
+    public ClassRef toReference(Collection<TypeRef> arguments) {
+        return toReference(arguments);
+    }
+
+    /**
+     * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties
+     * etc). It uses as arguments the same 'letters' as the parameters definition.
      */
     public ClassRef toInternalReference() {
         List<TypeRef> arguments = new ArrayList<TypeRef>();
@@ -275,12 +304,12 @@ public class TypeDef extends ModifierSupport {
         return new ClassRefBuilder()
                 .withDefinition(this)
                 .withArguments(arguments)
+                .withAttributes(getAttributes())
                 .build();
     }
 
     /**
      * Creates a {@link ClassRef} without bounds.
-     * @return
      */
     public ClassRef toUnboundedReference() {
         return new ClassRefBuilder()
@@ -292,7 +321,11 @@ public class TypeDef extends ModifierSupport {
     public Set<String> getImports() {
         final Set<String> imports = new LinkedHashSet<String>();
         for (ClassRef ref : getReferenceMap().values()) {
-            if (ref .getDefinition().getPackageName() == null || ref .getDefinition().getPackageName().isEmpty() ||  ref.getDefinition().getPackageName().equals(packageName)) {
+            TypeDef definition = ref.getDefinition();
+            if (definition.getPackageName() == null ||
+                    definition.getPackageName().isEmpty() ||
+                    definition.getPackageName().equals(packageName) ||
+                    definition.getName().equals(name)) {
                 continue;
             } else {
                 imports.add(ref.getDefinition().getFullyQualifiedName());
@@ -301,24 +334,40 @@ public class TypeDef extends ModifierSupport {
         return imports;
     }
 
+
     /**
      * Create a mapping from class name to {@link ClassRef}.
-     * @return
      */
-    public Map<String, ClassRef> getReferenceMap() {
+    private Map<String, ClassRef> getReferenceMap() {
         Map<String, ClassRef> mapping = new HashMap<String, ClassRef>();
-        for (ClassRef ref : getReferences()) {
-            mapping.put(ref.getDefinition().getName(), ref);
+        List<ClassRef> refs = getReferences();
+
+        //It's best to have predictable order, so that we can generate uniform code.
+        Collections.sort(refs, new Comparator<ClassRef>() {
+            @Override
+            public int compare(ClassRef o1, ClassRef o2) {
+                return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
+            }
+        });
+
+        for (ClassRef ref : refs) {
+            String key = ref.getDefinition().getName();
+            if (!mapping.containsKey(key)) {
+                mapping.put(key, ref);
+            }
         }
         return mapping;
     }
 
-    public Set<ClassRef> getReferences() {
-        final Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+    public List<ClassRef> getReferences() {
+        final List<ClassRef> refs = new ArrayList<ClassRef>();
+
+        for (AnnotationRef a : annotations) {
+            refs.addAll(a.getReferences());
+        }
 
         for (ClassRef i : implementsList) {
             refs.addAll(i.getReferences());
-
         }
 
         for (ClassRef e : extendsList) {
@@ -403,7 +452,6 @@ public class TypeDef extends ModifierSupport {
             sb.append(SPACE).append(IMPLEMENTS).append(SPACE);
             sb.append(StringUtils.join(implementsList, COMA));
         }
-
         return sb.toString();
     }
 }

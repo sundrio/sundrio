@@ -16,8 +16,6 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.codegen.PackageScope;
-import io.sundr.codegen.annotations.ResourceSelector;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -49,6 +47,7 @@ public class TypeDef extends ModifierSupport {
     private final String packageName;
     private final String name;
 
+    private final List<String> comments;
     private final List<AnnotationRef> annotations;
     private final List<ClassRef> extendsList;
     private final List<ClassRef> implementsList;
@@ -60,11 +59,12 @@ public class TypeDef extends ModifierSupport {
     private final TypeDef outerType;
     private final List<TypeDef> innerTypes;
 
-    public TypeDef(Kind kind, String packageName, String name, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
+    public TypeDef(Kind kind, String packageName, String name, List<String> comments, List<AnnotationRef> annotations, List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties, List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.kind = kind != null ? kind : Kind.CLASS;
         this.packageName = packageName;
         this.name = name;
+        this.comments = comments;
         this.annotations = annotations;
         this.extendsList = extendsList;
         this.implementsList = implementsList;
@@ -150,6 +150,10 @@ public class TypeDef extends ModifierSupport {
 
     public Kind getKind() {
         return kind;
+    }
+
+    public List<String> getComments() {
+        return comments;
     }
 
     public List<AnnotationRef> getAnnotations() {
