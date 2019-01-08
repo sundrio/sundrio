@@ -18,9 +18,12 @@ package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class AnnotationRef extends AttributeSupport {
 
     private final ClassRef classRef;
@@ -40,6 +43,27 @@ public class AnnotationRef extends AttributeSupport {
         return parameters;
     }
 
+    public Set<ClassRef> getReferences() {
+        Set<ClassRef> result = new HashSet<>();
+        result.add(classRef);
+
+        for (Object o : parameters.values()) {
+            if (o instanceof ClassRef) {
+                result.add((ClassRef) o);
+            } else if (o instanceof AnnotationRef)  {
+                result.addAll(((AnnotationRef) o).getReferences());
+            } else if (o instanceof Collection)  {
+                for (Object i : (Collection)o) {
+                    if (i instanceof ClassRef) {
+                        result.addAll(((ClassRef)i).getReferences());
+                    } else if (i instanceof AnnotationRef) {
+                        result.addAll(((AnnotationRef)i).getReferences());
+                    }
+                }
+            }
+        }
+        return result;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

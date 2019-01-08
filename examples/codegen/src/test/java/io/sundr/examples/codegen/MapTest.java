@@ -18,6 +18,7 @@ package io.sundr.examples.codegen;
 
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.*;
@@ -59,7 +60,7 @@ public class MapTest {
                 .removeFromAttributes(key1)
                 .build();
 
-        assertNull(attributeSupport.getAttributes());
+        assertEquals(attributeSupport.getAttributes(), Collections.emptyMap());
     }
 
     @Test
@@ -72,6 +73,6 @@ public class MapTest {
                 .removeFromAttributes(map)
                 .build();
 
-        assertNull(attributeSupport.getAttributes());
+        assertEquals(attributeSupport.getAttributes(), Collections.emptyMap());
     }
 }

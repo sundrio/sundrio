@@ -20,7 +20,7 @@ import io.sundr.builder.annotations.Buildable;
 
 import java.util.Map;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class PrimitiveRef extends TypeRef {
 
     private final String name;

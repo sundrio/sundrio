@@ -20,7 +20,7 @@ import io.sundr.builder.annotations.Buildable;
 
 import java.util.List;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class Block {
 
     private List<Statement> statements;

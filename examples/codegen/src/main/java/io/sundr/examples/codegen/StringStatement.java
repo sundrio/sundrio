@@ -24,7 +24,7 @@ public class StringStatement implements Statement {
     private final Provider<String> provider;
     private final Object[] parameters;
 
-    @Buildable
+    @Buildable(lazyCollectionInitEnabled=false)
     public StringStatement(Provider<String> provider) {
         this.provider = provider;
         this.parameters = new Object[]{};

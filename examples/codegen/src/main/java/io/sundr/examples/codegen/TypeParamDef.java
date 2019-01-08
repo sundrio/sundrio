@@ -22,7 +22,7 @@ import io.sundr.codegen.utils.StringUtils;
 import java.util.List;
 import java.util.Map;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class TypeParamDef extends AttributeSupport {
 
     private final String name;

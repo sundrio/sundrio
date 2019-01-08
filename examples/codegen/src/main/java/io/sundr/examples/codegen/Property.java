@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class Property extends ModifierSupport {
 
     private final List<AnnotationRef> annotations;

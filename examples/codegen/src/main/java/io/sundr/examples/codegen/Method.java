@@ -28,7 +28,7 @@ import java.util.Set;
 
 import static io.sundr.codegen.utils.StringUtils.join;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class Method extends ModifierSupport {
 
     private final List<String> comments;

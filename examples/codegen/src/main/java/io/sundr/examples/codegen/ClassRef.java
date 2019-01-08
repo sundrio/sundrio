@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class ClassRef extends TypeRef {
 
     public static final String UNKWNON = "<unkwnon>";

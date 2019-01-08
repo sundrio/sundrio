@@ -22,7 +22,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class ModifierSupport extends AttributeSupport {
 
     public static final String ABSTRACT = "abstract";

@@ -28,7 +28,7 @@ public @interface Pojo {
     /**
      * Indicates that the generated pojo will be mutable or not.
      * If not mutable all properties will be final and no default constructor will be provided.
-     * @return true if mutable, false otherwise.
+     * @return true if mutable, false otherwise.t
      */
     boolean mutable() default false;
 

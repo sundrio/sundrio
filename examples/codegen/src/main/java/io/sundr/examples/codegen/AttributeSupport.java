@@ -21,7 +21,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.Collections;
 import java.util.Map;
 
-@Buildable
+@Buildable(lazyCollectionInitEnabled=false)
 public class AttributeSupport implements Attributeable {
 
     private final Map<AttributeKey, Object> attributes;
