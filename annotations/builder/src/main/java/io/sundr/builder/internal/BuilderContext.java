@@ -26,7 +26,6 @@ import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.TypeUtils;
-import javax.validation.Validator;
 import java.lang.reflect.Method;
 
 import javax.lang.model.util.Elements;
@@ -35,7 +34,6 @@ import javax.lang.model.util.Types;
 import java.util.ArrayList;
 
 import static io.sundr.builder.Constants.INLINEABLE;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 
 public class BuilderContext {
 
@@ -148,13 +146,19 @@ public class BuilderContext {
     }
 
     private static boolean hasValidatorArg(String c) {
+        Class validator;
         try {
-        Method m = Class.forName(c).getMethod("validate", Object.class, Validator.class);
-        return true;
+            validator = Class.forName("javax.validation.Validator");
         } catch (ClassNotFoundException e) {
-        return true; 
+            return false;
+        }
+        try {
+            Method m = Class.forName(c).getMethod("validate", Object.class, validator);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return true;
         } catch (NoSuchMethodException e) {
-        return false;
+            return false;
         }
     }
 
