@@ -23,8 +23,9 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.ParserPoolImpl;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.log.JdkLogChute;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
-import org.apache.velocity.runtime.log.NullLogChute;
+import org.apache.velocity.runtime.log.SystemLogChute;
 import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 import org.apache.velocity.runtime.resource.ResourceCacheImpl;
 import org.apache.velocity.util.introspection.Uberspect;
@@ -52,16 +53,23 @@ public class CodeGeneratorContext {
         this.velocityEngine.setProperty(RuntimeConstants.RESOURCE_MANAGER_CACHE_CLASS, ResourceCacheImpl.class.getName());
         this.velocityEngine.setProperty(RuntimeConstants.PARSER_POOL_CLASS, ParserPoolImpl.class.getName());
         this.velocityEngine.setProperty(RuntimeConstants.UBERSPECT_CLASSNAME, UberspectImpl.class.getName());
-        this.velocityEngine.setProperty("runtime.log.logsystem.class", NullLogChute.class.getName());
-        this.velocityEngine.init();
+        this.velocityEngine.setProperty("runtime.log.logsystem.class", SystemLogChute.class.getName());
 
-        //Load standard directives
-        this.velocityEngine.loadDirective(ClassDirective.class.getCanonicalName());
-        this.velocityEngine.loadDirective(MethodDirective.class.getCanonicalName());
-        this.velocityEngine.loadDirective(FieldDirective.class.getCanonicalName());
-        //Load utility directives
-        this.velocityEngine.loadDirective(PluralizeDirective.class.getCanonicalName());
-        this.velocityEngine.loadDirective(SingularizeDirective.class.getCanonicalName());
+        ClassLoader current = Thread.currentThread().getContextClassLoader();
+        try {
+            Thread.currentThread().setContextClassLoader(VelocityEngine.class.getClassLoader());
+            this.velocityEngine.init();
+
+            //Load standard directives
+            this.velocityEngine.loadDirective(ClassDirective.class.getCanonicalName());
+            this.velocityEngine.loadDirective(MethodDirective.class.getCanonicalName());
+            this.velocityEngine.loadDirective(FieldDirective.class.getCanonicalName());
+            //Load utility directives
+            this.velocityEngine.loadDirective(PluralizeDirective.class.getCanonicalName());
+            this.velocityEngine.loadDirective(SingularizeDirective.class.getCanonicalName());
+        } finally {
+            Thread.currentThread().setContextClassLoader(current);
+        }
     }
 
     public VelocityEngine getVelocityEngine() {
