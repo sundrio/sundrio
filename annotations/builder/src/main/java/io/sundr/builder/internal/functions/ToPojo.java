@@ -516,18 +516,23 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
      * @return              The code.
      */
     private static String readProperty(String ref, TypeDef source, Property property) {
-        if (property.getTypeRef().getDimensions() > 0) {
-            return readArrayProperty(ref, source, property);
-        }
+        TypeRef propertyTypeRef = property.getTypeRef();
         Method getter = getterOf(source, property);
         if (getter == null) {
             return "null";
         }
+
         TypeRef getterTypeRef = getter.getReturnType();
+        if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions() && propertyTypeRef.isAssignableFrom(getterTypeRef)) {
+            return readObjectProperty(ref, source, property);
+        }
+
+        if (property.getTypeRef().getDimensions() > 0) {
+            return readArrayProperty(ref, source, property);
+        }
         if (property.getTypeRef() instanceof ClassRef && ((ClassRef)getterTypeRef).getDefinition().isAnnotation()) {
             return readAnnotationProperty(ref + "."+getter.getName()+"()", ((ClassRef) getterTypeRef).getDefinition(), property);
         }
-
         return readObjectProperty(ref, source, property);
     }
 
@@ -550,16 +555,16 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
      * @return              The code.
      */
     private static String readArrayProperty(String ref, TypeDef source, Property property) {
-        StringBuilder sb = new StringBuilder();
         TypeRef typeRef = property.getTypeRef();
         if (typeRef instanceof ClassRef) {
+            //TODO: This needs further breakdown, to cover edge cases.
             return readObjectArrayProperty(ref, source, property);
         }
 
         if (typeRef instanceof PrimitiveRef) {
             return readPrimitiveArrayProperty(ref, source, property);
         }
-        return sb.toString();
+        throw new IllegalStateException("Property should be either an object or a primitive.");
     }
 
     /**
