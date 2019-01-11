@@ -74,10 +74,14 @@ public class ClassDirective extends Directive {
                     }
                 } else {
                     //reading block content and rendering it
-                    StringWriter blockContent = new StringWriter();
-                    node.jjtGetChild(i).render(context, blockContent);
+                    try {
+                        StringWriter blockContent = new StringWriter();
+                        node.jjtGetChild(i).render(context, blockContent);
 
-                    block = blockContent.toString();
+                        block = blockContent.toString();
+                    } catch (Exception e)  {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }
