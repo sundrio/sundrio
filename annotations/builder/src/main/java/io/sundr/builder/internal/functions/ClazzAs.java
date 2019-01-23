@@ -210,7 +210,7 @@ public class ClazzAs {
             Method instanceConstructor = new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                     .addNewArgument()
-                    .withTypeRef(item.toReference())
+                    .withTypeRef(item.toInternalReference())
                     .withName("instance").and()
                     .withNewBlock()
                     .withStatements(toInstanceConstructorBody(item, ""))
