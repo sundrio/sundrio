@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.sundr.codegen.utils.StringUtils.join;
 
@@ -140,15 +141,18 @@ public class Method extends ModifierSupport {
         if (parameters != null ? !parameters.equals(method.parameters) : method.parameters != null)
             return false;
         if (name != null ? !name.equals(method.name) : method.name != null) return false;
-        return arguments != null ? arguments.equals(method.arguments) : method.arguments == null;
 
+        List<TypeRef> argumentTypes = arguments != null ? arguments.stream().map(Property::getTypeRef).collect(Collectors.toList()) : null;
+        List<TypeRef> methodArgumentTypes = method.arguments != null ? method.arguments.stream().map(Property::getTypeRef).collect(Collectors.toList()) : null;
+
+        return argumentTypes != null ? argumentTypes.equals(methodArgumentTypes) : methodArgumentTypes == null;
     }
 
     @Override
     public int hashCode() {
         int result = parameters != null ? parameters.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
+        result = 31 * result + (arguments != null ? arguments.stream().map(Property::getTypeRef).collect(Collectors.toList()).hashCode() : 0);
         return result;
     }
 
