@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,7 +78,7 @@ public class ClazzAs {
 
     public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
-            Set<Method> methods = new LinkedHashSet<>();
+            List<Method> methods = new ArrayList<Method>();
             List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
             TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
             TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
@@ -87,7 +86,7 @@ public class ClazzAs {
             //The generic letter is always the last
             final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
 
-            for (Property property : new HashSet<>(TypeUtils.allProperties(item))) {
+            for (Property property : item.getProperties()) {
                 final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
                 if (property.isStatic()) {
                     continue;
@@ -186,7 +185,7 @@ public class ClazzAs {
             return new TypeDefBuilder(fluentType)
                     .withAnnotations()
                     .withInnerTypes(nestedClazzes)
-                    .withMethods(new ArrayList<>(methods))
+                    .withMethods(methods)
                     .build();
 
         }
@@ -195,7 +194,7 @@ public class ClazzAs {
     public static final Function<TypeDef, TypeDef> FLUENT_IMPL = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
         public TypeDef apply(TypeDef item) {
             List<Method> constructors = new ArrayList<Method>();
-            Set<Method> methods = new LinkedHashSet<>();
+            List<Method> methods = new ArrayList<Method>();
             List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
             final List<Property> properties = new ArrayList<Property>();
             TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
@@ -221,7 +220,7 @@ public class ClazzAs {
             constructors.add(emptyConstructor);
             constructors.add(instanceConstructor);
 
-            for (final Property property : new HashSet<>(TypeUtils.allProperties(item))) {
+            for (final Property property : item.getProperties()) {
                 final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
                 if (property.isStatic()) {
@@ -343,7 +342,7 @@ public class ClazzAs {
                     .withConstructors(constructors)
                     .withProperties(properties)
                     .withInnerTypes(nestedClazzes)
-                    .withMethods(new ArrayList<>(methods))
+                    .withMethods(methods)
                     .build());
         }
     });
