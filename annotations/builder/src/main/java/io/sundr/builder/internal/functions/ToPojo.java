@@ -22,7 +22,9 @@ import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
@@ -382,7 +384,31 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                         .endBlock()
                         .build();
 
+                Method staticMapAdapter = new MethodBuilder()
+                        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+                        .withName("adapt")
+                        .addNewArgument()
+                        .withName("map")
+                        .withTypeRef(Collections.MAP.toUnboundedReference())
+                        .endArgument()
+                        .withReturnType(generatedPojo.toInternalReference())
+                        .withNewBlock()
+                        .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo )+";"))
+                        .endBlock()
+                        .build();
 
+                Method staticMapAdaptingBuilder = new MethodBuilder()
+                        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+                        .withName("newBuilder")
+                        .addNewArgument()
+                        .withName("map")
+                        .withTypeRef(Collections.MAP.toUnboundedReference())
+                        .endArgument()
+                        .withReturnType(pojoBuilder.toInternalReference())
+                        .withNewBlock()
+                        .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo, pojoBuilder )+";"))
+                        .endBlock()
+                        .build();
 
                 if (enableStaticAdapter && hasArrayFields(item)) {
                         item.getMethods()
@@ -394,6 +420,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                         });
                         additionalMethods.add(staticAdapter);
                         additionalMethods.add(staticAdaptingBuilder);
+                        additionalMethods.add(staticMapAdapter);
+                        additionalMethods.add(staticMapAdaptingBuilder);
                 }
 
                 for (Object o : adapters) {
@@ -421,6 +449,13 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                         adapterImports.add(ARRAYS);
                                         adapterImports.add(COLLECTORS);
                                 }
+
+
+                                List<ClassRef> generatedRefs = new ArrayList<>();
+                                TypeUtils.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef).forEach(
+                                        i->populateReferences((ClassRef)i, generatedRefs)
+                                );
+                                adapterImports.addAll(generatedRefs);
                                 adapterImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
                                 adapterImports.addAll(TypeUtils.allProperties(generatedPojo).stream()
                                         .filter(p -> p.getTypeRef() instanceof ClassRef)
@@ -430,6 +465,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
                                 adapterMethods.add(staticAdapter);
                                 adapterMethods.add(staticAdaptingBuilder);
+                                adapterMethods.add(staticMapAdapter);
+                                adapterMethods.add(staticMapAdaptingBuilder);
 
                                 TypeDef mapper = new TypeDefBuilder()
                                         .withModifiers(modifiersToInt(Modifier.PUBLIC))
@@ -481,14 +518,6 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         return sb.toString();
     }
 
-    private static final Method getterOf(TypeDef source, Property property)  {
-        Method result =  source.getMethods().stream()
-                .filter(m -> m.isPublic() && m.getArguments().size() == 0 && Getter.propertyNameSafe(m).equals(property.getName()))
-                .findFirst()
-                .orElse(null);
-        return result;
-    }
-
     /**
      * Converts a reference from the source type, to the target.
      * @param ref               The ref.
@@ -506,7 +535,6 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         sb.append("new ").append(target.getFullyQualifiedName()).append("(").append(arguments).append(")");
         return sb.toString();
     }
-
 
     /**
      * Returns the string representation of the code that given a reference of the specified type, reads the specified property.
@@ -623,6 +651,175 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         return convertReference(ref, source, ((ClassRef)property.getTypeRef()).getDefinition());
     }
 
+
+
+    //
+    //
+    // Map references
+    //
+    //
+
+
+
+    /**
+     * Converts a map describing the source type, to the target type by using the builder.
+     * @param ref               The ref.
+     * @param source            The source type of the reference..
+     * @param target            The target type.
+     * @param targetBuilder     The target type builder.
+     * @return
+     */
+    private static String convertMap(String ref, TypeDef source, TypeDef target, TypeDef targetBuilder) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("new ").append(targetBuilder.getName()).append("(").append(convertMap(ref,source,target)).append(")");
+        return sb.toString();
+    }
+
+    /**
+     * Converts a map describing the source type, to the target.
+     * @param ref               The ref.
+     * @param source            The source type of the reference..
+     * @param target            The target type.
+     * @return
+     */
+    private static String convertMap(String ref, TypeDef source, TypeDef target) {
+        Method ctor = BuilderUtils.findBuildableConstructor(target);
+        String arguments = ctor.getArguments().stream()
+                .map(p -> readMapValue(ref, source, p))
+                .collect(joining(", "));
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("new ").append(target.getFullyQualifiedName()).append("(").append(arguments).append(")");
+        return sb.toString();
+    }
+
+    /**
+     * Returns the string representation of the code that given a reference of the specified type, reads the specified property.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readMapValue(String ref, TypeDef source, Property property) {
+        TypeRef propertyTypeRef = property.getTypeRef();
+        Method getter = getterOf(source, property);
+        if (getter == null) {
+            return "null";
+        }
+
+        TypeRef getterTypeRef = getter.getReturnType();
+        if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions() && propertyTypeRef.isAssignableFrom(getterTypeRef)) {
+            return readObjectValue(ref, source, property);
+        }
+
+        if (property.getTypeRef().getDimensions() > 0) {
+            return readArrayValue(ref, source, property);
+        }
+        if (property.getTypeRef() instanceof ClassRef && ((ClassRef)getterTypeRef).getDefinition().isAnnotation()) {
+            return readAnnotationValue("((Map)(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null))", ((ClassRef) getterTypeRef).getDefinition(), property);
+        }
+        return readObjectValue(ref, source, property);
+    }
+
+    /**
+     * Returns the string representation of the code that reads an object property from a reference using a getter.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readObjectValue(String ref, TypeDef source, Property property) {
+        return "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null)";
+    }
+
+
+        /**
+     * Returns the string representation of the code that reads an array property.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readArrayValue(String ref, TypeDef source, Property property) {
+        TypeRef typeRef = property.getTypeRef();
+        if (typeRef instanceof ClassRef) {
+            //TODO: This needs further breakdown, to cover edge cases.
+            return readObjectArrayValue(ref, source, property);
+        }
+
+        if (typeRef instanceof PrimitiveRef) {
+            return readPrimitiveArrayValue(ref, source, property);
+        }
+        throw new IllegalStateException("Property should be either an object or a primitive.");
+    }
+
+    /**
+     * Returns the string representation of the code that reads an object array property.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readObjectArrayValue(String ref, TypeDef source, Property property)  {
+        StringBuilder sb = new StringBuilder();
+        Method getter = getterOf(source, property);
+        TypeRef getterTypeRef = getter.getReturnType();
+        TypeRef propertyTypeRef = property.getTypeRef();
+        if (propertyTypeRef instanceof ClassRef && getterTypeRef instanceof ClassRef) {
+            String nextRef = variables.pop();
+            try {
+                TypeDef propertyType = ((ClassRef) propertyTypeRef).getDefinition();
+                TypeDef getterType = ((ClassRef) getterTypeRef).getDefinition();
+                sb.append("Arrays.asList(")
+                        .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null))")
+                        .append(".stream().map(").append(nextRef).append(" ->").append(convertMap(nextRef, getterType, propertyType)).append(")")
+                        .append(".collect(Collectors.toList()).toArray(new " + propertyType.getFullyQualifiedName() + "[0])");
+            } finally {
+                variables.push(nextRef);
+            }
+            return sb.toString();
+        }
+        throw new IllegalArgumentException("Expected an object property and a matching object getter!!");
+    }
+
+    /**
+     * Returns the string representation of the code that reads a primitive array property.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readPrimitiveArrayValue(String ref, TypeDef source, Property property)  {
+        StringBuilder sb = new StringBuilder();
+        Method getter = getterOf(source, property);
+        sb.append("Arrays.asList(")
+                .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null))")
+            .append(".stream()").append(".collect(Collectors.toList())).toArray(new "+getter.getReturnType().toString()+"[])");
+        return sb.toString();
+    }
+
+    /**
+     * Returns the string representation of the code that reads a primitive array property.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readAnnotationValue(String ref, TypeDef source, Property property) {
+        return convertMap(ref, source, ((ClassRef)property.getTypeRef()).getDefinition());
+    }
+
+
+
+
+    private void populateReferences(ClassRef ref, List<ClassRef> refs) {
+        if (!refs.contains(ref) && !Constants.OBJECT.equals(ref)) {
+            refs.add(ref);
+            TypeUtils.allProperties(ref.getDefinition()).stream().filter(p -> p.getTypeRef() instanceof ClassRef).forEach(p -> populateReferences((ClassRef) p.getTypeRef(), refs));
+        }
+    }
+
+
     private static boolean hasArrayFields(TypeDef item) {
         return item.getMethods()
                 .stream()
@@ -630,4 +827,11 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                 .findAny().isPresent();
     }
 
+    private static final Method getterOf(TypeDef source, Property property)  {
+        Method result =  source.getMethods().stream()
+                .filter(m -> m.isPublic() && m.getArguments().size() == 0 && Getter.propertyNameSafe(m).equals(property.getName()))
+                .findFirst()
+                .orElse(null);
+        return result;
+    }
 }
