@@ -111,6 +111,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                 AnnotationRef pojoRef = null;
                 boolean enableStaticBuilder = true;
                 boolean enableStaticAdapter = true;
+                boolean enableStaticMapAdapter = false;
                 boolean mutable = false;
 
                 final List adapters = new ArrayList();
@@ -183,6 +184,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                 }
                                 enableStaticBuilder = !"false".equals(String.valueOf(params.get("withStaticBuilderMethod")));
                                 enableStaticAdapter = !"false".equals(String.valueOf(params.get("withStaticAdapterMethod")));
+                                enableStaticMapAdapter = !"false".equals(String.valueOf(params.get("withStaticMapAdapterMethod")));
                         }
                 }
 
@@ -421,7 +423,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                         additionalMethods.add(staticAdapter);
                         additionalMethods.add(staticAdaptingBuilder);
                         additionalMethods.add(staticMapAdapter);
-                        additionalMethods.add(staticMapAdaptingBuilder);
+                        if (enableStaticMapAdapter) {
+                            additionalMethods.add(staticMapAdaptingBuilder);
+                        }
                 }
 
                 for (Object o : adapters) {
@@ -431,7 +435,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                 String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
                                 String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
                                 String mapperRelativePath = "";
-
+                                boolean enableMapAdapter = !"false".equals(String.valueOf(r.getParameters().getOrDefault("withMapAdapterMethod", "false")));
                                 List<Method> adapterMethods = new ArrayList<>();
 
                                 if (StringUtils.isNullOrEmpty(name) && StringUtils.isNullOrEmpty(prefix) && StringUtils.isNullOrEmpty(suffix)) {
@@ -466,7 +470,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                 adapterMethods.add(staticAdapter);
                                 adapterMethods.add(staticAdaptingBuilder);
                                 adapterMethods.add(staticMapAdapter);
-                                adapterMethods.add(staticMapAdaptingBuilder);
+                                if (enableMapAdapter) {
+                                    adapterMethods.add(staticMapAdaptingBuilder);
+                                }
 
                                 TypeDef mapper = new TypeDefBuilder()
                                         .withModifiers(modifiersToInt(Modifier.PUBLIC))

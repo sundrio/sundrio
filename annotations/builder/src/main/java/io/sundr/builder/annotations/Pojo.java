@@ -86,6 +86,13 @@ public @interface Pojo {
 
 
     /**
+     * Flag to incluce mapping methods from map instances.
+     * @return True, if static adapter should be included, false, otherwise.
+     */
+    boolean withStaticMapAdapterMethod() default false;
+
+
+    /**
      * Adapter configuration
      * @return  The adapter configuration.
      */

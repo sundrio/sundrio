@@ -49,4 +49,11 @@ public @interface Adapter {
      */
     String relativePath() default "";
 
+
+    /**
+     * Flag to incluce mapping methods from map instances.
+     * @return True, if adapter method should be included, false, otherwise.
+     */
+    boolean withMapAdapterMethod() default false;
+
 }
