@@ -56,6 +56,10 @@ public class Constants {
 
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
     public static final TypeDef OBJECT = TypeDef.OBJECT;
+
+    public static final TypeDef STRING = TYPEDEF.apply(String.class);
+    public static final TypeRef STRING_REF = STRING.toReference();
+
     public static final TypeDef ARRAY = TYPEDEF.apply(Array.class);
     public static final TypeDef TYPE = TYPEDEF.apply(Type.class);
     public static final TypeDef TYPE_VARIABLE = TYPEDEF.apply(TypeVariable.class);

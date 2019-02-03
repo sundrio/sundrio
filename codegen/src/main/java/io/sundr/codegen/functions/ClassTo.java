@@ -21,6 +21,8 @@ import io.sundr.Function;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
+import io.sundr.codegen.model.AttributeKey;
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -46,6 +48,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -305,6 +308,10 @@ public class ClassTo {
                     parameters.add(typeParamDef);
                 }
             }
+             Map<AttributeKey, Object> attributes = new HashMap<>();
+             if (method.getDefaultValue() != null) {
+                attributes.put(Attributeable.DEFAULT_VALUE, method.getDefaultValue());
+             }
 
             methods.add(new MethodBuilder()
                     .withName(method.getName())
@@ -313,6 +320,7 @@ public class ClassTo {
                     .withArguments(arguments)
                     .withParameters(parameters)
                     .withAnnotations(annotationRefs)
+                    .withAttributes(attributes)
                     .build());
         }
         return methods;

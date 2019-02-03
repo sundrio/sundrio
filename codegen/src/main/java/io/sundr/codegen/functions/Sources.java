@@ -22,6 +22,8 @@ import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.NamedNode;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.TypeParameter;
+import com.github.javaparser.ast.body.AnnotationDeclaration;
+import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
@@ -45,6 +47,7 @@ import io.sundr.builder.Function;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
+import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.BlockBuilder;
@@ -77,8 +80,10 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Sources {
@@ -323,6 +328,11 @@ public class Sources {
                 List<Property> properties = new ArrayList<Property>();
                 List<Method> methods = new ArrayList<Method>();
                 List<Method> constructors = new ArrayList<Method>();
+                List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+
+                for (AnnotationExpr annotationExpr : decl.getAnnotations()) {
+                    annotations.add(ANNOTATIONREF.apply(annotationExpr));
+                }
 
                 for (TypeParameter typeParameter: decl.getTypeParameters()) {
                     parameters.add(TYPEPARAMDEF.apply(typeParameter));
@@ -352,7 +362,10 @@ public class Sources {
                         MethodDeclaration methodDeclaration = (MethodDeclaration) bodyDeclaration;
                         List<Property> arguments = new ArrayList<Property>();
                         List<ClassRef> exceptions = new ArrayList<ClassRef>();
-
+                        List<AnnotationRef> methodAnnotations = new ArrayList<AnnotationRef>();
+                        for (AnnotationExpr annotationExpr : methodDeclaration.getAnnotations()) {
+                            methodAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
+                        }
                         for (ReferenceType referenceType : methodDeclaration.getThrows()) {
                             TypeRef exceptionRef = TYPEREF.apply(referenceType.getType());
                             if (exceptionRef instanceof ClassRef) {
@@ -362,9 +375,9 @@ public class Sources {
                         Boolean preferVarArg = false;
 
                         for (Parameter parameter : methodDeclaration.getParameters()) {
-                            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+                            List<AnnotationRef> paramAnnotations = new ArrayList<AnnotationRef>();
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
-                                annotations.add(ANNOTATIONREF.apply(annotationExpr));
+                                paramAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }
 
 
@@ -379,7 +392,7 @@ public class Sources {
                                     .withName(parameter.getId().getName())
                                     .withTypeRef(typeRef)
                                     .withModifiers(parameter.getModifiers())
-                                    .withAnnotations(annotations)
+                                    .withAnnotations(paramAnnotations)
                                     .build());
                         }
 
@@ -399,6 +412,7 @@ public class Sources {
                                 .withReturnType(returnType)
                                 .withExceptions(exceptions)
                                 .withArguments(arguments)
+                                .withAnnotations(methodAnnotations)
                                 .withBlock(BLOCK.apply(methodDeclaration.getBody()))
                                 .build());
 
@@ -406,7 +420,11 @@ public class Sources {
                         ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
                         List<Property> arguments = new ArrayList<Property>();
                         List<ClassRef> exceptions = new ArrayList<ClassRef>();
+                        List<AnnotationRef> ctorAnnotations = new ArrayList<AnnotationRef>();
 
+                        for (AnnotationExpr annotationExpr : constructorDeclaration.getAnnotations()) {
+                            ctorAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
+                        }
                         for (NameExpr nameExpr : constructorDeclaration.getThrows()) {
                             String name = nameExpr.getName();
                             String packageName = PACKAGENAME.apply(nameExpr);
@@ -416,22 +434,23 @@ public class Sources {
                             .endDefinition().build());
                         }
                         for (Parameter parameter : constructorDeclaration.getParameters()) {
-                            List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+                            List<AnnotationRef> ctorParamAnnotations = new ArrayList<AnnotationRef>();
                             for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
-                                annotations.add(ANNOTATIONREF.apply(annotationExpr));
+                                ctorParamAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
                             }
                             TypeRef typeRef = checkAgainstTypeParamRef(TYPEREF.apply(parameter.getType()), parameters);
                             arguments.add(new PropertyBuilder()
                                     .withName(parameter.getId().getName())
                                     .withTypeRef(typeRef)
                                     .withModifiers(parameter.getModifiers())
-                                    .withAnnotations(annotations)
+                                    .withAnnotations(ctorParamAnnotations)
                                     .build());
                         }
                         constructors.add(new MethodBuilder()
                                 .withModifiers(constructorDeclaration.getModifiers())
                                 .withExceptions(exceptions)
                                 .withArguments(arguments)
+                                .withAnnotations(ctorAnnotations)
                                 .withBlock(BLOCK.apply(constructorDeclaration.getBlock()))
                                 .build());
                     }
@@ -448,6 +467,45 @@ public class Sources {
                         .withProperties(properties)
                         .withMethods(methods)
                         .withConstructors(constructors)
+                        .withAnnotations(annotations)
+                        .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
+                        .build());
+            }
+
+            if (type instanceof AnnotationDeclaration) {
+                AnnotationDeclaration decl = (AnnotationDeclaration) type;
+                Kind kind = Kind.ANNOTATION;
+                List<Method> methods = new ArrayList<Method>();
+
+                for (BodyDeclaration bodyDeclaration : decl.getMembers()) {
+                    if (bodyDeclaration instanceof AnnotationMemberDeclaration) {
+                        Map<AttributeKey, Object> attributes = new HashMap<>();
+                        AnnotationMemberDeclaration annotationMemberDeclaration = (AnnotationMemberDeclaration) bodyDeclaration;
+                        if (annotationMemberDeclaration.getDefaultValue() != null) {
+                            attributes.put(Attributeable.DEFAULT_VALUE, annotationMemberDeclaration.getDefaultValue().toString());
+                        }
+                        TypeRef returnType = TYPEREF.apply(annotationMemberDeclaration.getType());
+                        methods.add(new MethodBuilder()
+                                .withName(annotationMemberDeclaration.getName())
+                                .withModifiers(annotationMemberDeclaration.getModifiers())
+                                .withReturnType(returnType)
+                                .withAttributes(attributes)
+                                .build());
+                    }
+                }
+
+                List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+                for (AnnotationExpr annotationExpr : decl.getAnnotations()) {
+                    annotations.add(ANNOTATIONREF.apply(annotationExpr));
+                }
+
+                return DefinitionRepository.getRepository().register( new TypeDefBuilder()
+                        .withKind(kind)
+                        .withPackageName(PACKAGENAME.apply(type))
+                        .withName(decl.getName())
+                        .withModifiers(type.getModifiers())
+                        .withMethods(methods)
+                        .withAnnotations(annotations)
                         .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
                         .build());
             }

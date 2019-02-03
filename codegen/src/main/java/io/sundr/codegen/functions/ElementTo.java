@@ -23,6 +23,8 @@ import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.converters.TypeRefTypeVisitor;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
+import io.sundr.codegen.model.AttributeKey;
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -172,10 +174,16 @@ public class ElementTo {
 
 
          public Method apply(ExecutableElement executableElement) {
+             Map<AttributeKey, Object> attributes = new HashMap<>();
+             if (executableElement.getDefaultValue() != null) {
+                attributes.put(Attributeable.DEFAULT_VALUE, executableElement.getDefaultValue().getValue());
+             }
              MethodBuilder methodBuilder = new MethodBuilder()
                      .withModifiers(TypeUtils.modifiersToInt(executableElement.getModifiers()))
                      .withName(executableElement.getSimpleName().toString())
-                     .withReturnType(MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()));
+                     .withReturnType(MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()))
+                     .withAttributes(attributes);
+
 
 
              //Populate constructor parameters

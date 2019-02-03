@@ -16,6 +16,7 @@
 
 package io.sundr.codegen.directives;
 
+import io.sundr.codegen.Constants;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Property;
 import org.apache.velocity.context.InternalContextAdapter;
@@ -55,9 +56,20 @@ public class FieldDirective extends Directive {
             writer.append(field.toString());
 
             if (field.getAttribute(INIT) != null) {
-                writer.append(" = ").append(field.getAttribute(INIT));
+                writer.append(" = ").append(getDefaultValue(field));
             }
         }
         writer.append(";");
     }
+
+    private String getDefaultValue(Property field) {
+        Object value = field.getAttribute(INIT);
+
+        if (Constants.STRING_REF.equals(field.getTypeRef()) && !String.valueOf(value).startsWith("\"") ) {
+            return "\"" + value + "\"";
+        } else {
+            return String.valueOf(value);
+        }
+    }
+
 }

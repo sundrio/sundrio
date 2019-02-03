@@ -28,6 +28,7 @@ import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
+import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
@@ -44,11 +45,14 @@ import io.sundr.codegen.utils.Getter;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +70,8 @@ import static io.sundr.builder.internal.functions.ClazzAs.POJO;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.codegen.model.Attributeable.DEFAULT_VALUE;
+import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 import static java.util.stream.Collectors.*;
 
@@ -117,75 +123,76 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                 final List adapters = new ArrayList();
 
                 for (AnnotationRef r : item.getAnnotations()) {
+                    if (r.getClassRef() != null) {
                         if (r.getClassRef().getFullyQualifiedName().equals(Buildable.class.getTypeName())) {
-                                if (!annotationRefs.contains(r)) {
-                                        annotationRefs.add(r);
-                                }
+                            if (!annotationRefs.contains(r)) {
+                                annotationRefs.add(r);
+                            }
                         }
                         if (r.getClassRef().getFullyQualifiedName().equals(Pojo.class.getTypeName())) {
-                                pojoRef = r;
-                                Map<String, Object> params = r.getParameters();
+                            pojoRef = r;
+                            Map<String, Object> params = r.getParameters();
 
-                                if (params.containsKey("mutable")) {
-                                        mutable = Boolean.parseBoolean(String.valueOf(r.getParameters().getOrDefault("mutable", false)));
+                            if (params.containsKey("mutable")) {
+                                mutable = Boolean.parseBoolean(String.valueOf(r.getParameters().getOrDefault("mutable", false)));
+                            }
+                            if (params.containsKey("name")) {
+                                pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
+                            } else if (params.containsKey("prefix") || params.containsKey("suffix")) {
+                                String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
+                                String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
+                                pojoName = StringUtils.toPojoName(item.getName(), prefix, suffix);
+                            } else if (params.containsKey("relativePath")) {
+                                //When the package is different and there is no name clash, just use the same name unless explicitly specified.
+                                pojoName = item.getName();
+                            }
+
+                            if (params.containsKey("adapter")) {
+                                adapters.addAll((List) params.getOrDefault("adapter", new ArrayList<>()));
+                            }
+
+                            String superClassName = TypeUtils.toClassName(r.getParameters().getOrDefault("superClass", ""));
+                            if (!superClassName.isEmpty()) {
+                                superClassName = superClassName.replaceAll("\\.class$", "");
+                                superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
+
+
+                                if (superClass == null) {
+                                    superClass = new TypeDefBuilder(ElementTo.TYPEDEF.apply(BuilderContextManager.getContext().getElements().getTypeElement(superClassName)))
+                                            .build();
+
+                                    BuilderContextManager.getContext().getDefinitionRepository().register(superClass);
+                                    BuilderContextManager.getContext().getBuildableRepository().register(superClass);
                                 }
-                                if (params.containsKey("name")) {
-                                        pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
+                                if (superClass != null) {
+                                    ClassRef superClassRef = superClass.toInternalReference();
+                                    extendsList.add(superClassRef);
+                                    BuilderContextManager.getContext().getBuildableRepository().register(superClassRef.getDefinition());
+                                    BuilderUtils.findBuildableReferences(superClassRef)
+                                            .stream()
+                                            .forEach(b -> BuilderContextManager.getContext().getBuildableRepository().register(b.getDefinition()));
+
                                 }
-                                else if (params.containsKey("prefix")  || params.containsKey("suffix")) {
-                                        String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
-                                        String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
-                                        pojoName = StringUtils.toPojoName(item.getName(), prefix, suffix);
-                                } else if (params.containsKey("relativePath")) {
-                                        //When the package is different and there is no name clash, just use the same name unless explicitly specified.
-                                        pojoName = item.getName();
-                                }
+                            }
+                            if (item.isInterface()) {
+                                implementsList.add(item.toInternalReference());
+                            }
+                            Arrays.asList(r.getParameters().getOrDefault("interfaces", new Object[]{})).stream()
+                                    .map(String::valueOf)
+                                    .map(s -> s.replaceAll("\\.class$", ""))
+                                    .map(n -> DefinitionRepository.getRepository().getDefinition(n))
+                                    .filter(d -> d != null)
+                                    .map(d -> d.toInternalReference())
+                                    .forEach(ref -> implementsList.add(ref));
 
-                                if (params.containsKey("adapter"))  {
-                                        adapters.addAll((List) params.getOrDefault("adapter", new ArrayList<>()));
-                                }
-
-                                String superClassName = TypeUtils.toClassName(r.getParameters().getOrDefault("superClass",""));
-                                if (!superClassName.isEmpty()) {
-                                        superClassName = superClassName.replaceAll("\\.class$", "");
-                                        superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
-
-
-                                        if  (superClass == null) {
-                                                superClass = new TypeDefBuilder(ElementTo.TYPEDEF.apply(BuilderContextManager.getContext().getElements().getTypeElement(superClassName)))
-                                                        .build();
-
-                                                BuilderContextManager.getContext().getDefinitionRepository().register(superClass);
-                                                BuilderContextManager.getContext().getBuildableRepository().register(superClass);
-                                        }
-                                        if (superClass != null) {
-                                                ClassRef superClassRef = superClass.toInternalReference();
-                                                extendsList.add(superClassRef);
-                                                BuilderContextManager.getContext().getBuildableRepository().register(superClassRef.getDefinition());
-                                                BuilderUtils.findBuildableReferences(superClassRef)
-                                                        .stream()
-                                                        .forEach(b -> BuilderContextManager.getContext().getBuildableRepository().register(b.getDefinition()));
-
-                                        }
-                                }
-                                if (item.isInterface()) {
-                                        implementsList.add(item.toInternalReference());
-                                }
-                                Arrays.asList(r.getParameters().getOrDefault("interfaces", new Object[]{})).stream()
-                                        .map(String::valueOf)
-                                        .map(s -> s.replaceAll("\\.class$", ""))
-                                        .map(n -> DefinitionRepository.getRepository().getDefinition(n))
-                                        .filter(d -> d != null)
-                                        .map(d -> d.toInternalReference())
-                                        .forEach(ref -> implementsList.add(ref));
-
-                                if (params.containsKey("relativePath")) {
-                                        relativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
-                                }
-                                enableStaticBuilder = !"false".equals(String.valueOf(params.get("withStaticBuilderMethod")));
-                                enableStaticAdapter = !"false".equals(String.valueOf(params.get("withStaticAdapterMethod")));
-                                enableStaticMapAdapter = !"false".equals(String.valueOf(params.get("withStaticMapAdapterMethod")));
+                            if (params.containsKey("relativePath")) {
+                                relativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
+                            }
+                            enableStaticBuilder = !"false".equals(String.valueOf(params.get("withStaticBuilderMethod")));
+                            enableStaticAdapter = !"false".equals(String.valueOf(params.get("withStaticAdapterMethod")));
+                            enableStaticMapAdapter = !"false".equals(String.valueOf(params.get("withStaticMapAdapterMethod")));
                         }
+                    }
                 }
 
 
@@ -203,7 +210,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                                 ClassRef ref = (ClassRef) method.getReturnType();
                                                 if (ref.getDefinition().isAnnotation()) {
 
-                                                        AnnotationRef inheritedPojoRef = new AnnotationRefBuilder(pojoRef)
+                                                        AnnotationRef inheritedPojoRef = (pojoRef != null ? new AnnotationRefBuilder(pojoRef) : new AnnotationRefBuilder())
                                                                 .removeFromParameters("name")
                                                                 .removeFromParameters("superClass")
                                                                 .removeFromParameters("interfaces")
@@ -224,16 +231,27 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                                                 .build();
                                                 }
                                         }
+                                        Map<AttributeKey, Object> fieldAttributes = new HashMap<>();
+                                        if (method.hasAttribute(DEFAULT_VALUE)) {
+                                            fieldAttributes.put(DEFAULT_VALUE, method.getAttribute(DEFAULT_VALUE));
+                                            if (mutable) {
+                                                fieldAttributes.put(INIT, getDefaultValue(new PropertyBuilder().withTypeRef(returnType).withAttributes(fieldAttributes).build()));
+                                            }
+                                        }
                                         arguments.add(new PropertyBuilder()
                                                 .withName(name)
                                                 .withTypeRef(returnType)
                                                 .withModifiers(TypeUtils.modifiersToInt())
+                                                .withAttributes(fieldAttributes)
                                                 .build());
+
+
 
                                         Property field = new PropertyBuilder()
                                                 .withName(StringUtils.toFieldName(name))
                                                 .withTypeRef(returnType)
                                                 .withModifiers(mutable ? TypeUtils.modifiersToInt(Modifier.PRIVATE) : TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+                                                .withAttributes(fieldAttributes)
                                                 .build();
 
 
@@ -287,11 +305,11 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                         sb.append(");");
                         statements.add(new StringStatement(sb.toString()));
                         for (Property p : fields) {
-                                statements.add(new StringStatement("this." + p.getName() + " = " + p.getName() + ";"));
+                                statements.add(new StringStatement(fieldIntializer(p)));
                         }
                 } else {
                         for (Property p : fields) {
-                                statements.add(new StringStatement("this." + p.getName() + " = " + p.getName() + ";"));
+                                statements.add(new StringStatement(fieldIntializer(p)));
                         }
                 }
 
@@ -722,7 +740,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             return readArrayValue(ref, source, property);
         }
         if (property.getTypeRef() instanceof ClassRef && ((ClassRef)getterTypeRef).getDefinition().isAnnotation()) {
-            return readAnnotationValue("((Map)(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null))", ((ClassRef) getterTypeRef).getDefinition(), property);
+            return readAnnotationValue("((Map)(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : "+getDefaultValue(property)+"))", ((ClassRef) getterTypeRef).getDefinition(), property);
         }
         return readObjectValue(ref, source, property);
     }
@@ -735,7 +753,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
      * @return              The code.
      */
     private static String readObjectValue(String ref, TypeDef source, Property property) {
-        return "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null)";
+        return "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\", " + getDefaultValue(property)+") : "+ getDefaultValue(property)+")";
     }
 
 
@@ -777,7 +795,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                 TypeDef propertyType = ((ClassRef) propertyTypeRef).getDefinition();
                 TypeDef getterType = ((ClassRef) getterTypeRef).getDefinition();
                 sb.append("Arrays.asList(")
-                        .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null))")
+                        .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , " +getDefaultValue(property)+") : "+ getDefaultValue(property)+"))")
                         .append(".stream().map(").append(nextRef).append(" ->").append(convertMap(nextRef, getterType, propertyType)).append(")")
                         .append(".collect(Collectors.toList()).toArray(new " + propertyType.getFullyQualifiedName() + "[0])");
             } finally {
@@ -799,10 +817,11 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         StringBuilder sb = new StringBuilder();
         Method getter = getterOf(source, property);
         sb.append("Arrays.asList(")
-                .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : null))")
+                .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , " + getDefaultValue(property)+") : "+ getDefaultValue(property)+")")
             .append(".stream()").append(".collect(Collectors.toList())).toArray(new "+getter.getReturnType().toString()+"[])");
         return sb.toString();
     }
+
 
     /**
      * Returns the string representation of the code that reads a primitive array property.
@@ -814,9 +833,6 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     private static String readAnnotationValue(String ref, TypeDef source, Property property) {
         return convertMap(ref, source, ((ClassRef)property.getTypeRef()).getDefinition());
     }
-
-
-
 
     private void populateReferences(ClassRef ref, List<ClassRef> refs) {
         if (!refs.contains(ref) && !Constants.OBJECT.equals(ref)) {
@@ -839,5 +855,61 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                 .findFirst()
                 .orElse(null);
         return result;
+    }
+
+
+    private static String fieldIntializer(Property p) {
+        if (p.hasAttribute(DEFAULT_VALUE) && (p.getTypeRef() instanceof ClassRef || p.getTypeRef().getDimensions() > 0)) {
+            return "this." + p.getName() + " = " +  p.getName() + " != null ? " + p.getName() + " : " + getDefaultValue(p) + ";";
+        } else {
+            return "this." + p.getName() + " = " + p.getName() + ";";
+        }
+    }
+
+    private static String getDefaultValue(Property p) {
+        Object value = p.getAttribute(DEFAULT_VALUE);
+        String stringVal = value != null ? String.valueOf(value) : null;
+
+        if (p.getTypeRef().getDimensions() > 0) {
+            StringBuilder sb = new StringBuilder();
+            if  (p.getTypeRef() instanceof PrimitiveRef)  {
+                sb.append(((PrimitiveRef) p.getTypeRef()).getName());
+            } else if (p.getTypeRef() instanceof ClassRef) {
+                sb.append("new ").append(((ClassRef) p.getTypeRef()).getFullyQualifiedName());
+            }
+            for (int d = 0; d < p.getTypeRef().getDimensions(); d++)  {
+                if (value == null || String.valueOf(value).isEmpty()) {
+                    sb.append("[0]");
+                } else {
+                    sb.append("[]");
+                }
+            }
+            return sb.toString();
+        }
+        if (Constants.STRING_REF.equals(p.getTypeRef()) && !String.valueOf(value).startsWith("\"")) {
+            return "\"" + value + "\"";
+        } else if (value instanceof Element)  {
+            Element element = (Element) value;
+            if (element.getKind() == ElementKind.ENUM_CONSTANT) {
+              return  element.getEnclosingElement() + "." +element.getSimpleName();
+            }
+        } else if (stringVal != null && stringVal.startsWith("@"))  {
+           String annotationFQCN = stringVal.substring(1);
+           TypeDef annotationDef = DefinitionRepository.getRepository().getDefinition(annotationFQCN);
+           if  (annotationDef != null) {
+               TypeDef pojoDef = ClazzAs.POJO.apply(annotationDef);
+               if (BuilderUtils.hasDefaultConstructor(pojoDef)) {
+                  return "new " + pojoDef.getFullyQualifiedName() + "()";
+               }
+           }
+            return "null";
+        } else if (stringVal == null && p.getTypeRef() instanceof PrimitiveRef) {
+            if (((PrimitiveRef) p.getTypeRef()).getName().equals("boolean")) {
+                return "false";
+            } else {
+                return "0";
+            }
+        }
+        return stringVal;
     }
 }
