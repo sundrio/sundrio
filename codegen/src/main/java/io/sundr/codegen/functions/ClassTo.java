@@ -48,12 +48,13 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ClassTo {
 
@@ -78,7 +79,7 @@ public class ClassTo {
             if (item == null) {
                 return new VoidRefBuilder().build();
             } else if (item instanceof WildcardType) {
-                return new WildcardRefBuilder().build();
+                return new WildcardRefBuilder().withBounds(Arrays.asList(((WildcardType) item).getLowerBounds()).stream().map(t->TYPEREF.apply(t)).collect(Collectors.toList())).build();
             } else if (item instanceof TypeVariable) {
                 return new TypeParamRefBuilder().withName(((TypeVariable) item).getName()).build();
             } else if (item instanceof GenericArrayType) {
@@ -240,7 +241,7 @@ public class ClassTo {
                     .withName(field.getName())
                     .withModifiers(field.getModifiers())
                     .withAnnotations(annotationRefs)
-                    .withTypeRef(TYPEREF.apply(field.getDeclaringClass()))
+                    .withTypeRef(TYPEREF.apply(field.getGenericType()))
                     .build());
         }
         return properties;
