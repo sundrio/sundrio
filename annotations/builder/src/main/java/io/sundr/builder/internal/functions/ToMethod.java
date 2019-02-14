@@ -86,7 +86,6 @@ import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.isArray;
-import static io.sundr.codegen.utils.TypeUtils.isBoolean;
 import static io.sundr.codegen.utils.TypeUtils.isList;
 import static io.sundr.codegen.utils.TypeUtils.isMap;
 import static io.sundr.codegen.utils.TypeUtils.isOptional;
@@ -283,6 +282,31 @@ public class ToMethod {
         }
     });
 
+    public static final Function<Property, Method> HAS_MATCHING = FunctionFactory.cache(new Function<Property, Method>() {
+        @Override
+        public Method apply(Property property) {
+            String prefix = "hasMatching";
+            String methodName = prefix + property.getNameCapitalized();
+            TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
+            TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
+            TypeRef builder =  BuilderUtils.buildableRef(unwrapped);
+
+            return new MethodBuilder()
+                        .withComments()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName(methodName)
+                        .addNewArgument()
+                        .withName("predicate")
+                        .withTypeRef(predicate.toReference(builder))
+                        .endArgument()
+                        .withReturnType(BOOLEAN_REF)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("for (" + builder + " item: " + property.getName() + ") { if(predicate.apply(item)){return true;} } return false;"))
+                        .endBlock()
+                        .build();
+        }
+    });
+
     public static final Function<Property, List<Method>> GETTER = FunctionFactory.cache(new Function<Property, List<Method>>() {
         public List<Method> apply(final Property property) {
             List<Method> methods = new ArrayList<Method>();
@@ -393,6 +417,10 @@ public class ToMethod {
                             .withStatements(new StringStatement("return this." + property.getName() + ".get(" + property.getName() + ".size() - 1).build();"))
                             .endBlock()
                             .build());
+                }
+
+                if (isList || isSet) {
+
 
                     methods.add(new MethodBuilder()
                             .withComments()
@@ -406,6 +434,21 @@ public class ToMethod {
                             .withReturnType(unwrapped)
                             .withNewBlock()
                             .withStatements(new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.apply(item)){return item.build();} } return null;"))
+                            .endBlock()
+                            .build());
+
+                    methods.add(new MethodBuilder()
+                            .withComments()
+                            .withAnnotations()
+                            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                            .withName("hasMatching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                            .addNewArgument()
+                            .withName("predicate")
+                            .withTypeRef(predicate.toReference(builderRef))
+                            .endArgument()
+                            .withReturnType(BOOLEAN_REF)
+                            .withNewBlock()
+                            .withStatements(new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.apply(item)){return true;} } return false;"))
                             .endBlock()
                             .build());
                 }
@@ -459,8 +502,22 @@ public class ToMethod {
                         .withStatements(new StringStatement("for (" + unwrapped + " item: " + property.getName() + ") { if(predicate.apply(item)){return item;} } return null;"))
                         .endBlock()
                         .build());
-            }
 
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations(annotations)
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName("hasMatching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .addNewArgument()
+                        .withName("predicate")
+                        .withTypeRef(predicate.toReference(unwrapped))
+                        .endArgument()
+                        .withReturnType(BOOLEAN_REF)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("for (" + unwrapped + " item: " + property.getName() + ") { if(predicate.apply(item)){return true;} } return false;"))
+                        .endBlock()
+                        .build());
+            }
             return methods;
         }
     });
@@ -561,6 +618,21 @@ public class ToMethod {
                         .withReturnType(unwrapped)
                         .withNewBlock()
                         .withStatements(new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.apply(item)){return item.build();} } return null;"))
+                        .endBlock()
+                        .build());
+
+                methods.add(new MethodBuilder()
+                        .withComments()
+                        .withAnnotations()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withName("hasMatching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                        .addNewArgument()
+                        .withName("predicate")
+                        .withTypeRef(predicate.toReference(builderRef))
+                        .endArgument()
+                        .withReturnType(BOOLEAN_REF)
+                        .withNewBlock()
+                        .withStatements(new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.apply(item)){return true;} } return false;"))
                         .endBlock()
                         .build());
             }

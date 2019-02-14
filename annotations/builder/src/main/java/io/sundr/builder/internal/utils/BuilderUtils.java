@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
@@ -103,6 +104,10 @@ public class BuilderUtils {
                 .filter(m -> "build".equals(m.getName()))
                 .filter(m -> m.getReturnType().isAssignableFrom(ref))
                 .count() > 0;
+    }
+
+    public static boolean isOrHasBuildableDescendants(Property property) {
+        return isBuildable(property.getTypeRef()) || (property.hasAttribute(DESCENDANTS) && !property.getAttribute(DESCENDANTS).isEmpty());
     }
 
     /**
