@@ -886,7 +886,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             }
             return sb.toString();
         }
-        if (Constants.STRING_REF.equals(p.getTypeRef()) && !String.valueOf(value).startsWith("\"")) {
+        if (Constants.STRING_REF.equals(p.getTypeRef()) && value != null && !String.valueOf(value).startsWith("\"")) {
             return "\"" + value + "\"";
         } else if (value instanceof Element)  {
             Element element = (Element) value;
