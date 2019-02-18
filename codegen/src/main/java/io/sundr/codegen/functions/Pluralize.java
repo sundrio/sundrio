@@ -72,6 +72,8 @@ public enum Pluralize implements Function<String, String> {
             return word;
         } else if (UNCOUNTABLE.contains(word)) {
             return word;
+        } else if (isAlreadyPlural(word)) {
+            return word;
         }
 
         for (Function<String, String> function : PLURALS) {
@@ -81,6 +83,22 @@ public enum Pluralize implements Function<String, String> {
             }
         }
         return word + "s";
+    }
+
+    /**
+     * Rudimentary implementation of checking whether word is plural or not.
+     * It can be further improved to handle complex cases.
+     *
+     * @param word
+     * @return Boolean value indicating whether it's already plural or not
+     */
+    private boolean isAlreadyPlural(String word) {
+        if(!word.endsWith("ss")) {
+            if(word.endsWith("s")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
