@@ -9,6 +9,9 @@ workflows:
       - java-8:
           requires:
             - update_dependencies
+      - java-11:
+          requires:
+            - checkout_code
 
 version: 2
 
@@ -93,3 +96,10 @@ jobs:
 
   java-8:
     <<: *mvn_job_defaults
+
+  java-11:
+    <<: *mvn_job_defaults
+
+    docker:
+      - image: openjdk:11-jdk
+
