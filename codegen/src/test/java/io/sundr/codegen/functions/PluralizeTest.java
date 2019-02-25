@@ -27,6 +27,8 @@ public class PluralizeTest {
         assertEquals("addresses", Pluralize.FUNCTION.apply("address"));
         assertEquals("numbers", Pluralize.FUNCTION.apply("number"));
         assertEquals("vertices", Pluralize.FUNCTION.apply("vertex"));
+        assertEquals("endpoints", Pluralize.FUNCTION.apply("endpoints"));
+        assertEquals("ingresses", Pluralize.FUNCTION.apply("ingress"));
     }
 
 }
