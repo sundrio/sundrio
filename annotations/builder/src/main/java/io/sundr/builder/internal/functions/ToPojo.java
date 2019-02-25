@@ -60,6 +60,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static io.sundr.builder.Constants.ADDITIONAL_BUILDABLES;
 import static io.sundr.builder.Constants.ADDITIONAL_TYPES;
@@ -553,7 +554,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         Method ctor = BuilderUtils.findBuildableConstructor(target);
         String arguments = ctor.getArguments().stream()
                 .map(p -> readProperty(ref, source, p))
-                .collect(joining(", "));
+                .collect(joining(",\n            "));
 
         StringBuilder sb = new StringBuilder();
         sb.append("new ").append(target.getFullyQualifiedName()).append("(").append(arguments).append(")");
@@ -710,7 +711,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         Method ctor = BuilderUtils.findBuildableConstructor(target);
         String arguments = ctor.getArguments().stream()
                 .map(p -> readMapValue(ref, source, p))
-                .collect(joining(", "));
+                .collect(joining(",\n","\n", ""));
 
         StringBuilder sb = new StringBuilder();
         sb.append("new ").append(target.getFullyQualifiedName()).append("(").append(arguments).append(")");
@@ -753,7 +754,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
      * @return              The code.
      */
     private static String readObjectValue(String ref, TypeDef source, Property property) {
-        return "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\", " + getDefaultValue(property)+") : "+ getDefaultValue(property)+")";
+        return indent(ref) + "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\", " + getDefaultValue(property)+") : "+ getDefaultValue(property)+")";
     }
 
 
@@ -794,10 +795,12 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             try {
                 TypeDef propertyType = ((ClassRef) propertyTypeRef).getDefinition();
                 TypeDef getterType = ((ClassRef) getterTypeRef).getDefinition();
-                sb.append("Arrays.asList(")
-                        .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , " +getDefaultValue(property)+") : "+ getDefaultValue(property)+"))")
-                        .append(".stream().map(").append(nextRef).append(" ->").append(convertMap(nextRef, getterType, propertyType)).append(")")
-                        .append(".collect(Collectors.toList()).toArray(new " + propertyType.getFullyQualifiedName() + "[0])");
+                sb.append(indent(ref))
+                        .append("Arrays.stream(")
+                        .append("(Map[])(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , new Map[0]) : new Map[0]))")
+                        //.append("("+getterType.getFullyQualifiedName()+"[])(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , new " +getterType.getFullyQualifiedName()+"[0]) : new "+ getterType.getFullyQualifiedName()+"[0]))")
+                        .append(".map(").append(nextRef).append(" ->").append(convertMap(nextRef, getterType, propertyType)).append(")")
+                        .append(".toArray(size-> new "+propertyType.getFullyQualifiedName()+"[size])");
             } finally {
                 variables.push(nextRef);
             }
@@ -816,9 +819,10 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     private static String readPrimitiveArrayValue(String ref, TypeDef source, Property property)  {
         StringBuilder sb = new StringBuilder();
         Method getter = getterOf(source, property);
-        sb.append("Arrays.asList(")
+        sb.append(indent(ref))
+                .append("Arrays.stream(")
                 .append("("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , " + getDefaultValue(property)+") : "+ getDefaultValue(property)+")")
-            .append(".stream()").append(".collect(Collectors.toList())).toArray(new "+getter.getReturnType().toString()+"[])");
+            .append(".toArray(size -> new "+getter.getReturnType().toString()+"[size])");
         return sb.toString();
     }
 
@@ -911,5 +915,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             }
         }
         return stringVal;
+    }
+
+    private static String indent(String ref) {
+       return Arrays.stream(ref.split("\\.")).map(s->"    ").collect(Collectors.joining("", "           ", ""));
     }
 }
