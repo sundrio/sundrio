@@ -42,33 +42,33 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
 
     public A addToAnnotations(int index,AnnotationRef item){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.annotations.add(index >= 0 ? index : annotations.size(), builder); return (A)this;
+            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(index >= 0 ? index : _visitables.get("annotations").size(), builder);this.annotations.add(index >= 0 ? index : annotations.size(), builder); return (A)this;
     }
 
     public A setToAnnotations(int index,AnnotationRef item){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
             AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("annotations").size()) { _visitables.get("annotations").add(builder); } else { _visitables.get("annotations").set(index, builder);}
             if (index < 0 || index >= annotations.size()) { annotations.add(builder); } else { annotations.set(index, builder);}
              return (A)this;
     }
 
     public A addToAnnotations(AnnotationRef... items){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A addAllToAnnotations(Collection<AnnotationRef> items){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A removeFromAnnotations(AnnotationRef... items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromAnnotations(Collection<AnnotationRef> items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
     
@@ -105,7 +105,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
-            if (this.annotations != null) { _visitables.removeAll(this.annotations);}
+            if (this.annotations != null) { _visitables.get("annotations").removeAll(this.annotations);}
             if (annotations != null) {this.annotations = new ArrayList<AnnotationRefBuilder>(); for (AnnotationRef item : annotations){this.addToAnnotations(item);}} else { this.annotations = new ArrayList<AnnotationRefBuilder>();} return (A) this;
     }
 
@@ -169,12 +169,12 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withTypeRef(TypeRef typeRef){
-            _visitables.remove(this.typeRef);
-            if (typeRef instanceof PrimitiveRef){ this.typeRef= new PrimitiveRefBuilder((PrimitiveRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof VoidRef){ this.typeRef= new VoidRefBuilder((VoidRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof WildcardRef){ this.typeRef= new WildcardRefBuilder((WildcardRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof ClassRef){ this.typeRef= new ClassRefBuilder((ClassRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof TypeParamRef){ this.typeRef= new TypeParamRefBuilder((TypeParamRef)typeRef); _visitables.add(this.typeRef);}
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (typeRef instanceof PrimitiveRef){ this.typeRef= new PrimitiveRefBuilder((PrimitiveRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof VoidRef){ this.typeRef= new VoidRefBuilder((VoidRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof WildcardRef){ this.typeRef= new WildcardRefBuilder((WildcardRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof ClassRef){ this.typeRef= new ClassRefBuilder((ClassRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof TypeParamRef){ this.typeRef= new TypeParamRefBuilder((TypeParamRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
             return (A) this;
     }
 
@@ -183,8 +183,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withPrimitiveRefType(PrimitiveRef primitiveRefType){
-            _visitables.remove(this.typeRef);
-            if (primitiveRefType!=null){ this.typeRef= new PrimitiveRefBuilder(primitiveRefType); _visitables.add(this.typeRef);} return (A) this;
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (primitiveRefType!=null){ this.typeRef= new PrimitiveRefBuilder(primitiveRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
     public PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefType(){
@@ -196,8 +196,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withVoidRefType(VoidRef voidRefType){
-            _visitables.remove(this.typeRef);
-            if (voidRefType!=null){ this.typeRef= new VoidRefBuilder(voidRefType); _visitables.add(this.typeRef);} return (A) this;
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (voidRefType!=null){ this.typeRef= new VoidRefBuilder(voidRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
     public PropertyFluent.VoidRefTypeNested<A> withNewVoidRefType(){
@@ -209,8 +209,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withWildcardRefType(WildcardRef wildcardRefType){
-            _visitables.remove(this.typeRef);
-            if (wildcardRefType!=null){ this.typeRef= new WildcardRefBuilder(wildcardRefType); _visitables.add(this.typeRef);} return (A) this;
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (wildcardRefType!=null){ this.typeRef= new WildcardRefBuilder(wildcardRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
     public PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefType(){
@@ -222,8 +222,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withClassRefType(ClassRef classRefType){
-            _visitables.remove(this.typeRef);
-            if (classRefType!=null){ this.typeRef= new ClassRefBuilder(classRefType); _visitables.add(this.typeRef);} return (A) this;
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (classRefType!=null){ this.typeRef= new ClassRefBuilder(classRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
     public PropertyFluent.ClassRefTypeNested<A> withNewClassRefType(){
@@ -235,8 +235,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withTypeParamRefType(TypeParamRef typeParamRefType){
-            _visitables.remove(this.typeRef);
-            if (typeParamRefType!=null){ this.typeRef= new TypeParamRefBuilder(typeParamRefType); _visitables.add(this.typeRef);} return (A) this;
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (typeParamRefType!=null){ this.typeRef= new TypeParamRefBuilder(typeParamRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
     public PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefType(){

@@ -89,6 +89,9 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     generateFromResources(context.getVisitableBuilderInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
+                    generateFromResources(context.getVisitableMapClass(),
+                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
+                    );
                     generateFromResources(context.getBuilderInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );

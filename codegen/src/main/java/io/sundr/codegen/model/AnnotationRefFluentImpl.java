@@ -48,8 +48,8 @@ public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends A
     }
 
     public A withClassRef(ClassRef classRef){
-            _visitables.remove(this.classRef);
-            if (classRef!=null){ this.classRef= new ClassRefBuilder(classRef); _visitables.add(this.classRef);} return (A) this;
+            _visitables.get("classRef").remove(this.classRef);
+            if (classRef!=null){ this.classRef= new ClassRefBuilder(classRef); _visitables.get("classRef").add(this.classRef);} return (A) this;
     }
 
     public Boolean hasClassRef(){

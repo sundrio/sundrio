@@ -106,7 +106,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withComments(List<String> comments){
-            if (this.comments != null) { _visitables.removeAll(this.comments);}
+            if (this.comments != null) { _visitables.get("comments").removeAll(this.comments);}
             if (comments != null) {this.comments = new ArrayList<String>(); for (String item : comments){this.addToComments(item);}} else { this.comments = new ArrayList<String>();} return (A) this;
     }
 
@@ -133,33 +133,33 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A addToAnnotations(int index,AnnotationRef item){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.annotations.add(index >= 0 ? index : annotations.size(), builder); return (A)this;
+            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(index >= 0 ? index : _visitables.get("annotations").size(), builder);this.annotations.add(index >= 0 ? index : annotations.size(), builder); return (A)this;
     }
 
     public A setToAnnotations(int index,AnnotationRef item){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
             AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("annotations").size()) { _visitables.get("annotations").add(builder); } else { _visitables.get("annotations").set(index, builder);}
             if (index < 0 || index >= annotations.size()) { annotations.add(builder); } else { annotations.set(index, builder);}
              return (A)this;
     }
 
     public A addToAnnotations(AnnotationRef... items){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A addAllToAnnotations(Collection<AnnotationRef> items){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A removeFromAnnotations(AnnotationRef... items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromAnnotations(Collection<AnnotationRef> items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
     
@@ -196,7 +196,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
-            if (this.annotations != null) { _visitables.removeAll(this.annotations);}
+            if (this.annotations != null) { _visitables.get("annotations").removeAll(this.annotations);}
             if (annotations != null) {this.annotations = new ArrayList<AnnotationRefBuilder>(); for (AnnotationRef item : annotations){this.addToAnnotations(item);}} else { this.annotations = new ArrayList<AnnotationRefBuilder>();} return (A) this;
     }
 
@@ -248,33 +248,33 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A addToParameters(int index,TypeParamDef item){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
-            TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.parameters.add(index >= 0 ? index : parameters.size(), builder); return (A)this;
+            TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").add(index >= 0 ? index : _visitables.get("parameters").size(), builder);this.parameters.add(index >= 0 ? index : parameters.size(), builder); return (A)this;
     }
 
     public A setToParameters(int index,TypeParamDef item){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
             TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("parameters").size()) { _visitables.get("parameters").add(builder); } else { _visitables.get("parameters").set(index, builder);}
             if (index < 0 || index >= parameters.size()) { parameters.add(builder); } else { parameters.set(index, builder);}
              return (A)this;
     }
 
     public A addToParameters(TypeParamDef... items){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder);} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").add(builder);this.parameters.add(builder);} return (A)this;
     }
 
     public A addAllToParameters(Collection<TypeParamDef> items){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder);} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").add(builder);this.parameters.add(builder);} return (A)this;
     }
 
     public A removeFromParameters(TypeParamDef... items){
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromParameters(Collection<TypeParamDef> items){
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
     }
 
     
@@ -311,7 +311,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withParameters(List<TypeParamDef> parameters){
-            if (this.parameters != null) { _visitables.removeAll(this.parameters);}
+            if (this.parameters != null) { _visitables.get("parameters").removeAll(this.parameters);}
             if (parameters != null) {this.parameters = new ArrayList<TypeParamDefBuilder>(); for (TypeParamDef item : parameters){this.addToParameters(item);}} else { this.parameters = new ArrayList<TypeParamDefBuilder>();} return (A) this;
     }
 
@@ -399,12 +399,12 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withReturnType(TypeRef returnType){
-            _visitables.remove(this.returnType);
-            if (returnType instanceof PrimitiveRef){ this.returnType= new PrimitiveRefBuilder((PrimitiveRef)returnType); _visitables.add(this.returnType);}
-            if (returnType instanceof VoidRef){ this.returnType= new VoidRefBuilder((VoidRef)returnType); _visitables.add(this.returnType);}
-            if (returnType instanceof WildcardRef){ this.returnType= new WildcardRefBuilder((WildcardRef)returnType); _visitables.add(this.returnType);}
-            if (returnType instanceof ClassRef){ this.returnType= new ClassRefBuilder((ClassRef)returnType); _visitables.add(this.returnType);}
-            if (returnType instanceof TypeParamRef){ this.returnType= new TypeParamRefBuilder((TypeParamRef)returnType); _visitables.add(this.returnType);}
+            _visitables.get("returnType").remove(this.returnType);
+            if (returnType instanceof PrimitiveRef){ this.returnType= new PrimitiveRefBuilder((PrimitiveRef)returnType); _visitables.get("returnType").add(this.returnType);}
+            if (returnType instanceof VoidRef){ this.returnType= new VoidRefBuilder((VoidRef)returnType); _visitables.get("returnType").add(this.returnType);}
+            if (returnType instanceof WildcardRef){ this.returnType= new WildcardRefBuilder((WildcardRef)returnType); _visitables.get("returnType").add(this.returnType);}
+            if (returnType instanceof ClassRef){ this.returnType= new ClassRefBuilder((ClassRef)returnType); _visitables.get("returnType").add(this.returnType);}
+            if (returnType instanceof TypeParamRef){ this.returnType= new TypeParamRefBuilder((TypeParamRef)returnType); _visitables.get("returnType").add(this.returnType);}
             return (A) this;
     }
 
@@ -413,8 +413,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withPrimitiveRefReturnType(PrimitiveRef primitiveRefReturnType){
-            _visitables.remove(this.returnType);
-            if (primitiveRefReturnType!=null){ this.returnType= new PrimitiveRefBuilder(primitiveRefReturnType); _visitables.add(this.returnType);} return (A) this;
+            _visitables.get("returnType").remove(this.returnType);
+            if (primitiveRefReturnType!=null){ this.returnType= new PrimitiveRefBuilder(primitiveRefReturnType); _visitables.get("returnType").add(this.returnType);} return (A) this;
     }
 
     public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnType(){
@@ -426,8 +426,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withVoidRefReturnType(VoidRef voidRefReturnType){
-            _visitables.remove(this.returnType);
-            if (voidRefReturnType!=null){ this.returnType= new VoidRefBuilder(voidRefReturnType); _visitables.add(this.returnType);} return (A) this;
+            _visitables.get("returnType").remove(this.returnType);
+            if (voidRefReturnType!=null){ this.returnType= new VoidRefBuilder(voidRefReturnType); _visitables.get("returnType").add(this.returnType);} return (A) this;
     }
 
     public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnType(){
@@ -439,8 +439,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withWildcardRefReturnType(WildcardRef wildcardRefReturnType){
-            _visitables.remove(this.returnType);
-            if (wildcardRefReturnType!=null){ this.returnType= new WildcardRefBuilder(wildcardRefReturnType); _visitables.add(this.returnType);} return (A) this;
+            _visitables.get("returnType").remove(this.returnType);
+            if (wildcardRefReturnType!=null){ this.returnType= new WildcardRefBuilder(wildcardRefReturnType); _visitables.get("returnType").add(this.returnType);} return (A) this;
     }
 
     public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnType(){
@@ -452,8 +452,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withClassRefReturnType(ClassRef classRefReturnType){
-            _visitables.remove(this.returnType);
-            if (classRefReturnType!=null){ this.returnType= new ClassRefBuilder(classRefReturnType); _visitables.add(this.returnType);} return (A) this;
+            _visitables.get("returnType").remove(this.returnType);
+            if (classRefReturnType!=null){ this.returnType= new ClassRefBuilder(classRefReturnType); _visitables.get("returnType").add(this.returnType);} return (A) this;
     }
 
     public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnType(){
@@ -465,8 +465,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withTypeParamRefReturnType(TypeParamRef typeParamRefReturnType){
-            _visitables.remove(this.returnType);
-            if (typeParamRefReturnType!=null){ this.returnType= new TypeParamRefBuilder(typeParamRefReturnType); _visitables.add(this.returnType);} return (A) this;
+            _visitables.get("returnType").remove(this.returnType);
+            if (typeParamRefReturnType!=null){ this.returnType= new TypeParamRefBuilder(typeParamRefReturnType); _visitables.get("returnType").add(this.returnType);} return (A) this;
     }
 
     public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnType(){
@@ -479,33 +479,33 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A addToArguments(int index,Property item){
             if (this.arguments == null) {this.arguments = new ArrayList<PropertyBuilder>();}
-            PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
+            PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
     }
 
     public A setToArguments(int index,Property item){
             if (this.arguments == null) {this.arguments = new ArrayList<PropertyBuilder>();}
             PropertyBuilder builder = new PropertyBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("arguments").size()) { _visitables.get("arguments").add(builder); } else { _visitables.get("arguments").set(index, builder);}
             if (index < 0 || index >= arguments.size()) { arguments.add(builder); } else { arguments.set(index, builder);}
              return (A)this;
     }
 
     public A addToArguments(Property... items){
             if (this.arguments == null) {this.arguments = new ArrayList<PropertyBuilder>();}
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A addAllToArguments(Collection<Property> items){
             if (this.arguments == null) {this.arguments = new ArrayList<PropertyBuilder>();}
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A removeFromArguments(Property... items){
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromArguments(Collection<Property> items){
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     
@@ -542,7 +542,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withArguments(List<Property> arguments){
-            if (this.arguments != null) { _visitables.removeAll(this.arguments);}
+            if (this.arguments != null) { _visitables.get("arguments").removeAll(this.arguments);}
             if (arguments != null) {this.arguments = new ArrayList<PropertyBuilder>(); for (Property item : arguments){this.addToArguments(item);}} else { this.arguments = new ArrayList<PropertyBuilder>();} return (A) this;
     }
 
@@ -606,33 +606,33 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
     public A addToExceptions(int index,ClassRef item){
             if (this.exceptions == null) {this.exceptions = new ArrayList<ClassRefBuilder>();}
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.exceptions.add(index >= 0 ? index : exceptions.size(), builder); return (A)this;
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("exceptions").add(index >= 0 ? index : _visitables.get("exceptions").size(), builder);this.exceptions.add(index >= 0 ? index : exceptions.size(), builder); return (A)this;
     }
 
     public A setToExceptions(int index,ClassRef item){
             if (this.exceptions == null) {this.exceptions = new ArrayList<ClassRefBuilder>();}
             ClassRefBuilder builder = new ClassRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("exceptions").size()) { _visitables.get("exceptions").add(builder); } else { _visitables.get("exceptions").set(index, builder);}
             if (index < 0 || index >= exceptions.size()) { exceptions.add(builder); } else { exceptions.set(index, builder);}
              return (A)this;
     }
 
     public A addToExceptions(ClassRef... items){
             if (this.exceptions == null) {this.exceptions = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.exceptions.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("exceptions").add(builder);this.exceptions.add(builder);} return (A)this;
     }
 
     public A addAllToExceptions(Collection<ClassRef> items){
             if (this.exceptions == null) {this.exceptions = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.exceptions.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("exceptions").add(builder);this.exceptions.add(builder);} return (A)this;
     }
 
     public A removeFromExceptions(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.exceptions != null) {this.exceptions.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("exceptions").remove(builder);if (this.exceptions != null) {this.exceptions.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromExceptions(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.exceptions != null) {this.exceptions.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("exceptions").remove(builder);if (this.exceptions != null) {this.exceptions.remove(builder);}} return (A)this;
     }
 
     
@@ -669,7 +669,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withExceptions(List<ClassRef> exceptions){
-            if (this.exceptions != null) { _visitables.removeAll(this.exceptions);}
+            if (this.exceptions != null) { _visitables.get("exceptions").removeAll(this.exceptions);}
             if (exceptions != null) {this.exceptions = new ArrayList<ClassRefBuilder>(); for (ClassRef item : exceptions){this.addToExceptions(item);}} else { this.exceptions = new ArrayList<ClassRefBuilder>();} return (A) this;
     }
 
@@ -733,8 +733,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public A withBlock(Block block){
-            _visitables.remove(this.block);
-            if (block!=null){ this.block= new BlockBuilder(block); _visitables.add(this.block);} return (A) this;
+            _visitables.get("block").remove(this.block);
+            if (block!=null){ this.block= new BlockBuilder(block); _visitables.get("block").add(this.block);} return (A) this;
     }
 
     public Boolean hasBlock(){

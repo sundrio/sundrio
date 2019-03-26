@@ -37,12 +37,12 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
 
     public A addToStatements(VisitableBuilder<? extends Statement,?> builder){
             if (this.statements == null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();}
-            _visitables.add(builder);this.statements.add(builder); return (A)this;
+            _visitables.get("statements").add(builder);this.statements.add(builder); return (A)this;
     }
 
     public A addToStatements(int index,VisitableBuilder<? extends Statement,?> builder){
             if (this.statements == null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();}
-            _visitables.add(index, builder);this.statements.add(index, builder); return (A)this;
+            _visitables.get("statements").add(index, builder);this.statements.add(index, builder); return (A)this;
     }
 
     public A addToStatements(int index,Statement item){
@@ -62,7 +62,7 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
             for (Statement item : items) { 
             if (item instanceof StringStatement){addToStringStatementStatements((StringStatement)item);}
 
-            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.add(builder);this.statements.add(builder); }
+            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.get("statements").add(builder);this.statements.add(builder); }
             } return (A)this;
     }
 
@@ -71,26 +71,26 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
             for (Statement item : items) { 
             if (item instanceof StringStatement){addToStringStatementStatements((StringStatement)item);}
 
-            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.add(builder);this.statements.add(builder); }
+            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.get("statements").add(builder);this.statements.add(builder); }
             } return (A)this;
     }
 
     public A removeFromStatements(VisitableBuilder<? extends Statement,?> builder){
             if (this.statements == null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();}
-            _visitables.remove(builder);this.statements.remove(builder); return (A)this;
+            _visitables.get("statements").remove(builder);this.statements.remove(builder); return (A)this;
     }
 
     public A removeFromStatements(Statement... items){
             for (Statement item : items) {if (item instanceof StringStatement){removeFromStringStatementStatements((StringStatement)item);}
 
-            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.remove(builder);this.statements.remove(builder); }
+            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.get("statements").remove(builder);this.statements.remove(builder); }
             } return (A)this;
     }
 
     public A removeAllFromStatements(Collection<Statement> items){
             for (Statement item : items) {if (item instanceof StringStatement){removeFromStringStatementStatements((StringStatement)item);}
 
-            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.remove(builder);this.statements.remove(builder); }
+            else {  VisitableBuilder<? extends Statement,?> builder = builderOf(item); _visitables.get("statements").remove(builder);this.statements.remove(builder); }
             } return (A)this;
     }
 
@@ -128,7 +128,7 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     }
 
     public A withStatements(List<Statement> statements){
-            if (this.statements != null) { _visitables.removeAll(this.statements);}
+            if (this.statements != null) { _visitables.get("statements").removeAll(this.statements);}
             if (statements != null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>(); for (Statement item : statements){this.addToStatements(item);}} else { this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();} return (A) this;
     }
 
@@ -143,33 +143,33 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
 
     public A addToStringStatementStatements(int index,StringStatement item){
             if (this.statements == null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();}
-            StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.statements.add(index >= 0 ? index : statements.size(), builder); return (A)this;
+            StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.get("statements").add(index >= 0 ? index : _visitables.get("statements").size(), builder);this.statements.add(index >= 0 ? index : statements.size(), builder); return (A)this;
     }
 
     public A setToStringStatementStatements(int index,StringStatement item){
             if (this.statements == null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();}
             StringStatementBuilder builder = new StringStatementBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("statements").size()) { _visitables.get("statements").add(builder); } else { _visitables.get("statements").set(index, builder);}
             if (index < 0 || index >= statements.size()) { statements.add(builder); } else { statements.set(index, builder);}
              return (A)this;
     }
 
     public A addToStringStatementStatements(StringStatement... items){
             if (this.statements == null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();}
-            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.add(builder);this.statements.add(builder);} return (A)this;
+            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.get("statements").add(builder);this.statements.add(builder);} return (A)this;
     }
 
     public A addAllToStringStatementStatements(Collection<StringStatement> items){
             if (this.statements == null) {this.statements = new ArrayList<VisitableBuilder<? extends Statement,?>>();}
-            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.add(builder);this.statements.add(builder);} return (A)this;
+            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.get("statements").add(builder);this.statements.add(builder);} return (A)this;
     }
 
     public A removeFromStringStatementStatements(StringStatement... items){
-            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.remove(builder);if (this.statements != null) {this.statements.remove(builder);}} return (A)this;
+            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.get("statements").remove(builder);if (this.statements != null) {this.statements.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromStringStatementStatements(Collection<StringStatement> items){
-            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.remove(builder);if (this.statements != null) {this.statements.remove(builder);}} return (A)this;
+            for (StringStatement item : items) {StringStatementBuilder builder = new StringStatementBuilder(item);_visitables.get("statements").remove(builder);if (this.statements != null) {this.statements.remove(builder);}} return (A)this;
     }
 
     public BlockFluent.StringStatementStatementsNested<A> addNewStringStatementStatement(){

@@ -37,12 +37,12 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A addToBounds(VisitableBuilder<? extends TypeRef,?> builder){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            _visitables.add(builder);this.bounds.add(builder); return (A)this;
+            _visitables.get("bounds").add(builder);this.bounds.add(builder); return (A)this;
     }
 
     public A addToBounds(int index,VisitableBuilder<? extends TypeRef,?> builder){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            _visitables.add(index, builder);this.bounds.add(index, builder); return (A)this;
+            _visitables.get("bounds").add(index, builder);this.bounds.add(index, builder); return (A)this;
     }
 
     public A addToBounds(int index,TypeRef item){
@@ -74,7 +74,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
  else if (item instanceof ClassRef){addToClassRefBounds((ClassRef)item);}
  else if (item instanceof TypeParamRef){addToTypeParamRefBounds((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.add(builder);this.bounds.add(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("bounds").add(builder);this.bounds.add(builder); }
             } return (A)this;
     }
 
@@ -87,13 +87,13 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
  else if (item instanceof ClassRef){addToClassRefBounds((ClassRef)item);}
  else if (item instanceof TypeParamRef){addToTypeParamRefBounds((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.add(builder);this.bounds.add(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("bounds").add(builder);this.bounds.add(builder); }
             } return (A)this;
     }
 
     public A removeFromBounds(VisitableBuilder<? extends TypeRef,?> builder){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            _visitables.remove(builder);this.bounds.remove(builder); return (A)this;
+            _visitables.get("bounds").remove(builder);this.bounds.remove(builder); return (A)this;
     }
 
     public A removeFromBounds(TypeRef... items){
@@ -103,7 +103,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
  else if (item instanceof ClassRef){removeFromClassRefBounds((ClassRef)item);}
  else if (item instanceof TypeParamRef){removeFromTypeParamRefBounds((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.remove(builder);this.bounds.remove(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("bounds").remove(builder);this.bounds.remove(builder); }
             } return (A)this;
     }
 
@@ -114,7 +114,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
  else if (item instanceof ClassRef){removeFromClassRefBounds((ClassRef)item);}
  else if (item instanceof TypeParamRef){removeFromTypeParamRefBounds((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.remove(builder);this.bounds.remove(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("bounds").remove(builder);this.bounds.remove(builder); }
             } return (A)this;
     }
 
@@ -152,7 +152,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     }
 
     public A withBounds(List<TypeRef> bounds){
-            if (this.bounds != null) { _visitables.removeAll(this.bounds);}
+            if (this.bounds != null) { _visitables.get("bounds").removeAll(this.bounds);}
             if (bounds != null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>(); for (TypeRef item : bounds){this.addToBounds(item);}} else { this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();} return (A) this;
     }
 
@@ -167,33 +167,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A addToPrimitiveRefBounds(int index,PrimitiveRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
+            PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
     }
 
     public A setToPrimitiveRefBounds(int index,PrimitiveRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("bounds").size()) { _visitables.get("bounds").add(builder); } else { _visitables.get("bounds").set(index, builder);}
             if (index < 0 || index >= bounds.size()) { bounds.add(builder); } else { bounds.set(index, builder);}
              return (A)this;
     }
 
     public A addToPrimitiveRefBounds(PrimitiveRef... items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A addAllToPrimitiveRefBounds(Collection<PrimitiveRef> items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A removeFromPrimitiveRefBounds(PrimitiveRef... items){
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromPrimitiveRefBounds(Collection<PrimitiveRef> items){
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound(){
@@ -210,33 +210,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A addToVoidRefBounds(int index,VoidRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
+            VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
     }
 
     public A setToVoidRefBounds(int index,VoidRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             VoidRefBuilder builder = new VoidRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("bounds").size()) { _visitables.get("bounds").add(builder); } else { _visitables.get("bounds").set(index, builder);}
             if (index < 0 || index >= bounds.size()) { bounds.add(builder); } else { bounds.set(index, builder);}
              return (A)this;
     }
 
     public A addToVoidRefBounds(VoidRef... items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A addAllToVoidRefBounds(Collection<VoidRef> items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A removeFromVoidRefBounds(VoidRef... items){
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromVoidRefBounds(Collection<VoidRef> items){
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBound(){
@@ -253,33 +253,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A addToWildcardRefBounds(int index,WildcardRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
+            WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
     }
 
     public A setToWildcardRefBounds(int index,WildcardRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             WildcardRefBuilder builder = new WildcardRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("bounds").size()) { _visitables.get("bounds").add(builder); } else { _visitables.get("bounds").set(index, builder);}
             if (index < 0 || index >= bounds.size()) { bounds.add(builder); } else { bounds.set(index, builder);}
              return (A)this;
     }
 
     public A addToWildcardRefBounds(WildcardRef... items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A addAllToWildcardRefBounds(Collection<WildcardRef> items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A removeFromWildcardRefBounds(WildcardRef... items){
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromWildcardRefBounds(Collection<WildcardRef> items){
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBound(){
@@ -296,33 +296,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A addToClassRefBounds(int index,ClassRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
     }
 
     public A setToClassRefBounds(int index,ClassRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             ClassRefBuilder builder = new ClassRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("bounds").size()) { _visitables.get("bounds").add(builder); } else { _visitables.get("bounds").set(index, builder);}
             if (index < 0 || index >= bounds.size()) { bounds.add(builder); } else { bounds.set(index, builder);}
              return (A)this;
     }
 
     public A addToClassRefBounds(ClassRef... items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A addAllToClassRefBounds(Collection<ClassRef> items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A removeFromClassRefBounds(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromClassRefBounds(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBound(){
@@ -339,33 +339,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A addToTypeParamRefBounds(int index,TypeParamRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
+            TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
     }
 
     public A setToTypeParamRefBounds(int index,TypeParamRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("bounds").size()) { _visitables.get("bounds").add(builder); } else { _visitables.get("bounds").set(index, builder);}
             if (index < 0 || index >= bounds.size()) { bounds.add(builder); } else { bounds.set(index, builder);}
              return (A)this;
     }
 
     public A addToTypeParamRefBounds(TypeParamRef... items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A addAllToTypeParamRefBounds(Collection<TypeParamRef> items){
             if (this.bounds == null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A removeFromTypeParamRefBounds(TypeParamRef... items){
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromTypeParamRefBounds(Collection<TypeParamRef> items){
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBound(){

@@ -173,7 +173,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withComments(List<String> comments){
-            if (this.comments != null) { _visitables.removeAll(this.comments);}
+            if (this.comments != null) { _visitables.get("comments").removeAll(this.comments);}
             if (comments != null) {this.comments = new ArrayList<String>(); for (String item : comments){this.addToComments(item);}} else { this.comments = new ArrayList<String>();} return (A) this;
     }
 
@@ -200,33 +200,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToAnnotations(int index,AnnotationRef item){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.annotations.add(index >= 0 ? index : annotations.size(), builder); return (A)this;
+            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(index >= 0 ? index : _visitables.get("annotations").size(), builder);this.annotations.add(index >= 0 ? index : annotations.size(), builder); return (A)this;
     }
 
     public A setToAnnotations(int index,AnnotationRef item){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
             AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("annotations").size()) { _visitables.get("annotations").add(builder); } else { _visitables.get("annotations").set(index, builder);}
             if (index < 0 || index >= annotations.size()) { annotations.add(builder); } else { annotations.set(index, builder);}
              return (A)this;
     }
 
     public A addToAnnotations(AnnotationRef... items){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A addAllToAnnotations(Collection<AnnotationRef> items){
             if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A removeFromAnnotations(AnnotationRef... items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromAnnotations(Collection<AnnotationRef> items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
     
@@ -263,7 +263,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
-            if (this.annotations != null) { _visitables.removeAll(this.annotations);}
+            if (this.annotations != null) { _visitables.get("annotations").removeAll(this.annotations);}
             if (annotations != null) {this.annotations = new ArrayList<AnnotationRefBuilder>(); for (AnnotationRef item : annotations){this.addToAnnotations(item);}} else { this.annotations = new ArrayList<AnnotationRefBuilder>();} return (A) this;
     }
 
@@ -315,33 +315,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToExtendsList(int index,ClassRef item){
             if (this.extendsList == null) {this.extendsList = new ArrayList<ClassRefBuilder>();}
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.extendsList.add(index >= 0 ? index : extendsList.size(), builder); return (A)this;
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("extendsList").add(index >= 0 ? index : _visitables.get("extendsList").size(), builder);this.extendsList.add(index >= 0 ? index : extendsList.size(), builder); return (A)this;
     }
 
     public A setToExtendsList(int index,ClassRef item){
             if (this.extendsList == null) {this.extendsList = new ArrayList<ClassRefBuilder>();}
             ClassRefBuilder builder = new ClassRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("extendsList").size()) { _visitables.get("extendsList").add(builder); } else { _visitables.get("extendsList").set(index, builder);}
             if (index < 0 || index >= extendsList.size()) { extendsList.add(builder); } else { extendsList.set(index, builder);}
              return (A)this;
     }
 
     public A addToExtendsList(ClassRef... items){
             if (this.extendsList == null) {this.extendsList = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.extendsList.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("extendsList").add(builder);this.extendsList.add(builder);} return (A)this;
     }
 
     public A addAllToExtendsList(Collection<ClassRef> items){
             if (this.extendsList == null) {this.extendsList = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.extendsList.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("extendsList").add(builder);this.extendsList.add(builder);} return (A)this;
     }
 
     public A removeFromExtendsList(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.extendsList != null) {this.extendsList.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("extendsList").remove(builder);if (this.extendsList != null) {this.extendsList.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromExtendsList(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.extendsList != null) {this.extendsList.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("extendsList").remove(builder);if (this.extendsList != null) {this.extendsList.remove(builder);}} return (A)this;
     }
 
     
@@ -378,7 +378,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withExtendsList(List<ClassRef> extendsList){
-            if (this.extendsList != null) { _visitables.removeAll(this.extendsList);}
+            if (this.extendsList != null) { _visitables.get("extendsList").removeAll(this.extendsList);}
             if (extendsList != null) {this.extendsList = new ArrayList<ClassRefBuilder>(); for (ClassRef item : extendsList){this.addToExtendsList(item);}} else { this.extendsList = new ArrayList<ClassRefBuilder>();} return (A) this;
     }
 
@@ -430,33 +430,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToImplementsList(int index,ClassRef item){
             if (this.implementsList == null) {this.implementsList = new ArrayList<ClassRefBuilder>();}
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.implementsList.add(index >= 0 ? index : implementsList.size(), builder); return (A)this;
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("implementsList").add(index >= 0 ? index : _visitables.get("implementsList").size(), builder);this.implementsList.add(index >= 0 ? index : implementsList.size(), builder); return (A)this;
     }
 
     public A setToImplementsList(int index,ClassRef item){
             if (this.implementsList == null) {this.implementsList = new ArrayList<ClassRefBuilder>();}
             ClassRefBuilder builder = new ClassRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("implementsList").size()) { _visitables.get("implementsList").add(builder); } else { _visitables.get("implementsList").set(index, builder);}
             if (index < 0 || index >= implementsList.size()) { implementsList.add(builder); } else { implementsList.set(index, builder);}
              return (A)this;
     }
 
     public A addToImplementsList(ClassRef... items){
             if (this.implementsList == null) {this.implementsList = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.implementsList.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("implementsList").add(builder);this.implementsList.add(builder);} return (A)this;
     }
 
     public A addAllToImplementsList(Collection<ClassRef> items){
             if (this.implementsList == null) {this.implementsList = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.implementsList.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("implementsList").add(builder);this.implementsList.add(builder);} return (A)this;
     }
 
     public A removeFromImplementsList(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.implementsList != null) {this.implementsList.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("implementsList").remove(builder);if (this.implementsList != null) {this.implementsList.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromImplementsList(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.implementsList != null) {this.implementsList.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("implementsList").remove(builder);if (this.implementsList != null) {this.implementsList.remove(builder);}} return (A)this;
     }
 
     
@@ -493,7 +493,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withImplementsList(List<ClassRef> implementsList){
-            if (this.implementsList != null) { _visitables.removeAll(this.implementsList);}
+            if (this.implementsList != null) { _visitables.get("implementsList").removeAll(this.implementsList);}
             if (implementsList != null) {this.implementsList = new ArrayList<ClassRefBuilder>(); for (ClassRef item : implementsList){this.addToImplementsList(item);}} else { this.implementsList = new ArrayList<ClassRefBuilder>();} return (A) this;
     }
 
@@ -545,33 +545,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToParameters(int index,TypeParamDef item){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
-            TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.parameters.add(index >= 0 ? index : parameters.size(), builder); return (A)this;
+            TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").add(index >= 0 ? index : _visitables.get("parameters").size(), builder);this.parameters.add(index >= 0 ? index : parameters.size(), builder); return (A)this;
     }
 
     public A setToParameters(int index,TypeParamDef item){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
             TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("parameters").size()) { _visitables.get("parameters").add(builder); } else { _visitables.get("parameters").set(index, builder);}
             if (index < 0 || index >= parameters.size()) { parameters.add(builder); } else { parameters.set(index, builder);}
              return (A)this;
     }
 
     public A addToParameters(TypeParamDef... items){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder);} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").add(builder);this.parameters.add(builder);} return (A)this;
     }
 
     public A addAllToParameters(Collection<TypeParamDef> items){
             if (this.parameters == null) {this.parameters = new ArrayList<TypeParamDefBuilder>();}
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.add(builder);this.parameters.add(builder);} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").add(builder);this.parameters.add(builder);} return (A)this;
     }
 
     public A removeFromParameters(TypeParamDef... items){
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromParameters(Collection<TypeParamDef> items){
-            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
+            for (TypeParamDef item : items) {TypeParamDefBuilder builder = new TypeParamDefBuilder(item);_visitables.get("parameters").remove(builder);if (this.parameters != null) {this.parameters.remove(builder);}} return (A)this;
     }
 
     
@@ -608,7 +608,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withParameters(List<TypeParamDef> parameters){
-            if (this.parameters != null) { _visitables.removeAll(this.parameters);}
+            if (this.parameters != null) { _visitables.get("parameters").removeAll(this.parameters);}
             if (parameters != null) {this.parameters = new ArrayList<TypeParamDefBuilder>(); for (TypeParamDef item : parameters){this.addToParameters(item);}} else { this.parameters = new ArrayList<TypeParamDefBuilder>();} return (A) this;
     }
 
@@ -660,33 +660,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToProperties(int index,Property item){
             if (this.properties == null) {this.properties = new ArrayList<PropertyBuilder>();}
-            PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.properties.add(index >= 0 ? index : properties.size(), builder); return (A)this;
+            PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("properties").add(index >= 0 ? index : _visitables.get("properties").size(), builder);this.properties.add(index >= 0 ? index : properties.size(), builder); return (A)this;
     }
 
     public A setToProperties(int index,Property item){
             if (this.properties == null) {this.properties = new ArrayList<PropertyBuilder>();}
             PropertyBuilder builder = new PropertyBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("properties").size()) { _visitables.get("properties").add(builder); } else { _visitables.get("properties").set(index, builder);}
             if (index < 0 || index >= properties.size()) { properties.add(builder); } else { properties.set(index, builder);}
              return (A)this;
     }
 
     public A addToProperties(Property... items){
             if (this.properties == null) {this.properties = new ArrayList<PropertyBuilder>();}
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.properties.add(builder);} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("properties").add(builder);this.properties.add(builder);} return (A)this;
     }
 
     public A addAllToProperties(Collection<Property> items){
             if (this.properties == null) {this.properties = new ArrayList<PropertyBuilder>();}
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.add(builder);this.properties.add(builder);} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("properties").add(builder);this.properties.add(builder);} return (A)this;
     }
 
     public A removeFromProperties(Property... items){
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.remove(builder);if (this.properties != null) {this.properties.remove(builder);}} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("properties").remove(builder);if (this.properties != null) {this.properties.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromProperties(Collection<Property> items){
-            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.remove(builder);if (this.properties != null) {this.properties.remove(builder);}} return (A)this;
+            for (Property item : items) {PropertyBuilder builder = new PropertyBuilder(item);_visitables.get("properties").remove(builder);if (this.properties != null) {this.properties.remove(builder);}} return (A)this;
     }
 
     
@@ -723,7 +723,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withProperties(List<Property> properties){
-            if (this.properties != null) { _visitables.removeAll(this.properties);}
+            if (this.properties != null) { _visitables.get("properties").removeAll(this.properties);}
             if (properties != null) {this.properties = new ArrayList<PropertyBuilder>(); for (Property item : properties){this.addToProperties(item);}} else { this.properties = new ArrayList<PropertyBuilder>();} return (A) this;
     }
 
@@ -775,33 +775,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToConstructors(int index,Method item){
             if (this.constructors == null) {this.constructors = new ArrayList<MethodBuilder>();}
-            MethodBuilder builder = new MethodBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.constructors.add(index >= 0 ? index : constructors.size(), builder); return (A)this;
+            MethodBuilder builder = new MethodBuilder(item);_visitables.get("constructors").add(index >= 0 ? index : _visitables.get("constructors").size(), builder);this.constructors.add(index >= 0 ? index : constructors.size(), builder); return (A)this;
     }
 
     public A setToConstructors(int index,Method item){
             if (this.constructors == null) {this.constructors = new ArrayList<MethodBuilder>();}
             MethodBuilder builder = new MethodBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("constructors").size()) { _visitables.get("constructors").add(builder); } else { _visitables.get("constructors").set(index, builder);}
             if (index < 0 || index >= constructors.size()) { constructors.add(builder); } else { constructors.set(index, builder);}
              return (A)this;
     }
 
     public A addToConstructors(Method... items){
             if (this.constructors == null) {this.constructors = new ArrayList<MethodBuilder>();}
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.constructors.add(builder);} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("constructors").add(builder);this.constructors.add(builder);} return (A)this;
     }
 
     public A addAllToConstructors(Collection<Method> items){
             if (this.constructors == null) {this.constructors = new ArrayList<MethodBuilder>();}
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.constructors.add(builder);} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("constructors").add(builder);this.constructors.add(builder);} return (A)this;
     }
 
     public A removeFromConstructors(Method... items){
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.remove(builder);if (this.constructors != null) {this.constructors.remove(builder);}} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("constructors").remove(builder);if (this.constructors != null) {this.constructors.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromConstructors(Collection<Method> items){
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.remove(builder);if (this.constructors != null) {this.constructors.remove(builder);}} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("constructors").remove(builder);if (this.constructors != null) {this.constructors.remove(builder);}} return (A)this;
     }
 
     
@@ -838,7 +838,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withConstructors(List<Method> constructors){
-            if (this.constructors != null) { _visitables.removeAll(this.constructors);}
+            if (this.constructors != null) { _visitables.get("constructors").removeAll(this.constructors);}
             if (constructors != null) {this.constructors = new ArrayList<MethodBuilder>(); for (Method item : constructors){this.addToConstructors(item);}} else { this.constructors = new ArrayList<MethodBuilder>();} return (A) this;
     }
 
@@ -890,33 +890,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToMethods(int index,Method item){
             if (this.methods == null) {this.methods = new ArrayList<MethodBuilder>();}
-            MethodBuilder builder = new MethodBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.methods.add(index >= 0 ? index : methods.size(), builder); return (A)this;
+            MethodBuilder builder = new MethodBuilder(item);_visitables.get("methods").add(index >= 0 ? index : _visitables.get("methods").size(), builder);this.methods.add(index >= 0 ? index : methods.size(), builder); return (A)this;
     }
 
     public A setToMethods(int index,Method item){
             if (this.methods == null) {this.methods = new ArrayList<MethodBuilder>();}
             MethodBuilder builder = new MethodBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("methods").size()) { _visitables.get("methods").add(builder); } else { _visitables.get("methods").set(index, builder);}
             if (index < 0 || index >= methods.size()) { methods.add(builder); } else { methods.set(index, builder);}
              return (A)this;
     }
 
     public A addToMethods(Method... items){
             if (this.methods == null) {this.methods = new ArrayList<MethodBuilder>();}
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.methods.add(builder);} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("methods").add(builder);this.methods.add(builder);} return (A)this;
     }
 
     public A addAllToMethods(Collection<Method> items){
             if (this.methods == null) {this.methods = new ArrayList<MethodBuilder>();}
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.add(builder);this.methods.add(builder);} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("methods").add(builder);this.methods.add(builder);} return (A)this;
     }
 
     public A removeFromMethods(Method... items){
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.remove(builder);if (this.methods != null) {this.methods.remove(builder);}} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("methods").remove(builder);if (this.methods != null) {this.methods.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromMethods(Collection<Method> items){
-            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.remove(builder);if (this.methods != null) {this.methods.remove(builder);}} return (A)this;
+            for (Method item : items) {MethodBuilder builder = new MethodBuilder(item);_visitables.get("methods").remove(builder);if (this.methods != null) {this.methods.remove(builder);}} return (A)this;
     }
 
     
@@ -953,7 +953,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withMethods(List<Method> methods){
-            if (this.methods != null) { _visitables.removeAll(this.methods);}
+            if (this.methods != null) { _visitables.get("methods").removeAll(this.methods);}
             if (methods != null) {this.methods = new ArrayList<MethodBuilder>(); for (Method item : methods){this.addToMethods(item);}} else { this.methods = new ArrayList<MethodBuilder>();} return (A) this;
     }
 
@@ -1017,8 +1017,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withOuterType(TypeDef outerType){
-            _visitables.remove(this.outerType);
-            if (outerType!=null){ this.outerType= new TypeDefBuilder(outerType); _visitables.add(this.outerType);} return (A) this;
+            _visitables.get("outerType").remove(this.outerType);
+            if (outerType!=null){ this.outerType= new TypeDefBuilder(outerType); _visitables.get("outerType").add(this.outerType);} return (A) this;
     }
 
     public Boolean hasOuterType(){
@@ -1047,33 +1047,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public A addToInnerTypes(int index,TypeDef item){
             if (this.innerTypes == null) {this.innerTypes = new ArrayList<TypeDefBuilder>();}
-            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.innerTypes.add(index >= 0 ? index : innerTypes.size(), builder); return (A)this;
+            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("innerTypes").add(index >= 0 ? index : _visitables.get("innerTypes").size(), builder);this.innerTypes.add(index >= 0 ? index : innerTypes.size(), builder); return (A)this;
     }
 
     public A setToInnerTypes(int index,TypeDef item){
             if (this.innerTypes == null) {this.innerTypes = new ArrayList<TypeDefBuilder>();}
             TypeDefBuilder builder = new TypeDefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("innerTypes").size()) { _visitables.get("innerTypes").add(builder); } else { _visitables.get("innerTypes").set(index, builder);}
             if (index < 0 || index >= innerTypes.size()) { innerTypes.add(builder); } else { innerTypes.set(index, builder);}
              return (A)this;
     }
 
     public A addToInnerTypes(TypeDef... items){
             if (this.innerTypes == null) {this.innerTypes = new ArrayList<TypeDefBuilder>();}
-            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.innerTypes.add(builder);} return (A)this;
+            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("innerTypes").add(builder);this.innerTypes.add(builder);} return (A)this;
     }
 
     public A addAllToInnerTypes(Collection<TypeDef> items){
             if (this.innerTypes == null) {this.innerTypes = new ArrayList<TypeDefBuilder>();}
-            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.innerTypes.add(builder);} return (A)this;
+            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("innerTypes").add(builder);this.innerTypes.add(builder);} return (A)this;
     }
 
     public A removeFromInnerTypes(TypeDef... items){
-            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.remove(builder);if (this.innerTypes != null) {this.innerTypes.remove(builder);}} return (A)this;
+            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("innerTypes").remove(builder);if (this.innerTypes != null) {this.innerTypes.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromInnerTypes(Collection<TypeDef> items){
-            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.remove(builder);if (this.innerTypes != null) {this.innerTypes.remove(builder);}} return (A)this;
+            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("innerTypes").remove(builder);if (this.innerTypes != null) {this.innerTypes.remove(builder);}} return (A)this;
     }
 
     
@@ -1110,7 +1110,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public A withInnerTypes(List<TypeDef> innerTypes){
-            if (this.innerTypes != null) { _visitables.removeAll(this.innerTypes);}
+            if (this.innerTypes != null) { _visitables.get("innerTypes").removeAll(this.innerTypes);}
             if (innerTypes != null) {this.innerTypes = new ArrayList<TypeDefBuilder>(); for (TypeDef item : innerTypes){this.addToInnerTypes(item);}} else { this.innerTypes = new ArrayList<TypeDefBuilder>();} return (A) this;
     }
 

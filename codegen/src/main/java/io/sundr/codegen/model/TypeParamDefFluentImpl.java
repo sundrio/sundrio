@@ -62,33 +62,33 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
 
     public A addToBounds(int index,ClassRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
     }
 
     public A setToBounds(int index,ClassRef item){
             if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
             ClassRefBuilder builder = new ClassRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("bounds").size()) { _visitables.get("bounds").add(builder); } else { _visitables.get("bounds").set(index, builder);}
             if (index < 0 || index >= bounds.size()) { bounds.add(builder); } else { bounds.set(index, builder);}
              return (A)this;
     }
 
     public A addToBounds(ClassRef... items){
             if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A addAllToBounds(Collection<ClassRef> items){
             if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A removeFromBounds(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromBounds(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     
@@ -125,7 +125,7 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     }
 
     public A withBounds(List<ClassRef> bounds){
-            if (this.bounds != null) { _visitables.removeAll(this.bounds);}
+            if (this.bounds != null) { _visitables.get("bounds").removeAll(this.bounds);}
             if (bounds != null) {this.bounds = new ArrayList<ClassRefBuilder>(); for (ClassRef item : bounds){this.addToBounds(item);}} else { this.bounds = new ArrayList<ClassRefBuilder>();} return (A) this;
     }
 

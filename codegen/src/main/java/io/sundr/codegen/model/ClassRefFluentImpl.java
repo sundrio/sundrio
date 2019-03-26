@@ -124,12 +124,12 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     public A addToArguments(VisitableBuilder<? extends TypeRef,?> builder){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            _visitables.add(builder);this.arguments.add(builder); return (A)this;
+            _visitables.get("arguments").add(builder);this.arguments.add(builder); return (A)this;
     }
 
     public A addToArguments(int index,VisitableBuilder<? extends TypeRef,?> builder){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            _visitables.add(index, builder);this.arguments.add(index, builder); return (A)this;
+            _visitables.get("arguments").add(index, builder);this.arguments.add(index, builder); return (A)this;
     }
 
     public A addToArguments(int index,TypeRef item){
@@ -161,7 +161,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
  else if (item instanceof ClassRef){addToClassRefArguments((ClassRef)item);}
  else if (item instanceof TypeParamRef){addToTypeParamRefArguments((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.add(builder);this.arguments.add(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("arguments").add(builder);this.arguments.add(builder); }
             } return (A)this;
     }
 
@@ -174,13 +174,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
  else if (item instanceof ClassRef){addToClassRefArguments((ClassRef)item);}
  else if (item instanceof TypeParamRef){addToTypeParamRefArguments((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.add(builder);this.arguments.add(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("arguments").add(builder);this.arguments.add(builder); }
             } return (A)this;
     }
 
     public A removeFromArguments(VisitableBuilder<? extends TypeRef,?> builder){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            _visitables.remove(builder);this.arguments.remove(builder); return (A)this;
+            _visitables.get("arguments").remove(builder);this.arguments.remove(builder); return (A)this;
     }
 
     public A removeFromArguments(TypeRef... items){
@@ -190,7 +190,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
  else if (item instanceof ClassRef){removeFromClassRefArguments((ClassRef)item);}
  else if (item instanceof TypeParamRef){removeFromTypeParamRefArguments((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.remove(builder);this.arguments.remove(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("arguments").remove(builder);this.arguments.remove(builder); }
             } return (A)this;
     }
 
@@ -201,7 +201,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
  else if (item instanceof ClassRef){removeFromClassRefArguments((ClassRef)item);}
  else if (item instanceof TypeParamRef){removeFromTypeParamRefArguments((TypeParamRef)item);}
 
-            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.remove(builder);this.arguments.remove(builder); }
+            else {  VisitableBuilder<? extends TypeRef,?> builder = builderOf(item); _visitables.get("arguments").remove(builder);this.arguments.remove(builder); }
             } return (A)this;
     }
 
@@ -239,7 +239,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     }
 
     public A withArguments(List<TypeRef> arguments){
-            if (this.arguments != null) { _visitables.removeAll(this.arguments);}
+            if (this.arguments != null) { _visitables.get("arguments").removeAll(this.arguments);}
             if (arguments != null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>(); for (TypeRef item : arguments){this.addToArguments(item);}} else { this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();} return (A) this;
     }
 
@@ -254,33 +254,33 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     public A addToPrimitiveRefArguments(int index,PrimitiveRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
+            PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
     }
 
     public A setToPrimitiveRefArguments(int index,PrimitiveRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("arguments").size()) { _visitables.get("arguments").add(builder); } else { _visitables.get("arguments").set(index, builder);}
             if (index < 0 || index >= arguments.size()) { arguments.add(builder); } else { arguments.set(index, builder);}
              return (A)this;
     }
 
     public A addToPrimitiveRefArguments(PrimitiveRef... items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A addAllToPrimitiveRefArguments(Collection<PrimitiveRef> items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A removeFromPrimitiveRefArguments(PrimitiveRef... items){
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromPrimitiveRefArguments(Collection<PrimitiveRef> items){
-            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public ClassRefFluent.PrimitiveRefArgumentsNested<A> addNewPrimitiveRefArgument(){
@@ -297,33 +297,33 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     public A addToVoidRefArguments(int index,VoidRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
+            VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
     }
 
     public A setToVoidRefArguments(int index,VoidRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             VoidRefBuilder builder = new VoidRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("arguments").size()) { _visitables.get("arguments").add(builder); } else { _visitables.get("arguments").set(index, builder);}
             if (index < 0 || index >= arguments.size()) { arguments.add(builder); } else { arguments.set(index, builder);}
              return (A)this;
     }
 
     public A addToVoidRefArguments(VoidRef... items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A addAllToVoidRefArguments(Collection<VoidRef> items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A removeFromVoidRefArguments(VoidRef... items){
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromVoidRefArguments(Collection<VoidRef> items){
-            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public ClassRefFluent.VoidRefArgumentsNested<A> addNewVoidRefArgument(){
@@ -340,33 +340,33 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     public A addToWildcardRefArguments(int index,WildcardRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
+            WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
     }
 
     public A setToWildcardRefArguments(int index,WildcardRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             WildcardRefBuilder builder = new WildcardRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("arguments").size()) { _visitables.get("arguments").add(builder); } else { _visitables.get("arguments").set(index, builder);}
             if (index < 0 || index >= arguments.size()) { arguments.add(builder); } else { arguments.set(index, builder);}
              return (A)this;
     }
 
     public A addToWildcardRefArguments(WildcardRef... items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A addAllToWildcardRefArguments(Collection<WildcardRef> items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A removeFromWildcardRefArguments(WildcardRef... items){
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromWildcardRefArguments(Collection<WildcardRef> items){
-            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public ClassRefFluent.WildcardRefArgumentsNested<A> addNewWildcardRefArgument(){
@@ -383,33 +383,33 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     public A addToClassRefArguments(int index,ClassRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
     }
 
     public A setToClassRefArguments(int index,ClassRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             ClassRefBuilder builder = new ClassRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("arguments").size()) { _visitables.get("arguments").add(builder); } else { _visitables.get("arguments").set(index, builder);}
             if (index < 0 || index >= arguments.size()) { arguments.add(builder); } else { arguments.set(index, builder);}
              return (A)this;
     }
 
     public A addToClassRefArguments(ClassRef... items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A addAllToClassRefArguments(Collection<ClassRef> items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A removeFromClassRefArguments(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromClassRefArguments(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public ClassRefFluent.ClassRefArgumentsNested<A> addNewClassRefArgument(){
@@ -426,33 +426,33 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
     public A addToTypeParamRefArguments(int index,TypeParamRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
+            TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);this.arguments.add(index >= 0 ? index : arguments.size(), builder); return (A)this;
     }
 
     public A setToTypeParamRefArguments(int index,TypeParamRef item){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
             TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
-            if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}
+            if (index < 0 || index >= _visitables.get("arguments").size()) { _visitables.get("arguments").add(builder); } else { _visitables.get("arguments").set(index, builder);}
             if (index < 0 || index >= arguments.size()) { arguments.add(builder); } else { arguments.set(index, builder);}
              return (A)this;
     }
 
     public A addToTypeParamRefArguments(TypeParamRef... items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A addAllToTypeParamRefArguments(Collection<TypeParamRef> items){
             if (this.arguments == null) {this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();}
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.add(builder);this.arguments.add(builder);} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("arguments").add(builder);this.arguments.add(builder);} return (A)this;
     }
 
     public A removeFromTypeParamRefArguments(TypeParamRef... items){
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromTypeParamRefArguments(Collection<TypeParamRef> items){
-            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
+            for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("arguments").remove(builder);if (this.arguments != null) {this.arguments.remove(builder);}} return (A)this;
     }
 
     public ClassRefFluent.TypeParamRefArgumentsNested<A> addNewTypeParamRefArgument(){
