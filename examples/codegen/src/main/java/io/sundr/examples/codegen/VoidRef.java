@@ -16,9 +16,12 @@
 
 package io.sundr.examples.codegen;
 
+import io.sundr.builder.annotations.Buildable;
+
 import java.util.Collections;
 import java.util.Map;
 
+@Buildable(lazyCollectionInitEnabled=false)
 public class VoidRef extends TypeRef {
 
     public VoidRef() {

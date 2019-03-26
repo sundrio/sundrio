@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.builder.Editable;
+
 import java.util.List;
 import java.util.Map;
-
-import io.sundr.builder.Editable;
 
 public class EditableMethod extends Method implements Editable<MethodBuilder>{
 

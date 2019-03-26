@@ -16,32 +16,20 @@
 
 package io.sundr.examples.codegen;
 
-import io.sundr.Provider;
 import io.sundr.builder.annotations.Buildable;
 
 import java.util.List;
 
+@Buildable(lazyCollectionInitEnabled=false)
 public class Block {
 
-    private final Provider<List<Statement>> provider;
+    private List<Statement> statements;
 
-    public Block(Provider<List<Statement>> provider) {
-        this.provider = provider;
-    }
-
-    @Buildable(lazyCollectionInitEnabled=false)
-    public Block(final List<Statement> statements) {
-        this.provider = new Provider<List<Statement>>() {
-            @Override
-            public List<Statement> get() {
-                return statements;
-            }
-        };
+    public Block(List<Statement> statements) {
+        this.statements = statements;
     }
 
     public List<Statement> getStatements() {
-        return provider.get();
+        return statements;
     }
-
-
 }

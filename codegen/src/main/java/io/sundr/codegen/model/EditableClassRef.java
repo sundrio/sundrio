@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -21,15 +21,18 @@ import io.sundr.builder.Editable;
 import java.util.List;
 import java.util.Map;
 
-public class EditableClassRef extends ClassRef implements Editable<ClassRefBuilder> {
+public class EditableClassRef extends ClassRef implements Editable<ClassRefBuilder>{
 
 
-    public EditableClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments, Map<AttributeKey, Object> attributes) {
-        super(definition, fullyQualifiedName, dimensions, arguments, attributes);
+    public EditableClassRef(TypeDef definition,String fullyQualifiedName,int dimensions,List<TypeRef> arguments,Map<AttributeKey,Object> attributes){
+            super(definition, fullyQualifiedName, dimensions, arguments, attributes);
     }
 
-    public ClassRefBuilder edit() {
-        return new ClassRefBuilder(this);
+    public ClassRefBuilder edit(){
+            return new ClassRefBuilder(this);
     }
+
+
+
 
 }

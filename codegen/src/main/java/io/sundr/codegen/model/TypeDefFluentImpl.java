@@ -1,5 +1,5 @@
 /*
- *      Copyright 2018 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -83,6 +83,18 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             return this.packageName != null;
     }
 
+    public A withNewPackageName(String arg1){
+            return (A)withPackageName(new String(arg1));
+    }
+
+    public A withNewPackageName(StringBuilder arg1){
+            return (A)withPackageName(new String(arg1));
+    }
+
+    public A withNewPackageName(StringBuffer arg1){
+            return (A)withPackageName(new String(arg1));
+    }
+
     public String getName(){
             return this.name;
     }
@@ -93,6 +105,18 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public Boolean hasName(){
             return this.name != null;
+    }
+
+    public A withNewName(String arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuilder arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuffer arg1){
+            return (A)withName(new String(arg1));
     }
 
     public A addToComments(int index,String item){
@@ -144,6 +168,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (String item: comments) { if(predicate.apply(item)){return item;} } return null;
     }
 
+    public Boolean hasMatchingComment(Predicate<String> predicate){
+            for (String item: comments) { if(predicate.apply(item)){return true;} } return false;
+    }
+
     public A withComments(List<String> comments){
             if (this.comments != null) { _visitables.removeAll(this.comments);}
             if (comments != null) {this.comments = new ArrayList<String>(); for (String item : comments){this.addToComments(item);}} else { this.comments = new ArrayList<String>();} return (A) this;
@@ -156,6 +184,18 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public Boolean hasComments(){
             return comments != null && !comments.isEmpty();
+    }
+
+    public A addNewComment(String arg1){
+            return (A)addToComments(new String(arg1));
+    }
+
+    public A addNewComment(StringBuilder arg1){
+            return (A)addToComments(new String(arg1));
+    }
+
+    public A addNewComment(StringBuffer arg1){
+            return (A)addToComments(new String(arg1));
     }
 
     public A addToAnnotations(int index,AnnotationRef item){
@@ -216,6 +256,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
             for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return item.build();} } return null;
+    }
+
+    public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
+            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return true;} } return false;
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
@@ -329,6 +373,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (ClassRefBuilder item: extendsList) { if(predicate.apply(item)){return item.build();} } return null;
     }
 
+    public Boolean hasMatchingExtendsList(Predicate<ClassRefBuilder> predicate){
+            for (ClassRefBuilder item: extendsList) { if(predicate.apply(item)){return true;} } return false;
+    }
+
     public A withExtendsList(List<ClassRef> extendsList){
             if (this.extendsList != null) { _visitables.removeAll(this.extendsList);}
             if (extendsList != null) {this.extendsList = new ArrayList<ClassRefBuilder>(); for (ClassRef item : extendsList){this.addToExtendsList(item);}} else { this.extendsList = new ArrayList<ClassRefBuilder>();} return (A) this;
@@ -438,6 +486,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public ClassRef buildMatchingImplementsList(Predicate<ClassRefBuilder> predicate){
             for (ClassRefBuilder item: implementsList) { if(predicate.apply(item)){return item.build();} } return null;
+    }
+
+    public Boolean hasMatchingImplementsList(Predicate<ClassRefBuilder> predicate){
+            for (ClassRefBuilder item: implementsList) { if(predicate.apply(item)){return true;} } return false;
     }
 
     public A withImplementsList(List<ClassRef> implementsList){
@@ -551,6 +603,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (TypeParamDefBuilder item: parameters) { if(predicate.apply(item)){return item.build();} } return null;
     }
 
+    public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate){
+            for (TypeParamDefBuilder item: parameters) { if(predicate.apply(item)){return true;} } return false;
+    }
+
     public A withParameters(List<TypeParamDef> parameters){
             if (this.parameters != null) { _visitables.removeAll(this.parameters);}
             if (parameters != null) {this.parameters = new ArrayList<TypeParamDefBuilder>(); for (TypeParamDef item : parameters){this.addToParameters(item);}} else { this.parameters = new ArrayList<TypeParamDefBuilder>();} return (A) this;
@@ -660,6 +716,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public Property buildMatchingProperty(Predicate<PropertyBuilder> predicate){
             for (PropertyBuilder item: properties) { if(predicate.apply(item)){return item.build();} } return null;
+    }
+
+    public Boolean hasMatchingProperty(Predicate<PropertyBuilder> predicate){
+            for (PropertyBuilder item: properties) { if(predicate.apply(item)){return true;} } return false;
     }
 
     public A withProperties(List<Property> properties){
@@ -773,6 +833,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
             for (MethodBuilder item: constructors) { if(predicate.apply(item)){return item.build();} } return null;
     }
 
+    public Boolean hasMatchingConstructor(Predicate<MethodBuilder> predicate){
+            for (MethodBuilder item: constructors) { if(predicate.apply(item)){return true;} } return false;
+    }
+
     public A withConstructors(List<Method> constructors){
             if (this.constructors != null) { _visitables.removeAll(this.constructors);}
             if (constructors != null) {this.constructors = new ArrayList<MethodBuilder>(); for (Method item : constructors){this.addToConstructors(item);}} else { this.constructors = new ArrayList<MethodBuilder>();} return (A) this;
@@ -882,6 +946,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public Method buildMatchingMethod(Predicate<MethodBuilder> predicate){
             for (MethodBuilder item: methods) { if(predicate.apply(item)){return item.build();} } return null;
+    }
+
+    public Boolean hasMatchingMethod(Predicate<MethodBuilder> predicate){
+            for (MethodBuilder item: methods) { if(predicate.apply(item)){return true;} } return false;
     }
 
     public A withMethods(List<Method> methods){
@@ -1035,6 +1103,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
     public TypeDef buildMatchingInnerType(Predicate<TypeDefBuilder> predicate){
             for (TypeDefBuilder item: innerTypes) { if(predicate.apply(item)){return item.build();} } return null;
+    }
+
+    public Boolean hasMatchingInnerType(Predicate<TypeDefBuilder> predicate){
+            for (TypeDefBuilder item: innerTypes) { if(predicate.apply(item)){return true;} } return false;
     }
 
     public A withInnerTypes(List<TypeDef> innerTypes){

@@ -19,8 +19,6 @@ package io.sundr.examples.codegen;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.PackageScope;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
@@ -49,13 +47,10 @@ public class ClassRef extends TypeRef {
         this.dimensions = dimensions;
         this.arguments = arguments;
         this.fullyQualifiedName = fullyQualifiedName != null ? fullyQualifiedName : (definition != null ? definition.getFullyQualifiedName() : null);
-        if (definition != null) {
-            DefinitionRepository.getRepository().registerIfAbsent(definition);
-        }
     }
 
     public TypeDef getDefinition() {
-        return DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
+        return definition;
     }
 
 

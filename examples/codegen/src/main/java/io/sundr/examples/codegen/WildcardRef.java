@@ -16,12 +16,14 @@
 
 package io.sundr.examples.codegen;
 
+import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@Buildable(lazyCollectionInitEnabled=false)
 public class WildcardRef extends TypeRef {
 
     private static final String WILDCARD = "?";

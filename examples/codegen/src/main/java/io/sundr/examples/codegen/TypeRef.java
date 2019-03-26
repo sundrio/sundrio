@@ -16,8 +16,11 @@
 
 package io.sundr.examples.codegen;
 
+import io.sundr.builder.annotations.Buildable;
+
 import java.util.Map;
 
+@Buildable(lazyCollectionInitEnabled=false)
 public abstract class TypeRef extends AttributeSupport {
 
     public TypeRef(Map<AttributeKey, Object> attributes) {

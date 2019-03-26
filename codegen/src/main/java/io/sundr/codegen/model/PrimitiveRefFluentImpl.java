@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -38,7 +38,19 @@ public class PrimitiveRefFluentImpl<A extends PrimitiveRefFluent<A>> extends Typ
     }
 
     public Boolean hasName(){
-            return this.name!=null;
+            return this.name != null;
+    }
+
+    public A withNewName(String arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuilder arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuffer arg1){
+            return (A)withName(new String(arg1));
     }
 
     public int getDimensions(){
