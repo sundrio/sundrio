@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -94,6 +94,11 @@ public class Method extends ModifierSupport {
 
     public Set<ClassRef> getReferences() {
         Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+
+        for (AnnotationRef annotationRef : annotations) {
+            refs.addAll(annotationRef.getReferences());
+        }
+
         if (returnType instanceof ClassRef) {
             ClassRef classRef = (ClassRef) returnType;
             refs.addAll(classRef.getReferences());
@@ -205,7 +210,7 @@ public class Method extends ModifierSupport {
             sb.append(SPACE).append(name);
         } else {
             //This is a constructor
-            sb.append(((ClassRef)returnType).getDefinition().getName());
+            sb.append(((ClassRef) returnType).getDefinition().getName());
         }
 
         sb.append(OP);
