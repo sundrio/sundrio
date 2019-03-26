@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Buildable(lazyCollectionInitEnabled=false)
 public class AnnotationRef extends AttributeSupport {
@@ -44,26 +45,41 @@ public class AnnotationRef extends AttributeSupport {
     }
 
     public Set<ClassRef> getReferences() {
-        Set<ClassRef> result = new HashSet<>();
-        result.add(classRef);
+       Set<ClassRef> result = new HashSet<>();
+       result.add(classRef);
 
-        for (Object o : parameters.values()) {
-            if (o instanceof ClassRef) {
-                result.add((ClassRef) o);
-            } else if (o instanceof AnnotationRef)  {
-                result.addAll(((AnnotationRef) o).getReferences());
-            } else if (o instanceof Collection)  {
-                for (Object i : (Collection)o) {
-                    if (i instanceof ClassRef) {
-                        result.addAll(((ClassRef)i).getReferences());
-                    } else if (i instanceof AnnotationRef) {
-                        result.addAll(((AnnotationRef)i).getReferences());
-                    }
-                }
-            }
-        }
-        return result;
+       for (Object o : parameters.values()) {
+           if (o instanceof ClassRef) {
+               result.add((ClassRef) o);
+           } else if (o instanceof AnnotationRef)  {
+               result.addAll(((AnnotationRef) o).getReferences());
+           } else if (o instanceof Collection)  {
+               for (Object i : (Collection)o) {
+                   if (i instanceof ClassRef) {
+                       result.addAll(((ClassRef)i).getReferences());
+                   } else if (i instanceof AnnotationRef) {
+                       result.addAll(((AnnotationRef)i).getReferences());
+                   }
+               }
+           }
+       }
+       return result;
     }
+
+    private static String toString(Object value) {
+        if  (value instanceof Collection) {
+            return OB + ((Collection)value).stream().map(AnnotationRef::toString).collect(Collectors.joining(",")) + CB;
+        } else if  (value instanceof PrimitiveRef) {
+            return String.valueOf(value);
+        } else if (value instanceof ClassRef) {
+            return ((ClassRef) value).getFullyQualifiedName() + ".class";
+        } else if (value instanceof AnnotationRef) {
+            return value.toString();
+        } else {
+            return DQ + value + DQ;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,8 +87,9 @@ public class AnnotationRef extends AttributeSupport {
 
         AnnotationRef that = (AnnotationRef) o;
 
-        return classRef.equals(that.classRef);
+        if (!classRef.equals(that.classRef)) return false;
 
+        return true;
     }
 
     @Override
@@ -88,15 +105,15 @@ public class AnnotationRef extends AttributeSupport {
         if (parameters != null && parameters.size() > 0) {
             sb.append(OP);
             boolean first = true;
+
             for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                Object value = entry.getValue();
                 if (first) {
                     first = false;
                 } else {
                     sb.append(SPACE).append(COMA);
                 }
-
-                sb.append(entry.getKey()).append(SPACE).append(EQ).append(SPACE).append(entry.getValue());
-
+                sb.append(entry.getKey()).append(SPACE).append(EQ).append(SPACE).append(toString(value));
             }
             sb.append(CP);
         }

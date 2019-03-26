@@ -1,5 +1,5 @@
 /*
- *      Copyright 2018 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -31,9 +31,15 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public String getPackageName();
     public A withPackageName(String packageName);
     public Boolean hasPackageName();
+    public A withNewPackageName(String arg1);
+    public A withNewPackageName(StringBuilder arg1);
+    public A withNewPackageName(StringBuffer arg1);
     public String getName();
     public A withName(String name);
     public Boolean hasName();
+    public A withNewName(String arg1);
+    public A withNewName(StringBuilder arg1);
+    public A withNewName(StringBuffer arg1);
     public A addToComments(int index, String item);
     public A setToComments(int index, String item);
     public A addToComments(String... items);
@@ -45,9 +51,13 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public String getFirstComment();
     public String getLastComment();
     public String getMatchingComment(Predicate<String> predicate);
+    public Boolean hasMatchingComment(Predicate<String> predicate);
     public A withComments(List<String> comments);
     public A withComments(String... comments);
     public Boolean hasComments();
+    public A addNewComment(String arg1);
+    public A addNewComment(StringBuilder arg1);
+    public A addNewComment(StringBuffer arg1);
     public A addToAnnotations(int index, AnnotationRef item);
     public A setToAnnotations(int index, AnnotationRef item);
     public A addToAnnotations(AnnotationRef... items);
@@ -65,6 +75,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public AnnotationRef buildFirstAnnotation();
     public AnnotationRef buildLastAnnotation();
     public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+    public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
     public A withAnnotations(List<AnnotationRef> annotations);
     public A withAnnotations(AnnotationRef... annotations);
     public Boolean hasAnnotations();
@@ -92,6 +103,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public ClassRef buildFirstExtendsList();
     public ClassRef buildLastExtendsList();
     public ClassRef buildMatchingExtendsList(Predicate<ClassRefBuilder> predicate);
+    public Boolean hasMatchingExtendsList(Predicate<ClassRefBuilder> predicate);
     public A withExtendsList(List<ClassRef> extendsList);
     public A withExtendsList(ClassRef... extendsList);
     public Boolean hasExtendsList();
@@ -119,6 +131,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public ClassRef buildFirstImplementsList();
     public ClassRef buildLastImplementsList();
     public ClassRef buildMatchingImplementsList(Predicate<ClassRefBuilder> predicate);
+    public Boolean hasMatchingImplementsList(Predicate<ClassRefBuilder> predicate);
     public A withImplementsList(List<ClassRef> implementsList);
     public A withImplementsList(ClassRef... implementsList);
     public Boolean hasImplementsList();
@@ -146,6 +159,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeParamDef buildFirstParameter();
     public TypeParamDef buildLastParameter();
     public TypeParamDef buildMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
+    public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
     public A withParameters(List<TypeParamDef> parameters);
     public A withParameters(TypeParamDef... parameters);
     public Boolean hasParameters();
@@ -173,6 +187,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public Property buildFirstProperty();
     public Property buildLastProperty();
     public Property buildMatchingProperty(Predicate<PropertyBuilder> predicate);
+    public Boolean hasMatchingProperty(Predicate<PropertyBuilder> predicate);
     public A withProperties(List<Property> properties);
     public A withProperties(Property... properties);
     public Boolean hasProperties();
@@ -200,6 +215,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public Method buildFirstConstructor();
     public Method buildLastConstructor();
     public Method buildMatchingConstructor(Predicate<MethodBuilder> predicate);
+    public Boolean hasMatchingConstructor(Predicate<MethodBuilder> predicate);
     public A withConstructors(List<Method> constructors);
     public A withConstructors(Method... constructors);
     public Boolean hasConstructors();
@@ -227,6 +243,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public Method buildFirstMethod();
     public Method buildLastMethod();
     public Method buildMatchingMethod(Predicate<MethodBuilder> predicate);
+    public Boolean hasMatchingMethod(Predicate<MethodBuilder> predicate);
     public A withMethods(List<Method> methods);
     public A withMethods(Method... methods);
     public Boolean hasMethods();
@@ -268,6 +285,7 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDef buildFirstInnerType();
     public TypeDef buildLastInnerType();
     public TypeDef buildMatchingInnerType(Predicate<TypeDefBuilder> predicate);
+    public Boolean hasMatchingInnerType(Predicate<TypeDefBuilder> predicate);
     public A withInnerTypes(List<TypeDef> innerTypes);
     public A withInnerTypes(TypeDef... innerTypes);
     public Boolean hasInnerTypes();

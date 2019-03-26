@@ -37,19 +37,19 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     }
 
     public A addToTypes(int index,TypeDef item){
-            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.types.add(builder); return (A)this;
+            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("types").add(builder);this.types.add(builder); return (A)this;
     }
 
     public A setToTypes(int index,TypeDef item){
-            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.types.add(builder); return (A)this;
+            TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("types").add(builder);this.types.add(builder); return (A)this;
     }
 
     public A addToTypes(TypeDef... items){
-            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.types.add(builder);} return (A)this;
+            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("types").add(builder);this.types.add(builder);} return (A)this;
     }
 
     public A addAllToTypes(Collection<TypeDef> items){
-            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.add(builder);this.types.add(builder);} return (A)this;
+            for (TypeDef item : items) {TypeDefBuilder builder = new TypeDefBuilder(item);_visitables.get("types").add(builder);this.types.add(builder);} return (A)this;
     }
 
     public A removeFromTypes(TypeDef... items){
@@ -91,7 +91,7 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     }
 
     public A withTypes(List<TypeDef> types){
-            _visitables.removeAll(this.types);
+            _visitables.get("types").removeAll(this.types);
             this.types.clear();
             if (types != null) {for (TypeDef item : types){this.addToTypes(item);}} return (A) this;
     }

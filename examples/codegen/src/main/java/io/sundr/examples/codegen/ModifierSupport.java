@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ public class ModifierSupport extends AttributeSupport {
     }
 
     public boolean isTransient() {
-        return Modifier.isSynchronized(modifiers);
+        return Modifier.isTransient(modifiers);
     }
 
     public int getModifiers() {

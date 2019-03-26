@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -16,12 +16,11 @@
 
 package io.sundr.codegen.model;
 
-import java.util.Collection;
-import java.util.List;
-
-import io.sundr.builder.Builder;
 import io.sundr.builder.Nested;
 import io.sundr.builder.Predicate;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFluent<A>{
 
@@ -37,9 +36,13 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public String getFirstComment();
     public String getLastComment();
     public String getMatchingComment(Predicate<String> predicate);
+    public Boolean hasMatchingComment(Predicate<String> predicate);
     public A withComments(List<String> comments);
     public A withComments(String... comments);
     public Boolean hasComments();
+    public A addNewComment(String arg1);
+    public A addNewComment(StringBuilder arg1);
+    public A addNewComment(StringBuffer arg1);
     public A addToAnnotations(int index, AnnotationRef item);
     public A setToAnnotations(int index, AnnotationRef item);
     public A addToAnnotations(AnnotationRef... items);
@@ -47,21 +50,27 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A removeFromAnnotations(AnnotationRef... items);
     public A removeAllFromAnnotations(Collection<AnnotationRef> items);
 
-    /**
-     * This method has been deprecated, please use method buildAnnotations instead.
-     */
-    @Deprecated
-    public List<AnnotationRef> getAnnotations();
+/**
+ * This method has been deprecated, please use method buildAnnotations instead.
+ * @return The buildable object.
+ */
+@Deprecated public List<AnnotationRef> getAnnotations();
     public List<AnnotationRef> buildAnnotations();
     public AnnotationRef buildAnnotation(int index);
     public AnnotationRef buildFirstAnnotation();
     public AnnotationRef buildLastAnnotation();
-    public AnnotationRef buildMatchingAnnotation(Predicate<Builder<? extends AnnotationRef>> predicate);
+    public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+    public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
     public A withAnnotations(List<AnnotationRef> annotations);
     public A withAnnotations(AnnotationRef... annotations);
     public Boolean hasAnnotations();
-    public AnnotationsNested<A> addNewAnnotation();
-    public AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item);
+    public MethodFluent.AnnotationsNested<A> addNewAnnotation();
+    public MethodFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item);
+    public MethodFluent.AnnotationsNested<A> setNewAnnotationLike(int index, AnnotationRef item);
+    public MethodFluent.AnnotationsNested<A> editAnnotation(int index);
+    public MethodFluent.AnnotationsNested<A> editFirstAnnotation();
+    public MethodFluent.AnnotationsNested<A> editLastAnnotation();
+    public MethodFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
     public A addToParameters(int index, TypeParamDef item);
     public A setToParameters(int index, TypeParamDef item);
     public A addToParameters(TypeParamDef... items);
@@ -69,48 +78,57 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A removeFromParameters(TypeParamDef... items);
     public A removeAllFromParameters(Collection<TypeParamDef> items);
 
-    /**
-     * This method has been deprecated, please use method buildParameters instead.
-     */
-    @Deprecated
-    public List<TypeParamDef> getParameters();
+/**
+ * This method has been deprecated, please use method buildParameters instead.
+ * @return The buildable object.
+ */
+@Deprecated public List<TypeParamDef> getParameters();
     public List<TypeParamDef> buildParameters();
     public TypeParamDef buildParameter(int index);
     public TypeParamDef buildFirstParameter();
     public TypeParamDef buildLastParameter();
-    public TypeParamDef buildMatchingParameter(Predicate<Builder<? extends TypeParamDef>> predicate);
+    public TypeParamDef buildMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
+    public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
     public A withParameters(List<TypeParamDef> parameters);
     public A withParameters(TypeParamDef... parameters);
     public Boolean hasParameters();
-    public ParametersNested<A> addNewParameter();
-    public ParametersNested<A> addNewParameterLike(TypeParamDef item);
+    public MethodFluent.ParametersNested<A> addNewParameter();
+    public MethodFluent.ParametersNested<A> addNewParameterLike(TypeParamDef item);
+    public MethodFluent.ParametersNested<A> setNewParameterLike(int index, TypeParamDef item);
+    public MethodFluent.ParametersNested<A> editParameter(int index);
+    public MethodFluent.ParametersNested<A> editFirstParameter();
+    public MethodFluent.ParametersNested<A> editLastParameter();
+    public MethodFluent.ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
     public String getName();
     public A withName(String name);
     public Boolean hasName();
+    public A withNewName(String arg1);
+    public A withNewName(StringBuilder arg1);
+    public A withNewName(StringBuffer arg1);
 
-    /**
-     * This method has been deprecated, please use method buildReturnType instead.
-     */
-    @Deprecated
-    public TypeRef getReturnType();
+/**
+ * This method has been deprecated, please use method buildReturnType instead.
+ * @return The buildable object.
+ */
+@Deprecated public TypeRef getReturnType();
     public TypeRef buildReturnType();
     public A withReturnType(TypeRef returnType);
     public Boolean hasReturnType();
-    public A withVoidRefReturnType(VoidRef voidRefReturnType);
-    public VoidRefReturnTypeNested<A> withNewVoidRefReturnType();
-    public VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(VoidRef item);
-    public A withWildcardRefReturnType(WildcardRef wildcardRefReturnType);
-    public WildcardRefReturnTypeNested<A> withNewWildcardRefReturnType();
-    public WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(WildcardRef item);
     public A withPrimitiveRefReturnType(PrimitiveRef primitiveRefReturnType);
-    public PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnType();
-    public PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(PrimitiveRef item);
-    public A withTypeParamRefReturnType(TypeParamRef typeParamRefReturnType);
-    public TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnType();
-    public TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(TypeParamRef item);
+    public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnType();
+    public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(PrimitiveRef item);
+    public A withVoidRefReturnType(VoidRef voidRefReturnType);
+    public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnType();
+    public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(VoidRef item);
+    public A withWildcardRefReturnType(WildcardRef wildcardRefReturnType);
+    public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnType();
+    public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(WildcardRef item);
     public A withClassRefReturnType(ClassRef classRefReturnType);
-    public ClassRefReturnTypeNested<A> withNewClassRefReturnType();
-    public ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(ClassRef item);
+    public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnType();
+    public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(ClassRef item);
+    public A withTypeParamRefReturnType(TypeParamRef typeParamRefReturnType);
+    public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnType();
+    public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(TypeParamRef item);
     public A addToArguments(int index, Property item);
     public A setToArguments(int index, Property item);
     public A addToArguments(Property... items);
@@ -118,21 +136,27 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A removeFromArguments(Property... items);
     public A removeAllFromArguments(Collection<Property> items);
 
-    /**
-     * This method has been deprecated, please use method buildArguments instead.
-     */
-    @Deprecated
-    public List<Property> getArguments();
+/**
+ * This method has been deprecated, please use method buildArguments instead.
+ * @return The buildable object.
+ */
+@Deprecated public List<Property> getArguments();
     public List<Property> buildArguments();
     public Property buildArgument(int index);
     public Property buildFirstArgument();
     public Property buildLastArgument();
-    public Property buildMatchingArgument(Predicate<Builder<? extends Property>> predicate);
+    public Property buildMatchingArgument(Predicate<PropertyBuilder> predicate);
+    public Boolean hasMatchingArgument(Predicate<PropertyBuilder> predicate);
     public A withArguments(List<Property> arguments);
     public A withArguments(Property... arguments);
     public Boolean hasArguments();
-    public ArgumentsNested<A> addNewArgument();
-    public ArgumentsNested<A> addNewArgumentLike(Property item);
+    public MethodFluent.ArgumentsNested<A> addNewArgument();
+    public MethodFluent.ArgumentsNested<A> addNewArgumentLike(Property item);
+    public MethodFluent.ArgumentsNested<A> setNewArgumentLike(int index, Property item);
+    public MethodFluent.ArgumentsNested<A> editArgument(int index);
+    public MethodFluent.ArgumentsNested<A> editFirstArgument();
+    public MethodFluent.ArgumentsNested<A> editLastArgument();
+    public MethodFluent.ArgumentsNested<A> editMatchingArgument(Predicate<PropertyBuilder> predicate);
     public boolean isVarArgPreferred();
     public A withVarArgPreferred(boolean varArgPreferred);
     public Boolean hasVarArgPreferred();
@@ -143,82 +167,88 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
     public A removeFromExceptions(ClassRef... items);
     public A removeAllFromExceptions(Collection<ClassRef> items);
 
-    /**
-     * This method has been deprecated, please use method buildExceptions instead.
-     */
-    @Deprecated
-    public List<ClassRef> getExceptions();
+/**
+ * This method has been deprecated, please use method buildExceptions instead.
+ * @return The buildable object.
+ */
+@Deprecated public List<ClassRef> getExceptions();
     public List<ClassRef> buildExceptions();
     public ClassRef buildException(int index);
     public ClassRef buildFirstException();
     public ClassRef buildLastException();
-    public ClassRef buildMatchingException(Predicate<Builder<? extends ClassRef>> predicate);
+    public ClassRef buildMatchingException(Predicate<ClassRefBuilder> predicate);
+    public Boolean hasMatchingException(Predicate<ClassRefBuilder> predicate);
     public A withExceptions(List<ClassRef> exceptions);
     public A withExceptions(ClassRef... exceptions);
     public Boolean hasExceptions();
-    public ExceptionsNested<A> addNewException();
-    public ExceptionsNested<A> addNewExceptionLike(ClassRef item);
+    public MethodFluent.ExceptionsNested<A> addNewException();
+    public MethodFluent.ExceptionsNested<A> addNewExceptionLike(ClassRef item);
+    public MethodFluent.ExceptionsNested<A> setNewExceptionLike(int index, ClassRef item);
+    public MethodFluent.ExceptionsNested<A> editException(int index);
+    public MethodFluent.ExceptionsNested<A> editFirstException();
+    public MethodFluent.ExceptionsNested<A> editLastException();
+    public MethodFluent.ExceptionsNested<A> editMatchingException(Predicate<ClassRefBuilder> predicate);
 
-    /**
-     * This method has been deprecated, please use method buildBlock instead.
-     */
-    @Deprecated
-    public Block getBlock();
+/**
+ * This method has been deprecated, please use method buildBlock instead.
+ * @return The buildable object.
+ */
+@Deprecated public Block getBlock();
     public Block buildBlock();
     public A withBlock(Block block);
     public Boolean hasBlock();
-    public BlockNested<A> withNewBlock();
-    public BlockNested<A> withNewBlockLike(Block item);
-    public BlockNested<A> editBlock();
-    public BlockNested<A> editOrNewBlock();
-    public BlockNested<A> editOrNewBlockLike(Block item);
+    public MethodFluent.BlockNested<A> withNewBlock();
+    public MethodFluent.BlockNested<A> withNewBlockLike(Block item);
+    public MethodFluent.BlockNested<A> editBlock();
+    public MethodFluent.BlockNested<A> editOrNewBlock();
+    public MethodFluent.BlockNested<A> editOrNewBlockLike(Block item);
 
-    public interface AnnotationsNested<N> extends Nested<N>,AnnotationRefFluent<AnnotationsNested<N>>{
+    public interface AnnotationsNested<N> extends Nested<N>,AnnotationRefFluent<MethodFluent.AnnotationsNested<N>>{
 
 
     public N and();    public N endAnnotation();
 }
-    public interface ParametersNested<N> extends Nested<N>,TypeParamDefFluent<ParametersNested<N>>{
+    public interface ParametersNested<N> extends Nested<N>,TypeParamDefFluent<MethodFluent.ParametersNested<N>>{
 
 
     public N and();    public N endParameter();
 }
-    public interface VoidRefReturnTypeNested<N> extends Nested<N>,VoidRefFluent<VoidRefReturnTypeNested<N>>{
-
-
-    public N and();    public N endVoidRefReturnType();
-}
-    public interface WildcardRefReturnTypeNested<N> extends Nested<N>,WildcardRefFluent<WildcardRefReturnTypeNested<N>>{
-
-
-    public N and();    public N endWildcardRefReturnType();
-}
-    public interface PrimitiveRefReturnTypeNested<N> extends Nested<N>,PrimitiveRefFluent<PrimitiveRefReturnTypeNested<N>>{
+    public interface PrimitiveRefReturnTypeNested<N> extends Nested<N>,PrimitiveRefFluent<MethodFluent.PrimitiveRefReturnTypeNested<N>>{
 
 
     public N and();    public N endPrimitiveRefReturnType();
 }
-    public interface TypeParamRefReturnTypeNested<N> extends Nested<N>,TypeParamRefFluent<TypeParamRefReturnTypeNested<N>>{
+    public interface VoidRefReturnTypeNested<N> extends Nested<N>,VoidRefFluent<MethodFluent.VoidRefReturnTypeNested<N>>{
 
 
-    public N and();    public N endTypeParamRefReturnType();
+    public N and();    public N endVoidRefReturnType();
 }
-    public interface ClassRefReturnTypeNested<N> extends Nested<N>,ClassRefFluent<ClassRefReturnTypeNested<N>>{
+    public interface WildcardRefReturnTypeNested<N> extends Nested<N>,WildcardRefFluent<MethodFluent.WildcardRefReturnTypeNested<N>>{
+
+
+    public N and();    public N endWildcardRefReturnType();
+}
+    public interface ClassRefReturnTypeNested<N> extends Nested<N>,ClassRefFluent<MethodFluent.ClassRefReturnTypeNested<N>>{
 
 
     public N and();    public N endClassRefReturnType();
 }
-    public interface ArgumentsNested<N> extends Nested<N>,PropertyFluent<ArgumentsNested<N>>{
+    public interface TypeParamRefReturnTypeNested<N> extends Nested<N>,TypeParamRefFluent<MethodFluent.TypeParamRefReturnTypeNested<N>>{
+
+
+    public N and();    public N endTypeParamRefReturnType();
+}
+    public interface ArgumentsNested<N> extends Nested<N>,PropertyFluent<MethodFluent.ArgumentsNested<N>>{
 
 
     public N and();    public N endArgument();
 }
-    public interface ExceptionsNested<N> extends Nested<N>,ClassRefFluent<ExceptionsNested<N>>{
+    public interface ExceptionsNested<N> extends Nested<N>,ClassRefFluent<MethodFluent.ExceptionsNested<N>>{
 
 
     public N and();    public N endException();
 }
-    public interface BlockNested<N> extends Nested<N>,BlockFluent<BlockNested<N>>{
+    public interface BlockNested<N> extends Nested<N>,BlockFluent<MethodFluent.BlockNested<N>>{
 
         
     public N and();    public N endBlock();

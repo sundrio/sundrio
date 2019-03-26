@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Buildable(lazyCollectionInitEnabled=false)
 public class Property extends ModifierSupport {
@@ -52,14 +54,19 @@ public class Property extends ModifierSupport {
     }
 
     public String getNameCapitalized() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(name.replaceAll("_", "").substring(0, 1).toUpperCase());
-        sb.append(name.replaceAll("_", "").substring(1));
-        return sb.toString();
+        return Stream.of(name.split("[^a-zA-Z0-9]"))
+            .filter(s -> s != null && s.length() > 0)
+            .map(v -> Character.toUpperCase(v.charAt(0)) + v.substring(1))
+            .collect(Collectors.joining());
     }
 
     public Set<ClassRef> getReferences() {
         Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+
+        for (AnnotationRef annotationRef : annotations) {
+            refs.addAll(annotationRef.getReferences());
+        }
+
         if (typeRef instanceof ClassRef) {
             ClassRef classRef = (ClassRef) typeRef;
             refs.addAll(classRef.getReferences());
@@ -86,7 +93,8 @@ public class Property extends ModifierSupport {
 
         Property property = (Property) o;
 
-        if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null) return false;
+        if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null)
+            return false;
         return name != null ? name.equals(property.name) : property.name == null;
 
     }

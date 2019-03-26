@@ -109,8 +109,13 @@ public class ClassTo {
                 if (c.isPrimitive()) {
                     return new PrimitiveRefBuilder().withName(c.getName()).build();
                 } else {
+                    List<TypeRef> arguments = new ArrayList<TypeRef>();
+                    for (TypeVariable v : c.getTypeParameters()) {
+                        arguments.add(TYPEREF.apply(v));
+                    }
                     return new ClassRefBuilder()
                             .withDefinition(TYPEDEF.apply(c))
+                            .withArguments(arguments)
                             .build();
                 }
             }

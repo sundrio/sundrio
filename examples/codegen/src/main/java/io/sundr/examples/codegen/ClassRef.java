@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package io.sundr.examples.codegen;
 
 import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.PackageScope;
 import io.sundr.codegen.utils.StringUtils;
 
 import java.util.LinkedHashSet;
@@ -27,7 +29,7 @@ import java.util.Set;
 @Buildable(lazyCollectionInitEnabled=false)
 public class ClassRef extends TypeRef {
 
-    public static final String UNKWNON = "<unkwnon>";
+    public static final String UNKNOWN = "<unknown>";
     public static final String BRACKETS = "[]";
 
     public static final ClassRef OBJECT = new ClassRefBuilder()
@@ -45,14 +47,10 @@ public class ClassRef extends TypeRef {
         this.dimensions = dimensions;
         this.arguments = arguments;
         this.fullyQualifiedName = fullyQualifiedName != null ? fullyQualifiedName : (definition != null ? definition.getFullyQualifiedName() : null);
-        if (definition != null) {
-            //DefinitionRepository.getRepository().registerIfAbsent(definition);
-        }
     }
 
     public TypeDef getDefinition() {
-        return null;
-        //return DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
+        return definition;
     }
 
 
@@ -78,11 +76,15 @@ public class ClassRef extends TypeRef {
         } else if (other == null) {
             return false;
         } else if (other instanceof PrimitiveRef) {
-            if (!getDefinition().getPackageName().equals(JAVA_LANG)) {
+            if (getDefinition() == null) {
                 return false;
             }
 
-            if(!getDefinition().getName().toUpperCase().startsWith(((PrimitiveRef) other).getName().toUpperCase())) {
+            if (getDefinition() != null && !JAVA_LANG.equals(getDefinition().getPackageName())) {
+                return false;
+            }
+
+            if (!getDefinition().getName().toUpperCase().startsWith(((PrimitiveRef) other).getName().toUpperCase())) {
                 return false;
             }
             return true;
@@ -103,13 +105,44 @@ public class ClassRef extends TypeRef {
         Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
         for (TypeRef argument : arguments) {
             if (argument instanceof ClassRef) {
-                refs.addAll(((ClassRef)argument).getReferences());
+                refs.addAll(((ClassRef) argument).getReferences());
             }
         }
         refs.add(this);
         return refs;
     }
 
+    /**
+     * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
+     * to a class with the same name but different package has been made already.
+     */
+    private boolean requiresFullyQualifiedName() {
+        String currentPackage = PackageScope.get();
+        if (currentPackage != null) {
+            if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
+                String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(), currentPackage);
+                if (!conflictingFQCN.equals(getFullyQualifiedName()) && DefinitionRepository.getRepository().getDefinition(conflictingFQCN) != null) {
+                    return true;
+                }
+            }
+        }
+
+        Map<String, String> referenceMap = DefinitionRepository.getRepository().getReferenceMap();
+        if (referenceMap != null && referenceMap.containsKey(definition.getName())) {
+            String fqn = referenceMap.get(definition.getName());
+            if (!getDefinition().getFullyQualifiedName().equals(fqn)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getName() {
+        if (requiresFullyQualifiedName()) {
+            return getDefinition().getFullyQualifiedName();
+        }
+        return getDefinition().getName();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -119,9 +152,9 @@ public class ClassRef extends TypeRef {
         ClassRef classRef = (ClassRef) o;
 
         if (dimensions != classRef.dimensions) return false;
-        if (definition != null ? !definition.equals(classRef.definition) : classRef.definition != null) return false;
+        if (definition != null ? !definition.equals(classRef.definition) : classRef.definition != null)
+            return false;
         return arguments != null ? arguments.equals(classRef.arguments) : classRef.arguments == null;
-
     }
 
     @Override
@@ -137,21 +170,25 @@ public class ClassRef extends TypeRef {
         StringBuilder sb = new StringBuilder();
         TypeDef definition = getDefinition();
         if (definition == null) {
-            sb.append(UNKWNON);
-        }
-        else if (definition.getOuterType() != null) {
-            sb.append(definition.getOuterType().getName()).append(DOT).append(definition.getName());
+            sb.append(UNKNOWN);
         } else {
-            sb.append(definition.getName());
-        }
+            if (requiresFullyQualifiedName()) {
+                sb.append(definition.getPackageName()).append(DOT);
+            }
 
+            if (definition.getOuterType() != null) {
+                sb.append(definition.getOuterType().getName()).append(DOT).append(definition.getName());
+            } else {
+                sb.append(definition.getName());
+            }
+        }
         if (arguments.size() > 0) {
             sb.append(LT);
             sb.append(StringUtils.join(arguments, COMA));
             sb.append(GT);
         }
 
-        for (int i=0;i<dimensions;i++) {
+        for (int i = 0; i < dimensions; i++) {
             sb.append(BRACKETS);
         }
         return sb.toString();

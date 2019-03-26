@@ -26,7 +26,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
     private static final String VISIT = "visit";
 
-    public final List<Visitable> _visitables = new ArrayList<Visitable>();
+    public final VisitableMap _visitables = new VisitableMap();
 
 
     public static <T> VisitableBuilder<T, ?> builderOf(T item) {

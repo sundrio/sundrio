@@ -50,6 +50,7 @@ public class BuilderContext {
     private final TypeDef editableInterface;
     private final TypeDef visitableInterface;
     private final TypeDef visitableBuilderInterface;
+    private final TypeDef visitableMapClass;
     private final TypeDef visitorInterface;
     private final TypeDef typedVisitorInterface;
     private final TypeDef pathAwareVisitorClass;
@@ -77,7 +78,9 @@ public class BuilderContext {
 
         buildableRepository = new BuildableRepository();
 
-        ClassTo.TYPEDEF.apply(ArrayList.class);
+        //We often have issues with these classes, like missing generics etc. So let's register them correctly from the beggining.
+        DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(ArrayList.class));
+        DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(Iterable.class));
 
         functionClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
@@ -107,7 +110,11 @@ public class BuilderContext {
         visitableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitable.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
-        
+
+        visitableMapClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableMap.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+                .build();
+
         builderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Builder.java"))
                 .withPackageName(builderPackage)
                 .build();
@@ -225,6 +232,10 @@ public class BuilderContext {
 
     public TypeDef getVisitableBuilderInterface() {
         return visitableBuilderInterface;
+    }
+
+    public TypeDef getVisitableMapClass() {
+        return visitableMapClass;
     }
 
     public TypeDef getVisitorInterface() {

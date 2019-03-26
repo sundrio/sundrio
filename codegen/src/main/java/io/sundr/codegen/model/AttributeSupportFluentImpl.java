@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.builder.BaseFluent;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import io.sundr.builder.BaseFluent;
 
 public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> extends BaseFluent<A> implements AttributeSupportFluent<A>{
 
@@ -32,19 +32,23 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     }
 
     public A addToAttributes(AttributeKey key,Object value){
+            if(this.attributes == null && key != null && value != null) { this.attributes = new LinkedHashMap<AttributeKey,Object>(); }
             if(key != null && value != null) {this.attributes.put(key, value);} return (A)this;
     }
 
     public A addToAttributes(Map<AttributeKey,Object> map){
+            if(this.attributes == null && map != null) { this.attributes = new LinkedHashMap<AttributeKey,Object>(); }
             if(map != null) { this.attributes.putAll(map);} return (A)this;
     }
 
     public A removeFromAttributes(AttributeKey key){
-            if(key != null) {this.attributes.remove(key);} return (A)this;
+            if(this.attributes == null) { return (A) this; }
+            if(key != null && this.attributes != null) {this.attributes.remove(key);} return (A)this;
     }
 
     public A removeFromAttributes(Map<AttributeKey,Object> map){
-            if(map != null) { for(Object key : map.keySet()) {this.attributes.remove(key);}} return (A)this;
+            if(this.attributes == null) { return (A) this; }
+            if(map != null) { for(Object key : map.keySet()) {if (this.attributes != null){this.attributes.remove(key);}}} return (A)this;
     }
 
     public Map<AttributeKey,Object> getAttributes(){
@@ -52,12 +56,11 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     }
 
     public A withAttributes(Map<AttributeKey,Object> attributes){
-            this.attributes.clear();
-            if (attributes != null) {this.attributes.putAll(attributes);} return (A) this;
+            if (attributes == null) { this.attributes =  new LinkedHashMap<AttributeKey,Object>();} else {this.attributes = new LinkedHashMap<AttributeKey,Object>(attributes);} return (A) this;
     }
 
     public Boolean hasAttributes(){
-            return this.attributes!=null;
+            return this.attributes != null;
     }
 
     public boolean equals(Object o){

@@ -136,7 +136,7 @@ public class ToMethod {
             }
 
             if (isBuildable(unwrapped) && !IS_COLLECTION.apply(type) && !IS_MAP.apply(type)) {
-                statements.add(new StringStatement("_visitables.remove(this." + fieldName + ");"));
+                statements.add(new StringStatement("_visitables.get(\""+fieldName+"\").remove(this." + fieldName + ");"));
             }
 
             if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
@@ -144,7 +144,7 @@ public class ToMethod {
                 if (IS_MAP.apply(type)) {
                     statements.add(new StringStatement("if (" + fieldName + " == null) { this." + fieldName + " =  "+property.getAttribute(LAZY_INIT)+";} else {this." + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Arrays.asList(fieldName)) + ";} return (" + returnType + ") this;"));
                 } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
-                    statements.add(new StringStatement("if (this." + fieldName + " != null) { _visitables.removeAll(this." + fieldName + ");}"));
+                    statements.add(new StringStatement("if (this." + fieldName + " != null) { _visitables.get(\""+fieldName+"\").removeAll(this." + fieldName + ");}"));
 
                     String addToMethodName = "addTo" + property.getNameCapitalized();
                     statements.add(new StringStatement("if (" + argumentName + " != null) {this."+fieldName+" = "+property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList())+"; for (" + unwrapped.toString() + " item : " + argumentName + "){this." + addToMethodName + "(item);}} else { this."+fieldName+" = "+property.getAttribute(LAZY_INIT)+";} return (" + returnType + ") this;"));
@@ -155,7 +155,7 @@ public class ToMethod {
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition());
                 String builderClass = builder.toReference().getName();
-                statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "(" + argumentName + "); _visitables.add(this." + fieldName + ");} return (" + returnType + ") this;"));
+                statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "(" + argumentName + "); _visitables.get(\""+fieldName+"\").add(this." + fieldName + ");} return (" + returnType + ") this;"));
                 return statements;
             }
 
@@ -164,7 +164,7 @@ public class ToMethod {
                     TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(descendant.getTypeRef());
                     TypeDef builder = BUILDER.apply(((ClassRef) dunwraped).getDefinition());
                     String builderClass = builder.toReference().getName();
-                    statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName + "= new " + builderClass + "((" + dunwraped + ")" + argumentName + "); _visitables.add(this." + fieldName + ");}"));
+                    statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName + "= new " + builderClass + "((" + dunwraped + ")" + argumentName + "); _visitables.get(\""+fieldName+"\").add(this." + fieldName + ");}"));
 
                     alsoImport.add((ClassRef) dunwraped);
                     alsoImport.add(builder.toInternalReference());
@@ -219,8 +219,8 @@ public class ToMethod {
 
             if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
                 TypeDef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition());
-                prepareSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + "); _visitables.add(b);";
-                prepareOptionalSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + ".get()); _visitables.add(b);";
+                prepareSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + "); _visitables.get(\""+fieldName+"\").add(b);";
+                prepareOptionalSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + ".get()); _visitables.get(\""+fieldName+"\").add(b);";
                 optionalSource = "Optional.of(b)";
                 source = "b";
             }
@@ -740,14 +740,14 @@ public class ToMethod {
                 //We need to do it more
                 alsoImport.add(TypeAs.BUILDER.apply(targetType.getDefinition()).toInternalReference());
                 statements.add(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"));
-                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.get(\""+propertyName+"\").add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
 
                 addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
                         .withParameters(parameters)
                         .editBlock()
                         .withStatements(
                                 new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
-                                new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.add(index >= 0 ? index : _visitables.size(), builder);this." + propertyName + ".add(index >= 0 ? index : " + propertyName + ".size(), builder); return (" + returnType + ")this;"))
+                                new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.get(\""+propertyName+"\").add(index >= 0 ? index : _visitables.get(\""+propertyName+"\").size(), builder);this." + propertyName + ".add(index >= 0 ? index : " + propertyName + ".size(), builder); return (" + returnType + ")this;"))
                         .endBlock()
                         .build();
 
@@ -757,7 +757,7 @@ public class ToMethod {
                         .withStatements(
                                 new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
                                 new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
-                                new StringStatement("if (index < 0 || index >= _visitables.size()) { _visitables.add(builder); } else { _visitables.set(index, builder);}"),
+                                new StringStatement("if (index < 0 || index >= _visitables.get(\""+propertyName+"\").size()) { _visitables.get(\""+propertyName+"\").add(builder); } else { _visitables.get(\""+propertyName+"\").set(index, builder);}"),
                                 new StringStatement("if (index < 0 || index >= " + propertyName + ".size()) { " + propertyName + ".add(builder); } else { " + propertyName + ".set(index, builder);}"),
                                 new StringStatement(" return (" + returnType + ")this;"))
                         .endBlock()
@@ -797,7 +797,7 @@ public class ToMethod {
                         .withNewBlock()
                         .addToStatements(
                                 new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
-                                new StringStatement("_visitables.add(builder);this."+propertyName+".add(builder); return (" + returnType + ")this;")
+                                new StringStatement("_visitables.get(\""+propertyName+"\").add(builder);this."+propertyName+".add(builder); return (" + returnType + ")this;")
                                 )
                         .endBlock()
                         .build());
@@ -811,7 +811,7 @@ public class ToMethod {
                         .withNewBlock()
                         .addToStatements(
                                 new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
-                                new StringStatement("_visitables.add(index, builder);this."+propertyName+".add(index, builder); return (" + returnType + ")this;")
+                                new StringStatement("_visitables.get(\""+propertyName+"\").add(index, builder);this."+propertyName+".add(index, builder); return (" + returnType + ")this;")
                         )
                         .endBlock()
                         .build());
@@ -871,7 +871,7 @@ public class ToMethod {
         }
 
         private Statement createAddToDescendantsFallback(String type, String name) {
-            return new StringStatement("else {  VisitableBuilder<? extends "+type+",?> builder = builderOf(item); _visitables.add(builder);this."+name+".add(builder); }");
+            return new StringStatement("else {  VisitableBuilder<? extends "+type+",?> builder = builderOf(item); _visitables.get(\""+name+"\").add(builder);this."+name+".add(builder); }");
         }
     });
 
@@ -916,7 +916,7 @@ public class ToMethod {
 
                 //We need to do it more elegantly
                 alsoImport.add(TypeAs.BUILDER.apply(targetType.getDefinition()).toInternalReference());
-                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.remove(builder);if (this." + propertyName + " != null) {this."+propertyName+".remove(builder);}} return (" + returnType + ")this;"));
+                statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new " + builderClass + "(item);_visitables.get(\""+propertyName+"\").remove(builder);if (this." + propertyName + " != null) {this."+propertyName+".remove(builder);}} return (" + returnType + ")this;"));
             } else if (!descendants.isEmpty()) {
                 final ClassRef targetType = (ClassRef) unwrapped;
                 parameters.addAll(targetType.getDefinition().getParameters());
@@ -941,7 +941,7 @@ public class ToMethod {
                         .withNewBlock()
                         .addToStatements(
                                 new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}"),
-                                new StringStatement("_visitables.remove(builder);this."+propertyName+".remove(builder); return (" + returnType + ")this;")
+                                new StringStatement("_visitables.get(\""+propertyName+"\").remove(builder);this."+propertyName+".remove(builder); return (" + returnType + ")this;")
                         )
                         .endBlock()
                         .build());
@@ -981,7 +981,7 @@ public class ToMethod {
         }
 
         private Statement createRemoveFromDescendantsFallback(String type, String name) {
-            return new StringStatement("else {  VisitableBuilder<? extends "+type+",?> builder = builderOf(item); _visitables.remove(builder);this."+name+".remove(builder); }");
+            return new StringStatement("else {  VisitableBuilder<? extends "+type+",?> builder = builderOf(item); _visitables.get(\""+name+"\").remove(builder);this."+name+".remove(builder); }");
         }
     });
 

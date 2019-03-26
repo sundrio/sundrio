@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package io.sundr.examples.codegen;
 
+import io.sundr.Function;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 
@@ -25,7 +27,9 @@ public interface Attributeable extends Node {
 
     AttributeKey<Collection<ClassRef>> ALSO_IMPORT = new AttributeKey<Collection<ClassRef>>("ALSO_IMPORT", Collection.class);
     AttributeKey<String> INIT = new AttributeKey<String>("INIT", String.class);
+    AttributeKey<String> DEFAULT_VALUE = new AttributeKey<String>("DEFAULT_VALUE", String.class);
     AttributeKey<String> LAZY_INIT = new AttributeKey<String>("LAZY_INIT", String.class);
+    AttributeKey<Function<List<String>, String>> INIT_FUNCTION = new AttributeKey<Function<List<String>, String>>("INIT_FUNCTION", Function.class);
 
 
     Map<AttributeKey, Object> getAttributes();

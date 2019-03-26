@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package io.sundr.codegen.model;
 
+import io.sundr.builder.Nested;
+import io.sundr.builder.Predicate;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import io.sundr.builder.Builder;
-import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
-import io.sundr.builder.VisitableBuilder;
-
 public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeParamDefFluent<A>{
 
     private String name;
-    private List<VisitableBuilder<? extends ClassRef,?>> bounds =  new ArrayList<VisitableBuilder<? extends ClassRef,?>>();
+    private List<ClassRefBuilder> bounds =  new ArrayList<ClassRefBuilder>();
 
     public TypeParamDefFluentImpl(){
     }
@@ -47,41 +45,59 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     }
 
     public Boolean hasName(){
-            return this.name!=null;
+            return this.name != null;
+    }
+
+    public A withNewName(String arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuilder arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuffer arg1){
+            return (A)withName(new String(arg1));
     }
 
     public A addToBounds(int index,ClassRef item){
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+            if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
+            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);this.bounds.add(index >= 0 ? index : bounds.size(), builder); return (A)this;
     }
 
     public A setToBounds(int index,ClassRef item){
-            ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder); return (A)this;
+            if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
+            ClassRefBuilder builder = new ClassRefBuilder(item);
+            if (index < 0 || index >= _visitables.get("bounds").size()) { _visitables.get("bounds").add(builder); } else { _visitables.get("bounds").set(index, builder);}
+            if (index < 0 || index >= bounds.size()) { bounds.add(builder); } else { bounds.set(index, builder);}
+             return (A)this;
     }
 
     public A addToBounds(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A addAllToBounds(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.add(builder);this.bounds.add(builder);} return (A)this;
+            if (this.bounds == null) {this.bounds = new ArrayList<ClassRefBuilder>();}
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").add(builder);this.bounds.add(builder);} return (A)this;
     }
 
     public A removeFromBounds(ClassRef... items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromBounds(Collection<ClassRef> items){
-            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.remove(builder);this.bounds.remove(builder);} return (A)this;
+            for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
-
-    /**
-     * This method has been deprecated, please use method buildBounds instead.
-     * @return The buildable object.
-     */
-    @Deprecated
-    public List<ClassRef> getBounds() {
-        return build(bounds);
+    
+/**
+ * This method has been deprecated, please use method buildBounds instead.
+ * @return The buildable object.
+ */
+@Deprecated public List<ClassRef> getBounds(){
+            return build(bounds);
     }
 
     public List<ClassRef> buildBounds(){
@@ -100,30 +116,63 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
             return this.bounds.get(bounds.size() - 1).build();
     }
 
-    public ClassRef buildMatchingBound(Predicate<Builder<? extends ClassRef>> predicate){
-            for (Builder<? extends ClassRef> item: bounds) { if(predicate.apply(item)){return item.build();} } return null;
+    public ClassRef buildMatchingBound(Predicate<ClassRefBuilder> predicate){
+            for (ClassRefBuilder item: bounds) { if(predicate.apply(item)){return item.build();} } return null;
+    }
+
+    public Boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate){
+            for (ClassRefBuilder item: bounds) { if(predicate.apply(item)){return true;} } return false;
     }
 
     public A withBounds(List<ClassRef> bounds){
-            _visitables.removeAll(this.bounds);
-            this.bounds.clear();
-            if (bounds != null) {for (ClassRef item : bounds){this.addToBounds(item);}} return (A) this;
+            if (this.bounds != null) { _visitables.get("bounds").removeAll(this.bounds);}
+            if (bounds != null) {this.bounds = new ArrayList<ClassRefBuilder>(); for (ClassRef item : bounds){this.addToBounds(item);}} else { this.bounds = new ArrayList<ClassRefBuilder>();} return (A) this;
     }
 
     public A withBounds(ClassRef... bounds){
-            this.bounds.clear(); if (bounds != null) {for (ClassRef item :bounds){ this.addToBounds(item);}} return (A) this;
+            if (this.bounds != null) {this.bounds.clear();}
+            if (bounds != null) {for (ClassRef item :bounds){ this.addToBounds(item);}} return (A) this;
     }
 
     public Boolean hasBounds(){
-            return bounds!= null && !bounds.isEmpty();
+            return bounds != null && !bounds.isEmpty();
     }
 
-    public BoundsNested<A> addNewBound(){
+    public TypeParamDefFluent.BoundsNested<A> addNewBound(){
             return new BoundsNestedImpl();
     }
 
-    public BoundsNested<A> addNewBoundLike(ClassRef item){
+    public TypeParamDefFluent.BoundsNested<A> addNewBoundLike(ClassRef item){
             return new BoundsNestedImpl(-1, item);
+    }
+
+    public TypeParamDefFluent.BoundsNested<A> setNewBoundLike(int index,ClassRef item){
+            return new BoundsNestedImpl(index, item);
+    }
+
+    public TypeParamDefFluent.BoundsNested<A> editBound(int index){
+            if (bounds.size() <= index) throw new RuntimeException("Can't edit bounds. Index exceeds size.");
+            return setNewBoundLike(index, buildBound(index));
+    }
+
+    public TypeParamDefFluent.BoundsNested<A> editFirstBound(){
+            if (bounds.size() == 0) throw new RuntimeException("Can't edit first bounds. The list is empty.");
+            return setNewBoundLike(0, buildBound(0));
+    }
+
+    public TypeParamDefFluent.BoundsNested<A> editLastBound(){
+            int index = bounds.size() - 1;
+            if (index < 0) throw new RuntimeException("Can't edit last bounds. The list is empty.");
+            return setNewBoundLike(index, buildBound(index));
+    }
+
+    public TypeParamDefFluent.BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate){
+            int index = -1;
+            for (int i=0;i<bounds.size();i++) { 
+            if (predicate.apply(bounds.get(i))) {index = i; break;}
+            } 
+            if (index < 0) throw new RuntimeException("Can't edit matching bounds. No match found.");
+            return setNewBoundLike(index, buildBound(index));
     }
 
     public boolean equals(Object o){
@@ -137,7 +186,7 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     }
 
 
-    public class BoundsNestedImpl<N> extends ClassRefFluentImpl<BoundsNested<N>> implements BoundsNested<N>,Nested<N>{
+    public class BoundsNestedImpl<N> extends ClassRefFluentImpl<TypeParamDefFluent.BoundsNested<N>> implements TypeParamDefFluent.BoundsNested<N>,Nested<N>{
 
             private final ClassRefBuilder builder;
         private final int index;
@@ -152,7 +201,7 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
             }
     
     public N and(){
-            return (N) TypeParamDefFluentImpl.this.addToBounds(index, builder.build());
+            return (N) TypeParamDefFluentImpl.this.setToBounds(index, builder.build());
     }
     public N endBound(){
             return and();

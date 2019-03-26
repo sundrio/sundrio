@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -16,18 +16,17 @@
 
 package io.sundr.codegen.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import io.sundr.builder.Builder;
 import io.sundr.builder.Nested;
 import io.sundr.builder.Predicate;
 import io.sundr.builder.VisitableBuilder;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSupportFluentImpl<A> implements PropertyFluent<A>{
 
-    private List<VisitableBuilder<? extends AnnotationRef,?>> annotations =  new ArrayList<VisitableBuilder<? extends AnnotationRef,?>>();
+    private List<AnnotationRefBuilder> annotations =  new ArrayList<AnnotationRefBuilder>();
     private VisitableBuilder<? extends TypeRef,?> typeRef;
     private String name;
 
@@ -42,37 +41,43 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A addToAnnotations(int index,AnnotationRef item){
-            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder); return (A)this;
+            if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
+            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(index >= 0 ? index : _visitables.get("annotations").size(), builder);this.annotations.add(index >= 0 ? index : annotations.size(), builder); return (A)this;
     }
 
     public A setToAnnotations(int index,AnnotationRef item){
-            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder); return (A)this;
+            if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
+            AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
+            if (index < 0 || index >= _visitables.get("annotations").size()) { _visitables.get("annotations").add(builder); } else { _visitables.get("annotations").set(index, builder);}
+            if (index < 0 || index >= annotations.size()) { annotations.add(builder); } else { annotations.set(index, builder);}
+             return (A)this;
     }
 
     public A addToAnnotations(AnnotationRef... items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A addAllToAnnotations(Collection<AnnotationRef> items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.add(builder);this.annotations.add(builder);} return (A)this;
+            if (this.annotations == null) {this.annotations = new ArrayList<AnnotationRefBuilder>();}
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").add(builder);this.annotations.add(builder);} return (A)this;
     }
 
     public A removeFromAnnotations(AnnotationRef... items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
     public A removeAllFromAnnotations(Collection<AnnotationRef> items){
-            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.remove(builder);this.annotations.remove(builder);} return (A)this;
+            for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
-
-    /**
-     * This method has been deprecated, please use method buildAnnotations instead.
-     * @return The buildable object.
-     */
-    @Deprecated
-    public List<AnnotationRef> getAnnotations() {
-        return build(annotations);
+    
+/**
+ * This method has been deprecated, please use method buildAnnotations instead.
+ * @return The buildable object.
+ */
+@Deprecated public List<AnnotationRef> getAnnotations(){
+            return build(annotations);
     }
 
     public List<AnnotationRef> buildAnnotations(){
@@ -91,40 +96,72 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             return this.annotations.get(annotations.size() - 1).build();
     }
 
-    public AnnotationRef buildMatchingAnnotation(Predicate<Builder<? extends AnnotationRef>> predicate){
-            for (Builder<? extends AnnotationRef> item: annotations) { if(predicate.apply(item)){return item.build();} } return null;
+    public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
+            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return item.build();} } return null;
+    }
+
+    public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
+            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return true;} } return false;
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
-            _visitables.removeAll(this.annotations);
-            this.annotations.clear();
-            if (annotations != null) {for (AnnotationRef item : annotations){this.addToAnnotations(item);}} return (A) this;
+            if (this.annotations != null) { _visitables.get("annotations").removeAll(this.annotations);}
+            if (annotations != null) {this.annotations = new ArrayList<AnnotationRefBuilder>(); for (AnnotationRef item : annotations){this.addToAnnotations(item);}} else { this.annotations = new ArrayList<AnnotationRefBuilder>();} return (A) this;
     }
 
     public A withAnnotations(AnnotationRef... annotations){
-            this.annotations.clear(); if (annotations != null) {for (AnnotationRef item :annotations){ this.addToAnnotations(item);}} return (A) this;
+            if (this.annotations != null) {this.annotations.clear();}
+            if (annotations != null) {for (AnnotationRef item :annotations){ this.addToAnnotations(item);}} return (A) this;
     }
 
     public Boolean hasAnnotations(){
-            return annotations!= null && !annotations.isEmpty();
+            return annotations != null && !annotations.isEmpty();
     }
 
-    public AnnotationsNested<A> addNewAnnotation(){
+    public PropertyFluent.AnnotationsNested<A> addNewAnnotation(){
             return new AnnotationsNestedImpl();
     }
 
-    public AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item){
+    public PropertyFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item){
             return new AnnotationsNestedImpl(-1, item);
     }
 
+    public PropertyFluent.AnnotationsNested<A> setNewAnnotationLike(int index,AnnotationRef item){
+            return new AnnotationsNestedImpl(index, item);
+    }
 
-    /**
-     * This method has been deprecated, please use method buildTypeRef instead.
-     * @return The buildable object.
-     */
-    @Deprecated
-    public TypeRef getTypeRef() {
-        return this.typeRef != null ? this.typeRef.build() : null;
+    public PropertyFluent.AnnotationsNested<A> editAnnotation(int index){
+            if (annotations.size() <= index) throw new RuntimeException("Can't edit annotations. Index exceeds size.");
+            return setNewAnnotationLike(index, buildAnnotation(index));
+    }
+
+    public PropertyFluent.AnnotationsNested<A> editFirstAnnotation(){
+            if (annotations.size() == 0) throw new RuntimeException("Can't edit first annotations. The list is empty.");
+            return setNewAnnotationLike(0, buildAnnotation(0));
+    }
+
+    public PropertyFluent.AnnotationsNested<A> editLastAnnotation(){
+            int index = annotations.size() - 1;
+            if (index < 0) throw new RuntimeException("Can't edit last annotations. The list is empty.");
+            return setNewAnnotationLike(index, buildAnnotation(index));
+    }
+
+    public PropertyFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
+            int index = -1;
+            for (int i=0;i<annotations.size();i++) { 
+            if (predicate.apply(annotations.get(i))) {index = i; break;}
+            } 
+            if (index < 0) throw new RuntimeException("Can't edit matching annotations. No match found.");
+            return setNewAnnotationLike(index, buildAnnotation(index));
+    }
+
+    
+/**
+ * This method has been deprecated, please use method buildTypeRef instead.
+ * @return The buildable object.
+ */
+@Deprecated public TypeRef getTypeRef(){
+            return this.typeRef!=null?this.typeRef.build():null;
     }
 
     public TypeRef buildTypeRef(){
@@ -132,82 +169,82 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public A withTypeRef(TypeRef typeRef){
-            _visitables.remove(this.typeRef);
-            if (typeRef instanceof VoidRef){ this.typeRef= new VoidRefBuilder((VoidRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof WildcardRef){ this.typeRef= new WildcardRefBuilder((WildcardRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof PrimitiveRef){ this.typeRef= new PrimitiveRefBuilder((PrimitiveRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof TypeParamRef){ this.typeRef= new TypeParamRefBuilder((TypeParamRef)typeRef); _visitables.add(this.typeRef);}
-            if (typeRef instanceof ClassRef){ this.typeRef= new ClassRefBuilder((ClassRef)typeRef); _visitables.add(this.typeRef);}
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (typeRef instanceof PrimitiveRef){ this.typeRef= new PrimitiveRefBuilder((PrimitiveRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof VoidRef){ this.typeRef= new VoidRefBuilder((VoidRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof WildcardRef){ this.typeRef= new WildcardRefBuilder((WildcardRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof ClassRef){ this.typeRef= new ClassRefBuilder((ClassRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
+            if (typeRef instanceof TypeParamRef){ this.typeRef= new TypeParamRefBuilder((TypeParamRef)typeRef); _visitables.get("typeRef").add(this.typeRef);}
             return (A) this;
     }
 
     public Boolean hasTypeRef(){
-            return this.typeRef!=null;
+            return this.typeRef != null;
     }
 
-    public A withVoidRefTypeRef(VoidRef voidRefTypeRef){
-            _visitables.remove(this.typeRef);
-            if (voidRefTypeRef!=null){ this.typeRef= new VoidRefBuilder(voidRefTypeRef); _visitables.add(this.typeRef);} return (A) this;
+    public A withPrimitiveRefType(PrimitiveRef primitiveRefType){
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (primitiveRefType!=null){ this.typeRef= new PrimitiveRefBuilder(primitiveRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
-    public VoidRefTypeRefNested<A> withNewVoidRefTypeRef(){
-            return new VoidRefTypeRefNestedImpl();
+    public PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefType(){
+            return new PrimitiveRefTypeNestedImpl();
     }
 
-    public VoidRefTypeRefNested<A> withNewVoidRefTypeRefLike(VoidRef item){
-            return new VoidRefTypeRefNestedImpl(item);
+    public PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefTypeLike(PrimitiveRef item){
+            return new PrimitiveRefTypeNestedImpl(item);
     }
 
-    public A withWildcardRefTypeRef(WildcardRef wildcardRefTypeRef){
-            _visitables.remove(this.typeRef);
-            if (wildcardRefTypeRef!=null){ this.typeRef= new WildcardRefBuilder(wildcardRefTypeRef); _visitables.add(this.typeRef);} return (A) this;
+    public A withVoidRefType(VoidRef voidRefType){
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (voidRefType!=null){ this.typeRef= new VoidRefBuilder(voidRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
-    public WildcardRefTypeRefNested<A> withNewWildcardRefTypeRef(){
-            return new WildcardRefTypeRefNestedImpl();
+    public PropertyFluent.VoidRefTypeNested<A> withNewVoidRefType(){
+            return new VoidRefTypeNestedImpl();
     }
 
-    public WildcardRefTypeRefNested<A> withNewWildcardRefTypeRefLike(WildcardRef item){
-            return new WildcardRefTypeRefNestedImpl(item);
+    public PropertyFluent.VoidRefTypeNested<A> withNewVoidRefTypeLike(VoidRef item){
+            return new VoidRefTypeNestedImpl(item);
     }
 
-    public A withPrimitiveRefTypeRef(PrimitiveRef primitiveRefTypeRef){
-            _visitables.remove(this.typeRef);
-            if (primitiveRefTypeRef!=null){ this.typeRef= new PrimitiveRefBuilder(primitiveRefTypeRef); _visitables.add(this.typeRef);} return (A) this;
+    public A withWildcardRefType(WildcardRef wildcardRefType){
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (wildcardRefType!=null){ this.typeRef= new WildcardRefBuilder(wildcardRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
-    public PrimitiveRefTypeRefNested<A> withNewPrimitiveRefTypeRef(){
-            return new PrimitiveRefTypeRefNestedImpl();
+    public PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefType(){
+            return new WildcardRefTypeNestedImpl();
     }
 
-    public PrimitiveRefTypeRefNested<A> withNewPrimitiveRefTypeRefLike(PrimitiveRef item){
-            return new PrimitiveRefTypeRefNestedImpl(item);
+    public PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefTypeLike(WildcardRef item){
+            return new WildcardRefTypeNestedImpl(item);
     }
 
-    public A withTypeParamRefTypeRef(TypeParamRef typeParamRefTypeRef){
-            _visitables.remove(this.typeRef);
-            if (typeParamRefTypeRef!=null){ this.typeRef= new TypeParamRefBuilder(typeParamRefTypeRef); _visitables.add(this.typeRef);} return (A) this;
+    public A withClassRefType(ClassRef classRefType){
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (classRefType!=null){ this.typeRef= new ClassRefBuilder(classRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
-    public TypeParamRefTypeRefNested<A> withNewTypeParamRefTypeRef(){
-            return new TypeParamRefTypeRefNestedImpl();
+    public PropertyFluent.ClassRefTypeNested<A> withNewClassRefType(){
+            return new ClassRefTypeNestedImpl();
     }
 
-    public TypeParamRefTypeRefNested<A> withNewTypeParamRefTypeRefLike(TypeParamRef item){
-            return new TypeParamRefTypeRefNestedImpl(item);
+    public PropertyFluent.ClassRefTypeNested<A> withNewClassRefTypeLike(ClassRef item){
+            return new ClassRefTypeNestedImpl(item);
     }
 
-    public A withClassRefTypeRef(ClassRef classRefTypeRef){
-            _visitables.remove(this.typeRef);
-            if (classRefTypeRef!=null){ this.typeRef= new ClassRefBuilder(classRefTypeRef); _visitables.add(this.typeRef);} return (A) this;
+    public A withTypeParamRefType(TypeParamRef typeParamRefType){
+            _visitables.get("typeRef").remove(this.typeRef);
+            if (typeParamRefType!=null){ this.typeRef= new TypeParamRefBuilder(typeParamRefType); _visitables.get("typeRef").add(this.typeRef);} return (A) this;
     }
 
-    public ClassRefTypeRefNested<A> withNewClassRefTypeRef(){
-            return new ClassRefTypeRefNestedImpl();
+    public PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefType(){
+            return new TypeParamRefTypeNestedImpl();
     }
 
-    public ClassRefTypeRefNested<A> withNewClassRefTypeRefLike(ClassRef item){
-            return new ClassRefTypeRefNestedImpl(item);
+    public PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefTypeLike(TypeParamRef item){
+            return new TypeParamRefTypeNestedImpl(item);
     }
 
     public String getName(){
@@ -219,7 +256,19 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public Boolean hasName(){
-            return this.name!=null;
+            return this.name != null;
+    }
+
+    public A withNewName(String arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuilder arg1){
+            return (A)withName(new String(arg1));
+    }
+
+    public A withNewName(StringBuffer arg1){
+            return (A)withName(new String(arg1));
     }
 
     public boolean equals(Object o){
@@ -234,11 +283,11 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
 
-    public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<AnnotationsNested<N>> implements AnnotationsNested<N>,Nested<N>{
+    public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<PropertyFluent.AnnotationsNested<N>> implements PropertyFluent.AnnotationsNested<N>,Nested<N>{
 
             private final AnnotationRefBuilder builder;
         private final int index;
-
+    
             AnnotationsNestedImpl(int index,AnnotationRef item){
                     this.index = index;
                     this.builder = new AnnotationRefBuilder(this, item);
@@ -247,106 +296,106 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
                     this.index = -1;
                     this.builder = new AnnotationRefBuilder(this);
             }
-
+    
     public N and(){
-            return (N) PropertyFluentImpl.this.addToAnnotations(index, builder.build());
+            return (N) PropertyFluentImpl.this.setToAnnotations(index, builder.build());
     }
     public N endAnnotation(){
             return and();
     }
 
 }
-    public class VoidRefTypeRefNestedImpl<N> extends VoidRefFluentImpl<VoidRefTypeRefNested<N>> implements VoidRefTypeRefNested<N>,Nested<N>{
-
-            private final VoidRefBuilder builder;
-
-            VoidRefTypeRefNestedImpl(VoidRef item){
-                    this.builder = new VoidRefBuilder(this, item);
-            }
-            VoidRefTypeRefNestedImpl(){
-                    this.builder = new VoidRefBuilder(this);
-            }
-
-    public N and(){
-            return (N) PropertyFluentImpl.this.withVoidRefTypeRef(builder.build());
-    }
-    public N endVoidRefTypeRef(){
-            return and();
-    }
-
-}
-    public class WildcardRefTypeRefNestedImpl<N> extends WildcardRefFluentImpl<WildcardRefTypeRefNested<N>> implements WildcardRefTypeRefNested<N>,Nested<N>{
-
-            private final WildcardRefBuilder builder;
-
-            WildcardRefTypeRefNestedImpl(WildcardRef item){
-                    this.builder = new WildcardRefBuilder(this, item);
-            }
-            WildcardRefTypeRefNestedImpl(){
-                    this.builder = new WildcardRefBuilder(this);
-            }
-
-    public N and(){
-            return (N) PropertyFluentImpl.this.withWildcardRefTypeRef(builder.build());
-    }
-    public N endWildcardRefTypeRef(){
-            return and();
-    }
-
-}
-    public class PrimitiveRefTypeRefNestedImpl<N> extends PrimitiveRefFluentImpl<PrimitiveRefTypeRefNested<N>> implements PrimitiveRefTypeRefNested<N>,Nested<N>{
+    public class PrimitiveRefTypeNestedImpl<N> extends PrimitiveRefFluentImpl<PropertyFluent.PrimitiveRefTypeNested<N>> implements PropertyFluent.PrimitiveRefTypeNested<N>,Nested<N>{
 
             private final PrimitiveRefBuilder builder;
-
-            PrimitiveRefTypeRefNestedImpl(PrimitiveRef item){
+    
+            PrimitiveRefTypeNestedImpl(PrimitiveRef item){
                     this.builder = new PrimitiveRefBuilder(this, item);
             }
-            PrimitiveRefTypeRefNestedImpl(){
+            PrimitiveRefTypeNestedImpl(){
                     this.builder = new PrimitiveRefBuilder(this);
             }
-
+    
     public N and(){
-            return (N) PropertyFluentImpl.this.withPrimitiveRefTypeRef(builder.build());
+            return (N) PropertyFluentImpl.this.withPrimitiveRefType(builder.build());
     }
-    public N endPrimitiveRefTypeRef(){
+    public N endPrimitiveRefType(){
             return and();
     }
 
 }
-    public class TypeParamRefTypeRefNestedImpl<N> extends TypeParamRefFluentImpl<TypeParamRefTypeRefNested<N>> implements TypeParamRefTypeRefNested<N>,Nested<N>{
+    public class VoidRefTypeNestedImpl<N> extends VoidRefFluentImpl<PropertyFluent.VoidRefTypeNested<N>> implements PropertyFluent.VoidRefTypeNested<N>,Nested<N>{
 
-            private final TypeParamRefBuilder builder;
-
-            TypeParamRefTypeRefNestedImpl(TypeParamRef item){
-                    this.builder = new TypeParamRefBuilder(this, item);
+            private final VoidRefBuilder builder;
+    
+            VoidRefTypeNestedImpl(VoidRef item){
+                    this.builder = new VoidRefBuilder(this, item);
             }
-            TypeParamRefTypeRefNestedImpl(){
-                    this.builder = new TypeParamRefBuilder(this);
+            VoidRefTypeNestedImpl(){
+                    this.builder = new VoidRefBuilder(this);
             }
-
+    
     public N and(){
-            return (N) PropertyFluentImpl.this.withTypeParamRefTypeRef(builder.build());
+            return (N) PropertyFluentImpl.this.withVoidRefType(builder.build());
     }
-    public N endTypeParamRefTypeRef(){
+    public N endVoidRefType(){
             return and();
     }
 
 }
-    public class ClassRefTypeRefNestedImpl<N> extends ClassRefFluentImpl<ClassRefTypeRefNested<N>> implements ClassRefTypeRefNested<N>,Nested<N>{
+    public class WildcardRefTypeNestedImpl<N> extends WildcardRefFluentImpl<PropertyFluent.WildcardRefTypeNested<N>> implements PropertyFluent.WildcardRefTypeNested<N>,Nested<N>{
+
+            private final WildcardRefBuilder builder;
+    
+            WildcardRefTypeNestedImpl(WildcardRef item){
+                    this.builder = new WildcardRefBuilder(this, item);
+            }
+            WildcardRefTypeNestedImpl(){
+                    this.builder = new WildcardRefBuilder(this);
+            }
+    
+    public N and(){
+            return (N) PropertyFluentImpl.this.withWildcardRefType(builder.build());
+    }
+    public N endWildcardRefType(){
+            return and();
+    }
+
+}
+    public class ClassRefTypeNestedImpl<N> extends ClassRefFluentImpl<PropertyFluent.ClassRefTypeNested<N>> implements PropertyFluent.ClassRefTypeNested<N>,Nested<N>{
 
             private final ClassRefBuilder builder;
     
-            ClassRefTypeRefNestedImpl(ClassRef item){
+            ClassRefTypeNestedImpl(ClassRef item){
                     this.builder = new ClassRefBuilder(this, item);
             }
-            ClassRefTypeRefNestedImpl(){
+            ClassRefTypeNestedImpl(){
                     this.builder = new ClassRefBuilder(this);
             }
     
     public N and(){
-            return (N) PropertyFluentImpl.this.withClassRefTypeRef(builder.build());
+            return (N) PropertyFluentImpl.this.withClassRefType(builder.build());
     }
-    public N endClassRefTypeRef(){
+    public N endClassRefType(){
+            return and();
+    }
+
+}
+    public class TypeParamRefTypeNestedImpl<N> extends TypeParamRefFluentImpl<PropertyFluent.TypeParamRefTypeNested<N>> implements PropertyFluent.TypeParamRefTypeNested<N>,Nested<N>{
+
+            private final TypeParamRefBuilder builder;
+    
+            TypeParamRefTypeNestedImpl(TypeParamRef item){
+                    this.builder = new TypeParamRefBuilder(this, item);
+            }
+            TypeParamRefTypeNestedImpl(){
+                    this.builder = new TypeParamRefBuilder(this);
+            }
+    
+    public N and(){
+            return (N) PropertyFluentImpl.this.withTypeParamRefType(builder.build());
+    }
+    public N endTypeParamRefType(){
             return and();
     }
 

@@ -1,5 +1,5 @@
 /*
- *      Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
  *      Licensed under the Apache License, Version 2.0 (the "License");
  *      you may not use this file except in compliance with the License.
@@ -30,12 +30,20 @@ public interface Node {
     String EQ = "=";
     String GT = ">";
 
+    String Q = "'";
+    String DQ = "\"";
+
     String OC = "/**";
     String STAR = "*";
     String CC = "*/";
 
     String OP = "(";
     String CP = ")";
+
+    String OB = "{";
+    String CB = "}";
+
+
     String VARARG = "...";
     String THROWS = "throws";
 

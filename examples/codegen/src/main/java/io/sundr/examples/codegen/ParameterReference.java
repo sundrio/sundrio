@@ -14,12 +14,7 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.examples.codegen;
 
-public interface TypeRefFluent<A extends TypeRefFluent<A>> extends AttributeSupportFluent<A>{
-
-
-
-
-
+public interface ParameterReference {
 }
