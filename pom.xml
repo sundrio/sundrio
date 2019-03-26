@@ -73,10 +73,15 @@
         <validation.api.version>1.1.0.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
 
+        <!-- Transitive Versions -->
+        <commons-collections.version>3.2.2</commons-collections.version>
+
+        <!-- Maven Plugin Versions -->
         <compiler.plugin.version>3.6.0</compiler.plugin.version>
         <invoker.plugin.version>2.0.0</invoker.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
         <surefire.plugin.version>3.0.0-M3</surefire.plugin.version>
+
         <!--maven.javadoc.failOnError>false</maven.javadoc.failOnError-->
     </properties>
 
@@ -134,6 +139,12 @@
                 <groupId>org.apache.velocity</groupId>
                 <artifactId>velocity</artifactId>
                 <version>${velocity.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons-collections.version}</version>
             </dependency>
 
             <dependency>
