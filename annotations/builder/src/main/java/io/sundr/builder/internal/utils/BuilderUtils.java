@@ -64,6 +64,7 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.codegen.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
@@ -208,6 +209,20 @@ public class BuilderUtils {
             return methodHasArgument(constructor, property);
         }
 
+    }
+    /**
+     * Checks if there is a default constructor available.
+     *
+     * @param item The clazz to check.
+     * @return     True if default constructor is found, false otherwise.
+     */
+    public static boolean hasDefaultConstructor(TypeRef item) {
+        DefinitionRepository repository =  DefinitionRepository.getRepository();
+        TypeDef def = repository.getDefinition(item);
+        if (def == null && item instanceof ClassRef) {
+            def = ((ClassRef)item).getDefinition();
+        }
+        return hasDefaultConstructor(def);
     }
 
     /**
@@ -494,6 +509,13 @@ public class BuilderUtils {
                 .addToAttributes(INIT, " Optional.empty()")
                 .addToAttributes(ALSO_IMPORT,  alsoImport(property, optionalRef, builderType))
                 .build();
+        }
+
+        if (TypeUtils.isConcrete(builderType) && BuilderUtils.hasDefaultConstructor(builderType)) {
+            return new PropertyBuilder(property).withTypeRef(builderType)
+                    .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
+                    .addToAttributes(INIT, "new " + builderType + "()")
+                    .build();
         }
 
         return new PropertyBuilder(property).withTypeRef(builderType)

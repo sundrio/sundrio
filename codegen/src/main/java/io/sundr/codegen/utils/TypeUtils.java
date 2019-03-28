@@ -247,6 +247,19 @@ public final class TypeUtils {
     }
 
     /**
+     * Checks if {@link TypeRef} is of an concrete
+     * @param   typeRef The type to check.
+     * @return  True if its an concrete type.
+     */
+    public static boolean isConcrete(TypeRef  typeRef) {
+        DefinitionRepository repository =  DefinitionRepository.getRepository();
+        TypeDef def = repository.getDefinition(typeRef);
+        if (def == null && typeRef instanceof ClassRef) {
+            def = ((ClassRef)typeRef).getDefinition();
+        }
+        return def != null ? !def.isAbstract() && !def.isInterface() : false;
+    }
+    /**
      * Checks if a {@link TypeRef} is a primitive type.
      * @param type  The type to check.
      * @return      True if its a primitive type.
