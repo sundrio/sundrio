@@ -32,3 +32,4 @@ This project was created to generate the boilerplate on compile time for you.
 - [Fabric8 Docker Client](https://github.com/fabric8io/docker-client)
 - [Snowdrop Service Catalog Client](https://github.com/snowdrop/service-catalog-java-api)
 - [Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
+- [Ap4k](https://github.com/ap4k/ap4k/)
