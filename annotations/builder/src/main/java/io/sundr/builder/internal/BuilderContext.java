@@ -41,9 +41,11 @@ public class BuilderContext {
     private final Types types;
     private final CodegenContext codegenContext;
 
-    private final TypeDef functionClass;
     private final TypeDef predicateClass;
-    private final TypeDef baseFluentClass;
+    private final TypeDef functionInterface;
+    private final TypeDef visitorInterface;
+    private final TypeDef typedVisitorInterface;
+    private final TypeDef pathAwareVisitorClass;
     private final TypeDef fluentInterface;
     private final TypeDef builderInterface;
     private final TypeDef nestedInterface;
@@ -51,12 +53,9 @@ public class BuilderContext {
     private final TypeDef visitableInterface;
     private final TypeDef visitableBuilderInterface;
     private final TypeDef visitableMapClass;
-    private final TypeDef visitorInterface;
-    private final TypeDef typedVisitorInterface;
-    private final TypeDef pathAwareVisitorClass;
-    private final TypeDef functionInterface;
     private final TypeDef inlineableBase;
     private final TypeDef validationUtils;
+    private final TypeDef baseFluentClass;
     private final Boolean generateBuilderPackage;
     private final Boolean validationEnabled;
     private final Boolean lazyCollectionsEnabled;
@@ -82,12 +81,12 @@ public class BuilderContext {
         DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(ArrayList.class));
         DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(Iterable.class));
 
-        functionClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
+
+        predicateClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Predicate.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-
-        predicateClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Predicate.java"))
+        functionInterface  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
@@ -103,15 +102,8 @@ public class BuilderContext {
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        functionInterface  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
-                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-                .build();
 
         visitableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitable.java"))
-                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-                .build();
-
-        visitableMapClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableMap.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
@@ -119,14 +111,14 @@ public class BuilderContext {
                 .withPackageName(builderPackage)
                 .build();
 
+        visitableBuilderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableBuilder.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+                .build();
+
         fluentInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Fluent.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-
-        baseFluentClass  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java"))
-                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-                .build();
 
         nestedInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Nested.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
@@ -136,11 +128,16 @@ public class BuilderContext {
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        visitableBuilderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableBuilder.java"))
+
+        inlineableBase = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Inlineable.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
-        inlineableBase = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Inlineable.java"))
+        visitableMapClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableMap.java"))
+                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+                .build();
+
+        baseFluentClass  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
                 .build();
 
@@ -193,10 +190,6 @@ public class BuilderContext {
         return builderPackage;
     }
 
-
-    public TypeDef getFunctionClass() {
-        return functionClass;
-    }
 
     public TypeDef getPredicateClass() {
         return predicateClass;

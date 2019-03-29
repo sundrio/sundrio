@@ -201,7 +201,7 @@ public class TypeDef extends ModifierSupport {
     }
 
     public boolean isClass() {
-        return kind == Kind.INTERFACE;
+        return kind == Kind.CLASS;
     }
 
     public boolean isInterface() {

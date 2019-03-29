@@ -462,7 +462,7 @@ public class BuilderUtils {
         TypeRef typeRef = property.getTypeRef();
         ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
         ClassRef classRef = (ClassRef) typeRef;
-        ClassRef builderType = isAbstract(unwrapped) ||  unwrapped.getDefinition().getKind() == Kind.INTERFACE  ? TypeAs.VISITABLE_BUILDER.apply(unwrapped) : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
+        ClassRef builderType = !TypeUtils.isConcrete(unwrapped) ? TypeAs.VISITABLE_BUILDER.apply(unwrapped) : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
 
         if (TypeUtils.isList(classRef)) {
             ClassRef listRef =  Collections.ARRAY_LIST.toReference(builderType);
@@ -511,7 +511,7 @@ public class BuilderUtils {
                 .build();
         }
 
-        if (TypeUtils.isConcrete(builderType) && BuilderUtils.hasDefaultConstructor(builderType)) {
+        if (TypeUtils.isConcrete(builderType) && BuilderUtils.hasDefaultConstructor(builderType) && property.hasAttribute(DEFAULT_VALUE)) {
             return new PropertyBuilder(property).withTypeRef(builderType)
                     .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
                     .addToAttributes(INIT, "new " + builderType + "()")
@@ -520,6 +520,7 @@ public class BuilderUtils {
 
         return new PropertyBuilder(property).withTypeRef(builderType)
                     .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
+                    .removeFromAttributes(INIT)
                     .build();
     }
 
