@@ -16,6 +16,16 @@
 
 package io.sundr.builder.internal.processor;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.lang.model.element.Modifier;
+
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
@@ -39,22 +49,13 @@ import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.TypeUtils;
 
-import javax.lang.model.element.Modifier;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import static io.sundr.builder.Constants.ADDITIONAL_BUILDABLES;
 import static io.sundr.builder.Constants.ADDITIONAL_TYPES;
 import static io.sundr.builder.Constants.BUILDABLE;
-import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
+import static io.sundr.builder.Constants.EDITABLE_ENABLED;
+import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.codegen.Constants.EMPTY;
-import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
@@ -322,7 +323,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                     continue;
                 }
 
-                if (typeDef.getAttributes().containsKey(EDIATABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDIATABLE_ENABLED)) {
+                if (typeDef.getAttributes().containsKey(EDITABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDITABLE_ENABLED)) {
                     generateFromResources(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 

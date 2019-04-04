@@ -16,19 +16,10 @@
 
 package io.sundr.builder.internal.processor;
 
-import io.sundr.builder.Constants;
-import io.sundr.builder.Visitor;
-import io.sundr.builder.annotations.ExternalBuildables;
-import io.sundr.builder.annotations.Inline;
-import io.sundr.builder.internal.BuilderContext;
-import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.utils.ModelUtils;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
@@ -38,13 +29,19 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
+import io.sundr.builder.Visitor;
+import io.sundr.builder.annotations.ExternalBuildables;
+import io.sundr.builder.internal.BuilderContext;
+import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.utils.ModelUtils;
+
+import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
@@ -92,7 +89,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                         final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
                                 .addToAttributes(EXTERNAL_BUILDABLE, generated)
-                                .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
+                                .addToAttributes(EDITABLE_ENABLED, generated.editableEnabled())
                                 .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
                                                             .accept(new Visitor<PropertyBuilder>() {
                                 @Override
@@ -111,7 +108,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
                     TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
                             .addToAttributes(EXTERNAL_BUILDABLE, generated)
-                            .addToAttributes(EDIATABLE_ENABLED, generated.editableEnabled())
+                            .addToAttributes(EDITABLE_ENABLED, generated.editableEnabled())
                             .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
                                                         .accept(new Visitor<PropertyBuilder>() {
                                 @Override

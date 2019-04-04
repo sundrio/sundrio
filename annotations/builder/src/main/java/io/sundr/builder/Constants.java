@@ -16,9 +16,13 @@
 
 package io.sundr.builder;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.ExternalBuildables;
-import io.sundr.builder.annotations.Pojo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AttributeKey;
@@ -28,12 +32,6 @@ import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeRef;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static io.sundr.codegen.functions.ClassTo.ANNOTATIONTYPEREF;
 import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
@@ -58,8 +56,10 @@ public class Constants {
     public static final AttributeKey<Set<TypeDef>> ADDITIONAL_TYPES = new AttributeKey<Set<TypeDef>>("ADDITIONAL_TYPES", Set.class);
 
     public static final AttributeKey<Boolean> VALIDATION_ENABLED = new AttributeKey<Boolean>("VALIDATION_ENABLED", Boolean.class);
-    public static final AttributeKey<Boolean> LAZY_COLLECTIONS_INIT_ENABLED = new AttributeKey<Boolean>("LAZY_COLELCTIONS_INIT_ENABLED", Boolean.class);
-    public static final AttributeKey<Boolean> EDIATABLE_ENABLED = new AttributeKey<Boolean>("EDITABLE_ENABLED", Boolean.class);
+
+    public static final AttributeKey<Boolean> LAZY_COLLECTIONS_INIT_ENABLED = new AttributeKey<Boolean>("LAZY_COLLECTIONS_INIT_ENABLED", Boolean.class);
+
+    public static final AttributeKey<Boolean> EDITABLE_ENABLED = new AttributeKey<Boolean>("EDITABLE_ENABLED", Boolean.class);
     public static final AttributeKey<Boolean> BUILDABLE_ENABLED =  new AttributeKey<Boolean>("BUILDABLE_ENABLED", Boolean.class);
 
     public static final AttributeKey<Boolean> SKIP =  new AttributeKey<Boolean>("SKIP", Boolean.class);
@@ -67,7 +67,8 @@ public class Constants {
     public static final AttributeKey<Boolean> GENERATED = new AttributeKey<Boolean>("GENERATED", Boolean.class);
 
     public static final AttributeKey<Buildable> BUILDABLE =  new AttributeKey<Buildable>("BUILDABLE_ANNOTATION", Buildable.class);
-    public static final AttributeKey<ExternalBuildables> EXTERNAL_BUILDABLE =  new AttributeKey<ExternalBuildables>("EXTERMAL_BUILDABLE", ExternalBuildables.class);
+
+    public static final AttributeKey<ExternalBuildables> EXTERNAL_BUILDABLE = new AttributeKey<ExternalBuildables>("EXTERNAL_BUILDABLE", ExternalBuildables.class);
 
     public static final AnnotationRef BUILDABLE_ANNOTATION = ANNOTATIONTYPEREF.apply(Buildable.class);
     public static final AnnotationRef DEPRECATED_ANNOTATION = ANNOTATIONTYPEREF.apply(Deprecated.class);
