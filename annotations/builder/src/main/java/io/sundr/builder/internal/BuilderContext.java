@@ -58,18 +58,16 @@ public class BuilderContext {
     private final TypeDef baseFluentClass;
     private final Boolean generateBuilderPackage;
     private final Boolean validationEnabled;
-    private final Boolean lazyCollectionsEnabled;
     private final Boolean externalValidatorSupported;
     private final String builderPackage;
     private final Inline[] inlineables;
     private final BuildableRepository buildableRepository;
 
     
-    public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, Boolean validationEnabled, Boolean lazyCollectionsEnabled, String builderPackage, Inline... inlineables) {
+    public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, Boolean validationEnabled, String builderPackage, Inline... inlineables) {
         this.elements = elements;
         this.types = types;
         this.validationEnabled = validationEnabled;
-        this.lazyCollectionsEnabled = lazyCollectionsEnabled;
         this.codegenContext = CodegenContext.create(elements, types);
         this.generateBuilderPackage = generateBuilderPackage;
         this.builderPackage = builderPackage;

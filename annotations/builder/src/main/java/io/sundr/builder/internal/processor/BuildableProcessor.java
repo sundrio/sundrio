@@ -65,7 +65,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                     continue;
                 }
 
-                ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.lazyCollectionInitEnabled(), buildable.generateBuilderPackage(), buildable.builderPackage());
+                ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(), buildable.builderPackage());
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
                                 .addToAttributes(BUILDABLE, buildable)
                                 .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())

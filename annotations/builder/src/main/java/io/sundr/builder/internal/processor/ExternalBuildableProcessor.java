@@ -68,7 +68,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 if (generated == null) {
                     continue;
                 }
-                ctx = BuilderContextManager.create(elements, types, generated.validationEnabled(), generated.lazyCollectionInitEnabled(), generated.generateBuilderPackage(), generated.builderPackage());
+                ctx = BuilderContextManager.create(elements, types, generated.validationEnabled(),  generated.generateBuilderPackage(), generated.builderPackage());
 
                 for (String name : generated.value()) {
                     PackageElement packageElement = elements.getPackageElement(name);

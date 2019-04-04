@@ -29,13 +29,13 @@ public class BuilderContextManager {
     private static BuilderContext context = null;
 
     public synchronized static BuilderContext create(Elements elements, Types types) {
-        context = new BuilderContext(elements, types, false, false, false, Builder.class.getPackage().getName());
+        context = new BuilderContext(elements, types, false, false, Builder.class.getPackage().getName());
         return context;
     }
 
-    public static BuilderContext create(Elements elements, Types types, Boolean validationEnabled, Boolean lazyCollectionsEnabled, Boolean generateBuilderPackage, String packageName, Inline... inlineables) {
+    public static BuilderContext create(Elements elements, Types types, Boolean validationEnabled, Boolean generateBuilderPackage, String packageName, Inline... inlineables) {
         if (context == null) {
-            context = new BuilderContext(elements, types, generateBuilderPackage, validationEnabled, lazyCollectionsEnabled, packageName, inlineables);
+            context = new BuilderContext(elements, types, generateBuilderPackage, validationEnabled, packageName, inlineables);
             return context;
         } else {
             if (!packageName.equals(context.getBuilderPackage())) {
