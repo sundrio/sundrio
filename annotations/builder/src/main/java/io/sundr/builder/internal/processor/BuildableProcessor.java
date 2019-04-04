@@ -16,19 +16,8 @@
 
 package io.sundr.builder.internal.processor;
 
-import io.sundr.builder.Constants;
-import io.sundr.builder.Visitor;
-import io.sundr.builder.annotations.Buildable;
-import io.sundr.builder.annotations.Inline;
-import io.sundr.builder.internal.BuilderContext;
-import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.utils.ModelUtils;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
@@ -37,12 +26,20 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+
+import io.sundr.builder.Visitor;
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.internal.BuilderContext;
+import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.codegen.utils.ModelUtils;
 
 import static io.sundr.builder.Constants.BUILDABLE;
-import static io.sundr.builder.Constants.EDIATABLE_ENABLED;
+import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
@@ -68,7 +65,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                 ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(), buildable.builderPackage());
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
                                 .addToAttributes(BUILDABLE, buildable)
-                                .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())
+                                .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
                                 .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
                                 .accept(new Visitor<PropertyBuilder>() {
                                     @Override
@@ -84,7 +81,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
                     TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
                             .addToAttributes(BUILDABLE, buildable)
-                            .addToAttributes(EDIATABLE_ENABLED, buildable.editableEnabled())
+                            .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
                             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
                             .accept(new Visitor<PropertyBuilder>() {
                                 @Override
