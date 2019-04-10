@@ -30,6 +30,7 @@ public @interface Buildable {
     boolean editableEnabled() default true;
     boolean validationEnabled() default false;
     boolean lazyCollectionInitEnabled() default true;
+    boolean lazyMapInitEnabled() default true;
     boolean generateBuilderPackage() default false;
     String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
     BuildableReference[] refs() default {};

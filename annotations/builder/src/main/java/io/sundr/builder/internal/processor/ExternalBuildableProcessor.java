@@ -44,6 +44,7 @@ import io.sundr.codegen.utils.ModelUtils;
 import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
+import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
@@ -86,15 +87,17 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
 
                     for (TypeElement typeElement : typeElements) {
-                        final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
+                        final boolean isLazyCollectionInitEnabled = generated.lazyCollectionInitEnabled();
+                        final boolean isLazyMapInitEnabled = generated.lazyMapInitEnabled();
                         TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
                                 .addToAttributes(EXTERNAL_BUILDABLE, generated)
                                 .addToAttributes(EDITABLE_ENABLED, generated.editableEnabled())
                                 .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
-                                                            .accept(new Visitor<PropertyBuilder>() {
+                                .accept(new Visitor<PropertyBuilder>() {
                                 @Override
                                 public void visit(PropertyBuilder builder) {
-                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionEnabled);
+                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionInitEnabled);
+                                    builder.addToAttributes(LAZY_MAP_INIT_ENABLED, isLazyMapInitEnabled);
                                 }
                             }).build();
 
@@ -105,7 +108,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 }
 
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
-                    final boolean isLazyCollectionEnabled = generated.lazyCollectionInitEnabled();
+                    final boolean isLazyCollectionInitEnabled = generated.lazyCollectionInitEnabled();
+                    final boolean isLazyMapInitEnabled = generated.lazyMapInitEnabled();
                     TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
                             .addToAttributes(EXTERNAL_BUILDABLE, generated)
                             .addToAttributes(EDITABLE_ENABLED, generated.editableEnabled())
@@ -113,7 +117,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                                                         .accept(new Visitor<PropertyBuilder>() {
                                 @Override
                                 public void visit(PropertyBuilder builder) {
-                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionEnabled);
+                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionInitEnabled);
+                                    builder.addToAttributes(LAZY_MAP_INIT_ENABLED, isLazyMapInitEnabled);
                                 }
                             }).build();
 

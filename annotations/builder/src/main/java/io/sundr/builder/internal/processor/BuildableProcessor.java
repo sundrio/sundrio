@@ -41,6 +41,7 @@ import io.sundr.codegen.utils.ModelUtils;
 import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
+import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
 @SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
@@ -71,6 +72,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                                     @Override
                                     public void visit(PropertyBuilder builder) {
                                        builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
+                                       builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
                                     }
                                 }).build();
 
@@ -87,6 +89,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
                                 @Override
                                 public void visit(PropertyBuilder builder) {
                                     builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
+                                    builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
                                 }
                             }).build();
 
