@@ -60,7 +60,7 @@ public class MapTest {
                 .removeFromAttributes(key1)
                 .build();
 
-        assertEquals(attributeSupport.getAttributes(), Collections.emptyMap());
+        assertEquals(attributeSupport.getAttributes(), null);
     }
 
     @Test
@@ -73,6 +73,6 @@ public class MapTest {
                 .removeFromAttributes(map)
                 .build();
 
-        assertEquals(attributeSupport.getAttributes(), Collections.emptyMap());
+        assertEquals(attributeSupport.getAttributes(), null);
     }
 }

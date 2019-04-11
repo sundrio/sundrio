@@ -36,6 +36,7 @@ import java.util.List;
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
+import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.INIT;
@@ -97,7 +98,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
         } else if (isMap) {
             ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments);
             builder.addToAttributes(LAZY_INIT, "new " + mapRef + "()")
-                    .addToAttributes(INIT , builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED) && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null : builder.getAttributes().get(LAZY_INIT))
+                    .addToAttributes(INIT , builder.getAttributes().containsKey(LAZY_MAP_INIT_ENABLED) && (Boolean) builder.getAttributes().get(LAZY_MAP_INIT_ENABLED) ? null : builder.getAttributes().get(LAZY_INIT))
                     .addToAttributes(INIT_FUNCTION, new Construct(Collections.LINKED_HASH_MAP, arguments))
                     .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, mapRef));
         } else if (isOptional) {

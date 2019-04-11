@@ -17,7 +17,6 @@
 package io.sundr.codegen.directives;
 
 import io.sundr.codegen.Constants;
-import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Property;
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
