@@ -20,7 +20,7 @@
     <parent>
         <artifactId>components</artifactId>
         <groupId>io.sundr</groupId>
-        <version>0.16-SNAPSHOT</version>
+        <version>0.18.0</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>io.sundr</groupId>
