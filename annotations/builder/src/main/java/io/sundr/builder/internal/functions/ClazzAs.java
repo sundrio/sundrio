@@ -697,7 +697,9 @@ public class ClazzAs {
 
 
     public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
-
+    private static final String BASE_FLUENT_FULLY_QUALIFIED_NAME = Constants.BASE_FLUENT.getFullyQualifiedName();
+    private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
+    
     private static Property arrayAsList(Property property) {
         TypeRef unwrapped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getTypeRef());
         return new PropertyBuilder(property)
@@ -872,7 +874,8 @@ public class ClazzAs {
         statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
 
         //If base fluent is the superclass just skip.
-        if (!Constants.BASE_FLUENT.getFullyQualifiedName().equals(superClass.getDefinition().getFullyQualifiedName())) {
+        final String superClassFQN = superClass.getDefinition().getFullyQualifiedName();
+        if (!BASE_FLUENT_FULLY_QUALIFIED_NAME.equals(superClassFQN) && !OBJECT_FULLY_QUALIFIED_NAME.equals(superClassFQN)) {
             statements.add(new StringStatement("if (!super.equals(o)) return false;"));
         }
         statements.add(new StringStatement(new StringBuilder().append(simpleName).append(" that = (").append(simpleName).append(") o;").toString()));
