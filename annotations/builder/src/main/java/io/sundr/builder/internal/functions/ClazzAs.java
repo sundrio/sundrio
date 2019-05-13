@@ -697,7 +697,6 @@ public class ClazzAs {
 
 
     public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
-    private static final String BASE_FLUENT_FULLY_QUALIFIED_NAME = Constants.BASE_FLUENT.getFullyQualifiedName();
     private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
     
     private static Property arrayAsList(Property property) {
@@ -866,7 +865,7 @@ public class ClazzAs {
 
 
     private static List<Statement> toEquals(TypeDef type, Collection<Property> properties) {
-        List<Statement> statements = new ArrayList<Statement>();
+        List<Statement> statements = new ArrayList<>();
 
         String simpleName = type.getName();
         ClassRef superClass = type.getExtendsList().isEmpty() ? TypeDef.OBJECT_REF : type.getExtendsList().iterator().next();
@@ -874,8 +873,9 @@ public class ClazzAs {
         statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
 
         //If base fluent is the superclass just skip.
+        final BuilderContext context = BuilderContextManager.getContext();
         final String superClassFQN = superClass.getDefinition().getFullyQualifiedName();
-        if (!BASE_FLUENT_FULLY_QUALIFIED_NAME.equals(superClassFQN) && !OBJECT_FULLY_QUALIFIED_NAME.equals(superClassFQN)) {
+        if (!context.getBaseFluentClass().getFullyQualifiedName().equals(superClassFQN) && !OBJECT_FULLY_QUALIFIED_NAME.equals(superClassFQN)) {
             statements.add(new StringStatement("if (!super.equals(o)) return false;"));
         }
         statements.add(new StringStatement(new StringBuilder().append(simpleName).append(" that = (").append(simpleName).append(") o;").toString()));
