@@ -50,6 +50,138 @@ class ToMethod {
     private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
     private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
 
+    private enum GeneratorType {
+        FIRST("First", "0"), LAST("Last", "%s.size() - 1"), INDEXED("", "index", true);
+
+
+        GeneratorType(String name, String indexStatementFmt) {
+            this(name, indexStatementFmt, false);
+        }
+
+        GeneratorType(String name, String indexStatementFmt, boolean appendIndexArg) {
+            this.name = name;
+            this.indexStatementFmt = indexStatementFmt;
+            this.appendIndexArg = appendIndexArg;
+        }
+
+        private String indexStatement(Property property) {
+            return String.format(indexStatementFmt, property.getName());
+        }
+
+        private void addIndexIfNeeded(MethodBuilder methodBuilder) {
+            if (appendIndexArg) {
+                methodBuilder.addToArguments(INDEX);
+            }
+        }
+
+        private final String name;
+        private final String indexStatementFmt;
+        private final boolean appendIndexArg;
+    }
+
+    private interface GeneratorCustomizer {
+        GeneratorCustomizer defaultCustomizer = new GeneratorCustomizer() {
+            @Override
+            public String methodPrefix(Property property) {
+                return Getter.prefix(property);
+            }
+
+            @Override
+            public String doWithItem() {
+                return "";
+            }
+        };
+        GeneratorCustomizer builderCustomizer = new GeneratorCustomizer() {
+            @Override
+            public String methodPrefix(Property property) {
+                return "build";
+            }
+
+            @Override
+            public String doWithItem() {
+                return ".build()";
+            }
+        };
+
+        String methodPrefix(Property property);
+
+        String doWithItem();
+    }
+
+    private static class GetterGenerator {
+        GetterGenerator(ToMethod.GeneratorType type) {
+            this(type, ToMethod.GeneratorCustomizer.defaultCustomizer);
+        }
+
+        GetterGenerator(ToMethod.GeneratorType type, ToMethod.GeneratorCustomizer customizer) {
+            this.type = type;
+            this.customizer = customizer;
+        }
+
+        private EditableMethod method(Property property, TypeRef unwrapped) {
+            final MethodBuilder methodBuilder = new MethodBuilder()
+                    .withComments()
+                    .withAnnotations()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withName(customizer.methodPrefix(property) + type.name + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                    .withReturnType(unwrapped);
+            type.addIndexIfNeeded(methodBuilder);
+
+            methodBuilder.withNewBlock()
+                    .withStatements(new StringStatement("return this." + property.getName() + ".get(" + type.indexStatement(property) + ")" + customizer.doWithItem() + ";"))
+                    .endBlock()
+                    .build();
+            return methodBuilder.build();
+        }
+
+        private final ToMethod.GeneratorCustomizer customizer;
+        private final ToMethod.GeneratorType type;
+    }
+
+    private static final GetterGenerator GET_FIRST = new GetterGenerator(GeneratorType.FIRST);
+    private static final GetterGenerator BUILD_FIRST = new GetterGenerator(GeneratorType.FIRST, GeneratorCustomizer.builderCustomizer);
+    private static final GetterGenerator GET_LAST = new GetterGenerator(GeneratorType.LAST);
+    private static final GetterGenerator BUILD_LAST = new GetterGenerator(GeneratorType.LAST, GeneratorCustomizer.builderCustomizer);
+    private static final GetterGenerator GET_INDEXED = new GetterGenerator(GeneratorType.INDEXED);
+    private static final GetterGenerator BUILD_INDEXED = new GetterGenerator(GeneratorType.INDEXED, GeneratorCustomizer.builderCustomizer);
+
+    private enum MatchingType {
+        BUILD("item.build()", "null"), HAS("true", "false"), GET("item", "null"), REMOVE(null, null);
+
+        private EditableMethod method(Property property, TypeRef returnType, TypeDef predicate, TypeRef builderRef, List<AnnotationRef> annotations, List<String> comments) {
+            return new MethodBuilder()
+                    .withComments(comments)
+                    .withAnnotations(annotations)
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withName(name().toLowerCase() + "Matching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                    .addNewArgument()
+                    .withName("predicate")
+                    .withTypeRef(predicate.toReference(builderRef))
+                    .endArgument()
+                    .withReturnType(returnType)
+                    .withNewBlock()
+                    .withStatements(statement(property, builderRef))
+                    .endBlock()
+                    .build();
+        }
+
+        private Statement statement(Property property, TypeRef builderRef) {
+            if (match != null && nonMatch != null) {
+                return new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.apply(item)){ return " + match + ";} } return " + nonMatch + ";");
+            } else {
+                return new StringStatement("return " + property.getName() + ".removeIf(item -> predicate.apply(item));");
+            }
+        }
+
+        MatchingType(String match, String nonMatch) {
+            this.match = match;
+            this.nonMatch = nonMatch;
+        }
+
+        private final String match;
+        private final String nonMatch;
+    }
+
     static final Function<Property, Method> WITH = FunctionFactory.cache(new Function<Property, Method>() {
 
         public Method apply(Property property) {
@@ -228,7 +360,6 @@ class ToMethod {
         TypeRef unwrapped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
         TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
-        String prefix = Getter.prefix(property);
         String getterName = Getter.name(property);
         String builderName = "build" + property.getNameCapitalized();
         List<AnnotationRef> annotations = new ArrayList<>();
@@ -295,9 +426,9 @@ class ToMethod {
                     .build());
 
             if (isList) {
-                methods.add(BuildType.INDEXED.method(property, unwrapped));
-                methods.add(BuildType.FIRST.method(property, unwrapped));
-                methods.add(BuildType.LAST.method(property, unwrapped));
+                methods.add(BUILD_INDEXED.method(property, unwrapped));
+                methods.add(BUILD_FIRST.method(property, unwrapped));
+                methods.add(BUILD_LAST.method(property, unwrapped));
             }
 
             if (isList || isSet) {
@@ -306,75 +437,15 @@ class ToMethod {
             }
         } else if (isList) {
 
-            methods.add(new MethodBuilder()
-                    .withComments()
-                    .withAnnotations(annotations)
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(prefix + Singularize.FUNCTION.apply(property.getNameCapitalized()))
-                    .withReturnType(unwrapped)
-                    .addToArguments(INDEX)
-                    .withNewBlock()
-                    .withStatements(new StringStatement("return this." + property.getName() + ".get(index);"))
-                    .endBlock()
-                    .build());
-
-            methods.add(new MethodBuilder()
-                    .withComments()
-                    .withAnnotations(annotations)
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(prefix + "First" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
-                    .withReturnType(unwrapped)
-                    .withNewBlock()
-                    .withStatements(new StringStatement("return this." + property.getName() + ".get(0);"))
-                    .endBlock()
-                    .build());
-
-            methods.add(new MethodBuilder()
-                    .withComments()
-                    .withAnnotations(annotations)
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(prefix + "Last" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
-                    .withReturnType(unwrapped)
-                    .withNewBlock()
-                    .withStatements(new StringStatement("return this." + property.getName() + ".get(" + property.getName() + ".size() - 1);"))
-                    .endBlock()
-                    .build());
-
-
+            methods.add(GET_INDEXED.method(property, unwrapped));
+            methods.add(GET_FIRST.method(property, unwrapped));
+            methods.add(GET_LAST.method(property, unwrapped));
             methods.add(MatchingType.GET.method(property, unwrapped, predicate, unwrapped, annotations, Collections.emptyList()));
             methods.add(MatchingType.HAS.method(property, BOOLEAN_REF, predicate, unwrapped, annotations, Collections.emptyList()));
+            methods.add(MatchingType.REMOVE.method(property, BOOLEAN_REF, predicate, unwrapped, annotations, Collections.emptyList()));
         }
         return methods;
     });
-
-    private enum MatchingType {
-        BUILD("item.build()", "null"), HAS("true", "false"), GET("item", "null");
-
-        private EditableMethod method(Property property, TypeRef returnType, TypeDef predicate, TypeRef builderRef, List<AnnotationRef> annotations, List<String> comments) {
-            return new MethodBuilder()
-                    .withComments(comments)
-                    .withAnnotations(annotations)
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(name().toLowerCase() + "Matching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
-                    .addNewArgument()
-                    .withName("predicate")
-                    .withTypeRef(predicate.toReference(builderRef))
-                    .endArgument()
-                    .withReturnType(returnType)
-                    .withNewBlock()
-                    .withStatements(new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.apply(item)){ return " + match + ";} } return " + nonMatch + ";"))
-                    .endBlock()
-                    .build();
-        }
-
-        MatchingType(String match, String nonMatch) {
-            this.match = match;
-            this.nonMatch = nonMatch;
-        }
-
-        private final String match;
-        private final String nonMatch;
-    }
 
     static final Function<Property, List<Method>> GETTER_ARRAY = FunctionFactory.cache(property -> {
         List<Method> methods = new ArrayList<>();
@@ -426,9 +497,9 @@ class ToMethod {
                     .withName(builderName)
                     .build());
 
-            methods.add(BuildType.INDEXED.method(property, unwrapped));
-            methods.add(BuildType.FIRST.method(property, unwrapped));
-            methods.add(BuildType.LAST.method(property, unwrapped));
+            methods.add(BUILD_INDEXED.method(property, unwrapped));
+            methods.add(BUILD_FIRST.method(property, unwrapped));
+            methods.add(BUILD_LAST.method(property, unwrapped));
 
             methods.add(MatchingType.BUILD.method(property, unwrapped, predicate, builderRef, Collections.emptyList(), Collections.emptyList()));
 
@@ -436,41 +507,6 @@ class ToMethod {
         }
         return methods;
     });
-
-
-    private enum BuildType {
-        FIRST("First", "0"), LAST("Last", "%s.size() - 1"), INDEXED("", "index");
-
-
-        BuildType(String name, String indexStatementFmt) {
-            this.name = name;
-            this.indexStatementFmt = indexStatementFmt;
-        }
-
-        private String indexStatement(Property property) {
-            return String.format(indexStatementFmt, property.getName());
-        }
-
-        private EditableMethod method(Property property, TypeRef unwrapped) {
-            final MethodBuilder methodBuilder = new MethodBuilder()
-                    .withComments()
-                    .withAnnotations()
-                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName("build" + name + Singularize.FUNCTION.apply(property.getNameCapitalized()))
-                    .withReturnType(unwrapped);
-            if (this == BuildType.INDEXED) {
-                methodBuilder.addToArguments(INDEX);
-            }
-            methodBuilder.withNewBlock()
-                    .withStatements(new StringStatement("return this." + property.getName() + ".get(" + indexStatement(property) + ").build();"))
-                    .endBlock()
-                    .build();
-            return methodBuilder.build();
-        }
-
-        private final String name;
-        private final String indexStatementFmt;
-    }
 
     static final Function<Property, List<Method>> ADD_TO_COLLECTION = FunctionFactory.cache(new Function<Property, List<Method>>() {
         public List<Method> apply(final Property property) {
