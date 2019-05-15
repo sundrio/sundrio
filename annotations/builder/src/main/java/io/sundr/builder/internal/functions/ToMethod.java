@@ -833,7 +833,6 @@ class ToMethod {
             if (isBuildable(unwrapped) && !isAbstract(unwrapped) && !property.hasAttribute(DESCENDANT_OF)) {
                 TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
                 TypeRef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition()).toInternalReference();
-                alsoImport.add(builderType);
                 methods.add(new MethodBuilder()
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                         .withReturnType(returnType)
