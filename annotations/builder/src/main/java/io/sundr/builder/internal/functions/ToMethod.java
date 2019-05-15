@@ -153,7 +153,7 @@ class ToMethod {
                     .withComments(comments)
                     .withAnnotations(annotations)
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
-                    .withName(name().toLowerCase() + "Matching" + Singularize.FUNCTION.apply(property.getNameCapitalized()))
+                    .withName(operationName() + Singularize.FUNCTION.apply(property.getNameCapitalized()))
                     .addNewArgument()
                     .withName("predicate")
                     .withTypeRef(predicate.toReference(builderRef))
@@ -163,6 +163,14 @@ class ToMethod {
                     .withStatements(statement(property, builderRef))
                     .endBlock()
                     .build();
+        }
+
+        private String operationName() {
+            if (this != REMOVE) {
+                return name().toLowerCase() + "Matching";
+            } else {
+                return "removeAllMatchingFrom";
+            }
         }
 
         private Statement statement(Property property, TypeRef builderRef) {
@@ -434,6 +442,7 @@ class ToMethod {
             if (isList || isSet) {
                 methods.add(MatchingType.BUILD.method(property, unwrapped, predicate, builderRef, Collections.emptyList(), Collections.emptyList()));
                 methods.add(MatchingType.HAS.method(property, BOOLEAN_REF, predicate, builderRef, Collections.emptyList(), Collections.emptyList()));
+                methods.add(MatchingType.REMOVE.method(property, BOOLEAN_REF, predicate, builderRef, Collections.emptyList(), Collections.emptyList()));
             }
         } else if (isList) {
 
@@ -442,7 +451,6 @@ class ToMethod {
             methods.add(GET_LAST.method(property, unwrapped));
             methods.add(MatchingType.GET.method(property, unwrapped, predicate, unwrapped, annotations, Collections.emptyList()));
             methods.add(MatchingType.HAS.method(property, BOOLEAN_REF, predicate, unwrapped, annotations, Collections.emptyList()));
-            methods.add(MatchingType.REMOVE.method(property, BOOLEAN_REF, predicate, unwrapped, annotations, Collections.emptyList()));
         }
         return methods;
     });
@@ -823,6 +831,30 @@ class ToMethod {
 
             methods.add(removeVarargFromCollection);
             methods.add(removeAllFromCollection);
+
+            if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
+                TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
+                TypeRef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition()).toInternalReference();
+                methods.add(new MethodBuilder()
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withReturnType(returnType)
+                        .withParameters(parameters)
+                        .withName("removeAllMatchingFrom" + property.getNameCapitalized())
+                        .addNewArgument()
+                        .withName("predicate")
+                        .withTypeRef(predicate.toReference(builder))
+                        .endArgument()
+                        .withNewBlock()
+                        .addNewStringStatementStatement("for (" + unwrapped + " item : items) {")
+                        .addNewStringStatementStatement(builder + " builder = new " + builder + "(item);")
+                        .addNewStringStatementStatement("if (predicate.apply(builder)) {")
+                        .addNewStringStatementStatement("_visitables.get(\"" + propertyName + "\").remove(builder);")
+                        .addNewStringStatementStatement("if (this." + propertyName + " != null) {this." + propertyName + ".remove(builder);}")
+                        .addNewStringStatementStatement("}}")
+                        .addNewStringStatementStatement(" return (" + returnType + ")this;")
+                        .endBlock()
+                        .build());
+            }
 
             return methods;
         }
