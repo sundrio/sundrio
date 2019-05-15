@@ -442,10 +442,8 @@ class ToMethod {
             if (isList || isSet) {
                 methods.add(MatchingType.BUILD.method(property, unwrapped, predicate, builderRef, Collections.emptyList(), Collections.emptyList()));
                 methods.add(MatchingType.HAS.method(property, BOOLEAN_REF, predicate, builderRef, Collections.emptyList(), Collections.emptyList()));
-                methods.add(MatchingType.REMOVE.method(property, BOOLEAN_REF, predicate, builderRef, Collections.emptyList(), Collections.emptyList()));
             }
         } else if (isList) {
-
             methods.add(GET_INDEXED.method(property, unwrapped));
             methods.add(GET_FIRST.method(property, unwrapped));
             methods.add(GET_LAST.method(property, unwrapped));
@@ -832,9 +830,10 @@ class ToMethod {
             methods.add(removeVarargFromCollection);
             methods.add(removeAllFromCollection);
 
-            if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
+            if (isBuildable(unwrapped) && !isAbstract(unwrapped) && !property.hasAttribute(DESCENDANT_OF)) {
                 TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
                 TypeRef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition()).toInternalReference();
+                alsoImport.add(builderType);
                 methods.add(new MethodBuilder()
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                         .withReturnType(returnType)
@@ -845,8 +844,7 @@ class ToMethod {
                         .withTypeRef(predicate.toReference(builder))
                         .endArgument()
                         .withNewBlock()
-                        .addNewStringStatementStatement("for (" + unwrapped + " item : items) {")
-                        .addNewStringStatementStatement(builder + " builder = new " + builder + "(item);")
+                        .addNewStringStatementStatement("for (" + builder + " builder : "+property.getName()+") {")
                         .addNewStringStatementStatement("if (predicate.apply(builder)) {")
                         .addNewStringStatementStatement("_visitables.get(\"" + propertyName + "\").remove(builder);")
                         .addNewStringStatementStatement("if (this." + propertyName + " != null) {this." + propertyName + ".remove(builder);}")
