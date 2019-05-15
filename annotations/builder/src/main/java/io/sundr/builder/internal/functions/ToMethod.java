@@ -833,7 +833,9 @@ class ToMethod {
             if (isBuildable(unwrapped) && !isAbstract(unwrapped) && !property.hasAttribute(DESCENDANT_OF)) {
                 TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
                 TypeRef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition()).toInternalReference();
+                alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
                 methods.add(new MethodBuilder()
+                        .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                         .withReturnType(returnType)
                         .withParameters(parameters)
@@ -843,12 +845,17 @@ class ToMethod {
                         .withTypeRef(predicate.toReference(builder))
                         .endArgument()
                         .withNewBlock()
-                        .addNewStringStatementStatement("for (" + builder + " builder : "+property.getName()+") {")
-                        .addNewStringStatementStatement("if (predicate.apply(builder)) {")
-                        .addNewStringStatementStatement("_visitables.get(\"" + propertyName + "\").remove(builder);")
-                        .addNewStringStatementStatement("if (this." + propertyName + " != null) {this." + propertyName + ".remove(builder);}")
-                        .addNewStringStatementStatement("}}")
-                        .addNewStringStatementStatement(" return (" + returnType + ")this;")
+                        .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
+                        .addNewStringStatementStatement("final Iterator<" + builder + "> each = " + propertyName + ".iterator();")
+                        .addNewStringStatementStatement("final List visitables = _visitables.get(\"" + propertyName + "\");")
+                        .addNewStringStatementStatement("while (each.hasNext()) {")
+                        .addNewStringStatementStatement("  " + builder + " builder = each.next();")
+                        .addNewStringStatementStatement("  if (predicate.apply(builder)) {")
+                        .addNewStringStatementStatement("    visitables.remove(builder);")
+                        .addNewStringStatementStatement("    each.remove();")
+                        .addNewStringStatementStatement("  }")
+                        .addNewStringStatementStatement("}")
+                        .addNewStringStatementStatement("return (" + returnType + ")this;")
                         .endBlock()
                         .build());
             }
