@@ -753,6 +753,8 @@ class ToMethod {
 
             String removeVarargMethodName = "removeFrom" + property.getNameCapitalized();
             String removeAllMethdoName = "removeAllFrom" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef) + property.getNameCapitalized();
+            String removeMatchingMethodName = "removeMatchingFrom" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef) + property.getNameCapitalized();
+
 
             String propertyName = property.getName();
             List<Statement> statements = new ArrayList<>();
@@ -830,16 +832,18 @@ class ToMethod {
             methods.add(removeVarargFromCollection);
             methods.add(removeAllFromCollection);
 
-            if (isBuildable(unwrapped) && !isAbstract(unwrapped) && !property.hasAttribute(DESCENDANT_OF)) {
+            if (isBuildable(unwrapped)) {
+            if (TypeUtils.isConcrete(unwrapped) && !property.hasAttribute(DESCENDANT_OF))  {
                 TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
                 TypeRef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition()).toInternalReference();
                 alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
+                alsoImport.add((ClassRef) builderType);
                 methods.add(new MethodBuilder()
                         .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                         .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
                         .withReturnType(returnType)
                         .withParameters(parameters)
-                        .withName("removeAllMatchingFrom" + property.getNameCapitalized())
+                        .withName(removeMatchingMethodName)
                         .addNewArgument()
                         .withName("predicate")
                         .withTypeRef(predicate.toReference(builder))
@@ -858,8 +862,42 @@ class ToMethod {
                         .addNewStringStatementStatement("return (" + returnType + ")this;")
                         .endBlock()
                         .build());
+            } else {
+                ClassRef fluentType = FLUENT_REF.apply(((ClassRef)unwrapped).getDefinition());
+                TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
+                if (property.hasAttribute(DESCENDANT_OF)) {
+                    builderType = VISITABLE_BUILDER.apply(property.getAttribute(DESCENDANT_OF).getTypeRef());
+                }
+
+                alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
+                alsoImport.add((ClassRef) builderType);
+                methods.add(new MethodBuilder()
+                        .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+                        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                        .withReturnType(returnType)
+                        .withParameters(parameters)
+                        .withName(removeMatchingMethodName)
+                        .addNewArgument()
+                        .withName("predicate")
+                        .withTypeRef(predicate.toReference(builderType))
+                        .endArgument()
+                        .withNewBlock()
+                        .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
+                        .addNewStringStatementStatement("final Iterator<" + builderType + "> each = " + propertyName + ".iterator();")
+                        .addNewStringStatementStatement("final List visitables = _visitables.get(\"" + propertyName + "\");")
+                        .addNewStringStatementStatement("while (each.hasNext()) {")
+                        .addNewStringStatementStatement("  " + builderType + " builder = each.next();")
+                        .addNewStringStatementStatement("  if (predicate.apply(builder)) {")
+                        .addNewStringStatementStatement("    visitables.remove(builder);")
+                        .addNewStringStatementStatement("    each.remove();")
+                        .addNewStringStatementStatement("  }")
+                        .addNewStringStatementStatement("}")
+                        .addNewStringStatementStatement("return (" + returnType + ")this;")
+                        .endBlock()
+                        .build());
             }
 
+            }
             return methods;
         }
 
