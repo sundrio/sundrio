@@ -253,8 +253,19 @@ public class TypeAs {
             index++;
         }
         return type;
-
     });
+
+    static final Function<TypeRef, String> PARSER_OF = FunctionFactory.cache(type -> {
+        int index = 0;
+        for (TypeRef primitive : PRIMITIVE_TYPES) {
+            if (primitive.equals(type)) {
+                return BOXED_PARSE_METHOD[index];
+            }
+            index++;
+        }
+        return null;
+    });
+
 
 
     static Function<TypeRef, TypeRef> ARRAY_OF = type -> {

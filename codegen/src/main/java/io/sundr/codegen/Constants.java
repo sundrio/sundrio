@@ -16,6 +16,7 @@
 
 package io.sundr.codegen;
 
+import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamRef;
@@ -70,13 +71,36 @@ public class Constants {
 
     public static Class[] PRIMITIVES = {boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class, float.class};
 
-    public static TypeRef[] PRIMITIVE_TYPES =
-            {TYPEREF.apply(boolean.class),
-                    TYPEREF.apply(byte.class), TYPEREF.apply(char.class),
-                    TYPEREF.apply(short.class), TYPEREF.apply(int.class), TYPEREF.apply(long.class),
-                    TYPEREF.apply(double.class), TYPEREF.apply(float.class)};
-    public static TypeRef[] BOXED_PRIMITIVE_TYPES = {TYPEREF.apply(Boolean.class),
-            TYPEREF.apply(Byte.class), TYPEREF.apply(Character.class),
-            TYPEREF.apply(Short.class), TYPEREF.apply(Integer.class), TYPEREF.apply(Long.class),
-            TYPEREF.apply(Double.class), TYPEREF.apply(Float.class)};
+    public static TypeRef[] PRIMITIVE_TYPES = {
+        TYPEREF.apply(boolean.class),
+        TYPEREF.apply(byte.class),
+        TYPEREF.apply(char.class),
+        TYPEREF.apply(short.class),
+        TYPEREF.apply(int.class),
+        TYPEREF.apply(long.class),
+        TYPEREF.apply(double.class),
+        TYPEREF.apply(float.class)
+    };
+
+    public static TypeRef[] BOXED_PRIMITIVE_TYPES = {
+        TYPEREF.apply(Boolean.class),
+        TYPEREF.apply(Byte.class),
+        TYPEREF.apply(Character.class),
+        TYPEREF.apply(Short.class),
+        TYPEREF.apply(Integer.class),
+        TYPEREF.apply(Long.class),
+        TYPEREF.apply(Double.class),
+        TYPEREF.apply(Float.class)
+    };
+
+    public static String[] BOXED_PARSE_METHOD = {
+        "parseBoolean",
+        "parseByte",
+        null,
+        "parseShort",
+        "parseInt",
+        "parseLong",
+        "parseDouble",
+        "parseFloat"
+    };
 }

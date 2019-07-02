@@ -777,9 +777,32 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             if (classRef.getDefinition().isEnum()) {
                 return readEnumValue(ref, source, property);
             }
-        } 
+        } else if (propertyRef instanceof PrimitiveRef) {
+                return readPrimitiveValue(ref, source, property);
+        }
         return indent(ref) + "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\", " + getDefaultValue(property)+") : "+ getDefaultValue(property)+")";
     }
+    /**
+     * Returns the string representation of the code that reads an enum property from a reference using a getter.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readPrimitiveValue(String ref, TypeDef source, Property property) {
+        String dv = getDefaultValue(property);
+        TypeRef propertyRef = property.getTypeRef();
+        ClassRef boxed = (ClassRef) TypeAs.BOXED_OF.apply(propertyRef);
+        String parse = TypeAs.PARSER_OF.apply(propertyRef);
+
+        String boxedName = boxed.getName();
+        if (parse != null) {
+            return indent(ref) + boxedName+"." + parse + "(String.valueOf(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\",\"" + dv+"\") : \""+ dv+"\"))";
+        } else {
+            return indent(ref) + "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\", " + dv +") : "+ dv +")";
+        }
+    }
+
 
     /**
      * Returns the string representation of the code that reads an enum property from a reference using a getter.
@@ -789,7 +812,6 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
      * @return              The code.
      */
     private static String readEnumValue(String ref, TypeDef source, Property property) {
-        String name = property.getName();
         String dv = getDefaultValue(property);
         if (dv != null && dv.contains(".")) {
             dv=dv.substring(dv.lastIndexOf(".") + 1);
