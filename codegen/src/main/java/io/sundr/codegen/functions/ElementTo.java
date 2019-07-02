@@ -234,6 +234,8 @@ public class ElementTo {
                 kind = Kind.CLASS;
             } else if (classElement.getKind() == ElementKind.ANNOTATION_TYPE) {
                 kind = Kind.ANNOTATION;
+            } else if (classElement.getKind() == ElementKind.ENUM) {
+                kind = Kind.ENUM;
             }
 
             for (TypeMirror interfaceTypeMirrror : classElement.getInterfaces()) {
@@ -343,6 +345,8 @@ public class ElementTo {
                 extendsList.add(TypeDef.OBJECT_REF);
             } else if (classElement.getKind() == ElementKind.ANNOTATION_TYPE) {
                 kind = Kind.ANNOTATION;
+            } else if (classElement.getKind() == ElementKind.ENUM) {
+                kind = Kind.ENUM;
             }
 
             Set<Method> allMethods = new LinkedHashSet<Method>();
