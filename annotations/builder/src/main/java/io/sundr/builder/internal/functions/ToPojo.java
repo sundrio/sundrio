@@ -99,6 +99,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
                 List<Property> arguments = new CopyOnWriteArrayList<>();
                 List<Property> fields = new CopyOnWriteArrayList<>();
+                Map<String, Property> superClassFields = new HashMap<>();
                 List<Method> getters = new CopyOnWriteArrayList<>();
                 List<Method> additionalMethods = new ArrayList<>();
 
@@ -279,6 +280,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                         for (Property f : fields) {
                                                 if (name.equals(f.getName())) {
                                                         fields.remove(f);
+                                                        superClassFields.put(f.getName(), f);
                                                 }
                                         }
                                 }
@@ -339,10 +341,18 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                         .accept(new TypedVisitor<PropertyBuilder>() {
                                 @Override
                                 public void visit(PropertyBuilder b) {
-                                        b.withName(StringUtils.toFieldName(b.getName()));
+                                    String name = b.getName();
+                                    b.withName(StringUtils.toFieldName(name));
+                                    //DEFAULT_VALUE is something that is available in Annotation types, but when the annotation becomes a Pojo
+                                    //That piece of information is lost (as is the case with our super-classs). Let's work-around it.
+                                    if (superClassFields.containsKey(name)) {
+                                        Property f = superClassFields.get(name);
+                                        if (f.getAttributes().containsKey(DEFAULT_VALUE)) {
+                                            b.addToAttributes(DEFAULT_VALUE, f.getAttribute(DEFAULT_VALUE));
+                                        }
+                                    }
                                 }
-                        })
-                        .build();
+                        }).build();
 
 
                 if (mutable) {
@@ -740,8 +750,15 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         if (property.getTypeRef().getDimensions() > 0) {
             return readArrayValue(ref, source, property);
         }
-        if (property.getTypeRef() instanceof ClassRef && ((ClassRef)getterTypeRef).getDefinition().isAnnotation()) {
-            return readAnnotationValue("((Map)(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : "+getDefaultValue(property)+"))", ((ClassRef) getterTypeRef).getDefinition(), property);
+
+        if (getterTypeRef instanceof ClassRef) {
+            TypeDef getterTypeDef = ((ClassRef)getterTypeRef).getDefinition();
+            if (getterTypeDef.isEnum()) {
+                return readEnumValue(ref, source, property);
+            }
+            if (getterTypeDef.isAnnotation()) {
+                return readAnnotationValue("((Map)(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\"" + getterOf(source, property).getName() + "\") : "+getDefaultValue(property)+"))", ((ClassRef) getterTypeRef).getDefinition(), property);
+            }
         }
         return readObjectValue(ref, source, property);
     }
@@ -754,7 +771,30 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
      * @return              The code.
      */
     private static String readObjectValue(String ref, TypeDef source, Property property) {
+        TypeRef propertyRef = property.getTypeRef();
+        if (propertyRef instanceof ClassRef) {
+            ClassRef classRef =  (ClassRef) propertyRef;
+            if (classRef.getDefinition().isEnum()) {
+                return readEnumValue(ref, source, property);
+            }
+        } 
         return indent(ref) + "("+property.getTypeRef().toString()+")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\", " + getDefaultValue(property)+") : "+ getDefaultValue(property)+")";
+    }
+
+    /**
+     * Returns the string representation of the code that reads an enum property from a reference using a getter.
+     * @param ref           The reference.
+     * @param source        The type of the reference.
+     * @param property      The property to read.
+     * @return              The code.
+     */
+    private static String readEnumValue(String ref, TypeDef source, Property property) {
+        String name = property.getName();
+        String dv = getDefaultValue(property);
+        if (dv != null && dv.contains(".")) {
+            dv=dv.substring(dv.lastIndexOf(".") + 1);
+        }
+        return indent(ref) + property.getTypeRef().toString()+".valueOf(String.valueOf(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\",\"" + dv+"\") : \""+ dv+"\"))";
     }
 
 
