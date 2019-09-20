@@ -19,6 +19,7 @@ package io.sundr.builder.internal.functions;
 import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.Provider;
+import io.sundr.SundrException;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
@@ -842,11 +843,16 @@ public class ClazzAs {
             }
 
             for (Property property : c.getProperties()) {
-                if (!hasBuildableConstructorWithArgument(c, property) && Setter.has(c, property)) {
-                    String setterName = "set" + property.getNameCapitalized();
+                Method setter;
+                try {
+                    setter = Setter.find(clazz, property);
+                } catch (SundrException e) {
+                    continue; // no setter found nothing to set
+                }
+                if (!hasBuildableConstructorWithArgument(c, property)) {
                     String getterName = Getter.name(property);
                     statements.add(new StringStatement(new StringBuilder()
-                            .append("buildable.").append(setterName).append("(fluent.").append(getterName).append("());")
+                            .append("buildable.").append(setter.getName()).append("(fluent.").append(getterName).append("());")
                             .toString()));
 
                 }
