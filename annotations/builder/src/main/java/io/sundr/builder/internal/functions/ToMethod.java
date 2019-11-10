@@ -923,6 +923,103 @@ class ToMethod {
                 .build();
     });
 
+    static final Function<Property, List<Method>> ADD_NEW_VALUE_TO_MAP = property -> {
+        TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
+        if (!(property.getTypeRef() instanceof ClassRef)) {
+            throw new IllegalStateException("Expected Map type and found:" + property.getTypeRef());
+        }
+        ClassRef mapType = (ClassRef) property.getTypeRef();
+        TypeRef keyType = mapType.getArguments().get(0);
+        TypeRef valueType = mapType.getArguments().get(1);
+
+        Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
+        Property valueProperty = new PropertyBuilder().withName("value").withTypeRef(valueType).build();
+        ClassRef targetType = (ClassRef) valueType;
+        TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+        TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+        TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
+
+        List<TypeParamDef> parameters = targetType.getDefinition().getParameters();
+        List<TypeRef> typeArguments = new ArrayList<>();
+        for (TypeRef arg : targetType.getArguments()) {
+            typeArguments.add(arg);
+        }
+        typeArguments.add(returnType);
+
+        ClassRef rewraped = nestedType.toReference(typeArguments);
+        ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
+        String methodSuffix = BuilderUtils.fullyQualifiedNameDiff(valueType, originTypeDef) + property.getNameCapitalized();
+        String propertyName = property.getName();
+        TypeRef baseType = valueType;
+        if (property.hasAttribute(Constants.DESCENDANT_OF)) {
+            Property attrValue = property.getAttribute(Constants.DESCENDANT_OF);
+            if (attrValue != null) {
+                propertyName = (attrValue).getName();
+                baseType = ((ClassRef) attrValue.getTypeRef()).getArguments().get(1);
+            }
+        }
+        String fullyQualifiedBaseType = ((ClassRef) baseType).getFullyQualifiedName();
+        String fullyQualifiedValueType = ((ClassRef) valueType).getFullyQualifiedName();
+
+        Method addNewValueTo = new MethodBuilder()
+                .withParameters(parameters)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withName("addNewValueTo" + methodSuffix)
+                .withReturnType(rewraped)
+                .withArguments(keyProperty)
+                .withNewBlock()
+                .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ");")
+                .endBlock()
+                .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
+                .build();
+
+        Method addNewValueLikeTo = new MethodBuilder()
+                .withParameters(parameters)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withName("addNewValueLikeTo" + methodSuffix)
+                .withReturnType(rewraped)
+                .withArguments(keyProperty, valueProperty)
+                .withNewBlock()
+                .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ", " + valueProperty.getName()  + ");")
+                .endBlock()
+                .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
+                .build();
+
+        Method editValueIn = new MethodBuilder()
+                .withParameters(parameters)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withName("editValueIn" + methodSuffix)
+                .withReturnType(rewraped)
+                .withArguments(keyProperty)
+                .withNewBlock()
+                .addNewStringStatementStatement("if (this." + propertyName + " == null || !this." + propertyName + ".containsKey(" + keyProperty.getName() + ")) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " + keyProperty.getName() + " + \"\\\" doesn't exist.\");")
+                .addNewStringStatementStatement(fullyQualifiedBaseType + " toEdit = this." + propertyName + ".get(" + keyProperty.getName() + ");")
+                .addNewStringStatementStatement("if (toEdit instanceof " + fullyQualifiedValueType +" == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
+                .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ", (" + fullyQualifiedValueType + ") toEdit);")
+                .endBlock()
+                .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
+                .build();
+
+        Method editOrAddValueIn = new MethodBuilder()
+                .withParameters(parameters)
+                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withName("editOrAddValueIn" + methodSuffix)
+                .withReturnType(rewraped)
+                .withArguments(keyProperty)
+                .withNewBlock()
+                .addNewStringStatementStatement("if (this." + propertyName + " != null && this." + propertyName + ".containsKey(" + keyProperty.getName() + ")) {")
+                .addNewStringStatementStatement(fullyQualifiedBaseType + " toEdit = this." + propertyName + ".get(" + keyProperty.getName() + ");")
+                .addNewStringStatementStatement("if (toEdit instanceof " + fullyQualifiedValueType +" == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
+                .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ", (" + fullyQualifiedValueType + ") toEdit);")
+                .addNewStringStatementStatement("}")
+                .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ");")
+                .endBlock()
+                .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
+                .build();
+
+        return Arrays.asList(addNewValueTo, addNewValueLikeTo, editValueIn, editOrAddValueIn);
+    };
+
     static final Function<Property, Method> ADD_TO_MAP = FunctionFactory.cache(property -> {
         TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
         if (!(property.getTypeRef() instanceof ClassRef)) {
@@ -1360,9 +1457,27 @@ class ToMethod {
 
             boolean isArray = TypeUtils.isArray(property.getTypeRef());
             boolean isList = TypeUtils.isList(property.getTypeRef());
+            boolean isMap = TypeUtils.isMap(property.getTypeRef());
 
-            String prefix = isArray || isList ? "setTo" : "with";
+            String prefix = "with";
+            if (isArray || isList) {
+                prefix = "setTo";
+            } else if (isMap) {
+                prefix = "addTo";
+            }
+            String indexOrKey = "";
+            if (isArray || isList) {
+                indexOrKey = "index,";
+            } else if (isMap) {
+                indexOrKey = "key,";
+            }
             String withMethodName = prefix + property.getNameCapitalized();
+            if (property.hasAttribute(Constants.DESCENDANT_OF)) {
+                Property attrValue = property.getAttribute(Constants.DESCENDANT_OF);
+                if (attrValue != null) {
+                    withMethodName = prefix + (attrValue).getNameCapitalized();
+                }
+            }
 
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
@@ -1370,8 +1485,7 @@ class ToMethod {
                     .withName("and")
                     .withNewBlock()
                     .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(" +
-                            (isArray || isList ? "index, " : "")
-                            + "builder.build());")
+                            indexOrKey + "builder.build());")
                     .endBlock()
                     .build();
 

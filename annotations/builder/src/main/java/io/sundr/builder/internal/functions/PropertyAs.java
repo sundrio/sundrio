@@ -42,12 +42,14 @@ import java.util.List;
 import java.util.Set;
 
 import static io.sundr.builder.Constants.INDEX;
-import static io.sundr.codegen.Constants.N;
 import static io.sundr.builder.Constants.OUTER_CLASS;
 import static io.sundr.builder.Constants.OUTER_INTERFACE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_MAP_KEY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_MAP_VALUE_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
+import static io.sundr.codegen.Constants.N;
 
 public final class PropertyAs {
 
@@ -59,8 +61,9 @@ public final class PropertyAs {
         public TypeDef apply(Property item) {
             boolean isArray = TypeUtils.isArray(item.getTypeRef());
             boolean isList = TypeUtils.isList(item.getTypeRef());
+            boolean isMap = TypeUtils.isMap(item.getTypeRef());
 
-            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
+            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF).apply(item.getTypeRef());
 
             if (unwrapped instanceof ClassRef) {
                 TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
@@ -90,20 +93,32 @@ public final class PropertyAs {
                         .withName("builder")
                         .withTypeRef(builderType).build());
 
-                List<Property> arguments = new ArrayList<Property>();
+                List<Property> argumentsWithItem = new ArrayList<Property>();
+                List<Property> argumentsWithoutItem = new ArrayList<Property>();
+
                 if (isArray || isList) {
-                    arguments.add(INDEX);
+                    argumentsWithItem.add(INDEX);
                     properties.add(INDEX);
                     statementsWithItem.add(new StringStatement("this.index = index;"));
                     statementsWithoutItem.add(new StringStatement("this.index = -1;"));
                 }
-                arguments.add(new PropertyBuilder().withName("item").withTypeRef(unwrapped).build());
+                if (isMap) {
+                    TypeRef keyType = UNWRAP_MAP_KEY_OF.apply(item.getTypeRef());
+                    Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
+                    Statement keyStatement = new StringStatement("this.key = key;");
+                    argumentsWithItem.add(keyProperty);
+                    argumentsWithoutItem.add(keyProperty);
+                    properties.add(keyProperty);
+                    statementsWithItem.add(keyStatement);
+                    statementsWithoutItem.add(keyStatement);
+                }
+                argumentsWithItem.add(new PropertyBuilder().withName("item").withTypeRef(unwrapped).build());
 
                 statementsWithItem.add(new StringStatement("this.builder = new " + builderType.getName() + "(this, item);"));
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
-                        .withArguments(arguments)
+                        .withArguments(argumentsWithItem)
                         .withNewBlock()
                             .withStatements(statementsWithItem)
                         .endBlock()
@@ -113,6 +128,7 @@ public final class PropertyAs {
                 constructors.add(new MethodBuilder()
                         .withName("")
                         .withReturnType(nestedRef)
+                        .withArguments(argumentsWithoutItem)
                         .withNewBlock()
                             .withStatements(statementsWithoutItem)
                         .endBlock()
@@ -133,7 +149,7 @@ public final class PropertyAs {
         public TypeDef apply(Property item) {
 
 
-            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
+            TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF).apply(item.getTypeRef());
             //TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
 
             if (unwrapped instanceof ClassRef) {
@@ -206,7 +222,7 @@ public final class PropertyAs {
                         .build();
 
                 //Not a typical fluent
-                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
+                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF).apply(item.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
                 if (typeDef == null) {
@@ -255,7 +271,7 @@ public final class PropertyAs {
                 TypeDef outerInterface = item.getAttribute(OUTER_INTERFACE);
                 //Not a typical fluent
 
-                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
+                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF).apply(item.getTypeRef());
                 //TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
@@ -304,7 +320,7 @@ public final class PropertyAs {
                 TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
 
-                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
+                TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF).apply(property.getTypeRef());
                 TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
 
                 if (typeDef == null) {

@@ -60,9 +60,7 @@ import java.util.Set;
 
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
-import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
-import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
-import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
+import static io.sundr.builder.internal.functions.TypeAs.*;
 import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.codegen.model.Attributeable.INIT;
@@ -424,7 +422,7 @@ public class BuilderUtils {
         String currentPackage = originType != null ? originType.getPackageName() : null;
 
         if (typeRef instanceof ClassRef) {
-            TypeRef unwrapped =   TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
+            TypeRef unwrapped =   TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF).apply(typeRef);
 
             if (unwrapped instanceof ClassRef) {
                 ClassRef classRef = (ClassRef) unwrapped;

@@ -222,6 +222,20 @@ public class TypeAs {
         return type;
     };
 
+    private static TypeRef unwrapMapOf(TypeRef type, int argumentIndex) {
+        if (type instanceof ClassRef) {
+            ClassRef classRef = (ClassRef) type;
+            if (Collections.IS_MAP.apply(classRef)) {
+                return classRef.getArguments().get(argumentIndex);
+            }
+        }
+        return type;
+    }
+
+    public static final Function<TypeRef, TypeRef> UNWRAP_MAP_KEY_OF = type -> unwrapMapOf(type, 0);
+
+    public static final Function<TypeRef, TypeRef> UNWRAP_MAP_VALUE_OF = type -> unwrapMapOf(type, 1);
+
     public static final Function<TypeRef, TypeRef> UNWRAP_OPTIONAL_OF = type -> {
         if (type instanceof ClassRef) {
             ClassRef classRef = (ClassRef) type;

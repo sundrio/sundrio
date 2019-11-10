@@ -43,6 +43,7 @@ import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.ORIGIN_TYPEDEF;
+import static io.sundr.codegen.functions.Collections.IS_MAP;
 import static io.sundr.codegen.utils.StringUtils.compact;
 import static io.sundr.codegen.utils.StringUtils.deCapitalizeFirst;
 import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
@@ -109,6 +110,36 @@ public class Descendants {
                         result.add(new PropertyBuilder(property)
                                 .withName(propertyName)
                                 .withTypeRef(collectionType)
+                                .addToAttributes(DESCENDANT_OF, property)
+                                .addToAttributes(BUILDABLE_ENABLED, true)
+                                .accept(new InitEnricher())
+                                .build());
+                    }
+                }
+            } else if (IS_MAP.apply(baseType)) {
+                TypeRef unwrapped = TypeAs.UNWRAP_MAP_VALUE_OF.apply(baseType);
+                if (unwrapped instanceof  ClassRef) {
+                    ClassRef candidate = (ClassRef) unwrapped;
+
+                    for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
+                        ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
+                                .build();
+
+                        if (isNestingFiltered(property, descendantRef)) {
+                            continue;
+                        } else if (origin.getName().equals(descendant.getName()) && !origin.getPackageName().equals(descendant.getPackageName())) {
+                            //We don't want to have a class that references a descendant with the same name in an other package. It's an extreme case and will not work.
+                            continue;
+                        }
+
+                        ClassRef mapType = new ClassRefBuilder((ClassRef)baseType)
+                                .withArguments(TypeAs.UNWRAP_MAP_KEY_OF.apply(baseType), descendantRef)
+                                .build();
+
+                        String propertyName = compact(deCapitalizeFirst(descendant.getName()) + property.getNameCapitalized());
+                        result.add(new PropertyBuilder(property)
+                                .withName(propertyName)
+                                .withTypeRef(mapType)
                                 .addToAttributes(DESCENDANT_OF, property)
                                 .addToAttributes(BUILDABLE_ENABLED, true)
                                 .accept(new InitEnricher())
