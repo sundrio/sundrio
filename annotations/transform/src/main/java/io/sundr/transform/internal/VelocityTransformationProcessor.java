@@ -25,6 +25,7 @@ import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
+import io.sundr.codegen.utils.StringUtils;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 
@@ -135,12 +136,18 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
         try {
             FileObject fileObject = filer.getResource(StandardLocation.CLASS_PATH, "", selector.value());
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileObject.openInputStream())))  {
-                Map<String, TypeDef> map = reader.lines()
+                System.out.println("Reading transformation resources from:" + selector.value() + ".");
+                List<String> lines = reader.lines().map(String::trim).filter(l->!StringUtils.isNullOrEmpty(l)).collect(Collectors.toList());
+                lines.forEach(System.out::println);
+                Map<String, TypeDef> map = lines.stream()
                         .map(l -> elements.getTypeElement(l))
                         .filter(e -> e instanceof TypeElement)
                         .map(e -> ElementTo.TYPEDEF.apply(e))
                         .collect(Collectors.toMap(e -> e.getFullyQualifiedName(), e -> e));
 
+                for (Map.Entry<String, TypeDef> entry : map.entrySet()) {
+                    System.out.println("Adding transformation resource:" + entry.getValue().getFullyQualifiedName());
+                }
                 definitions.putAll(map);
             }
 
