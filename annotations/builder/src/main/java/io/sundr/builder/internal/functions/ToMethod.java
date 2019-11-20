@@ -1151,7 +1151,8 @@ class ToMethod {
 
         String prefix = "editOrNew";
         String suffix = "Like";
-        String methodNameBase = property.getNameCapitalized();
+
+        String methodNameBase = prefix + BuilderUtils.fullyQualifiedNameDiff(baseType, propertyTypeDef) + property.getNameCapitalized();
         String methodName = prefix + methodNameBase + suffix;
 
         String statement = isOptional(property.getTypeRef())
@@ -1203,9 +1204,11 @@ class ToMethod {
 
         String prefix = isCollection ? "addNew" : "withNew";
         String suffix = "Like";
+        String diff = BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), propertyTypeDef);
+
         String methodName = (prefix + (isCollection
-                ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-                : property.getNameCapitalized()) + suffix);
+                ? Singularize.FUNCTION.apply(diff + property.getNameCapitalized())
+                : diff + property.getNameCapitalized()) + suffix);
 
         return new MethodBuilder()
                 .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
