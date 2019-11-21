@@ -37,6 +37,7 @@ import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.EditableClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
@@ -110,6 +111,7 @@ public class ClazzAs {
                 boolean isSet = TypeUtils.isSet(toAdd.getTypeRef());
                 boolean isList = TypeUtils.isList(toAdd.getTypeRef());
                 boolean isMap = TypeUtils.isMap(toAdd.getTypeRef());
+                boolean isMapWithBuildableValue = isMap && isBuildable(TypeAs.UNWRAP_MAP_VALUE_OF.apply(unwrapped));
                 boolean isAbstract = isAbstract(unwrapped);
                 boolean isOptional = TypeUtils.isOptional(toAdd.getTypeRef())
                     || TypeUtils.isOptionalInt(toAdd.getTypeRef())
@@ -133,6 +135,13 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                 } else if (isMap) {
+                    if (isMapWithBuildableValue && !isAbstract) {
+                        methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(toAdd));
+                    } else if (!descendants.isEmpty()) {
+                        for (Property descendant : descendants) {
+                            methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(descendant));
+                        }
+                    }
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
@@ -151,7 +160,13 @@ public class ClazzAs {
                 methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
 
                 if (isMap) {
-                    //
+                    if (isMapWithBuildableValue && !isAbstract) {
+                        nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
+                    } else if (!descendants.isEmpty()) {
+                        for (Property descendant : descendants) {
+                            nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
+                        }
+                    }
                 } else if (isBuildable && !isAbstract) {
                     methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
                     methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
@@ -238,6 +253,7 @@ public class ClazzAs {
                 final boolean isSet = TypeUtils.isSet(property.getTypeRef());
                 final boolean isList = TypeUtils.isList(property.getTypeRef());
                 final boolean isMap = TypeUtils.isMap(property.getTypeRef());
+                final boolean isMapWithBuildableValue = isMap && isBuildable(TypeAs.UNWRAP_MAP_VALUE_OF.apply(unwrapped));
                 final boolean isAbstract = isAbstract(unwrapped);
                 boolean isOptional = TypeUtils.isOptional(property.getTypeRef())
                     || TypeUtils.isOptionalInt(property.getTypeRef())
@@ -269,6 +285,15 @@ public class ClazzAs {
                     methods.add(ToMethod.WITH.apply(toAdd));
                     methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
                 } else if (isMap) {
+                    if (isMapWithBuildableValue && !isAbstract) {
+                        methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(toAdd));
+                        nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
+                    } else if (!descendants.isEmpty()) {
+                        for (Property descendant : descendants) {
+                            methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(descendant));
+                            nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
+                        }
+                    }
                     methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
                     methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));

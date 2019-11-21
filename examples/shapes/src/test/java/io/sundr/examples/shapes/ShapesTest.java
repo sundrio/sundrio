@@ -28,6 +28,7 @@ import io.sundr.examples.shapes.v1.EditableCircle;
 import io.sundr.examples.shapes.v1.Square;
 import io.sundr.examples.shapes.v1.SquareBuilder;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -244,5 +245,52 @@ public class ShapesTest {
         Assert.assertTrue(builder.hasShapes());
         builder.withShapes();
         Assert.assertFalse(builder.hasShapes());
+    }
+
+    @Test
+    public void testAddNamedShapes() {
+        Canvas canvas = new CanvasBuilder()
+                .addNewValueToCircleNamedShapes("v1Circle")
+                    .withX(10).withY(20).withRadius(5.4).withNotes("CircleV1")
+                .and().addNewValueToV2CircleNamedShapes("v2Circle")
+                    .withX(30).withY(40).withRadius(5.8).withNotes("CircleV2")
+                .and().addNewValueToSquareNamedShapes("v1Square")
+                    .withX(50).withY(60).withNotes("SquareV1")
+                .and().addNewValueToV2SquareNamedShapes("v2Square")
+                    .withX(70).withY(80).withNotes("v2Square")
+                .and().build();
+
+        Assert.assertNotNull(canvas.getNamedShapes());
+        Assert.assertEquals("Should contain 4 named shapes.", 4, canvas.getNamedShapes().size());
+        Assert.assertTrue(canvas.getNamedShapes().containsKey("v1Circle"));
+        Assert.assertTrue(canvas.getNamedShapes().get("v1Circle") instanceof Circle);
+        Assert.assertEquals(10, canvas.getNamedShapes().get("v1Circle").getX());
+        Assert.assertEquals(20, canvas.getNamedShapes().get("v1Circle").getY());
+        Assert.assertTrue(canvas.getNamedShapes().containsKey("v2Circle"));
+        Assert.assertTrue(canvas.getNamedShapes().get("v2Circle") instanceof io.sundr.examples.shapes.v2.Circle);
+        Assert.assertEquals(30, canvas.getNamedShapes().get("v2Circle").getX());
+        Assert.assertEquals(40, canvas.getNamedShapes().get("v2Circle").getY());
+    }
+
+    @Test
+    public void testEditNamedShape() {
+        Canvas canvas = new Canvas(Collections.singletonMap("testShape", new Square(1, 2, 3)), null, null, null, null);
+        Canvas modifiedCanvas = new CanvasBuilder(canvas)
+                .editValueInSquareNamedShapes("testShape")
+                    .withX(5)
+                .and().build();
+
+        Assert.assertNotNull(modifiedCanvas.getNamedShapes());
+        Assert.assertEquals("Should contain only one shape.", 1, modifiedCanvas.getNamedShapes().size());
+        Assert.assertTrue(modifiedCanvas.getNamedShapes().containsKey("testShape"));
+        Assert.assertEquals(5, modifiedCanvas.getNamedShapes().get("testShape").getX());
+        Assert.assertEquals(2, modifiedCanvas.getNamedShapes().get("testShape").getY());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testExceptionOnWrongInstanceType() {
+        Canvas canvas = new Canvas(Collections.singletonMap("testShape", new Square(1, 2, 3)), null, null, null, null);
+        new CanvasBuilder(canvas)
+                .editOrAddValueInCircleNamedShapes("testShape").and().build();
     }
 }
