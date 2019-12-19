@@ -20,16 +20,16 @@ import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.generator.CodeGeneratorContext;
 import io.sundr.codegen.model.TypeDef;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.FilerException;
 import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.regex.Pattern;
+import java.io.Writer;
 
 public abstract class JavaGeneratingProcessor extends AbstractProcessor {
 
@@ -67,13 +67,15 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
             return;
         }
         System.err.println("Generating: "+model.getFullyQualifiedName());
-        new CodeGeneratorBuilder<TypeDef>()
+        try (Writer writer = fileObject.openWriter()) {
+            new CodeGeneratorBuilder<TypeDef>()
                 .withContext(context)
                 .withModel(model)
-                .withWriter(fileObject.openWriter())
+                .withWriter(writer)
                 .withTemplateResource(resourceName)
                 .build()
                 .generate();
+        }
     }
 
     /**
@@ -118,14 +120,16 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
             }
         }
         System.err.println("Generating: "+fileObject.getName());
-        new CodeGeneratorBuilder<T>()
+        try (Writer writer = fileObject.openWriter()) {
+            new CodeGeneratorBuilder<T>()
                 .withContext(context)
                 .withModel(model)
                 .withParameters(parameters)
-                .withWriter(fileObject.openWriter())
+                .withWriter(writer)
                 .withTemplateContent(content)
                 .build()
                 .generate();
+        }
     }
 
     /**
@@ -162,7 +166,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
     }
 
     /**
-     * Generate a {@link TypeDef} from the specified model, parameters and template. 
+     * Generate a {@link TypeDef} from the specified model, parameters and template.
      */
     public <T> TypeDef createTypeFromTemplate(T model, String[] parameters, String content) {
         try (StringWriter writer = new StringWriter()) {

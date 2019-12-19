@@ -16,6 +16,7 @@
 
 package io.sundr;
 
+@FunctionalInterface
 public interface Function<Y, X> {
 
     X apply(Y item);
