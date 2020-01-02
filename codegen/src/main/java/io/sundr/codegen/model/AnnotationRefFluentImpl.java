@@ -18,23 +18,23 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends AttributeSupportFluentImpl<A> implements AnnotationRefFluent<A>{
 
     private ClassRefBuilder classRef;
-    private Map<String,Object> parameters = new LinkedHashMap<String,Object>();
+    private final Map<String, Object> parameters = new HashMap<>();
 
     public AnnotationRefFluentImpl(){
     }
     public AnnotationRefFluentImpl(AnnotationRef instance){
-            this.withClassRef(instance.getClassRef()); 
-            this.withParameters(instance.getParameters()); 
-            this.withAttributes(instance.getAttributes()); 
+            this.withClassRef(instance.getClassRef());
+            this.withParameters(instance.getParameters());
+            this.withAttributes(instance.getAttributes());
     }
 
-    
+
 /**
  * This method has been deprecated, please use method buildClassRef instead.
  * @return The buildable object.
@@ -77,23 +77,22 @@ public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends A
     }
 
     public A addToParameters(String key,Object value){
-            if(this.parameters == null && key != null && value != null) { this.parameters = new LinkedHashMap<String,Object>(); }
             if(key != null && value != null) {this.parameters.put(key, value);} return (A)this;
     }
 
     public A addToParameters(Map<String,Object> map){
-            if(this.parameters == null && map != null) { this.parameters = new LinkedHashMap<String,Object>(); }
             if(map != null) { this.parameters.putAll(map);} return (A)this;
     }
 
     public A removeFromParameters(String key){
-            if(this.parameters == null) { return (A) this; }
             if(key != null && this.parameters != null) {this.parameters.remove(key);} return (A)this;
     }
 
-    public A removeFromParameters(Map<String,Object> map){
-            if(this.parameters == null) { return (A) this; }
-            if(map != null) { for(Object key : map.keySet()) {if (this.parameters != null){this.parameters.remove(key);}}} return (A)this;
+    public A removeFromParameters(Map<String, Object> map){
+        if (map != null) {
+            map.keySet().forEach(parameters::remove);
+        }
+        return (A) this;
     }
 
     public Map<String,Object> getParameters(){
@@ -101,11 +100,13 @@ public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends A
     }
 
     public A withParameters(Map<String,Object> parameters){
-            if (parameters == null) { this.parameters =  new LinkedHashMap<String,Object>();} else {this.parameters = new LinkedHashMap<String,Object>(parameters);} return (A) this;
+        this.parameters.clear();
+        this.parameters.putAll(parameters);
+        return (A) this;
     }
 
     public Boolean hasParameters(){
-            return this.parameters != null;
+            return !this.parameters.isEmpty();
     }
 
     public boolean equals(Object o){
@@ -122,14 +123,14 @@ public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends A
     public class ClassRefNestedImpl<N> extends ClassRefFluentImpl<AnnotationRefFluent.ClassRefNested<N>> implements AnnotationRefFluent.ClassRefNested<N>,Nested<N>{
 
             private final ClassRefBuilder builder;
-    
+
             ClassRefNestedImpl(ClassRef item){
                     this.builder = new ClassRefBuilder(this, item);
             }
             ClassRefNestedImpl(){
                     this.builder = new ClassRefBuilder(this);
             }
-    
+
     public N and(){
             return (N) AnnotationRefFluentImpl.this.withClassRef(builder.build());
     }
