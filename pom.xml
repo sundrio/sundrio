@@ -70,7 +70,7 @@
         <maven.plugin.annotations.version>3.2</maven.plugin.annotations.version>
         <maven-plugin-plugin-version>3.5</maven-plugin-plugin-version>
         <sun.tools.version>1.7</sun.tools.version>
-        <validation.api.version>1.1.0.Final</validation.api.version>
+        <validation.api.version>2.0.1.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
 
         <!-- Transitive Versions -->

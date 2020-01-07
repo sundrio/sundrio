@@ -27,6 +27,9 @@ import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import utils.matchers.TypeNamed;
 
@@ -55,6 +58,12 @@ public class TypeDefUtilsTest {
     private final TypeDef STRING = new TypeDefBuilder().withPackageName("java.lang").withName("String").build();
     private final TypeDef INTEGER = new TypeDefBuilder().withPackageName("java.lang").withName("Integer").build();
     private final TypeDef LONG = new TypeDefBuilder().withPackageName("java.lang").withName("Long").build();
+
+    @BeforeClass
+    public static void setupClass() {
+        String version = System.getProperty("java.specification.version");
+        Assume.assumeTrue(version.trim().startsWith("1.8"));
+    }
 
     @Test
     public void testExecutableToInterface() throws Exception {
