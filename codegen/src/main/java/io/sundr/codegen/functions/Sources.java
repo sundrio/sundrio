@@ -202,6 +202,9 @@ public class Sources {
                     if (wildcardType.getExtends() != null) {
                         TypeRef bound = TYPEREF.apply(wildcardType.getExtends());
                         arguments.add(new WildcardRefBuilder().addToBounds(bound).build());
+                    } else if (wildcardType.getSuper() != null) {
+                        TypeRef bound = TYPEREF.apply(wildcardType.getSuper());
+                        arguments.add(new WildcardRefBuilder().addToBounds(bound).withBoundKind(WildcardRef.BoundKind.SUPER).build());
                     } else {
                         arguments.add(new WildcardRef());
                     }
@@ -217,9 +220,12 @@ public class Sources {
             TypeDef knownDefinition = DefinitionRepository.getRepository().getDefinition(fqn);
 
             if (knownDefinition != null) {
-                return arguments.isEmpty()
-                        ? new ClassRefBuilder().withDefinition(knownDefinition).build()
-                        : knownDefinition.toReference(arguments);
+              return new ClassRefBuilder().withDefinition(knownDefinition).withArguments(arguments).build();
+              // TODO:The lines below more accurate, however the fail in some circumstances with more recent version of JDK
+              // as some of the known type definition are missing parameters.
+              // return arguments.isEmpty()
+              //            ? new ClassRefBuilder().withDefinition(knownDefinition).build()
+              //            : knownDefinition.toReference(arguments);
             } else if (classOrInterfaceType.getTypeArgs().isEmpty() && boundName.length() == 1)  {
                 //We are doing our best here to distinguish between class refs and type parameter refs.
                 return new TypeParamRefBuilder().withName(boundName).build();
@@ -425,13 +431,9 @@ public class Sources {
                         for (AnnotationExpr annotationExpr : constructorDeclaration.getAnnotations()) {
                             ctorAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
                         }
-                        for (NameExpr nameExpr : constructorDeclaration.getThrows()) {
-                            String name = nameExpr.getName();
-                            String packageName = PACKAGENAME.apply(nameExpr);
-                            exceptions.add(new ClassRefBuilder().withNewDefinition()
-                                    .withName(name)
-                                    .withPackageName(packageName)
-                            .endDefinition().build());
+                        for (ReferenceType referenceType : constructorDeclaration.getThrows()) {
+                            TypeRef exceptionRef = TYPEREF.apply(referenceType.getType());
+                            exceptions.add((ClassRef) exceptionRef);
                         }
                         for (Parameter parameter : constructorDeclaration.getParameters()) {
                             List<AnnotationRef> ctorParamAnnotations = new ArrayList<AnnotationRef>();

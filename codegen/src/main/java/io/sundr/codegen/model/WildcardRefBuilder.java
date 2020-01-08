@@ -1,22 +1,8 @@
-/*
- *      Copyright 2019 The original authors.
- *
- *      Licensed under the Apache License, Version 2.0 (the "License");
- *      you may not use this file except in compliance with the License.
- *      You may obtain a copy of the License at
- *
- *          http://www.apache.org/licenses/LICENSE-2.0
- *
- *      Unless required by applicable law or agreed to in writing, software
- *      distributed under the License is distributed on an "AS IS" BASIS,
- *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *      See the License for the specific language governing permissions and
- *      limitations under the License.
- */
-
 package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
+import java.lang.Object;
+import java.lang.Boolean;
 
 public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder> implements VisitableBuilder<WildcardRef,WildcardRefBuilder>{
 
@@ -40,6 +26,7 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
     }
     public WildcardRefBuilder(WildcardRefFluent<?> fluent,WildcardRef instance,Boolean validationEnabled){
             this.fluent = fluent; 
+            fluent.withBoundKind(instance.getBoundKind()); 
             fluent.withBounds(instance.getBounds()); 
             fluent.withAttributes(instance.getAttributes()); 
             this.validationEnabled = validationEnabled; 
@@ -49,13 +36,14 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
     }
     public WildcardRefBuilder(WildcardRef instance,Boolean validationEnabled){
             this.fluent = this; 
+            this.withBoundKind(instance.getBoundKind()); 
             this.withBounds(instance.getBounds()); 
             this.withAttributes(instance.getAttributes()); 
             this.validationEnabled = validationEnabled; 
     }
 
     public EditableWildcardRef build(){
-            EditableWildcardRef buildable = new EditableWildcardRef(fluent.getBounds(),fluent.getAttributes());
+            EditableWildcardRef buildable = new EditableWildcardRef(fluent.getBoundKind(),fluent.getBounds(),fluent.getAttributes());
             return buildable;
     }
 

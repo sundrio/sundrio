@@ -1,17 +1,17 @@
 /*
- * Copyright 2016 The original authors.
+ *      Copyright 2019 The original authors.
  *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
+ *      Licensed under the Apache License, Version 2.0 (the "License");
+ *      you may not use this file except in compliance with the License.
+ *      You may obtain a copy of the License at
  *
- *        http://www.apache.org/licenses/LICENSE-2.0
+ *          http://www.apache.org/licenses/LICENSE-2.0
  *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
+ *      Unless required by applicable law or agreed to in writing, software
+ *      distributed under the License is distributed on an "AS IS" BASIS,
+ *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *      See the License for the specific language governing permissions and
+ *      limitations under the License.
  */
 
 package io.sundr.codegen.model;
@@ -24,44 +24,63 @@ import java.util.Map;
 
 public class WildcardRef extends TypeRef {
 
-    private static final String WILDCARD = "?";
-    private final List<TypeRef> bounds;
+   public enum BoundKind {
+    EXTENDS("? extends %s"),
+    SUPER("? super %s");
 
+    String format;
 
-    public WildcardRef() {
-        this(Collections.<TypeRef>emptyList(), Collections.<AttributeKey, Object>emptyMap());
+    BoundKind(String format) {
+      this.format=format;
     }
 
-    public WildcardRef(List<TypeRef> bounds, Map<AttributeKey, Object> attributes) {
-        super(attributes);
-        this.bounds = bounds;
+    String getFormat()  {
+      return format;
     }
+  }
 
-    public List<TypeRef> getBounds() {
-        return bounds;
+  private final BoundKind boundKind;
+  private final List<TypeRef> bounds;
+
+  public WildcardRef() {
+    this(BoundKind.EXTENDS, Collections.<TypeRef>emptyList(), Collections.<AttributeKey, Object>emptyMap());
+  }
+
+  public WildcardRef(BoundKind boundKind, List<TypeRef> bounds, Map<AttributeKey, Object> attributes) {
+    super(attributes);
+    this.boundKind = boundKind;
+    this.bounds = bounds;
+  }
+
+  public List<TypeRef> getBounds() {
+    return bounds;
+  }
+
+  public BoundKind getBoundKind() {
+    return boundKind;
+  }
+
+  public int getDimensions() {
+    return 0;
+  }
+
+  public TypeRef withDimensions(int dimensions) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if (bounds == null || bounds.isEmpty()) {
+      sb.append("?");
+    } else {
+      sb.append(String.format(boundKind.format, StringUtils.join(bounds, ",")));
     }
+    return sb.toString();
+  }
 
-    public int getDimensions() {
-        return 0;
-    }
 
-    public TypeRef withDimensions(int dimensions) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(WILDCARD);
-        if (bounds != null && !bounds.isEmpty()) {
-            sb.append(" extends ");
-            sb.append(StringUtils.join(bounds, ","));
-        }
-        return sb.toString();
-    }
-
-    public boolean isAssignableFrom(TypeRef ref) {
-        return false;
-    }
-
+  public boolean isAssignableFrom(TypeRef ref) {
+    return false;
+  }
 }
