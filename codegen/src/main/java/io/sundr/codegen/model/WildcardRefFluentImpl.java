@@ -1,38 +1,41 @@
-/*
- *      Copyright 2019 The original authors.
- *
- *      Licensed under the Apache License, Version 2.0 (the "License");
- *      you may not use this file except in compliance with the License.
- *      You may obtain a copy of the License at
- *
- *          http://www.apache.org/licenses/LICENSE-2.0
- *
- *      Unless required by applicable law or agreed to in writing, software
- *      distributed under the License is distributed on an "AS IS" BASIS,
- *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *      See the License for the specific language governing permissions and
- *      limitations under the License.
- */
-
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
+import java.lang.Enum;
 import io.sundr.builder.VisitableBuilder;
-
+import io.sundr.builder.Nested;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.lang.String;
+import io.sundr.builder.Predicate;
+import java.lang.Deprecated;
+import java.util.Iterator;
 import java.util.List;
+import java.lang.Boolean;
+import java.util.Collection;
+import java.lang.Object;
 
 public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeRefFluentImpl<A> implements WildcardRefFluent<A>{
 
+    private WildcardRef.BoundKind boundKind;
     private List<VisitableBuilder<? extends TypeRef,?>> bounds =  new ArrayList<VisitableBuilder<? extends TypeRef,?>>();
 
     public WildcardRefFluentImpl(){
     }
     public WildcardRefFluentImpl(WildcardRef instance){
+            this.withBoundKind(instance.getBoundKind()); 
             this.withBounds(instance.getBounds()); 
             this.withAttributes(instance.getAttributes()); 
+    }
+
+    public WildcardRef.BoundKind getBoundKind(){
+            return this.boundKind;
+    }
+
+    public A withBoundKind(WildcardRef.BoundKind boundKind){
+            this.boundKind=boundKind; return (A) this;
+    }
+
+    public Boolean hasBoundKind(){
+            return this.boundKind != null;
     }
 
     public A addToBounds(VisitableBuilder<? extends TypeRef,?> builder){
@@ -118,6 +121,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             } return (A)this;
     }
 
+    public A removeMatchingFromBounds(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
+            if (bounds == null) return (A) this;
+            final Iterator<VisitableBuilder<? extends TypeRef,?>> each = bounds.iterator();
+            final List visitables = _visitables.get("bounds");
+            while (each.hasNext()) {
+              VisitableBuilder<? extends TypeRef,?> builder = each.next();
+              if (predicate.apply(builder)) {
+                visitables.remove(builder);
+                each.remove();
+              }
+            }
+            return (A)this;
+    }
+
     
 /**
  * This method has been deprecated, please use method buildBounds instead.
@@ -144,16 +161,16 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     }
 
     public TypeRef buildMatchingBound(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
-            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.apply(item)){return item.build();} } return null;
+            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.apply(item)){ return item.build();} } return null;
     }
 
     public Boolean hasMatchingBound(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
-            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.apply(item)){return true;} } return false;
+            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.apply(item)){ return true;} } return false;
     }
 
     public A withBounds(List<TypeRef> bounds){
             if (this.bounds != null) { _visitables.get("bounds").removeAll(this.bounds);}
-            if (bounds != null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>(); for (TypeRef item : bounds){this.addToBounds(item);}} else { this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>();} return (A) this;
+            if (bounds != null) {this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef,?>>(); for (TypeRef item : bounds){this.addToBounds(item);}} else { this.bounds = null;} return (A) this;
     }
 
     public A withBounds(TypeRef... bounds){
@@ -194,6 +211,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A removeAllFromPrimitiveRefBounds(Collection<PrimitiveRef> items){
             for (PrimitiveRef item : items) {PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+    }
+
+    public A removeMatchingFromPrimitiveRefBounds(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
+            if (bounds == null) return (A) this;
+            final Iterator<VisitableBuilder<? extends TypeRef,?>> each = bounds.iterator();
+            final List visitables = _visitables.get("bounds");
+            while (each.hasNext()) {
+              VisitableBuilder<? extends TypeRef,?> builder = each.next();
+              if (predicate.apply(builder)) {
+                visitables.remove(builder);
+                each.remove();
+              }
+            }
+            return (A)this;
     }
 
     public WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound(){
@@ -239,6 +270,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (VoidRef item : items) {VoidRefBuilder builder = new VoidRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
+    public A removeMatchingFromVoidRefBounds(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
+            if (bounds == null) return (A) this;
+            final Iterator<VisitableBuilder<? extends TypeRef,?>> each = bounds.iterator();
+            final List visitables = _visitables.get("bounds");
+            while (each.hasNext()) {
+              VisitableBuilder<? extends TypeRef,?> builder = each.next();
+              if (predicate.apply(builder)) {
+                visitables.remove(builder);
+                each.remove();
+              }
+            }
+            return (A)this;
+    }
+
     public WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBound(){
             return new VoidRefBoundsNestedImpl();
     }
@@ -280,6 +325,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
 
     public A removeAllFromWildcardRefBounds(Collection<WildcardRef> items){
             for (WildcardRef item : items) {WildcardRefBuilder builder = new WildcardRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
+    }
+
+    public A removeMatchingFromWildcardRefBounds(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
+            if (bounds == null) return (A) this;
+            final Iterator<VisitableBuilder<? extends TypeRef,?>> each = bounds.iterator();
+            final List visitables = _visitables.get("bounds");
+            while (each.hasNext()) {
+              VisitableBuilder<? extends TypeRef,?> builder = each.next();
+              if (predicate.apply(builder)) {
+                visitables.remove(builder);
+                each.remove();
+              }
+            }
+            return (A)this;
     }
 
     public WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBound(){
@@ -325,6 +384,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (ClassRef item : items) {ClassRefBuilder builder = new ClassRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
+    public A removeMatchingFromClassRefBounds(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
+            if (bounds == null) return (A) this;
+            final Iterator<VisitableBuilder<? extends TypeRef,?>> each = bounds.iterator();
+            final List visitables = _visitables.get("bounds");
+            while (each.hasNext()) {
+              VisitableBuilder<? extends TypeRef,?> builder = each.next();
+              if (predicate.apply(builder)) {
+                visitables.remove(builder);
+                each.remove();
+              }
+            }
+            return (A)this;
+    }
+
     public WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBound(){
             return new ClassRefBoundsNestedImpl();
     }
@@ -368,6 +441,20 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             for (TypeParamRef item : items) {TypeParamRefBuilder builder = new TypeParamRefBuilder(item);_visitables.get("bounds").remove(builder);if (this.bounds != null) {this.bounds.remove(builder);}} return (A)this;
     }
 
+    public A removeMatchingFromTypeParamRefBounds(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
+            if (bounds == null) return (A) this;
+            final Iterator<VisitableBuilder<? extends TypeRef,?>> each = bounds.iterator();
+            final List visitables = _visitables.get("bounds");
+            while (each.hasNext()) {
+              VisitableBuilder<? extends TypeRef,?> builder = each.next();
+              if (predicate.apply(builder)) {
+                visitables.remove(builder);
+                each.remove();
+              }
+            }
+            return (A)this;
+    }
+
     public WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBound(){
             return new TypeParamRefBoundsNestedImpl();
     }
@@ -385,6 +472,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             if (o == null || getClass() != o.getClass()) return false;
             if (!super.equals(o)) return false;
             WildcardRefFluentImpl that = (WildcardRefFluentImpl) o;
+            if (boundKind != null ? !boundKind.equals(that.boundKind) :that.boundKind != null) return false;
             if (bounds != null ? !bounds.equals(that.bounds) :that.bounds != null) return false;
             return true;
     }
@@ -405,7 +493,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             }
     
     public N and(){
-            return (N) WildcardRefFluentImpl.this.setToPrimitiveRefBounds(index, builder.build());
+            return (N) WildcardRefFluentImpl.this.setToBounds(index,builder.build());
     }
     public N endPrimitiveRefBound(){
             return and();
@@ -427,7 +515,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             }
     
     public N and(){
-            return (N) WildcardRefFluentImpl.this.setToVoidRefBounds(index, builder.build());
+            return (N) WildcardRefFluentImpl.this.setToBounds(index,builder.build());
     }
     public N endVoidRefBound(){
             return and();
@@ -449,7 +537,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             }
     
     public N and(){
-            return (N) WildcardRefFluentImpl.this.setToWildcardRefBounds(index, builder.build());
+            return (N) WildcardRefFluentImpl.this.setToBounds(index,builder.build());
     }
     public N endWildcardRefBound(){
             return and();
@@ -471,7 +559,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             }
     
     public N and(){
-            return (N) WildcardRefFluentImpl.this.setToClassRefBounds(index, builder.build());
+            return (N) WildcardRefFluentImpl.this.setToBounds(index,builder.build());
     }
     public N endClassRefBound(){
             return and();
@@ -493,7 +581,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             }
     
     public N and(){
-            return (N) WildcardRefFluentImpl.this.setToTypeParamRefBounds(index, builder.build());
+            return (N) WildcardRefFluentImpl.this.setToBounds(index,builder.build());
     }
     public N endTypeParamRefBound(){
             return and();

@@ -27,15 +27,12 @@ public class EditableWildcardRef extends WildcardRef implements Editable<Wildcar
     public EditableWildcardRef(){
             super();
     }
-    public EditableWildcardRef(List<TypeRef> bounds,Map<AttributeKey,Object> attributes){
-            super(bounds, attributes);
+
+    public EditableWildcardRef(BoundKind kind, List<TypeRef> bounds,Map<AttributeKey,Object> attributes){
+        super(kind, bounds, attributes);
     }
 
     public WildcardRefBuilder edit(){
             return new WildcardRefBuilder(this);
     }
-
-
-
-
 }

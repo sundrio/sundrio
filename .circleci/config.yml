@@ -1,95 +1,117 @@
-workflows:
-  version: 2
-  multiple-java-versions:
-    jobs:
-      - checkout_code
-      - update_dependencies:
-          requires:
-            - checkout_code
-      - java-8:
-          requires:
-            - update_dependencies
-
-version: 2
-
-job_defaults: &job_defaults
-  working_directory: /src
-
-  docker:
-    - image: openjdk:8-jdk
-
-mvn_job_defaults: &mvn_job_defaults
-  <<: *job_defaults
-
-  steps:
-    - restore_cache:
-        key: code-repo-{{ .Environment.CIRCLE_SHA1 }}-{{ .Environment.CIRCLE_TAG }}
-
-    - run:
-        name: Prep for Maven cache load
-        command: |
-          cat $(find app -name pom.xml ! -path */src/* | sort) > /tmp/all-poms
-
-    - restore_cache:
-        keys:
-          - dependencies-{{ checksum "/tmp/all-poms" }}
-
-    - run:
-        name: Run Maven build
-        command: ./mvnw -B -U clean install
-
-    - run:
-        name: Save test results
-        command: |
-          mkdir -p ~/junit/
-          find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} ~/junit/ \;
-        when: always
-
-    - store_test_results:
-        path: ~/junit
-
-    - store_artifacts:
-        path: ~/junit
+# Java Maven CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2.1
 
 jobs:
-  checkout_code:
-    <<: *job_defaults
+  JDK8:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx3200m
 
     steps:
       - checkout
 
-      - save_cache:
-          key: code-repo-{{ .Environment.CIRCLE_SHA1 }}-{{ .Environment.CIRCLE_TAG }}
-          paths:
-            - /src
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v8-dependencies-{{ checksum "pom.xml" }}
+          # fallback to using the latest cache if no exact match is found
+          - v8-dependencies-
 
-  update_dependencies:
-    <<: *job_defaults
+      - run: mvn -DskipTests clean install dependency:resolve-plugins dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v8-dependencies-{{ checksum "pom.xml" }}
+
+      # run tests!
+      - run: mvn clean integration-test
+  JDK11:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:11-jdk
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx3200m
 
     steps:
+      - checkout
+
+      # Download and cache dependencies
       - restore_cache:
           keys:
-            - code-repo-{{ .Environment.CIRCLE_SHA1 }}-{{ .Environment.CIRCLE_TAG }}
+          - v11-dependencies-{{ checksum "pom.xml" }}
+          # fallback to using the latest cache if no exact match is found
+          - v11-dependencies-
 
-      - run:
-          name: Prep for Maven cache load
-          command: |
-            cat $(find app -name pom.xml ! -path */src/* | sort) > /tmp/all-poms
-
-      - restore_cache:
-          keys:
-            - dependencies-{{ checksum "/tmp/all-poms" }}
-
-      - run:
-          name: Update dependencies
-          command: |
-            ./mvnw -B -U -DskipTests package dependency:go-offline
-
+      - run: mvn -DskipTests clean install dependency:resolve-plugins dependency:go-offline
       - save_cache:
-          key: dependencies-{{ checksum "/tmp/all-poms" }}
           paths:
-            - /root/.m2
+            - ~/.m2
+          key: v11-dependencies-{{ checksum "pom.xml" }}
 
+      # run tests!
+      - run: mvn clean integration-test
+  JDK13:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:13-jdk-buster
 
-  java-8:
-    <<: *mvn_job_defaults
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      MAVEN_OPTS: -Xmx3200m
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v11-dependencies-{{ checksum "pom.xml" }}
+          # fallback to using the latest cache if no exact match is found
+          - v11-dependencies-
+
+      - run: mvn -DskipTests clean install dependency:resolve-plugins dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v11-dependencies-{{ checksum "pom.xml" }}
+
+      # run tests!
+      - run: mvn clean integration-test
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - JDK8
+      - JDK11
+      - JDK13
