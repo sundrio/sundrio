@@ -88,10 +88,11 @@
     <modules>
         <module>core</module>
         <module>codegen</module>
-        <module>examples</module>
         <module>maven-plugin</module>
         <module>annotations</module>
         <module>components</module>
+        <module>examples</module>
+        <module>tests</module>
     </modules>
     
     <build>

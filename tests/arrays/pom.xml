@@ -17,15 +17,15 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>examples</artifactId>
+        <artifactId>tests</artifactId>
         <groupId>io.sundr</groupId>
         <version>0.21-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr.examples</groupId>
+    <groupId>io.sundr.tests</groupId>
     <artifactId>arrays</artifactId>
-    <name>Sundrio :: Examples :: Arrays</name>
+    <name>Sundrio :: Tests :: Arrays</name>
 
 
     <dependencies>
