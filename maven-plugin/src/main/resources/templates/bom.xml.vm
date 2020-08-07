@@ -9,7 +9,7 @@
     <version>${model.version}</version>
     <name>${model.name}</name>
     <packaging>pom</packaging>
-    <description>Bill of material</description>
+    <description>${model.description}</description>
     #if ($model.url)
 
         <url>${model.url}</url>#end
