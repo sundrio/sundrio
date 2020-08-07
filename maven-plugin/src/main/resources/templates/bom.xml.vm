@@ -31,7 +31,7 @@
         <scm>
             <connection>${model.scm.connection}</connection>
             <developerConnection>${model.scm.developerConnection}</developerConnection>
-            <url>${model.scm.connection}</url>
+            <url>${model.scm.url}</url>
             <tag>${model.scm.tag}</tag>
         </scm>
     #end
