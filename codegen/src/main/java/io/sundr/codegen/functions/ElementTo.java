@@ -40,6 +40,7 @@ import io.sundr.codegen.model.TypeParamRef;
 import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRef;
+import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
 
 import javax.lang.model.element.AnnotationMirror;
@@ -55,8 +56,12 @@ import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.ElementFilter;
+
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -76,6 +81,7 @@ public class ElementTo {
     private static final String COM_SUN_PREFIX = "com.sun.";
     private static final String EMPTY_PARENTHESIS = "()";
     private static final String EMPTY = "";
+    private static final String NEWLINE_PATTERN = "\r|\n";
 
     private static final Function<TypeMirror, Boolean> IS_JAVA_TYPE_MIRROR = new Function<TypeMirror, Boolean>() {
 
@@ -161,7 +167,10 @@ public class ElementTo {
                     annotations.add(ANNOTATION_REF.apply(annotationMirror));
             }
 
+            String comments = CodegenContext.getContext().getElements().getDocComment(variableElement);
+            List<String> commentList = StringUtils.isNullOrEmpty(comments) ? new ArrayList<>() : Arrays.stream(comments.split(NEWLINE_PATTERN)).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
             return new PropertyBuilder()
+                    .withComments(commentList)
                     .withName(name)
                     .withTypeRef(type)
                     .withAnnotations(annotations)
@@ -178,7 +187,10 @@ public class ElementTo {
              if (executableElement.getDefaultValue() != null) {
                 attributes.put(Attributeable.DEFAULT_VALUE, executableElement.getDefaultValue().getValue());
              }
+             String comments = CodegenContext.getContext().getElements().getDocComment(executableElement);
+             List<String> commentList = StringUtils.isNullOrEmpty(comments) ? new ArrayList<>() : Arrays.stream(comments.split(NEWLINE_PATTERN)).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
              MethodBuilder methodBuilder = new MethodBuilder()
+                     .withComments(commentList)
                      .withModifiers(TypeUtils.modifiersToInt(executableElement.getModifiers()))
                      .withName(executableElement.getSimpleName().toString())
                      .withReturnType(MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()))
@@ -268,7 +280,10 @@ public class ElementTo {
                 genericTypes.add(genericType);
             }
 
+            String comments = CodegenContext.getContext().getElements().getDocComment(classElement);
+            List<String> commentList = StringUtils.isNullOrEmpty(comments) ? new ArrayList<>() : Arrays.stream(comments.split(NEWLINE_PATTERN)).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
             TypeDef baseType = new TypeDefBuilder()
+                    .withComments(commentList)
                     .withKind(kind)
                     .withModifiers(TypeUtils.modifiersToInt(classElement.getModifiers()))
                     .withPackageName(getPackageName(classElement))

@@ -1,34 +1,25 @@
-/*
- *      Copyright 2019 The original authors.
- *
- *      Licensed under the Apache License, Version 2.0 (the "License");
- *      you may not use this file except in compliance with the License.
- *      You may obtain a copy of the License at
- *
- *          http://www.apache.org/licenses/LICENSE-2.0
- *
- *      Unless required by applicable law or agreed to in writing, software
- *      distributed under the License is distributed on an "AS IS" BASIS,
- *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *      See the License for the specific language governing permissions and
- *      limitations under the License.
- */
-
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
 import io.sundr.builder.VisitableBuilder;
-
 import java.util.ArrayList;
-import java.util.Collection;
+import java.lang.String;
+import io.sundr.builder.Predicate;
 import java.util.List;
+import java.lang.Boolean;
+import java.util.Collection;
+import java.lang.Object;
+import java.lang.StringBuilder;
+import io.sundr.builder.Nested;
+import java.lang.Deprecated;
+import java.util.Iterator;
+import java.lang.StringBuffer;
 
 public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSupportFluentImpl<A> implements PropertyFluent<A>{
 
     private List<AnnotationRefBuilder> annotations =  new ArrayList<AnnotationRefBuilder>();
     private VisitableBuilder<? extends TypeRef,?> typeRef;
     private String name;
+    private List<String> comments = new ArrayList<String>();
 
     public PropertyFluentImpl(){
     }
@@ -36,6 +27,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             this.withAnnotations(instance.getAnnotations()); 
             this.withTypeRef(instance.getTypeRef()); 
             this.withName(instance.getName()); 
+            this.withComments(instance.getComments()); 
             this.withModifiers(instance.getModifiers()); 
             this.withAttributes(instance.getAttributes()); 
     }
@@ -71,6 +63,20 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             for (AnnotationRef item : items) {AnnotationRefBuilder builder = new AnnotationRefBuilder(item);_visitables.get("annotations").remove(builder);if (this.annotations != null) {this.annotations.remove(builder);}} return (A)this;
     }
 
+    public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate){
+            if (annotations == null) return (A) this;
+            final Iterator<AnnotationRefBuilder> each = annotations.iterator();
+            final List visitables = _visitables.get("annotations");
+            while (each.hasNext()) {
+              AnnotationRefBuilder builder = each.next();
+              if (predicate.apply(builder)) {
+                visitables.remove(builder);
+                each.remove();
+              }
+            }
+            return (A)this;
+    }
+
     
 /**
  * This method has been deprecated, please use method buildAnnotations instead.
@@ -97,16 +103,16 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return item.build();} } return null;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){ return item.build();} } return null;
     }
 
     public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return true;} } return false;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){ return true;} } return false;
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
             if (this.annotations != null) { _visitables.get("annotations").removeAll(this.annotations);}
-            if (annotations != null) {this.annotations = new ArrayList<AnnotationRefBuilder>(); for (AnnotationRef item : annotations){this.addToAnnotations(item);}} else { this.annotations = new ArrayList<AnnotationRefBuilder>();} return (A) this;
+            if (annotations != null) {this.annotations = new ArrayList<AnnotationRefBuilder>(); for (AnnotationRef item : annotations){this.addToAnnotations(item);}} else { this.annotations = null;} return (A) this;
     }
 
     public A withAnnotations(AnnotationRef... annotations){
@@ -271,6 +277,85 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             return (A)withName(new String(arg1));
     }
 
+    public A addToComments(int index,String item){
+            if (this.comments == null) {this.comments = new ArrayList<String>();}
+            this.comments.add(index, item);
+            return (A)this;
+    }
+
+    public A setToComments(int index,String item){
+            if (this.comments == null) {this.comments = new ArrayList<String>();}
+            this.comments.set(index, item); return (A)this;
+    }
+
+    public A addToComments(String... items){
+            if (this.comments == null) {this.comments = new ArrayList<String>();}
+            for (String item : items) {this.comments.add(item);} return (A)this;
+    }
+
+    public A addAllToComments(Collection<String> items){
+            if (this.comments == null) {this.comments = new ArrayList<String>();}
+            for (String item : items) {this.comments.add(item);} return (A)this;
+    }
+
+    public A removeFromComments(String... items){
+            for (String item : items) {if (this.comments!= null){ this.comments.remove(item);}} return (A)this;
+    }
+
+    public A removeAllFromComments(Collection<String> items){
+            for (String item : items) {if (this.comments!= null){ this.comments.remove(item);}} return (A)this;
+    }
+
+    public List<String> getComments(){
+            return this.comments;
+    }
+
+    public String getComment(int index){
+            return this.comments.get(index);
+    }
+
+    public String getFirstComment(){
+            return this.comments.get(0);
+    }
+
+    public String getLastComment(){
+            return this.comments.get(comments.size() - 1);
+    }
+
+    public String getMatchingComment(Predicate<String> predicate){
+            for (String item: comments) { if(predicate.apply(item)){ return item;} } return null;
+    }
+
+    public Boolean hasMatchingComment(Predicate<String> predicate){
+            for (String item: comments) { if(predicate.apply(item)){ return true;} } return false;
+    }
+
+    public A withComments(List<String> comments){
+            if (this.comments != null) { _visitables.get("comments").removeAll(this.comments);}
+            if (comments != null) {this.comments = new ArrayList<String>(); for (String item : comments){this.addToComments(item);}} else { this.comments = null;} return (A) this;
+    }
+
+    public A withComments(String... comments){
+            if (this.comments != null) {this.comments.clear();}
+            if (comments != null) {for (String item :comments){ this.addToComments(item);}} return (A) this;
+    }
+
+    public Boolean hasComments(){
+            return comments != null && !comments.isEmpty();
+    }
+
+    public A addNewComment(String arg1){
+            return (A)addToComments(new String(arg1));
+    }
+
+    public A addNewComment(StringBuilder arg1){
+            return (A)addToComments(new String(arg1));
+    }
+
+    public A addNewComment(StringBuffer arg1){
+            return (A)addToComments(new String(arg1));
+    }
+
     public boolean equals(Object o){
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
@@ -279,6 +364,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             if (annotations != null ? !annotations.equals(that.annotations) :that.annotations != null) return false;
             if (typeRef != null ? !typeRef.equals(that.typeRef) :that.typeRef != null) return false;
             if (name != null ? !name.equals(that.name) :that.name != null) return false;
+            if (comments != null ? !comments.equals(that.comments) :that.comments != null) return false;
             return true;
     }
 
@@ -298,7 +384,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             }
     
     public N and(){
-            return (N) PropertyFluentImpl.this.setToAnnotations(index, builder.build());
+            return (N) PropertyFluentImpl.this.setToAnnotations(index,builder.build());
     }
     public N endAnnotation(){
             return and();
@@ -317,7 +403,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             }
     
     public N and(){
-            return (N) PropertyFluentImpl.this.withPrimitiveRefType(builder.build());
+            return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
     }
     public N endPrimitiveRefType(){
             return and();
@@ -336,7 +422,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             }
     
     public N and(){
-            return (N) PropertyFluentImpl.this.withVoidRefType(builder.build());
+            return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
     }
     public N endVoidRefType(){
             return and();
@@ -355,7 +441,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             }
     
     public N and(){
-            return (N) PropertyFluentImpl.this.withWildcardRefType(builder.build());
+            return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
     }
     public N endWildcardRefType(){
             return and();
@@ -374,7 +460,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             }
     
     public N and(){
-            return (N) PropertyFluentImpl.this.withClassRefType(builder.build());
+            return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
     }
     public N endClassRefType(){
             return and();
@@ -393,7 +479,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             }
     
     public N and(){
-            return (N) PropertyFluentImpl.this.withTypeParamRefType(builder.build());
+            return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
     }
     public N endTypeParamRefType(){
             return and();
