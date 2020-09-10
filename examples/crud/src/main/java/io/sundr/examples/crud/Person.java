@@ -19,6 +19,9 @@ package io.sundr.examples.crud;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 
+/** 
+ * The person. 
+ */
 @VelocityTransformations(
         {
                 @VelocityTransformation("/dao.vm"),

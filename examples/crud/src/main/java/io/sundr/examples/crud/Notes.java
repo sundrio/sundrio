@@ -20,6 +20,9 @@ package io.sundr.examples.crud;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 
+/** 
+ * The notes. 
+ */
 @VelocityTransformations(
         {
                 @VelocityTransformation("/dao.vm"),
