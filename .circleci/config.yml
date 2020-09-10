@@ -31,7 +31,10 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v8-dependencies-
 
-      - run: mvn -DskipTests clean install dependency:resolve-plugins dependency:go-offline
+      - run:
+          command: |
+            mvn install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar
+            mvn -DskipTests clean install dependency:resolve-plugins dependency:go-offline
       - save_cache:
           paths:
             - ~/.m2
