@@ -69,7 +69,7 @@
         <maven.invoker.version>2.0.11</maven.invoker.version>
         <maven.plugin.annotations.version>3.2</maven.plugin.annotations.version>
         <maven-plugin-plugin-version>3.5</maven-plugin-plugin-version>
-        <sun.tools.version>1.7</sun.tools.version>
+        <sun.tools.version>8</sun.tools.version>
         <validation.api.version>2.0.1.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
 
@@ -204,8 +204,6 @@
                          <artifactId>tools</artifactId>
                          <version>${sun.tools.version}</version>
                          <optional>true</optional>
-                         <scope>system</scope>
-                         <systemPath>${java.home}/../lib/tools.jar</systemPath>
                      </dependency>
                  </dependencies>
              </dependencyManagement>
