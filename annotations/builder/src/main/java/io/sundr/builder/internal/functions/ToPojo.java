@@ -66,6 +66,7 @@ import static io.sundr.builder.Constants.ADDITIONAL_BUILDABLES;
 import static io.sundr.builder.Constants.ADDITIONAL_TYPES;
 import static io.sundr.builder.Constants.ARRAYS;
 import static io.sundr.builder.Constants.COLLECTORS;
+import static io.sundr.builder.Constants.TO_STRING_ARRAY_SNIPPET;
 import static io.sundr.builder.internal.functions.ClazzAs.BUILDER;
 import static io.sundr.builder.internal.functions.ClazzAs.POJO;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
@@ -74,9 +75,12 @@ import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.codegen.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.codegen.model.Attributeable.INIT;
 import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static java.util.stream.Collectors.*;
 
 public class ToPojo implements Function<TypeDef, TypeDef> {
+
+    private static final String TO_STRING_ARRAY_TEXT = loadResourceQuietly(TO_STRING_ARRAY_SNIPPET);
 
     //A stack of variable names to be used for lambda expressions.
     //We need them because nested lambdas may clash.
@@ -441,6 +445,20 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                         .endBlock()
                         .build();
 
+                Method staticToStringArray = new MethodBuilder()
+                        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+                        .withName("toStringArray")
+                        .addNewArgument()
+                        .withName("o")
+                        .withTypeRef(Constants.OBJECT.toInternalReference())
+                        .endArgument()
+                        .withReturnType(Constants.STRING_REF.withDimensions(1))
+                        .withNewBlock()
+                        .addToStatements(new StringStatement(TO_STRING_ARRAY_TEXT))
+                        .endBlock()
+                        .build();
+
+
                 if (enableStaticAdapter && hasArrayFields(item)) {
                         item.getMethods()
                                 .stream()
@@ -478,12 +496,12 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                 String adapterPackage = relativePackage(item.getPackageName(), mapperRelativePath);
 
                                 List<ClassRef> adapterImports = new ArrayList<>();
+                                adapterImports.add(Collections.LIST.toInternalReference());
+
                                 if (hasArrayFields(item)) {
                                         adapterImports.add(ARRAYS);
                                         adapterImports.add(COLLECTORS);
                                 }
-
-
                                 List<ClassRef> generatedRefs = new ArrayList<>();
                                 TypeUtils.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef).forEach(
                                         i->populateReferences((ClassRef)i, generatedRefs)
@@ -502,6 +520,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                                 if (enableMapAdapter) {
                                     adapterMethods.add(staticMapAdaptingBuilder);
                                 }
+                                adapterMethods.add(staticToStringArray);
 
                                 TypeDef mapper = new TypeDefBuilder()
                                         .withModifiers(modifiersToInt(Modifier.PUBLIC))
@@ -699,9 +718,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     /**
      * Converts a map describing the source type, to the target type by using the builder.
      * @param ref               The ref.
-     * @param source            The source type of the reference..
-     * @param target            The target type.
-     * @param targetBuilder     The target type builder.
+     * @param source            The source type of the reference (e.g. the annotation).
+     * @param target            The target type (e.g. the generated pojo).
+     * @param targetBuilder     The target type builder (e.g. the pojo builder.
      * @return
      */
     private static String convertMap(String ref, TypeDef source, TypeDef target, TypeDef targetBuilder) {
@@ -713,8 +732,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     /**
      * Converts a map describing the source type, to the target.
      * @param ref               The ref.
-     * @param source            The source type of the reference..
-     * @param target            The target type.
+     * @param source            The source type of the reference (e.g. the annotation).
+     * @param target            The target type (e.g. the generated pojo).
      * @return
      */
     private static String convertMap(String ref, TypeDef source, TypeDef target) {
@@ -776,6 +795,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             ClassRef classRef =  (ClassRef) propertyRef;
             if (classRef.getDefinition().isEnum()) {
                 return readEnumValue(ref, source, property);
+            }
+            if (propertyRef.getDimensions() > 0) {
+              return readObjectArrayValue(ref, source, property);
             }
         } else if (propertyRef instanceof PrimitiveRef) {
                 return readPrimitiveValue(ref, source, property);
@@ -857,12 +879,14 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             try {
                 TypeDef propertyType = ((ClassRef) propertyTypeRef).getDefinition();
                 TypeDef getterType = ((ClassRef) getterTypeRef).getDefinition();
-                sb.append(indent(ref))
-                        .append("Arrays.stream(")
-                        .append("(Map[])(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , new Map[0]) : new Map[0]))")
-                        //.append("("+getterType.getFullyQualifiedName()+"[])(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\" , new " +getterType.getFullyQualifiedName()+"[0]) : new "+ getterType.getFullyQualifiedName()+"[0]))")
-                        .append(".map(").append(nextRef).append(" ->").append(convertMap(nextRef, getterType, propertyType)).append(")")
-                        .append(".toArray(size-> new "+propertyType.getFullyQualifiedName()+"[size])");
+                if (Constants.STRING.equals(getterType)) {
+                  sb.append(ref + " instanceof Map ? toStringArray(((Map)" + ref + ").get(\"" + getter.getName() + "\")) : toStringArray("+ ref +")");
+                } else {
+                  sb.append(indent(ref)).append("Arrays.stream(");
+                  sb.append("(Map[])(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\"" + getter.getName() + "\" , new Map[0]) : new Map[0]))");
+                  sb.append(".map(").append(nextRef).append(" ->").append(convertMap(nextRef, getterType, propertyType)).append(")");
+                  sb.append(".toArray(size-> new "+propertyType.getFullyQualifiedName()+"[size])");
+                }
             } finally {
                 variables.push(nextRef);
             }
@@ -870,6 +894,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         }
         throw new IllegalArgumentException("Expected an object property and a matching object getter!!");
     }
+
 
     /**
      * Returns the string representation of the code that reads a primitive array property.
@@ -887,7 +912,6 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             .append(".toArray(size -> new "+getter.getReturnType().toString()+"[size])");
         return sb.toString();
     }
-
 
     /**
      * Returns the string representation of the code that reads a primitive array property.

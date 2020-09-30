@@ -1,0 +1,17 @@
+        if (o instanceof String[]) {
+          return (String[]) o;
+        }
+        if (o instanceof String) {
+          String s =  (String) o;
+          return s.split(",[ ]*");
+        }
+        else if (o instanceof List) {
+          List c = (List) o;
+          String[] result = new String[c.size()]; 
+          for (int i=0; i <= c.size(); i++) {
+            result[i] = String.valueOf(c.get(i));
+          }
+          return result;
+        }
+        return new String[0];
+    
