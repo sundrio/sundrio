@@ -58,7 +58,7 @@ public class FieldDirective extends Directive {
                 writer.append(" = ").append(getDefaultValue(field));
             }
         }
-        writer.append(";");
+        writer.append(";\n");
     }
 
     private String getDefaultValue(Property field) {
@@ -70,5 +70,4 @@ public class FieldDirective extends Directive {
             return String.valueOf(value);
         }
     }
-
 }
