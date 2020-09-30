@@ -23,6 +23,7 @@ import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.functions.Descendants;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.ClassTo;
@@ -37,6 +38,8 @@ import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.Statement;
+import io.sundr.codegen.model.StringStatement;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
@@ -57,6 +60,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
@@ -69,6 +74,8 @@ import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 
 public class BuilderUtils {
+
+    private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
 
     private BuilderUtils() {}
 
@@ -534,5 +541,48 @@ public class BuilderUtils {
         List<ClassRef> result = alsoImportAsList(attributeable);
         result.addAll(Arrays.asList(refs));
         return result;
+    }
+
+    public static List<Statement> toHashCode(Collection<Property> properties) {
+        List<Statement> statements = new ArrayList<>();
+        statements.add(new StringStatement("return java.util.Objects.hash(" + Stream.concat(properties.stream().map(Property::getName), Stream.of("super.hashCode()")).collect(Collectors.joining(",  ")) + ");"));
+        return statements;
+    }
+
+
+    public static List<Statement> toEquals(TypeDef type, Collection<Property> properties) {
+        List<Statement> statements = new ArrayList<>();
+
+        String simpleName = type.getName();
+        ClassRef superClass = type.getExtendsList().isEmpty() ? TypeDef.OBJECT_REF : type.getExtendsList().iterator().next();
+        statements.add(new StringStatement("if (this == o) return true;"));
+        statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
+
+        //If base fluent is the superclass just skip.
+        final BuilderContext context = BuilderContextManager.getContext();
+        final String superClassFQN = superClass.getDefinition().getFullyQualifiedName();
+        if (!context.getBaseFluentClass().getFullyQualifiedName().equals(superClassFQN) && !OBJECT_FULLY_QUALIFIED_NAME.equals(superClassFQN)) {
+            statements.add(new StringStatement("if (!super.equals(o)) return false;"));
+        }
+        statements.add(new StringStatement(new StringBuilder().append(simpleName).append(" that = (").append(simpleName).append(") o;").toString()));
+
+        for (Property property : properties) {
+            String name = property.getName();
+            if (TypeUtils.isPrimitive(property.getTypeRef())) {
+                statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").toString()));
+            } else if (property.getTypeRef() instanceof ClassRef && Descendants.isDescendant(type, ((ClassRef) property.getTypeRef()).getDefinition())) {
+                statements.add(new StringStatement(new StringBuilder()
+                        .append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
+                        .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n")
+                        .toString()));
+            } else {
+                statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != null ? !").append(name).append(".equals(that.").append(name).append(") :")
+                        .append("that.").append(name).append(" != null) return false;").toString()));
+
+            }
+        }
+
+        statements.add(new StringStatement("return true;"));
+        return statements;
     }
 }
