@@ -4,59 +4,62 @@ package ${model.packageName};
 import $i;
 #end
 
-#class ($model)
+#class ($model) {
 
 #if  ($model.isInterface())
 #else
 #foreach($f in $model.properties)
     #field ($f)
-
 #end
-
 #foreach ($c in ${model.constructors})
-    #method ($c)
-    #foreach ($s in $c.block.statements)
-        $s.toString()
-    #end
-#end
-#end
-#end
 
+    #method ($c) { 
+#foreach ($s in $c.block.statements)
+        $s.toString()
+#end
+    }
+
+#end
+#end
+#end
 #foreach($m in $model.methods)
-    #method ($m, $model.isInterface())
-    #foreach ($s in $m.block.statements)
+
+    #method ($m, $model.isInterface()) {
+#foreach ($s in $m.block.statements)
         $s.toString()
-    #end
 #end
-
+    }
 #end
-
+#end
 #foreach($n in $model.innerTypes)
-    #class ($n)
 
-    #if  ($n.isInterface())
-    #else
-    #foreach($f in $n.properties)
-    private final ${f.typeRef} ${f.name};
-    #end
+    #class ($n) {
+#if  ($n.isInterface())
+#else
+#foreach($f in $n.properties)
+        private final ${f.typeRef} ${f.name};
+#end
+#foreach($c in $n.constructors)
 
-    #foreach($c in $n.constructors)
-        #method ($c)
-        #foreach ($s in $c.block.statements)
+        #method ($c) {
+#foreach ($s in $c.block.statements)
             $s.toString()
-        #end
-    #end
-    #end
 #end
-
+        }
+#end
+#end
+#end
 #foreach($m in $n.methods)
-    #method ($m, $n.isInterface())
-    #foreach ($s in $m.block.statements)
-        $s.toString()
-    #end
-#end
-#end
-#end
-#end
 
+        #method ($m, $n.isInterface()) {
+#foreach ($s in $m.block.statements)
+             $s.toString()
 #end
+        }
+#end
+#end
+    }
+#end
+#end
+#end
+}

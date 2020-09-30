@@ -4,10 +4,11 @@ package ${model.packageName};
 import $i;
 #end
 
-#class ($model)
+#class ($model) {
 
 #foreach($m in $model.methods)
-    #method ($m)#end
+    #method ($m, $model.isInterface())#end
 #end
 
 #end
+}
