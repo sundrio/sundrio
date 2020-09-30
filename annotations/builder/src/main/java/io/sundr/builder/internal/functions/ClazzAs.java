@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2015 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,6 +69,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
@@ -358,11 +359,24 @@ public class ClazzAs {
                     .withBlock(new Block(new Provider<List<Statement>>() {
                         @Override
                         public List<Statement> get() {
-                            return toEquals(fluentImplType, properties);
+                            return BuilderUtils.toEquals(fluentImplType, properties);
                         }
                     })).build();
 
+            Method hashCode = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF)
+                    .withName("hashCode")
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return BuilderUtils.toHashCode(properties);
+                        }
+                    })).build();
+
+
             methods.add(equals);
+            methods.add(hashCode);
 
             return BuilderContextManager.getContext().getDefinitionRepository().register(new TypeDefBuilder(fluentImplType)
                     .withAnnotations()
@@ -552,11 +566,23 @@ public class ClazzAs {
                     .withBlock(new Block(new Provider<List<Statement>>() {
                         @Override
                         public List<Statement> get() {
-                            return toEquals(builderType, fields);
+                            return BuilderUtils.toEquals(builderType, fields);
+                        }
+                    })).build();
+
+            Method hashCode = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF)
+                    .withName("hashCode")
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return BuilderUtils.toHashCode(fields);
                         }
                     })).build();
 
             methods.add(equals);
+            methods.add(hashCode);
 
 
             if (validationEnabled) {
@@ -723,7 +749,6 @@ public class ClazzAs {
 
 
     public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
-    private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
     
     private static Property arrayAsList(Property property) {
         TypeRef unwrapped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getTypeRef());
@@ -891,43 +916,6 @@ public class ClazzAs {
             statements.add(new StringStatement("if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable);}"));
         }
         statements.add(new StringStatement("return buildable;"));
-        return statements;
-    }
-
-
-    private static List<Statement> toEquals(TypeDef type, Collection<Property> properties) {
-        List<Statement> statements = new ArrayList<>();
-
-        String simpleName = type.getName();
-        ClassRef superClass = type.getExtendsList().isEmpty() ? TypeDef.OBJECT_REF : type.getExtendsList().iterator().next();
-        statements.add(new StringStatement("if (this == o) return true;"));
-        statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
-
-        //If base fluent is the superclass just skip.
-        final BuilderContext context = BuilderContextManager.getContext();
-        final String superClassFQN = superClass.getDefinition().getFullyQualifiedName();
-        if (!context.getBaseFluentClass().getFullyQualifiedName().equals(superClassFQN) && !OBJECT_FULLY_QUALIFIED_NAME.equals(superClassFQN)) {
-            statements.add(new StringStatement("if (!super.equals(o)) return false;"));
-        }
-        statements.add(new StringStatement(new StringBuilder().append(simpleName).append(" that = (").append(simpleName).append(") o;").toString()));
-
-        for (Property property : properties) {
-            String name = property.getName();
-            if (TypeUtils.isPrimitive(property.getTypeRef())) {
-                statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.").append(name).append(") return false;").toString()));
-            } else if (property.getTypeRef() instanceof ClassRef && Descendants.isDescendant(type, ((ClassRef) property.getTypeRef()).getDefinition())) {
-                statements.add(new StringStatement(new StringBuilder()
-                        .append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name).append(".equals(that.").append(name).append(") :")
-                        .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n")
-                        .toString()));
-            } else {
-                statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != null ? !").append(name).append(".equals(that.").append(name).append(") :")
-                        .append("that.").append(name).append(" != null) return false;").toString()));
-
-            }
-        }
-
-        statements.add(new StringStatement("return true;"));
         return statements;
     }
 

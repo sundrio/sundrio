@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import io.sundr.Function;
+import io.sundr.Provider;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Pojo;
@@ -24,11 +25,13 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.AttributeKey;
+import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Method;
@@ -474,6 +477,33 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                             additionalMethods.add(staticMapAdaptingBuilder);
                         }
                 }
+
+                Method equals = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
+                    .addNewArgument().withName("o").withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument()
+                    .withName("equals")
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return BuilderUtils.toEquals(generatedPojo, fields);
+                        }
+                    })).build();
+
+                Method hashCode = new MethodBuilder()
+                    .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF)
+                    .withName("hashCode")
+                    .withBlock(new Block(new Provider<List<Statement>>() {
+                        @Override
+                        public List<Statement> get() {
+                            return BuilderUtils.toHashCode(fields);
+                        }
+                    })).build();
+
+
+                additionalMethods.add(equals);
+                additionalMethods.add(hashCode);
 
                 for (Object o : adapters) {
                         if (o instanceof AnnotationRef) {

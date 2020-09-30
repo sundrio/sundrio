@@ -54,6 +54,7 @@ public class Constants {
     public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
     public static final TypeRef PRIMITIVE_BOOLEAN_REF = TYPEREF.apply(boolean.class);
+    public static final TypeRef PRIMITIVE_INT_REF = TYPEREF.apply(int.class);
 
     public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
     public static final TypeDef OBJECT = TypeDef.OBJECT;
