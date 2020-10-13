@@ -63,7 +63,7 @@
         <swagger-annotations.version>1.5.17</swagger-annotations.version>
         <swagger-codegen.version>3.0.1</swagger-codegen.version>
         <swagger-codegen-generator.version>1.0.1</swagger-codegen-generator.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
 
         <maven.version>3.3.1</maven.version>
         <maven.invoker.version>2.0.11</maven.invoker.version>
