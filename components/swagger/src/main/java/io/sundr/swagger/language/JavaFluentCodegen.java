@@ -42,8 +42,18 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaFluentCodegen.class);
 
     public static final String GENERATE_BUILDERS = "generateBuilders";
+    public static final String EDITABLE_ENABLED = "editableEnabled";
+    public static final String VALIDATION_ENABLED = "validationEnabled";
+    public static final String LAZY_MAP_INIT_ENABLED = "lazyMapInitEnabled";
+    public static final String GENERATE_BUILDER_PACKAGE = "generateBuilderPackage";
+    public static final String BUILDER_PACKAGE = "builderPackage";
 
     protected boolean generateBuilders = true;
+    protected boolean editableEnabled = true;
+    protected boolean validationEnabled = false;
+    protected boolean lazyMapInitEnabled = true;
+    protected boolean generateBuilderPackage = false;
+    protected String builderPackage = null;
 
     public JavaFluentCodegen() {
         super();
@@ -63,9 +73,37 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         if (additionalProperties.containsKey(GENERATE_BUILDERS)) {
             this.setGenerateBuilders(Boolean.valueOf(additionalProperties.get(GENERATE_BUILDERS).toString()));
         }
+        additionalProperties.put(GENERATE_BUILDERS, generateBuilders);
 
-        final String invokerFolder = (sourceFolder + '/' + invokerPackage).replace(".", "/");
-        final String modelFolder = (sourceFolder + '/' + modelPackage).replace(".", "/");
+        if (additionalProperties.containsKey(EDITABLE_ENABLED)) {
+            this.setEditableEnabled(Boolean.valueOf(additionalProperties.get(EDITABLE_ENABLED).toString()));
+        }
+        additionalProperties.put(EDITABLE_ENABLED, editableEnabled);
+
+        if (additionalProperties.containsKey(VALIDATION_ENABLED)) {
+            this.setValidationEnabled(Boolean.valueOf(additionalProperties.get(VALIDATION_ENABLED).toString()));
+        }
+        additionalProperties.put(VALIDATION_ENABLED, validationEnabled);
+        
+        if (additionalProperties.containsKey(LAZY_MAP_INIT_ENABLED)) {
+            this.setLazyMapInitEnabled(Boolean.valueOf(additionalProperties.get(LAZY_MAP_INIT_ENABLED).toString()));
+        }
+        additionalProperties.put(LAZY_MAP_INIT_ENABLED, lazyMapInitEnabled);
+
+        if (additionalProperties.containsKey(GENERATE_BUILDER_PACKAGE)) {
+            this.setGenerateBuilderPackage(Boolean.valueOf(additionalProperties.get(GENERATE_BUILDER_PACKAGE).toString()));
+        }
+        additionalProperties.put(GENERATE_BUILDER_PACKAGE, generateBuilderPackage);
+
+        if (additionalProperties.containsKey(BUILDER_PACKAGE)) {
+            this.setBuilderPackage(additionalProperties.get(BUILDER_PACKAGE).toString());
+        } else {
+            //When builder package does not exist, we need to generate one, relative to the model.
+            this.setGenerateBuilderPackage(true);
+            this.setBuilderPackage(modelPackage + ".builder");
+        }
+        additionalProperties.put(BUILDER_PACKAGE, builderPackage);
+        additionalProperties.put(GENERATE_BUILDER_PACKAGE, generateBuilderPackage);
     }
 
     @Override
@@ -88,10 +126,6 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         return "JavaFluent";
     }
 
-    public void setGenerateBuilders(boolean generateBuilders) {
-        this.generateBuilders = generateBuilders;
-    }
-
     //
     // Customizations
     //
@@ -106,12 +140,12 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
         Object o = objs.getOrDefault("models", Collections.emptyMap());
         if (o instanceof Map) {
-            refactorModel(pkg, (Map<String, Object>) o,objs);
+            refactorModel(pkg, (Map<String, Object>) o, objs);
         } else if (o instanceof Iterable) {
             for (Object i : (Iterable<? extends Object>) o) {
-              if  (i instanceof Map) {
-                  refactorModel(pkg, (Map<String, Object>) i, objs);
-              }
+                if (i instanceof Map) {
+                    refactorModel(pkg, (Map<String, Object>) i, objs);
+                }
             }
         }
 
@@ -120,84 +154,88 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
     @Override
     public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
-         String pkg = (String) objs.getOrDefault("package", "");
+        String pkg = (String) objs.getOrDefault("package", "");
 
         Object o = objs.getOrDefault("operations", Collections.emptyMap());
         if (o instanceof Map) {
-            refactorOperation(pkg, (Map<String, Object>) o,objs);
+            refactorOperation(pkg, (Map<String, Object>) o, objs);
         } else if (o instanceof Iterable) {
             for (Object i : (Iterable<? extends Object>) o) {
-              if  (i instanceof Map) {
-                  refactorOperation(pkg, (Map<String, Object>) i, objs);
-              }
+                if (i instanceof Map) {
+                    refactorOperation(pkg, (Map<String, Object>) i, objs);
+                }
             }
         }
         return objs;
     }
 
-
-  /**
-   * Refactors model classes.
-   * 1. Adds the @Buildable and @Inline annotations to import list.
-   * 2. Stips dotted prefixes for name and moves them to the package.
-   * 3. Set the `GENERATE_BUILDERS` property to the model so that template rendering can use them.
-   */
+    /**
+     * Refactors model classes. 1. Adds the @Buildable and @Inline annotations to
+     * import list. 2. Stips dotted prefixes for name and moves them to the package.
+     * 3. Set the `GENERATE_BUILDERS` property to the model so that template
+     * rendering can use them.
+     */
     private Map<String, Object> refactorModel(String pkg, Map<String, Object> model, Map<String, Object> models) {
-            CodegenModel cm = (CodegenModel) model.getOrDefault("model", "");
-            String importPath = (String) model.getOrDefault("importPath", "");
-            String name = cm.name;
-            String classname = cm.classname;
+        CodegenModel cm = (CodegenModel) model.getOrDefault("model", "");
+        String importPath = (String) model.getOrDefault("importPath", "");
+        String name = cm.name;
+        String classname = cm.classname;
 
-            if (generateBuilders) {
-                List<Map<String, String>> imports = (List<Map<String, String>>) models.getOrDefault("imports", new ArrayList<Map<String, String>>());
-                imports.add(new HashMap<String, String>() {{
+        if (generateBuilders) {
+            List<Map<String, String>> imports = (List<Map<String, String>>) models.getOrDefault("imports",
+                    new ArrayList<Map<String, String>>());
+            imports.add(new HashMap<String, String>() {
+                {
                     put("import", "io.sundr.builder.annotations.Buildable");
-                }});
-
-                imports.add(new HashMap<String, String>() {{
-                    put("import", "io.sundr.builder.annotations.Inline");
-                }});
-
-                models.put("imports", imports);
-            }
-
-            if (name.contains(".")) {
-
-                String prefix = name.substring(0, name.lastIndexOf("."));
-                String newPackage = pkg + "." + prefix;
-
-                String newName = name.substring(name.lastIndexOf(".") + 1);
-                cm.name = newName;
-                cm.classname = newName;
-
-                String newClassFilename = prefix.replaceAll("[\\.]",File.separator) + File.separator + cm.name;
-                cm.classFilename = newClassFilename;
-
-                String newImportPath = importPath.replace(pkg, newPackage).replace(classname, cm.classname);
-                importMappings.put(name, newImportPath);
-                classMappings.put(name, newName);
-
-                model.put("importPath", newImportPath);
-                models.put("package", newPackage);
-
-                updateImports(knownModels, importPath, newImportPath);
-                for (CodegenProperty cp : cm.vars) {
-                    cp.complexType = removePackage(cp.complexType, pkg, prefix);
-                    cp.baseType = removePackage(cp.baseType, pkg, prefix);
-                    cp.datatypeWithEnum = removePackage(cp.datatypeWithEnum, pkg, prefix);
-                    cp.defaultValue = removePackage(cp.defaultValue, pkg, prefix);
                 }
-            } 
-            models.put(GENERATE_BUILDERS, true);
-            return model;
+            });
+
+            imports.add(new HashMap<String, String>() {
+                {
+                    put("import", "io.sundr.builder.annotations.Inline");
+                }
+            });
+
+            models.put("imports", imports);
+        }
+
+        if (name.contains(".")) {
+
+            String prefix = name.substring(0, name.lastIndexOf("."));
+            String newPackage = pkg + "." + prefix;
+
+            String newName = name.substring(name.lastIndexOf(".") + 1);
+            cm.name = newName;
+            cm.classname = newName;
+
+            String newClassFilename = prefix.replaceAll("[\\.]", File.separator) + File.separator + cm.name;
+            cm.classFilename = newClassFilename;
+
+            String newImportPath = importPath.replace(pkg, newPackage).replace(classname, cm.classname);
+            importMappings.put(name, newImportPath);
+            classMappings.put(name, newName);
+
+            model.put("importPath", newImportPath);
+            models.put("package", newPackage);
+
+            updateImports(knownModels, importPath, newImportPath);
+            for (CodegenProperty cp : cm.vars) {
+                cp.complexType = removePackage(cp.complexType, pkg, prefix);
+                cp.baseType = removePackage(cp.baseType, pkg, prefix);
+                cp.datatypeWithEnum = removePackage(cp.datatypeWithEnum, pkg, prefix);
+                cp.defaultValue = removePackage(cp.defaultValue, pkg, prefix);
+            }
+        }
+        models.put(GENERATE_BUILDERS, true);
+        return model;
     }
 
-  /**
-   * Refactors operation classes.
-   * 1. Stips dotted prefixes for name and moves them to the package.
-   * 2. Updates the model references.
-   */
-    private Map<String, Object> refactorOperation(String pkg, Map<String, Object> operation, Map<String, Object> operations) {
+    /**
+     * Refactors operation classes. 1. Stips dotted prefixes for name and moves them
+     * to the package. 2. Updates the model references.
+     */
+    private Map<String, Object> refactorOperation(String pkg, Map<String, Object> operation,
+            Map<String, Object> operations) {
         String name = (String) operation.get("classname");
         if (name.contains(".")) {
             String prefix = name.substring(0, name.lastIndexOf("."));
@@ -213,11 +251,11 @@ public class JavaFluentCodegen extends JavaClientCodegen {
                     CodegenOperation co = (CodegenOperation) o;
                     updateModelRefs(co);
                     List<Map<String, String>> imports = (List<Map<String, String>>) operations.get("imports");
-                    for (String i: co.imports) {
-                        if (!importExists(i, imports))  {
-                          Map<String, String> importMap = new HashMap<>();
-                          importMap.put("import", i);
-                          imports.add(importMap);
+                    for (String i : co.imports) {
+                        if (!importExists(i, imports)) {
+                            Map<String, String> importMap = new HashMap<>();
+                            importMap.put("import", i);
+                            imports.add(importMap);
                         }
                     }
                 }
@@ -226,25 +264,24 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         return operation;
     }
 
-
     private static void updateImports(List<Map<String, Object>> models, String importPath, String newImportPath) {
-       for (Map<String, Object> objs : models) {
-        Object o = objs.getOrDefault("imports", Collections.emptyMap());
-        if (o instanceof Map) {
-            updateImports((Map) o, importPath, newImportPath);
-        } else if (o instanceof Iterable) {
-            for (Object i : (Iterable<? extends Object>) o) {
-              if  (i instanceof Map) {
-                  updateImports((Map) i, importPath, newImportPath);
-              }
+        for (Map<String, Object> objs : models) {
+            Object o = objs.getOrDefault("imports", Collections.emptyMap());
+            if (o instanceof Map) {
+                updateImports((Map) o, importPath, newImportPath);
+            } else if (o instanceof Iterable) {
+                for (Object i : (Iterable<? extends Object>) o) {
+                    if (i instanceof Map) {
+                        updateImports((Map) i, importPath, newImportPath);
+                    }
+                }
             }
         }
-       }
     }
 
     private static void updateImports(Map<String, String> imports, String importPath, String newImportPath) {
-        Map<String ,String> copy = new HashMap<>(imports);
-        for (Map.Entry<String, String> e : copy.entrySet())  {
+        Map<String, String> copy = new HashMap<>(imports);
+        for (Map.Entry<String, String> e : copy.entrySet()) {
             String key = e.getKey();
             String value = e.getValue();
             if (value.equals(importPath)) {
@@ -256,16 +293,16 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     private void updateModelRefs(CodegenOperation operation) {
         String returnType = operation.returnType;
         String returnBaseType = operation.returnBaseType;
-        if (classMappings.get(returnBaseType) != null)  {
+        if (classMappings.get(returnBaseType) != null) {
             operation.returnBaseType = classMappings.get(returnBaseType);
         }
-        if (importMappings.get(returnBaseType) != null)  {
+        if (importMappings.get(returnBaseType) != null) {
             operation.imports.add(importMappings.get(returnBaseType));
         }
-        if (classMappings.get(returnType) != null)  {
+        if (classMappings.get(returnType) != null) {
             operation.returnType = classMappings.get(returnType);
         }
-        if (importMappings.get(returnType) != null)  {
+        if (importMappings.get(returnType) != null) {
             operation.imports.add(importMappings.get(returnType));
         }
 
@@ -291,29 +328,29 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         }
     }
 
-    private void updateModelRefs(CodegenOperation operation, CodegenProperty property)  {
-        if  (property == null) {
+    private void updateModelRefs(CodegenOperation operation, CodegenProperty property) {
+        if (property == null) {
             return;
         }
         String baseType = property.baseType;
         String datatype = property.datatype;
         String datatypeWithEnum = property.datatypeWithEnum;
-        //baseType
-        if (classMappings.get(baseType) != null)  {
+        // baseType
+        if (classMappings.get(baseType) != null) {
             property.baseType = classMappings.get(baseType);
         }
         if (importMappings.get(baseType) != null) {
             operation.imports.add(importMappings.get(baseType));
         }
-        //dataType
-        if (classMappings.get(datatype) != null)  {
+        // dataType
+        if (classMappings.get(datatype) != null) {
             property.datatype = classMappings.get(datatype);
         }
         if (importMappings.get(datatype) != null) {
             operation.imports.add(importMappings.get(datatype));
         }
-        //dataTypeWithEnum
-        if (classMappings.get(datatypeWithEnum) != null)  {
+        // dataTypeWithEnum
+        if (classMappings.get(datatypeWithEnum) != null) {
             property.datatypeWithEnum = classMappings.get(datatypeWithEnum);
         }
         if (importMappings.get(datatypeWithEnum) != null) {
@@ -322,29 +359,29 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
     }
 
-    private void updateModelRefs(CodegenOperation operation, CodegenParameter parameter)  {
-        if  (parameter == null) {
+    private void updateModelRefs(CodegenOperation operation, CodegenParameter parameter) {
+        if (parameter == null) {
             return;
         }
         String baseType = parameter.baseType;
         String datatype = parameter.dataType;
         String datatypeWithEnum = parameter.datatypeWithEnum;
-        //baseType
-        if (classMappings.get(baseType) != null)  {
+        // baseType
+        if (classMappings.get(baseType) != null) {
             parameter.baseType = classMappings.get(baseType);
         }
         if (importMappings.get(baseType) != null) {
             operation.imports.add(importMappings.get(baseType));
         }
-        //dataType
-        if (classMappings.get(datatype) != null)  {
+        // dataType
+        if (classMappings.get(datatype) != null) {
             parameter.dataType = classMappings.get(datatype);
         }
         if (importMappings.get(datatype) != null) {
             operation.imports.add(importMappings.get(datatype));
         }
-        //dataTypeWithEnum
-        if (classMappings.get(datatypeWithEnum) != null)  {
+        // dataTypeWithEnum
+        if (classMappings.get(datatypeWithEnum) != null) {
             parameter.datatypeWithEnum = classMappings.get(datatypeWithEnum);
         }
         if (importMappings.get(datatypeWithEnum) != null) {
@@ -352,29 +389,26 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         }
     }
 
-
     /**
      * Add operation to group
      *
-     * @param tag name of the tag
+     * @param tag          name of the tag
      * @param resourcePath path of the resource
-     * @param operation Swagger Operation object
-     * @param co Codegen Operation object
-     * @param operations map of Codegen operations
+     * @param operation    Swagger Operation object
+     * @param co           Codegen Operation object
+     * @param operations   map of Codegen operations
      */
     @SuppressWarnings("static-method")
-    public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co, Map<String, List<CodegenOperation>> operations) {
-        String prefix =  co.returnBaseType != null && co.returnBaseType.contains(".")
+    public void addOperationToGroup(String tag, String resourcePath, Operation operation, CodegenOperation co,
+            Map<String, List<CodegenOperation>> operations) {
+        String prefix = co.returnBaseType != null && co.returnBaseType.contains(".")
                 ? co.returnBaseType.substring(0, co.returnBaseType.lastIndexOf("."))
                 : "";
 
-        String newTag = !prefix.isEmpty()
-                ? prefix + "." + tag
-                : tag;
+        String newTag = !prefix.isEmpty() ? prefix + "." + tag : tag;
 
         super.addOperationToGroup(newTag, resourcePath, operation, co, operations);
     }
-
 
     private static String removePackage(String name, String basePackage, String subPackage) {
         if (name == null || name.isEmpty()) {
@@ -385,26 +419,23 @@ public class JavaFluentCodegen extends JavaClientCodegen {
             String ref = name.substring(0, name.indexOf("<"));
             String[] args = name.substring(name.indexOf("<") + 1, name.lastIndexOf(">")).split(",");
             StringBuilder sb = new StringBuilder();
-            sb.append(removePackage(ref, basePackage, subPackage))
-                    .append("<")
-                    .append( StringUtils.join(args, new Function<String, String>() {
-                @Override
-                public String apply(String s) {
-                    return removePackage(s, basePackage, subPackage);
-                }
-            }, ","))
-                    .append(">")
-            .append(name.substring(name.lastIndexOf(">") + 1));
+            sb.append(removePackage(ref, basePackage, subPackage)).append("<")
+                    .append(StringUtils.join(args, new Function<String, String>() {
+                        @Override
+                        public String apply(String s) {
+                            return removePackage(s, basePackage, subPackage);
+                        }
+                    }, ",")).append(">").append(name.substring(name.lastIndexOf(">") + 1));
             return sb.toString();
         }
 
-        if  (name.contains(".")) {
-            String prefix = name.substring(0 , name.lastIndexOf("."));
+        if (name.contains(".")) {
+            String prefix = name.substring(0, name.lastIndexOf("."));
             String trimmed = name.substring(name.lastIndexOf(".") + 1);
             if (prefix.equals(subPackage)) {
                 return trimmed;
             } else {
-               return basePackage + "." + prefix + "." + trimmed;
+                return basePackage + "." + prefix + "." + trimmed;
             }
         }
         return name;
@@ -419,10 +450,12 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     public String toModelFilename(String name) {
         return name.replaceAll(Pattern.quote("."), File.separator);
     }
+
     @Override
     public String toModelTestFilename(String name) {
         return super.toModelTestFilename(name).replaceAll(Pattern.quote("."), File.separator);
     }
+
     @Override
     public String toModelImport(String name) {
         return super.toModelImport(name);
@@ -437,7 +470,6 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     public String toBooleanGetter(String name) {
         return "is" + getterAndSetterCapitalize(name);
     }
-
 
     @Override
     public String toApiDocFilename(String name) {
@@ -469,71 +501,68 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         return super.toApiImport(name);
     }
 
-  private static String className(String fqcn) {
-    return !fqcn.contains(".") ? fqcn : fqcn.substring(fqcn.lastIndexOf(".") + 1);
-  }
-
-  private static boolean importExists(String candidate, List<Map<String, String>> imports) {
-    return imports.stream().flatMap(i -> i.values().stream())
-      .map(i -> className(i))
-      .filter(i -> i.equals(className(candidate)))
-      .findAny()
-      .isPresent();
-  }
-
-
-/*
-        @Override
-    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
-        String pkg = (String) objs.getOrDefault("package", "");
-
-        Object o = objs.getOrDefault("models", Collections.emptyMap());
-        if (o instanceof Map) {
-            fixClassName((Map)o);
-        } else if (o instanceof Iterable) {
-            for (Object i : (Iterable<? extends Object>) o) {
-              if  (i instanceof Map) {
-                  fixClassName((Map)i);
-              }
-            }
-        }
-
-        return super.postProcessModels(objs);
+    public boolean isGenerateBuilders() {
+        return generateBuilders;
     }
 
-    public void fixClassName(Map<String, Object> map) {
-        CodegenModel cm = (CodegenModel) map.getOrDefault("model", "");
-        String name = cm.name;
-         if (name != null && !name.isEmpty() && name.contains(".")) {
-             cm.name = name.substring(name.lastIndexOf(".") + 1);
-             cm.classname = cm.name;
-        }
+    public void setGenerateBuilders(boolean generateBuilders) {
+        this.generateBuilders = generateBuilders;
     }
 
-    @Override
-    public String toModelName(String name) {
-            return name;
+    public boolean isEditableEnabled() {
+        return editableEnabled;
     }
 
-    @Override
-    public String toModelImport(String name) {
-        return super.toModelImport(name);
+    public void setEditableEnabled(boolean editableEnabled) {
+        this.editableEnabled = editableEnabled;
     }
 
-
-
-    @Override
-    public String toModelFilename(String name) {
-        if (name == null || name.isEmpty() || !name.contains(".")) {
-            return super.toModelName(name);
-        }
-        String prefix = name.substring(0, name.lastIndexOf("."));
-        return prefix.replaceAll("[\\.]",File.separator) + File.separator + name.substring(name.lastIndexOf(".") + 1);
+    public boolean isValidationEnabled() {
+        return validationEnabled;
     }
 
-    @Override
-    public String toBooleanGetter(String name) {
-        return "is" + super.toBooleanGetter(name);
+    public void setValidationEnabled(boolean validationEnabled) {
+        this.validationEnabled = validationEnabled;
     }
-    */
+
+    public boolean isLazyMapInitEnabled() {
+        return lazyMapInitEnabled;
+    }
+
+    public void setLazyMapInitEnabled(boolean lazyMapInitEnabled) {
+        this.lazyMapInitEnabled = lazyMapInitEnabled;
+    }
+
+    public boolean isGenerateBuilderPackage() {
+        return generateBuilderPackage;
+    }
+
+    public void setGenerateBuilderPackage(boolean generateBuilderPackage) {
+        this.generateBuilderPackage = generateBuilderPackage;
+    }
+
+    public String getBuilderPackage() {
+        return builderPackage;
+    }
+
+    public void setBuilderPackage(String builderPackage) {
+        this.builderPackage = builderPackage;
+    }
+
+    public Map<String, String> getImportMappings() {
+        return importMappings;
+    }
+
+    public Map<String, String> getClassMappings() {
+        return classMappings;
+    }
+
+    private static String className(String fqcn) {
+        return !fqcn.contains(".") ? fqcn : fqcn.substring(fqcn.lastIndexOf(".") + 1);
+    }
+
+    private static boolean importExists(String candidate, List<Map<String, String>> imports) {
+        return imports.stream().flatMap(i -> i.values().stream()).map(i -> className(i))
+                .filter(i -> i.equals(className(candidate))).findAny().isPresent();
+    }
 }
