@@ -24,6 +24,8 @@ import java.util.Set;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
@@ -47,6 +49,7 @@ import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")
 public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
     @Override
