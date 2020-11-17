@@ -83,6 +83,11 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         return "Generates a Java fluent model.";
     }
 
+    @Override
+    public String getDefaultTemplateDir() {
+        return "JavaFluent";
+    }
+
     public void setGenerateBuilders(boolean generateBuilders) {
         this.generateBuilders = generateBuilders;
     }

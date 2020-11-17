@@ -190,6 +190,8 @@
       <artifactId>builder-annotations</artifactId>
       <version>${project.version}</version>
     </dependency>
+    {{^generateBuilders}}
+    <!-- don't generate builders: central-->
     {{/generateBuilders}}
     {{#useOas2}}
     <dependency>
