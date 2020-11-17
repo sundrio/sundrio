@@ -94,7 +94,6 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     private final Map<String, String> classMappings = new HashMap<>();
     private final List<Map<String, Object>> knownModels = new ArrayList<>();
 
-
     @Override
     public Map<String, Object> postProcessModels(Map<String, Object> objs) {
         knownModels.add(objs);
@@ -114,12 +113,35 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         return super.postProcessModels(objs);
     }
 
+    @Override
+    public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
+         String pkg = (String) objs.getOrDefault("package", "");
+
+        Object o = objs.getOrDefault("operations", Collections.emptyMap());
+        if (o instanceof Map) {
+            refactorOperation(pkg, (Map<String, Object>) o,objs);
+        } else if (o instanceof Iterable) {
+            for (Object i : (Iterable<? extends Object>) o) {
+              if  (i instanceof Map) {
+                  refactorOperation(pkg, (Map<String, Object>) i, objs);
+              }
+            }
+        }
+        return objs;
+    }
+
+
+  /**
+   * Refactors model classes.
+   * 1. Adds the @Buildable and @Inline annotations to import list.
+   * 2. Stips dotted prefixes for name and moves them to the package.
+   * 3. Set the `GENERATE_BUILDERS` property to the model so that template rendering can use them.
+   */
     private Map<String, Object> refactorModel(String pkg, Map<String, Object> model, Map<String, Object> models) {
             CodegenModel cm = (CodegenModel) model.getOrDefault("model", "");
             String importPath = (String) model.getOrDefault("importPath", "");
             String name = cm.name;
             String classname = cm.classname;
-            String classFilename = cm.classFilename;
 
             if (generateBuilders) {
                 List<Map<String, String>> imports = (List<Map<String, String>>) models.getOrDefault("imports", new ArrayList<Map<String, String>>());
@@ -160,10 +182,45 @@ public class JavaFluentCodegen extends JavaClientCodegen {
                     cp.datatypeWithEnum = removePackage(cp.datatypeWithEnum, pkg, prefix);
                     cp.defaultValue = removePackage(cp.defaultValue, pkg, prefix);
                 }
-            }
+            } 
             models.put(GENERATE_BUILDERS, true);
             return model;
     }
+
+  /**
+   * Refactors operation classes.
+   * 1. Stips dotted prefixes for name and moves them to the package.
+   * 2. Updates the model references.
+   */
+    private Map<String, Object> refactorOperation(String pkg, Map<String, Object> operation, Map<String, Object> operations) {
+        String name = (String) operation.get("classname");
+        if (name.contains(".")) {
+            String prefix = name.substring(0, name.lastIndexOf("."));
+            String newPackage = pkg + "." + prefix;
+            String newName = name.substring(name.lastIndexOf(".") + 1);
+            operation.put("classname", newName);
+            operations.put("package", newPackage);
+        }
+        Object obj = operation.get("operation");
+        if (obj instanceof Iterable) {
+            for (Object o : (Iterable<? extends Object>) obj) {
+                if (o instanceof CodegenOperation) {
+                    CodegenOperation co = (CodegenOperation) o;
+                    updateModelRefs(co);
+                    List<Map<String, String>> imports = (List<Map<String, String>>) operations.get("imports");
+                    for (String i: co.imports) {
+                        if (!importExists(i, imports))  {
+                          Map<String, String> importMap = new HashMap<>();
+                          importMap.put("import", i);
+                          imports.add(importMap);
+                        }
+                    }
+                }
+            }
+        }
+        return operation;
+    }
+
 
     private static void updateImports(List<Map<String, Object>> models, String importPath, String newImportPath) {
        for (Map<String, Object> objs : models) {
@@ -189,52 +246,6 @@ public class JavaFluentCodegen extends JavaClientCodegen {
                 imports.put(key, newImportPath);
             }
         }
-    }
-
-    @Override
-    public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
-         String pkg = (String) objs.getOrDefault("package", "");
-
-        Object o = objs.getOrDefault("operations", Collections.emptyMap());
-        if (o instanceof Map) {
-            refactorOperation(pkg, (Map<String, Object>) o,objs);
-        } else if (o instanceof Iterable) {
-            for (Object i : (Iterable<? extends Object>) o) {
-              if  (i instanceof Map) {
-                  refactorOperation(pkg, (Map<String, Object>) i, objs);
-              }
-            }
-        }
-        return objs;
-    }
-
-    private Map<String, Object> refactorOperation(String pkg, Map<String, Object> operation, Map<String, Object> operations) {
-        String name = (String) operation.get("classname");
-        if (name.contains(".")) {
-            String prefix = name.substring(0, name.lastIndexOf("."));
-            String newPackage = pkg + "." + prefix;
-            String newName = name.substring(name.lastIndexOf(".") + 1);
-            operation.put("classname", newName);
-            operations.put("package", newPackage);
-        }
-        Object obj = operation.get("operation");
-        if (obj instanceof Iterable) {
-            for (Object o : (Iterable<? extends Object>) obj) {
-                if (o instanceof CodegenOperation) {
-                    CodegenOperation co = (CodegenOperation) o;
-                    updateModelRefs(co);
-                    List<Map<String, String>> imports = (List<Map<String, String>>) operations.get("imports");
-                    for (String i: co.imports) {
-                        Map<String, String> importMap = new HashMap<>();
-                        importMap.put("import", i);
-                        if (!imports.contains(importMap))  {
-                            imports.add(importMap);
-                        }
-                    }
-                }
-            }
-        }
-        return operation;
     }
 
     private void updateModelRefs(CodegenOperation operation) {
@@ -452,6 +463,19 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     public String toApiImport(String name) {
         return super.toApiImport(name);
     }
+
+  private static String className(String fqcn) {
+    return !fqcn.contains(".") ? fqcn : fqcn.substring(fqcn.lastIndexOf(".") + 1);
+  }
+
+  private static boolean importExists(String candidate, List<Map<String, String>> imports) {
+    return imports.stream().flatMap(i -> i.values().stream())
+      .map(i -> className(i))
+      .filter(i -> i.equals(className(candidate)))
+      .findAny()
+      .isPresent();
+  }
+
 
 /*
         @Override
