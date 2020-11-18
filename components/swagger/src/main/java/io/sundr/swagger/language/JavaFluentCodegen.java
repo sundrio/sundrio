@@ -47,6 +47,13 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     public static final String LAZY_MAP_INIT_ENABLED = "lazyMapInitEnabled";
     public static final String GENERATE_BUILDER_PACKAGE = "generateBuilderPackage";
     public static final String BUILDER_PACKAGE = "builderPackage";
+    public static final String BUILDER_ARTIFACT = "builderArtifact";
+    public static final String BUILDER_GROUP_ID = "builderGroupId";
+    public static final String BUILDER_ARTIFACT_ID = "builderArtifactId";
+    public static final String BUILDER_VERSION = "builderVersion";
+    public static final String BUILDER_CLASSIFIER = "builderClassifier";
+    public static final String HAS_BUILDER_ARTIFACT = "hasBuilderArtifact";
+    public static final String HAS_BUILDER_CLASSIFIER = "hasBuilderClassifier";
 
     protected boolean generateBuilders = true;
     protected boolean editableEnabled = true;
@@ -54,6 +61,11 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     protected boolean lazyMapInitEnabled = true;
     protected boolean generateBuilderPackage = false;
     protected String builderPackage = null;
+    protected String builderArtifact = null;
+    protected String builderGroupId = null;
+    protected String builderArtifactId = null;
+    protected String builderVersion = null;
+    protected String builderClassifier = null;
 
     public JavaFluentCodegen() {
         super();
@@ -65,6 +77,13 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         modelPackage = "io.sundr.client.model";
 
         cliOptions.add(CliOption.newBoolean(GENERATE_BUILDERS, "Whether to generate builders for model objects."));
+        cliOptions.add(CliOption.newBoolean(EDITABLE_ENABLED, "Flag to specify if editable classes should to be generated."));
+        cliOptions.add(CliOption.newBoolean(VALIDATION_ENABLED, "Flag to specify if validation code should be part of the generated builders."));
+        cliOptions.add(CliOption.newBoolean(LAZY_MAP_INIT_ENABLED, "Flag to specify if maps should be lazily initialized."));
+
+        cliOptions.add(CliOption.newBoolean(BUILDER_PACKAGE, "The package that contains the builder helper classes."));
+        cliOptions.add(CliOption.newBoolean(GENERATE_BUILDER_PACKAGE, "Flag that specifies wether the builder package should be generated or not."));
+        cliOptions.add(CliOption.newBoolean(BUILDER_ARTIFACT, "The maven artifact that contains the builder utility classes. The format is <groupId>:<artifactId>:<version>(:<classifier>)"));
     }
 
     @Override
@@ -97,13 +116,45 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
         if (additionalProperties.containsKey(BUILDER_PACKAGE)) {
             this.setBuilderPackage(additionalProperties.get(BUILDER_PACKAGE).toString());
-        } else {
+        } else if (!additionalProperties.containsKey(BUILDER_ARTIFACT)) {
             //When builder package does not exist, we need to generate one, relative to the model.
             this.setGenerateBuilderPackage(true);
             this.setBuilderPackage(modelPackage + ".builder");
         }
         additionalProperties.put(BUILDER_PACKAGE, builderPackage);
         additionalProperties.put(GENERATE_BUILDER_PACKAGE, generateBuilderPackage);
+
+        if (additionalProperties.containsKey(BUILDER_ARTIFACT)) {
+            this.setBuilderArtifact(additionalProperties.get(BUILDER_ARTIFACT).toString());
+            this.setBuilderGroupId(ArtifactUtil.groupId(builderArtifact));
+            this.setBuilderArtifactId(ArtifactUtil.artifactId(builderArtifact));
+            this.setBuilderVersion(ArtifactUtil.version(builderArtifact));
+            ArtifactUtil.classifier(builderArtifact).ifPresent(c -> this.setBuilderClassifier(c));
+        }
+        additionalProperties.put(BUILDER_ARTIFACT, builderArtifact);
+
+        if (additionalProperties.containsKey(BUILDER_GROUP_ID)) {
+            this.setBuilderGroupId(additionalProperties.get(BUILDER_GROUP_ID).toString());
+        }
+        additionalProperties.put(BUILDER_GROUP_ID, builderGroupId);
+
+        if (additionalProperties.containsKey(BUILDER_ARTIFACT_ID)) {
+            this.setBuilderArtifactId(additionalProperties.get(BUILDER_ARTIFACT_ID).toString());
+        }
+        additionalProperties.put(BUILDER_ARTIFACT_ID, builderArtifactId);
+
+        if (additionalProperties.containsKey(BUILDER_VERSION)) {
+            this.setBuilderVersion(additionalProperties.get(BUILDER_VERSION).toString());
+        }
+        additionalProperties.put(BUILDER_VERSION, builderVersion);
+ 
+        if (additionalProperties.containsKey(BUILDER_CLASSIFIER)) {
+            this.setBuilderClassifier(additionalProperties.get(BUILDER_CLASSIFIER).toString());
+        }
+        additionalProperties.put(BUILDER_CLASSIFIER, builderClassifier);
+
+        additionalProperties.put(HAS_BUILDER_ARTIFACT, !StringUtils.isNullOrEmpty(builderGroupId) && !Strings.isNullOrEmpty(builderArtifactId) && !Strings.isNullOrEmpty(builderVersion));
+        additionalProperties.put(HAS_BUILDER_CLASSIFIER, !StringUtils.isNullOrEmpty(builderClassifier));
     }
 
     @Override
@@ -547,6 +598,48 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
     public void setBuilderPackage(String builderPackage) {
         this.builderPackage = builderPackage;
+    }
+
+  
+    public String getBuilderArtifact() {
+        return builderArtifact;
+    }
+
+    public void setBuilderArtifact(String builderArtifact) {
+        this.builderArtifact = builderArtifact;
+    }
+
+
+    public String getBuilderGroupId() {
+        return builderGroupId;
+    }
+
+    public void setBuilderGroupId(String builderGroupId) {
+        this.builderGroupId = builderGroupId;
+    }
+
+    public String getBuilderArtifactId() {
+        return builderArtifactId;
+    }
+
+    public void setBuilderArtifactId(String builderArtifactId) {
+        this.builderArtifactId = builderArtifactId;
+    }
+
+    public String getBuilderVersion() {
+        return builderVersion;
+    }
+
+    public void setBuilderVersion(String builderVersion) {
+        this.builderVersion = builderVersion;
+    }
+        
+    public String getBuilderClassifier() {
+      return this.builderClassifier;
+    }
+
+    public void setBuilderClassifier(String builderClassifier) {
+      this.builderClassifier=builderClassifier;
     }
 
     public Map<String, String> getImportMappings() {

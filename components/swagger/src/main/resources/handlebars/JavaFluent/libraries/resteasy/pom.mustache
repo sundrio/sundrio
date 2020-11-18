@@ -125,6 +125,14 @@
       <version>${project.version}</version>
     </dependency>
     {{/generateBuilders}}
+     {{#hasBuilderArtifact}}
+    <dependency>
+      <groupId>{{builderGroupId}}</groupId>
+      <artifactId>{{builderArtifactId}}</artifactId>
+      <version>{{builderVersion}}</version>
+      {{#hasBuilderClassifier}}<classifier>{{builderClassifier}}</classifier>{{/hasBuilderClassifier}}
+    </dependency>
+    {{/hasBuilderArtifact}}    
     {{#useOas2}}
     <dependency>
       <groupId>io.swagger</groupId>
