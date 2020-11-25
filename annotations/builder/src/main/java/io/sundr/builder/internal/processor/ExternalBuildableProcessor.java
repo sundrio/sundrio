@@ -17,9 +17,12 @@
 package io.sundr.builder.internal.processor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
@@ -38,6 +41,7 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
@@ -59,13 +63,12 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         Filer filer = processingEnv.getFiler();
 
 
-        ExternalBuildables generated = null;
         BuilderContext ctx = null;
         Set<TypeDef> buildables = new HashSet<>();
         //First pass register all externals
         for (TypeElement annotation : annotations) {
             for (Element element : env.getElementsAnnotatedWith(annotation)) {
-                generated = element.getAnnotation(ExternalBuildables.class);
+                final ExternalBuildables generated  = element.getAnnotation(ExternalBuildables.class);
                 if (generated == null) {
                     continue;
                 }
@@ -92,18 +95,36 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     for (TypeElement typeElement : typeElements) {
                         final boolean isLazyCollectionInitEnabled = generated.lazyCollectionInitEnabled();
                         final boolean isLazyMapInitEnabled = generated.lazyMapInitEnabled();
-                        TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
-                                .addToAttributes(EXTERNAL_BUILDABLE, generated)
-                                .addToAttributes(EDITABLE_ENABLED, generated.editableEnabled())
-                                .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
+                          
+                        TypeDef original = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement));
+                        String fqcn = original.getFullyQualifiedName();
+                        boolean isBuildable = original.getKind() != Kind.ENUM && !original.isAbstract() && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());
+
+                        TypeDef b = new TypeDefBuilder(original)
                                 .accept(new Visitor<PropertyBuilder>() {
                                 @Override
                                 public void visit(PropertyBuilder builder) {
+                                  if (isBuildable) {
+                                    builder.addToAttributes(EXTERNAL_BUILDABLE, generated);
+                                    builder.addToAttributes(EDITABLE_ENABLED, generated.editableEnabled());
+                                    builder.addToAttributes(VALIDATION_ENABLED, generated.validationEnabled());
                                     builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionInitEnabled);
                                     builder.addToAttributes(LAZY_MAP_INIT_ENABLED, isLazyMapInitEnabled);
+                                  }
                                 }
                             }).build();
 
+
+                        if (b.getKind() == Kind.ENUM || b.isAbstract()) {
+                          continue;
+                        }
+
+                        if (!isIncluded(b.getFullyQualifiedName(), generated.includes())) {
+                          continue;
+                        }
+                        if (isExcluded(b.getFullyQualifiedName(), generated.excludes())) {
+                          continue;
+                        }
                         ctx.getDefinitionRepository().register(b);
                         ctx.getBuildableRepository().register(b);
                         buildables.add(b);
@@ -113,17 +134,37 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
                     final boolean isLazyCollectionInitEnabled = generated.lazyCollectionInitEnabled();
                     final boolean isLazyMapInitEnabled = generated.lazyMapInitEnabled();
-                    TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
-                            .addToAttributes(EXTERNAL_BUILDABLE, generated)
-                            .addToAttributes(EDITABLE_ENABLED, generated.editableEnabled())
-                            .addToAttributes(VALIDATION_ENABLED, generated.validationEnabled())
+
+
+                    TypeDef original = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref));
+                    String fqcn = original.getFullyQualifiedName();
+                    boolean isBuildable = original.getKind() != Kind.ENUM && !original.isAbstract() && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());
+
+                    TypeDef r = new TypeDefBuilder(original)
                                                         .accept(new Visitor<PropertyBuilder>() {
                                 @Override
                                 public void visit(PropertyBuilder builder) {
-                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionInitEnabled);
-                                    builder.addToAttributes(LAZY_MAP_INIT_ENABLED, isLazyMapInitEnabled);
+                                    if (isBuildable) {
+                                      builder.addToAttributes(EXTERNAL_BUILDABLE, generated);
+                                      builder.addToAttributes(EDITABLE_ENABLED, generated.editableEnabled());
+                                      builder.addToAttributes(VALIDATION_ENABLED, generated.validationEnabled());
+                                      builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionInitEnabled);
+                                      builder.addToAttributes(LAZY_MAP_INIT_ENABLED, isLazyMapInitEnabled);
+                                    }
                                 }
                             }).build();
+
+
+                    if (r.getKind() == Kind.ENUM || r.isAbstract()) {
+                      continue;
+                    }
+
+                    if (!isIncluded(r.getFullyQualifiedName(), generated.includes())) {
+                      continue;
+                    }
+                    if (isExcluded(r.getFullyQualifiedName(), generated.excludes())) {
+                      continue;
+                    }
 
                     ctx.getDefinitionRepository().register(r);
                     ctx.getBuildableRepository().register(r);
@@ -144,4 +185,15 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         System.err.println("100%: Builder generation complete.");
         return true;
     }
+
+
+  private boolean isIncluded(String fqcn, String[] includes) {
+    return includes.length == 0 || Arrays.stream(includes).map(Pattern::compile).map(p -> p.matcher(fqcn)).filter(Matcher::matches).findAny().isPresent();
+  }
+
+  private boolean isExcluded(String fqcn, String[] excludes) {
+    return excludes.length != 0 &&
+      Arrays.stream(excludes).map(Pattern::compile).map(p -> p.matcher(fqcn)).filter(Matcher::matches).findAny().isPresent();
+  }
+
 }
