@@ -5,10 +5,10 @@ import io.sundr.builder.VisitableBuilder;
 import io.sundr.builder.Nested;
 import java.util.ArrayList;
 import java.lang.String;
-import io.sundr.builder.Predicate;
 import java.lang.Deprecated;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.lang.Boolean;
 import java.util.Collection;
 import java.lang.Object;
@@ -127,7 +127,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             final List visitables = _visitables.get("bounds");
             while (each.hasNext()) {
               VisitableBuilder<? extends TypeRef,?> builder = each.next();
-              if (predicate.apply(builder)) {
+              if (predicate.test(builder)) {
                 visitables.remove(builder);
                 each.remove();
               }
@@ -161,11 +161,11 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     }
 
     public TypeRef buildMatchingBound(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
-            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.apply(item)){ return item.build();} } return null;
+            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.test(item)){ return item.build();} } return null;
     }
 
     public Boolean hasMatchingBound(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
-            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.apply(item)){ return true;} } return false;
+            for (VisitableBuilder<? extends TypeRef,?> item: bounds) { if(predicate.test(item)){ return true;} } return false;
     }
 
     public A withBounds(List<TypeRef> bounds){
@@ -219,7 +219,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             final List visitables = _visitables.get("bounds");
             while (each.hasNext()) {
               VisitableBuilder<? extends TypeRef,?> builder = each.next();
-              if (predicate.apply(builder)) {
+              if (predicate.test(builder)) {
                 visitables.remove(builder);
                 each.remove();
               }
@@ -276,7 +276,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             final List visitables = _visitables.get("bounds");
             while (each.hasNext()) {
               VisitableBuilder<? extends TypeRef,?> builder = each.next();
-              if (predicate.apply(builder)) {
+              if (predicate.test(builder)) {
                 visitables.remove(builder);
                 each.remove();
               }
@@ -333,7 +333,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             final List visitables = _visitables.get("bounds");
             while (each.hasNext()) {
               VisitableBuilder<? extends TypeRef,?> builder = each.next();
-              if (predicate.apply(builder)) {
+              if (predicate.test(builder)) {
                 visitables.remove(builder);
                 each.remove();
               }
@@ -390,7 +390,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             final List visitables = _visitables.get("bounds");
             while (each.hasNext()) {
               VisitableBuilder<? extends TypeRef,?> builder = each.next();
-              if (predicate.apply(builder)) {
+              if (predicate.test(builder)) {
                 visitables.remove(builder);
                 each.remove();
               }
@@ -447,7 +447,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
             final List visitables = _visitables.get("bounds");
             while (each.hasNext()) {
               VisitableBuilder<? extends TypeRef,?> builder = each.next();
-              if (predicate.apply(builder)) {
+              if (predicate.test(builder)) {
                 visitables.remove(builder);
                 each.remove();
               }

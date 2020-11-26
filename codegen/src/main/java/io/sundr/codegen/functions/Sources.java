@@ -43,7 +43,6 @@ import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
-import io.sundr.builder.Function;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
@@ -85,6 +84,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 public class Sources {
 

@@ -72,15 +72,8 @@ public class ShapesTest {
                 .withHeight(30)
                 .and()
                 .build();
-
-        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
-            @Override
-            public void visit(CircleBuilder<Integer> builder) {
-                builder.withRadius(100 + builder.getRadius());
-            }
-        }).build();
-
-
+        
+        canvas = new CanvasBuilder(canvas).accept(CircleBuilder.class,  b -> b.withRadius(100 + (int) b.getRadius())).build();
         Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
     }
 
@@ -121,14 +114,7 @@ public class ShapesTest {
                 .build());
         Canvas canvas = canvasBuilder.build();
 
-        canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
-            @Override
-            public void visit(CircleBuilder<Integer> builder) {
-                builder.withRadius(100 + builder.getRadius());
-            }
-        }).build();
-
-
+        canvas = new CanvasBuilder(canvas).accept(CircleBuilder.class, b -> b.withRadius(100 + (int) b.getRadius())).build();
         Assert.assertEquals(110, ((Circle)canvas.getShapes().get(0)).getRadius());
     }
 

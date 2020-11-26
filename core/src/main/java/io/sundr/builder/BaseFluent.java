@@ -90,7 +90,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     }
 
 
-    private static <V, F> Boolean canVisit(V visitor, F fluent) {
+    private static <V extends Visitor, F> Boolean canVisit(V visitor, F fluent) {
         if (visitor instanceof TypedVisitor) {
             if (!((TypedVisitor) visitor).getType().isAssignableFrom(fluent.getClass())) {
                 return false;
@@ -140,6 +140,21 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         }
     }
 
+  @Override
+  public <V> F accept(final Class<V> type, final Visitor<V> visitor) {
+    return accept(new TypedVisitor<V>(){
+		@Override
+		public Class<V> getType() {
+                  return type;
+		}
+
+		@Override
+		public void visit(V element) {
+                  visitor.visit(element);
+		}
+    });
+  }
+
     private F acceptInternal(Visitor visitor) {
         for (Visitable visitable : _visitables) {
             visitable.accept(visitor);
@@ -155,4 +170,5 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     private F acceptPathAware(PathAwareTypedVisitor pathAwareTypedVisitor) {
         return acceptInternal(pathAwareTypedVisitor.next(this));
     }
+
 }

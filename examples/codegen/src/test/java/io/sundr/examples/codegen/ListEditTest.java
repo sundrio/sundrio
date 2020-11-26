@@ -20,9 +20,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.function.Predicate;
 
 import io.sundr.builder.Builder;
-import io.sundr.builder.Predicate;
 
 public class ListEditTest {
 
@@ -61,7 +61,7 @@ public class ListEditTest {
 
         Method capitalC1 = new MethodBuilder(method).editMatchingArgument(new Predicate<PropertyBuilder>() {
             @Override
-            public boolean apply(PropertyBuilder item) {
+            public boolean test(PropertyBuilder item) {
                 return item.getName().equals("c");
             }
         }).withName("C1").endArgument().build();

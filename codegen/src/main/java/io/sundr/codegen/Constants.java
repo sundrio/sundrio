@@ -16,7 +16,6 @@
 
 package io.sundr.codegen;
 
-import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamRef;

@@ -5,7 +5,7 @@ import io.sundr.builder.VisitableBuilder;
 import io.sundr.builder.Nested;
 import java.util.ArrayList;
 import java.lang.String;
-import io.sundr.builder.Predicate;
+import java.util.function.Predicate;
 import java.lang.Deprecated;
 import java.util.Iterator;
 import java.util.List;

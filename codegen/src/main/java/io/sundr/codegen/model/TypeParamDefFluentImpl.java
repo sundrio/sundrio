@@ -17,11 +17,11 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeParamDefFluent<A>{
 
@@ -117,11 +117,11 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     }
 
     public ClassRef buildMatchingBound(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: bounds) { if(predicate.apply(item)){return item.build();} } return null;
+            for (ClassRefBuilder item: bounds) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: bounds) { if(predicate.apply(item)){return true;} } return false;
+            for (ClassRefBuilder item: bounds) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withBounds(List<ClassRef> bounds){
@@ -169,7 +169,7 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     public TypeParamDefFluent.BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate){
             int index = -1;
             for (int i=0;i<bounds.size();i++) { 
-            if (predicate.apply(bounds.get(i))) {index = i; break;}
+            if (predicate.test(bounds.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching bounds. No match found.");
             return setNewBoundLike(index, buildBound(index));

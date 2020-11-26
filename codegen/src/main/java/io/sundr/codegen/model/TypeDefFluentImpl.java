@@ -17,7 +17,7 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
+import java.util.function.Predicate;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -165,11 +165,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public String getMatchingComment(Predicate<String> predicate){
-            for (String item: comments) { if(predicate.apply(item)){return item;} } return null;
+            for (String item: comments) { if(predicate.test(item)){return item;} } return null;
     }
 
     public Boolean hasMatchingComment(Predicate<String> predicate){
-            for (String item: comments) { if(predicate.apply(item)){return true;} } return false;
+            for (String item: comments) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withComments(List<String> comments){
@@ -255,11 +255,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return item.build();} } return null;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return true;} } return false;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
@@ -307,7 +307,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
             int index = -1;
             for (int i=0;i<annotations.size();i++) { 
-            if (predicate.apply(annotations.get(i))) {index = i; break;}
+            if (predicate.test(annotations.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching annotations. No match found.");
             return setNewAnnotationLike(index, buildAnnotation(index));
@@ -370,11 +370,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public ClassRef buildMatchingExtendsList(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: extendsList) { if(predicate.apply(item)){return item.build();} } return null;
+            for (ClassRefBuilder item: extendsList) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingExtendsList(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: extendsList) { if(predicate.apply(item)){return true;} } return false;
+            for (ClassRefBuilder item: extendsList) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withExtendsList(List<ClassRef> extendsList){
@@ -422,7 +422,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.ExtendsListNested<A> editMatchingExtendsList(Predicate<ClassRefBuilder> predicate){
             int index = -1;
             for (int i=0;i<extendsList.size();i++) { 
-            if (predicate.apply(extendsList.get(i))) {index = i; break;}
+            if (predicate.test(extendsList.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching extendsList. No match found.");
             return setNewExtendsListLike(index, buildExtendsList(index));
@@ -485,11 +485,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public ClassRef buildMatchingImplementsList(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: implementsList) { if(predicate.apply(item)){return item.build();} } return null;
+            for (ClassRefBuilder item: implementsList) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingImplementsList(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: implementsList) { if(predicate.apply(item)){return true;} } return false;
+            for (ClassRefBuilder item: implementsList) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withImplementsList(List<ClassRef> implementsList){
@@ -537,7 +537,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.ImplementsListNested<A> editMatchingImplementsList(Predicate<ClassRefBuilder> predicate){
             int index = -1;
             for (int i=0;i<implementsList.size();i++) { 
-            if (predicate.apply(implementsList.get(i))) {index = i; break;}
+            if (predicate.test(implementsList.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching implementsList. No match found.");
             return setNewImplementsListLike(index, buildImplementsList(index));
@@ -600,11 +600,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public TypeParamDef buildMatchingParameter(Predicate<TypeParamDefBuilder> predicate){
-            for (TypeParamDefBuilder item: parameters) { if(predicate.apply(item)){return item.build();} } return null;
+            for (TypeParamDefBuilder item: parameters) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate){
-            for (TypeParamDefBuilder item: parameters) { if(predicate.apply(item)){return true;} } return false;
+            for (TypeParamDefBuilder item: parameters) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withParameters(List<TypeParamDef> parameters){
@@ -652,7 +652,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate){
             int index = -1;
             for (int i=0;i<parameters.size();i++) { 
-            if (predicate.apply(parameters.get(i))) {index = i; break;}
+            if (predicate.test(parameters.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching parameters. No match found.");
             return setNewParameterLike(index, buildParameter(index));
@@ -715,11 +715,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public Property buildMatchingProperty(Predicate<PropertyBuilder> predicate){
-            for (PropertyBuilder item: properties) { if(predicate.apply(item)){return item.build();} } return null;
+            for (PropertyBuilder item: properties) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingProperty(Predicate<PropertyBuilder> predicate){
-            for (PropertyBuilder item: properties) { if(predicate.apply(item)){return true;} } return false;
+            for (PropertyBuilder item: properties) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withProperties(List<Property> properties){
@@ -767,7 +767,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.PropertiesNested<A> editMatchingProperty(Predicate<PropertyBuilder> predicate){
             int index = -1;
             for (int i=0;i<properties.size();i++) { 
-            if (predicate.apply(properties.get(i))) {index = i; break;}
+            if (predicate.test(properties.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching properties. No match found.");
             return setNewPropertyLike(index, buildProperty(index));
@@ -830,11 +830,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public Method buildMatchingConstructor(Predicate<MethodBuilder> predicate){
-            for (MethodBuilder item: constructors) { if(predicate.apply(item)){return item.build();} } return null;
+            for (MethodBuilder item: constructors) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingConstructor(Predicate<MethodBuilder> predicate){
-            for (MethodBuilder item: constructors) { if(predicate.apply(item)){return true;} } return false;
+            for (MethodBuilder item: constructors) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withConstructors(List<Method> constructors){
@@ -882,7 +882,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.ConstructorsNested<A> editMatchingConstructor(Predicate<MethodBuilder> predicate){
             int index = -1;
             for (int i=0;i<constructors.size();i++) { 
-            if (predicate.apply(constructors.get(i))) {index = i; break;}
+            if (predicate.test(constructors.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching constructors. No match found.");
             return setNewConstructorLike(index, buildConstructor(index));
@@ -945,11 +945,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public Method buildMatchingMethod(Predicate<MethodBuilder> predicate){
-            for (MethodBuilder item: methods) { if(predicate.apply(item)){return item.build();} } return null;
+            for (MethodBuilder item: methods) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingMethod(Predicate<MethodBuilder> predicate){
-            for (MethodBuilder item: methods) { if(predicate.apply(item)){return true;} } return false;
+            for (MethodBuilder item: methods) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withMethods(List<Method> methods){
@@ -997,7 +997,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.MethodsNested<A> editMatchingMethod(Predicate<MethodBuilder> predicate){
             int index = -1;
             for (int i=0;i<methods.size();i++) { 
-            if (predicate.apply(methods.get(i))) {index = i; break;}
+            if (predicate.test(methods.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching methods. No match found.");
             return setNewMethodLike(index, buildMethod(index));
@@ -1102,11 +1102,11 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
     public TypeDef buildMatchingInnerType(Predicate<TypeDefBuilder> predicate){
-            for (TypeDefBuilder item: innerTypes) { if(predicate.apply(item)){return item.build();} } return null;
+            for (TypeDefBuilder item: innerTypes) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingInnerType(Predicate<TypeDefBuilder> predicate){
-            for (TypeDefBuilder item: innerTypes) { if(predicate.apply(item)){return true;} } return false;
+            for (TypeDefBuilder item: innerTypes) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withInnerTypes(List<TypeDef> innerTypes){
@@ -1154,7 +1154,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public TypeDefFluent.InnerTypesNested<A> editMatchingInnerType(Predicate<TypeDefBuilder> predicate){
             int index = -1;
             for (int i=0;i<innerTypes.size();i++) { 
-            if (predicate.apply(innerTypes.get(i))) {index = i; break;}
+            if (predicate.test(innerTypes.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching innerTypes. No match found.");
             return setNewInnerTypeLike(index, buildInnerType(index));

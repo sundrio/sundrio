@@ -17,7 +17,7 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
+import java.util.function.Predicate;
 import io.sundr.builder.VisitableBuilder;
 
 import java.util.ArrayList;
@@ -98,11 +98,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public String getMatchingComment(Predicate<String> predicate){
-            for (String item: comments) { if(predicate.apply(item)){return item;} } return null;
+            for (String item: comments) { if(predicate.test(item)){return item;} } return null;
     }
 
     public Boolean hasMatchingComment(Predicate<String> predicate){
-            for (String item: comments) { if(predicate.apply(item)){return true;} } return false;
+            for (String item: comments) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withComments(List<String> comments){
@@ -188,11 +188,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return item.build();} } return null;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){return true;} } return false;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
@@ -240,7 +240,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     public MethodFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
             int index = -1;
             for (int i=0;i<annotations.size();i++) { 
-            if (predicate.apply(annotations.get(i))) {index = i; break;}
+            if (predicate.test(annotations.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching annotations. No match found.");
             return setNewAnnotationLike(index, buildAnnotation(index));
@@ -303,11 +303,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public TypeParamDef buildMatchingParameter(Predicate<TypeParamDefBuilder> predicate){
-            for (TypeParamDefBuilder item: parameters) { if(predicate.apply(item)){return item.build();} } return null;
+            for (TypeParamDefBuilder item: parameters) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate){
-            for (TypeParamDefBuilder item: parameters) { if(predicate.apply(item)){return true;} } return false;
+            for (TypeParamDefBuilder item: parameters) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withParameters(List<TypeParamDef> parameters){
@@ -355,7 +355,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     public MethodFluent.ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate){
             int index = -1;
             for (int i=0;i<parameters.size();i++) { 
-            if (predicate.apply(parameters.get(i))) {index = i; break;}
+            if (predicate.test(parameters.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching parameters. No match found.");
             return setNewParameterLike(index, buildParameter(index));
@@ -534,11 +534,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public Property buildMatchingArgument(Predicate<PropertyBuilder> predicate){
-            for (PropertyBuilder item: arguments) { if(predicate.apply(item)){return item.build();} } return null;
+            for (PropertyBuilder item: arguments) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingArgument(Predicate<PropertyBuilder> predicate){
-            for (PropertyBuilder item: arguments) { if(predicate.apply(item)){return true;} } return false;
+            for (PropertyBuilder item: arguments) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withArguments(List<Property> arguments){
@@ -586,7 +586,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     public MethodFluent.ArgumentsNested<A> editMatchingArgument(Predicate<PropertyBuilder> predicate){
             int index = -1;
             for (int i=0;i<arguments.size();i++) { 
-            if (predicate.apply(arguments.get(i))) {index = i; break;}
+            if (predicate.test(arguments.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching arguments. No match found.");
             return setNewArgumentLike(index, buildArgument(index));
@@ -661,11 +661,11 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     }
 
     public ClassRef buildMatchingException(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: exceptions) { if(predicate.apply(item)){return item.build();} } return null;
+            for (ClassRefBuilder item: exceptions) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingException(Predicate<ClassRefBuilder> predicate){
-            for (ClassRefBuilder item: exceptions) { if(predicate.apply(item)){return true;} } return false;
+            for (ClassRefBuilder item: exceptions) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withExceptions(List<ClassRef> exceptions){
@@ -713,7 +713,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     public MethodFluent.ExceptionsNested<A> editMatchingException(Predicate<ClassRefBuilder> predicate){
             int index = -1;
             for (int i=0;i<exceptions.size();i++) { 
-            if (predicate.apply(exceptions.get(i))) {index = i; break;}
+            if (predicate.test(exceptions.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching exceptions. No match found.");
             return setNewExceptionLike(index, buildException(index));

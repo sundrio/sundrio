@@ -1,20 +1,10 @@
 package io.sundr.codegen.model;
 
-import java.lang.Enum;
-import io.sundr.builder.VisitableBuilder;
-import java.lang.StringBuilder;
-import io.sundr.builder.Nested;
-import java.util.ArrayList;
-import java.lang.String;
-import io.sundr.builder.Predicate;
-import java.lang.Deprecated;
-import java.util.Iterator;
-import java.util.List;
-import java.lang.Boolean;
-import java.lang.StringBuffer;
 import java.util.Collection;
-import java.lang.Object;
-import java.util.Map;
+import java.util.List;
+import java.util.function.Predicate;
+
+import io.sundr.builder.Nested;
 
 public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupportFluent<A>{
 

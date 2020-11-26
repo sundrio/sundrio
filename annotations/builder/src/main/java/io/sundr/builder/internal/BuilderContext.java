@@ -32,6 +32,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import java.util.ArrayList;
+import java.util.function.Predicate;
 
 import static io.sundr.builder.Constants.INLINEABLE;
 
@@ -41,8 +42,6 @@ public class BuilderContext {
     private final Types types;
     private final CodegenContext codegenContext;
 
-    private final TypeDef predicateClass;
-    private final TypeDef functionInterface;
     private final TypeDef visitorInterface;
     private final TypeDef typedVisitorInterface;
     private final TypeDef pathAwareVisitorClass;
@@ -79,14 +78,6 @@ public class BuilderContext {
         DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(ArrayList.class));
         DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(Iterable.class));
 
-
-        predicateClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Predicate.java"))
-                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-                .build();
-
-        functionInterface  = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Function.java"))
-                .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-                .build();
 
         visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
                 .accept(new ReplacePackage("io.sundr.builder", builderPackage))
@@ -188,21 +179,12 @@ public class BuilderContext {
         return builderPackage;
     }
 
-
-    public TypeDef getPredicateClass() {
-        return predicateClass;
-    }
-
     public TypeDef getBaseFluentClass() {
         return baseFluentClass;
     }
 
     public TypeDef getFluentInterface() {
         return fluentInterface;
-    }
-
-    public TypeDef getFunctionInterface() {
-        return functionInterface;
     }
 
     public TypeDef getBuilderInterface() {
