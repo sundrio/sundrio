@@ -35,5 +35,7 @@ public @interface ExternalBuildables {
     String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
     BuildableReference[] refs() default {};
     String[] value() default {};
+    String[] includes() default {};
+    String[] excludes() default {};
     Inline[] inline() default {};
 }
