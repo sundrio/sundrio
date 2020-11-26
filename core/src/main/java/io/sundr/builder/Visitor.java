@@ -16,7 +16,9 @@
 
 package io.sundr.builder;
 
-public interface Visitor<T> {
+@FunctionalInterface
+public interface Visitor<T>  {
 
     void visit(T element);
+
 }

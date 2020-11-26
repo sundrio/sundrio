@@ -18,5 +18,7 @@ package io.sundr.builder;
 
 public interface Visitable<T> {
 
-    T accept(Visitor visitor);
+   <V> T accept(Visitor<V> visitor);
+
+   <V> T accept(Class<V> type, Visitor<V> visitor);
 }
