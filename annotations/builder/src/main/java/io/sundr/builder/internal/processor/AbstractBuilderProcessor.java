@@ -65,14 +65,6 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
             try {
                 if (context.getGenerateBuilderPackage() && !Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getBuilderPackage())) {
 
-                    generateFromResources(context.getFluentInterface(),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                    );
-
-                    generateFromResources(context.getPredicateClass(),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                    );
-
                     generateFromResources(context.getVisitableInterface(),
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
@@ -112,9 +104,6 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
                     );
 
-                    generateFromResources(context.getFunctionInterface(),
-                            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION
-                    );
                 }
 
                 if (context.isValidationEnabled() &&  !classExists(context.getBuilderPackage() + ".ValidationUtils") ) {
@@ -156,7 +145,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
                 .withMethods()
                 .withConstructors().build();
 
-        TypeRef functionType = ctx.getFunctionInterface().toReference(type.toInternalReference(), returnType.toInternalReference());
+        TypeRef functionType = Constants.FUNCTION.toReference(type.toInternalReference(), returnType.toInternalReference());
 
         Property builderProperty = new PropertyBuilder()
                 .withTypeRef(TypeAs.BUILDER.apply(type).toInternalReference())

@@ -68,6 +68,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static io.sundr.codegen.utils.ModelUtils.getClassName;
@@ -83,18 +84,16 @@ public class ElementTo {
     private static final String EMPTY = "";
     private static final String NEWLINE_PATTERN = "\r|\n";
 
-    private static final Function<TypeMirror, Boolean> IS_JAVA_TYPE_MIRROR = new Function<TypeMirror, Boolean>() {
-
-        public Boolean apply(TypeMirror item) {
+    private static final Predicate<TypeMirror> IS_JAVA_TYPE_MIRROR = new Predicate<TypeMirror>() {
+        public boolean test(TypeMirror item) {
             String fqn = item.toString();
             return fqn.startsWith(JAVA_PEFIX) || fqn.startsWith(JAVAX_PEFIX) || fqn.startsWith(COM_SUN_PREFIX);
         }
     };
 
 
-    private static final Function<TypeElement, Boolean> IS_JAVA_ELEMENT = new Function<TypeElement, Boolean>() {
-
-        public Boolean apply(TypeElement item) {
+    private static final Predicate<TypeElement> IS_JAVA_ELEMENT = new Predicate<TypeElement>() {
+        public boolean test(TypeElement item) {
             String fqn = item.toString();
             return fqn.startsWith(JAVA_PEFIX) || fqn.startsWith(JAVAX_PEFIX) || fqn.startsWith(COM_SUN_PREFIX);
         }

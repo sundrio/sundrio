@@ -17,7 +17,7 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
+import java.util.function.Predicate;
 import io.sundr.builder.VisitableBuilder;
 
 import java.util.ArrayList;
@@ -231,11 +231,11 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     }
 
     public TypeRef buildMatchingArgument(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
-            for (VisitableBuilder<? extends TypeRef,?> item: arguments) { if(predicate.apply(item)){return item.build();} } return null;
+            for (VisitableBuilder<? extends TypeRef,?> item: arguments) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingArgument(Predicate<VisitableBuilder<? extends TypeRef,?>> predicate){
-            for (VisitableBuilder<? extends TypeRef,?> item: arguments) { if(predicate.apply(item)){return true;} } return false;
+            for (VisitableBuilder<? extends TypeRef,?> item: arguments) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withArguments(List<TypeRef> arguments){

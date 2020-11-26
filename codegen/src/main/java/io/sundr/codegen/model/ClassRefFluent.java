@@ -17,11 +17,11 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
 import io.sundr.builder.VisitableBuilder;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 public interface ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A>{
 

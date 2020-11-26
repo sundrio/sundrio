@@ -18,11 +18,11 @@ package io.sundr.codegen.model;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import io.sundr.builder.Builder;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
 
 public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A>{
 

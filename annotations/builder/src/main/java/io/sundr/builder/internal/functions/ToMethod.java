@@ -175,9 +175,9 @@ class ToMethod {
 
         private Statement statement(Property property, TypeRef builderRef) {
             if (match != null && nonMatch != null) {
-                return new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.apply(item)){ return " + match + ";} } return " + nonMatch + ";");
+                return new StringStatement("for (" + builderRef + " item: " + property.getName() + ") { if(predicate.test(item)){ return " + match + ";} } return " + nonMatch + ";");
             } else {
-                return new StringStatement("return " + property.getName() + ".removeIf(item -> predicate.apply(item));");
+                return new StringStatement("return " + property.getName() + ".removeIf(item -> predicate.test(item));");
             }
         }
 
@@ -367,7 +367,7 @@ class ToMethod {
         List<Method> methods = new ArrayList<>();
         TypeRef unwrapped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
 
-        TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
+        TypeDef predicate = Constants.PREDICATE;
         String getterName = Getter.name(property);
         String builderName = "build" + property.getNameCapitalized();
         List<AnnotationRef> annotations = new ArrayList<>();
@@ -461,7 +461,7 @@ class ToMethod {
         String getterName = Getter.name(property);
         String builderName = "build" + property.getNameCapitalized();
         TypeRef unwrapped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(property.getTypeRef());
-        TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
+        TypeDef predicate = Constants.PREDICATE;
 
         TypeRef type = property.getTypeRef();
         Boolean isBuildable = isBuildable(type);
@@ -834,7 +834,6 @@ class ToMethod {
 
             if (isBuildable(unwrapped)) {
             if (TypeUtils.isConcrete(unwrapped) && !property.hasAttribute(DESCENDANT_OF))  {
-                TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
                 TypeRef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition()).toInternalReference();
                 alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
                 alsoImport.add((ClassRef) builderType);
@@ -846,7 +845,7 @@ class ToMethod {
                         .withName(removeMatchingMethodName)
                         .addNewArgument()
                         .withName("predicate")
-                        .withTypeRef(predicate.toReference(builder))
+                        .withTypeRef(Constants.PREDICATE.toReference(builder))
                         .endArgument()
                         .withNewBlock()
                         .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
@@ -854,7 +853,7 @@ class ToMethod {
                         .addNewStringStatementStatement("final List visitables = _visitables.get(\"" + propertyName + "\");")
                         .addNewStringStatementStatement("while (each.hasNext()) {")
                         .addNewStringStatementStatement("  " + builder + " builder = each.next();")
-                        .addNewStringStatementStatement("  if (predicate.apply(builder)) {")
+                        .addNewStringStatementStatement("  if (predicate.test(builder)) {")
                         .addNewStringStatementStatement("    visitables.remove(builder);")
                         .addNewStringStatementStatement("    each.remove();")
                         .addNewStringStatementStatement("  }")
@@ -864,7 +863,6 @@ class ToMethod {
                         .build());
             } else {
                 ClassRef fluentType = FLUENT_REF.apply(((ClassRef)unwrapped).getDefinition());
-                TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
                 if (property.hasAttribute(DESCENDANT_OF)) {
                     builderType = VISITABLE_BUILDER.apply(property.getAttribute(DESCENDANT_OF).getTypeRef());
                 }
@@ -879,7 +877,7 @@ class ToMethod {
                         .withName(removeMatchingMethodName)
                         .addNewArgument()
                         .withName("predicate")
-                        .withTypeRef(predicate.toReference(builderType))
+                        .withTypeRef(Constants.PREDICATE.toReference(builderType))
                         .endArgument()
                         .withNewBlock()
                         .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
@@ -887,7 +885,7 @@ class ToMethod {
                         .addNewStringStatementStatement("final List visitables = _visitables.get(\"" + propertyName + "\");")
                         .addNewStringStatementStatement("while (each.hasNext()) {")
                         .addNewStringStatementStatement("  " + builderType + " builder = each.next();")
-                        .addNewStringStatementStatement("  if (predicate.apply(builder)) {")
+                        .addNewStringStatementStatement("  if (predicate.test(builder)) {")
                         .addNewStringStatementStatement("    visitables.remove(builder);")
                         .addNewStringStatementStatement("    each.remove();")
                         .addNewStringStatementStatement("  }")
@@ -1355,7 +1353,6 @@ class ToMethod {
         }
         ClassRef unwrapped = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
         TypeRef builderRef = BuilderUtils.buildableRef(unwrapped);
-        TypeDef predicate = typeGenericOf(BuilderContextManager.getContext().getPredicateClass(), T);
 
         //Let's reload the class from the repository if available....
         TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition((unwrapped).getDefinition().getFullyQualifiedName());
@@ -1431,13 +1428,13 @@ class ToMethod {
                     .withName("editMatching" + suffix)
                     .addNewArgument()
                     .withName("predicate")
-                    .withTypeRef(predicate.toReference(builderRef))
+                    .withTypeRef(Constants.PREDICATE.toReference(builderRef))
                     .endArgument()
                     .editBlock()
                     .withStatements(
                             new StringStatement("int index = -1;"),
                             new StringStatement("for (int i=0;i<" + property.getName() + ".size();i++) { "),
-                            new StringStatement("if (predicate.apply(" + property.getName() + ".get(i))) {index = i; break;}"),
+                            new StringStatement("if (predicate.test(" + property.getName() + ".get(i))) {index = i; break;}"),
                             new StringStatement("} "),
                             new StringStatement("if (index < 0) throw new RuntimeException(\"Can't edit matching " + property.getName() + ". No match found.\");"),
                             new StringStatement("return setNew" + suffix + "Like(index, build" + suffix + "(index));"))

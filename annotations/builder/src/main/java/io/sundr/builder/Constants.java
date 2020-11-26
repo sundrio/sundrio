@@ -19,6 +19,8 @@ package io.sundr.builder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import io.sundr.builder.annotations.Buildable;
@@ -80,13 +82,12 @@ public class Constants {
 
     public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(io.sundr.codegen.Constants.INT_REF).build();
 
-    public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), io.sundr.codegen.Constants.T);
-
     public static final TypeDef BUILDER = typeGenericOf(TYPEDEF.apply(Builder.class), io.sundr.codegen.Constants.T);
     public static final TypeDef BASE_FLUENT = typeGenericOf(TYPEDEF.apply(BaseFluent.class), io.sundr.codegen.Constants.T);
     public static final TypeDef EDITABLE = typeGenericOf(TYPEDEF.apply(Editable.class), io.sundr.codegen.Constants.T);
     public static final TypeDef FLUENT = typeGenericOf(TYPEDEF.apply(Fluent.class), io.sundr.codegen.Constants.T);
     public static final TypeDef FUNCTION = typeGenericOf(TYPEDEF.apply(Function.class), io.sundr.codegen.Constants.I, io.sundr.codegen.Constants.O);
+    public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), io.sundr.codegen.Constants.T);
     public static final TypeDef INLINEABLE = typeGenericOf(TYPEDEF.apply(Inlineable.class), io.sundr.codegen.Constants.T);
     public static final TypeDef NESTED = typeGenericOf(TYPEDEF.apply(Nested.class), io.sundr.codegen.Constants.N);
     public static final TypeDef VISITOR = typeGenericOf(TYPEDEF.apply(Visitor.class), io.sundr.codegen.Constants.V);

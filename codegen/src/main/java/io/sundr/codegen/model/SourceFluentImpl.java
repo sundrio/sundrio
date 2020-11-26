@@ -19,11 +19,11 @@ package io.sundr.codegen.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Builder;
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
 import io.sundr.builder.VisitableBuilder;
 
 public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> implements SourceFluent<A>{
@@ -87,7 +87,7 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     }
 
     public TypeDef buildMatchingType(Predicate<Builder<? extends TypeDef>> predicate){
-            for (Builder<? extends TypeDef> item: types) { if(predicate.apply(item)){return item.build();} } return null;
+            for (Builder<? extends TypeDef> item: types) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public A withTypes(List<TypeDef> types){

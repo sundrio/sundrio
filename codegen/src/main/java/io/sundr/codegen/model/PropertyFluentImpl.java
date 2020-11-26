@@ -3,7 +3,7 @@ package io.sundr.codegen.model;
 import io.sundr.builder.VisitableBuilder;
 import java.util.ArrayList;
 import java.lang.String;
-import io.sundr.builder.Predicate;
+import java.util.function.Predicate;
 import java.util.List;
 import java.lang.Boolean;
 import java.util.Collection;
@@ -69,7 +69,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
             final List visitables = _visitables.get("annotations");
             while (each.hasNext()) {
               AnnotationRefBuilder builder = each.next();
-              if (predicate.apply(builder)) {
+              if (predicate.test(builder)) {
                 visitables.remove(builder);
                 each.remove();
               }
@@ -103,11 +103,11 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){ return item.build();} } return null;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.test(item)){ return item.build();} } return null;
     }
 
     public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
-            for (AnnotationRefBuilder item: annotations) { if(predicate.apply(item)){ return true;} } return false;
+            for (AnnotationRefBuilder item: annotations) { if(predicate.test(item)){ return true;} } return false;
     }
 
     public A withAnnotations(List<AnnotationRef> annotations){
@@ -155,7 +155,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     public PropertyFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate){
             int index = -1;
             for (int i=0;i<annotations.size();i++) { 
-            if (predicate.apply(annotations.get(i))) {index = i; break;}
+            if (predicate.test(annotations.get(i))) {index = i; break;}
             } 
             if (index < 0) throw new RuntimeException("Can't edit matching annotations. No match found.");
             return setNewAnnotationLike(index, buildAnnotation(index));
@@ -323,11 +323,11 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
 
     public String getMatchingComment(Predicate<String> predicate){
-            for (String item: comments) { if(predicate.apply(item)){ return item;} } return null;
+            for (String item: comments) { if(predicate.test(item)){ return item;} } return null;
     }
 
     public Boolean hasMatchingComment(Predicate<String> predicate){
-            for (String item: comments) { if(predicate.apply(item)){ return true;} } return false;
+            for (String item: comments) { if(predicate.test(item)){ return true;} } return false;
     }
 
     public A withComments(List<String> comments){

@@ -18,7 +18,7 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
+import java.util.function.Predicate;
 import io.sundr.builder.VisitableBuilder;
 
 import java.util.ArrayList;
@@ -120,11 +120,11 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     }
 
     public Statement buildMatchingStatement(Predicate<VisitableBuilder<? extends Statement,?>> predicate){
-            for (VisitableBuilder<? extends Statement,?> item: statements) { if(predicate.apply(item)){return item.build();} } return null;
+            for (VisitableBuilder<? extends Statement,?> item: statements) { if(predicate.test(item)){return item.build();} } return null;
     }
 
     public Boolean hasMatchingStatement(Predicate<VisitableBuilder<? extends Statement,?>> predicate){
-            for (VisitableBuilder<? extends Statement,?> item: statements) { if(predicate.apply(item)){return true;} } return false;
+            for (VisitableBuilder<? extends Statement,?> item: statements) { if(predicate.test(item)){return true;} } return false;
     }
 
     public A withStatements(List<Statement> statements){

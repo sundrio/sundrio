@@ -17,10 +17,10 @@
 package io.sundr.codegen.model;
 
 import io.sundr.builder.Nested;
-import io.sundr.builder.Predicate;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends AttributeSupportFluent<A>{
 

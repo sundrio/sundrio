@@ -20,13 +20,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.Predicate;
 
 public class FunctionFactory<X,Y> implements Function<X,Y> {
 
     private final Map<X,Y> cache;
     private final Function<X,Y> function;
     private final Function<X,Y> fallback;
-    private final Function<X, Boolean> fallbackPredicate;
+    private final Predicate<X> fallbackPredicate;
     private final int maximumRecursionLevel;
     private final int maximumNestingDepth;
 
@@ -34,7 +35,7 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
     private final Stack<X> ownStack;
     private static final Stack globalStack = new Stack();
 
-    public FunctionFactory(Map<X, Y> cache, Function<X, Y> function, Function<X, Y> fallback, Function<X, Boolean> fallbackPredicate, int maximumRecursionLevel, int maximumNestingDepth, Stack<X> ownStack) {
+    public FunctionFactory(Map<X, Y> cache, Function<X, Y> function, Function<X, Y> fallback, Predicate<X> fallbackPredicate, int maximumRecursionLevel, int maximumNestingDepth, Stack<X> ownStack) {
         this.cache = cache;
         this.function = function;
         this.fallback = fallback;
@@ -57,7 +58,7 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
                     int nestingDepth = globalStack.size();
                     boolean recursionLevelExceeded = recursionLevel > maximumRecursionLevel && maximumRecursionLevel > 0;
                     boolean nestringDeptExceeded =nestingDepth > maximumNestingDepth && maximumNestingDepth > 0;
-                    boolean predicateMatched = fallbackPredicate != null && fallbackPredicate.apply(item);
+                    boolean predicateMatched = fallbackPredicate != null && fallbackPredicate.test(item);
                     if ((recursionLevelExceeded || nestringDeptExceeded || predicateMatched) && fallback != null) {
                         result = fallback.apply(item);
                     }  else {
@@ -100,7 +101,7 @@ public class FunctionFactory<X,Y> implements Function<X,Y> {
         return new FunctionFactory<X, Y>(cache, function, fallback, fallbackPredicate, maximumRecursionLevel, maximumNestingDepth, ownStack);
     }
 
-    public FunctionFactory<X,Y> withFallbackPredicate(Function<X,Boolean> fallbackPredicate) {
+    public FunctionFactory<X,Y> withFallbackPredicate(Predicate<X> fallbackPredicate) {
         return new FunctionFactory<X, Y>(cache, function, fallback, fallbackPredicate, maximumRecursionLevel, maximumNestingDepth, ownStack);
     }
 }
