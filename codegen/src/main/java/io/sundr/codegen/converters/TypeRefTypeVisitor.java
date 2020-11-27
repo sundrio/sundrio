@@ -41,7 +41,7 @@ public class TypeRefTypeVisitor extends AbstractTypeVisitor6<TypeRef, Integer> {
 
     public TypeRef visitPrimitive(PrimitiveType t, Integer dimension) {
         return new PrimitiveRefBuilder()
-                .withName(t.toString())
+                .withName(t.getKind().name().toLowerCase())
                 .withDimensions(dimension)
                 .build();
     }
