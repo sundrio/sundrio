@@ -321,6 +321,7 @@ public class ClassTo {
 
             methods.add(new MethodBuilder()
                     .withName(method.getName())
+                    .withDefaultMethod(method.isDefault())
                     .withModifiers(method.getModifiers())
                     .withReturnType(TYPEREF.apply(method.getReturnType()))
                     .withArguments(arguments)
