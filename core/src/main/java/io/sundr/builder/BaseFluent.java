@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Arrays;
 
 public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> {
 
@@ -132,12 +133,12 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
         return false;
     }
 
-    public F accept(Visitor visitor) {
-        if (visitor instanceof PathAwareTypedVisitor) {
-            return acceptPathAware((PathAwareTypedVisitor) visitor);
-        } else {
-            return acceptInternal(visitor);
-        }
+    public F accept(Visitor... visitors) {
+      if (isPathAwareVisitorArray(visitors)) {
+        return acceptPathAware(asPathAwareVisitorArray(visitors));
+      } else {
+        return acceptInternal(visitors);
+      }
     }
 
   @Override
@@ -155,20 +156,32 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     });
   }
 
-    private F acceptInternal(Visitor visitor) {
+    private F acceptInternal(Visitor... visitors) {
+      for (Visitor visitor : visitors) {
         for (Visitable visitable : _visitables) {
-            visitable.accept(visitor);
+          visitable.accept(visitor);
         }
 
         if (canVisit(visitor, this)) {
-            visitor.visit(this);
+          visitor.visit(this);
         }
-        return (F) this;
+      }
+      return (F) this;
     }
 
 
-    private F acceptPathAware(PathAwareTypedVisitor pathAwareTypedVisitor) {
-        return acceptInternal(pathAwareTypedVisitor.next(this));
+    private F acceptPathAware(PathAwareTypedVisitor...  pathAwareTypedVisitors) {
+      return acceptInternal(Arrays.stream(pathAwareTypedVisitors).map(p -> p.next(this)).toArray(size -> new PathAwareTypedVisitor[size]));
     }
 
+
+  private static boolean isPathAwareVisitorArray(Visitor... visitors) {
+    return !Arrays.stream(visitors).filter(v -> !(v instanceof PathAwareTypedVisitor)).findAny().isPresent();
+  }
+
+  private static PathAwareTypedVisitor[] asPathAwareVisitorArray(Visitor... visitors) {
+    return Arrays.stream(visitors).filter(v -> v instanceof PathAwareTypedVisitor)
+      .map(v -> (PathAwareTypedVisitor)v)
+      .toArray(size -> new PathAwareTypedVisitor[size]);
+  }
 }
