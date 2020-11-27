@@ -29,6 +29,8 @@ import static io.sundr.codegen.utils.StringUtils.join;
 
 public class Method extends ModifierSupport {
 
+    public static final String DEFAULT = "default";
+
     private final List<String> comments;
     private final List<AnnotationRef> annotations;
     private final List<TypeParamDef> parameters;
@@ -37,9 +39,10 @@ public class Method extends ModifierSupport {
     private final List<Property> arguments;
     private final boolean varArgPreferred;
     private final List<ClassRef> exceptions;
+    private final boolean defaultMethod;
     private final Block block;
 
-    public Method(List<String> comments, List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<AttributeKey, Object> attributes) {
+  public Method(List<String> comments, List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, boolean defaultMethod, Block block, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.comments = comments != null ? comments : Collections.<String>emptyList();
         this.annotations = annotations;
@@ -49,6 +52,7 @@ public class Method extends ModifierSupport {
         this.arguments = arguments;
         this.varArgPreferred = varArgPreferred;
         this.exceptions = exceptions;
+        this.defaultMethod = defaultMethod;
         this.block = block;
     }
 
@@ -83,6 +87,10 @@ public class Method extends ModifierSupport {
 
     public List<ClassRef> getExceptions() {
         return exceptions;
+    }
+
+    public boolean isDefaultMethod() {
+      return this.defaultMethod;
     }
 
     public Block getBlock() {
@@ -178,6 +186,8 @@ public class Method extends ModifierSupport {
             sb.append(PROTECTED).append(SPACE);
         } else if (isPrivate()) {
             sb.append(PRIVATE).append(SPACE);
+        } else if (isDefaultMethod()) {
+            sb.append(DEFAULT).append(SPACE);
         }
 
         if (isSynchronized()) {

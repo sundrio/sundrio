@@ -65,14 +65,15 @@ public class MethodDirective extends Directive {
                 }
             }
         }
-        writeMethod(writer, method, block, isInterface);
+        boolean hasBody = !method.isAbstract() && (!isInterface || method.isDefaultMethod());
+        writeMethod(writer, method, block, hasBody);
         return true;
     }
 
-    private void writeMethod(Writer writer, Method method, String block, Boolean isInterface) throws IOException {
+    private void writeMethod(Writer writer, Method method, String block, Boolean hasBody) throws IOException {
         if (method != null) {
             writer.append(method.toString());
-            if (!method.isAbstract() && !isInterface) {
+            if (hasBody) {
                 writer.append(block);
             } else {
                 writer.append(";");

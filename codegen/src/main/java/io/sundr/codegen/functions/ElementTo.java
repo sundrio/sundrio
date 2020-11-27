@@ -190,9 +190,11 @@ public class ElementTo {
              List<String> commentList = StringUtils.isNullOrEmpty(comments) ? new ArrayList<>() : Arrays.stream(comments.split(NEWLINE_PATTERN)).map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toList());
              MethodBuilder methodBuilder = new MethodBuilder()
                      .withComments(commentList)
+                     .withDefaultMethod(executableElement.isDefault())
                      .withModifiers(TypeUtils.modifiersToInt(executableElement.getModifiers()))
                      .withName(executableElement.getSimpleName().toString())
                      .withReturnType(MIRROR_TO_TYPEREF.apply(executableElement.getReturnType()))
+                     .withVarArgPreferred(executableElement.isVarArgs())
                      .withAttributes(attributes);
 
 

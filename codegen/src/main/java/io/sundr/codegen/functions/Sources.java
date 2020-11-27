@@ -410,8 +410,8 @@ public class Sources {
 
                         TypeRef returnType = checkAgainstTypeParamRef(TYPEREF.apply(methodDeclaration.getType()), parameters);
                         methods.add(new MethodBuilder()
-
                                 .withName(methodDeclaration.getName())
+                                .withDefaultMethod(methodDeclaration.isDefault())
                                 .withModifiers(methodDeclaration.getModifiers())
                                 .withParameters(typeParamDefs)
                                 .withVarArgPreferred(preferVarArg)

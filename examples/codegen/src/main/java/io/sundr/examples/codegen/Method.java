@@ -1,17 +1,17 @@
 /*
- *      Copyright 2019 The original authors.
+ * Copyright 2016 The original authors.
  *
- *      Licensed under the Apache License, Version 2.0 (the "License");
- *      you may not use this file except in compliance with the License.
- *      You may obtain a copy of the License at
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- *          http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- *      Unless required by applicable law or agreed to in writing, software
- *      distributed under the License is distributed on an "AS IS" BASIS,
- *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *      See the License for the specific language governing permissions and
- *      limitations under the License.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package io.sundr.examples.codegen;
@@ -31,6 +31,8 @@ import static io.sundr.codegen.utils.StringUtils.join;
 @Buildable(lazyCollectionInitEnabled=false)
 public class Method extends ModifierSupport {
 
+    public static final String DEFAULT = "default";
+
     private final List<String> comments;
     private final List<AnnotationRef> annotations;
     private final List<TypeParamDef> parameters;
@@ -39,9 +41,10 @@ public class Method extends ModifierSupport {
     private final List<Property> arguments;
     private final boolean varArgPreferred;
     private final List<ClassRef> exceptions;
+    private final boolean defaultMethod;
     private final Block block;
 
-    public Method(List<String> comments, List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, Block block, int modifiers, Map<AttributeKey, Object> attributes) {
+  public Method(List<String> comments, List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name, TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, boolean defaultMethod, Block block, int modifiers, Map<AttributeKey, Object> attributes) {
         super(modifiers, attributes);
         this.comments = comments != null ? comments : Collections.<String>emptyList();
         this.annotations = annotations;
@@ -51,6 +54,7 @@ public class Method extends ModifierSupport {
         this.arguments = arguments;
         this.varArgPreferred = varArgPreferred;
         this.exceptions = exceptions;
+        this.defaultMethod = defaultMethod;
         this.block = block;
     }
 
@@ -85,6 +89,10 @@ public class Method extends ModifierSupport {
 
     public List<ClassRef> getExceptions() {
         return exceptions;
+    }
+
+    public boolean isDefaultMethod() {
+      return this.defaultMethod;
     }
 
     public Block getBlock() {
@@ -180,6 +188,8 @@ public class Method extends ModifierSupport {
             sb.append(PROTECTED).append(SPACE);
         } else if (isPrivate()) {
             sb.append(PRIVATE).append(SPACE);
+        } else if (isDefaultMethod()) {
+            sb.append(DEFAULT).append(SPACE);
         }
 
         if (isSynchronized()) {
