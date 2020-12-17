@@ -41,7 +41,7 @@ public class BuilderContextManager {
             if (!packageName.equals(context.getBuilderPackage())) {
                 throw new IllegalStateException("Cannot use different builder package names in a single project. Used:"
                         + packageName + " but package:"
-                        + context.getGenerateBuilderPackage() + " already exists.");
+                        + context.getBuilderPackage() + " already exists.");
             } else if (!generateBuilderPackage.equals(context.getGenerateBuilderPackage())) {
                 throw new IllegalStateException("Cannot use different values for generate builder package in a single project.");
             } else {
