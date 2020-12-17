@@ -463,6 +463,24 @@ public class BuilderUtils {
         return isAbstract(unwrapped) || unwrapped.getDefinition().getKind() == Kind.INTERFACE ? TypeAs.VISITABLE_BUILDER.apply(unwrapped) : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
     }
 
+    public static Property arrayAsList(Property property) {
+        TypeRef typeRef = property.getTypeRef();
+        TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
+        ClassRef listRef = Collections.ARRAY_LIST.toReference(BOXED_OF.apply(unwrapped));
+        
+        if (TypeUtils.isPrimitive(unwrapped)) {
+          return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(BOXED_OF.apply(unwrapped)))
+            .addToAttributes(LAZY_INIT, " new " + listRef + "()")
+            .addToAttributes(INIT , property.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && property.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED) ? null : " new " + listRef +  "()" )
+            .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef))
+            .build();
+        }
+
+        return new PropertyBuilder(property)
+          .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(unwrapped)))
+          .build();
+    }
+
     public static Property buildableField(Property property) {
         TypeRef typeRef = property.getTypeRef();
         ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
