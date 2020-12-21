@@ -210,7 +210,7 @@ public class TypeAs {
     //TODO: Need a home for: .withDefaultImplementation(Constants.ARRAY_LIST)
     private static final Function<TypeRef, TypeRef> LIST_OF = FunctionFactory.cache(Collections.LIST::toReference);
 
-    static final Function<TypeRef, TypeRef> ARRAY_AS_LIST = FunctionFactory.cache(item -> LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item)));
+    public static final Function<TypeRef, TypeRef> ARRAY_AS_LIST = FunctionFactory.cache(item -> LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item)));
 
     public static final Function<TypeRef, TypeRef> UNWRAP_COLLECTION_OF = type -> {
         if (type instanceof ClassRef) {
@@ -258,7 +258,7 @@ public class TypeAs {
         return type;
     };
 
-    static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(type -> {
+    public static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(type -> {
         int index = 0;
         for (TypeRef primitive : PRIMITIVE_TYPES) {
             if (primitive.equals(type)) {

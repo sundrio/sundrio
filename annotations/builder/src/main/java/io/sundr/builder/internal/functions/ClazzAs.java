@@ -749,15 +749,6 @@ public class ClazzAs {
 
 
     public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
-    
-    private static Property arrayAsList(Property property) {
-        TypeRef unwrapped = TypeAs.UNWRAP_ARRAY_OF.apply(property.getTypeRef());
-        return new PropertyBuilder(property)
-                .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(unwrapped)))
-                .build();
-    }
-
-
     private static String staticAdapterBody(TypeDef pojo, TypeDef pojoBuilder, TypeDef source, boolean returnBuilder) {
         StringBuilder sb = new StringBuilder();
         sb.append("return new ").append(pojoBuilder.getName()).append("()");
