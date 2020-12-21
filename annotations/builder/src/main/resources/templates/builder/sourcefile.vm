@@ -13,22 +13,21 @@ import $i;
 #end
 #foreach ($c in ${model.constructors})
 
-    #method ($c) { 
+#method ($c, false, 1)  
 #foreach ($s in $c.block.statements)
-        $s.toString()
+$s.toString()
 #end
-    }
 
 #end
 #end
 #end
 #foreach($m in $model.methods)
 
-    #method ($m, $model.isInterface()) {
+#method ($m, $model.isInterface(), 1) 
 #foreach ($s in $m.block.statements)
-        $s.toString()
+$s.toString()
 #end
-    }
+
 #end
 #end
 #foreach($n in $model.innerTypes)
@@ -41,21 +40,21 @@ import $i;
 #end
 #foreach($c in $n.constructors)
 
-        #method ($c) {
+#method ($c, false, 3) 
 #foreach ($s in $c.block.statements)
-            $s.toString()
+$s.toString()
 #end
-        }
+        
 #end
 #end
 #end
 #foreach($m in $n.methods)
 
-        #method ($m, $n.isInterface()) {
+#method ($m, $n.isInterface(), 3) 
 #foreach ($s in $m.block.statements)
-             $s.toString()
+$s.toString()
 #end
-        }
+
 #end
 #end
     }
