@@ -325,6 +325,9 @@ public class TypeDef extends ModifierSupport {
                     definition.getPackageName().equals(packageName) ||
                     definition.getName().equals(name)) {
                 continue;
+            } else if (definition.getFullyQualifiedName().startsWith("com.ibm.jit.JITHelpers") || definition.getFullyQualifiedName().equals("java.lang.StringCompressionFlag")) {
+              // When using openj9 these imports leak into the generated code, causing issues. Let's ignore them
+              continue;
             } else {
                 imports.add(ref.getDefinition().getFullyQualifiedName());
             }
