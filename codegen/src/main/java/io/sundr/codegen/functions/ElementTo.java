@@ -57,9 +57,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.ElementFilter;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -262,23 +259,29 @@ public class ElementTo {
 
             for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
                 List<ClassRef> genericBounds = new ArrayList<ClassRef>();
-                if (!typeParameter.getBounds().isEmpty()) {
+                try {
+                  if (!typeParameter.getBounds().isEmpty()) {
                     TypeMirror bound = typeParameter.getBounds().get(0);
                     if (!OBJECT_BOUND.equals(bound.toString())) {
-                        TypeRef boundRef = MIRROR_TO_TYPEREF.apply(bound);
-                        if (boundRef instanceof ClassRef) {
-                            genericBounds.add((ClassRef) boundRef);
-                        } else {
-                            throw new IllegalStateException("Parameter bound: [" + boundRef + "] not mapped to a class ref.");
-                        }
+                      TypeRef boundRef = MIRROR_TO_TYPEREF.apply(bound);
+                      if (boundRef instanceof ClassRef) {
+                        genericBounds.add((ClassRef) boundRef);
+                      } else {
+                        throw new IllegalStateException("Parameter bound: [" + boundRef + "] not mapped to a class ref.");
+                      }
                     }
-                }
+                  }
+             
 
                 TypeParamDef genericType = new TypeParamDefBuilder().withName(typeParameter.getSimpleName().toString())
                         .withBounds(genericBounds)
                         .build();
 
                 genericTypes.add(genericType);
+
+                } catch (Exception e) {
+                  //ignore
+                }
             }
 
             String comments = CodegenContext.getContext().getElements().getDocComment(classElement);
