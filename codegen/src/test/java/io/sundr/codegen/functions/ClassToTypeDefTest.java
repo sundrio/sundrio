@@ -16,10 +16,22 @@
 
 package io.sundr.codegen.functions;
 
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
+import io.sundr.example.Address;
+import io.sundr.example.Person;
+
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ClassToTypeDefTest {
 
@@ -28,4 +40,39 @@ public class ClassToTypeDefTest {
         TypeDef def = ClassTo.TYPEDEF.apply(List.class);
         System.out.println(def);
     }
+
+    @Test
+    public void testConverterWithComplexTypes() {
+        TypeDef person = ClassTo.TYPEDEF.apply(Person.class);
+        Optional<ClassRef> personType = findClassRef(person, "type");
+        assertTrue(personType.isPresent());
+        personType.ifPresent(p -> {
+            assertEquals("io.sundr.example.Person.Type", p.getFullyQualifiedName());
+            Set<String> properties = p.getDefinition().getProperties().stream().map(Property::getName).collect(Collectors.toSet());
+            assertTrue(properties.contains("O_MINUS"));
+        });
+
+        Optional<ClassRef> addresses = findClassRef(person, "addresses");
+        assertTrue(addresses.isPresent());
+        addresses.ifPresent(l -> {
+            ClassRef address = (ClassRef) l.getArguments().get(0);
+            Optional<ClassRef> addressType = findClassRef(address.getDefinition(), "type");
+            assertFalse(address.getDefinition().getProperties().isEmpty());
+            address.getDefinition().getProperties().stream().peek(p -> {System.out.println(p.getTypeRef() + " " + p.getName());}).collect(Collectors.toList());
+            assertTrue(addressType.isPresent());
+            addressType.ifPresent(a ->  {
+                assertEquals("io.sundr.example.Address.Type", a.getFullyQualifiedName());
+                Set<String> properties = a.getDefinition().getProperties().stream().map(Property::getName).collect(Collectors.toSet());
+                assertTrue(properties.contains("WORK"));
+              });
+          });
+    }
+
+  public static Optional<ClassRef> findClassRef(TypeDef def, String propertyName) {
+    return def.getProperties().stream()
+      .filter(p -> propertyName.equals(p.getName()))
+      .filter(p -> p.getTypeRef() instanceof ClassRef)
+      .map(p -> (ClassRef) p.getTypeRef())
+      .findFirst();
+  }
 }
