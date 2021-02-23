@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ClassTo {
 
@@ -179,8 +180,10 @@ public class ClassTo {
                         .build());
             }
 
+            TypeDef declaringType = item.getDeclaringClass() != null ? TYPEDEF.apply(item.getDeclaringClass()) : null;
             return DefinitionRepository.getRepository().register(new TypeDefBuilder()
                     .withKind(kind)
+                    .withOuterType(declaringType)
                     .withName(item.getSimpleName())
                     .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
                     .withModifiers(item.getModifiers())
@@ -212,7 +215,7 @@ public class ClassTo {
         }
     };
 
-    public static final Function<Class, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF).withFallback(INTERNAL_SHALLOW_TYPEDEF).withMaximumRecursionLevel(5).withMaximumNestingDepth(5);
+    public static final Function<Class, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF).withFallback(INTERNAL_SHALLOW_TYPEDEF).withMaximumRecursionLevel(10).withMaximumNestingDepth(10);
 
     private static Function<Type, TypeParamDef> TYPEPARAMDEF = FunctionFactory.cache(new Function<Type, TypeParamDef>() {
 
@@ -242,6 +245,13 @@ public class ClassTo {
                 annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
             }
             field.getDeclaringClass();
+            // If property contains generic bounds, we need to process them too.
+            if (field.getGenericType() instanceof ParameterizedType) {
+              ParameterizedType p = (ParameterizedType) field.getGenericType();
+              Stream.of(p.getActualTypeArguments()).filter(t -> t instanceof Class)
+                .map(t -> (Class)t)
+                .forEach(a -> TYPEDEF.apply(a));
+            }
             properties.add(new PropertyBuilder()
                     .withName(field.getName())
                     .withModifiers(field.getModifiers())
