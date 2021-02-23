@@ -19,7 +19,7 @@
     <parent>
         <artifactId>tests</artifactId>
         <groupId>io.sundr</groupId>
-        <version>0.23-SNAPSHOT</version>
+        <version>0.24.3</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
