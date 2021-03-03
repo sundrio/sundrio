@@ -233,6 +233,20 @@ public final class TypeUtils {
   }
 
   /**
+   * Checks a {@link TypeRef} is an enum.
+   * 
+   * @param typeRef The type to check.
+   * @return True if its an enum type.
+   */
+  public static boolean isEnum(TypeRef typeRef) {
+    if (typeRef instanceof ClassRef) {
+      ClassRef classRef = (ClassRef) typeRef;
+      return classRef.getDefinition().isEnum();
+    }
+    return false;
+  }
+
+  /**
    * Checks a {@link TypeRef} is of an abstract type.
    * 
    * @param typeRef The type to check.
