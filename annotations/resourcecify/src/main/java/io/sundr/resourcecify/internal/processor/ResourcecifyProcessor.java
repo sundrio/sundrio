@@ -16,8 +16,6 @@
 
 package io.sundr.resourcecify.internal.processor;
 
-import com.sun.tools.javac.code.Symbol;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,82 +35,83 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 
+import com.sun.tools.javac.code.Symbol;
+
 import io.sundr.resourcecify.annotations.Resourcecify;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("io.sundr.resourcecify.annotations.Resourcecify")
 public class ResourcecifyProcessor extends AbstractProcessor {
 
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        Filer filer = processingEnv.getFiler();
+  @Override
+  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+    Filer filer = processingEnv.getFiler();
 
-        for (TypeElement typeElement : annotations) {
-            for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-                Resourcecify resourcecify = element.getAnnotation(Resourcecify.class);
-                if (resourcecify == null) {
-                    continue;
-                }
-
-                if (element instanceof Symbol.ClassSymbol) {
-                    Symbol.ClassSymbol s = (Symbol.ClassSymbol) element;
-                    try {
-                        String packageName = getPackageName(s);
-
-                        JavaFileObject source = s.sourcefile;
-                        File sourceFile = new File(source.getName()).getAbsoluteFile();
-                        String sourceFileName = sourceFile.getName();
-
-                        FileObject target = filer.createResource(StandardLocation.CLASS_OUTPUT, packageName, sourceFileName, s);
-                        copy(source, target);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-
-            }
+    for (TypeElement typeElement : annotations) {
+      for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+        Resourcecify resourcecify = element.getAnnotation(Resourcecify.class);
+        if (resourcecify == null) {
+          continue;
         }
-        return false;
-    }
 
+        if (element instanceof Symbol.ClassSymbol) {
+          Symbol.ClassSymbol s = (Symbol.ClassSymbol) element;
+          try {
+            String packageName = getPackageName(s);
 
-    //
-    //
-    // The utilities below are duplicate. We have them here so that this processor doesn't depend on any other sundrio module (avoid cyclic refs).
-    //
-    //
-    public static String getPackageName(Element element) {
-        return getPackageElement(element).getQualifiedName().toString();
-    }
+            JavaFileObject source = s.sourcefile;
+            File sourceFile = new File(source.getName()).getAbsoluteFile();
+            String sourceFileName = sourceFile.getName();
 
-    public static PackageElement getPackageElement(Element element) {
-        if (element instanceof PackageElement) {
-            return (PackageElement) element;
-        } else {
-            return getPackageElement(element.getEnclosingElement());
+            FileObject target = filer.createResource(StandardLocation.CLASS_OUTPUT, packageName, sourceFileName, s);
+            copy(source, target);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }
-    }
 
-    /**
-     * Copy one {@link FileObject} into an other.
-     * @param source    The source {@link FileObject}.
-     * @param target    The target {@link FileObject}.
-     * @throws IOException
-     */
-    public static void copy(FileObject source, FileObject target) throws IOException {
-        InputStream in = source.openInputStream();
-        OutputStream out = target.openOutputStream();
-        try {
-            byte[] buffer = new byte[1024];
-            int len = in.read(buffer);
-            while (len != -1) {
-                out.write(buffer, 0, len);
-                len = in.read(buffer);
-            }
-        } finally {
-            in.close();
-            out.close();
-        }
+      }
     }
+    return false;
+  }
+
+  //
+  //
+  // The utilities below are duplicate. We have them here so that this processor doesn't depend on any other sundrio module (avoid cyclic refs).
+  //
+  //
+  public static String getPackageName(Element element) {
+    return getPackageElement(element).getQualifiedName().toString();
+  }
+
+  public static PackageElement getPackageElement(Element element) {
+    if (element instanceof PackageElement) {
+      return (PackageElement) element;
+    } else {
+      return getPackageElement(element.getEnclosingElement());
+    }
+  }
+
+  /**
+   * Copy one {@link FileObject} into an other.
+   * 
+   * @param source The source {@link FileObject}.
+   * @param target The target {@link FileObject}.
+   * @throws IOException
+   */
+  public static void copy(FileObject source, FileObject target) throws IOException {
+    InputStream in = source.openInputStream();
+    OutputStream out = target.openOutputStream();
+    try {
+      byte[] buffer = new byte[1024];
+      int len = in.read(buffer);
+      while (len != -1) {
+        out.write(buffer, 0, len);
+        len = in.read(buffer);
+      }
+    } finally {
+      in.close();
+      out.close();
+    }
+  }
 }

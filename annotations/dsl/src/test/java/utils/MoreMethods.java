@@ -17,9 +17,12 @@
 package utils;
 
 public interface MoreMethods {
-    
-    void methodA();
-    void methodC();
-    void methodD();
-    Long methodE();
+
+  void methodA();
+
+  void methodC();
+
+  void methodD();
+
+  Long methodE();
 }

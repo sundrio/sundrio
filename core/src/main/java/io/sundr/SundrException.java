@@ -18,29 +18,29 @@ package io.sundr;
 
 public class SundrException extends RuntimeException {
 
-    public SundrException() {
-        super();
-    }
+  public SundrException() {
+    super();
+  }
 
-    public SundrException(String message) {
-        super(message);
-    }
+  public SundrException(String message) {
+    super(message);
+  }
 
-    public SundrException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public SundrException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-    public SundrException(Throwable cause) {
-        super(cause);
-    }
+  public SundrException(Throwable cause) {
+    super(cause);
+  }
 
-    public RuntimeException launderThrowable(Throwable cause) {
-        if (cause instanceof RuntimeException) {
-            return (RuntimeException) cause;
-        } else if (cause instanceof Error) {
-            throw (Error) cause;
-        } else {
-            throw new SundrException("An error has occurred.", cause);
-        }
+  public RuntimeException launderThrowable(Throwable cause) {
+    if (cause instanceof RuntimeException) {
+      return (RuntimeException) cause;
+    } else if (cause instanceof Error) {
+      throw (Error) cause;
+    } else {
+      throw new SundrException("An error has occurred.", cause);
     }
+  }
 }

@@ -20,5 +20,5 @@ import org.apache.maven.artifact.Artifact;
 
 public interface ArtifactFilter {
 
-    Artifact apply(Artifact artifact);
+  Artifact apply(Artifact artifact);
 }

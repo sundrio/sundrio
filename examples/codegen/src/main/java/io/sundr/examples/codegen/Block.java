@@ -16,20 +16,20 @@
 
 package io.sundr.examples.codegen;
 
-import io.sundr.builder.annotations.Buildable;
-
 import java.util.List;
 
-@Buildable(lazyCollectionInitEnabled=false)
+import io.sundr.builder.annotations.Buildable;
+
+@Buildable(lazyCollectionInitEnabled = false)
 public class Block {
 
-    private List<Statement> statements;
+  private List<Statement> statements;
 
-    public Block(List<Statement> statements) {
-        this.statements = statements;
-    }
+  public Block(List<Statement> statements) {
+    this.statements = statements;
+  }
 
-    public List<Statement> getStatements() {
-        return statements;
-    }
+  public List<Statement> getStatements() {
+    return statements;
+  }
 }

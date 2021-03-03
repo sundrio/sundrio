@@ -21,34 +21,33 @@ package io.sundr.builder.annotations;
  */
 public @interface Inline {
 
-    /**
-     * @return The name of the inline build method.
-     */
-    String value();
+  /**
+   * @return The name of the inline build method.
+   */
+  String value();
 
-    /**
-     * @return The prefix of the Inlinable.
-     */
-    String prefix() default "";
+  /**
+   * @return The prefix of the Inlinable.
+   */
+  String prefix() default "";
 
+  /**
+   * @return The name of the Inline builder.
+   */
+  String name() default "";
 
-    /**
-     * @return The name of the Inline builder.
-     */
-    String name() default "";
+  /**
+   * @return The suffix of the inlinable.
+   */
+  String suffix() default "";
 
-    /**
-     * @return The suffix of the inlinable.
-     */
-    String suffix() default "";
+  /**
+   * @return The type of the item to build "inline"
+   */
+  Class type();
 
-    /**
-     * @return The type of the item to build "inline"
-     */
-    Class type();
-
-    /**
-     * @return The return type of the "inline" method.
-     */
-    Class returnType() default None.class;
+  /**
+   * @return The return type of the "inline" method.
+   */
+  Class returnType() default None.class;
 }

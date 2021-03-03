@@ -18,13 +18,13 @@ package io.sundr.codegen.converters;
 
 public class ClassWithParam<T> {
 
-    private T value;
+  private T value;
 
-    public T getValue() {
-        return value;
-    }
+  public T getValue() {
+    return value;
+  }
 
-    public void setValue(T value) {
-        this.value = value;
-    }
+  public void setValue(T value) {
+    this.value = value;
+  }
 }

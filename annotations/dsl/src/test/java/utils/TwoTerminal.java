@@ -17,8 +17,8 @@
 package utils;
 
 public interface TwoTerminal {
-    
-    Integer methodA();
 
-    Long methodB();
+  Integer methodA();
+
+  Long methodB();
 }

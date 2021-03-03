@@ -16,22 +16,18 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
 import java.util.List;
 
-public class EditableBlock extends Block implements Editable<BlockBuilder>{
+import io.sundr.builder.Editable;
 
+public class EditableBlock extends Block implements Editable<BlockBuilder> {
 
-    public EditableBlock(List<Statement> statements){
-            super(statements);
-    }
+  public EditableBlock(List<Statement> statements) {
+    super(statements);
+  }
 
-    public BlockBuilder edit(){
-            return new BlockBuilder(this);
-    }
-
-
-
+  public BlockBuilder edit() {
+    return new BlockBuilder(this);
+  }
 
 }

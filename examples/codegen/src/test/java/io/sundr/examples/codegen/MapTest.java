@@ -16,63 +16,62 @@
 
 package io.sundr.examples.codegen;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class MapTest {
 
-    private final AttributeKey key1 = new AttributeKey("key1", String.class);
-    private final AttributeKey key2 = new AttributeKey("key2", String.class);
+  private final AttributeKey key1 = new AttributeKey("key1", String.class);
+  private final AttributeKey key2 = new AttributeKey("key2", String.class);
 
+  @Test
+  public void testWithMap() {
+    Map<AttributeKey, Object> map = new HashMap<>();
 
-    @Test
-    public void testWithMap() {
-        Map<AttributeKey, Object> map = new HashMap<>();
+    map.put(key1, "value1");
+    map.put(key2, "value2");
+    AttributeSupport attributeSupport = new AttributeSupportBuilder()
+        .withAttributes(map)
+        .build();
 
-        map.put(key1, "value1");
-        map.put(key2, "value2");
-        AttributeSupport attributeSupport = new AttributeSupportBuilder()
-                .withAttributes(map)
-                .build();
+    assertEquals("value1", attributeSupport.getAttributes().get(key1));
+    assertEquals("value2", attributeSupport.getAttributes().get(key2));
+  }
 
-        assertEquals("value1", attributeSupport.getAttributes().get(key1));
-        assertEquals("value2", attributeSupport.getAttributes().get(key2));
-    }
+  @Test
+  public void testAddToMap() {
+    AttributeSupport attributeSupport = new AttributeSupportBuilder()
+        .addToAttributes(key1, "value1")
+        .addToAttributes(key2, "value2")
+        .build();
 
-    @Test
-    public void testAddToMap() {
-        AttributeSupport attributeSupport = new AttributeSupportBuilder()
-                .addToAttributes(key1, "value1")
-                .addToAttributes(key2, "value2")
-                .build();
+    assertEquals("value1", attributeSupport.getAttributes().get(key1));
+    assertEquals("value2", attributeSupport.getAttributes().get(key2));
+  }
 
-        assertEquals("value1", attributeSupport.getAttributes().get(key1));
-        assertEquals("value2", attributeSupport.getAttributes().get(key2));
-    }
+  @Test
+  public void testRemoveFromMap() {
+    AttributeSupport attributeSupport = new AttributeSupportBuilder()
+        .removeFromAttributes(key1)
+        .build();
 
-    @Test
-    public void testRemoveFromMap() {
-        AttributeSupport attributeSupport = new AttributeSupportBuilder()
-                .removeFromAttributes(key1)
-                .build();
+    assertEquals(attributeSupport.getAttributes(), null);
+  }
 
-        assertEquals(attributeSupport.getAttributes(), null);
-    }
+  @Test
+  public void testRemoveMapFromMap() {
+    Map<AttributeKey, Object> map = new HashMap<>();
 
-    @Test
-    public void testRemoveMapFromMap() {
-        Map<AttributeKey, Object> map = new HashMap<>();
+    map.put(key1, "value1");
+    map.put(key2, "value2");
+    AttributeSupport attributeSupport = new AttributeSupportBuilder()
+        .removeFromAttributes(map)
+        .build();
 
-        map.put(key1, "value1");
-        map.put(key2, "value2");
-        AttributeSupport attributeSupport = new AttributeSupportBuilder()
-                .removeFromAttributes(map)
-                .build();
-
-        assertEquals(attributeSupport.getAttributes(), null);
-    }
+    assertEquals(attributeSupport.getAttributes(), null);
+  }
 }

@@ -18,30 +18,26 @@ package io.sundr.codegen.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import javax.tools.FileObject;
 
 public class IOUtils {
 
-    /**
-     * Closes multiple {@link Closeable} objects swallowing exceptions.
-     * @param cloasebales   The {@link Closeable} objects.
-     */
-    public static void closeQuietly(Closeable... cloasebales) {
-        if (cloasebales != null) {
-            for (Closeable c : cloasebales) {
-                try {
-                    if (c != null) {
-                        c.close();
-                    }
-                } catch (IOException ex) {
-                    //ignore
-                }
-            }
+  /**
+   * Closes multiple {@link Closeable} objects swallowing exceptions.
+   * 
+   * @param cloasebales The {@link Closeable} objects.
+   */
+  public static void closeQuietly(Closeable... cloasebales) {
+    if (cloasebales != null) {
+      for (Closeable c : cloasebales) {
+        try {
+          if (c != null) {
+            c.close();
+          }
+        } catch (IOException ex) {
+          //ignore
         }
+      }
     }
-
+  }
 
 }

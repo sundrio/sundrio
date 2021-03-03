@@ -19,51 +19,49 @@ package io.sundr.examples.crud;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 
-/** 
- * The address. 
+/**
+ * The address.
  */
-@VelocityTransformations(
-        {
-                @VelocityTransformation("/dao.vm"),
-                @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
-        }
-)
+@VelocityTransformations({
+    @VelocityTransformation("/dao.vm"),
+    @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
+})
 public class Address {
 
-    public String street;
-    public int number;
-    public String city;
-    public String country;
+  public String street;
+  public int number;
+  public String city;
+  public String country;
 
-    public String getStreet() {
-        return street;
-    }
+  public String getStreet() {
+    return street;
+  }
 
-    public void setStreet(String street) {
-        this.street = street;
-    }
+  public void setStreet(String street) {
+    this.street = street;
+  }
 
-    public int getNumber() {
-        return number;
-    }
+  public int getNumber() {
+    return number;
+  }
 
-    public void setNumber(int number) {
-        this.number = number;
-    }
+  public void setNumber(int number) {
+    this.number = number;
+  }
 
-    public String getCity() {
-        return city;
-    }
+  public String getCity() {
+    return city;
+  }
 
-    public void setCity(String city) {
-        this.city = city;
-    }
+  public void setCity(String city) {
+    this.city = city;
+  }
 
-    public String getCountry() {
-        return country;
-    }
+  public String getCountry() {
+    return country;
+  }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+  public void setCountry(String country) {
+    this.country = country;
+  }
 }

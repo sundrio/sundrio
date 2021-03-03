@@ -17,8 +17,8 @@
 package utils;
 
 public interface TwoNonTerminal {
-    
-    void methodA();
 
-    void methodB();
+  void methodA();
+
+  void methodB();
 }

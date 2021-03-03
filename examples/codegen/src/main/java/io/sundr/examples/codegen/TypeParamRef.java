@@ -16,56 +16,58 @@
 
 package io.sundr.examples.codegen;
 
-import io.sundr.builder.annotations.Buildable;
-
 import java.util.Map;
 
-@Buildable(lazyCollectionInitEnabled=false)
+import io.sundr.builder.annotations.Buildable;
+
+@Buildable(lazyCollectionInitEnabled = false)
 public class TypeParamRef extends TypeRef {
 
-    private final String name;
-    private final int dimensions;
+  private final String name;
+  private final int dimensions;
 
-    public TypeParamRef(String name, int dimensions, Map<AttributeKey, Object> attributes) {
-        super(attributes);
-        this.name = name;
-        this.dimensions = dimensions;
-    }
+  public TypeParamRef(String name, int dimensions, Map<AttributeKey, Object> attributes) {
+    super(attributes);
+    this.name = name;
+    this.dimensions = dimensions;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int getDimensions() {
-        return dimensions;
-    }
+  public int getDimensions() {
+    return dimensions;
+  }
 
-    public TypeParamRef withDimensions(int dimensions) {
-        return new TypeParamRefBuilder(this).withDimensions(dimensions).build();
-    }
+  public TypeParamRef withDimensions(int dimensions) {
+    return new TypeParamRefBuilder(this).withDimensions(dimensions).build();
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
-        TypeParamRef that = (TypeParamRef) o;
+    TypeParamRef that = (TypeParamRef) o;
 
-        return name != null ? name.equals(that.name) : that.name == null;
+    return name != null ? name.equals(that.name) : that.name == null;
 
-    }
+  }
 
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
-    }
+  @Override
+  public int hashCode() {
+    return name != null ? name.hashCode() : 0;
+  }
 
-    @Override
-    public String toString() {
-        return name;
-    }
+  @Override
+  public String toString() {
+    return name;
+  }
 
-    public boolean isAssignableFrom(TypeRef ref) {
-        return this.equals(ref);
-    }
+  public boolean isAssignableFrom(TypeRef ref) {
+    return this.equals(ref);
+  }
 }

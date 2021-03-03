@@ -16,58 +16,60 @@
 
 package io.sundr.codegen.directives;
 
-import io.sundr.codegen.Constants;
-import io.sundr.codegen.model.Property;
-import org.apache.velocity.context.InternalContextAdapter;
-import org.apache.velocity.runtime.directive.Directive;
-import org.apache.velocity.runtime.parser.node.Node;
+import static io.sundr.codegen.model.Attributeable.INIT;
 
 import java.io.IOException;
 import java.io.Writer;
 
-import static io.sundr.codegen.model.Attributeable.INIT;
+import org.apache.velocity.context.InternalContextAdapter;
+import org.apache.velocity.runtime.directive.Directive;
+import org.apache.velocity.runtime.parser.node.Node;
+
+import io.sundr.codegen.Constants;
+import io.sundr.codegen.model.Property;
+
 public class FieldDirective extends Directive {
 
-    @Override
-    public String getName() {
-        return "field";
+  @Override
+  public String getName() {
+    return "field";
+  }
+
+  @Override
+  public int getType() {
+    return LINE;
+  }
+
+  @Override
+  public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
+    String block = "";
+    Property field = null;
+    //reading params
+    if (node.jjtGetChild(0) != null) {
+      field = (Property) node.jjtGetChild(0).value(context);
     }
+    writeField(writer, field, block);
+    return true;
+  }
 
-    @Override
-    public int getType() {
-        return LINE;
+  private void writeField(Writer writer, Property field, String block) throws IOException {
+    if (field != null) {
+      writer.append(field.toString());
+
+      if (field.getAttribute(INIT) != null) {
+        writer.append(" = ").append(getDefaultValue(field));
+      }
     }
+    writer.append(";\n");
+  }
 
-    @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
-        String block = "";
-        Property field = null;
-        //reading params
-        if (node.jjtGetChild(0) != null) {
-            field = (Property) node.jjtGetChild(0).value(context);
-        }
-        writeField(writer, field, block);
-        return true;
+  private String getDefaultValue(Property field) {
+    Object value = field.getAttribute(INIT);
+
+    if (Constants.STRING_REF.equals(field.getTypeRef()) && !String.valueOf(value).startsWith("\"")) {
+      return "\"" + value + "\"";
+    } else {
+      return String.valueOf(value);
     }
-
-    private void writeField(Writer writer, Property field, String block) throws IOException {
-        if (field != null) {
-            writer.append(field.toString());
-
-            if (field.getAttribute(INIT) != null) {
-                writer.append(" = ").append(getDefaultValue(field));
-            }
-        }
-        writer.append(";\n");
-    }
-
-    private String getDefaultValue(Property field) {
-        Object value = field.getAttribute(INIT);
-
-        if (Constants.STRING_REF.equals(field.getTypeRef()) && !String.valueOf(value).startsWith("\"") ) {
-            return "\"" + value + "\"";
-        } else {
-            return String.valueOf(value);
-        }
-    }
+  }
 }

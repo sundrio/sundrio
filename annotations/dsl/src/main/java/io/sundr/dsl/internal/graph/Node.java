@@ -16,32 +16,32 @@
 
 package io.sundr.dsl.internal.graph;
 
-import io.sundr.codegen.utils.StringUtils;
-
 import java.util.Set;
+
+import io.sundr.codegen.utils.StringUtils;
 
 public class Node<T> {
 
-    private final T item;
-    private final Set<Node<T>> transitions;
+  private final T item;
+  private final Set<Node<T>> transitions;
 
-    Node(T item, Set<Node<T>> transitions) {
-        this.item = item;
-        this.transitions = transitions;
-    }
+  Node(T item, Set<Node<T>> transitions) {
+    this.item = item;
+    this.transitions = transitions;
+  }
 
-    public T getItem() {
-        return item;
-    }
+  public T getItem() {
+    return item;
+  }
 
-    public Set<Node<T>> getTransitions() {
-        return transitions;
-    }
+  public Set<Node<T>> getTransitions() {
+    return transitions;
+  }
 
-    @Override
-    public String toString() {
-        return item + "[" +
-                  StringUtils.join(transitions, ",") +
-                "]";
-    }
+  @Override
+  public String toString() {
+    return item + "[" +
+        StringUtils.join(transitions, ",") +
+        "]";
+  }
 }

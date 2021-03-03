@@ -18,57 +18,69 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class StringStatementBuilder extends StringStatementFluentImpl<StringStatementBuilder> implements VisitableBuilder<StringStatement,StringStatementBuilder>{
+public class StringStatementBuilder extends StringStatementFluentImpl<StringStatementBuilder>
+    implements VisitableBuilder<StringStatement, StringStatementBuilder> {
 
-    StringStatementFluent<?> fluent;
-    Boolean validationEnabled;
+  StringStatementFluent<?> fluent;
+  Boolean validationEnabled;
 
-    public StringStatementBuilder(){
-            this(true);
-    }
-    public StringStatementBuilder(Boolean validationEnabled){
-            this.fluent = this; this.validationEnabled=validationEnabled;
-    }
-    public StringStatementBuilder(StringStatementFluent<?> fluent){
-            this(fluent, true);
-    }
-    public StringStatementBuilder(StringStatementFluent<?> fluent,Boolean validationEnabled){
-            this.fluent = fluent; this.validationEnabled=validationEnabled;
-    }
-    public StringStatementBuilder(StringStatementFluent<?> fluent,StringStatement instance){
-            this(fluent, instance, true);
-    }
-    public StringStatementBuilder(StringStatementFluent<?> fluent,StringStatement instance,Boolean validationEnabled){
-            this.fluent = fluent; 
-            fluent.withProvider(instance.getProvider()); 
-            this.validationEnabled = validationEnabled; 
-    }
-    public StringStatementBuilder(StringStatement instance){
-            this(instance,true);
-    }
-    public StringStatementBuilder(StringStatement instance,Boolean validationEnabled){
-            this.fluent = this; 
-            this.withProvider(instance.getProvider()); 
-            this.validationEnabled = validationEnabled; 
-    }
+  public StringStatementBuilder() {
+    this(true);
+  }
 
-    public EditableStringStatement build(){
-            EditableStringStatement buildable = new EditableStringStatement(fluent.getProvider());
-            return buildable;
-    }
+  public StringStatementBuilder(Boolean validationEnabled) {
+    this.fluent = this;
+    this.validationEnabled = validationEnabled;
+  }
 
-    public boolean equals(Object o){
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-            StringStatementBuilder that = (StringStatementBuilder) o;
-            if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+  public StringStatementBuilder(StringStatementFluent<?> fluent) {
+    this(fluent, true);
+  }
 
-            if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) :that.validationEnabled != null) return false;
-            return true;
-    }
+  public StringStatementBuilder(StringStatementFluent<?> fluent, Boolean validationEnabled) {
+    this.fluent = fluent;
+    this.validationEnabled = validationEnabled;
+  }
 
+  public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance) {
+    this(fluent, instance, true);
+  }
 
+  public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance, Boolean validationEnabled) {
+    this.fluent = fluent;
+    fluent.withProvider(instance.getProvider());
+    this.validationEnabled = validationEnabled;
+  }
 
+  public StringStatementBuilder(StringStatement instance) {
+    this(instance, true);
+  }
+
+  public StringStatementBuilder(StringStatement instance, Boolean validationEnabled) {
+    this.fluent = this;
+    this.withProvider(instance.getProvider());
+    this.validationEnabled = validationEnabled;
+  }
+
+  public EditableStringStatement build() {
+    EditableStringStatement buildable = new EditableStringStatement(fluent.getProvider());
+    return buildable;
+  }
+
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    StringStatementBuilder that = (StringStatementBuilder) o;
+    if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
+      return false;
+
+    if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) : that.validationEnabled != null)
+      return false;
+    return true;
+  }
 
 }

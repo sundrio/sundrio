@@ -19,37 +19,40 @@ package io.sundr.codegen.model;
 import io.sundr.Provider;
 import io.sundr.builder.BaseFluent;
 
-public class StringStatementFluentImpl<A extends StringStatementFluent<A>> extends BaseFluent<A> implements StringStatementFluent<A>{
+public class StringStatementFluentImpl<A extends StringStatementFluent<A>> extends BaseFluent<A>
+    implements StringStatementFluent<A> {
 
-    private Provider<String> provider;
+  private Provider<String> provider;
 
-    public StringStatementFluentImpl(){
-    }
-    public StringStatementFluentImpl(StringStatement instance){
-            this.withProvider(instance.getProvider()); 
-    }
+  public StringStatementFluentImpl() {
+  }
 
-    public Provider<String> getProvider(){
-            return this.provider;
-    }
+  public StringStatementFluentImpl(StringStatement instance) {
+    this.withProvider(instance.getProvider());
+  }
 
-    public A withProvider(Provider<String> provider){
-            this.provider=provider; return (A) this;
-    }
+  public Provider<String> getProvider() {
+    return this.provider;
+  }
 
-    public Boolean hasProvider(){
-            return this.provider != null;
-    }
+  public A withProvider(Provider<String> provider) {
+    this.provider = provider;
+    return (A) this;
+  }
 
-    public boolean equals(Object o){
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            StringStatementFluentImpl that = (StringStatementFluentImpl) o;
-            if (provider != null ? !provider.equals(that.provider) :that.provider != null) return false;
-            return true;
-    }
+  public Boolean hasProvider() {
+    return this.provider != null;
+  }
 
-
-
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    StringStatementFluentImpl that = (StringStatementFluentImpl) o;
+    if (provider != null ? !provider.equals(that.provider) : that.provider != null)
+      return false;
+    return true;
+  }
 
 }

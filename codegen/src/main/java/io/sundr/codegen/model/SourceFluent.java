@@ -24,38 +24,53 @@ import io.sundr.builder.Builder;
 import io.sundr.builder.Fluent;
 import io.sundr.builder.Nested;
 
-public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A>{
+public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A> {
 
+  public A addToTypes(int index, TypeDef item);
 
-    public A addToTypes(int index, TypeDef item);
-    public A setToTypes(int index, TypeDef item);
-    public A addToTypes(TypeDef... items);
-    public A addAllToTypes(Collection<TypeDef> items);
-    public A removeFromTypes(TypeDef... items);
-    public A removeAllFromTypes(Collection<TypeDef> items);
+  public A setToTypes(int index, TypeDef item);
 
-    /**
-     * This method has been deprecated, please use method buildTypes instead.
-     * @return The buildable object.
-     */
-    @Deprecated
-    public List<TypeDef> getTypes();
-    public List<TypeDef> buildTypes();
-    public TypeDef buildType(int index);
-    public TypeDef buildFirstType();
-    public TypeDef buildLastType();
-    public TypeDef buildMatchingType(Predicate<Builder<? extends TypeDef>> predicate);
-    public A withTypes(List<TypeDef> types);
-    public A withTypes(TypeDef... types);
-    public Boolean hasTypes();
-    public TypesNested<A> addNewType();
-    public TypesNested<A> addNewTypeLike(TypeDef item);
+  public A addToTypes(TypeDef... items);
 
-    public interface TypesNested<N> extends Nested<N>,TypeDefFluent<TypesNested<N>>{
+  public A addAllToTypes(Collection<TypeDef> items);
 
-        
-    public N and();    public N endType();
-}
+  public A removeFromTypes(TypeDef... items);
 
+  public A removeAllFromTypes(Collection<TypeDef> items);
+
+  /**
+   * This method has been deprecated, please use method buildTypes instead.
+   * 
+   * @return The buildable object.
+   */
+  @Deprecated
+  public List<TypeDef> getTypes();
+
+  public List<TypeDef> buildTypes();
+
+  public TypeDef buildType(int index);
+
+  public TypeDef buildFirstType();
+
+  public TypeDef buildLastType();
+
+  public TypeDef buildMatchingType(Predicate<Builder<? extends TypeDef>> predicate);
+
+  public A withTypes(List<TypeDef> types);
+
+  public A withTypes(TypeDef... types);
+
+  public Boolean hasTypes();
+
+  public TypesNested<A> addNewType();
+
+  public TypesNested<A> addNewTypeLike(TypeDef item);
+
+  public interface TypesNested<N> extends Nested<N>, TypeDefFluent<TypesNested<N>> {
+
+    public N and();
+
+    public N endType();
+  }
 
 }

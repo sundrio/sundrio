@@ -16,67 +16,64 @@
 
 package io.sundr.examples.validation;
 
-import org.junit.Test;
-
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+import org.junit.Test;
+
 public class AddressValidationTest {
 
-    Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+  Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testWithNullStreet() {
-        Address address = new AddressBuilder().build();
-    }
+  @Test(expected = ConstraintViolationException.class)
+  public void testWithNullStreet() {
+    Address address = new AddressBuilder().build();
+  }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testWithZeroNumber() {
-        Address address = new AddressBuilder().withStreet("Sesame").withNumber(0).build();
-    }
+  @Test(expected = ConstraintViolationException.class)
+  public void testWithZeroNumber() {
+    Address address = new AddressBuilder().withStreet("Sesame").withNumber(0).build();
+  }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testWithAlphanumericZipCode() {
-        Address address = new AddressBuilder().withStreet("Sesame")
-                .withNumber(1)
-                .withZipCode("abcd")
-                .build();
-    }
+  @Test(expected = ConstraintViolationException.class)
+  public void testWithAlphanumericZipCode() {
+    Address address = new AddressBuilder().withStreet("Sesame")
+        .withNumber(1)
+        .withZipCode("abcd")
+        .build();
+  }
 
+  @Test(expected = ConstraintViolationException.class)
+  public void testWithLongZipCode() {
+    Address address = new AddressBuilder().withStreet("Sesame")
+        .withNumber(1)
+        .withZipCode("1234567")
+        .build();
+  }
 
-    @Test(expected = ConstraintViolationException.class)
-    public void testWithLongZipCode() {
-        Address address = new AddressBuilder().withStreet("Sesame")
-                .withNumber(1)
-                .withZipCode("1234567")
-                .build();
-    }
+  @Test
+  public void testWithExplicitlySkippingValidation() {
+    Address address = new AddressBuilder(false).withStreet("Sesame")
+        .withNumber(1)
+        .withZipCode("1234567")
+        .build();
+  }
 
+  @Test
+  public void testWithValid() {
+    Address address = new AddressBuilder().withStreet("Sesame")
+        .withNumber(1)
+        .withZipCode("1234")
+        .build();
+  }
 
-    @Test
-    public void testWithExplicitlySkippingValidation() {
-        Address address = new AddressBuilder(false).withStreet("Sesame")
-                .withNumber(1)
-                .withZipCode("1234567")
-                .build();
-    }
-
-    @Test
-    public void testWithValid() {
-        Address address = new AddressBuilder().withStreet("Sesame")
-                .withNumber(1)
-                .withZipCode("1234")
-                .build();
-    }
-
-
-    @Test
-    public void testWithValidWithOwnValidator() {
-        Address address = new AddressBuilder(validator)
-                .withStreet("Sesame")
-                .withNumber(1)
-                .withZipCode("1234")
-                .build();
-    }
+  @Test
+  public void testWithValidWithOwnValidator() {
+    Address address = new AddressBuilder(validator)
+        .withStreet("Sesame")
+        .withNumber(1)
+        .withZipCode("1234")
+        .build();
+  }
 }

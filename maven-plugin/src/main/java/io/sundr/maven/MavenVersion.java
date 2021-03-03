@@ -21,61 +21,60 @@ import java.util.regex.Pattern;
 
 public class MavenVersion implements Comparable<MavenVersion> {
 
+  private static final Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+).(?<minor>\\d+).(?<micro>\\d+)");
 
-    private static final Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+).(?<minor>\\d+).(?<micro>\\d+)");
+  private final int major;
+  private final int minor;
+  private final int micro;
 
-    private final int major;
-    private final int minor;
-    private final int micro;
+  public MavenVersion(String version) {
+    this(versionGroup(version, "major"), versionGroup(version, "minor"), versionGroup(version, "micro"));
+  }
 
-    public MavenVersion(String version) {
-        this(versionGroup(version, "major"), versionGroup(version, "minor"), versionGroup(version, "micro"));
+  public MavenVersion(int major, int minor, int micro) {
+    this.major = major;
+    this.minor = minor;
+    this.micro = micro;
+  }
+
+  @Override
+  public int compareTo(MavenVersion o) {
+    if (o == null) {
+      return 0;
+    } else if (this.major > o.major) {
+      return -1;
+    } else if (this.major < o.major) {
+      return 1;
+    } else if (this.minor > o.minor) {
+      return -1;
+    } else if (this.minor < o.minor) {
+      return 1;
+    } else if (this.micro > o.micro) {
+      return -1;
+    } else if (this.micro < o.micro) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return major + "." + minor + "." + micro;
+  }
+
+  private static int versionGroup(String version, String group) {
+    if (version == null || version.isEmpty()) {
+      return 0;
     }
 
-    public MavenVersion(int major, int minor, int micro) {
-        this.major = major;
-        this.minor = minor;
-        this.micro = micro;
+    String cleanVersion = version.replaceAll("[^\\d\\.]", "");
+    Matcher matcher = VERSION_PATTERN.matcher(cleanVersion);
+    if (matcher.matches()) {
+      String str = matcher.group(group);
+      return Integer.parseInt(str);
+    } else {
+      return 0;
     }
-
-    @Override
-    public int compareTo(MavenVersion o) {
-        if (o == null) {
-            return 0;
-        } else if (this.major > o.major) {
-            return -1;
-        } else if (this.major < o.major) {
-            return 1;
-        } else if (this.minor > o.minor) {
-            return -1;
-        } else if (this.minor < o.minor) {
-            return 1;
-        } else if (this.micro > o.micro) {
-            return -1;
-        } else if (this.micro < o.micro) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return major + "." + minor + "." + micro;
-    }
-
-    private static int versionGroup(String version, String group) {
-        if (version == null || version.isEmpty()) {
-            return 0;
-        }
-
-        String cleanVersion = version.replaceAll("[^\\d\\.]", "");
-        Matcher matcher = VERSION_PATTERN.matcher(cleanVersion);
-        if (matcher.matches()) {
-            String str = matcher.group(group);
-            return Integer.parseInt(str);
-        } else {
-            return 0;
-        }
-    }
+  }
 }

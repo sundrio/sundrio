@@ -17,8 +17,8 @@
 package utils;
 
 public interface TwoWithTerminal {
-    
-    void methodA();
 
-    String methodB();
+  void methodA();
+
+  String methodB();
 }

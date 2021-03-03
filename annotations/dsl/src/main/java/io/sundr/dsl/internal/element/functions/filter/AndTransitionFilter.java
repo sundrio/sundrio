@@ -16,31 +16,31 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
-import io.sundr.codegen.model.TypeDef;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.sundr.codegen.model.TypeDef;
+
 public class AndTransitionFilter implements TransitionFilter {
 
-    private final Set<TransitionFilter> filters;
+  private final Set<TransitionFilter> filters;
 
-    public AndTransitionFilter(Set<TransitionFilter> filters) {
-        this.filters = filters;
-    }
-    public AndTransitionFilter(TransitionFilter... filters) {
-        this.filters = new HashSet<TransitionFilter>(Arrays.asList(filters));
-    }
+  public AndTransitionFilter(Set<TransitionFilter> filters) {
+    this.filters = filters;
+  }
 
+  public AndTransitionFilter(TransitionFilter... filters) {
+    this.filters = new HashSet<TransitionFilter>(Arrays.asList(filters));
+  }
 
-    public Boolean apply(Collection<TypeDef> items) {
-        for (TransitionFilter filter : filters) {
-            if (!filter.apply(items)) {
-                return false;
-            }
-        }
-        return true;
+  public Boolean apply(Collection<TypeDef> items) {
+    for (TransitionFilter filter : filters) {
+      if (!filter.apply(items)) {
+        return false;
+      }
     }
+    return true;
+  }
 }

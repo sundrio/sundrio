@@ -16,23 +16,22 @@
 
 package io.sundr.codegen.model;
 
-
 public final class AttributeKey<T> {
 
-    private final String name;
-    private final Class<T> type;
+  private final String name;
+  private final Class<T> type;
 
-    public AttributeKey(String name, Class type) {
-        this.name = name;
-        this.type = type;
-    }
+  public AttributeKey(String name, Class type) {
+    this.name = name;
+    this.type = type;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public Class<T> getType() {
-        return type;
-    }
+  public Class<T> getType() {
+    return type;
+  }
 
 }

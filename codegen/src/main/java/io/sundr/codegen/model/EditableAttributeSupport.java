@@ -16,22 +16,18 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
 import java.util.Map;
 
-public class EditableAttributeSupport extends AttributeSupport implements Editable<AttributeSupportBuilder>{
+import io.sundr.builder.Editable;
 
+public class EditableAttributeSupport extends AttributeSupport implements Editable<AttributeSupportBuilder> {
 
-    public EditableAttributeSupport(Map<AttributeKey,Object> attributes){
-            super(attributes);
-    }
+  public EditableAttributeSupport(Map<AttributeKey, Object> attributes) {
+    super(attributes);
+  }
 
-    public AttributeSupportBuilder edit(){
-            return new AttributeSupportBuilder(this);
-    }
-
-
-
+  public AttributeSupportBuilder edit() {
+    return new AttributeSupportBuilder(this);
+  }
 
 }

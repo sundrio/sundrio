@@ -18,5 +18,5 @@ package io.sundr;
 
 public interface Provider<T> {
 
-    T get();
+  T get();
 }

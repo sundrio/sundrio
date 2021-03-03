@@ -16,47 +16,46 @@
 
 package io.sundr.dsl.internal.element.functions;
 
-import io.sundr.Function;
-import io.sundr.dsl.annotations.Keyword;
-import io.sundr.dsl.internal.utils.TypeDefUtils;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.util.HashSet;
-import java.util.Set;
+
+import io.sundr.Function;
+import io.sundr.dsl.annotations.Keyword;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
 
 public class ToKeywords implements Function<Element, Set<String>> {
 
-    private final TypeElement KEYWORD;
-    private final Element VALUE;
+  private final TypeElement KEYWORD;
+  private final Element VALUE;
 
+  public ToKeywords(Elements elements) {
+    KEYWORD = elements.getTypeElement(Keyword.class.getCanonicalName());
+    VALUE = KEYWORD.getEnclosedElements().get(0);
+  }
 
-    public ToKeywords(Elements elements) {
-        KEYWORD = elements.getTypeElement(Keyword.class.getCanonicalName());
-        VALUE = KEYWORD.getEnclosedElements().get(0);
-    }
+  public Set<String> apply(Element element) {
+    Set<String> keywords = new HashSet<String>();
+    for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+      if (mirror.getAnnotationType().asElement().equals(KEYWORD)) {
+        keywords.addAll(TypeDefUtils.toClassNames(mirror.getElementValues().get(VALUE).getValue()));
+      }
 
-    public Set<String> apply(Element element) {
-        Set<String> keywords = new HashSet<String>();
-        for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
-            if (mirror.getAnnotationType().asElement().equals(KEYWORD)) {
-                keywords.addAll(TypeDefUtils.toClassNames(mirror.getElementValues().get(VALUE).getValue()));
-            }
-
-
-            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(KEYWORD)) {
-                    if (innerMirror.getElementValues().containsKey(VALUE)) {
-                        keywords.addAll(TypeDefUtils.toClassNames(innerMirror.getElementValues().get(VALUE).getValue()));
-                    } else {
-                        keywords.addAll(TypeDefUtils.toClassNames(mirror.getAnnotationType().asElement().toString()));
-                    }
-                }
-            }
+      for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
+        if (innerMirror.getAnnotationType().asElement().equals(KEYWORD)) {
+          if (innerMirror.getElementValues().containsKey(VALUE)) {
+            keywords.addAll(TypeDefUtils.toClassNames(innerMirror.getElementValues().get(VALUE).getValue()));
+          } else {
+            keywords.addAll(TypeDefUtils.toClassNames(mirror.getAnnotationType().asElement().toString()));
+          }
         }
-        return keywords;
+      }
     }
+    return keywords;
+  }
 
 }

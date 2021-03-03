@@ -16,24 +16,23 @@
 
 package io.sundr.builder.internal.processor;
 
-import io.sundr.builder.internal.functions.ToPojo;
-import io.sundr.codegen.functions.Sources;
-import io.sundr.codegen.model.TypeDef;
 import org.junit.Assert;
 import org.junit.Test;
 
-
+import io.sundr.builder.internal.functions.ToPojo;
+import io.sundr.codegen.functions.Sources;
+import io.sundr.codegen.model.TypeDef;
 
 public class SimpleAnnotationTest extends AbstractProcessorTest {
 
-    TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleAnnotation.java"));
+  TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
+      .apply(getClass().getClassLoader().getResourceAsStream("SimpleAnnotation.java"));
 
-    @Test
-    public void testPojo() {
-        System.out.println(simpleClassDef);
-        TypeDef pojo = new ToPojo().apply(simpleClassDef);
-        Assert.assertNotNull(pojo);
-    }
-
+  @Test
+  public void testPojo() {
+    System.out.println(simpleClassDef);
+    TypeDef pojo = new ToPojo().apply(simpleClassDef);
+    Assert.assertNotNull(pojo);
+  }
 
 }

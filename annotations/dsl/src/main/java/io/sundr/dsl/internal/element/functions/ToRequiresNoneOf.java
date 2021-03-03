@@ -16,21 +16,22 @@
 
 package io.sundr.dsl.internal.element.functions;
 
+import java.util.Set;
+
+import javax.lang.model.util.Elements;
+
 import io.sundr.dsl.annotations.None;
 import io.sundr.dsl.internal.element.functions.filter.RequiresNoneOfFilter;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 
-import javax.lang.model.util.Elements;
-import java.util.Set;
-
 public class ToRequiresNoneOf extends KeywordsAndMethodsToFilter {
 
-    public ToRequiresNoneOf(Elements elements) {
-        super(elements, None.class.getCanonicalName());
-    }
+  public ToRequiresNoneOf(Elements elements) {
+    super(elements, None.class.getCanonicalName());
+  }
 
-    @Override
-    public TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods) {
-        return new RequiresNoneOfFilter(classes, keywords, methods);
-    }
+  @Override
+  public TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods) {
+    return new RequiresNoneOfFilter(classes, keywords, methods);
+  }
 }

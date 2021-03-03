@@ -24,26 +24,26 @@ import io.sundr.examples.shapes.Rectangle;
 import io.sundr.examples.shapes.Updateable;
 
 @Buildable(inline = {
-        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+    @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+    @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
 })
 public class Square extends AbstractShape implements Rectangle {
 
-    private final int height;
+  private final int height;
 
-    public Square(int x, int y, int height) {
-        super(x, y);
-        this.height = height;
-    }
+  public Square(int x, int y, int height) {
+    super(x, y);
+    this.height = height;
+  }
 
-    @Override
-    public int getWidth() {
-        return height;
-    }
+  @Override
+  public int getWidth() {
+    return height;
+  }
 
-    @Override
-    public int getHeight() {
-        return height;
-    }
+  @Override
+  public int getHeight() {
+    return height;
+  }
 
 }

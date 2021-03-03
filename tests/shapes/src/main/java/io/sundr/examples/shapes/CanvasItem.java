@@ -16,16 +16,18 @@
 
 package io.sundr.examples.shapes;
 
+import java.io.Serializable;
+
 import io.sundr.builder.annotations.Adapter;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Pojo;
 
-import java.io.Serializable;
-
 @Buildable
-@Pojo(name = "Citem", superClass = Item.class, interfaces = {Serializable.class}, relativePath = "../v2", adapter = @Adapter(suffix = "Adapter"))
+@Pojo(name = "Citem", superClass = Item.class, interfaces = {
+    Serializable.class }, relativePath = "../v2", adapter = @Adapter(suffix = "Adapter"))
 public @interface CanvasItem {
 
-    String name() default "";
-    Label label();
+  String name() default "";
+
+  Label label();
 }

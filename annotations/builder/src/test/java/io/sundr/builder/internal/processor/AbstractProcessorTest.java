@@ -16,9 +16,16 @@
 
 package io.sundr.builder.internal.processor;
 
+import java.lang.annotation.Annotation;
+import java.util.concurrent.Callable;
+
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
+
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -26,66 +33,61 @@ import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
 
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-import java.lang.annotation.Annotation;
-import java.util.concurrent.Callable;
-
 public class AbstractProcessorTest {
 
-    final Context context = new Context();
-    final Elements elements = JavacElements.instance(context);
-    final Types types = JavacTypes.instance(context);
-    final BuilderContext builderContext = BuilderContextManager.create(elements, types);
+  final Context context = new Context();
+  final Elements elements = JavacElements.instance(context);
+  final Types types = JavacTypes.instance(context);
+  final BuilderContext builderContext = BuilderContextManager.create(elements, types);
 
-    final Inline inline = new Inline() {
-        public Class<? extends Annotation> annotationType() {
-            return Inline.class;
-        }
-
-        public String value() {
-            return "call";
-        }
-
-        public String prefix() {
-            return "Callable";
-        }
-
-        public String name() {
-            return "";
-        }
-
-        public String suffix() {
-            return "";
-        }
-
-        public Class type() {
-            return Callable.class;
-        }
-
-        public Class returnType() {
-            return null;
-        }
-    };
-
-    static boolean hasMethod(TypeDef typeDef, String name, TypeRef... arguments) {
-        for (Method method : typeDef.getMethods()) {
-            if (!method.getName().equals(name)) {
-                continue;
-            } else if (method.getArguments().size() != arguments.length) {
-                continue;
-            }
-
-            boolean argumentsMatched = true;
-            for (int i = 0; i < arguments.length; i++) {
-                if (!arguments[i].equals(method.getArguments().get(i).getTypeRef())) {
-                    argumentsMatched = false;
-                }
-            }
-            if (argumentsMatched) {
-                return true;
-            }
-        }
-        return false;
+  final Inline inline = new Inline() {
+    public Class<? extends Annotation> annotationType() {
+      return Inline.class;
     }
+
+    public String value() {
+      return "call";
+    }
+
+    public String prefix() {
+      return "Callable";
+    }
+
+    public String name() {
+      return "";
+    }
+
+    public String suffix() {
+      return "";
+    }
+
+    public Class type() {
+      return Callable.class;
+    }
+
+    public Class returnType() {
+      return null;
+    }
+  };
+
+  static boolean hasMethod(TypeDef typeDef, String name, TypeRef... arguments) {
+    for (Method method : typeDef.getMethods()) {
+      if (!method.getName().equals(name)) {
+        continue;
+      } else if (method.getArguments().size() != arguments.length) {
+        continue;
+      }
+
+      boolean argumentsMatched = true;
+      for (int i = 0; i < arguments.length; i++) {
+        if (!arguments[i].equals(method.getArguments().get(i).getTypeRef())) {
+          argumentsMatched = false;
+        }
+      }
+      if (argumentsMatched) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

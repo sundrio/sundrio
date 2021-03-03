@@ -16,69 +16,69 @@
 
 package io.sundr.dsl.internal.element.functions;
 
-import io.sundr.Function;
-import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
-import io.sundr.dsl.internal.utils.TypeDefUtils;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.util.HashSet;
-import java.util.Set;
+
+import io.sundr.Function;
+import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
 
 public abstract class KeywordsAndMethodsToFilter implements Function<Element, TransitionFilter> {
 
-    final TypeElement ELEMENT;
-    final Element CLASSES_VALUE;
-    final Element KEYWORDS_VALUE;
-    final Element METHODS_VALUE;
+  final TypeElement ELEMENT;
+  final Element CLASSES_VALUE;
+  final Element KEYWORDS_VALUE;
+  final Element METHODS_VALUE;
 
+  public KeywordsAndMethodsToFilter(Elements elements, String annotationClassName) {
+    this.ELEMENT = elements.getTypeElement(annotationClassName);
+    CLASSES_VALUE = ELEMENT.getEnclosedElements().get(0);
+    KEYWORDS_VALUE = ELEMENT.getEnclosedElements().get(1);
+    METHODS_VALUE = ELEMENT.getEnclosedElements().get(2);
 
-    public KeywordsAndMethodsToFilter(Elements elements, String annotationClassName) {
-        this.ELEMENT = elements.getTypeElement(annotationClassName);
-        CLASSES_VALUE = ELEMENT.getEnclosedElements().get(0);
-        KEYWORDS_VALUE = ELEMENT.getEnclosedElements().get(1);
-        METHODS_VALUE = ELEMENT.getEnclosedElements().get(2);
+  }
 
-    }
+  public TransitionFilter apply(Element element) {
+    Set<String> classes = new HashSet<String>();
+    Set<String> keywords = new HashSet<String>();
+    Set<String> methods = new HashSet<String>();
 
-    public TransitionFilter apply(Element element) {
-        Set<String> classes = new HashSet<String>();
-        Set<String> keywords = new HashSet<String>();
-        Set<String> methods = new HashSet<String>();
+    for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+      if (mirror.getAnnotationType().asElement().equals(ELEMENT)) {
+        addToSet(mirror, CLASSES_VALUE, classes);
+        addToSet(mirror, KEYWORDS_VALUE, keywords);
+        addToSet(mirror, METHODS_VALUE, methods);
+      }
 
-        for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
-            if (mirror.getAnnotationType().asElement().equals(ELEMENT)) {
-                addToSet(mirror, CLASSES_VALUE, classes);
-                addToSet(mirror, KEYWORDS_VALUE, keywords);
-                addToSet(mirror, METHODS_VALUE, methods);
-            }
-
-            //Also look for use on custom annotations
-            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(ELEMENT)) {
-                    addToSet(innerMirror, CLASSES_VALUE, classes);
-                    addToSet(innerMirror, KEYWORDS_VALUE, keywords);
-                    addToSet(innerMirror, METHODS_VALUE, methods);
-                }
-            }
+      //Also look for use on custom annotations
+      for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
+        if (innerMirror.getAnnotationType().asElement().equals(ELEMENT)) {
+          addToSet(innerMirror, CLASSES_VALUE, classes);
+          addToSet(innerMirror, KEYWORDS_VALUE, keywords);
+          addToSet(innerMirror, METHODS_VALUE, methods);
         }
-        return create(classes, keywords, methods);
+      }
     }
+    return create(classes, keywords, methods);
+  }
 
-    void addToSet(AnnotationMirror mirror, Element element, Set<String> target) {
-        if (mirror.getElementValues().containsKey(element)) {
-            target.addAll(TypeDefUtils.toClassNames(mirror.getElementValues().get(element).getValue()));
-        }
+  void addToSet(AnnotationMirror mirror, Element element, Set<String> target) {
+    if (mirror.getElementValues().containsKey(element)) {
+      target.addAll(TypeDefUtils.toClassNames(mirror.getElementValues().get(element).getValue()));
     }
+  }
 
-    Boolean getBoolean(AnnotationMirror mirror, Element element) {
-        if (mirror.getElementValues().containsKey(element)) {
-            return (Boolean) mirror.getElementValues().get(element).getValue();
-        }
-        return false;
+  Boolean getBoolean(AnnotationMirror mirror, Element element) {
+    if (mirror.getElementValues().containsKey(element)) {
+      return (Boolean) mirror.getElementValues().get(element).getValue();
     }
+    return false;
+  }
 
-    public abstract TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods);
+  public abstract TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods);
 }

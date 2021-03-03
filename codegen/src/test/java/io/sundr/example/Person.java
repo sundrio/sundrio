@@ -29,13 +29,6 @@ public class Person {
   private List<Address> addresses;
 
   public enum Type {
-    A_MINUS,
-    A_PLUS,
-    B_MINUS,
-    B_PLUS,
-    AB_MINUS,
-    AB_PLUS,
-    O_MINUS,
-    O_PLUS
+    A_MINUS, A_PLUS, B_MINUS, B_PLUS, AB_MINUS, AB_PLUS, O_MINUS, O_PLUS
   }
 }

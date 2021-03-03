@@ -16,40 +16,40 @@
 
 package io.sundr.examples.codegen;
 
-import io.sundr.builder.annotations.Buildable;
-
 import java.util.Collections;
 import java.util.Map;
 
-@Buildable(lazyCollectionInitEnabled=false)
+import io.sundr.builder.annotations.Buildable;
+
+@Buildable(lazyCollectionInitEnabled = false)
 public class AttributeSupport implements Attributeable {
 
-    private final Map<AttributeKey, Object> attributes;
+  private final Map<AttributeKey, Object> attributes;
 
-    public AttributeSupport(Map<AttributeKey, Object> attributes) {
-        this.attributes = attributes;
-    }
+  public AttributeSupport(Map<AttributeKey, Object> attributes) {
+    this.attributes = attributes;
+  }
 
-    public Map<AttributeKey, Object> getAttributes() {
-        if (attributes == null) {
-            return null;
-        }
-        return Collections.unmodifiableMap(attributes);
+  public Map<AttributeKey, Object> getAttributes() {
+    if (attributes == null) {
+      return null;
     }
+    return Collections.unmodifiableMap(attributes);
+  }
 
-    @Override
-    public <T> T getAttribute(AttributeKey<T> key) {
-        if (attributes == null) {
-            return null;
-        }
-        return (T) attributes.get(key);
+  @Override
+  public <T> T getAttribute(AttributeKey<T> key) {
+    if (attributes == null) {
+      return null;
     }
+    return (T) attributes.get(key);
+  }
 
-    @Override
-    public <T> boolean hasAttribute(AttributeKey<T> key) {
-        if (attributes == null) {
-            return false;
-        }
-        return attributes.containsKey(key);
+  @Override
+  public <T> boolean hasAttribute(AttributeKey<T> key) {
+    if (attributes == null) {
+      return false;
     }
+    return attributes.containsKey(key);
+  }
 }

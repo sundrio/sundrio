@@ -16,23 +16,30 @@
 
 package io.sundr.builder.annotations;
 
-import io.sundr.builder.Constants;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.CONSTRUCTOR, ElementType.TYPE})
+import io.sundr.builder.Constants;
+
+@Target({ ElementType.CONSTRUCTOR, ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface Buildable {
 
-    boolean editableEnabled() default true;
-    boolean validationEnabled() default false;
-    boolean lazyCollectionInitEnabled() default true;
-    boolean lazyMapInitEnabled() default true;
-    boolean generateBuilderPackage() default false;
-    String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
-    BuildableReference[] refs() default {};
-    Inline[] inline() default {};
+  boolean editableEnabled() default true;
+
+  boolean validationEnabled() default false;
+
+  boolean lazyCollectionInitEnabled() default true;
+
+  boolean lazyMapInitEnabled() default true;
+
+  boolean generateBuilderPackage() default false;
+
+  String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
+
+  BuildableReference[] refs() default {};
+
+  Inline[] inline() default {};
 }

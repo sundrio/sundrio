@@ -16,20 +16,20 @@
 
 package io.sundr.examples.codegen;
 
-import io.sundr.builder.annotations.Buildable;
-
 import java.util.Map;
 
-@Buildable(lazyCollectionInitEnabled=false)
+import io.sundr.builder.annotations.Buildable;
+
+@Buildable(lazyCollectionInitEnabled = false)
 public abstract class TypeRef extends AttributeSupport {
 
-    public TypeRef(Map<AttributeKey, Object> attributes) {
-        super(attributes);
-    }
+  public TypeRef(Map<AttributeKey, Object> attributes) {
+    super(attributes);
+  }
 
-    public abstract boolean isAssignableFrom(TypeRef ref);
+  public abstract boolean isAssignableFrom(TypeRef ref);
 
-    public abstract int getDimensions();
+  public abstract int getDimensions();
 
-    public abstract TypeRef withDimensions(int dimensions);
+  public abstract TypeRef withDimensions(int dimensions);
 }

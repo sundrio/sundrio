@@ -21,19 +21,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface PackageSelector {
 
-    /**
-     * The package to use for selecting classes.
-     * @return
-     */
-    String value();
+  /**
+   * The package to use for selecting classes.
+   * 
+   * @return
+   */
+  String value();
 
-    /**
-     *
-     * @return
-     */
-    String pattern() default "[a-zA-Z_$][a-zA-Z0-9_$]*";
+  /**
+   *
+   * @return
+   */
+  String pattern() default "[a-zA-Z_$][a-zA-Z0-9_$]*";
 }

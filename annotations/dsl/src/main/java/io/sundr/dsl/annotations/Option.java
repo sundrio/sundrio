@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 /**
  * An annotation to specify that the current annotation is using for transition filtering.
  */
-@Target({ElementType.ANNOTATION_TYPE})
+@Target({ ElementType.ANNOTATION_TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface Option {
 }

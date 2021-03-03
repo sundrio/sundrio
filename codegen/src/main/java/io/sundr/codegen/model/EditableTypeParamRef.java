@@ -16,22 +16,18 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
 import java.util.Map;
 
-public class EditableTypeParamRef extends TypeParamRef implements Editable<TypeParamRefBuilder>{
+import io.sundr.builder.Editable;
 
+public class EditableTypeParamRef extends TypeParamRef implements Editable<TypeParamRefBuilder> {
 
-    public EditableTypeParamRef(String name,int dimensions,Map<AttributeKey,Object> attributes){
-            super(name, dimensions, attributes);
-    }
+  public EditableTypeParamRef(String name, int dimensions, Map<AttributeKey, Object> attributes) {
+    super(name, dimensions, attributes);
+  }
 
-    public TypeParamRefBuilder edit(){
-            return new TypeParamRefBuilder(this);
-    }
-
-
-
+  public TypeParamRefBuilder edit() {
+    return new TypeParamRefBuilder(this);
+  }
 
 }

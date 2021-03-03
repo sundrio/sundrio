@@ -23,6 +23,7 @@ import io.sundr.builder.annotations.Pojo;
 @Pojo(name = "MyRect", superClass = AbstractShape.class)
 public interface Rectangle extends Shape {
 
-    int getWidth();
-    int getHeight();
+  int getWidth();
+
+  int getHeight();
 }

@@ -21,19 +21,19 @@ import io.sundr.builder.annotations.BuildableReference;
 import io.sundr.builder.annotations.Inline;
 
 @Buildable(inline = {
-        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
-}, refs = {@BuildableReference(AbstractShape.class)})
+    @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+    @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+}, refs = { @BuildableReference(AbstractShape.class) })
 public class Triangle<T extends Number> extends AbstractShape {
 
-    private final T size;
+  private final T size;
 
-    public Triangle(int x, int y, T size) {
-        super(x, y);
-        this.size = size;
-    }
+  public Triangle(int x, int y, T size) {
+    super(x, y);
+    this.size = size;
+  }
 
-    public T getSize() {
-        return size;
-    }
+  public T getSize() {
+    return size;
+  }
 }

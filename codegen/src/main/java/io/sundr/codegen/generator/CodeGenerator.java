@@ -16,108 +16,111 @@
 
 package io.sundr.codegen.generator;
 
-import io.sundr.codegen.PackageScope;
-import io.sundr.codegen.model.TypeDef;
-import org.apache.velocity.Template;
-import org.apache.velocity.runtime.directive.Directive;
-import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
-import org.apache.velocity.runtime.resource.util.StringResourceRepository;
+import static io.sundr.codegen.utils.StringUtils.loadResource;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URL;
 import java.util.Set;
 
-import static io.sundr.codegen.utils.StringUtils.loadResource;
+import org.apache.velocity.Template;
+import org.apache.velocity.runtime.directive.Directive;
+import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
+import org.apache.velocity.runtime.resource.util.StringResourceRepository;
+
+import io.sundr.codegen.PackageScope;
+import io.sundr.codegen.model.TypeDef;
 
 public class CodeGenerator<M> {
 
-    private static final String TEMPLATE = "template";
-    private static final String MODEL = "model";
-    private static final String PARAMETERS = "parameters";
-    private static final String TEMPLATE_READER_FAILURE = "Failed to read template.";
+  private static final String TEMPLATE = "template";
+  private static final String MODEL = "model";
+  private static final String PARAMETERS = "parameters";
+  private static final String TEMPLATE_READER_FAILURE = "Failed to read template.";
 
-    private final CodeGeneratorContext context;
-    private final Writer writer;
-    private final M model;
-    private final String[] parameters;
-    private final String templateResource;
-    private final URL templateUrl;
-    private final String templateContent;
-    private final Template template;
-    private final Set<Class<? extends Directive>> directives;
+  private final CodeGeneratorContext context;
+  private final Writer writer;
+  private final M model;
+  private final String[] parameters;
+  private final String templateResource;
+  private final URL templateUrl;
+  private final String templateContent;
+  private final Template template;
+  private final Set<Class<? extends Directive>> directives;
 
-    public CodeGenerator(CodeGeneratorContext context, M model, String[] parameters, Writer writer, URL templateUrl, String templateResource, String templateContent, Set<Class<? extends Directive>> directives) {
-        this.context = context != null ? context : new CodeGeneratorContext();
-        this.model = model;
-        this.parameters = parameters;
-        this.writer = writer;
-        this.templateResource = templateResource;
-        this.templateUrl = templateUrl;
-        this.templateContent = templateContent;
-        this.directives = directives;
+  public CodeGenerator(CodeGeneratorContext context, M model, String[] parameters, Writer writer, URL templateUrl,
+      String templateResource, String templateContent, Set<Class<? extends Directive>> directives) {
+    this.context = context != null ? context : new CodeGeneratorContext();
+    this.model = model;
+    this.parameters = parameters;
+    this.writer = writer;
+    this.templateResource = templateResource;
+    this.templateUrl = templateUrl;
+    this.templateContent = templateContent;
+    this.directives = directives;
 
-        StringResourceRepository repo = StringResourceLoader.getRepository();
-        try {
-            repo.putStringResource(TEMPLATE, templateContent != null ? templateContent : (templateUrl != null ? loadResource(templateUrl) : loadResource(templateResource)));
-        } catch (Exception e) {
-            throw new RuntimeException(TEMPLATE_READER_FAILURE, e);
-        }
-
-        for (Class<? extends Directive> directive : directives) {
-            context.getVelocityEngine().loadDirective(directive.getCanonicalName());
-        }
-
-        this.template = this.context.getVelocityEngine().getTemplate(TEMPLATE);
-        this.context.getVelocityContext().put(MODEL, model);
-        this.context.getVelocityContext().put(PARAMETERS, parameters);
+    StringResourceRepository repo = StringResourceLoader.getRepository();
+    try {
+      repo.putStringResource(TEMPLATE, templateContent != null ? templateContent
+          : (templateUrl != null ? loadResource(templateUrl) : loadResource(templateResource)));
+    } catch (Exception e) {
+      throw new RuntimeException(TEMPLATE_READER_FAILURE, e);
     }
 
-    public CodeGenerator(M model, String[] parameters, Writer writer, URL templateUrl, String templateResource, Set<Class<? extends Directive>> directives, String templateContent) {
-        this(new CodeGeneratorContext(), model, parameters, writer, templateUrl, templateResource, templateContent, directives);
+    for (Class<? extends Directive> directive : directives) {
+      context.getVelocityEngine().loadDirective(directive.getCanonicalName());
     }
 
+    this.template = this.context.getVelocityEngine().getTemplate(TEMPLATE);
+    this.context.getVelocityContext().put(MODEL, model);
+    this.context.getVelocityContext().put(PARAMETERS, parameters);
+  }
 
-    public Writer getWriter() {
-        return writer;
-    }
+  public CodeGenerator(M model, String[] parameters, Writer writer, URL templateUrl, String templateResource,
+      Set<Class<? extends Directive>> directives, String templateContent) {
+    this(new CodeGeneratorContext(), model, parameters, writer, templateUrl, templateResource, templateContent, directives);
+  }
 
-    public M getModel() {
-        return model;
-    }
+  public Writer getWriter() {
+    return writer;
+  }
 
-    public String[] getParameters() {
-        return parameters;
-    }
+  public M getModel() {
+    return model;
+  }
 
-    public String getTemplateResource() {
-        return templateResource;
-    }
+  public String[] getParameters() {
+    return parameters;
+  }
 
-    public URL getTemplateUrl() {
-        return templateUrl;
-    }
+  public String getTemplateResource() {
+    return templateResource;
+  }
 
-    public String getTemplateContent() {
-        return templateContent;
-    }
+  public URL getTemplateUrl() {
+    return templateUrl;
+  }
 
-    public Template getTemplate() {
-        return template;
-    }
+  public String getTemplateContent() {
+    return templateContent;
+  }
 
-    public Set<Class<? extends Directive>> getDirectives() {
-        return directives;
-    }
+  public Template getTemplate() {
+    return template;
+  }
 
-    public void generate() throws IOException {
-        if (model instanceof TypeDef) {
-            TypeDef typeDef = (TypeDef) model;
-            PackageScope.set(typeDef.getPackageName());
-            GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
-            PackageScope.clear();
-        }  else {
-            GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
-        }
+  public Set<Class<? extends Directive>> getDirectives() {
+    return directives;
+  }
+
+  public void generate() throws IOException {
+    if (model instanceof TypeDef) {
+      TypeDef typeDef = (TypeDef) model;
+      PackageScope.set(typeDef.getPackageName());
+      GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
+      PackageScope.clear();
+    } else {
+      GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
     }
+  }
 }

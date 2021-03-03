@@ -20,48 +20,49 @@ import io.sundr.builder.VisitableBuilder;
 
 public class SourceBuilder extends SourceFluentImpl<SourceBuilder> implements VisitableBuilder<Source, SourceBuilder> {
 
-    SourceFluent<?> fluent;
+  SourceFluent<?> fluent;
 
-    public SourceBuilder() {
-        this(new Source());
-    }
+  public SourceBuilder() {
+    this(new Source());
+  }
 
-    public SourceBuilder(SourceFluent<?> fluent) {
-        this(fluent, new Source());
-    }
+  public SourceBuilder(SourceFluent<?> fluent) {
+    this(fluent, new Source());
+  }
 
-    public SourceBuilder(SourceFluent<?> fluent, Source instance) {
-        this.fluent = fluent;
-        fluent.withTypes(instance.getTypes());
-    }
+  public SourceBuilder(SourceFluent<?> fluent, Source instance) {
+    this.fluent = fluent;
+    fluent.withTypes(instance.getTypes());
+  }
 
-    public SourceBuilder(Source instance) {
-        this.fluent = this;
-        this.withTypes(instance.getTypes());
-    }
+  public SourceBuilder(Source instance) {
+    this.fluent = this;
+    this.withTypes(instance.getTypes());
+  }
 
-    public EditableSource build() {
-        EditableSource buildable = new EditableSource(fluent.getTypes());
-        validate(buildable);
-        return buildable;
+  public EditableSource build() {
+    EditableSource buildable = new EditableSource(fluent.getTypes());
+    validate(buildable);
+    return buildable;
 
-    }
+  }
 
-    public boolean equals(Object o) {
+  public boolean equals(Object o) {
 
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        SourceBuilder that = (SourceBuilder) o;
-        if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-            return false;
-        return true;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    SourceBuilder that = (SourceBuilder) o;
+    if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
+      return false;
+    return true;
 
-    }
+  }
 
-    private <T> void validate(T item) {
-    }
-
+  private <T> void validate(T item) {
+  }
 
 }
-    

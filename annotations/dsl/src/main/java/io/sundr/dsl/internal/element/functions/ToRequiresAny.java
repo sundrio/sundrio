@@ -16,21 +16,22 @@
 
 package io.sundr.dsl.internal.element.functions;
 
+import java.util.Set;
+
+import javax.lang.model.util.Elements;
+
 import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.internal.element.functions.filter.RequiresAnyFilter;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 
-import javax.lang.model.util.Elements;
-import java.util.Set;
-
 public class ToRequiresAny extends KeywordsAndMethodsToFilter {
 
-    public ToRequiresAny(Elements elements) {
-        super(elements, Any.class.getCanonicalName());
-    }
+  public ToRequiresAny(Elements elements) {
+    super(elements, Any.class.getCanonicalName());
+  }
 
-    @Override
-    public TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods) {
-        return new RequiresAnyFilter(classes, keywords, methods);
-    }
+  @Override
+  public TransitionFilter create(Set<String> classes, Set<String> keywords, Set<String> methods) {
+    return new RequiresAnyFilter(classes, keywords, methods);
+  }
 }

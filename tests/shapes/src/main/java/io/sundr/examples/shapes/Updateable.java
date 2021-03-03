@@ -18,5 +18,5 @@ package io.sundr.examples.shapes;
 
 public interface Updateable<T> {
 
-    T update();
+  T update();
 }

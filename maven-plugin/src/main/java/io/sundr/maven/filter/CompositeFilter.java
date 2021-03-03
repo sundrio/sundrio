@@ -16,23 +16,23 @@
 
 package io.sundr.maven.filter;
 
-import org.apache.maven.artifact.Artifact;
-
 import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
 
 public class CompositeFilter implements ArtifactFilter {
 
-    private final List<ArtifactFilter> filters;
+  private final List<ArtifactFilter> filters;
 
-    public CompositeFilter(List<ArtifactFilter> filters) {
-        this.filters = filters;
-    }
+  public CompositeFilter(List<ArtifactFilter> filters) {
+    this.filters = filters;
+  }
 
-    public Artifact apply(Artifact artifact) {
-        Artifact result = artifact;
-        for (ArtifactFilter filter : filters) {
-            result = filter.apply(result);
-        }
-        return result;
+  public Artifact apply(Artifact artifact) {
+    Artifact result = artifact;
+    for (ArtifactFilter filter : filters) {
+      result = filter.apply(result);
     }
+    return result;
+  }
 }

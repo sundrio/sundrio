@@ -18,19 +18,19 @@ package io.sundr.builder;
 
 public interface Visitable<T> {
 
-   T accept(Visitor... visitor);
+  T accept(Visitor... visitor);
 
-   default <V> T accept(Class<V> type, Visitor<V> visitor) {
-     return accept(new TypedVisitor<V>() {
-         @Override
-         public Class<V> getType() {
-           return type;
-         }
+  default <V> T accept(Class<V> type, Visitor<V> visitor) {
+    return accept(new TypedVisitor<V>() {
+      @Override
+      public Class<V> getType() {
+        return type;
+      }
 
-         @Override
-         public void visit(V element) {
-           visitor.visit(element);
-         }
-       });
-   }
+      @Override
+      public void visit(V element) {
+        visitor.visit(element);
+      }
+    });
+  }
 }

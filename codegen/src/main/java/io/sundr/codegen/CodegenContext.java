@@ -21,38 +21,38 @@ import javax.lang.model.util.Types;
 
 public class CodegenContext {
 
-    private static CodegenContext INSTANCE;
+  private static CodegenContext INSTANCE;
 
-    private final Types types;
-    private final Elements elements;
-    private final DefinitionRepository definitionRepository = DefinitionRepository.getRepository();
+  private final Types types;
+  private final Elements elements;
+  private final DefinitionRepository definitionRepository = DefinitionRepository.getRepository();
 
-    private CodegenContext(Elements elements, Types types) {
-        this.types = types;
-        this.elements = elements;
+  private CodegenContext(Elements elements, Types types) {
+    this.types = types;
+    this.elements = elements;
+  }
+
+  public synchronized static CodegenContext create(Elements elements, Types types) {
+    INSTANCE = new CodegenContext(elements, types);
+    return INSTANCE;
+  }
+
+  public synchronized static CodegenContext getContext() {
+    if (INSTANCE == null) {
+      throw new IllegalStateException("CodeGenContext has not been created, yet.");
     }
+    return INSTANCE;
+  }
 
-    public synchronized static CodegenContext create(Elements elements, Types types) {
-        INSTANCE = new CodegenContext(elements, types);
-        return INSTANCE;
-    }
+  public Types getTypes() {
+    return types;
+  }
 
-    public synchronized static CodegenContext getContext() {
-        if (INSTANCE == null) {
-            throw new IllegalStateException("CodeGenContext has not been created, yet.");
-        }
-        return INSTANCE;
-    }
+  public Elements getElements() {
+    return elements;
+  }
 
-    public Types getTypes() {
-        return types;
-    }
-
-    public Elements getElements() {
-        return elements;
-    }
-
-    public DefinitionRepository getDefinitionRepository() {
-        return definitionRepository;
-    }
+  public DefinitionRepository getDefinitionRepository() {
+    return definitionRepository;
+  }
 }

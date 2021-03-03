@@ -16,98 +16,98 @@
 
 package io.sundr.builder.internal.processor;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.FileNotFoundException;
+import java.util.Iterator;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.FileNotFoundException;
-import java.util.Iterator;
-
-import static org.junit.Assert.assertEquals;
 
 public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
 
-    TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
-    TypeDef simpleClassWithDateDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClassWithDate.java"));
+  TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
+      .apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
+  TypeDef simpleClassWithDateDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
+      .apply(getClass().getClassLoader().getResourceAsStream("SimpleClassWithDate.java"));
 
-    @Before
-    public void setUp() {
-        builderContext.getBuildableRepository().register(simpleClassDef);
-    }
+  @Before
+  public void setUp() {
+    builderContext.getBuildableRepository().register(simpleClassDef);
+  }
 
-    @Test
-    public void testFluent() {
-        TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassWithDateDef);
-        System.out.println(fluent);
+  @Test
+  public void testFluent() {
+    TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassWithDateDef);
+    System.out.println(fluent);
 
-        assertEquals(Kind.INTERFACE, fluent.getKind());
-        assertEquals("SimpleClassWithDateFluent", fluent.getName());
-        assertEquals(1, fluent.getExtendsList().size());
+    assertEquals(Kind.INTERFACE, fluent.getKind());
+    assertEquals("SimpleClassWithDateFluent", fluent.getName());
+    assertEquals(1, fluent.getExtendsList().size());
 
-        ClassRef superClass = fluent.getExtendsList().iterator().next();
-        assertEquals("SimpleClassFluent", superClass.getDefinition().getName());
-        assertEquals(1, superClass.getArguments().size());
-        assertEquals("A", superClass.getArguments().iterator().next().toString());
-    }
+    ClassRef superClass = fluent.getExtendsList().iterator().next();
+    assertEquals("SimpleClassFluent", superClass.getDefinition().getName());
+    assertEquals(1, superClass.getArguments().size());
+    assertEquals("A", superClass.getArguments().iterator().next().toString());
+  }
 
+  @Test
+  public void testFluentImpl() throws FileNotFoundException {
+    TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassWithDateDef);
+    System.out.println(fluentImpl);
 
-    @Test
-    public void testFluentImpl() throws FileNotFoundException {
-        TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassWithDateDef);
-        System.out.println(fluentImpl);
+    assertEquals(Kind.CLASS, fluentImpl.getKind());
+    assertEquals("SimpleClassWithDateFluentImpl", fluentImpl.getName());
+    assertEquals(1, fluentImpl.getExtendsList().size());
 
-        assertEquals(Kind.CLASS, fluentImpl.getKind());
-        assertEquals("SimpleClassWithDateFluentImpl", fluentImpl.getName());
-        assertEquals(1, fluentImpl.getExtendsList().size());
+    ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
+    assertEquals("SimpleClassFluentImpl", superClass.getDefinition().getName());
+    assertEquals(1, superClass.getArguments().size());
+    assertEquals("A", superClass.getArguments().iterator().next().toString());
+  }
 
+  @Test
+  public void testBuilder() throws FileNotFoundException {
+    TypeDef builder = ClazzAs.BUILDER.apply(simpleClassWithDateDef);
+    System.out.println(builder);
 
-        ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
-        assertEquals("SimpleClassFluentImpl", superClass.getDefinition().getName());
-        assertEquals(1, superClass.getArguments().size());
-        assertEquals("A", superClass.getArguments().iterator().next().toString());
-    }
+    assertEquals(Kind.CLASS, builder.getKind());
+    assertEquals("SimpleClassWithDateBuilder", builder.getName());
+    assertEquals(1, builder.getExtendsList().size());
 
-    @Test
-    public void testBuilder() throws FileNotFoundException {
-        TypeDef builder = ClazzAs.BUILDER.apply(simpleClassWithDateDef);
-        System.out.println(builder);
+    ClassRef superClass = builder.getImplementsList().iterator().next();
+    assertEquals(builderContext.getVisitableBuilderInterface().getName(), superClass.getDefinition().getName());
+    assertEquals(2, superClass.getArguments().size());
+    Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
+    assertEquals("SimpleClassWithDate", argIterator.next().toString());
+    assertEquals("SimpleClassWithDateBuilder", argIterator.next().toString());
+  }
 
-        assertEquals(Kind.CLASS, builder.getKind());
-        assertEquals("SimpleClassWithDateBuilder", builder.getName());
-        assertEquals(1, builder.getExtendsList().size());
+  @Test
+  public void testEditable() {
+    TypeDef editable = ClazzAs.EDITABLE.apply(simpleClassWithDateDef);
+    System.out.println(editable);
 
-        ClassRef superClass = builder.getImplementsList().iterator().next();
-        assertEquals(builderContext.getVisitableBuilderInterface().getName(), superClass.getDefinition().getName());
-        assertEquals(2, superClass.getArguments().size());
-        Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
-        assertEquals("SimpleClassWithDate", argIterator.next().toString());
-        assertEquals("SimpleClassWithDateBuilder", argIterator.next().toString());
-    }
+    assertEquals(Kind.CLASS, editable.getKind());
+    assertEquals("EditableSimpleClassWithDate", editable.getName());
+    assertEquals(1, editable.getExtendsList().size());
 
-    @Test
-    public void testEditable() {
-        TypeDef editable = ClazzAs.EDITABLE.apply(simpleClassWithDateDef);
-        System.out.println(editable);
+    ClassRef superClass = editable.getExtendsList().iterator().next();
+    assertEquals(simpleClassWithDateDef.toInternalReference(), superClass);
+  }
 
-        assertEquals(Kind.CLASS, editable.getKind());
-        assertEquals("EditableSimpleClassWithDate", editable.getName());
-        assertEquals(1, editable.getExtendsList().size());
-
-        ClassRef superClass = editable.getExtendsList().iterator().next();
-        assertEquals(simpleClassWithDateDef.toInternalReference(), superClass);
-    }
-
-
-    @Test
-    public void testInline() {
-        TypeDef inlineable = BuildableProcessor.inlineableOf(builderContext, simpleClassWithDateDef, inline);
-        System.out.println(inlineable);
-        assertEquals(Kind.CLASS, inlineable.getKind());
-        assertEquals("CallableSimpleClassWithDate", inlineable.getName());
-    }
+  @Test
+  public void testInline() {
+    TypeDef inlineable = BuildableProcessor.inlineableOf(builderContext, simpleClassWithDateDef, inline);
+    System.out.println(inlineable);
+    assertEquals(Kind.CLASS, inlineable.getKind());
+    assertEquals("CallableSimpleClassWithDate", inlineable.getName());
+  }
 }

@@ -18,5 +18,5 @@ package io.sundr.builder;
 
 public interface Doneable<T> {
 
-    T done();
+  T done();
 }

@@ -20,20 +20,21 @@ import io.sundr.builder.Builder;
 
 public class CodeGeneratorBuilder<M> extends CodeGeneratorFluent<M, CodeGeneratorBuilder<M>> implements Builder<CodeGenerator> {
 
-    public CodeGeneratorBuilder() {
-    }
-    
-    public CodeGeneratorBuilder(CodeGenerator<M> instance) {
-        withModel(instance.getModel());
-        withParameters(instance.getParameters());
-        withWriter(instance.getWriter());
-        withTemplateResource(instance.getTemplateResource());
-        withTemplateContent(instance.getTemplateContent());
-        withTemplateUrl(instance.getTemplateUrl());
-        withDirectives(instance.getDirectives());
-    }
-    
-    public CodeGenerator build() {
-       return new CodeGenerator(getContext(),  getModel(), getParameters(), getWriter(), getTemplateUrl(), getTemplateResource(), getTemplateContent(), getDirectives() );
-    }
+  public CodeGeneratorBuilder() {
+  }
+
+  public CodeGeneratorBuilder(CodeGenerator<M> instance) {
+    withModel(instance.getModel());
+    withParameters(instance.getParameters());
+    withWriter(instance.getWriter());
+    withTemplateResource(instance.getTemplateResource());
+    withTemplateContent(instance.getTemplateContent());
+    withTemplateUrl(instance.getTemplateUrl());
+    withDirectives(instance.getDirectives());
+  }
+
+  public CodeGenerator build() {
+    return new CodeGenerator(getContext(), getModel(), getParameters(), getWriter(), getTemplateUrl(), getTemplateResource(),
+        getTemplateContent(), getDirectives());
+  }
 }

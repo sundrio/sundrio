@@ -16,21 +16,24 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Fluent;
-
 import java.util.Map;
 
-public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A>{
+import io.sundr.builder.Fluent;
 
+public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A> {
 
-    public A addToAttributes(AttributeKey key, Object value);
-    public A addToAttributes(Map<AttributeKey, Object> map);
-    public A removeFromAttributes(AttributeKey key);
-    public A removeFromAttributes(Map<AttributeKey, Object> map);
-    public Map<AttributeKey,Object> getAttributes();
-    public A withAttributes(Map<AttributeKey, Object> attributes);
-    public Boolean hasAttributes();
+  public A addToAttributes(AttributeKey key, Object value);
 
+  public A addToAttributes(Map<AttributeKey, Object> map);
 
+  public A removeFromAttributes(AttributeKey key);
+
+  public A removeFromAttributes(Map<AttributeKey, Object> map);
+
+  public Map<AttributeKey, Object> getAttributes();
+
+  public A withAttributes(Map<AttributeKey, Object> attributes);
+
+  public Boolean hasAttributes();
 
 }

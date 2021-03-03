@@ -16,7 +16,10 @@
 
 package io.sundr.maven;
 
-import io.sundr.codegen.utils.StringUtils;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -38,94 +41,97 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import io.sundr.codegen.utils.StringUtils;
 
 public abstract class AbstractSundrioMojo extends AbstractMojo {
 
-    static final String BOM_NAME = "pom.xml";
-    static final String POM_TYPE = "pom";
-    static final String PLUGIN_TYPE = "maven-plugin";
+  static final String BOM_NAME = "pom.xml";
+  static final String POM_TYPE = "pom";
+  static final String PLUGIN_TYPE = "maven-plugin";
 
-    @Parameter(defaultValue = "${project}", readonly = true)
-    private MavenProject project;
+  @Parameter(defaultValue = "${project}", readonly = true)
+  private MavenProject project;
 
-    @Parameter( defaultValue = "${session}", readonly = true )
-    private MavenSession session;
+  @Parameter(defaultValue = "${session}", readonly = true)
+  private MavenSession session;
 
-    @Parameter( defaultValue = "${mojoExecution}", readonly = true )
-    private MojoExecution mojo;
+  @Parameter(defaultValue = "${mojoExecution}", readonly = true)
+  private MojoExecution mojo;
 
-    // this is required for the deploy phase, but end user may just use a install phase only, so let required = false
-    @Parameter(defaultValue = "${project.distributionManagementArtifactRepository}", readonly = true, required = false)
-    private ArtifactRepository deploymentRepository;
+  // this is required for the deploy phase, but end user may just use a install phase only, so let required = false
+  @Parameter(defaultValue = "${project.distributionManagementArtifactRepository}", readonly = true, required = false)
+  private ArtifactRepository deploymentRepository;
 
-    @Parameter(defaultValue = "${altDeploymentRepository}", readonly = true, required = false)
-    private String altDeploymentRepository;
+  @Parameter(defaultValue = "${altDeploymentRepository}", readonly = true, required = false)
+  private String altDeploymentRepository;
 
-    @Component
-    private ArtifactHandler artifactHandler;
+  @Component
+  private ArtifactHandler artifactHandler;
 
-    public MavenProject getProject() {
-        return project;
+  public MavenProject getProject() {
+    return project;
+  }
+
+  public MavenSession getSession() {
+    return session;
+  }
+
+  public ArtifactHandler getArtifactHandler() {
+    return artifactHandler;
+  }
+
+  MavenProject readProject(File pomFile) throws IOException {
+    MavenXpp3Reader mavenReader = new MavenXpp3Reader();
+    FileReader fileReader = null;
+    try {
+      fileReader = new FileReader(pomFile);
+      Model model = mavenReader.read(fileReader);
+      model.setPomFile(pomFile);
+      MavenProject project = new MavenProject(model);
+      project.setFile(pomFile);
+      project.setArtifact(createArtifact(pomFile, model.getGroupId(), model.getArtifactId(), model.getVersion(), "compile",
+          model.getPackaging(), ""));
+      return project;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (fileReader != null) {
+        fileReader.close();
+      }
     }
+  }
 
-    public MavenSession getSession() {
-        return session;
+  Artifact createArtifact(File file, String groupId, String artifactId, String version, String scope, String type,
+      String classifier) {
+    DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, version, scope, type, classifier, artifactHandler);
+    artifact.setFile(file);
+    artifact.setResolved(true);
+    return artifact;
+  }
+
+  void backGroundBuild(MavenProject project) throws MojoExecutionException {
+    MavenExecutionRequest executionRequest = session.getRequest();
+
+    InvocationRequest request = new DefaultInvocationRequest();
+    request.setBaseDirectory(project.getBasedir());
+    request.setPomFile(project.getFile());
+    request.setGoals(executionRequest.getGoals());
+    request.setRecursive(false);
+    request.setInteractive(false);
+
+    request.setProfiles(executionRequest.getActiveProfiles());
+    request.setProperties(executionRequest.getUserProperties());
+    Invoker invoker = new DefaultInvoker();
+    try {
+      InvocationResult result = invoker.execute(request);
+      if (result.getExitCode() != 0) {
+        throw new IllegalStateException(
+            "Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]",
+            result.getExecutionException());
+      }
+    } catch (MavenInvocationException e) {
+      throw new IllegalStateException(
+          "Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]", e);
     }
-
-    public ArtifactHandler getArtifactHandler() {
-        return artifactHandler;
-    }
-
-    MavenProject readProject(File pomFile) throws IOException {
-        MavenXpp3Reader mavenReader = new MavenXpp3Reader();
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(pomFile);
-            Model model = mavenReader.read(fileReader);
-            model.setPomFile(pomFile);
-            MavenProject project = new MavenProject(model);
-            project.setFile(pomFile);
-            project.setArtifact(createArtifact(pomFile, model.getGroupId(), model.getArtifactId(), model.getVersion(), "compile", model.getPackaging(), ""));
-            return project;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (fileReader != null) {
-                fileReader.close();
-            }
-        }
-    }
-
-    Artifact createArtifact(File file, String groupId, String artifactId, String version, String scope, String type, String classifier) {
-        DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, version, scope, type, classifier, artifactHandler);
-        artifact.setFile(file);
-        artifact.setResolved(true);
-        return artifact;
-    }
-
-    void backGroundBuild(MavenProject project) throws MojoExecutionException {
-        MavenExecutionRequest executionRequest = session.getRequest();
-
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setBaseDirectory(project.getBasedir());
-        request.setPomFile(project.getFile());
-        request.setGoals(executionRequest.getGoals());
-        request.setRecursive(false);
-        request.setInteractive(false);
-
-        request.setProfiles(executionRequest.getActiveProfiles());
-        request.setProperties(executionRequest.getUserProperties());
-        Invoker invoker = new DefaultInvoker();
-        try {
-            InvocationResult result = invoker.execute(request);
-            if (result.getExitCode() != 0) {
-                throw new IllegalStateException("Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]", result.getExecutionException());
-            }
-        } catch (MavenInvocationException e) {
-            throw new IllegalStateException("Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]", e);
-        }
-    }
+  }
 }

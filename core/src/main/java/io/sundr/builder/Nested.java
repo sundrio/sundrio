@@ -18,5 +18,5 @@ package io.sundr.builder;
 
 public interface Nested<F> {
 
-     F and();
+  F and();
 }

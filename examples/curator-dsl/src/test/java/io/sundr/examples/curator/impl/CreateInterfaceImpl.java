@@ -16,17 +16,15 @@
 
 package io.sundr.examples.curator.impl;
 
+public class CreateInterfaceImpl {
 
-public class CreateInterfaceImpl  {
-
-    /*
-    static {
-        new CreateInterfaceImpl().createParentsIfNeeded().withMode(1).forPath("somePath");
-        new CreateInterfaceImpl().withMode(1).forPath("somePath");
-        new CreateInterfaceImpl().createParentsIfNeeded().forPath("somePath");
-        new CreateInterfaceImpl().forPath("somePath");
-    }
-    */
-
+  /*
+   * static {
+   * new CreateInterfaceImpl().createParentsIfNeeded().withMode(1).forPath("somePath");
+   * new CreateInterfaceImpl().withMode(1).forPath("somePath");
+   * new CreateInterfaceImpl().createParentsIfNeeded().forPath("somePath");
+   * new CreateInterfaceImpl().forPath("somePath");
+   * }
+   */
 
 }

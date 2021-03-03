@@ -16,12 +16,13 @@
 
 package io.sundr.maven.filter;
 
-import io.sundr.maven.Constants;
 import org.apache.maven.artifact.Artifact;
+
+import io.sundr.maven.Constants;
 
 public class MavenPluginFilter implements ArtifactFilter {
 
-    public Artifact apply(Artifact artifact) {
-        return artifact == null ? null : (Constants.MAVEN_PLUGIN_TYPE.equals(artifact.getType()) ? artifact : null);
-    }
+  public Artifact apply(Artifact artifact) {
+    return artifact == null ? null : (Constants.MAVEN_PLUGIN_TYPE.equals(artifact.getType()) ? artifact : null);
+  }
 }

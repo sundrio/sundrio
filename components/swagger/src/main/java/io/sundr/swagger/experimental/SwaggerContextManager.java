@@ -22,24 +22,25 @@ import io.swagger.models.Swagger;
 
 public class SwaggerContextManager {
 
-    private SwaggerContextManager() {}
+  private SwaggerContextManager() {
+  }
 
-    private static SwaggerContext context = null;
+  private static SwaggerContext context = null;
 
-    public synchronized static SwaggerContext create(ClientOptInput opts) {
-        context = new SwaggerContext(opts.getSwagger(), opts.getConfig(), opts);
-        return context;
+  public synchronized static SwaggerContext create(ClientOptInput opts) {
+    context = new SwaggerContext(opts.getSwagger(), opts.getConfig(), opts);
+    return context;
+  }
+
+  public synchronized static SwaggerContext create(Swagger swagger, CodegenConfig config, ClientOptInput opts) {
+    context = new SwaggerContext(swagger, config, opts);
+    return context;
+  }
+
+  public static synchronized SwaggerContext getContext() {
+    if (context == null) {
+      throw new IllegalStateException("Swagger context not available.");
     }
-
-    public synchronized static SwaggerContext create(Swagger swagger, CodegenConfig config, ClientOptInput opts) {
-        context = new SwaggerContext(swagger, config, opts);
-        return context;
-    }
-
-    public static synchronized SwaggerContext getContext() {
-        if (context== null) {
-            throw new IllegalStateException("Swagger context not available.");
-        }
-        return context;
-    }
+    return context;
+  }
 }

@@ -18,5 +18,5 @@ package io.sundr.examples.shapes;
 
 public interface Createable<T> {
 
-    T create();
+  T create();
 }

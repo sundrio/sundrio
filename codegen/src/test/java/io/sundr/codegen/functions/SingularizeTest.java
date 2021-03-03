@@ -16,20 +16,20 @@
 
 package io.sundr.codegen.functions;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class SingularizeTest {
 
-    @Test
-    public void testSingularize() {
+  @Test
+  public void testSingularize() {
 
-        assertEquals("address", Singularize.FUNCTION.apply("addresses"));
-        assertEquals("ADDRESS", Singularize.FUNCTION.apply("ADDRESSES"));
+    assertEquals("address", Singularize.FUNCTION.apply("addresses"));
+    assertEquals("ADDRESS", Singularize.FUNCTION.apply("ADDRESSES"));
 
-        assertEquals("number", Singularize.FUNCTION.apply("numbers"));
-        assertEquals("NUMBER", Singularize.FUNCTION.apply("NUMBERS"));
-    }
+    assertEquals("number", Singularize.FUNCTION.apply("numbers"));
+    assertEquals("NUMBER", Singularize.FUNCTION.apply("NUMBERS"));
+  }
 
 }

@@ -27,10 +27,9 @@ public class PersonTest {
   @Test
   public void testPersonNumbers() throws Exception {
     Person person = new PersonBuilder()
-      .withFirstName("John")
-      .withLastName("Doe")
-      .addToNumbers(1)
-      .build();
+        .withFirstName("John")
+        .withLastName("Doe")
+        .addToNumbers(1)
+        .build();
   }
 }
-

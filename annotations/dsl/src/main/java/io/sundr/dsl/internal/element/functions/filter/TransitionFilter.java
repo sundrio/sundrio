@@ -16,10 +16,10 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
+import java.util.Collection;
+
 import io.sundr.Function;
 import io.sundr.codegen.model.TypeDef;
-
-import java.util.Collection;
 
 /**
  * A Function that determines if a set of visited keyword types satisfies some requirements.

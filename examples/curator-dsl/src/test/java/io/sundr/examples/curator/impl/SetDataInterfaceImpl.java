@@ -22,56 +22,54 @@ import io.sundr.examples.curator.StatablePathablePathAndBytesableInterface;
 import io.sundr.examples.curator.WatchableStatablePathablePathAndBytesableInterface;
 
 public class SetDataInterfaceImpl implements SetDataInterface, WatchableStatablePathablePathAndBytesableInterface<String, Void>,
-        PathableAndBytesableInterface<String, Void>,
-        StatablePathablePathAndBytesableInterface<String, Void>{
-    
-    @Override
-    public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(boolean flag) {
-        return this;
-    }
+    PathableAndBytesableInterface<String, Void>,
+    StatablePathablePathAndBytesableInterface<String, Void> {
 
-    @Override
-    public WatchableStatablePathablePathAndBytesableInterface<String, Void>  inBackground(Object context) {
-        return this;
-    }
+  @Override
+  public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(boolean flag) {
+    return this;
+  }
 
-    @Override
-    public WatchableStatablePathablePathAndBytesableInterface<String, Void>  inBackground() {
-        return this;
-    }
+  @Override
+  public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(Object context) {
+    return this;
+  }
 
-    @Override
-    public Void forPath(String path, byte[] bytes) {
-        return null;
-    }
+  @Override
+  public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground() {
+    return this;
+  }
 
-    @Override
-    public String forPath(String path) {
-        return "";
-    }
+  @Override
+  public Void forPath(String path, byte[] bytes) {
+    return null;
+  }
 
-    @Override
-    public PathableAndBytesableInterface<String, Void> storingStatIn(String stat) {
-        return this;
-    }
+  @Override
+  public String forPath(String path) {
+    return "";
+  }
 
-    @Override
-    public StatablePathablePathAndBytesableInterface<String, Void> watched() {
-        return this;
-    }
+  @Override
+  public PathableAndBytesableInterface<String, Void> storingStatIn(String stat) {
+    return this;
+  }
 
+  @Override
+  public StatablePathablePathAndBytesableInterface<String, Void> watched() {
+    return this;
+  }
 
-    /*
-    static {
-        new SetDataInterfaceImpl().forPath("somePath");
-        new SetDataInterfaceImpl().forPath("somePath", (byte) 0);
-        new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 0);
-        new SetDataInterfaceImpl().forPath("somePath");
-        new SetDataInterfaceImpl().watched().forPath("somePath");
-        new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 9);
-        String s = new SetDataInterfaceImpl().inBackground().forPath("somePath");
-    }
-*/
+  /*
+   * static {
+   * new SetDataInterfaceImpl().forPath("somePath");
+   * new SetDataInterfaceImpl().forPath("somePath", (byte) 0);
+   * new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 0);
+   * new SetDataInterfaceImpl().forPath("somePath");
+   * new SetDataInterfaceImpl().watched().forPath("somePath");
+   * new SetDataInterfaceImpl().inBackground().forPath("somePath", (byte) 9);
+   * String s = new SetDataInterfaceImpl().inBackground().forPath("somePath");
+   * }
+   */
 
-    
 }

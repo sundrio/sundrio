@@ -16,92 +16,90 @@
 
 package io.sundr.builder.internal.processor;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Iterator;
+
+import org.junit.Test;
+
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
-import org.junit.Test;
-
-import java.util.Iterator;
-
-import static org.junit.Assert.assertEquals;
 
 public class SimpleClassWithParameterTest extends AbstractProcessorTest {
 
-    TypeDef simpleClassWithParameterDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(getClass().getClassLoader().getResourceAsStream("SimpleClassWithParameter.java"));
+  TypeDef simpleClassWithParameterDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
+      .apply(getClass().getClassLoader().getResourceAsStream("SimpleClassWithParameter.java"));
 
-    @Test
-    public void testFluent() {
-        TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassWithParameterDef);
-        System.out.println(fluent);
+  @Test
+  public void testFluent() {
+    TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassWithParameterDef);
+    System.out.println(fluent);
 
-        assertEquals(Kind.INTERFACE, fluent.getKind());
-        assertEquals("SimpleClassWithParameterFluent", fluent.getName());
-        assertEquals(1, fluent.getExtendsList().size());
+    assertEquals(Kind.INTERFACE, fluent.getKind());
+    assertEquals("SimpleClassWithParameterFluent", fluent.getName());
+    assertEquals(1, fluent.getExtendsList().size());
 
+    ClassRef superClass = fluent.getExtendsList().iterator().next();
+    assertEquals("Fluent", superClass.getDefinition().getName());
+    assertEquals(1, superClass.getArguments().size());
+    assertEquals("A", superClass.getArguments().iterator().next().toString());
+  }
 
-        ClassRef superClass = fluent.getExtendsList().iterator().next();
-        assertEquals("Fluent", superClass.getDefinition().getName());
-        assertEquals(1, superClass.getArguments().size());
-        assertEquals("A", superClass.getArguments().iterator().next().toString());
-    }
+  @Test
+  public void testFluentImpl() {
+    TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassWithParameterDef);
+    System.out.println(fluentImpl);
 
+    assertEquals(Kind.CLASS, fluentImpl.getKind());
+    assertEquals("SimpleClassWithParameterFluentImpl", fluentImpl.getName());
+    assertEquals(1, fluentImpl.getExtendsList().size());
 
-    @Test
-    public void testFluentImpl() {
-        TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassWithParameterDef);
-        System.out.println(fluentImpl);
+    ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
+    assertEquals("BaseFluent", superClass.getDefinition().getName());
+    assertEquals(1, superClass.getArguments().size());
+    assertEquals("A", superClass.getArguments().iterator().next().toString());
+  }
 
-        assertEquals(Kind.CLASS, fluentImpl.getKind());
-        assertEquals("SimpleClassWithParameterFluentImpl", fluentImpl.getName());
-        assertEquals(1, fluentImpl.getExtendsList().size());
+  @Test
+  public void testBuilder() {
+    TypeDef builder = ClazzAs.BUILDER.apply(simpleClassWithParameterDef);
+    System.out.println(builder);
 
-        ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
-        assertEquals("BaseFluent", superClass.getDefinition().getName());
-        assertEquals(1, superClass.getArguments().size());
-        assertEquals("A", superClass.getArguments().iterator().next().toString());
-    }
+    assertEquals(Kind.CLASS, builder.getKind());
+    assertEquals("SimpleClassWithParameterBuilder", builder.getName());
+    assertEquals(1, builder.getExtendsList().size());
 
-    @Test
-    public void testBuilder() {
-        TypeDef builder = ClazzAs.BUILDER.apply(simpleClassWithParameterDef);
-        System.out.println(builder);
+    ClassRef superClass = builder.getImplementsList().iterator().next();
+    assertEquals("VisitableBuilder", superClass.getDefinition().getName());
+    assertEquals(2, superClass.getArguments().size());
+    Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
+    assertEquals("SimpleClassWithParameter<N>", argIterator.next().toString());
+    assertEquals("SimpleClassWithParameterBuilder<N>", argIterator.next().toString());
 
-        assertEquals(Kind.CLASS, builder.getKind());
-        assertEquals("SimpleClassWithParameterBuilder", builder.getName());
-        assertEquals(1, builder.getExtendsList().size());
+  }
 
+  @Test
+  public void testEditable() {
+    TypeDef editable = ClazzAs.EDITABLE.apply(simpleClassWithParameterDef);
+    System.out.println(editable);
 
-        ClassRef superClass = builder.getImplementsList().iterator().next();
-        assertEquals("VisitableBuilder", superClass.getDefinition().getName());
-        assertEquals(2, superClass.getArguments().size());
-        Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
-        assertEquals("SimpleClassWithParameter<N>", argIterator.next().toString());
-        assertEquals("SimpleClassWithParameterBuilder<N>", argIterator.next().toString());
+    assertEquals(Kind.CLASS, editable.getKind());
+    assertEquals("EditableSimpleClassWithParameter", editable.getName());
+    assertEquals(1, editable.getExtendsList().size());
 
-    }
+    ClassRef superClass = editable.getExtendsList().iterator().next();
+    assertEquals(simpleClassWithParameterDef.toInternalReference(), superClass);
+  }
 
-    @Test
-    public void testEditable() {
-        TypeDef editable = ClazzAs.EDITABLE.apply(simpleClassWithParameterDef);
-        System.out.println(editable);
-
-        assertEquals(Kind.CLASS, editable.getKind());
-        assertEquals("EditableSimpleClassWithParameter", editable.getName());
-        assertEquals(1, editable.getExtendsList().size());
-
-        ClassRef superClass = editable.getExtendsList().iterator().next();
-        assertEquals(simpleClassWithParameterDef.toInternalReference(), superClass);
-    }
-
-
-    @Test
-    public void testInline() {
-        TypeDef inlineable = BuildableProcessor.inlineableOf(builderContext, simpleClassWithParameterDef, inline);
-        System.out.println(inlineable);
-        assertEquals(Kind.CLASS, inlineable.getKind());
-        assertEquals("CallableSimpleClassWithParameter", inlineable.getName());
-    }
+  @Test
+  public void testInline() {
+    TypeDef inlineable = BuildableProcessor.inlineableOf(builderContext, simpleClassWithParameterDef, inline);
+    System.out.println(inlineable);
+    assertEquals(Kind.CLASS, inlineable.getKind());
+    assertEquals("CallableSimpleClassWithParameter", inlineable.getName());
+  }
 }

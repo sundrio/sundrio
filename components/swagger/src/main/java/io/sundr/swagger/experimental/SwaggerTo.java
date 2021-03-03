@@ -25,25 +25,26 @@ import io.swagger.models.Model;
 
 public class SwaggerTo {
 
-    private static final Function<Model, TypeDef> INTERNAL_MODEL = new Function<Model, TypeDef>() {
+  private static final Function<Model, TypeDef> INTERNAL_MODEL = new Function<Model, TypeDef>() {
 
-        public TypeDef apply(Model model) {
+    public TypeDef apply(Model model) {
 
-            return new TypeDefBuilder()
-                    .withKind(Kind.CLASS)
-                    .build();
-        }
-    };
+      return new TypeDefBuilder()
+          .withKind(Kind.CLASS)
+          .build();
+    }
+  };
 
-    private static final Function<Model, TypeDef> INTERNAL_SHALLOW_MODEL = new Function<Model, TypeDef>() {
+  private static final Function<Model, TypeDef> INTERNAL_SHALLOW_MODEL = new Function<Model, TypeDef>() {
 
-        public TypeDef apply(Model model) {
+    public TypeDef apply(Model model) {
 
-            return new TypeDefBuilder()
-                    .withKind(Kind.CLASS)
-                    .build();
-        }
-    };
+      return new TypeDefBuilder()
+          .withKind(Kind.CLASS)
+          .build();
+    }
+  };
 
-    public static final Function<Model, TypeDef> MODEL = FunctionFactory.cache(INTERNAL_MODEL).withFallback(INTERNAL_SHALLOW_MODEL).withMaximumRecursionLevel(5).withMaximumNestingDepth(5);
+  public static final Function<Model, TypeDef> MODEL = FunctionFactory.cache(INTERNAL_MODEL)
+      .withFallback(INTERNAL_SHALLOW_MODEL).withMaximumRecursionLevel(5).withMaximumNestingDepth(5);
 }

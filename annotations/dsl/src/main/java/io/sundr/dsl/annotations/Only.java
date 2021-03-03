@@ -22,11 +22,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+@Target({ ElementType.ANNOTATION_TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.SOURCE)
 public @interface Only {
-    Class<? extends Annotation>[] value() default {};
-    String[] keywords() default {};
-    String[] methods() default {};
-    boolean orNone() default false;
+  Class<? extends Annotation>[] value() default {};
+
+  String[] keywords() default {};
+
+  String[] methods() default {};
+
+  boolean orNone() default false;
 }

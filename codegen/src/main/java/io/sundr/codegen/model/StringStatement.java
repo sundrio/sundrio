@@ -19,33 +19,33 @@ package io.sundr.codegen.model;
 import io.sundr.Provider;
 
 public class StringStatement implements Statement {
-    private final Provider<String> provider;
-    private final Object[] parameters;
+  private final Provider<String> provider;
+  private final Object[] parameters;
 
-    public StringStatement(Provider<String> provider) {
-        this.provider = provider;
-        this.parameters = new Object[]{};
-    }
+  public StringStatement(Provider<String> provider) {
+    this.provider = provider;
+    this.parameters = new Object[] {};
+  }
 
-    public StringStatement(Provider<String> provider, Object[] parameters) {
-        this.provider = provider;
-        this.parameters = parameters;
-    }
+  public StringStatement(Provider<String> provider, Object[] parameters) {
+    this.provider = provider;
+    this.parameters = parameters;
+  }
 
-    public StringStatement(final String data) {
-        this(() -> data, new Object[]{});
-    }
+  public StringStatement(final String data) {
+    this(() -> data, new Object[] {});
+  }
 
-    public StringStatement(final String data, final Object... parameters) {
-        this(() -> String.format(data, parameters));
-    }
+  public StringStatement(final String data, final Object... parameters) {
+    this(() -> String.format(data, parameters));
+  }
 
-    public Provider<String> getProvider() {
-        return provider;
-    }
+  public Provider<String> getProvider() {
+    return provider;
+  }
 
-    @Override
-    public String toString() {
-        return provider.get();
-    }
+  @Override
+  public String toString() {
+    return provider.get();
+  }
 }

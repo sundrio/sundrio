@@ -16,43 +16,42 @@
 
 package io.sundr.codegen.generator;
 
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.apache.velocity.Template;
+import org.apache.velocity.VelocityContext;
+
 public final class GeneratorUtils {
 
-    private GeneratorUtils() {
-        //Utility Class
-    }
+  private GeneratorUtils() {
+    //Utility Class
+  }
 
-
-    static void generate(VelocityContext context, Writer writer, Template template) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(writer);
-        try {
-            template.merge(context, bufferedWriter);
-            writer.flush();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            bufferedWriter.close();
-        }
+  static void generate(VelocityContext context, Writer writer, Template template) throws IOException {
+    BufferedWriter bufferedWriter = new BufferedWriter(writer);
+    try {
+      template.merge(context, bufferedWriter);
+      writer.flush();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      bufferedWriter.close();
     }
+  }
 
-    static void generate(VelocityContext context, File dir, String fileName, Template template) throws IOException {
-        FileWriter fw = null;
-        try  {
-            fw = new FileWriter(new File(dir, fileName));
-            generate(context, fw, template);
-        } finally {
-            if (fw != null) {
-                fw.close();
-            }
-        }
+  static void generate(VelocityContext context, File dir, String fileName, Template template) throws IOException {
+    FileWriter fw = null;
+    try {
+      fw = new FileWriter(new File(dir, fileName));
+      generate(context, fw, template);
+    } finally {
+      if (fw != null) {
+        fw.close();
+      }
     }
+  }
 }

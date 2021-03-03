@@ -18,5 +18,5 @@ package io.sundr.builder.annotations;
 
 public @interface BuildableReference {
 
-    Class value();
+  Class value();
 }

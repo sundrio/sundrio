@@ -16,84 +16,83 @@
 
 package io.sundr.codegen.directives;
 
-import io.sundr.codegen.model.TypeDef;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+
 import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import io.sundr.codegen.model.TypeDef;
 
 public class ClassDirective extends Directive {
-    
-    
-    private static final String MEMBER_OF = "MEMBER_OF";
-    private static final String ABSTRACT = " abstract ";
-    private static final String STATIC = " static ";
-    private static final String FINAL = " final ";
-    private static final String EXTENDS = " extends ";
-    private static final String IMPLEMENTS = " implements ";
-    private static final String PUBLIC = "public ";
-    private static final String CLASS = "class";
-    private static final String SPACE = " ";
-    private static final String COMMA = ",";
-    private static final String NEWLINE = "\n";
-    private static final String BRACKETS_LR = "[]";
 
-    private static final String SQUIGGLE_L = "{";
-    private static final String SQUIGGLE_R = "}";
+  private static final String MEMBER_OF = "MEMBER_OF";
+  private static final String ABSTRACT = " abstract ";
+  private static final String STATIC = " static ";
+  private static final String FINAL = " final ";
+  private static final String EXTENDS = " extends ";
+  private static final String IMPLEMENTS = " implements ";
+  private static final String PUBLIC = "public ";
+  private static final String CLASS = "class";
+  private static final String SPACE = " ";
+  private static final String COMMA = ",";
+  private static final String NEWLINE = "\n";
+  private static final String BRACKETS_LR = "[]";
 
-    private static final String LT = "<";
-    private static final String GT = ">";
+  private static final String SQUIGGLE_L = "{";
+  private static final String SQUIGGLE_R = "}";
 
+  private static final String LT = "<";
+  private static final String GT = ">";
 
-    @Override
-    public String getName() {
-        return CLASS;
-    }
+  @Override
+  public String getName() {
+    return CLASS;
+  }
 
-    @Override
-    public int getType() {
-        return BLOCK;
-    }
+  @Override
+  public int getType() {
+    return BLOCK;
+  }
 
-    @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
-        String block = "";
-        TypeDef clazz = null;
-        for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-            if (node.jjtGetChild(i) != null) {
-                if (!(node.jjtGetChild(i) instanceof ASTBlock)) {
-                    //reading and casting inline parameters
-                    if (i == 0) {
-                        clazz = (TypeDef) node.jjtGetChild(i).value(context);
-                    } else {
-                        break;
-                    }
-                } else {
-                    //reading block content and rendering it
-                    try {
-                        StringWriter blockContent = new StringWriter();
-                        node.jjtGetChild(i).render(context, blockContent);
+  @Override
+  public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
+    String block = "";
+    TypeDef clazz = null;
+    for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+      if (node.jjtGetChild(i) != null) {
+        if (!(node.jjtGetChild(i) instanceof ASTBlock)) {
+          //reading and casting inline parameters
+          if (i == 0) {
+            clazz = (TypeDef) node.jjtGetChild(i).value(context);
+          } else {
+            break;
+          }
+        } else {
+          //reading block content and rendering it
+          try {
+            StringWriter blockContent = new StringWriter();
+            node.jjtGetChild(i).render(context, blockContent);
 
-                        block = blockContent.toString();
-                    } catch (Exception e)  {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
-            }
+            block = blockContent.toString();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+          break;
         }
-        writeClazz(writer, clazz, block);
-        return true;
+      }
     }
+    writeClazz(writer, clazz, block);
+    return true;
+  }
 
-    private void writeClazz(Writer writer, TypeDef type, String block) throws IOException {
-        if (type != null) {
-            writer.append(type.toString());
-            writer.append(block).append(NEWLINE);
-        }
+  private void writeClazz(Writer writer, TypeDef type, String block) throws IOException {
+    if (type != null) {
+      writer.append(type.toString());
+      writer.append(block).append(NEWLINE);
     }
+  }
 }

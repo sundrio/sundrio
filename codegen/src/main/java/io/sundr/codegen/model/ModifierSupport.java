@@ -21,54 +21,54 @@ import java.util.Map;
 
 public class ModifierSupport extends AttributeSupport {
 
-    public static final String ABSTRACT = "abstract";
-    public static final String PUBLIC = "public";
-    public static final String PROTECTED = "protected";
-    public static final String PRIVATE = "private";
-    public static final String STATIC = "static";
-    public static final String FINAL = "final";
-    public static final String SYNCHRONIZED = "synchronized";
+  public static final String ABSTRACT = "abstract";
+  public static final String PUBLIC = "public";
+  public static final String PROTECTED = "protected";
+  public static final String PRIVATE = "private";
+  public static final String STATIC = "static";
+  public static final String FINAL = "final";
+  public static final String SYNCHRONIZED = "synchronized";
 
-    private final int modifiers;
+  private final int modifiers;
 
-    public ModifierSupport(int modifiers, Map<AttributeKey, Object> attributes) {
-        super(attributes);
-        this.modifiers = modifiers;
-    }
+  public ModifierSupport(int modifiers, Map<AttributeKey, Object> attributes) {
+    super(attributes);
+    this.modifiers = modifiers;
+  }
 
-    public boolean isPrivate() {
-        return Modifier.isPrivate(modifiers);
-    }
+  public boolean isPrivate() {
+    return Modifier.isPrivate(modifiers);
+  }
 
-    public boolean isProtected() {
-        return Modifier.isProtected(modifiers);
-    }
+  public boolean isProtected() {
+    return Modifier.isProtected(modifiers);
+  }
 
-    public boolean isPublic() {
-        return Modifier.isPublic(modifiers);
-    }
+  public boolean isPublic() {
+    return Modifier.isPublic(modifiers);
+  }
 
-    public boolean isFinal() {
-        return Modifier.isFinal(modifiers);
-    }
+  public boolean isFinal() {
+    return Modifier.isFinal(modifiers);
+  }
 
-    public boolean isStatic() {
-        return Modifier.isStatic(modifiers);
-    }
+  public boolean isStatic() {
+    return Modifier.isStatic(modifiers);
+  }
 
-    public boolean isAbstract() {
-        return Modifier.isAbstract(modifiers);
-    }
+  public boolean isAbstract() {
+    return Modifier.isAbstract(modifiers);
+  }
 
-    public boolean isSynchronized() {
-        return Modifier.isSynchronized(modifiers);
-    }
+  public boolean isSynchronized() {
+    return Modifier.isSynchronized(modifiers);
+  }
 
-    public boolean isTransient() {
-        return Modifier.isTransient(modifiers);
-    }
+  public boolean isTransient() {
+    return Modifier.isTransient(modifiers);
+  }
 
-    public int getModifiers() {
-        return modifiers;
-    }
+  public int getModifiers() {
+    return modifiers;
+  }
 }

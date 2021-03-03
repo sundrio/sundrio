@@ -20,8 +20,7 @@ import org.apache.maven.artifact.Artifact;
 
 public class SystemFilter implements ArtifactFilter {
 
-
-    public Artifact apply(Artifact artifact) {
-        return artifact == null ? null : (!Artifact.SCOPE_SYSTEM.equals(artifact.getScope())? artifact : null);
-    }
+  public Artifact apply(Artifact artifact) {
+    return artifact == null ? null : (!Artifact.SCOPE_SYSTEM.equals(artifact.getScope()) ? artifact : null);
+  }
 }

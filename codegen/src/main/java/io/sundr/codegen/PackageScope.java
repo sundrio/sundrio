@@ -18,18 +18,18 @@ package io.sundr.codegen;
 
 public class PackageScope {
 
-    private static String pkg;
+  private static String pkg;
 
-    public static void set(String pkg) {
-        PackageScope.pkg = pkg;
-    }
+  public static void set(String pkg) {
+    PackageScope.pkg = pkg;
+  }
 
-    public static String get() {
-        return PackageScope.pkg;
-    }
+  public static String get() {
+    return PackageScope.pkg;
+  }
 
-    public static void clear() {
-        PackageScope.pkg = null;
-    }
+  public static void clear() {
+    PackageScope.pkg = null;
+  }
 
 }

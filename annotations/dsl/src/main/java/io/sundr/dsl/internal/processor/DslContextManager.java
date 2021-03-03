@@ -16,31 +16,32 @@
 
 package io.sundr.dsl.internal.processor;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class DslContextManager {
 
-    private DslContextManager() {
-    }
+  private DslContextManager() {
+  }
 
-    private static final AtomicReference<DslContext> context = new AtomicReference<DslContext>();
+  private static final AtomicReference<DslContext> context = new AtomicReference<DslContext>();
 
-    public static DslContext create(Elements elements, Types types) {
-        DslContext ctx = new DslContext(elements, types);
-        if (context.compareAndSet(null, ctx)) {
-            return ctx;
-        } else {
-            DslContext existing = context.get();
-            return existing;
-        }
+  public static DslContext create(Elements elements, Types types) {
+    DslContext ctx = new DslContext(elements, types);
+    if (context.compareAndSet(null, ctx)) {
+      return ctx;
+    } else {
+      DslContext existing = context.get();
+      return existing;
     }
+  }
 
-    public static synchronized DslContext getContext() {
-        if (context.get() == null) {
-            throw new IllegalStateException("Dsl context not available.");
-        }
-        return context.get();
+  public static synchronized DslContext getContext() {
+    if (context.get() == null) {
+      throw new IllegalStateException("Dsl context not available.");
     }
+    return context.get();
+  }
 }

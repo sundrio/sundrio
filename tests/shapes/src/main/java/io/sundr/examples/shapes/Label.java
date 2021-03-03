@@ -17,7 +17,9 @@
 package io.sundr.examples.shapes;
 
 public @interface Label {
-    String key() default "";
-    String value() default "";
-    int order() default 1;
+  String key() default "";
+
+  String value() default "";
+
+  int order() default 1;
 }

@@ -16,22 +16,23 @@
 
 package io.sundr.codegen.converters.parser;
 
-import com.github.javaparser.ast.TypeParameter;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import io.sundr.Function;
-import io.sundr.codegen.model.TypeRef;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.javaparser.ast.TypeParameter;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+
+import io.sundr.Function;
+import io.sundr.codegen.model.TypeRef;
+
 public class TypeParameterToJavaType implements Function<TypeParameter, TypeRef> {
 
-    public TypeRef apply(TypeParameter item) {
-        List<TypeRef> interfaces = new ArrayList<TypeRef>();
+  public TypeRef apply(TypeParameter item) {
+    List<TypeRef> interfaces = new ArrayList<TypeRef>();
 
-        for (ClassOrInterfaceType classOrInterfaceType : item.getTypeBound()) {
+    for (ClassOrInterfaceType classOrInterfaceType : item.getTypeBound()) {
 
-        }
-        return null;
     }
+    return null;
+  }
 }

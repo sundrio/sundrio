@@ -18,75 +18,73 @@ package io.sundr.dsl.internal.type.functions;
 
 import io.sundr.Function;
 import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 
-import java.util.Arrays;
-
 public final class Merge {
-    
-    private Merge() {}
 
-    public static final Function<TypeDef[], TypeDef> TYPES = new Function<TypeDef[], TypeDef>() {
+  private Merge() {
+  }
 
-        public TypeDef apply(TypeDef... items) {
-            if (items == null || items.length == 0) {
-                throw new IllegalArgumentException("Items cannot be empty.");
-            } else if (items.length == 1) {
-                return items[0];
-            } else if (items.length == 2) {
-                TypeDefBuilder builder = new TypeDefBuilder(items[0]);
+  public static final Function<TypeDef[], TypeDef> TYPES = new Function<TypeDef[], TypeDef>() {
 
-                for (ClassRef classRef : items[1].getExtendsList()) {
-                    builder = builder.addToExtendsList(classRef);
-                }
+    public TypeDef apply(TypeDef... items) {
+      if (items == null || items.length == 0) {
+        throw new IllegalArgumentException("Items cannot be empty.");
+      } else if (items.length == 1) {
+        return items[0];
+      } else if (items.length == 2) {
+        TypeDefBuilder builder = new TypeDefBuilder(items[0]);
 
-                for (TypeParamDef type : items[1].getParameters()) {
-                    if (!items[0].getParameters().contains(type)) {
-                        builder = builder.addToParameters(type);
-                    }
-                }
-                return builder.build();
-            } else {
-                TypeDef[] rest = new TypeDef[items.length - 1];
-                System.arraycopy(items, 1, rest, 0, rest.length);
-                return TYPES.apply(new TypeDef[]{items[0], TYPES.apply(rest)});
-            }
+        for (ClassRef classRef : items[1].getExtendsList()) {
+          builder = builder.addToExtendsList(classRef);
         }
-    };
 
-
-    public static final Function<TypeDef[], TypeDef> CLASSES = new Function<TypeDef[], TypeDef>() {
-        public TypeDef apply(TypeDef... items) {
-            if (items == null || items.length == 0) {
-                throw new IllegalArgumentException("Items cannot be empty.");
-            } else if (items.length == 1) {
-                return items[0];
-            } else if (items.length == 2) {
-                TypeDef mergedType = TYPES.apply(new TypeDef[]{items[0], items[1]});
-
-                TypeDefBuilder builder = new TypeDefBuilder(mergedType);
-                for (Method constructor : items[1].getConstructors()) {
-                    builder = builder.addToConstructors(constructor);
-                }
-
-                for (Method method : items[1].getMethods()) {
-                    builder = builder.addToMethods(method);
-                }
-                for (Property property : items[1].getProperties()) {
-                    builder = builder.addToProperties(property);
-                }
-                return builder.build();
-            } else {
-                TypeDef[] rest = new TypeDef[items.length - 1];
-                System.arraycopy(items, 1, rest, 0, rest.length);
-                CLASSES.apply(new TypeDef[]{items[0], CLASSES.apply(rest)});
-            }
-            return null;
-
+        for (TypeParamDef type : items[1].getParameters()) {
+          if (!items[0].getParameters().contains(type)) {
+            builder = builder.addToParameters(type);
+          }
         }
-    };
+        return builder.build();
+      } else {
+        TypeDef[] rest = new TypeDef[items.length - 1];
+        System.arraycopy(items, 1, rest, 0, rest.length);
+        return TYPES.apply(new TypeDef[] { items[0], TYPES.apply(rest) });
+      }
+    }
+  };
+
+  public static final Function<TypeDef[], TypeDef> CLASSES = new Function<TypeDef[], TypeDef>() {
+    public TypeDef apply(TypeDef... items) {
+      if (items == null || items.length == 0) {
+        throw new IllegalArgumentException("Items cannot be empty.");
+      } else if (items.length == 1) {
+        return items[0];
+      } else if (items.length == 2) {
+        TypeDef mergedType = TYPES.apply(new TypeDef[] { items[0], items[1] });
+
+        TypeDefBuilder builder = new TypeDefBuilder(mergedType);
+        for (Method constructor : items[1].getConstructors()) {
+          builder = builder.addToConstructors(constructor);
+        }
+
+        for (Method method : items[1].getMethods()) {
+          builder = builder.addToMethods(method);
+        }
+        for (Property property : items[1].getProperties()) {
+          builder = builder.addToProperties(property);
+        }
+        return builder.build();
+      } else {
+        TypeDef[] rest = new TypeDef[items.length - 1];
+        System.arraycopy(items, 1, rest, 0, rest.length);
+        CLASSES.apply(new TypeDef[] { items[0], CLASSES.apply(rest) });
+      }
+      return null;
+
+    }
+  };
 }

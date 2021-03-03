@@ -16,10 +16,6 @@
 
 package io.sundr.codegen.model;
 
-public interface VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A>{
-
-
-
-
+public interface VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A> {
 
 }

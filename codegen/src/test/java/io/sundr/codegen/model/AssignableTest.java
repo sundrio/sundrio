@@ -16,64 +16,63 @@
 
 package io.sundr.codegen.model;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class AssignableTest {
 
-    TypeDef collection = new TypeDefBuilder()
-            .withKind(Kind.INTERFACE)
-            .withPackageName("java.utl")
-            .withName("Collection")
-            .build();
+  TypeDef collection = new TypeDefBuilder()
+      .withKind(Kind.INTERFACE)
+      .withPackageName("java.utl")
+      .withName("Collection")
+      .build();
 
-    ClassRef collectionRef = collection.toReference();
+  ClassRef collectionRef = collection.toReference();
 
-    TypeDef list = new TypeDefBuilder()
-            .withKind(Kind.INTERFACE)
-            .withPackageName("java.utl")
-            .withName("List")
-            .withExtendsList(collectionRef)
-            .build();
+  TypeDef list = new TypeDefBuilder()
+      .withKind(Kind.INTERFACE)
+      .withPackageName("java.utl")
+      .withName("List")
+      .withExtendsList(collectionRef)
+      .build();
 
-    ClassRef listRef = list.toReference();
+  ClassRef listRef = list.toReference();
 
-    TypeDef arrayList = new TypeDefBuilder()
-            .withKind(Kind.INTERFACE)
-            .withPackageName("java.utl")
-            .withName("ArrayList")
-            .withImplementsList(listRef)
-            .build();
+  TypeDef arrayList = new TypeDefBuilder()
+      .withKind(Kind.INTERFACE)
+      .withPackageName("java.utl")
+      .withName("ArrayList")
+      .withImplementsList(listRef)
+      .build();
 
-    ClassRef arrayListRef = arrayList.toReference();
+  ClassRef arrayListRef = arrayList.toReference();
 
-    @Test
-    public void testWithTypeDef() {
-        assertTrue(collection.isAssignableFrom(list));
-        assertTrue(collection.isAssignableFrom(arrayList));
+  @Test
+  public void testWithTypeDef() {
+    assertTrue(collection.isAssignableFrom(list));
+    assertTrue(collection.isAssignableFrom(arrayList));
 
-        assertTrue(list.isAssignableFrom(arrayList));
-        assertTrue(arrayList.isAssignableFrom(arrayList));
+    assertTrue(list.isAssignableFrom(arrayList));
+    assertTrue(arrayList.isAssignableFrom(arrayList));
 
-        assertFalse(list.isAssignableFrom(collection));
-        assertFalse(arrayList.isAssignableFrom(collection));
+    assertFalse(list.isAssignableFrom(collection));
+    assertFalse(arrayList.isAssignableFrom(collection));
 
-        assertFalse(arrayList.isAssignableFrom(list));
-    }
+    assertFalse(arrayList.isAssignableFrom(list));
+  }
 
+  @Test
+  public void testWithClassRef() {
+    assertTrue(collectionRef.isAssignableFrom(listRef));
+    assertTrue(collectionRef.isAssignableFrom(arrayListRef));
 
-    @Test
-    public void testWithClassRef() {
-        assertTrue(collectionRef.isAssignableFrom(listRef));
-        assertTrue(collectionRef.isAssignableFrom(arrayListRef));
+    assertTrue(listRef.isAssignableFrom(arrayListRef));
+    assertTrue(arrayListRef.isAssignableFrom(arrayListRef));
 
-        assertTrue(listRef.isAssignableFrom(arrayListRef));
-        assertTrue(arrayListRef.isAssignableFrom(arrayListRef));
+    assertFalse(listRef.isAssignableFrom(collectionRef));
+    assertFalse(arrayListRef.isAssignableFrom(collectionRef));
 
-        assertFalse(listRef.isAssignableFrom(collectionRef));
-        assertFalse(arrayListRef.isAssignableFrom(collectionRef));
-
-        assertFalse(arrayListRef.isAssignableFrom(listRef));
-    }
+    assertFalse(arrayListRef.isAssignableFrom(listRef));
+  }
 }

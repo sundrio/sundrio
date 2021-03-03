@@ -20,37 +20,37 @@ import io.sundr.builder.annotations.Buildable;
 
 @Buildable
 public class Person {
-    private String firstName;
-    private String lastName;
-    private int numbers[];
+  private String firstName;
+  private String lastName;
+  private int numbers[];
 
-    public Person(String firstName, String lastName, int[] numbers) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.numbers = numbers;
-    }
+  public Person(String firstName, String lastName, int[] numbers) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.numbers = numbers;
+  }
 
-    public String getFirstName() {
-        return firstName;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public String getLastName() {
-        return lastName;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 
-    public int[] getNumbers() {
-        return numbers;
-    }
+  public int[] getNumbers() {
+    return numbers;
+  }
 
-    public void setNumbers(int[] numbers) {
-        this.numbers = numbers;
-    }
+  public void setNumbers(int[] numbers) {
+    this.numbers = numbers;
+  }
 }
