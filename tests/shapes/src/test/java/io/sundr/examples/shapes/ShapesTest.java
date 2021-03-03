@@ -260,7 +260,7 @@ public class ShapesTest {
 
     @Test
     public void testEditNamedShape() {
-        Canvas canvas = new Canvas(Collections.singletonMap("testShape", new Square(1, 2, 3)), null, null, null, null);
+        Canvas canvas = new Canvas(null, Collections.singletonMap("testShape", new Square(1, 2, 3)), null, null, null, null);
         Canvas modifiedCanvas = new CanvasBuilder(canvas)
                 .editValueInSquareNamedShapes("testShape")
                     .withX(5)
@@ -275,7 +275,7 @@ public class ShapesTest {
 
     @Test(expected = RuntimeException.class)
     public void testExceptionOnWrongInstanceType() {
-        Canvas canvas = new Canvas(Collections.singletonMap("testShape", new Square(1, 2, 3)), null, null, null, null);
+        Canvas canvas = new Canvas(null, Collections.singletonMap("testShape", new Square(1, 2, 3)), null, null, null, null);
         new CanvasBuilder(canvas)
                 .editOrAddValueInCircleNamedShapes("testShape").and().build();
     }

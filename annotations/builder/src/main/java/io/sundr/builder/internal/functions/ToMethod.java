@@ -16,6 +16,63 @@
 
 package io.sundr.builder.internal.functions;
 
+import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
+import static io.sundr.builder.Constants.DEPRECATED_ANNOTATION;
+import static io.sundr.builder.Constants.DESCENDANTS;
+import static io.sundr.builder.Constants.DESCENDANT_OF;
+import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
+import static io.sundr.builder.Constants.INDEX;
+import static io.sundr.builder.Constants.OUTER_CLASS;
+import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
+import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.BOXED_OF;
+import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
+import static io.sundr.builder.internal.functions.TypeAs.FLUENT_REF;
+import static io.sundr.builder.internal.functions.TypeAs.SHALLOW_BUILDER;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
+import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER;
+import static io.sundr.builder.internal.functions.TypeAs.combine;
+import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
+import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
+import static io.sundr.codegen.Constants.BOOLEAN_REF;
+import static io.sundr.codegen.Constants.N_REF;
+import static io.sundr.codegen.Constants.Q;
+import static io.sundr.codegen.Constants.T_REF;
+import static io.sundr.codegen.functions.Collections.COLLECTION;
+import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
+import static io.sundr.codegen.functions.Collections.IS_LIST;
+import static io.sundr.codegen.functions.Collections.IS_MAP;
+import static io.sundr.codegen.functions.Collections.IS_SET;
+import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.codegen.model.Attributeable.INIT;
+import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
+import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
+import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
+import static io.sundr.codegen.utils.TypeUtils.isAbstract;
+import static io.sundr.codegen.utils.TypeUtils.isArray;
+import static io.sundr.codegen.utils.TypeUtils.isList;
+import static io.sundr.codegen.utils.TypeUtils.isMap;
+import static io.sundr.codegen.utils.TypeUtils.isOptional;
+import static io.sundr.codegen.utils.TypeUtils.isOptionalDouble;
+import static io.sundr.codegen.utils.TypeUtils.isOptionalInt;
+import static io.sundr.codegen.utils.TypeUtils.isOptionalLong;
+import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
+import static io.sundr.codegen.utils.TypeUtils.isSet;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.lang.model.element.Modifier;
+
 import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
@@ -23,26 +80,23 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Singularize;
-import io.sundr.codegen.model.*;
+import io.sundr.codegen.model.AnnotationRef;
+import io.sundr.codegen.model.Attributeable;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.EditableMethod;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.MethodBuilder;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.PropertyBuilder;
+import io.sundr.codegen.model.Statement;
+import io.sundr.codegen.model.StringStatement;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.Getter;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
-
-import javax.lang.model.element.Modifier;
-import java.util.*;
-
-import static io.sundr.builder.Constants.*;
-import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
-import static io.sundr.builder.internal.functions.TypeAs.*;
-import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
-import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.codegen.Constants.Q;
-import static io.sundr.codegen.Constants.*;
-import static io.sundr.codegen.functions.Collections.*;
-import static io.sundr.codegen.model.Attributeable.*;
-import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.*;
 
 
 class ToMethod {
@@ -196,8 +250,16 @@ class ToMethod {
             TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
             String methodName = "with" + property.getNameCapitalized();
             List<ClassRef> alsoImport = new ArrayList<>();
+
+            List<TypeParamDef> parameters = new ArrayList<>();
+            if (property.getTypeRef() instanceof ClassRef) {
+              ClassRef baseType = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
+              parameters.addAll(baseType.getDefinition().getParameters());
+            }
+
             return new MethodBuilder()
                     .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                    .withParameters(parameters)
                     .withName(methodName)
                     .withReturnType(returnType)
                     .withArguments(property)
@@ -249,13 +311,13 @@ class ToMethod {
 
             if (!descendants.isEmpty()) {
                 for (Property descendant : descendants) {
-                    TypeRef dunwraped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(descendant.getTypeRef());
+                    TypeRef dunwraped = new ClassRefBuilder((ClassRef)combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(descendant.getTypeRef())).withArguments(new TypeRef[0]).build();
                     TypeDef builder = BUILDER.apply(((ClassRef) dunwraped).getDefinition());
-                    String builderClass = builder.toReference().getName();
-                    statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName + "= new " + builderClass + "((" + dunwraped + ")" + argumentName + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");}"));
+                    TypeRef builderRef = builder.toUnboundedReference();
+                    statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName + "= new " + builderRef + "((" + dunwraped + ")" + argumentName + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");}"));
 
                     alsoImport.add((ClassRef) dunwraped);
-                    alsoImport.add(builder.toInternalReference());
+                    alsoImport.add((ClassRef) builderRef);
                 }
                 statements.add(new StringStatement("return (" + returnType + ") this;"));
                 return statements;
