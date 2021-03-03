@@ -16,37 +16,37 @@
 
 package io.sundr.examples.codegen;
 
-import io.sundr.builder.annotations.Buildable;
-
 import java.util.Collections;
 import java.util.Map;
 
-@Buildable(lazyCollectionInitEnabled=false)
+import io.sundr.builder.annotations.Buildable;
+
+@Buildable(lazyCollectionInitEnabled = false)
 public class VoidRef extends TypeRef {
 
-    public VoidRef() {
-        this(Collections.<AttributeKey, Object>emptyMap());
-    }
+  public VoidRef() {
+    this(Collections.<AttributeKey, Object> emptyMap());
+  }
 
-    public VoidRef(Map<AttributeKey, Object> attributes) {
-        super(attributes);
-    }
+  public VoidRef(Map<AttributeKey, Object> attributes) {
+    super(attributes);
+  }
 
-    public int getDimensions() {
-        return 0;
-    }
+  public int getDimensions() {
+    return 0;
+  }
 
-    public TypeRef withDimensions(int dimensions) {
-        throw new UnsupportedOperationException();
-    }
+  public TypeRef withDimensions(int dimensions) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public String toString() {
-        return "void";
-    }
+  @Override
+  public String toString() {
+    return "void";
+  }
 
-    public boolean isAssignableFrom(TypeRef ref) {
-        return false;
-    }
+  public boolean isAssignableFrom(TypeRef ref) {
+    return false;
+  }
 
 }

@@ -1,4 +1,4 @@
-package io.sundr.examples.validation;/*
+/*
  * Copyright 2015 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,42 +13,41 @@ package io.sundr.examples.validation;/*
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package io.sundr.examples.validation;
 
-import io.sundr.builder.annotations.Buildable;
-
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import io.sundr.builder.annotations.Buildable;
+
 public class Address {
-    
-    @NotNull
-    private final String street;
-    @Min(1)
-    private final int number;
-    @Pattern(regexp="[0-9]*")
-    @Size(min = 4, max = 6)
-    private final String zipCode;
 
+  @NotNull
+  private final String street;
+  @Min(1)
+  private final int number;
+  @Pattern(regexp = "[0-9]*")
+  @Size(min = 4, max = 6)
+  private final String zipCode;
 
-    @Buildable(validationEnabled = true)
-    public Address(String street, int number, String zipCode) {
-        this.street = street;
-        this.number = number;
-        this.zipCode = zipCode;
-    }
+  @Buildable(validationEnabled = true)
+  public Address(String street, int number, String zipCode) {
+    this.street = street;
+    this.number = number;
+    this.zipCode = zipCode;
+  }
 
-    public String getStreet() {
-        return street;
-    }
+  public String getStreet() {
+    return street;
+  }
 
-    public int getNumber() {
-        return number;
-    }
+  public int getNumber() {
+    return number;
+  }
 
-    public String getZipCode() {
-        return zipCode;
-    }
+  public String getZipCode() {
+    return zipCode;
+  }
 }

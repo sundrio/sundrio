@@ -16,44 +16,44 @@
 
 package io.sundr.dsl.internal.graph;
 
-import io.sundr.codegen.model.TypeDef;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import io.sundr.codegen.model.TypeDef;
+
 public class NodeRepository {
 
-    private final Map<String, Node<TypeDef>> map = new HashMap<String, Node<TypeDef>>();
+  private final Map<String, Node<TypeDef>> map = new HashMap<String, Node<TypeDef>>();
 
-    public Node<TypeDef> createNode(TypeDef item, Set<Node<TypeDef>> transitions) {
-        return new Node<TypeDef>(item, transitions);
-    }
+  public Node<TypeDef> createNode(TypeDef item, Set<Node<TypeDef>> transitions) {
+    return new Node<TypeDef>(item, transitions);
+  }
 
-    public Node<TypeDef> get(TypeDef item) {
-        String key = getKey(item);
-        return map.get(key);
-    }
+  public Node<TypeDef> get(TypeDef item) {
+    String key = getKey(item);
+    return map.get(key);
+  }
 
-    public Node<TypeDef> getOrCreateNode(TypeDef item, Set<Node<TypeDef>> transitions) {
-        Node<TypeDef> node;
-        String key = getKey(item);
-        if (map.containsKey(key)) {
-            node = map.get(key);
-            node.getTransitions().addAll(transitions);
-            return node;
-        } else {
-            node = new Node<TypeDef>(item, transitions);
-            map.put(key, node);
-        }
-        return node;
+  public Node<TypeDef> getOrCreateNode(TypeDef item, Set<Node<TypeDef>> transitions) {
+    Node<TypeDef> node;
+    String key = getKey(item);
+    if (map.containsKey(key)) {
+      node = map.get(key);
+      node.getTransitions().addAll(transitions);
+      return node;
+    } else {
+      node = new Node<TypeDef>(item, transitions);
+      map.put(key, node);
     }
+    return node;
+  }
 
-    public void clear() {
-        map.clear();
-    }
+  public void clear() {
+    map.clear();
+  }
 
-    private static String getKey(TypeDef clazz) {
-        return clazz.getFullyQualifiedName();
-    }
+  private static String getKey(TypeDef clazz) {
+    return clazz.getFullyQualifiedName();
+  }
 }

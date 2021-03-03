@@ -16,24 +16,24 @@
 
 package io.sundr.dsl.internal.element.functions.filter;
 
-import io.sundr.codegen.model.TypeDef;
-
 import java.util.Collection;
+
+import io.sundr.codegen.model.TypeDef;
 
 public class OrTransitionFilter implements TransitionFilter {
 
-    private final TransitionFilter[] filters;
+  private final TransitionFilter[] filters;
 
-    public OrTransitionFilter(TransitionFilter... filters) {
-        this.filters = filters;
-    }
+  public OrTransitionFilter(TransitionFilter... filters) {
+    this.filters = filters;
+  }
 
-    public Boolean apply(Collection<TypeDef> items) {
-        for (TransitionFilter filter : filters) {
-            if (filter.apply(items)) {
-                return true;
-            }
-        }
-        return false;
+  public Boolean apply(Collection<TypeDef> items) {
+    for (TransitionFilter filter : filters) {
+      if (filter.apply(items)) {
+        return true;
+      }
     }
+    return false;
+  }
 }

@@ -19,28 +19,25 @@ package io.sundr;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class FunctionFactoryTest
-{
+public class FunctionFactoryTest {
 
-
-    private static final Function<String, String> TEST_FUNCTION = FunctionFactory.cache(new Function<String, String>() {
-        public String apply(String item) {
-            return "R" + TEST_FUNCTION.apply(item);
-        }
-    }).withFallback( new Function<String, String>() {
-        public String apply(String item) {
-            return "overflow";
-        }
-    }).withMaximumRecursionLevel(10);
-
-
-    @Test
-    public void testCachingWithOverflowProtection() {
-        String expectedResult = "RRRRRRRRRRoverflow";
-        String result = TEST_FUNCTION.apply("");
-        Assert.assertEquals(expectedResult, result);
-
-        result = TEST_FUNCTION.apply("");
-        Assert.assertEquals(expectedResult, result);
+  private static final Function<String, String> TEST_FUNCTION = FunctionFactory.cache(new Function<String, String>() {
+    public String apply(String item) {
+      return "R" + TEST_FUNCTION.apply(item);
     }
+  }).withFallback(new Function<String, String>() {
+    public String apply(String item) {
+      return "overflow";
+    }
+  }).withMaximumRecursionLevel(10);
+
+  @Test
+  public void testCachingWithOverflowProtection() {
+    String expectedResult = "RRRRRRRRRRoverflow";
+    String result = TEST_FUNCTION.apply("");
+    Assert.assertEquals(expectedResult, result);
+
+    result = TEST_FUNCTION.apply("");
+    Assert.assertEquals(expectedResult, result);
+  }
 }

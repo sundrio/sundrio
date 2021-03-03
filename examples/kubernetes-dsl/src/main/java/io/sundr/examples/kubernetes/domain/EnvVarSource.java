@@ -16,6 +16,7 @@
 package io.sundr.examples.kubernetes.domain;
 
 import io.sundr.builder.annotations.Buildable;
+
 /*
  * EnvVarSource represents a source for the value of an EnvVar.
  */

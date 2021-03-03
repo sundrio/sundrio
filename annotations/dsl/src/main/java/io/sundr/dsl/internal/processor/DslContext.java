@@ -16,6 +16,9 @@
 
 package io.sundr.dsl.internal.processor;
 
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.dsl.internal.element.functions.ToClasses;
@@ -24,84 +27,77 @@ import io.sundr.dsl.internal.element.functions.ToRequiresAll;
 import io.sundr.dsl.internal.element.functions.ToRequiresAny;
 import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
 import io.sundr.dsl.internal.element.functions.ToRequiresOnly;
-import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.graph.NodeRepository;
-
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 
 public class DslContext {
 
-    private final Elements elements;
-    private final Types types;
-    private final CodegenContext codegenContext;
+  private final Elements elements;
+  private final Types types;
+  private final CodegenContext codegenContext;
 
-    private final ToRequiresAny toRequiresAny;
-    private final ToRequiresAll toRequiresAll;
-    private final ToRequiresNoneOf toRequiresNoneOf;
-    private final ToRequiresOnly toRequiresOnly;
-    private final ToKeywords toKeywords;
-    private final ToClasses toClasses;
+  private final ToRequiresAny toRequiresAny;
+  private final ToRequiresAll toRequiresAll;
+  private final ToRequiresNoneOf toRequiresNoneOf;
+  private final ToRequiresOnly toRequiresOnly;
+  private final ToKeywords toKeywords;
+  private final ToClasses toClasses;
 
-    private final NodeRepository nodeRepository = new NodeRepository();
+  private final NodeRepository nodeRepository = new NodeRepository();
 
+  public DslContext(Elements elements, Types types) {
+    this.elements = elements;
+    this.types = types;
+    this.codegenContext = CodegenContext.create(elements, types);
+    this.toRequiresAny = new ToRequiresAny(elements);
+    this.toRequiresAll = new ToRequiresAll(elements);
+    this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
+    this.toRequiresOnly = new ToRequiresOnly(elements);
+    this.toKeywords = new ToKeywords(elements);
+    this.toClasses = new ToClasses(elements);
+  }
 
+  public Elements getElements() {
+    return elements;
+  }
 
-    public DslContext(Elements elements, Types types) {
-        this.elements = elements;
-        this.types = types;
-        this.codegenContext = CodegenContext.create(elements, types);
-        this.toRequiresAny = new ToRequiresAny(elements);
-        this.toRequiresAll = new ToRequiresAll(elements);
-        this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
-        this.toRequiresOnly = new ToRequiresOnly(elements);
-        this.toKeywords = new ToKeywords(elements);
-        this.toClasses = new ToClasses(elements);
-    }
+  public Types getTypes() {
+    return types;
+  }
 
-    public Elements getElements() {
-        return elements;
-    }
+  public CodegenContext getCodegenContext() {
+    return codegenContext;
+  }
 
-    public Types getTypes() {
-        return types;
-    }
+  public NodeRepository getNodeRepository() {
+    return nodeRepository;
+  }
 
-    public CodegenContext getCodegenContext() {
-        return codegenContext;
-    }
+  public DefinitionRepository getDefinitionRepository() {
+    return codegenContext.getDefinitionRepository();
+  }
 
-    public NodeRepository getNodeRepository() {
-        return nodeRepository;
-    }
+  public ToRequiresAny getToRequiresAny() {
+    return toRequiresAny;
+  }
 
+  public ToRequiresAll getToRequiresAll() {
+    return toRequiresAll;
+  }
 
-    public DefinitionRepository getDefinitionRepository() {
-        return codegenContext.getDefinitionRepository();
-    }
+  public ToRequiresNoneOf getToRequiresNoneOf() {
+    return toRequiresNoneOf;
+  }
 
-    public ToRequiresAny getToRequiresAny() {
-        return toRequiresAny;
-    }
+  public ToRequiresOnly getToRequiresOnly() {
+    return toRequiresOnly;
+  }
 
-    public ToRequiresAll getToRequiresAll() {
-        return toRequiresAll;
-    }
+  public ToKeywords getToKeywords() {
+    return toKeywords;
+  }
 
-    public ToRequiresNoneOf getToRequiresNoneOf() {
-        return toRequiresNoneOf;
-    }
-
-    public ToRequiresOnly getToRequiresOnly() {
-        return toRequiresOnly;
-    }
-
-    public ToKeywords getToKeywords() {
-        return toKeywords;
-    }
-
-    public ToClasses getToClasses() {
-        return toClasses;
-    }
+  public ToClasses getToClasses() {
+    return toClasses;
+  }
 
 }

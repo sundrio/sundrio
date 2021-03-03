@@ -19,33 +19,31 @@ package io.sundr.examples.crud;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 
-/** 
- * The person. 
+/**
+ * The person.
  */
-@VelocityTransformations(
-        {
-                @VelocityTransformation("/dao.vm"),
-                @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
-        }
-)
+@VelocityTransformations({
+    @VelocityTransformation("/dao.vm"),
+    @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
+})
 public class Person {
 
-    public String firstName;
-    public String lastName;
+  public String firstName;
+  public String lastName;
 
-    public String getFirstName() {
-        return firstName;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public String getLastName() {
-        return lastName;
-    }
+  public String getLastName() {
+    return lastName;
+  }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
 }

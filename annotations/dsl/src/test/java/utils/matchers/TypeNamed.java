@@ -16,36 +16,37 @@
 
 package utils.matchers;
 
-import io.sundr.codegen.model.ClassRef;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
+import io.sundr.codegen.model.ClassRef;
+
 public class TypeNamed extends BaseMatcher<ClassRef> {
 
-    private final String expectedValue;
+  private final String expectedValue;
 
-    public TypeNamed(String equalArg) {
-        expectedValue = equalArg;
-    }
+  public TypeNamed(String equalArg) {
+    expectedValue = equalArg;
+  }
 
-    public boolean matches(Object item) {
-        if (item instanceof ClassRef) {
-            ClassRef type = (ClassRef) item;
-            if (type.getDefinition().toString().equals(expectedValue)) {
-                return true;
-            }
-        }
-        return false;
+  public boolean matches(Object item) {
+    if (item instanceof ClassRef) {
+      ClassRef type = (ClassRef) item;
+      if (type.getDefinition().toString().equals(expectedValue)) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    public void describeTo(Description description) {
-        description.appendValue(expectedValue);
-    }
+  public void describeTo(Description description) {
+    description.appendValue(expectedValue);
+  }
 
-    @Factory
-    public static Matcher<ClassRef> typeNamed(String operand) {
-        return new TypeNamed(operand);
-    }
+  @Factory
+  public static Matcher<ClassRef> typeNamed(String operand) {
+    return new TypeNamed(operand);
+  }
 }

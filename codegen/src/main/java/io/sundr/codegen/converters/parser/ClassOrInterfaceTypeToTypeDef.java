@@ -16,33 +16,34 @@
 
 package io.sundr.codegen.converters.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+
 import io.sundr.Function;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamDefBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ClassOrInterfaceTypeToTypeDef implements Function<ClassOrInterfaceType, TypeDef> {
 
-    private Function<TypeParameter, TypeDef> typeParamterToTypeDef;
+  private Function<TypeParameter, TypeDef> typeParamterToTypeDef;
 
-    public TypeDef apply(ClassOrInterfaceType item) {
-        List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+  public TypeDef apply(ClassOrInterfaceType item) {
+    List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
-        for (Type type : item.getTypeArgs()) {
-            new TypeParamDefBuilder()
-                    .build();
-        }
-
-        return new TypeDefBuilder()
-                .withName(item.getName())
-                .withParameters(parameters)
-                .build();
+    for (Type type : item.getTypeArgs()) {
+      new TypeParamDefBuilder()
+          .build();
     }
+
+    return new TypeDefBuilder()
+        .withName(item.getName())
+        .withParameters(parameters)
+        .build();
+  }
 }

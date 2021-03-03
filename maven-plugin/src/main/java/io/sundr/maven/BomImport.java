@@ -20,61 +20,61 @@ package io.sundr.maven;
  */
 public class BomImport {
 
-    private String groupId;
+  private String groupId;
 
-    private String artifactId;
+  private String artifactId;
 
-    private String version;
+  private String version;
 
-    private String repository;
+  private String repository;
 
-    private ArtifactSet dependencyManagement = new ArtifactSet();
+  private ArtifactSet dependencyManagement = new ArtifactSet();
 
-    public BomImport() {
-    }
+  public BomImport() {
+  }
 
-    public String getGroupId() {
-        return groupId;
-    }
+  public String getGroupId() {
+    return groupId;
+  }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-    }
+  public void setGroupId(String groupId) {
+    this.groupId = groupId;
+  }
 
-    public String getArtifactId() {
-        return artifactId;
-    }
+  public String getArtifactId() {
+    return artifactId;
+  }
 
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
-    }
+  public void setArtifactId(String artifactId) {
+    this.artifactId = artifactId;
+  }
 
-    public String getVersion() {
-        return version;
-    }
+  public String getVersion() {
+    return version;
+  }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
-    public String getRepository() {
-        return repository;
-    }
+  public String getRepository() {
+    return repository;
+  }
 
-    public void setRepository(String repository) {
-        this.repository = repository;
-    }
+  public void setRepository(String repository) {
+    this.repository = repository;
+  }
 
-    public ArtifactSet getDependencyManagement() {
-        return dependencyManagement;
-    }
+  public ArtifactSet getDependencyManagement() {
+    return dependencyManagement;
+  }
 
-    public void setDependencyManagement(ArtifactSet dependencyManagement) {
-        this.dependencyManagement = dependencyManagement;
-    }
+  public void setDependencyManagement(ArtifactSet dependencyManagement) {
+    this.dependencyManagement = dependencyManagement;
+  }
 
-    @Override
-    public String toString() {
-        return groupId + ":" + artifactId + ":" + version;
-    }
+  @Override
+  public String toString() {
+    return groupId + ":" + artifactId + ":" + version;
+  }
 }

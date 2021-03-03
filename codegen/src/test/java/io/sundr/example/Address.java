@@ -25,7 +25,6 @@ public class Address {
   private Type type;
 
   enum Type {
-    HOME,
-    WORK
+    HOME, WORK
   }
 }

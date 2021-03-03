@@ -16,6 +16,7 @@
 package io.sundr.examples.kubernetes.domain;
 
 import io.sundr.builder.annotations.Buildable;
+
 /*
  * EnvVar represents an environment variable present in a Container.
  */

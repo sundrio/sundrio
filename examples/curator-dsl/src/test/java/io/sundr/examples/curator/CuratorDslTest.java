@@ -20,9 +20,9 @@ import org.junit.Test;
 
 public class CuratorDslTest {
 
-    @Test
-    public void testGeneratedCode() {
+  @Test
+  public void testGeneratedCode() {
 
-    }
+  }
 
 }

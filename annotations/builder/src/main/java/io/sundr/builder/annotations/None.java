@@ -5,5 +5,5 @@ package io.sundr.builder.annotations;
  */
 public interface None {
 
-    String FQN = "io.sundr.builder.annotations.None";
+  String FQN = "io.sundr.builder.annotations.None";
 }

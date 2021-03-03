@@ -16,60 +16,56 @@
 
 package io.sundr.examples.curator.impl;
 
-
 import io.sundr.examples.curator.GetDataInterface;
 import io.sundr.examples.curator.PathableAndBytesableInterface;
 import io.sundr.examples.curator.StatablePathablePathAndBytesableInterface;
 import io.sundr.examples.curator.WatchableStatablePathablePathAndBytesableInterface;
 
 public class GetDataInterfaceImpl implements GetDataInterface,
-        WatchableStatablePathablePathAndBytesableInterface<String, Void>,
-        StatablePathablePathAndBytesableInterface<String, Void>,
-        PathableAndBytesableInterface<String, Void> {
+    WatchableStatablePathablePathAndBytesableInterface<String, Void>,
+    StatablePathablePathAndBytesableInterface<String, Void>,
+    PathableAndBytesableInterface<String, Void> {
 
-    static {
-        new GetDataInterfaceImpl().watched().forPath("somePath");
-        new GetDataInterfaceImpl().inBackground().forPath("somePath");
-        new GetDataInterfaceImpl().forPath("somePath");
-        new GetDataInterfaceImpl().inBackground().forPath("somePath");
-        new GetDataInterfaceImpl().inBackground().forPath("somePath");
-    }
+  static {
+    new GetDataInterfaceImpl().watched().forPath("somePath");
+    new GetDataInterfaceImpl().inBackground().forPath("somePath");
+    new GetDataInterfaceImpl().forPath("somePath");
+    new GetDataInterfaceImpl().inBackground().forPath("somePath");
+    new GetDataInterfaceImpl().inBackground().forPath("somePath");
+  }
 
+  @Override
+  public String forPath(String path) {
+    return "";
+  }
 
-    @Override
-    public String forPath(String path) {
-        return "";
-    }
+  @Override
+  public Void forPath(String path, byte[] bytes) {
+    return null;
+  }
 
+  @Override
+  public PathableAndBytesableInterface<String, Void> storingStatIn(String stat) {
+    return this;
+  }
 
+  @Override
+  public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(boolean flag) {
+    return this;
+  }
 
-    @Override
-    public Void forPath(String path, byte[] bytes) {
-        return null;
-    }
+  @Override
+  public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground() {
+    return this;
+  }
 
-    @Override
-    public PathableAndBytesableInterface<String, Void> storingStatIn(String stat) {
-        return this;
-    }
+  @Override
+  public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(Object context) {
+    return this;
+  }
 
-    @Override
-    public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(boolean flag) {
-        return this;
-    }
-
-    @Override
-    public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground() {
-        return this;
-    }
-
-    @Override
-    public WatchableStatablePathablePathAndBytesableInterface<String, Void> inBackground(Object context) {
-        return this;
-    }
-
-    @Override
-    public StatablePathablePathAndBytesableInterface<String, Void> watched() {
-        return this;
-    }
+  @Override
+  public StatablePathablePathAndBytesableInterface<String, Void> watched() {
+    return this;
+  }
 }

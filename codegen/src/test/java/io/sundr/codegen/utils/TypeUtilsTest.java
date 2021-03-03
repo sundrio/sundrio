@@ -16,17 +16,18 @@
 
 package io.sundr.codegen.utils;
 
-import io.sundr.codegen.Constants;
+import static org.junit.Assert.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import io.sundr.codegen.Constants;
 
 public class TypeUtilsTest {
 
-    @Test
-    public void isBoolean() {
-        Assert.assertTrue(TypeUtils.isBoolean(Constants.BOOLEAN_REF));
-        Assert.assertTrue(TypeUtils.isBoolean(Constants.PRIMITIVE_BOOLEAN_REF));
-    }
+  @Test
+  public void isBoolean() {
+    Assert.assertTrue(TypeUtils.isBoolean(Constants.BOOLEAN_REF));
+    Assert.assertTrue(TypeUtils.isBoolean(Constants.PRIMITIVE_BOOLEAN_REF));
+  }
 }

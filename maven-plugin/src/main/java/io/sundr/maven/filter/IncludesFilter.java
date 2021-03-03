@@ -16,26 +16,26 @@
 
 package io.sundr.maven.filter;
 
-import org.apache.maven.artifact.Artifact;
-
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
 
 public class IncludesFilter extends ArtifactRuleFilter {
 
-    private final Set<String> includes;
+  private final Set<String> includes;
 
-    public IncludesFilter(Set<String> includes) {
-        this.includes = includes;
-    }
+  public IncludesFilter(Set<String> includes) {
+    this.includes = includes;
+  }
 
-    @Override
-    public Artifact apply(Artifact artifact) {
-        if (artifact == null) {
-            return null;
-        } else if (matches(artifact, includes)) {
-            return artifact;
-        } else {
-            return null;
-        }
+  @Override
+  public Artifact apply(Artifact artifact) {
+    if (artifact == null) {
+      return null;
+    } else if (matches(artifact, includes)) {
+      return artifact;
+    } else {
+      return null;
     }
+  }
 }

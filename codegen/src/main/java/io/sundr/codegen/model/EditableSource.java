@@ -16,25 +16,22 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.builder.Editable;
-
 import java.util.List;
+
+import io.sundr.builder.Editable;
 
 public class EditableSource extends Source implements Editable<SourceBuilder> {
 
+  public EditableSource() {
+    super();
+  }
 
-    public EditableSource() {
-        super();
-    }
+  public EditableSource(List<TypeDef> types) {
+    super(types);
+  }
 
-    public EditableSource(List<TypeDef> types) {
-        super(types);
-    }
-
-    public SourceBuilder edit() {
-        return new SourceBuilder(this);
-    }
-
+  public SourceBuilder edit() {
+    return new SourceBuilder(this);
+  }
 
 }
-    

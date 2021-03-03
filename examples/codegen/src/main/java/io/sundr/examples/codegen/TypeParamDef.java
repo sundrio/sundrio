@@ -16,66 +16,69 @@
 
 package io.sundr.examples.codegen;
 
-import io.sundr.builder.annotations.Buildable;
-import io.sundr.codegen.utils.StringUtils;
-
 import java.util.List;
 import java.util.Map;
 
-@Buildable(lazyCollectionInitEnabled=false)
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.codegen.utils.StringUtils;
+
+@Buildable(lazyCollectionInitEnabled = false)
 public class TypeParamDef extends AttributeSupport {
 
-    private final String name;
-    private final List<ClassRef> bounds;
+  private final String name;
+  private final List<ClassRef> bounds;
 
-    public TypeParamDef(String name, List<ClassRef> bounds, Map<AttributeKey, Object> attributes) {
-        super(attributes);
-        this.name = name;
-        this.bounds = bounds;
+  public TypeParamDef(String name, List<ClassRef> bounds, Map<AttributeKey, Object> attributes) {
+    super(attributes);
+    this.name = name;
+    this.bounds = bounds;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public List<ClassRef> getBounds() {
+    return bounds;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+
+    TypeParamDef that = (TypeParamDef) o;
+
+    if (name != null ? !name.equals(that.name) : that.name != null)
+      return false;
+    return bounds != null ? bounds.equals(that.bounds) : that.bounds == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name != null ? name.hashCode() : 0;
+    result = 31 * result + (bounds != null ? bounds.hashCode() : 0);
+    return result;
+  }
+
+  public TypeParamRef toReference() {
+    return new TypeParamRefBuilder()
+        .withName(name)
+        .withAttributes(getAttributes())
+        .build();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name);
+    if (bounds != null && !bounds.isEmpty()) {
+      sb.append(" extends ");
+      sb.append(StringUtils.join(bounds, ","));
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<ClassRef> getBounds() {
-        return bounds;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TypeParamDef that = (TypeParamDef) o;
-
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        return bounds != null ? bounds.equals(that.bounds) : that.bounds == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (bounds != null ? bounds.hashCode() : 0);
-        return result;
-    }
-
-    public TypeParamRef toReference() {
-        return new TypeParamRefBuilder()
-                .withName(name)
-                .withAttributes(getAttributes())
-                .build();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(name);
-        if (bounds != null && !bounds.isEmpty()) {
-            sb.append(" extends ");
-            sb.append(StringUtils.join(bounds, ","));
-        }
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 }

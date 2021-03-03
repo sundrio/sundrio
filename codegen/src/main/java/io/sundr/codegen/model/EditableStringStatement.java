@@ -19,27 +19,26 @@ package io.sundr.codegen.model;
 import io.sundr.Provider;
 import io.sundr.builder.Editable;
 
-public class EditableStringStatement extends StringStatement implements Editable<StringStatementBuilder>{
+public class EditableStringStatement extends StringStatement implements Editable<StringStatementBuilder> {
 
+  public EditableStringStatement(Provider<String> provider) {
+    super(provider);
+  }
 
-    public EditableStringStatement(Provider<String> provider){
-            super(provider);
-    }
-    public EditableStringStatement(Provider<String> provider,Object[] parameters){
-            super(provider, parameters);
-    }
-    public EditableStringStatement(final String data){
-            super(data);
-    }
-    public EditableStringStatement(final String data,final Object[] parameters){
-            super(data, parameters);
-    }
+  public EditableStringStatement(Provider<String> provider, Object[] parameters) {
+    super(provider, parameters);
+  }
 
-    public StringStatementBuilder edit(){
-            return new StringStatementBuilder(this);
-    }
+  public EditableStringStatement(final String data) {
+    super(data);
+  }
 
+  public EditableStringStatement(final String data, final Object[] parameters) {
+    super(data, parameters);
+  }
 
-
+  public StringStatementBuilder edit() {
+    return new StringStatementBuilder(this);
+  }
 
 }

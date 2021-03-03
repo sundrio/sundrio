@@ -16,13 +16,12 @@
 
 package io.sundr.codegen.model;
 
-public interface ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends AttributeSupportFluent<A>{
+public interface ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends AttributeSupportFluent<A> {
 
+  public int getModifiers();
 
-    public int getModifiers();
-    public A withModifiers(int modifiers);
-    public Boolean hasModifiers();
+  public A withModifiers(int modifiers);
 
-
+  public Boolean hasModifiers();
 
 }

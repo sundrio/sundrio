@@ -18,13 +18,13 @@ package io.sundr.codegen.converters;
 
 public class ClassWithPrimitiveArray {
 
-    private int[] value;
+  private int[] value;
 
-    public int[] getValue() {
-        return value;
-    }
+  public int[] getValue() {
+    return value;
+  }
 
-    public void setValue(int[] value) {
-        this.value = value;
-    }
+  public void setValue(int[] value) {
+    this.value = value;
+  }
 }

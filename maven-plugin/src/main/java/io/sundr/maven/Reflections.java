@@ -16,55 +16,57 @@
 
 package io.sundr.maven;
 
-import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 
 /**
  * Utility class to work around class visibility issues due to maven exports.
  */
 final class Reflections {
 
-    private Reflections() {
-      //Utility class
-    }
+  private Reflections() {
+    //Utility class
+  }
 
-    /**
-     * Read using reflection the SessionScope of the {@link org.apache.maven.lifecycle.internal.LifecycleModuleBuilder}.
-     * @param source    The {@link org.apache.maven.lifecycle.internal.LifecycleModuleBuilder}
-     * @return          The {@link org.apache.maven.session.scope.internal.SessionScope.Memento}
-     * @throws Exception
-     */
-    static Object getMemento(LifecycleModuleBuilder source) throws Exception {
-        Field sessionScopeFiled = source.getClass().getDeclaredField("sessionScope");
-        sessionScopeFiled.setAccessible(true);
-        Object sessionScope = sessionScopeFiled.get(source);
-        Method mementoMethod = sessionScope.getClass().getDeclaredMethod("memento");
-        mementoMethod.setAccessible(true);
-        return mementoMethod.invoke(sessionScope);
-    }
+  /**
+   * Read using reflection the SessionScope of the {@link org.apache.maven.lifecycle.internal.LifecycleModuleBuilder}.
+   * 
+   * @param source The {@link org.apache.maven.lifecycle.internal.LifecycleModuleBuilder}
+   * @return The {@link org.apache.maven.session.scope.internal.SessionScope.Memento}
+   * @throws Exception
+   */
+  static Object getMemento(LifecycleModuleBuilder source) throws Exception {
+    Field sessionScopeFiled = source.getClass().getDeclaredField("sessionScope");
+    sessionScopeFiled.setAccessible(true);
+    Object sessionScope = sessionScopeFiled.get(source);
+    Method mementoMethod = sessionScope.getClass().getDeclaredMethod("memento");
+    mementoMethod.setAccessible(true);
+    return mementoMethod.invoke(sessionScope);
+  }
 
-    /**
-     * Read any field that matches the specified name.
-     * @param obj       The obj to read from.
-     * @param names     The var-arg of names.
-     * @return          The value of the first field that matches or null if no match is found.
-     */
-    static String readAnyField(Object obj, String ... names) {
+  /**
+   * Read any field that matches the specified name.
+   * 
+   * @param obj The obj to read from.
+   * @param names The var-arg of names.
+   * @return The value of the first field that matches or null if no match is found.
+   */
+  static String readAnyField(Object obj, String... names) {
+    try {
+      for (String name : names) {
         try {
-            for (String name : names) {
-                try {
-                    Field field = obj.getClass().getDeclaredField(name);
-                    field.setAccessible(true);
-                    return (String) field.get(obj);
-                } catch (NoSuchFieldException e) {
-                    //ignore and try next field...
-                }
-            }
-            return null;
-        } catch (IllegalAccessException e) {
-            return null;
+          Field field = obj.getClass().getDeclaredField(name);
+          field.setAccessible(true);
+          return (String) field.get(obj);
+        } catch (NoSuchFieldException e) {
+          //ignore and try next field...
         }
+      }
+      return null;
+    } catch (IllegalAccessException e) {
+      return null;
     }
+  }
 }

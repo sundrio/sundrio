@@ -16,44 +16,46 @@
 
 package io.sundr.builder.internal;
 
-import io.sundr.builder.Builder;
-import io.sundr.builder.annotations.Inline;
-
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import io.sundr.builder.Builder;
+import io.sundr.builder.annotations.Inline;
+
 public class BuilderContextManager {
-    
-    private BuilderContextManager() {}
 
-    private static BuilderContext context = null;
+  private BuilderContextManager() {
+  }
 
-    public synchronized static BuilderContext create(Elements elements, Types types) {
-        context = new BuilderContext(elements, types, false, false, Builder.class.getPackage().getName());
+  private static BuilderContext context = null;
+
+  public synchronized static BuilderContext create(Elements elements, Types types) {
+    context = new BuilderContext(elements, types, false, false, Builder.class.getPackage().getName());
+    return context;
+  }
+
+  public static BuilderContext create(Elements elements, Types types, Boolean validationEnabled, Boolean generateBuilderPackage,
+      String packageName, Inline... inlineables) {
+    if (context == null) {
+      context = new BuilderContext(elements, types, generateBuilderPackage, validationEnabled, packageName, inlineables);
+      return context;
+    } else {
+      if (!packageName.equals(context.getBuilderPackage())) {
+        throw new IllegalStateException("Cannot use different builder package names in a single project. Used:"
+            + packageName + " but package:"
+            + context.getBuilderPackage() + " already exists.");
+      } else if (!generateBuilderPackage.equals(context.getGenerateBuilderPackage())) {
+        throw new IllegalStateException("Cannot use different values for generate builder package in a single project.");
+      } else {
         return context;
+      }
     }
+  }
 
-    public static BuilderContext create(Elements elements, Types types, Boolean validationEnabled, Boolean generateBuilderPackage, String packageName, Inline... inlineables) {
-        if (context == null) {
-            context = new BuilderContext(elements, types, generateBuilderPackage, validationEnabled, packageName, inlineables);
-            return context;
-        } else {
-            if (!packageName.equals(context.getBuilderPackage())) {
-                throw new IllegalStateException("Cannot use different builder package names in a single project. Used:"
-                        + packageName + " but package:"
-                        + context.getBuilderPackage() + " already exists.");
-            } else if (!generateBuilderPackage.equals(context.getGenerateBuilderPackage())) {
-                throw new IllegalStateException("Cannot use different values for generate builder package in a single project.");
-            } else {
-                return context;
-            }
-        }
+  public static synchronized BuilderContext getContext() {
+    if (context == null) {
+      throw new IllegalStateException("Builder context not available.");
     }
-
-    public static synchronized BuilderContext getContext() {
-        if (context== null) {
-            throw new IllegalStateException("Builder context not available.");
-        }
-        return context;
-    }
+    return context;
+  }
 }

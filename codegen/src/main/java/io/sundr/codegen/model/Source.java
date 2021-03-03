@@ -21,17 +21,17 @@ import java.util.List;
 
 public class Source {
 
-    private final List<TypeDef> types;
+  private final List<TypeDef> types;
 
-    public Source() {
-        this(Collections.EMPTY_LIST);
-    }
+  public Source() {
+    this(Collections.EMPTY_LIST);
+  }
 
-    public Source(List<TypeDef> types) {
-        this.types = types;
-    }
+  public Source(List<TypeDef> types) {
+    this.types = types;
+  }
 
-    public List<TypeDef> getTypes() {
-        return types;
-    }
+  public List<TypeDef> getTypes() {
+    return types;
+  }
 }

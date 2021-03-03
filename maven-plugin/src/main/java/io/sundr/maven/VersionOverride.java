@@ -20,35 +20,35 @@ package io.sundr.maven;
  */
 public class VersionOverride {
 
-    private ArtifactSet dependencies = new ArtifactSet();
+  private ArtifactSet dependencies = new ArtifactSet();
 
-    private String version;
+  private String version;
 
-    public VersionOverride() {
-    }
+  public VersionOverride() {
+  }
 
-    public ArtifactSet getDependencies() {
-        return dependencies;
-    }
+  public ArtifactSet getDependencies() {
+    return dependencies;
+  }
 
-    public void setDependencies(ArtifactSet dependencies) {
-        this.dependencies = dependencies;
-    }
+  public void setDependencies(ArtifactSet dependencies) {
+    this.dependencies = dependencies;
+  }
 
-    public String getVersion() {
-        return version;
-    }
+  public String getVersion() {
+    return version;
+  }
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+  public void setVersion(String version) {
+    this.version = version;
+  }
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("VersionOverride{");
-        sb.append("dependencies=").append(dependencies);
-        sb.append(", version='").append(version).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("VersionOverride{");
+    sb.append("dependencies=").append(dependencies);
+    sb.append(", version='").append(version).append('\'');
+    sb.append('}');
+    return sb.toString();
+  }
 }

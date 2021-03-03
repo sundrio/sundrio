@@ -16,30 +16,28 @@
 
 package io.sundr.codegen.functions;
 
-import io.sundr.Function;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.sundr.Function;
+
 public class StringReplace implements Function<String, String> {
 
-    private final String target;
-    private final String replacement;
-    private final Pattern pattern;
+  private final String target;
+  private final String replacement;
+  private final Pattern pattern;
 
+  public StringReplace(String target, String replacement) {
+    this.target = target;
+    this.replacement = replacement;
+    this.pattern = Pattern.compile(target, Pattern.CASE_INSENSITIVE);
+  }
 
-    public StringReplace(String target, String replacement) {
-        this.target = target;
-        this.replacement = replacement;
-        this.pattern = Pattern.compile(target, Pattern.CASE_INSENSITIVE);
+  public String apply(String word) {
+    Matcher matcher = this.pattern.matcher(word);
+    if (!matcher.find()) {
+      return null;
     }
-
-    public String apply(String word) {
-        Matcher matcher = this.pattern.matcher(word);
-        if (!matcher.find()) {
-            return null;
-        }
-        return matcher.replaceAll(replacement);
-    }
+    return matcher.replaceAll(replacement);
+  }
 }
-

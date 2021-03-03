@@ -17,8 +17,5 @@
 package io.sundr.examples.codegen;
 
 public enum Kind {
-    CLASS,
-    INTERFACE,
-    ANNOTATION,
-    ENUM
+  CLASS, INTERFACE, ANNOTATION, ENUM
 }

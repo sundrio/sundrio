@@ -16,62 +16,62 @@
 
 package io.sundr.builder.internal.processor.generator;
 
-import io.sundr.builder.Constants;
-import io.sundr.codegen.generator.CodeGeneratorBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import org.junit.Test;
+import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
+import org.junit.Test;
+
+import io.sundr.builder.Constants;
+import io.sundr.codegen.generator.CodeGeneratorBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeDefBuilder;
 
 public class BuilderGeneratorTest {
 
-    private static final TypeDef INTEGER = TYPEDEF.apply(Integer.class);
+  private static final TypeDef INTEGER = TYPEDEF.apply(Integer.class);
 
-    @Test
-    public void testFluentTemplate() throws IOException {
+  @Test
+  public void testFluentTemplate() throws IOException {
 
+    TypeDef type = new TypeDefBuilder()
+        .withName("Circle")
+        .withPackageName("my.Test")
+        .addNewConstructor()
+        .addNewArgument()
+        .withName("w")
+        .withTypeRef(INTEGER.toReference())
+        .endArgument()
+        .addNewArgument()
+        .withName("w")
+        .withTypeRef(INTEGER.toReference())
+        .endArgument()
+        .endConstructor()
+        .build();
 
-        TypeDef type = new TypeDefBuilder()
-                .withName("Circle")
-                .withPackageName("my.Test")
-                .addNewConstructor()
-                    .addNewArgument()
-                        .withName("w")
-                        .withTypeRef(INTEGER.toReference())
-                    .endArgument()
-                    .addNewArgument()
-                        .withName("w")
-                        .withTypeRef(INTEGER.toReference())
-                    .endArgument()
-                .endConstructor()
-                .build();
+    File tmp = new File(System.getProperty("java.io.tmpdir"));
+    generate(type, tmp, "CircleFluent.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+    generate(type, tmp, "CircleBuilder.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
 
-        File tmp = new File(System.getProperty("java.io.tmpdir"));
-        generate(type, tmp, "CircleFluent.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        generate(type, tmp, "CircleBuilder.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+  }
 
+  private static void generate(TypeDef model, File dir, String name, String templateResource) throws IOException {
+    FileWriter fluentWriter = null;
+    try {
+      fluentWriter = new FileWriter(new File(dir, name));
+      new CodeGeneratorBuilder<TypeDef>()
+          .withModel(model)
+          .withWriter(fluentWriter)
+          .withTemplateResource(templateResource)
+          .build().generate();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (fluentWriter != null) {
+        fluentWriter.close();
+      }
     }
-
-    private static void generate(TypeDef model, File dir, String name, String templateResource) throws IOException {
-        FileWriter fluentWriter = null;
-        try {
-            fluentWriter = new FileWriter(new File(dir, name));
-            new CodeGeneratorBuilder<TypeDef>()
-                    .withModel(model)
-                    .withWriter(fluentWriter)
-                    .withTemplateResource(templateResource)
-                    .build().generate();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if (fluentWriter != null) {
-                fluentWriter.close();
-            }
-        }
-    }
+  }
 }

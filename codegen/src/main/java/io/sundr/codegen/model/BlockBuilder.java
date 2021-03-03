@@ -18,57 +18,68 @@ package io.sundr.codegen.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class BlockBuilder extends BlockFluentImpl<BlockBuilder> implements VisitableBuilder<Block,BlockBuilder>{
+public class BlockBuilder extends BlockFluentImpl<BlockBuilder> implements VisitableBuilder<Block, BlockBuilder> {
 
-    BlockFluent<?> fluent;
-    Boolean validationEnabled;
+  BlockFluent<?> fluent;
+  Boolean validationEnabled;
 
-    public BlockBuilder(){
-            this(true);
-    }
-    public BlockBuilder(Boolean validationEnabled){
-            this.fluent = this; this.validationEnabled=validationEnabled;
-    }
-    public BlockBuilder(BlockFluent<?> fluent){
-            this(fluent, true);
-    }
-    public BlockBuilder(BlockFluent<?> fluent,Boolean validationEnabled){
-            this.fluent = fluent; this.validationEnabled=validationEnabled;
-    }
-    public BlockBuilder(BlockFluent<?> fluent,Block instance){
-            this(fluent, instance, true);
-    }
-    public BlockBuilder(BlockFluent<?> fluent,Block instance,Boolean validationEnabled){
-            this.fluent = fluent; 
-            fluent.withStatements(instance.getStatements()); 
-            this.validationEnabled = validationEnabled; 
-    }
-    public BlockBuilder(Block instance){
-            this(instance,true);
-    }
-    public BlockBuilder(Block instance,Boolean validationEnabled){
-            this.fluent = this; 
-            this.withStatements(instance.getStatements()); 
-            this.validationEnabled = validationEnabled; 
-    }
+  public BlockBuilder() {
+    this(true);
+  }
 
-    public EditableBlock build(){
-            EditableBlock buildable = new EditableBlock(fluent.getStatements());
-            return buildable;
-    }
+  public BlockBuilder(Boolean validationEnabled) {
+    this.fluent = this;
+    this.validationEnabled = validationEnabled;
+  }
 
-    public boolean equals(Object o){
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-            BlockBuilder that = (BlockBuilder) o;
-            if (fluent != null &&fluent != this ? !fluent.equals(that.fluent) :that.fluent != null &&fluent != this ) return false;
+  public BlockBuilder(BlockFluent<?> fluent) {
+    this(fluent, true);
+  }
 
-            if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) :that.validationEnabled != null) return false;
-            return true;
-    }
+  public BlockBuilder(BlockFluent<?> fluent, Boolean validationEnabled) {
+    this.fluent = fluent;
+    this.validationEnabled = validationEnabled;
+  }
 
+  public BlockBuilder(BlockFluent<?> fluent, Block instance) {
+    this(fluent, instance, true);
+  }
 
+  public BlockBuilder(BlockFluent<?> fluent, Block instance, Boolean validationEnabled) {
+    this.fluent = fluent;
+    fluent.withStatements(instance.getStatements());
+    this.validationEnabled = validationEnabled;
+  }
 
+  public BlockBuilder(Block instance) {
+    this(instance, true);
+  }
+
+  public BlockBuilder(Block instance, Boolean validationEnabled) {
+    this.fluent = this;
+    this.withStatements(instance.getStatements());
+    this.validationEnabled = validationEnabled;
+  }
+
+  public EditableBlock build() {
+    EditableBlock buildable = new EditableBlock(fluent.getStatements());
+    return buildable;
+  }
+
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    BlockBuilder that = (BlockBuilder) o;
+    if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
+      return false;
+
+    if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) : that.validationEnabled != null)
+      return false;
+    return true;
+  }
 
 }

@@ -20,26 +20,23 @@ package io.sundr.examples.crud;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 
-/** 
- * The notes. 
+/**
+ * The notes.
  */
-@VelocityTransformations(
-        {
-                @VelocityTransformation("/dao.vm"),
-                @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
-        }
-)
+@VelocityTransformations({
+    @VelocityTransformation("/dao.vm"),
+    @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
+})
 public class Notes {
 
-    public String content;
+  public String content;
 
-    public String getContent() {
-      return this.content;
-    }
+  public String getContent() {
+    return this.content;
+  }
 
-    public void setContent(String content) {
-      this.content=content;
-    }
-
+  public void setContent(String content) {
+    this.content = content;
+  }
 
 }

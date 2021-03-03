@@ -23,22 +23,22 @@ import io.sundr.examples.shapes.Createable;
 import io.sundr.examples.shapes.Updateable;
 
 @Buildable(inline = {
-        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+    @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+    @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
 })
 public class Circle<T extends Number> extends AbstractShape {
 
-    private final T radius;
-    private final Double area;
+  private final T radius;
+  private final Double area;
 
-    public Circle(int x, int y, T radius) {
-        super(x, y);
-        this.radius = radius;
-        this.area = Math.PI * Math.sqrt(radius.doubleValue());
-    }
+  public Circle(int x, int y, T radius) {
+    super(x, y);
+    this.radius = radius;
+    this.area = Math.PI * Math.sqrt(radius.doubleValue());
+  }
 
-    public T getRadius() {
-        return radius;
-    }
+  public T getRadius() {
+    return radius;
+  }
 
 }

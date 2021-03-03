@@ -20,7 +20,6 @@ import io.sundr.dsl.annotations.Any;
 import io.sundr.dsl.annotations.Dsl;
 import io.sundr.dsl.annotations.EntryPoint;
 import io.sundr.dsl.annotations.InterfaceName;
-import io.sundr.dsl.annotations.Keyword;
 import io.sundr.dsl.annotations.None;
 import io.sundr.dsl.annotations.Terminal;
 
@@ -28,67 +27,67 @@ import io.sundr.dsl.annotations.Terminal;
 @InterfaceName("CuratorFramework")
 public interface CuratorDsl {
 
-    @EntryPoint
-    void getData();
+  @EntryPoint
+  void getData();
 
-    @EntryPoint
-    void setData();
+  @EntryPoint
+  void setData();
 
-    @EntryPoint
-    @InterfaceName("ReConfigBuilder")
-    void reconfig();
+  @EntryPoint
+  @InterfaceName("ReConfigBuilder")
+  void reconfig();
 
-    @EntryPoint
-    @InterfaceName("GetConfigBuilder")
-    void config();
+  @EntryPoint
+  @InterfaceName("GetConfigBuilder")
+  void config();
 
-    @InterfaceName("Leavable")
-    @Any(methods = "reconfig")
-    @None(methods = "withMembers")
-    void leaving(String... server);
+  @InterfaceName("Leavable")
+  @Any(methods = "reconfig")
+  @None(methods = "withMembers")
+  void leaving(String... server);
 
-    @InterfaceName("Joinable")
-    @Any(methods = "reconfig")
-    @None(methods = "withMembers")
-    void joining(String... server);
+  @InterfaceName("Joinable")
+  @Any(methods = "reconfig")
+  @None(methods = "withMembers")
+  void joining(String... server);
 
-    @InterfaceName("Memberable")
-    @Any(methods = "reconfig")
-    @None(methods = {"joining", "leaving"})
-    void withMembers(String... server);
+  @InterfaceName("Memberable")
+  @Any(methods = "reconfig")
+  @None(methods = { "joining", "leaving" })
+  void withMembers(String... server);
 
-    @InterfaceName("Backgroundable")
-    void inBackground(boolean flag);
+  @InterfaceName("Backgroundable")
+  void inBackground(boolean flag);
 
-    @InterfaceName("Backgroundable")
-    void inBackground();
+  @InterfaceName("Backgroundable")
+  void inBackground();
 
-    @InterfaceName("Backgroundable")
-    void inBackground(Object context);
+  @InterfaceName("Backgroundable")
+  void inBackground(Object context);
 
-    @InterfaceName("Watchable")
-    void watched();
+  @InterfaceName("Watchable")
+  void watched();
 
-    @Any(methods = {"getData", "setData"})
-    @InterfaceName("Statable")
-    void storingStatIn(String stat);
+  @Any(methods = { "getData", "setData" })
+  @InterfaceName("Statable")
+  void storingStatIn(String stat);
 
-    @Any(methods = "config")
-    @InterfaceName("Configurable")
-    void fromConfig(Long config);
-    
-    @Terminal
-    @InterfaceName("Ensemblable")
-    @Any(methods = {"reconfig", "config"})
-    byte[] forEnsemble();
+  @Any(methods = "config")
+  @InterfaceName("Configurable")
+  void fromConfig(Long config);
 
-    @Terminal
-    @InterfaceName("Pathable")
-    @Any(methods = {"getData", "setData"})
-    String forPath(String path);
+  @Terminal
+  @InterfaceName("Ensemblable")
+  @Any(methods = { "reconfig", "config" })
+  byte[] forEnsemble();
 
-    @Terminal
-    @InterfaceName("PathAndBytesable")
-    @Any(methods = {"getData", "setData"})
-    void forPath(String path, byte[] bytes);
+  @Terminal
+  @InterfaceName("Pathable")
+  @Any(methods = { "getData", "setData" })
+  String forPath(String path);
+
+  @Terminal
+  @InterfaceName("PathAndBytesable")
+  @Any(methods = { "getData", "setData" })
+  void forPath(String path, byte[] bytes);
 }

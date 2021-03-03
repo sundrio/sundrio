@@ -16,53 +16,52 @@
 
 package io.sundr.codegen.converters.parser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+
 import io.sundr.Function;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-
 public class DeclarationToJavaClazz implements Function<ClassOrInterfaceDeclaration, TypeDef> {
 
-    private final ClassOrInterfaceTypeToTypeDef classOrInterfaceTypeToTypeDef = new ClassOrInterfaceTypeToTypeDef();
+  private final ClassOrInterfaceTypeToTypeDef classOrInterfaceTypeToTypeDef = new ClassOrInterfaceTypeToTypeDef();
 
-    public TypeDef apply(ClassOrInterfaceDeclaration item) {
-        TypeDef superClassType = null;
-        List<TypeDef> implementsTypes = new ArrayList<TypeDef>();
-        List<TypeDef> genericTypes = new ArrayList<TypeDef>();
+  public TypeDef apply(ClassOrInterfaceDeclaration item) {
+    TypeDef superClassType = null;
+    List<TypeDef> implementsTypes = new ArrayList<TypeDef>();
+    List<TypeDef> genericTypes = new ArrayList<TypeDef>();
 
-        for (ClassOrInterfaceType type : item.getImplements()) {
-            if (item.isInterface()) {
-                implementsTypes.add(classOrInterfaceTypeToTypeDef.apply(type));
-            } else if (superClassType == null) {
-                superClassType = classOrInterfaceTypeToTypeDef.apply(type);
-            } else {
-                throw new IllegalStateException("Multiple extends found and type is not an interface");
-            }
-        }
-
-        for (ClassOrInterfaceType type : item.getImplements()) {
-            implementsTypes.add(classOrInterfaceTypeToTypeDef.apply(type));
-        }
-
-        for (TypeParameter type : item.getTypeParameters()) {
-
-        }
-
-
-        return new TypeDefBuilder()
-                .withPackageName("changeme")
-                .withName(item.getName())
-                .withKind(item.isInterface() ? Kind.INTERFACE : Kind.CLASS)
-                .withModifiers(item.getModifiers())
-                //.withExtendsList(superClassType)
-                //.withInterfaces(implementsTypes.toArray(new TypeDef[implementsTypes.size()]))
-                .build();
+    for (ClassOrInterfaceType type : item.getImplements()) {
+      if (item.isInterface()) {
+        implementsTypes.add(classOrInterfaceTypeToTypeDef.apply(type));
+      } else if (superClassType == null) {
+        superClassType = classOrInterfaceTypeToTypeDef.apply(type);
+      } else {
+        throw new IllegalStateException("Multiple extends found and type is not an interface");
+      }
     }
+
+    for (ClassOrInterfaceType type : item.getImplements()) {
+      implementsTypes.add(classOrInterfaceTypeToTypeDef.apply(type));
+    }
+
+    for (TypeParameter type : item.getTypeParameters()) {
+
+    }
+
+    return new TypeDefBuilder()
+        .withPackageName("changeme")
+        .withName(item.getName())
+        .withKind(item.isInterface() ? Kind.INTERFACE : Kind.CLASS)
+        .withModifiers(item.getModifiers())
+        //.withExtendsList(superClassType)
+        //.withInterfaces(implementsTypes.toArray(new TypeDef[implementsTypes.size()]))
+        .build();
+  }
 }

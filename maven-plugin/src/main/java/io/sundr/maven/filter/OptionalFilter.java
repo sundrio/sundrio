@@ -20,7 +20,7 @@ import org.apache.maven.artifact.Artifact;
 
 public class OptionalFilter implements ArtifactFilter {
 
-    public Artifact apply(Artifact artifact) {
-        return artifact == null ? null : (artifact.isOptional() ? null : artifact);
-    }
+  public Artifact apply(Artifact artifact) {
+    return artifact == null ? null : (artifact.isOptional() ? null : artifact);
+  }
 }

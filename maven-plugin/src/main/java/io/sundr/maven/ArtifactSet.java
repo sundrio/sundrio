@@ -21,14 +21,14 @@ import java.util.Set;
 
 public class ArtifactSet {
 
-    private Set<String> includes = new HashSet<String>();
-    private Set<String> excludes = new HashSet<String>();
+  private Set<String> includes = new HashSet<String>();
+  private Set<String> excludes = new HashSet<String>();
 
-    public Set<String> getIncludes() {
-        return includes;
-    }
+  public Set<String> getIncludes() {
+    return includes;
+  }
 
-    public Set<String> getExcludes() {
-        return excludes;
-    }
+  public Set<String> getExcludes() {
+    return excludes;
+  }
 }

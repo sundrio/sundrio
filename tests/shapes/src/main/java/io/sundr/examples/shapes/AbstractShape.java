@@ -16,47 +16,47 @@
 
 package io.sundr.examples.shapes;
 
-import io.sundr.builder.annotations.Buildable;
-
 import java.util.Optional;
 import java.util.OptionalInt;
+
+import io.sundr.builder.annotations.Buildable;
 
 @Buildable
 public abstract class AbstractShape implements Shape {
 
-    private final int x;
-    private final int y;
+  private final int x;
+  private final int y;
 
-    private Optional<String> notes;
+  private Optional<String> notes;
 
-    private OptionalInt count;
+  private OptionalInt count;
 
-    public AbstractShape(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+  public AbstractShape(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
 
-    public int getX() {
-        return x;
-    }
+  public int getX() {
+    return x;
+  }
 
-    public int getY() {
-        return y;
-    }
+  public int getY() {
+    return y;
+  }
 
-    public Optional<String> getNotes() {
-        return notes;
-    }
+  public Optional<String> getNotes() {
+    return notes;
+  }
 
-    public void setNotes(Optional<String> notes) {
-        this.notes = notes;
-    }
+  public void setNotes(Optional<String> notes) {
+    this.notes = notes;
+  }
 
-    public OptionalInt getCount() {
-        return count;
-    }
+  public OptionalInt getCount() {
+    return count;
+  }
 
-    public void setCount(OptionalInt count) {
-        this.count = count;
-    }
+  public void setCount(OptionalInt count) {
+    this.count = count;
+  }
 }

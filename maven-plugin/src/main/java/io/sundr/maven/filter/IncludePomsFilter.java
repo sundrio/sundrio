@@ -16,19 +16,20 @@
 
 package io.sundr.maven.filter;
 
-import io.sundr.maven.Constants;
 import org.apache.maven.artifact.Artifact;
+
+import io.sundr.maven.Constants;
 
 public class IncludePomsFilter implements ArtifactFilter {
 
-    private final boolean include;
+  private final boolean include;
 
-    public IncludePomsFilter(boolean include) {
-        this.include = include;
-    }
+  public IncludePomsFilter(boolean include) {
+    this.include = include;
+  }
 
-    public Artifact apply(Artifact artifact) {
-        return artifact == null ? null : (include == Constants.POM_TYPE.equals(artifact.getType()) ? artifact : null);
-    }
+  public Artifact apply(Artifact artifact) {
+    return artifact == null ? null : (include == Constants.POM_TYPE.equals(artifact.getType()) ? artifact : null);
+  }
 
 }

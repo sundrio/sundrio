@@ -18,38 +18,37 @@ package io.sundr.codegen.model;
 
 public interface Node {
 
-    String DOT = ".";
-    String COMA = ",";
-    String SEMICOLN = ";";
-    String SPACE = " ";
-    String NEWLINE = "\n";
+  String DOT = ".";
+  String COMA = ",";
+  String SEMICOLN = ";";
+  String SPACE = " ";
+  String NEWLINE = "\n";
 
-    String AT = "@";
+  String AT = "@";
 
-    String LT = "<";
-    String EQ = "=";
-    String GT = ">";
+  String LT = "<";
+  String EQ = "=";
+  String GT = ">";
 
-    String Q = "'";
-    String DQ = "\"";
+  String Q = "'";
+  String DQ = "\"";
 
-    String OC = "/**";
-    String STAR = "*";
-    String CC = "*/";
+  String OC = "/**";
+  String STAR = "*";
+  String CC = "*/";
 
-    String OP = "(";
-    String CP = ")";
+  String OP = "(";
+  String CP = ")";
 
-    String OB = "{";
-    String CB = "}";
+  String OB = "{";
+  String CB = "}";
 
+  String VARARG = "...";
+  String THROWS = "throws";
 
-    String VARARG = "...";
-    String THROWS = "throws";
+  String EXTENDS = "extends";
+  String IMPLEMENTS = "implements";
 
-    String EXTENDS = "extends";
-    String IMPLEMENTS = "implements";
-
-    String JAVA_LANG = "java.lang";
+  String JAVA_LANG = "java.lang";
 
 }

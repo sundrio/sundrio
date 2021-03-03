@@ -16,6 +16,12 @@
 
 package io.sundr.builder.internal.processor;
 
+import static io.sundr.builder.Constants.BUILDABLE;
+import static io.sundr.builder.Constants.EDITABLE_ENABLED;
+import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
+import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
+import static io.sundr.builder.Constants.VALIDATION_ENABLED;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,79 +46,74 @@ import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.utils.ModelUtils;
 
-import static io.sundr.builder.Constants.BUILDABLE;
-import static io.sundr.builder.Constants.EDITABLE_ENABLED;
-import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
-import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
-import static io.sundr.builder.Constants.VALIDATION_ENABLED;
-
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
 public class BuildableProcessor extends AbstractBuilderProcessor {
-    @Override
-    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
-        Elements elements = processingEnv.getElementUtils();
-        Types types = processingEnv.getTypeUtils();
-        Filer filer = processingEnv.getFiler();
+  @Override
+  public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
+    Elements elements = processingEnv.getElementUtils();
+    Types types = processingEnv.getTypeUtils();
+    Filer filer = processingEnv.getFiler();
 
-        BuilderContext ctx = null;
+    BuilderContext ctx = null;
 
-        //First pass register all buildables
-        Set<TypeDef> buildables = new HashSet<>();
-        for (TypeElement typeElement : annotations) {
-            for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-                Buildable buildable = element.getAnnotation(Buildable.class);
-                if (buildable == null) {
-                    continue;
-                }
-
-                ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(), buildable.builderPackage());
-                        TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
-                                .addToAttributes(BUILDABLE, buildable)
-                                .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
-                                .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
-                                .accept(new Visitor<PropertyBuilder>() {
-                                    @Override
-                                    public void visit(PropertyBuilder builder) {
-                                       builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
-                                       builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
-                                    }
-                                }).build();
-
-                    ctx.getDefinitionRepository().register(b);
-                    ctx.getBuildableRepository().register(b);
-                    buildables.add(b);
-
-                for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
-                    TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
-                            .addToAttributes(BUILDABLE, buildable)
-                            .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
-                            .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
-                            .accept(new Visitor<PropertyBuilder>() {
-                                @Override
-                                public void visit(PropertyBuilder builder) {
-                                    builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
-                                    builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
-                                }
-                            }).build();
-
-                    ctx.getDefinitionRepository().register(r);
-                    ctx.getBuildableRepository().register(r);
-                    buildables.add(r);
-                }
-            }
+    //First pass register all buildables
+    Set<TypeDef> buildables = new HashSet<>();
+    for (TypeElement typeElement : annotations) {
+      for (Element element : env.getElementsAnnotatedWith(typeElement)) {
+        Buildable buildable = element.getAnnotation(Buildable.class);
+        if (buildable == null) {
+          continue;
         }
 
-        if (ctx == null) {
-            return true;
-        }
-        generateLocalDependenciesIfNeeded();
-        addCustomMappings(ctx);
+        ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(),
+            buildable.builderPackage());
+        TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
+            .addToAttributes(BUILDABLE, buildable)
+            .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
+            .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
+            .accept(new Visitor<PropertyBuilder>() {
+              @Override
+              public void visit(PropertyBuilder builder) {
+                builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
+                builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
+              }
+            }).build();
 
-        ctx.getDefinitionRepository().updateReferenceMap();
-        generateBuildables(ctx, buildables);
-        generatePojos(ctx, buildables);
-        System.err.println("100%: Builder generation complete.");
-        return false;
+        ctx.getDefinitionRepository().register(b);
+        ctx.getBuildableRepository().register(b);
+        buildables.add(b);
+
+        for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
+          TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
+              .addToAttributes(BUILDABLE, buildable)
+              .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
+              .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
+              .accept(new Visitor<PropertyBuilder>() {
+                @Override
+                public void visit(PropertyBuilder builder) {
+                  builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
+                  builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
+                }
+              }).build();
+
+          ctx.getDefinitionRepository().register(r);
+          ctx.getBuildableRepository().register(r);
+          buildables.add(r);
+        }
+      }
     }
+
+    if (ctx == null) {
+      return true;
+    }
+    generateLocalDependenciesIfNeeded();
+    addCustomMappings(ctx);
+
+    ctx.getDefinitionRepository().updateReferenceMap();
+    generateBuildables(ctx, buildables);
+    generatePojos(ctx, buildables);
+    System.err.println("100%: Builder generation complete.");
+    return false;
+  }
 }

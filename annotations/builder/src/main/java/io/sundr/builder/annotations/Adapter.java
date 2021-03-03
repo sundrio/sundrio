@@ -16,44 +16,47 @@
 
 package io.sundr.builder.annotations;
 
-
 /**
  * Configuration for generating a adapter.
  * A adapter is a 'function' that maps an object into an other.
- * Example: When generating a Pojo from an interface or annotation, a adapter can be used to convert the source object into the generated pojo.
+ * Example: When generating a Pojo from an interface or annotation, a adapter can be used to convert the source object into the
+ * generated pojo.
  */
 public @interface Adapter {
 
-    /**
-     * The class name of the generated Adapter.
-     * @return The class name, or empty (default) if the name is to be the implicitly specified.
-     */
-    String name() default "";
+  /**
+   * The class name of the generated Adapter.
+   * 
+   * @return The class name, or empty (default) if the name is to be the implicitly specified.
+   */
+  String name() default "";
 
-    /**
-     * The prefix to add to the annotated class in order to create the adapter name.
-     * @return  The prefix.
-     */
-    String prefix() default "";
+  /**
+   * The prefix to add to the annotated class in order to create the adapter name.
+   * 
+   * @return The prefix.
+   */
+  String prefix() default "";
 
-    /**
-     * The suffix to add to the annotated class in order to create the adapter name.
-     * @return  The suffix.
-     */
-    String suffix() default "";
+  /**
+   * The suffix to add to the annotated class in order to create the adapter name.
+   * 
+   * @return The suffix.
+   */
+  String suffix() default "";
 
+  /**
+   * The relative path the pojo adapter be generated.
+   * 
+   * @return The relative path.
+   */
+  String relativePath() default "";
 
-    /**
-     * The relative path the pojo adapter be generated.
-     * @return The relative path.
-     */
-    String relativePath() default "";
-
-
-    /**
-     * Flag to incluce mapping methods from map instances.
-     * @return True, if adapter method should be included, false, otherwise.
-     */
-    boolean withMapAdapterMethod() default false;
+  /**
+   * Flag to incluce mapping methods from map instances.
+   * 
+   * @return True, if adapter method should be included, false, otherwise.
+   */
+  boolean withMapAdapterMethod() default false;
 
 }

@@ -19,13 +19,12 @@ package io.sundr.codegen.model;
 import io.sundr.Provider;
 import io.sundr.builder.Fluent;
 
-public interface StringStatementFluent<A extends StringStatementFluent<A>> extends Fluent<A>{
+public interface StringStatementFluent<A extends StringStatementFluent<A>> extends Fluent<A> {
 
+  public Provider<String> getProvider();
 
-    public Provider<String> getProvider();
-    public A withProvider(Provider<String> provider);
-    public Boolean hasProvider();
+  public A withProvider(Provider<String> provider);
 
-
+  public Boolean hasProvider();
 
 }

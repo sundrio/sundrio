@@ -20,8 +20,9 @@ import java.util.Optional;
 
 public interface Shape {
 
-    int getX();
-    int getY();
+  int getX();
 
-    Optional<String> getNotes();
+  int getY();
+
+  Optional<String> getNotes();
 }

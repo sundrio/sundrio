@@ -16,31 +16,31 @@
 
 package io.sundr.dsl.internal.visitors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.TypeRef;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TypeArgumentReplace extends TypedVisitor<ClassRefBuilder> {
 
-    private final TypeRef target;
-    private final TypeRef replacement;
+  private final TypeRef target;
+  private final TypeRef replacement;
 
-    public TypeArgumentReplace(TypeRef target, TypeRef replacement) {
-        this.target = target;
-        this.replacement = replacement;
-    }
+  public TypeArgumentReplace(TypeRef target, TypeRef replacement) {
+    this.target = target;
+    this.replacement = replacement;
+  }
 
-    public void visit(ClassRefBuilder builder) {
-        List<TypeRef> updated = new ArrayList<TypeRef>();
-        for (TypeRef typeArgument : builder.getArguments()) {
-            if (typeArgument.equals(target)) {
-                updated.add(replacement);
-            } else {
-                updated.add(typeArgument);
-            }
-        }
+  public void visit(ClassRefBuilder builder) {
+    List<TypeRef> updated = new ArrayList<TypeRef>();
+    for (TypeRef typeArgument : builder.getArguments()) {
+      if (typeArgument.equals(target)) {
+        updated.add(replacement);
+      } else {
+        updated.add(typeArgument);
+      }
     }
+  }
 }

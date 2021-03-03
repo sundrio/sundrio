@@ -16,51 +16,50 @@
 
 package io.sundr.builder.internal;
 
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ParameterReference;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeRef;
+
 public class BuildableRepository {
 
-    private final Map<String, TypeDef> buildables = new HashMap<String, TypeDef>();
+  private final Map<String, TypeDef> buildables = new HashMap<String, TypeDef>();
 
-    public TypeDef register(TypeDef buildable) {
-        if (buildable != null) {
-            buildables.put(buildable.getFullyQualifiedName(), buildable);
-        }
-        return buildable;
+  public TypeDef register(TypeDef buildable) {
+    if (buildable != null) {
+      buildables.put(buildable.getFullyQualifiedName(), buildable);
     }
+    return buildable;
+  }
 
-    public Set<TypeDef> getBuildables() {
-        return Collections.unmodifiableSet(new LinkedHashSet<TypeDef>(buildables.values()));
-    }
+  public Set<TypeDef> getBuildables() {
+    return Collections.unmodifiableSet(new LinkedHashSet<TypeDef>(buildables.values()));
+  }
 
-    public TypeDef getBuildable(TypeRef type) {
-        if (type instanceof ClassRef) {
-            return buildables.get(((ClassRef)type).getDefinition().getFullyQualifiedName());
-        }
-        return null;
+  public TypeDef getBuildable(TypeRef type) {
+    if (type instanceof ClassRef) {
+      return buildables.get(((ClassRef) type).getDefinition().getFullyQualifiedName());
     }
+    return null;
+  }
 
-    public boolean isBuildable(TypeDef type) {
-        return type != null && buildables.containsKey(type.getFullyQualifiedName());
-    }
+  public boolean isBuildable(TypeDef type) {
+    return type != null && buildables.containsKey(type.getFullyQualifiedName());
+  }
 
-    public boolean isBuildable(TypeRef type) {
-        if (type instanceof ClassRef) {
-            return isBuildable(((ClassRef)type).getDefinition());
-        }
-        return false;
+  public boolean isBuildable(TypeRef type) {
+    if (type instanceof ClassRef) {
+      return isBuildable(((ClassRef) type).getDefinition());
     }
+    return false;
+  }
 
-    public void clear() {
-        buildables.clear();
-    }
+  public void clear() {
+    buildables.clear();
+  }
 }

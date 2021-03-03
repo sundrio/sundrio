@@ -16,31 +16,31 @@
 
 package io.sundr.dsl.internal.visitors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TypeParamDefReplace extends TypedVisitor<TypeDefBuilder> {
 
-    private final TypeParamDef target;
-    private final TypeParamDef replacement;
+  private final TypeParamDef target;
+  private final TypeParamDef replacement;
 
-    public TypeParamDefReplace(TypeParamDef target, TypeParamDef replacement) {
-        this.target = target;
-        this.replacement = replacement;
-    }
+  public TypeParamDefReplace(TypeParamDef target, TypeParamDef replacement) {
+    this.target = target;
+    this.replacement = replacement;
+  }
 
-    public void visit(TypeDefBuilder builder) {
-        List<TypeParamDef> updated = new ArrayList<TypeParamDef>();
-        for (TypeParamDef parameter : builder.getParameters()) {
-            if (parameter.equals(target)) {
-                updated.add(replacement);
-            } else {
-                updated.add(parameter);
-            }
-        }
+  public void visit(TypeDefBuilder builder) {
+    List<TypeParamDef> updated = new ArrayList<TypeParamDef>();
+    for (TypeParamDef parameter : builder.getParameters()) {
+      if (parameter.equals(target)) {
+        updated.add(replacement);
+      } else {
+        updated.add(parameter);
+      }
     }
+  }
 }

@@ -16,12 +16,8 @@
 
 package io.sundr.codegen.converters;
 
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.PrimitiveRefBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRefBuilder;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
@@ -34,65 +30,70 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.AbstractTypeVisitor6;
-import java.util.ArrayList;
-import java.util.List;
+
+import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.PrimitiveRefBuilder;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeRef;
+import io.sundr.codegen.model.VoidRefBuilder;
 
 public class TypeRefTypeVisitor extends AbstractTypeVisitor6<TypeRef, Integer> {
 
-    public TypeRef visitPrimitive(PrimitiveType t, Integer dimension) {
-        return new PrimitiveRefBuilder()
-                .withName(t.getKind().name().toLowerCase())
-                .withDimensions(dimension)
-                .build();
-    }
+  public TypeRef visitPrimitive(PrimitiveType t, Integer dimension) {
+    return new PrimitiveRefBuilder()
+        .withName(t.getKind().name().toLowerCase())
+        .withDimensions(dimension)
+        .build();
+  }
 
-    public TypeRef visitNull(NullType t, Integer dimension) {
-        return null;
-    }
+  public TypeRef visitNull(NullType t, Integer dimension) {
+    return null;
+  }
 
-    public TypeRef visitArray(ArrayType t, Integer dimension) {
-        return t.getComponentType().accept(this, dimension + 1);
-    }
+  public TypeRef visitArray(ArrayType t, Integer dimension) {
+    return t.getComponentType().accept(this, dimension + 1);
+  }
 
-    public TypeRef visitDeclared(DeclaredType t, Integer dimension) {
-        List<TypeRef> arguments = new ArrayList<TypeRef>();
-        for (TypeMirror typeMirror : t.getTypeArguments()) {
-            TypeRef arg = typeMirror.accept(this, dimension);
-            if (arg != null) {
-                arguments.add(arg);
-            }
-        }
-        TypeDef typeDef = new TypeDefElementVisitor().visit(t.asElement()).build();
-
-        return new ClassRefBuilder()
-                .withDefinition(typeDef)
-                .withDimensions(dimension)
-                .withArguments(arguments)
-                .build();
+  public TypeRef visitDeclared(DeclaredType t, Integer dimension) {
+    List<TypeRef> arguments = new ArrayList<TypeRef>();
+    for (TypeMirror typeMirror : t.getTypeArguments()) {
+      TypeRef arg = typeMirror.accept(this, dimension);
+      if (arg != null) {
+        arguments.add(arg);
+      }
     }
+    TypeDef typeDef = new TypeDefElementVisitor().visit(t.asElement()).build();
 
-    public TypeRef visitError(ErrorType t, Integer dimension) {
-        return new ClassRefBuilder().withDefinition(new TypeDefElementVisitor().visit(t.asElement()).build()).build();
-    }
+    return new ClassRefBuilder()
+        .withDefinition(typeDef)
+        .withDimensions(dimension)
+        .withArguments(arguments)
+        .build();
+  }
 
-    public TypeRef visitTypeVariable(TypeVariable t, Integer dimension) {
-        return ElementTo.TYPEVARIABLE_TO_TYPEPARAM_REF.apply(t);
-    }
+  public TypeRef visitError(ErrorType t, Integer dimension) {
+    return new ClassRefBuilder().withDefinition(new TypeDefElementVisitor().visit(t.asElement()).build()).build();
+  }
 
-    public TypeRef visitWildcard(WildcardType t, Integer dimension) {
-        return null;
-    }
+  public TypeRef visitTypeVariable(TypeVariable t, Integer dimension) {
+    return ElementTo.TYPEVARIABLE_TO_TYPEPARAM_REF.apply(t);
+  }
 
-    public TypeRef visitExecutable(ExecutableType t, Integer dimension) {
-        return null;
-    }
+  public TypeRef visitWildcard(WildcardType t, Integer dimension) {
+    return null;
+  }
 
-    public TypeRef visitNoType(NoType t, Integer dimension) {
-        return new VoidRefBuilder().build();
-    }
+  public TypeRef visitExecutable(ExecutableType t, Integer dimension) {
+    return null;
+  }
 
-    public TypeRef visitUnknown(TypeMirror t, Integer dimension) {
-        return null;
-    }
+  public TypeRef visitNoType(NoType t, Integer dimension) {
+    return new VoidRefBuilder().build();
+  }
+
+  public TypeRef visitUnknown(TypeMirror t, Integer dimension) {
+    return null;
+  }
 
 }

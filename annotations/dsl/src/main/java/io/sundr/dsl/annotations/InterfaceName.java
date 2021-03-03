@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 /**
  * This annotation allows you to explicitly define the generated interface name.
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.SOURCE)
 public @interface InterfaceName {
-    String value();
+  String value();
 }

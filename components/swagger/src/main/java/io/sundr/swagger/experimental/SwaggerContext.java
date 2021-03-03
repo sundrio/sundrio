@@ -22,30 +22,30 @@ import io.swagger.models.Swagger;
 
 public class SwaggerContext {
 
-    private final Swagger swagger;
-    private final CodegenConfig config;
-    private final ClientOptInput opts;
-    private final SwaggerRepository repository = new SwaggerRepository();
+  private final Swagger swagger;
+  private final CodegenConfig config;
+  private final ClientOptInput opts;
+  private final SwaggerRepository repository = new SwaggerRepository();
 
-    public SwaggerContext(Swagger swagger, CodegenConfig config, ClientOptInput opts) {
-        this.swagger = swagger;
-        this.config = config;
-        this.opts = opts;
-    }
+  public SwaggerContext(Swagger swagger, CodegenConfig config, ClientOptInput opts) {
+    this.swagger = swagger;
+    this.config = config;
+    this.opts = opts;
+  }
 
-    public Swagger getSwagger() {
-        return swagger;
-    }
+  public Swagger getSwagger() {
+    return swagger;
+  }
 
-    public CodegenConfig getConfig() {
-        return config;
-    }
+  public CodegenConfig getConfig() {
+    return config;
+  }
 
-    public ClientOptInput getOpts() {
-        return opts;
-    }
+  public ClientOptInput getOpts() {
+    return opts;
+  }
 
-    public SwaggerRepository getRepository() {
-        return repository;
-    }
+  public SwaggerRepository getRepository() {
+    return repository;
+  }
 }

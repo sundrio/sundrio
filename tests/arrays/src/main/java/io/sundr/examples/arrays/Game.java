@@ -21,17 +21,17 @@ import io.sundr.builder.annotations.Buildable;
 @Buildable
 public class Game {
 
-    private Person[] players;
+  private Person[] players;
 
-    public Game(Person[] players) {
-        this.players = players;
-    }
+  public Game(Person[] players) {
+    this.players = players;
+  }
 
-    public Person[] getPlayers() {
-        return players;
-    }
+  public Person[] getPlayers() {
+    return players;
+  }
 
-    public void setPlayers(Person[] players) {
-        this.players = players;
-    }
+  public void setPlayers(Person[] players) {
+    this.players = players;
+  }
 }

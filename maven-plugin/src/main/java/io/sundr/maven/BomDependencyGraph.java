@@ -16,37 +16,37 @@
 
 package io.sundr.maven;
 
-import org.apache.maven.execution.ProjectDependencyGraph;
-import org.apache.maven.project.MavenProject;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.project.MavenProject;
+
 public class BomDependencyGraph implements ProjectDependencyGraph {
 
-    private final List<MavenProject> projects;
+  private final List<MavenProject> projects;
 
-    public BomDependencyGraph(MavenProject project) {
-        this.projects = Arrays.asList(project);
-    }
+  public BomDependencyGraph(MavenProject project) {
+    this.projects = Arrays.asList(project);
+  }
 
-    public BomDependencyGraph(List<MavenProject> projects) {
-        this.projects = projects;
-    }
+  public BomDependencyGraph(List<MavenProject> projects) {
+    this.projects = projects;
+  }
 
-    @Override
-    public List<MavenProject> getSortedProjects() {
-        return projects;
-    }
+  @Override
+  public List<MavenProject> getSortedProjects() {
+    return projects;
+  }
 
-    @Override
-    public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
-        return Collections.emptyList();
-    }
+  @Override
+  public List<MavenProject> getDownstreamProjects(MavenProject project, boolean transitive) {
+    return Collections.emptyList();
+  }
 
-    @Override
-    public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
-        return Collections.emptyList();
-    }
+  @Override
+  public List<MavenProject> getUpstreamProjects(MavenProject project, boolean transitive) {
+    return Collections.emptyList();
+  }
 }

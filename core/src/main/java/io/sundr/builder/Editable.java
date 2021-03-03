@@ -21,9 +21,10 @@ package io.sundr.builder;
  * Editable objects are objects that can by edited by obtaining
  * a new instance of the appropriate {@link Builder} feed with the information encapsulated
  * by the current instance.
- * @param <T>  The object to edit.
+ * 
+ * @param <T> The object to edit.
  */
 public interface Editable<T> {
 
-    T edit();
+  T edit();
 }

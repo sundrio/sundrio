@@ -16,58 +16,59 @@
 
 package io.sundr.examples.shapes;
 
-import io.sundr.builder.annotations.Buildable;
-import io.sundr.builder.annotations.Inline;
-import io.sundr.transform.annotations.VelocityTransformation;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.Inline;
+import io.sundr.transform.annotations.VelocityTransformation;
+
 @Buildable(lazyMapInitEnabled = false, inline = {
-        @Inline(type = Createable.class, value = "create", prefix = "Createable"),
-        @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
+    @Inline(type = Createable.class, value = "create", prefix = "Createable"),
+    @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
 })
 @VelocityTransformation("transformation.vm") //This is just used to demonstrate how we can use velocity transformations.
 public class Canvas {
 
-    private final Shape canvasShape;
-    private final Map<String, Shape> namedShapes;
-    private final List<Shape> shapes;
-    private final Artist artist;
-    private final Date date;
-    private final Map<String, String> notes;
+  private final Shape canvasShape;
+  private final Map<String, Shape> namedShapes;
+  private final List<Shape> shapes;
+  private final Artist artist;
+  private final Date date;
+  private final Map<String, String> notes;
 
-    public Canvas(Shape canvasShape, Map<String, Shape> namedShapes, List<Shape> shapes, Artist artist, Date date, Map<String, String> notes) {
-        this.canvasShape = canvasShape;
-        this.namedShapes = (namedShapes == null) ? null : Collections.unmodifiableMap(namedShapes);
-        this.shapes = (shapes == null) ? null : Collections.unmodifiableList(shapes);
-        this.artist = artist;
-        this.date = date;
-        this.notes = notes;
-    }
+  public Canvas(Shape canvasShape, Map<String, Shape> namedShapes, List<Shape> shapes, Artist artist, Date date,
+      Map<String, String> notes) {
+    this.canvasShape = canvasShape;
+    this.namedShapes = (namedShapes == null) ? null : Collections.unmodifiableMap(namedShapes);
+    this.shapes = (shapes == null) ? null : Collections.unmodifiableList(shapes);
+    this.artist = artist;
+    this.date = date;
+    this.notes = notes;
+  }
 
-    public Shape getCanvasShape() {
-        return this.canvasShape;
-    }
+  public Shape getCanvasShape() {
+    return this.canvasShape;
+  }
 
-    public Map<String, Shape> getNamedShapes() {
-        return namedShapes;
-    }
+  public Map<String, Shape> getNamedShapes() {
+    return namedShapes;
+  }
 
-    public List<Shape> getShapes() {
-        return shapes;
-    }
+  public List<Shape> getShapes() {
+    return shapes;
+  }
 
-    public Artist getArtist() {
-        return artist;
-    }
+  public Artist getArtist() {
+    return artist;
+  }
 
-    public Date getDate() {
-        return date;
-    }
+  public Date getDate() {
+    return date;
+  }
 
-    public Map<String, String> getNotes() {
-        return notes;
-    }
+  public Map<String, String> getNotes() {
+    return notes;
+  }
 }

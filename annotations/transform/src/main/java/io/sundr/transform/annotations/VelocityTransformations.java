@@ -16,43 +16,43 @@
 
 package io.sundr.transform.annotations;
 
-import io.sundr.codegen.annotations.AnnotationSelector;
-import io.sundr.codegen.annotations.PackageSelector;
-import io.sundr.codegen.annotations.ResourceSelector;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+import io.sundr.codegen.annotations.AnnotationSelector;
+import io.sundr.codegen.annotations.PackageSelector;
+import io.sundr.codegen.annotations.ResourceSelector;
+
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface VelocityTransformations {
 
-    /**
-     * @return a list of transformations to apply.
-     */
-    VelocityTransformation[] value();
+  /**
+   * @return a list of transformations to apply.
+   */
+  VelocityTransformation[] value();
 
-    /**
-     * @return a list of packages for selecting transformation target.
-     * Classes that match the package and regex will be selected.
-     */
-    PackageSelector[] packages() default {};
+  /**
+   * @return a list of packages for selecting transformation target.
+   *         Classes that match the package and regex will be selected.
+   */
+  PackageSelector[] packages() default {};
 
-    /**
-     * @return a list of annotations to use for selecting transformation target.
-     * Classes annotated with the annotations will be selected.
-     * Note: This only works for local classes and NOT for dependencies.
-     * If you need to transform 3rd party classes prefer the resource selector.
-     * You can also specify the package selector if you are specify the package explicitly.
-     */
-    AnnotationSelector[] annotations() default {};
+  /**
+   * @return a list of annotations to use for selecting transformation target.
+   *         Classes annotated with the annotations will be selected.
+   *         Note: This only works for local classes and NOT for dependencies.
+   *         If you need to transform 3rd party classes prefer the resource selector.
+   *         You can also specify the package selector if you are specify the package explicitly.
+   */
+  AnnotationSelector[] annotations() default {};
 
-    /**
-     * @return a list of resources to use for selecting transformation target.
-     * These resources are expected to contain one FQCN per line.
-     */
-    ResourceSelector[] resources() default {};
+  /**
+   * @return a list of resources to use for selecting transformation target.
+   *         These resources are expected to contain one FQCN per line.
+   */
+  ResourceSelector[] resources() default {};
 
 }

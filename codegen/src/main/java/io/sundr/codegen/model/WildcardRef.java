@@ -16,25 +16,24 @@
 
 package io.sundr.codegen.model;
 
-import io.sundr.codegen.utils.StringUtils;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.sundr.codegen.utils.StringUtils;
+
 public class WildcardRef extends TypeRef {
 
-   public enum BoundKind {
-    EXTENDS("? extends %s"),
-    SUPER("? super %s");
+  public enum BoundKind {
+    EXTENDS("? extends %s"), SUPER("? super %s");
 
     String format;
 
     BoundKind(String format) {
-      this.format=format;
+      this.format = format;
     }
 
-    String getFormat()  {
+    String getFormat() {
       return format;
     }
   }
@@ -43,7 +42,7 @@ public class WildcardRef extends TypeRef {
   private final List<TypeRef> bounds;
 
   public WildcardRef() {
-    this(BoundKind.EXTENDS, Collections.<TypeRef>emptyList(), Collections.<AttributeKey, Object>emptyMap());
+    this(BoundKind.EXTENDS, Collections.<TypeRef> emptyList(), Collections.<AttributeKey, Object> emptyMap());
   }
 
   public WildcardRef(BoundKind boundKind, List<TypeRef> bounds, Map<AttributeKey, Object> attributes) {
@@ -78,7 +77,6 @@ public class WildcardRef extends TypeRef {
     }
     return sb.toString();
   }
-
 
   public boolean isAssignableFrom(TypeRef ref) {
     return false;

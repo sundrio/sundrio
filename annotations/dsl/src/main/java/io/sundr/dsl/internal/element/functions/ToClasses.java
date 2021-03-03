@@ -16,36 +16,35 @@
 
 package io.sundr.dsl.internal.element.functions;
 
-import io.sundr.Function;
-import io.sundr.dsl.annotations.Keyword;
-import io.sundr.dsl.annotations.Option;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+
+import io.sundr.Function;
+import io.sundr.dsl.annotations.Option;
 
 public class ToClasses implements Function<Element, Set<String>> {
 
-    private final TypeElement OPTION;
+  private final TypeElement OPTION;
 
-    public ToClasses(Elements elements) {
-        OPTION = elements.getTypeElement(Option.class.getCanonicalName());
-    }
+  public ToClasses(Elements elements) {
+    OPTION = elements.getTypeElement(Option.class.getCanonicalName());
+  }
 
-    public Set<String> apply(Element element) {
-        Set<String> classes = new HashSet<String>();
-        for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
-            for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
-                if (innerMirror.getAnnotationType().asElement().equals(OPTION)) {
-                    classes.add(mirror.getAnnotationType().asElement().toString());
-                    continue;
-                }
-            }
+  public Set<String> apply(Element element) {
+    Set<String> classes = new HashSet<String>();
+    for (AnnotationMirror mirror : element.getAnnotationMirrors()) {
+      for (AnnotationMirror innerMirror : mirror.getAnnotationType().asElement().getAnnotationMirrors()) {
+        if (innerMirror.getAnnotationType().asElement().equals(OPTION)) {
+          classes.add(mirror.getAnnotationType().asElement().toString());
+          continue;
         }
-        return classes;
+      }
     }
+    return classes;
+  }
 }

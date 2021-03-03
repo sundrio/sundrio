@@ -16,19 +16,20 @@
 
 package io.sundr.codegen.functions;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class PluralizeTest {
 
-    @Test
-    public void testPluralize() {
+  @Test
+  public void testPluralize() {
 
-        assertEquals("addresses", Pluralize.FUNCTION.apply("address"));
-        assertEquals("numbers", Pluralize.FUNCTION.apply("number"));
-        assertEquals("vertices", Pluralize.FUNCTION.apply("vertex"));
-        assertEquals("endpoints", Pluralize.FUNCTION.apply("endpoints"));
-        assertEquals("ingresses", Pluralize.FUNCTION.apply("ingress"));
-    }
+    assertEquals("addresses", Pluralize.FUNCTION.apply("address"));
+    assertEquals("numbers", Pluralize.FUNCTION.apply("number"));
+    assertEquals("vertices", Pluralize.FUNCTION.apply("vertex"));
+    assertEquals("endpoints", Pluralize.FUNCTION.apply("endpoints"));
+    assertEquals("ingresses", Pluralize.FUNCTION.apply("ingress"));
+  }
 
 }

@@ -16,7 +16,6 @@
 
 package io.sundr.codegen.model;
 
-
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,115 +26,118 @@ import java.util.stream.Stream;
 
 public class Property extends ModifierSupport {
 
-    private final List<AnnotationRef> annotations;
-    private final TypeRef typeRef;
-    private final String name;
-    private final List<String> comments;
+  private final List<AnnotationRef> annotations;
+  private final TypeRef typeRef;
+  private final String name;
+  private final List<String> comments;
 
-  public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, int modifiers, Map<AttributeKey, Object> attributes) {
-        super(modifiers, attributes);
-        this.annotations = annotations;
-        this.typeRef = typeRef;
-        this.name = name;
-        this.comments = comments;
+  public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, int modifiers,
+      Map<AttributeKey, Object> attributes) {
+    super(modifiers, attributes);
+    this.annotations = annotations;
+    this.typeRef = typeRef;
+    this.name = name;
+    this.comments = comments;
+  }
+
+  public List<AnnotationRef> getAnnotations() {
+    return annotations;
+  }
+
+  public TypeRef getTypeRef() {
+    return typeRef;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public List<String> getComments() {
+    return this.comments;
+  }
+
+  public String getNameCapitalized() {
+    return Stream.of(name.split("[^a-zA-Z0-9]"))
+        .filter(s -> s != null && s.length() > 0)
+        .map(v -> Character.toUpperCase(v.charAt(0)) + v.substring(1))
+        .collect(Collectors.joining());
+  }
+
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
+
+    for (AnnotationRef annotationRef : annotations) {
+      refs.addAll(annotationRef.getReferences());
     }
 
-    public List<AnnotationRef> getAnnotations() {
-        return annotations;
+    if (typeRef instanceof ClassRef) {
+      ClassRef classRef = (ClassRef) typeRef;
+      refs.addAll(classRef.getReferences());
+    }
+    for (AnnotationRef a : getAnnotations()) {
+      refs.addAll(a.getClassRef().getReferences());
     }
 
-    public TypeRef getTypeRef() {
-        return typeRef;
+    if (getAttributes().containsKey(ALSO_IMPORT)) {
+      Object obj = getAttributes().get(ALSO_IMPORT);
+      if (obj instanceof ClassRef) {
+        refs.add((ClassRef) obj);
+      } else if (obj instanceof Collection) {
+        refs.addAll((Collection<? extends ClassRef>) obj);
+      }
+    }
+    return refs;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+
+    Property property = (Property) o;
+
+    if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null)
+      return false;
+    return name != null ? name.equals(property.name) : property.name == null;
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = typeRef != null ? typeRef.hashCode() : 0;
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    return result;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    // if (comments != null && !comments.isEmpty()) {
+    //   sb.append(comments.stream().collect(Collectors.joining(NEWLINE)));
+    // }
+
+    if (isPublic()) {
+      sb.append(PUBLIC).append(SPACE);
+    } else if (isProtected()) {
+      sb.append(PROTECTED).append(SPACE);
+    } else if (isPrivate()) {
+      sb.append(PRIVATE).append(SPACE);
     }
 
-    public String getName() {
-        return name;
+    if (isStatic()) {
+      sb.append(STATIC).append(SPACE);
     }
 
-    public List<String> getComments() {
-      return this.comments;
+    if (isFinal()) {
+      sb.append(FINAL).append(SPACE);
     }
 
-    public String getNameCapitalized() {
-        return Stream.of(name.split("[^a-zA-Z0-9]"))
-            .filter(s -> s != null && s.length() > 0)
-            .map(v -> Character.toUpperCase(v.charAt(0)) + v.substring(1))
-            .collect(Collectors.joining());
-    }
+    sb.append(typeRef).append(SPACE);
+    sb.append(name);
 
-    public Set<ClassRef> getReferences() {
-        Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
-
-        for (AnnotationRef annotationRef : annotations) {
-            refs.addAll(annotationRef.getReferences());
-        }
-
-        if (typeRef instanceof ClassRef) {
-            ClassRef classRef = (ClassRef) typeRef;
-            refs.addAll(classRef.getReferences());
-        }
-        for (AnnotationRef a : getAnnotations()) {
-            refs.addAll(a.getClassRef().getReferences());
-        }
-
-        if (getAttributes().containsKey(ALSO_IMPORT)) {
-            Object obj = getAttributes().get(ALSO_IMPORT);
-            if (obj instanceof ClassRef) {
-                refs.add((ClassRef) obj);
-            } else if (obj instanceof Collection) {
-                refs.addAll((Collection<? extends ClassRef>) obj);
-            }
-        }
-        return refs;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Property property = (Property) o;
-
-        if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null)
-            return false;
-        return name != null ? name.equals(property.name) : property.name == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = typeRef != null ? typeRef.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-
-        // if (comments != null && !comments.isEmpty()) {
-        //   sb.append(comments.stream().collect(Collectors.joining(NEWLINE)));
-        // }
-
-        if (isPublic()) {
-            sb.append(PUBLIC).append(SPACE);
-        } else if (isProtected()) {
-            sb.append(PROTECTED).append(SPACE);
-        } else if (isPrivate()) {
-            sb.append(PRIVATE).append(SPACE);
-        }
-
-        if (isStatic()) {
-            sb.append(STATIC).append(SPACE);
-        }
-
-        if (isFinal()) {
-            sb.append(FINAL).append(SPACE);
-        }
-
-        sb.append(typeRef).append(SPACE);
-        sb.append(name);
-
-        return sb.toString();
-    }
+    return sb.toString();
+  }
 }

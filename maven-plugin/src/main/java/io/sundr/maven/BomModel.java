@@ -16,43 +16,43 @@
 
 package io.sundr.maven;
 
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 
-import java.util.Set;
-
 public class BomModel {
 
-    private final MavenProject project;
-    private final Set<Artifact> archives;
-    private final Set<Artifact> poms;
-    private final Set<Artifact> plugins;
+  private final MavenProject project;
+  private final Set<Artifact> archives;
+  private final Set<Artifact> poms;
+  private final Set<Artifact> plugins;
 
-    public BomModel(MavenProject project, Set<Artifact> archives, Set<Artifact> poms, Set<Artifact> plugins) {
-        this.project = project;
-        this.archives = archives;
-        this.poms = poms;
-        this.plugins = plugins;
-    }
+  public BomModel(MavenProject project, Set<Artifact> archives, Set<Artifact> poms, Set<Artifact> plugins) {
+    this.project = project;
+    this.archives = archives;
+    this.poms = poms;
+    this.plugins = plugins;
+  }
 
-    public MavenProject getProject() {
-        return project;
-    }
+  public MavenProject getProject() {
+    return project;
+  }
 
-    public Set<Artifact> getArchives() {
-        return archives;
-    }
+  public Set<Artifact> getArchives() {
+    return archives;
+  }
 
-    public Set<Artifact> getPoms() {
-        return poms;
-    }
+  public Set<Artifact> getPoms() {
+    return poms;
+  }
 
-    public Set<Artifact> getPlugins() {
-        return plugins;
-    }
+  public Set<Artifact> getPlugins() {
+    return plugins;
+  }
 
-    @Override
-    public String toString() {
-        return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
-    }
+  @Override
+  public String toString() {
+    return project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
+  }
 }

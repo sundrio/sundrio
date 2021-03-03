@@ -16,24 +16,26 @@
 
 package io.sundr.codegen.functions;
 
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import io.sundr.codegen.model.TypeDef;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.TypeDeclaration;
+
+import io.sundr.codegen.model.TypeDef;
+
 public class PareserTest {
 
-    @Test
-    public void testParser() throws Exception {
+  @Test
+  public void testParser() throws Exception {
 
-        CompilationUnit cu = Sources.FROM_CLASSPATH_TO_COMPILATIONUNIT.apply("io/sundr/builder/BaseFluent.java");
-        String packageName = cu.getPackage().getPackageName();
-        Assert.assertEquals("io.sundr.builder", packageName);
+    CompilationUnit cu = Sources.FROM_CLASSPATH_TO_COMPILATIONUNIT.apply("io/sundr/builder/BaseFluent.java");
+    String packageName = cu.getPackage().getPackageName();
+    Assert.assertEquals("io.sundr.builder", packageName);
 
-        for (TypeDeclaration typeDeclaration : cu.getTypes()) {
-            TypeDef typeDef = Sources.TYPEDEF.apply(typeDeclaration);
-            System.out.print(typeDef);
-        }
+    for (TypeDeclaration typeDeclaration : cu.getTypes()) {
+      TypeDef typeDef = Sources.TYPEDEF.apply(typeDeclaration);
+      System.out.print(typeDef);
     }
+  }
 }

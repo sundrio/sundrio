@@ -16,9 +16,15 @@
 
 package io.sundr.builder.internal.functions;
 
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+
+import org.junit.Test;
+
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
+
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -26,37 +32,33 @@ import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
-import org.junit.Test;
-
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
 
 public class ClazzAsTest {
 
-    private final Context context = new Context();
-    private final Elements elements = JavacElements.instance(context);
-    private final Types types = JavacTypes.instance(context);
+  private final Context context = new Context();
+  private final Elements elements = JavacElements.instance(context);
+  private final Types types = JavacTypes.instance(context);
 
-    @Test
-    public void testToFluent() {
-        BuilderContext builderContext = BuilderContextManager.create(elements, types);
+  @Test
+  public void testToFluent() {
+    BuilderContext builderContext = BuilderContextManager.create(elements, types);
 
-        TypeDef type = new TypeDefBuilder()
-                .withName("MyClass")
-                .withPackageName(getClass().getPackage().getName())
-                .withParameters()
-                .build();
+    TypeDef type = new TypeDefBuilder()
+        .withName("MyClass")
+        .withPackageName(getClass().getPackage().getName())
+        .withParameters()
+        .build();
 
-        Method constructor = new MethodBuilder()
-                .withReturnType(type.toReference())
-                .withAnnotations(Constants.BUILDABLE_ANNOTATION)
-                .build();
+    Method constructor = new MethodBuilder()
+        .withReturnType(type.toReference())
+        .withAnnotations(Constants.BUILDABLE_ANNOTATION)
+        .build();
 
-        type = new TypeDefBuilder(type)
-                .withConstructors(constructor)
-                .build();
+    type = new TypeDefBuilder(type)
+        .withConstructors(constructor)
+        .build();
 
-        TypeDef result = ClazzAs.FLUENT_IMPL.apply(type);
-        System.out.println(result);
-    }
+    TypeDef result = ClazzAs.FLUENT_IMPL.apply(type);
+    System.out.println(result);
+  }
 }

@@ -18,11 +18,11 @@ package io.sundr.examples.crud;
 
 public interface Dao<T> {
 
-    T create(T item);
+  T create(T item);
 
-    T get(String id);
+  T get(String id);
 
-    T update(T item);
+  T update(T item);
 
-    Boolean delete(T item);
+  Boolean delete(T item);
 }

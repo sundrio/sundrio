@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 /**
  * Annotation, that marks that we want to keep the source of the class inside the resources.
  */
-@Target({ElementType.TYPE})
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface Resourcecify {
 

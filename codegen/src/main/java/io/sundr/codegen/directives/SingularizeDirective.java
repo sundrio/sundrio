@@ -16,40 +16,38 @@
 
 package io.sundr.codegen.directives;
 
-import io.sundr.codegen.model.TypeDef;
-import java.io.StringWriter;
-import org.apache.velocity.runtime.parser.node.ASTBlock;
 import java.io.IOException;
-import org.apache.velocity.runtime.directive.Directive;
-import org.apache.velocity.context.InternalContextAdapter;
 import java.io.Writer;
+
+import org.apache.velocity.context.InternalContextAdapter;
+import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.Node;
+
 import io.sundr.codegen.functions.Singularize;
 
-
 public class SingularizeDirective extends Directive {
-    
-    private static final String SINGULRIZE = "singularize";
 
-    @Override
-    public String getName() {
-        return SINGULRIZE;
+  private static final String SINGULRIZE = "singularize";
+
+  @Override
+  public String getName() {
+    return SINGULRIZE;
+  }
+
+  @Override
+  public int getType() {
+    return LINE;
+  }
+
+  @Override
+  public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
+    String word = null;
+    if (node.jjtGetChild(0) != null) {
+      word = String.valueOf(node.jjtGetChild(0).value(context));
     }
 
-    @Override
-    public int getType() {
-        return LINE;
-    }
-
-    @Override
-    public boolean render(InternalContextAdapter context, Writer writer, Node node) throws IOException {
-        String word = null;
-        if (node.jjtGetChild(0) != null) {
-            word = String.valueOf(node.jjtGetChild(0).value(context));
-        }
-
-        //truncate and write result to writer
-        writer.write(Singularize.FUNCTION.apply(word));
-        return true;
-    }
+    //truncate and write result to writer
+    writer.write(Singularize.FUNCTION.apply(word));
+    return true;
+  }
 }

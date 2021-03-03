@@ -16,21 +16,21 @@
 
 package io.sundr.dsl.internal.visitors;
 
+import java.util.Collection;
+
 import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;
 
-import java.util.Collection;
-
 public class TypeParamDefColletor extends TypedVisitor<TypeDefBuilder> {
 
-    private final Collection<TypeParamDef> collection;
+  private final Collection<TypeParamDef> collection;
 
-    public TypeParamDefColletor(Collection<TypeParamDef> collection) {
-        this.collection = collection;
-    }
+  public TypeParamDefColletor(Collection<TypeParamDef> collection) {
+    this.collection = collection;
+  }
 
-    public void visit(TypeDefBuilder builder) {
-        collection.addAll(builder.getParameters());
-    }
+  public void visit(TypeDefBuilder builder) {
+    collection.addAll(builder.getParameters());
+  }
 }
