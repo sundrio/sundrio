@@ -26,6 +26,13 @@ import java.lang.annotation.Target;
 public @interface Pojo {
 
   /**
+   * Indicates that the generated pojo will be autoboxed or not.
+   * 
+   * @return true if autoboxing is enabled, false otherwise.t
+   */
+  boolean autobox() default false;
+
+  /**
    * Indicates that the generated pojo will be mutable or not.
    * If not mutable all properties will be final and no default constructor will be provided.
    * 
