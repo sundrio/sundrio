@@ -260,16 +260,7 @@ public class TypeAs {
     return type;
   };
 
-  public static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(type -> {
-    int index = 0;
-    for (TypeRef primitive : PRIMITIVE_TYPES) {
-      if (primitive.equals(type)) {
-        return BOXED_PRIMITIVE_TYPES[index];
-      }
-      index++;
-    }
-    return type;
-  });
+  public static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(TypeUtils::box);
 
   static final Function<TypeRef, String> PARSER_OF = FunctionFactory.cache(type -> {
     int index = 0;

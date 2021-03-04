@@ -129,6 +129,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     boolean enableStaticBuilder = true;
     boolean enableStaticAdapter = true;
     boolean enableStaticMapAdapter = false;
+    boolean autobox = false;
     boolean mutable = false;
 
     final List adapters = new ArrayList();
@@ -146,6 +147,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
           if (params.containsKey("mutable")) {
             mutable = Boolean.parseBoolean(String.valueOf(r.getParameters().getOrDefault("mutable", false)));
+          }
+          if (params.containsKey("autobox")) {
+            autobox = Boolean.parseBoolean(String.valueOf(r.getParameters().getOrDefault("autobox", false)));
           }
           if (params.containsKey("name")) {
             pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
@@ -215,6 +219,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         if (Getter.is(method) || t.equals(item)) {
           String name = Getter.propertyNameSafe(method);
           TypeRef returnType = method.getReturnType();
+          if (autobox) {
+            returnType = TypeUtils.box(returnType);
+          }
           //If return type is an annotation also convert the annotation.
           if (method.getReturnType() instanceof ClassRef) {
             ClassRef ref = (ClassRef) method.getReturnType();
@@ -532,10 +539,17 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           adapterImports.add(COLLECTORS);
         }
         List<ClassRef> generatedRefs = new ArrayList<>();
-        TypeUtils.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef).forEach(
-            i -> populateReferences((ClassRef) i, generatedRefs));
+        TypeUtils.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef)
+            .forEach(i -> populateReferences((ClassRef) i, generatedRefs));
         adapterImports.addAll(generatedRefs);
         adapterImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
+
+        TypeUtils.allProperties(generatedPojo).stream()
+            .filter(p -> p.getTypeRef() instanceof ClassRef)
+            .map(p -> (ClassRef) p.getTypeRef())
+            .filter(c -> !adapterPackage.equals(c.getDefinition().getPackageName()))
+            .collect(toList());
+
         adapterImports.addAll(TypeUtils.allProperties(generatedPojo).stream()
             .filter(p -> p.getTypeRef() instanceof ClassRef)
             .map(p -> (ClassRef) p.getTypeRef())
@@ -977,9 +991,10 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
   }
 
   private void populateReferences(ClassRef ref, List<ClassRef> refs) {
-    if (!refs.contains(ref) && !Constants.OBJECT.equals(ref)) {
+    if (!refs.contains(ref) && !TypeUtils.isJdkType(ref)) {
       refs.add(ref);
-      TypeUtils.allProperties(ref.getDefinition()).stream().filter(p -> p.getTypeRef() instanceof ClassRef)
+      TypeUtils.allProperties(ref.getDefinition()).stream()
+          .filter(p -> p.getTypeRef() instanceof ClassRef)
           .forEach(p -> populateReferences((ClassRef) p.getTypeRef(), refs));
     }
   }

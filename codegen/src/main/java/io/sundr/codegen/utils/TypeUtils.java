@@ -58,6 +58,19 @@ public final class TypeUtils {
     //Utility Class
   }
 
+  public static TypeRef box(TypeRef ref) {
+    if (ref instanceof PrimitiveRef) {
+      int index = 0;
+      for (TypeRef primitive : Constants.PRIMITIVE_TYPES) {
+        if (primitive.equals(ref)) {
+          return Constants.BOXED_PRIMITIVE_TYPES[index];
+        }
+        index++;
+      }
+    }
+    return ref;
+  }
+
   /**
    * Checks if a {@link TypeDef} is an instance of an other {@link TypeDef}.
    * 
@@ -415,6 +428,30 @@ public final class TypeUtils {
     }
 
     return JAVA_UTIL_OPTIONAL_LONG.equals(((ClassRef) type).getDefinition().getFullyQualifiedName());
+  }
+
+  /**
+   * Check if type is an internal JDK type.
+   * 
+   * @return true if jdk type, false otherwise.
+   */
+  public static boolean isJdkType(TypeRef type) {
+    if (!(type instanceof ClassRef)) {
+      return false;
+    }
+
+    String packageName = ((ClassRef) type).getDefinition().getPackageName();
+    if (packageName.startsWith("java.")) {
+      return true;
+    } else if (packageName.startsWith("sun.")) {
+      return true;
+    } else if (packageName.startsWith("com.sun.")) {
+      return true;
+    } else if (packageName.startsWith("com.ibm.jit.")) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
