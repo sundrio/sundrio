@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -64,6 +65,7 @@ import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.AttributeKey;
+import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -130,6 +132,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     boolean enableStaticAdapter = true;
     boolean enableStaticMapAdapter = false;
     boolean autobox = false;
+    boolean initialize = false;
     boolean mutable = false;
 
     final List adapters = new ArrayList();
@@ -150,6 +153,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           }
           if (params.containsKey("autobox")) {
             autobox = Boolean.parseBoolean(String.valueOf(r.getParameters().getOrDefault("autobox", false)));
+          }
+          if (params.containsKey("initialize")) {
+            initialize = Boolean.parseBoolean(String.valueOf(r.getParameters().getOrDefault("initialize", false)));
           }
           if (params.containsKey("name")) {
             pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
@@ -214,6 +220,16 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     Set<TypeDef> additionalTypes = new HashSet<>();
 
     for (TypeDef t : types) {
+      if (superClass != null) {
+        Method constructor = findBuildableConstructor(superClass);
+        if (constructor != null) {
+          for (Property p : constructor.getArguments()) {
+            String name = StringUtils.toFieldName(p.getName());
+            superClassFields.put(p.getName(), p);
+          }
+        }
+      }
+
       for (Method method : t.getMethods()) {
         //We need all getters and all annotation methods.
         if (Getter.is(method) || t.equals(item)) {
@@ -251,8 +267,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           }
           Map<AttributeKey, Object> fieldAttributes = new HashMap<>();
           if (method.hasAttribute(DEFAULT_VALUE)) {
-            fieldAttributes.put(DEFAULT_VALUE, method.getAttribute(DEFAULT_VALUE));
-            if (mutable) {
+            if (returnType.getDimensions() > 0 || (mutable && initialize)) {
+              fieldAttributes.put(DEFAULT_VALUE, method.getAttribute(DEFAULT_VALUE));
               fieldAttributes.put(INIT,
                   getDefaultValue(new PropertyBuilder().withTypeRef(returnType).withAttributes(fieldAttributes).build()));
             }
@@ -264,22 +280,37 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
               .withAttributes(fieldAttributes)
               .build());
 
-          Property field = new PropertyBuilder()
-              .withName(StringUtils.toFieldName(name))
-              .withTypeRef(returnType)
-              .withModifiers(mutable ? TypeUtils.modifiersToInt(Modifier.PRIVATE)
-                  : TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
-              .withAttributes(fieldAttributes)
-              .build();
+          if (!superClassFields.containsKey(StringUtils.toFieldName(name))) {
+            Property field = new PropertyBuilder()
+                .withName(StringUtils.toFieldName(name))
+                .withTypeRef(returnType)
+                .withModifiers(mutable ? TypeUtils.modifiersToInt(Modifier.PRIVATE)
+                    : TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+                .withAttributes(fieldAttributes)
+                .build();
 
-          fields.add(field);
-          getters.add(new MethodBuilder(Getter.forProperty(field))
-              .withModifiers(modifiersToInt(Modifier.PUBLIC))
-              .withNewBlock()
-              .withStatements(new StringStatement("return this." + StringUtils.toFieldName(name) + ";"))
-              .endBlock()
-              .build());
+            Method getter = new MethodBuilder(Getter.forProperty(field))
+                .withModifiers(modifiersToInt(Modifier.PUBLIC))
+                .withNewBlock()
+                .withStatements(new StringStatement("return this." + StringUtils.toFieldName(name) + ";"))
+                .endBlock()
+                .build();
 
+            fields.add(field);
+            getters.add(getter);
+            if (field.getTypeRef().equals(Constants.BOOLEAN_REF)) {
+              Method primitiveGetter = new MethodBuilder(getter)
+                  .withName("is" + getter.getName().replaceAll("^get", ""))
+                  .withReturnType(Constants.PRIMITIVE_BOOLEAN_REF)
+                  .withNewBlock()
+                  .withStatements(new StringStatement(
+                      "return this." + StringUtils.toFieldName(name) + " != null &&  this." + StringUtils.toFieldName(name)
+                          + ";"))
+                  .endBlock()
+                  .build();
+              getters.add(primitiveGetter);
+            }
+          }
         }
       }
     }
@@ -289,27 +320,6 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
       Method constructor = findBuildableConstructor(superClass);
       if (constructor != null) {
         constructorArgs.addAll(constructor.getArguments());
-        //Remove properties set by superclass
-        for (Property p : constructor.getArguments()) {
-          String name = StringUtils.toFieldName(p.getName());
-          for (Property f : fields) {
-            if (name.equals(f.getName())) {
-              fields.remove(f);
-              superClassFields.put(f.getName(), f);
-            }
-          }
-        }
-
-        //Remove getters provided by superclass.
-        for (Method method : superClass.getMethods()) {
-          if (Getter.is(method)) {
-            for (Method m : getters) {
-              if (m.getName().equals(method.getName())) {
-                getters.remove(m);
-              }
-            }
-          }
-        }
       }
 
       StringBuilder sb = new StringBuilder();
@@ -323,11 +333,13 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
       sb.append(");");
       statements.add(new StringStatement(sb.toString()));
       for (Property p : fields) {
-        statements.add(new StringStatement(fieldIntializer(p)));
+        statements.add(new StringStatement(fieldIntializer(p, initialize)));
       }
-    } else {
+    } else
+
+    {
       for (Property p : fields) {
-        statements.add(new StringStatement(fieldIntializer(p)));
+        statements.add(new StringStatement(fieldIntializer(p, initialize)));
       }
     }
 
@@ -347,12 +359,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
     //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
     //The processor instead explicitly generates fluent and builder for the new pojo.
-    Method buildableConstructor = new MethodBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
-        .withArguments(constructorArgs)
-        .withNewBlock()
-        .withStatements(statements)
-        .endBlock()
+    Method buildableConstructor = new MethodBuilder().withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withArguments(constructorArgs).withNewBlock().withStatements(statements).endBlock()
         .accept(new TypedVisitor<PropertyBuilder>() {
           @Override
           public void visit(PropertyBuilder b) {
@@ -400,6 +408,37 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           .build();
 
       additionalMethods.add(staticBuilder);
+
+      StringBuilder sb = new StringBuilder().append("return new " + pojoBuilder.getFullyQualifiedName() + "()");
+
+      for (Method m : item.getMethods()) {
+        if (m.hasAttribute(DEFAULT_VALUE)) {
+          if (m.getReturnType().getDimensions() > 0) {
+            continue;
+          }
+
+          String defaultValue = getDefaultValue(m);
+          if (defaultValue == null || defaultValue.trim().isEmpty() || defaultValue.equals("\"\"")
+              || defaultValue.equals("null")) {
+            continue;
+          }
+
+          sb.append(
+              ".with" + StringUtils.capitalizeFirst(StringUtils.toFieldName(m.getName())) + "(" + defaultValue + ")");
+        }
+      }
+      sb.append(";");
+
+      Method staticBuilderFromDefaults = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName(extendsList.isEmpty() ? "newBuilderFromDefaults" : "new" + pojoBuilder.getName() + "FromDefaults") //avoid clashes in case of inheritance
+          .withReturnType(pojoBuilder.toInternalReference())
+          .withNewBlock()
+          .addNewStringStatementStatement(sb.toString())
+          .endBlock()
+          .build();
+
+      additionalMethods.add(staticBuilderFromDefaults);
     }
 
     Method staticAdapter = new MethodBuilder()
@@ -468,7 +507,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         .endBlock()
         .build();
 
-    if (enableStaticAdapter && hasArrayFields(item)) {
+    if (enableStaticAdapter &&
+
+        hasArrayFields(item)) {
       item.getMethods()
           .stream()
           .filter(m -> m.getReturnType() instanceof ClassRef && ((ClassRef) m.getReturnType()).getDimensions() > 0)
@@ -870,6 +911,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
    */
   private static String readPrimitiveValue(String ref, TypeDef source, Property property) {
     String dv = getDefaultValue(property);
+    String key = getterOf(source, property).getName();
+    String type = property.getTypeRef().toString();
     TypeRef propertyRef = property.getTypeRef();
     ClassRef boxed = (ClassRef) TypeAs.BOXED_OF.apply(propertyRef);
     String parse = TypeAs.PARSER_OF.apply(propertyRef);
@@ -877,10 +920,10 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     String boxedName = boxed.getName();
     if (parse != null) {
       return indent(ref) + boxedName + "." + parse + "(String.valueOf(" + ref + " instanceof Map ? ((Map)" + ref
-          + ").getOrDefault(\"" + getterOf(source, property).getName() + "\",\"" + dv + "\") : \"" + dv + "\"))";
+          + ").getOrDefault(\"" + key + "\",\"" + dv + "\") : \"" + dv + "\"))";
     } else {
-      return indent(ref) + "(" + property.getTypeRef().toString() + ")(" + ref + " instanceof Map ? ((Map)" + ref
-          + ").getOrDefault(\"" + getterOf(source, property).getName() + "\", " + dv + ") : " + dv + ")";
+      return indent(ref) + "(" + type + ")(" + ref + " instanceof Map ? ((Map)" + ref
+          + ").getOrDefault(\"" + key + "\", " + dv + ") : " + dv + ")";
     }
   }
 
@@ -894,11 +937,20 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
    */
   private static String readEnumValue(String ref, TypeDef source, Property property) {
     String dv = getDefaultValue(property);
+    String key = getterOf(source, property).getName();
+    String type = property.getTypeRef().toString();
+
     if (dv != null && dv.contains(".")) {
       dv = dv.substring(dv.lastIndexOf(".") + 1);
     }
-    return indent(ref) + property.getTypeRef().toString() + ".valueOf(String.valueOf(" + ref + " instanceof Map ? ((Map)" + ref
-        + ").getOrDefault(\"" + getterOf(source, property).getName() + "\",\"" + dv + "\") : \"" + dv + "\"))";
+    if (property.hasAttribute(DEFAULT_VALUE)) {
+      return indent(ref) + property.getTypeRef().toString() + ".valueOf(String.valueOf(" + ref + " instanceof Map ? ((Map)"
+          + ref + ").getOrDefault(\"" + getterOf(source, property).getName() + "\",\"" + dv + "\") : \"" + dv + "\"))";
+    } else {
+      return indent(ref) + "(" + type + ")(" + ref + " instanceof Map ? ( ((Map)" + ref + ").getOrDefault(\"" + key
+          + "\", null) != null ? " + type + ".valueOf(String.valueOf(((Map)" + ref + ").getOrDefault(\"" + key
+          + "\", null))) : null ) : null)";
+    }
   }
 
   /**
@@ -1014,26 +1066,37 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     return result;
   }
 
-  private static String fieldIntializer(Property p) {
-    if (p.hasAttribute(DEFAULT_VALUE) && (p.getTypeRef() instanceof ClassRef || p.getTypeRef().getDimensions() > 0)) {
+  private static String fieldIntializer(Property p, boolean initialize) {
+    if ((initialize && p.hasAttribute(DEFAULT_VALUE) && (p.getTypeRef() instanceof ClassRef)
+        || p.getTypeRef().getDimensions() > 0)) {
       return "this." + p.getName() + " = " + p.getName() + " != null ? " + p.getName() + " : " + getDefaultValue(p) + ";";
     } else {
       return "this." + p.getName() + " = " + p.getName() + ";";
     }
   }
 
-  private static String getDefaultValue(Property p) {
-    Object value = p.getAttribute(DEFAULT_VALUE);
+  private static String getDefaultValue(Attributeable attributeable) {
+    Object value = attributeable.getAttribute(DEFAULT_VALUE);
     String stringVal = value != null ? String.valueOf(value) : null;
 
-    if (p.getTypeRef().getDimensions() > 0) {
+    TypeRef typeRef = null;
+
+    if (attributeable instanceof Method) {
+      typeRef = ((Method) attributeable).getReturnType();
+    } else if (attributeable instanceof Property) {
+      typeRef = ((Property) attributeable).getTypeRef();
+    } else {
+      throw new IllegalArgumentException("Method 'getDefaultValue' accepts Property or Method as argument!");
+    }
+
+    if (typeRef.getDimensions() > 0) {
       StringBuilder sb = new StringBuilder();
-      if (p.getTypeRef() instanceof PrimitiveRef) {
-        sb.append(((PrimitiveRef) p.getTypeRef()).getName());
-      } else if (p.getTypeRef() instanceof ClassRef) {
-        sb.append("new ").append(((ClassRef) p.getTypeRef()).getFullyQualifiedName());
+      if (typeRef instanceof PrimitiveRef) {
+        sb.append(((PrimitiveRef) typeRef).getName());
+      } else if (typeRef instanceof ClassRef) {
+        sb.append("new ").append(((ClassRef) typeRef).getFullyQualifiedName());
       }
-      for (int d = 0; d < p.getTypeRef().getDimensions(); d++) {
+      for (int d = 0; d < typeRef.getDimensions(); d++) {
         if (value == null || String.valueOf(value).isEmpty()) {
           sb.append("[0]");
         } else {
@@ -1042,7 +1105,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
       }
       return sb.toString();
     }
-    if (Constants.STRING_REF.equals(p.getTypeRef()) && value != null && !String.valueOf(value).startsWith("\"")) {
+    if (Constants.STRING_REF.equals(typeRef) && value != null && !String.valueOf(value).startsWith("\"")) {
       return "\"" + value + "\"";
     } else if (value instanceof Element) {
       Element element = (Element) value;
@@ -1054,19 +1117,36 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
       TypeDef annotationDef = DefinitionRepository.getRepository().getDefinition(annotationFQCN);
       if (annotationDef != null) {
         TypeDef pojoDef = ClazzAs.POJO.apply(annotationDef);
-        if (BuilderUtils.hasDefaultConstructor(pojoDef)) {
+
+        Optional<AnnotationRef> pojoAnnotation = getPojoAnnotation(pojoDef);
+        Optional<Method> builderFromDefaults = getBuilderFromDefaults(pojoDef);
+        if (pojoAnnotation.isPresent() && builderFromDefaults.isPresent()) {
+          return pojoDef.getFullyQualifiedName() + "." + builderFromDefaults.get().getName() + "().build()";
+        } else if (BuilderUtils.hasDefaultConstructor(pojoDef)) {
           return "new " + pojoDef.getFullyQualifiedName() + "()";
         }
       }
       return "null";
-    } else if (stringVal == null && p.getTypeRef() instanceof PrimitiveRef) {
-      if (((PrimitiveRef) p.getTypeRef()).getName().equals("boolean")) {
+    } else if (stringVal == null && typeRef instanceof PrimitiveRef) {
+      if (((PrimitiveRef) typeRef).getName().equals("boolean")) {
         return "false";
       } else {
         return "0";
       }
     }
     return stringVal;
+  }
+
+  public static Optional<AnnotationRef> getPojoAnnotation(TypeDef typeDef) {
+    return typeDef.getAnnotations().stream()
+        .filter(a -> a.getClassRef().getFullyQualifiedName().equals("io.sundr.builder.annotations.Pojo"))
+        .findFirst();
+  }
+
+  public static Optional<Method> getBuilderFromDefaults(TypeDef typeDef) {
+    return typeDef.getMethods().stream()
+        .filter(m -> m.getName().startsWith("new") && m.getName().endsWith("BuilderFromDefaults"))
+        .findFirst();
   }
 
   private static String indent(String ref) {

@@ -268,6 +268,6 @@ public class Getter {
   }
 
   public static String prefix(Property property) {
-    return TypeUtils.isBoolean(property.getTypeRef()) ? IS_PREFIX : GET_PREFIX;
+    return TypeUtils.isPrimitive(property.getTypeRef()) && TypeUtils.isBoolean(property.getTypeRef()) ? IS_PREFIX : GET_PREFIX;
   }
 }
