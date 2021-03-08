@@ -33,6 +33,13 @@ public @interface Pojo {
   boolean autobox() default false;
 
   /**
+   * Indicates that the generated pojo will be initialized with default values or not.
+   * 
+   * @return true if default value initialization is enabled, false otherwise.t
+   */
+  boolean initialize() default false;
+
+  /**
    * Indicates that the generated pojo will be mutable or not.
    * If not mutable all properties will be final and no default constructor will be provided.
    * 
