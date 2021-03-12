@@ -20,9 +20,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.FilerException;
+import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
@@ -40,7 +42,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
 
   /**
    * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
-   * 
+   *
    * @param model The model of the class to generate.
    * @param resourceName The template to use.
    * @throws IOException If it fails to create the source file.
@@ -51,7 +53,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
           .getFiler()
           .createSourceFile(model.getFullyQualifiedName()), resourceName);
     } catch (FilerException e) {
-      //TODO: Need to avoid dublicate interfaces here.
+      // TODO: Need to avoid duplicate interfaces here.
     }
   }
 
@@ -65,10 +67,9 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
    */
   public void generateFromResources(TypeDef model, JavaFileObject fileObject, String resourceName) throws IOException {
     if (classExists(model)) {
-      System.err.println("Skipping: " + model.getFullyQualifiedName() + ". Class already exists.");
+      printSkipping(model.getFullyQualifiedName(), "Class already exists.");
       return;
     }
-    System.err.println("Generating: " + model.getFullyQualifiedName());
     try (Writer writer = fileObject.openWriter()) {
       new CodeGeneratorBuilder<TypeDef>()
           .withContext(context)
@@ -90,11 +91,11 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
   public void generateFromStringTemplate(TypeDef model, String[] parameters, String content) throws IOException {
     TypeDef newModel = createTypeFromTemplate(model, parameters, content);
     if (processingEnv.getElementUtils().getTypeElement(newModel.getFullyQualifiedName()) != null) {
-      System.err.println("Skipping: " + newModel.getFullyQualifiedName() + ". Class already exists.");
+      printSkipping(newModel.getFullyQualifiedName(), "Class already exists.");
       return;
     }
     if (classExists(newModel)) {
-      System.err.println("Skipping: " + newModel.getFullyQualifiedName() + ". Class already exists.");
+      printSkipping(newModel.getFullyQualifiedName(), "Class already exists.");
       return;
     }
     generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()),
@@ -115,15 +116,14 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
     if (fileObject.getName().endsWith(SOURCE_SUFFIX)) {
       TypeDef newModel = createTypeFromTemplate(model, parameters, content);
       if (processingEnv.getElementUtils().getTypeElement(newModel.getFullyQualifiedName()) != null) {
-        System.err.println("Skipping: " + fileObject.getName() + ". File already exists.");
+        printSkipping(fileObject.getName(), "File already exists.");
         return;
       }
       if (classExists(newModel)) {
-        System.err.println("Skipping: " + newModel.getFullyQualifiedName() + ". Class already exists.");
+        printSkipping(newModel.getFullyQualifiedName(), "Class already exists.");
         return;
       }
     }
-    System.err.println("Generating: " + fileObject.getName());
     try (Writer writer = fileObject.openWriter()) {
       new CodeGeneratorBuilder<T>()
           .withContext(context)
@@ -186,7 +186,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
           .build()
           .generate();
 
-      ByteArrayInputStream bis = new ByteArrayInputStream(writer.toString().getBytes());
+      ByteArrayInputStream bis = new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
       return Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(bis);
     } catch (IOException e) {
       return null;
@@ -195,7 +195,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
 
   /**
    * Checks if class already exists.
-   * 
+   *
    * @param typeDef The type definition to check if exists.
    * @return True if class can be found, false otherwise.
    */
@@ -206,5 +206,10 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
     } catch (ClassNotFoundException e) {
       return false;
     }
+  }
+
+  private void printSkipping(String name, String msg) {
+    processingEnv.getMessager().printMessage(Diagnostic.Kind.OTHER,
+        String.format("Skipping: %s. %-120s", name, msg));
   }
 }

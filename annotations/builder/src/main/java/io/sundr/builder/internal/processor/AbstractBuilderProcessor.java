@@ -225,7 +225,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
   /**
    * Create a mapping from class name to {@link ClassRef}.
-   * 
+   *
    * @param builderContext The builder context.
    */
   public void addCustomMappings(BuilderContext builderContext) {
@@ -281,8 +281,8 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     int count = 0;
     for (TypeDef typeDef : buildables) {
       try {
-        double percentage = 100 * (count++) / total;
-        System.err.println(Math.round(percentage) + "%: " + typeDef.getFullyQualifiedName());
+        double percentage = 100d * (count++) / total;
+        System.err.printf("\033[2K%3d%% Generating: %s\r", Math.round(percentage), typeDef.getFullyQualifiedName());
 
         generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
             Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
@@ -330,7 +330,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
   /**
    * Returns true if pojos where generated.
-   * 
+   *
    * @param builderContext The builder context.
    * @param buildables The set of buildables.
    */
