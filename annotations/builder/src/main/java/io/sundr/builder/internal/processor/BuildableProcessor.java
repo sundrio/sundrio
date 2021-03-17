@@ -34,6 +34,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
@@ -113,7 +114,8 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
     ctx.getDefinitionRepository().updateReferenceMap();
     generateBuildables(ctx, buildables);
     generatePojos(ctx, buildables);
-    System.err.println("100%: Builder generation complete.");
+    processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE,
+        String.format("%-120s", "100%: Builder generation complete."));
     return false;
   }
 }
