@@ -16,10 +16,9 @@
 
 package io.sundr.codegen.functions;
 
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import io.sundr.Function;
 
 public class StringReplace implements Function<String, String> {
 

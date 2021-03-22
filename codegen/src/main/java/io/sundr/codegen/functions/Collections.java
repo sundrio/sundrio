@@ -25,8 +25,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
-import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;

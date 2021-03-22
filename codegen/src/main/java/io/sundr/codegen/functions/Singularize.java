@@ -18,8 +18,7 @@ package io.sundr.codegen.functions;
 
 import java.util.Arrays;
 import java.util.List;
-
-import io.sundr.Function;
+import java.util.function.Function;
 
 /**
  * This is heavily inspired by the Inflector, which has many different incarnations in mandy different languages.

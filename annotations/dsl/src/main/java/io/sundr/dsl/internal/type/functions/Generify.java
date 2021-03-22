@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import io.sundr.Function;
+import java.util.function.Function;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.TypeDef;

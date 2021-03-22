@@ -42,7 +42,7 @@ import java.util.Set;
 
 import javax.lang.model.element.Modifier;
 
-import io.sundr.Function;
+import java.util.function.Function;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;

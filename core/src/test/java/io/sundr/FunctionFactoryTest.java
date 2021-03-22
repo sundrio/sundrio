@@ -16,6 +16,8 @@
 
 package io.sundr;
 
+import java.util.function.Function;
+
 import org.junit.Assert;
 import org.junit.Test;
 

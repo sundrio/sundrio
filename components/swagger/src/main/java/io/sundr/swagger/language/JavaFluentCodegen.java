@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.sundr.Function;
+import java.util.function.Function;
 import io.sundr.codegen.utils.StringUtils;
 import io.swagger.codegen.v3.CliOption;
 import io.swagger.codegen.v3.CodegenModel;

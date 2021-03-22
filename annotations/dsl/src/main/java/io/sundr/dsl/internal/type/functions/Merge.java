@@ -16,7 +16,7 @@
 
 package io.sundr.dsl.internal.type.functions;
 
-import io.sundr.Function;
+import java.util.function.Function;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.Property;

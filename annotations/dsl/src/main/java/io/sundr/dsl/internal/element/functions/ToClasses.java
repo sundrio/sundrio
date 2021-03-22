@@ -24,7 +24,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
-import io.sundr.Function;
+import java.util.function.Function;
 import io.sundr.dsl.annotations.Option;
 
 public class ToClasses implements Function<Element, Set<String>> {

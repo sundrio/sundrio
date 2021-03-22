@@ -18,7 +18,7 @@ package io.sundr.dsl.internal.element.functions.filter;
 
 import java.util.Collection;
 
-import io.sundr.Function;
+import java.util.function.Function;
 import io.sundr.codegen.model.TypeDef;
 
 /**

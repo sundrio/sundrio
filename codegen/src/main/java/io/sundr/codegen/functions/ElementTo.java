@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,6 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.ElementFilter;
 
-import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;

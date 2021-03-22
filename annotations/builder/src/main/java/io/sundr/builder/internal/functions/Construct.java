@@ -19,9 +19,9 @@ package io.sundr.builder.internal.functions;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.sundr.Function;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
