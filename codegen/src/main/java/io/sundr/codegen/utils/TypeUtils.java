@@ -87,6 +87,10 @@ public final class TypeUtils {
         return true;
       }
 
+      if (type.equals(Constants.OBJECT_REF)) {
+        return false;
+      }
+
       for (TypeRef i : definition.getImplementsList()) {
         if (function.apply(i)) {
           return true;
