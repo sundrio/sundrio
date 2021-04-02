@@ -155,17 +155,17 @@ public class ClassRef extends TypeRef {
       return false;
 
     ClassRef classRef = (ClassRef) o;
-
     if (dimensions != classRef.dimensions)
       return false;
-    if (definition != null ? !definition.equals(classRef.definition) : classRef.definition != null)
+    if (fullyQualifiedName != null ? !fullyQualifiedName.equals(classRef.getFullyQualifiedName())
+        : classRef.getFullyQualifiedName() != null)
       return false;
     return arguments != null ? arguments.equals(classRef.arguments) : classRef.arguments == null;
   }
 
   @Override
   public int hashCode() {
-    int result = definition != null ? definition.hashCode() : 0;
+    int result = fullyQualifiedName != null ? fullyQualifiedName.hashCode() : 0;
     result = 31 * result + dimensions;
     result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
     return result;
