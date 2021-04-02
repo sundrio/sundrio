@@ -108,6 +108,17 @@ public class ClassTo {
         return ClassRef.OBJECT;
       } else if (item instanceof Class) {
         Class c = (Class) item;
+        if (c.isArray()) {
+          Class target = c;
+          int dimensions = 0;
+          while (target.isArray()) {
+            target = ((Class) target).getComponentType();
+            dimensions++;
+          }
+          TypeRef targetRef = TYPEREF.apply(target);
+          return targetRef.withDimensions(dimensions + targetRef.getDimensions());
+        }
+
         if (c.isPrimitive()) {
           return new PrimitiveRefBuilder().withName(c.getName()).build();
         } else {
