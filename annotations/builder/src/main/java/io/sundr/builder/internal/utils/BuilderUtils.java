@@ -450,11 +450,14 @@ public class BuilderUtils {
         }
 
         //If not then we compare against what has been found in the map.
-        String fqn = map.get(classRef.getDefinition().getName());
-        if (fqn == null) {
+        String fqcn = map.get(classRef.getDefinition().getName());
+        TypeDef mainDef = fqcn != null ? DefinitionRepository.getRepository().getDefinition(fqcn) : null;
+        boolean mainBuildable = mainDef != null ? isBuildable(mainDef) : false;
+
+        if (fqcn == null) {
           System.out.println("Warning: Expected to find class with name:" + classRef.getDefinition().getName());
-        } else if (!classRef.getDefinition().getFullyQualifiedName().equals(fqn)) {
-          return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(fqn, classRef.getFullyQualifiedName()));
+        } else if (!classRef.getDefinition().getFullyQualifiedName().equals(fqcn) && mainBuildable) {
+          return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(fqcn, classRef.getFullyQualifiedName()));
         }
       }
     }
