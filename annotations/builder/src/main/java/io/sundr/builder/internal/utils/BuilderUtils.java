@@ -285,6 +285,10 @@ public class BuilderUtils {
       return false;
     }
 
+    if (!method.getExceptions().isEmpty()) {
+      return false;
+    }
+
     // the method must be either public or protected
     if (!(method.isPublic() || method.isProtected())) {
       // the method is either private or package, so we cannot use it
