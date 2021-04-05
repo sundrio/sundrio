@@ -21,8 +21,8 @@ import static io.sundr.dsl.internal.Constants.IS_GENERIC;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import java.util.function.Function;
+
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.TypeDef;

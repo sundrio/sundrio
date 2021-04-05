@@ -37,8 +37,8 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
 import java.util.function.Function;
+
 import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.model.ClassRef;
