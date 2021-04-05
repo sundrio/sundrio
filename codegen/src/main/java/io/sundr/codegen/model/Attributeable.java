@@ -19,8 +19,7 @@ package io.sundr.codegen.model;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import io.sundr.Function;
+import java.util.function.Function;
 
 public interface Attributeable extends Node {
 

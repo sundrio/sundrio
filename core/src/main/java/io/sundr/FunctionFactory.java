@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class FunctionFactory<X, Y> implements Function<X, Y> {

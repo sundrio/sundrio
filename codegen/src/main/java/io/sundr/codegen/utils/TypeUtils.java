@@ -25,11 +25,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.lang.model.element.Modifier;
 
-import io.sundr.Function;
 import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Collections;
@@ -85,6 +85,10 @@ public final class TypeUtils {
       TypeDef definition = classRef.getDefinition();
       if (definition.getFullyQualifiedName().equals(targetType.getFullyQualifiedName())) {
         return true;
+      }
+
+      if (type.equals(Constants.OBJECT_REF)) {
+        return false;
       }
 
       for (TypeRef i : definition.getImplementsList()) {

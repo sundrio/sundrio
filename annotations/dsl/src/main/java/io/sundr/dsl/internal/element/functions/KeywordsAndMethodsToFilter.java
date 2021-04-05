@@ -18,13 +18,13 @@ package io.sundr.dsl.internal.element.functions;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
-import io.sundr.Function;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
 

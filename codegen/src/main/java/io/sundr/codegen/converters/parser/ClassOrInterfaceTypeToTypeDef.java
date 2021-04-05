@@ -18,12 +18,12 @@ package io.sundr.codegen.converters.parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 
-import io.sundr.Function;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeDefBuilder;
 import io.sundr.codegen.model.TypeParamDef;

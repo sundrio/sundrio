@@ -21,10 +21,10 @@ import static io.sundr.codegen.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.lang.model.element.Modifier;
 
-import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;

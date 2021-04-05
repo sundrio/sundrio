@@ -22,8 +22,8 @@ import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.function.Function;
 
-import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;

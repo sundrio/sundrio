@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
-import io.sundr.Function;
 import io.sundr.Provider;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;

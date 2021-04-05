@@ -30,10 +30,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.model.AnnotationRef;
@@ -108,6 +108,17 @@ public class ClassTo {
         return ClassRef.OBJECT;
       } else if (item instanceof Class) {
         Class c = (Class) item;
+        if (c.isArray()) {
+          Class target = c;
+          int dimensions = 0;
+          while (target.isArray()) {
+            target = ((Class) target).getComponentType();
+            dimensions++;
+          }
+          TypeRef targetRef = TYPEREF.apply(target);
+          return targetRef.withDimensions(dimensions + targetRef.getDimensions());
+        }
+
         if (c.isPrimitive()) {
           return new PrimitiveRefBuilder().withName(c.getName()).build();
         } else {
@@ -272,6 +283,11 @@ public class ClassTo {
         annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
       }
 
+      List<ClassRef> exceptionRefs = new ArrayList<>();
+      for (Class exceptionType : constructor.getExceptionTypes()) {
+        exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
+      }
+
       List<Property> arguments = new ArrayList<Property>();
       for (int i = 1; i <= constructor.getGenericParameterTypes().length; i++) {
         Type argumentType = constructor.getGenericParameterTypes()[i - 1];
@@ -296,6 +312,7 @@ public class ClassTo {
           .withArguments(arguments)
           .withParameters(parameters)
           .withAnnotations(annotationRefs)
+          .withExceptions(exceptionRefs)
           .build());
     }
     return constructors;
@@ -304,9 +321,14 @@ public class ClassTo {
   private static Set<Method> getMethods(Class item) {
     Set<Method> methods = new HashSet<Method>();
     for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
-      List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
+      List<AnnotationRef> annotationRefs = new ArrayList<>();
       for (Annotation annotation : method.getDeclaredAnnotations()) {
         annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
+      }
+
+      List<ClassRef> exceptionRefs = new ArrayList<>();
+      for (Class exceptionType : method.getExceptionTypes()) {
+        exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
       }
 
       List<Property> arguments = new ArrayList<Property>();
@@ -338,6 +360,7 @@ public class ClassTo {
           .withReturnType(TYPEREF.apply(method.getReturnType()))
           .withArguments(arguments)
           .withParameters(parameters)
+          .withExceptions(exceptionRefs)
           .withAnnotations(annotationRefs)
           .withAttributes(attributes)
           .build());

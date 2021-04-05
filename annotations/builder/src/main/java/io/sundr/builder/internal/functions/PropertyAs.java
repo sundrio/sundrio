@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.lang.model.element.Modifier;
 
-import io.sundr.Function;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;

@@ -24,11 +24,11 @@ import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.lang.model.element.Modifier;
 
-import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.Provider;
 import io.sundr.SundrException;

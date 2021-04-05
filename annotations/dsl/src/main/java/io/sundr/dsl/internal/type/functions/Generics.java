@@ -26,8 +26,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-import io.sundr.Function;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;

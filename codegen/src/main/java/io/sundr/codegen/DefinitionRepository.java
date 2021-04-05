@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 
 import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
@@ -53,6 +54,13 @@ public class DefinitionRepository {
       INSTANCE = new DefinitionRepository();
     }
     return INSTANCE;
+  }
+
+  public TypeDef registerIfAbsent(String fqcn, Supplier<TypeDef> definition) {
+    if (definitions.containsKey(fqcn)) {
+      return definitions.get(fqcn);
+    }
+    return definitions.putIfAbsent(fqcn, definition.get());
   }
 
   public TypeDef registerIfAbsent(TypeDef definition) {

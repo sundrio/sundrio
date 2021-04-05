@@ -22,12 +22,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.sundr.Function;
 import io.sundr.codegen.utils.StringUtils;
 import io.swagger.codegen.v3.CliOption;
 import io.swagger.codegen.v3.CodegenModel;

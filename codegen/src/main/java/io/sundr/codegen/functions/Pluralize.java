@@ -18,8 +18,7 @@ package io.sundr.codegen.functions;
 
 import java.util.Arrays;
 import java.util.List;
-
-import io.sundr.Function;
+import java.util.function.Function;
 
 public enum Pluralize implements Function<String, String> {
 

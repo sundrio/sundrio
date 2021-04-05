@@ -16,7 +16,8 @@
 
 package io.sundr.swagger.experimental;
 
-import io.sundr.Function;
+import java.util.function.Function;
+
 import io.sundr.FunctionFactory;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.TypeDef;

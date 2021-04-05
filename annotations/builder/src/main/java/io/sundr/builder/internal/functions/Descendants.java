@@ -28,9 +28,9 @@ import static io.sundr.codegen.utils.StringUtils.deCapitalizeFirst;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import io.sundr.Function;
 import io.sundr.FunctionFactory;
 import io.sundr.builder.annotations.FilterDescendants;
 import io.sundr.builder.annotations.IgnoreDescendants;
