@@ -18,7 +18,10 @@ package io.sundr.codegen.model;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import io.sundr.codegen.DefinitionRepository;
 
 public class AssignableTest {
 
@@ -47,6 +50,13 @@ public class AssignableTest {
       .build();
 
   ClassRef arrayListRef = arrayList.toReference();
+
+  @Before
+  public void init() {
+    DefinitionRepository.getRepository().register(collection);
+    DefinitionRepository.getRepository().register(list);
+    DefinitionRepository.getRepository().register(arrayList);
+  }
 
   @Test
   public void testWithTypeDef() {
