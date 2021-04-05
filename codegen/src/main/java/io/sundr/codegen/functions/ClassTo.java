@@ -283,6 +283,11 @@ public class ClassTo {
         annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
       }
 
+      List<ClassRef> exceptionRefs = new ArrayList<>();
+      for (Class exceptionType : constructor.getExceptionTypes()) {
+        exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
+      }
+
       List<Property> arguments = new ArrayList<Property>();
       for (int i = 1; i <= constructor.getGenericParameterTypes().length; i++) {
         Type argumentType = constructor.getGenericParameterTypes()[i - 1];
@@ -307,6 +312,7 @@ public class ClassTo {
           .withArguments(arguments)
           .withParameters(parameters)
           .withAnnotations(annotationRefs)
+          .withExceptions(exceptionRefs)
           .build());
     }
     return constructors;
@@ -315,11 +321,17 @@ public class ClassTo {
   private static Set<Method> getMethods(Class item) {
     Set<Method> methods = new HashSet<Method>();
     for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
-      List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
+      List<AnnotationRef> annotationRefs = new ArrayList<>();
       for (Annotation annotation : method.getDeclaredAnnotations()) {
         annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
       }
 
+      List<ClassRef> exceptionRefs = new ArrayList<>();
+      for (Class exceptionType : method.getExceptionTypes()) {
+        exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
+      }
+
+      references.add(method.getReturnType());
       List<Property> arguments = new ArrayList<Property>();
       for (int i = 1; i <= method.getGenericParameterTypes().length; i++) {
         Type argumentType = method.getGenericParameterTypes()[i - 1];
@@ -349,6 +361,7 @@ public class ClassTo {
           .withReturnType(TYPEREF.apply(method.getReturnType()))
           .withArguments(arguments)
           .withParameters(parameters)
+          .withExceptions(exceptionRefs)
           .withAnnotations(annotationRefs)
           .withAttributes(attributes)
           .build());
