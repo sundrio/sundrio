@@ -32,10 +32,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.FileObject;
-import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
-
-import com.sun.tools.javac.code.Symbol;
 
 import io.sundr.resourcecify.annotations.Resourcecify;
 
@@ -54,12 +51,12 @@ public class ResourcecifyProcessor extends AbstractProcessor {
           continue;
         }
 
-        if (element instanceof Symbol.ClassSymbol) {
-          Symbol.ClassSymbol s = (Symbol.ClassSymbol) element;
+        if (element instanceof TypeElement) {
+          TypeElement s = (TypeElement) element;
           try {
             String packageName = getPackageName(s);
-
-            JavaFileObject source = s.sourcefile;
+            String className = s.getSimpleName().toString();
+            FileObject source = filer.getResource(StandardLocation.SOURCE_PATH, packageName, className + ".java");
             File sourceFile = new File(source.getName()).getAbsoluteFile();
             String sourceFileName = sourceFile.getName();
 
