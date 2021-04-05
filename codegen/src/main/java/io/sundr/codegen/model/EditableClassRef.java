@@ -23,9 +23,9 @@ import io.sundr.builder.Editable;
 
 public class EditableClassRef extends ClassRef implements Editable<ClassRefBuilder> {
 
-  public EditableClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments,
+  public EditableClassRef(String fullyQualifiedName, int dimensions, List<TypeRef> arguments,
       Map<AttributeKey, Object> attributes) {
-    super(definition, fullyQualifiedName, dimensions, arguments, attributes);
+    super(fullyQualifiedName, dimensions, arguments, attributes);
   }
 
   public ClassRefBuilder edit() {

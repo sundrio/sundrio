@@ -97,7 +97,6 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
 
   public ClassRefBuilder(ClassRefFluent<?> fluent, ClassRef instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withDefinition(instance.getDefinition());
     fluent.withFullyQualifiedName(instance.getFullyQualifiedName());
     fluent.withDimensions(instance.getDimensions());
     fluent.withArguments(instance.getArguments());
@@ -111,7 +110,6 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
 
   public ClassRefBuilder(ClassRef instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withDefinition(instance.getDefinition());
     this.withFullyQualifiedName(instance.getFullyQualifiedName());
     this.withDimensions(instance.getDimensions());
     this.withArguments(instance.getArguments());
@@ -137,22 +135,25 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
   }
 
   private static EditableClassRef newInstance(ClassRefFluent<?> fluent, TypeDef definition) {
-    return new EditableClassRef(definition, fluent.getFullyQualifiedName(),
-        fluent.getDimensions(), fluent.buildArguments(), fluent.getAttributes());
+    return new EditableClassRef(fluent.getFullyQualifiedName(), fluent.getDimensions(), fluent.buildArguments(),
+        fluent.getAttributes());
   }
 
   public EditableClassRef build() {
-    final TypeDef definition = fluent.buildDefinition();
-    if (canCache(fluent, definition)) {
-      final CacheKey key = new CacheKey(fluent, definition);
-      // ConcurrentHashMap#computeIfAbsent -> dead-lock
-      return Optional.ofNullable(CACHE.get(key)).orElseGet(() -> {
-        final EditableClassRef ret = newInstance(fluent, definition);
-        CACHE.put(key, ret);
-        return ret;
-      });
-    }
-    return newInstance(fluent, definition);
+    // final TypeDef definition = fluent.buildDefinition();
+    // if (canCache(fluent, definition)) {
+    //   final CacheKey key = new CacheKey(fluent, definition);
+    //   // ConcurrentHashMap#computeIfAbsent -> dead-lock
+    //   return Optional.ofNullable(CACHE.get(key)).orElseGet(() -> {
+    //     final EditableClassRef ret = newInstance(fluent, definition);
+    //     CACHE.put(key, ret);
+    //     return ret;
+    //   });
+    // }
+    //return newInstance(fluent, definition);
+
+    return new EditableClassRef(fluent.getFullyQualifiedName(), fluent.getDimensions(), fluent.buildArguments(),
+        fluent.getAttributes());
   }
 
   public boolean equals(Object o) {

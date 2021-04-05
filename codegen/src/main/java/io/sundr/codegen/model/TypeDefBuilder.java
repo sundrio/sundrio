@@ -58,7 +58,7 @@ public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements
     fluent.withProperties(instance.getProperties());
     fluent.withConstructors(instance.getConstructors());
     fluent.withMethods(instance.getMethods());
-    fluent.withOuterType(instance.getOuterType());
+    fluent.withOuterTypeName(instance.getOuterTypeName());
     fluent.withInnerTypes(instance.getInnerTypes());
     fluent.withModifiers(instance.getModifiers());
     fluent.withAttributes(instance.getAttributes());
@@ -82,7 +82,7 @@ public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements
     this.withProperties(instance.getProperties());
     this.withConstructors(instance.getConstructors());
     this.withMethods(instance.getMethods());
-    this.withOuterType(instance.getOuterType());
+    this.withOuterTypeName(instance.getOuterTypeName());
     this.withInnerTypes(instance.getInnerTypes());
     this.withModifiers(instance.getModifiers());
     this.withAttributes(instance.getAttributes());
@@ -92,7 +92,8 @@ public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements
   public EditableTypeDef build() {
     EditableTypeDef buildable = new EditableTypeDef(fluent.getKind(), fluent.getPackageName(), fluent.getName(),
         fluent.getComments(), fluent.getAnnotations(), fluent.getExtendsList(), fluent.getImplementsList(),
-        fluent.getParameters(), fluent.getProperties(), fluent.getConstructors(), fluent.getMethods(), fluent.getOuterType(),
+        fluent.getParameters(), fluent.getProperties(), fluent.getConstructors(), fluent.getMethods(),
+        fluent.getOuterTypeName(),
         fluent.getInnerTypes(), fluent.getModifiers(), fluent.getAttributes());
     return buildable;
   }

@@ -16,10 +16,16 @@
 
 package io.sundr.codegen.model;
 
+import static io.sundr.codegen.utils.Predicates.after;
+import static io.sundr.codegen.utils.Predicates.until;
+
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.PackageScope;
@@ -31,29 +37,48 @@ public class ClassRef extends TypeRef {
   public static final String BRACKETS = "[]";
 
   public static final ClassRef OBJECT = new ClassRefBuilder()
-      .withDefinition(TypeDef.OBJECT)
+      .withFullyQualifiedName("java.lang.Object")
       .build();
 
-  private final TypeDef definition;
   private final String fullyQualifiedName;
   private final int dimensions;
   private final List<TypeRef> arguments;
 
-  public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments,
+  public ClassRef(String fullyQualifiedName, int dimensions, List<TypeRef> arguments,
       Map<AttributeKey, Object> attributes) {
     super(attributes);
-    this.definition = definition != null ? definition : new TypeDefBuilder().build();
     this.dimensions = dimensions;
     this.arguments = arguments;
-    this.fullyQualifiedName = fullyQualifiedName != null ? fullyQualifiedName
-        : (definition != null ? definition.getFullyQualifiedName() : null);
-    if (definition != null) {
-      DefinitionRepository.getRepository().registerIfAbsent(definition);
-    }
+    this.fullyQualifiedName = fullyQualifiedName;
   }
 
   public TypeDef getDefinition() {
-    return DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
+    TypeDef def = DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
+    if (def != null) {
+      return def;
+    }
+    Predicate<String> isLowerCase = w -> Character.isUpperCase(w.charAt(0));
+    Predicate<String> inPackage = until(isLowerCase);
+    Predicate<String> outOfPackage = after(isLowerCase);
+
+    String packageName = Arrays.stream(fullyQualifiedName.split("\\.")).filter(inPackage).collect(Collectors.joining("."));
+    String className = Arrays.stream(fullyQualifiedName.split("\\.")).filter(outOfPackage).collect(Collectors.joining("."));
+
+    String ownerClassName = className.contains(".") ? className.substring(0, className.indexOf(".")) : null;
+
+    if (ownerClassName != null) {
+      className = className.substring(ownerClassName.length() + 1);
+      return new TypeDefBuilder()
+          .withName(className)
+          .withPackageName(packageName)
+          .withOuterTypeName(packageName + "." + ownerClassName)
+          .build();
+    }
+
+    return new TypeDefBuilder()
+        .withName(className)
+        .withPackageName(packageName)
+        .build();
   }
 
   public String getFullyQualifiedName() {
@@ -100,7 +125,7 @@ public class ClassRef extends TypeRef {
       return true;
     }
 
-    return definition.isAssignableFrom(((ClassRef) other).getDefinition());
+    return getDefinition().isAssignableFrom(((ClassRef) other).getDefinition());
   }
 
   public Set<ClassRef> getReferences() {
@@ -119,6 +144,7 @@ public class ClassRef extends TypeRef {
    * to a class with the same name but different package has been made already.
    */
   private boolean requiresFullyQualifiedName() {
+    TypeDef definition = getDefinition();
     String currentPackage = PackageScope.get();
     if (currentPackage != null) {
       if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
@@ -178,15 +204,15 @@ public class ClassRef extends TypeRef {
     if (definition == null) {
       sb.append(UNKNOWN);
     } else {
-      if (requiresFullyQualifiedName()) {
+      if (requiresFullyQualifiedName() && definition.getOuterTypeName() == null) {
         sb.append(definition.getPackageName()).append(DOT);
       }
 
-      if (definition.getOuterType() != null) {
-        sb.append(definition.getOuterType().getName()).append(DOT).append(definition.getName());
-      } else {
-        sb.append(definition.getName());
+      if (definition.getOuterTypeName() != null) {
+        sb.append(definition.getOuterTypeName());
+        sb.append(".");
       }
+      sb.append(definition.getName());
     }
     if (arguments.size() > 0) {
       sb.append(LT);

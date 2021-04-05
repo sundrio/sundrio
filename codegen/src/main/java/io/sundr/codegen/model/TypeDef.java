@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.utils.StringUtils;
 
 public class TypeDef extends ModifierSupport {
@@ -56,12 +57,12 @@ public class TypeDef extends ModifierSupport {
   private final List<Property> properties;
   private final List<Method> constructors;
   private final List<Method> methods;
-  private final TypeDef outerType;
+  private final String outerTypeName;
   private final List<TypeDef> innerTypes;
 
   public TypeDef(Kind kind, String packageName, String name, List<String> comments, List<AnnotationRef> annotations,
       List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties,
-      List<Method> constructors, List<Method> methods, TypeDef outerType, List<TypeDef> innerTypes, int modifiers,
+      List<Method> constructors, List<Method> methods, String outerTypeName, List<TypeDef> innerTypes, int modifiers,
       Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
     this.kind = kind != null ? kind : Kind.CLASS;
@@ -75,7 +76,7 @@ public class TypeDef extends ModifierSupport {
     this.properties = properties;
     this.constructors = adaptConstructors(constructors, this);
     this.methods = methods;
-    this.outerType = outerType;
+    this.outerTypeName = outerTypeName;
     this.innerTypes = setOuterType(innerTypes, this);
   }
 
@@ -97,10 +98,11 @@ public class TypeDef extends ModifierSupport {
   private static List<TypeDef> setOuterType(List<TypeDef> types, TypeDef outer) {
     List<TypeDef> updated = new ArrayList<TypeDef>();
     for (TypeDef typeDef : types) {
-      if (outer.equals(typeDef.getOuterType())) {
+      if (outer.getFullyQualifiedName().equals(typeDef.getOuterTypeName())) {
         updated.add(typeDef);
       } else {
-        updated.add(new TypeDefBuilder(typeDef).withOuterType(outer).withPackageName(outer.getPackageName()).build());
+        updated.add(new TypeDefBuilder(typeDef).withOuterTypeName(outer.getFullyQualifiedName())
+            .withPackageName(outer.getPackageName()).build());
       }
     }
     return updated;
@@ -111,12 +113,12 @@ public class TypeDef extends ModifierSupport {
    */
   public String getFullyQualifiedName() {
     StringBuilder sb = new StringBuilder();
-    if (packageName != null && !packageName.isEmpty()) {
+    if (packageName != null && !packageName.isEmpty() && (outerTypeName == null || outerTypeName.isEmpty())) {
       sb.append(getPackageName()).append(".");
     }
 
-    if (outerType != null) {
-      sb.append(outerType.getName()).append(".");
+    if (outerTypeName != null) {
+      sb.append(outerTypeName).append(".");
     }
     sb.append(getName());
 
@@ -125,6 +127,10 @@ public class TypeDef extends ModifierSupport {
 
   public boolean isAssignableFrom(TypeDef o) {
     if (this == o || this.equals(o)) {
+      return true;
+    }
+
+    if (getFullyQualifiedName().equals(o.getFullyQualifiedName())) {
       return true;
     }
 
@@ -194,8 +200,12 @@ public class TypeDef extends ModifierSupport {
     return methods;
   }
 
+  public String getOuterTypeName() {
+    return outerTypeName;
+  }
+
   public TypeDef getOuterType() {
-    return outerType;
+    return DefinitionRepository.getRepository().getDefinition(outerTypeName);
   }
 
   public List<TypeDef> getInnerTypes() {
@@ -229,7 +239,7 @@ public class TypeDef extends ModifierSupport {
 
     if (packageName != null ? !packageName.equals(typeDef.packageName) : typeDef.packageName != null)
       return false;
-    if (outerType != null ? !outerType.equals(typeDef.outerType) : typeDef.outerType != null)
+    if (outerTypeName != null ? !outerTypeName.equals(typeDef.outerTypeName) : typeDef.outerTypeName != null)
       return false;
     return name != null ? name.equals(typeDef.name) : typeDef.name == null;
 
@@ -238,7 +248,7 @@ public class TypeDef extends ModifierSupport {
   @Override
   public int hashCode() {
     int result = packageName != null ? packageName.hashCode() : 0;
-    result = 31 * result + (outerType != null ? outerType.hashCode() : 0);
+    result = 31 * result + (outerTypeName != null ? outerTypeName.hashCode() : 0);
     result = 31 * result + (name != null ? name.hashCode() : 0);
     return result;
   }
@@ -258,7 +268,7 @@ public class TypeDef extends ModifierSupport {
       }
     }
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(this.getFullyQualifiedName())
         .withArguments(actualArguments)
         .withAttributes(getAttributes())
         .build();
@@ -279,7 +289,7 @@ public class TypeDef extends ModifierSupport {
       }
     }
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(this.getFullyQualifiedName())
         .withArguments(actualArguments)
         .withAttributes(getAttributes())
         .build();
@@ -304,7 +314,7 @@ public class TypeDef extends ModifierSupport {
       arguments.add(parameter.toReference());
     }
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(this.getFullyQualifiedName())
         .withArguments(arguments)
         .withAttributes(getAttributes())
         .build();
@@ -315,7 +325,7 @@ public class TypeDef extends ModifierSupport {
    */
   public ClassRef toUnboundedReference() {
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(this.getFullyQualifiedName())
         .withArguments(new TypeRef[0])
         .build();
   }

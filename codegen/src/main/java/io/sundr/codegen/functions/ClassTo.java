@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -120,14 +121,15 @@ public class ClassTo {
         }
 
         if (c.isPrimitive()) {
-          return new PrimitiveRefBuilder().withName(c.getName()).build();
+          return new PrimitiveRefBuilder().withName(c.getName()).withDimensions(0).build();
         } else {
           List<TypeRef> arguments = new ArrayList<TypeRef>();
           for (TypeVariable v : c.getTypeParameters()) {
             arguments.add(TYPEREF.apply(v));
           }
+          String fqcn = c.getName().replaceAll(Pattern.quote("$"), ".");
           return new ClassRefBuilder()
-              .withDefinition(TYPEDEF.apply(c))
+              .withFullyQualifiedName(fqcn)
               .withArguments(arguments)
               .build();
         }
@@ -167,16 +169,17 @@ public class ClassTo {
         extendsList.add((ClassRef) TYPEREF.apply(item.getSuperclass()));
       }
 
-      constructors.addAll(getConstructors(item));
-      methods.addAll(getMethods(item));
-      properties.addAll(getProperties(item));
-
       for (Class interfaceClass : item.getInterfaces()) {
         TypeRef ref = TYPEREF.apply(interfaceClass);
         if (ref instanceof ClassRef) {
           implementsList.add((ClassRef) ref);
         }
       }
+
+      Set<Class> references = new HashSet<Class>();
+      constructors.addAll(getConstructors(item, references));
+      methods.addAll(getMethods(item, references));
+      properties.addAll(getProperties(item, references));
 
       for (TypeVariable typeVariable : item.getTypeParameters()) {
         List<ClassRef> bounds = new ArrayList<ClassRef>();
@@ -190,12 +193,13 @@ public class ClassTo {
             .withName(typeVariable.getName())
             .withBounds(bounds)
             .build());
+
       }
 
-      TypeDef declaringType = item.getDeclaringClass() != null ? TYPEDEF.apply(item.getDeclaringClass()) : null;
-      return DefinitionRepository.getRepository().register(new TypeDefBuilder()
+      String outerFQCN = item.getDeclaringClass() != null ? item.getDeclaringClass().getName() : null;
+      TypeDef result = DefinitionRepository.getRepository().register(new TypeDefBuilder()
           .withKind(kind)
-          .withOuterType(declaringType)
+          .withOuterTypeName(outerFQCN)
           .withName(item.getSimpleName())
           .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
           .withModifiers(item.getModifiers())
@@ -206,6 +210,24 @@ public class ClassTo {
           .withExtendsList(extendsList)
           .withImplementsList(implementsList)
           .build());
+
+      references.stream()
+          .filter(c -> !c.equals(item))
+          .forEach(c -> {
+            String referenceFQCN = c.getName().replaceAll(Pattern.quote("$"), ".");
+            DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> apply(c));
+          });
+
+      // for (Class reference : references) {
+      //   String referenceFQCN = reference.getName();
+      //   TypeDef existing = DefinitionRepository.getRepository().getDefinition(referenceFQCN);
+      //   if (existing == null) {
+      //     DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> apply(reference));
+      //   }
+      //   //        DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> TYPEDEF.apply(reference));
+      // }
+
+      return result;
     }
   };
 
@@ -216,9 +238,10 @@ public class ClassTo {
         return TypeDef.OBJECT;
       }
       Kind kind = KIND.apply(item);
-
+      String outerFQCN = item.getDeclaringClass() != null ? item.getDeclaringClass().getName() : null;
       return new TypeDefBuilder()
           .withKind(kind)
+          .withOuterTypeName(outerFQCN)
           .withName(item.getSimpleName())
           .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
           .withModifiers(item.getModifiers())
@@ -227,8 +250,9 @@ public class ClassTo {
     }
   };
 
-  public static final Function<Class, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF)
-      .withFallback(INTERNAL_SHALLOW_TYPEDEF).withMaximumRecursionLevel(10).withMaximumNestingDepth(10);
+  public static final Function<Class, TypeDef> TYPEDEF = INTERNAL_TYPEDEF;
+  //  public static final Function<Class, TypeDef> TYPEDEF = FunctionFactory.cache(INTERNAL_TYPEDEF);
+  //      .withFallback(INTERNAL_SHALLOW_TYPEDEF).withMaximumRecursionLevel(10).withMaximumNestingDepth(10);
 
   private static Function<Type, TypeParamDef> TYPEPARAMDEF = FunctionFactory.cache(new Function<Type, TypeParamDef>() {
 
@@ -250,20 +274,24 @@ public class ClassTo {
     }
   });
 
-  private static Set<Property> getProperties(Class item) {
+  private static Set<Property> getProperties(Class item, Set<Class> references) {
     Set<Property> properties = new HashSet<Property>();
     for (Field field : item.getDeclaredFields()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
       for (Annotation annotation : field.getDeclaredAnnotations()) {
         annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
       }
-      field.getDeclaringClass();
+
+      if (field.getGenericType() instanceof Class) {
+        references.add((Class) field.getGenericType());
+      }
       // If property contains generic bounds, we need to process them too.
       if (field.getGenericType() instanceof ParameterizedType) {
         ParameterizedType p = (ParameterizedType) field.getGenericType();
-        Stream.of(p.getActualTypeArguments()).filter(t -> t instanceof Class)
+        references.addAll(Stream.of(p.getActualTypeArguments()).filter(t -> t instanceof Class)
             .map(t -> (Class) t)
-            .forEach(a -> TYPEDEF.apply(a));
+            .filter(c -> !item.equals(c))
+            .collect(Collectors.toList()));
       }
       properties.add(new PropertyBuilder()
           .withName(field.getName())
@@ -275,7 +303,7 @@ public class ClassTo {
     return properties;
   }
 
-  private static Set<Method> getConstructors(Class item) {
+  private static Set<Method> getConstructors(Class item, Set<Class> references) {
     Set<Method> constructors = new HashSet<Method>();
     for (java.lang.reflect.Constructor constructor : item.getDeclaredConstructors()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
@@ -295,6 +323,10 @@ public class ClassTo {
             .withName(ARGUMENT_PREFIX + i)
             .withTypeRef(TYPEREF.apply(argumentType))
             .build());
+
+        if (argumentType instanceof Class) {
+          references.add((Class) argumentType);
+        }
       }
 
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
@@ -318,7 +350,7 @@ public class ClassTo {
     return constructors;
   }
 
-  private static Set<Method> getMethods(Class item) {
+  private static Set<Method> getMethods(Class item, Set<Class> references) {
     Set<Method> methods = new HashSet<Method>();
     for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
       List<AnnotationRef> annotationRefs = new ArrayList<>();
@@ -338,6 +370,10 @@ public class ClassTo {
             .withName(ARGUMENT_PREFIX + i)
             .withTypeRef(TYPEREF.apply(argumentType))
             .build());
+
+        if (argumentType instanceof Class) {
+          references.add((Class) argumentType);
+        }
       }
 
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();

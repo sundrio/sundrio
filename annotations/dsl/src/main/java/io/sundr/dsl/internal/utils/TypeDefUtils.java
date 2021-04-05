@@ -122,7 +122,8 @@ public final class TypeDefUtils {
 
     TypeRef returnType;
     if (isTerminal(executableElement)) {
-      returnType = isVoid(executableElement) ? VOID_REF : ElementTo.MIRROR_TO_TYPEREF.apply(executableElement.getReturnType());
+      returnType = isVoid(executableElement) ? VOID_REF
+          : ElementTo.DEEP.getTypeMirrorToTypeRef().apply(executableElement.getReturnType());
     } else {
       returnType = TRANSPARENT_REF;
     }
@@ -146,7 +147,7 @@ public final class TypeDefUtils {
 
     TypeParamDef paremeterType = Generics.MAP.apply(returnType);
 
-    Method sourceMethod = ElementTo.METHOD.apply(executableElement);
+    Method sourceMethod = ElementTo.DEEP.getExecutableElementToMethod().apply(executableElement);
     List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
     for (AnnotationRef candidate : sourceMethod.getAnnotations()) {
       if (!candidate.getClassRef().getFullyQualifiedName().startsWith("io.sundr")) {

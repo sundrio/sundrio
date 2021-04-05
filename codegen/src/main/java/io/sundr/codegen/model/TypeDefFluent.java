@@ -460,23 +460,11 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
    * @return The buildable object.
    */
   @Deprecated
-  public TypeDef getOuterType();
+  public String getOuterTypeName();
 
-  public TypeDef buildOuterType();
+  public A withOuterTypeName(String outerType);
 
-  public A withOuterType(TypeDef outerType);
-
-  public Boolean hasOuterType();
-
-  public TypeDefFluent.OuterTypeNested<A> withNewOuterType();
-
-  public TypeDefFluent.OuterTypeNested<A> withNewOuterTypeLike(TypeDef item);
-
-  public TypeDefFluent.OuterTypeNested<A> editOuterType();
-
-  public TypeDefFluent.OuterTypeNested<A> editOrNewOuterType();
-
-  public TypeDefFluent.OuterTypeNested<A> editOrNewOuterTypeLike(TypeDef item);
+  public Boolean hasOuterTypeName();
 
   public A addToInnerTypes(int index, TypeDef item);
 

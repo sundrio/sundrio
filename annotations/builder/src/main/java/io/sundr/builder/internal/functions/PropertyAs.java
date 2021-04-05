@@ -218,7 +218,7 @@ public final class PropertyAs {
       TypeDef nested = new TypeDefBuilder(shallowNestedType)
           .withPackageName(outerClass.getPackageName())
           .withName(shallowNestedType.getName() + "Impl")
-          .withOuterType(outerClass)
+          .withOuterTypeName(outerClass.getFullyQualifiedName())
           .build();
 
       //Not a typical fluent
@@ -250,10 +250,7 @@ public final class PropertyAs {
       superClassParameters.add(nestedInterfaceRef);
 
       ClassRef superClassFluent = new ClassRefBuilder()
-          .withNewDefinition()
-          .withName(typeDef.getName() + "FluentImpl")
-          .withPackageName(typeDef.getPackageName())
-          .endDefinition()
+          .withFullyQualifiedName(typeDef.getFullyQualifiedName() + "FluentImpl")
           .withArguments(superClassParameters)
           .build();
 
@@ -270,11 +267,12 @@ public final class PropertyAs {
 
   public static final Function<Property, TypeDef> NESTED_INTERFACE_TYPE = new Function<Property, TypeDef>() {
     public TypeDef apply(Property item) {
-      TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item)).withOuterType(item.getAttribute(OUTER_INTERFACE))
-          .build();
       TypeDef outerInterface = item.getAttribute(OUTER_INTERFACE);
-      //Not a typical fluent
+      TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item))
+          .withOuterTypeName(outerInterface != null ? outerInterface.getFullyQualifiedName() : null)
+          .build();
 
+      //Not a typical fluent
       TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF)
           .apply(item.getTypeRef());
       //TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
@@ -303,10 +301,7 @@ public final class PropertyAs {
 
       //CircleFluent<T, CircleShapesNested<T, N>>
       ClassRef superClassFluent = new ClassRefBuilder()
-          .withNewDefinition()
-          .withName(typeDef.getName() + "Fluent")
-          .withPackageName(typeDef.getPackageName())
-          .endDefinition()
+          .withFullyQualifiedName(typeDef.getFullyQualifiedName() + "Fluent")
           .withArguments(superClassParameters)
           .build();
 
@@ -314,7 +309,7 @@ public final class PropertyAs {
           .withKind(Kind.INTERFACE)
           .withPackageName(outerInterface.getPackageName())
           .withParameters(parameters)
-          .withOuterType(outerInterface)
+          .withOuterTypeName(outerInterface.getFullyQualifiedName())
           .withImplementsList()
           .withExtendsList(BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()),
               superClassFluent)

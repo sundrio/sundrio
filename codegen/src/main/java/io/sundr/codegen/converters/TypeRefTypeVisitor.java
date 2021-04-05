@@ -19,6 +19,7 @@ package io.sundr.codegen.converters;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.ErrorType;
@@ -31,20 +32,24 @@ import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
 import javax.lang.model.util.AbstractTypeVisitor6;
 
-import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.element.ElementContext;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.PrimitiveRefBuilder;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeParamRefBuilder;
 import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.model.VoidRefBuilder;
 
 public class TypeRefTypeVisitor extends AbstractTypeVisitor6<TypeRef, Integer> {
 
+  private final ElementContext context;
+
+  public TypeRefTypeVisitor(ElementContext context) {
+    this.context = context;
+  }
+
   public TypeRef visitPrimitive(PrimitiveType t, Integer dimension) {
-    return new PrimitiveRefBuilder()
-        .withName(t.getKind().name().toLowerCase())
-        .withDimensions(dimension)
-        .build();
+    return new PrimitiveRefBuilder().withName(t.getKind().name().toLowerCase()).withDimensions(dimension).build();
   }
 
   public TypeRef visitNull(NullType t, Integer dimension) {
@@ -63,21 +68,28 @@ public class TypeRefTypeVisitor extends AbstractTypeVisitor6<TypeRef, Integer> {
         arguments.add(arg);
       }
     }
-    TypeDef typeDef = new TypeDefElementVisitor().visit(t.asElement()).build();
+    TypeElement element = (TypeElement) t.asElement();
 
-    return new ClassRefBuilder()
-        .withDefinition(typeDef)
-        .withDimensions(dimension)
+    //TODO: need a cleaner way to get this registered.
+    if (!DefinitionRepository.getRepository().hasDefinition(element.toString())) {
+      context.getReferences().add(element);
+    }
+
+    String fqcn = element.toString();
+    return new ClassRefBuilder().withFullyQualifiedName(fqcn).withDimensions(dimension)
         .withArguments(arguments)
         .build();
   }
 
   public TypeRef visitError(ErrorType t, Integer dimension) {
-    return new ClassRefBuilder().withDefinition(new TypeDefElementVisitor().visit(t.asElement()).build()).build();
+    TypeElement element = (TypeElement) t.asElement();
+    String fqcn = element.toString();
+    return new ClassRefBuilder().withFullyQualifiedName(fqcn)
+        .build();
   }
 
   public TypeRef visitTypeVariable(TypeVariable t, Integer dimension) {
-    return ElementTo.TYPEVARIABLE_TO_TYPEPARAM_REF.apply(t);
+    return new TypeParamRefBuilder().withName(t.asElement().getSimpleName().toString()).build();
   }
 
   public TypeRef visitWildcard(WildcardType t, Integer dimension) {
