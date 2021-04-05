@@ -331,7 +331,6 @@ public class ClassTo {
         exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
       }
 
-      references.add(method.getReturnType());
       List<Property> arguments = new ArrayList<Property>();
       for (int i = 1; i <= method.getGenericParameterTypes().length; i++) {
         Type argumentType = method.getGenericParameterTypes()[i - 1];
