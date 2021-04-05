@@ -351,7 +351,7 @@ public final class TypeUtils {
    */
   public static boolean isBoolean(TypeRef type) {
     if (type instanceof PrimitiveRef) {
-      return Constants.PRIMITIVE_BOOLEAN_REF.equals(type);
+      return Constants.PRIMITIVE_BOOLEAN_REF.getName().equals(((PrimitiveRef) type).getName());
     } else if (!(type instanceof ClassRef)) {
       return false;
     } else {
