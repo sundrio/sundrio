@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import io.sundr.codegen.model.AttributeKey;
 import io.sundr.codegen.model.ClassRef;
@@ -40,6 +42,7 @@ public class DefinitionRepository {
   private static DefinitionRepository INSTANCE;
 
   private final ConcurrentMap<String, TypeDef> definitions = new ConcurrentHashMap<String, TypeDef>();
+  private final ConcurrentMap<String, Supplier<TypeDef>> suppliers = new ConcurrentHashMap<String, Supplier<TypeDef>>();
 
   //Custom mappings
   private final ConcurrentMap<String, String> custom = new ConcurrentHashMap<String, String>();
@@ -56,18 +59,29 @@ public class DefinitionRepository {
     return INSTANCE;
   }
 
-  public TypeDef registerIfAbsent(String fqcn, Supplier<TypeDef> definition) {
+  public void registerIfAbsent(String fqcn, Supplier<TypeDef> supplier) {
     if (definitions.containsKey(fqcn)) {
-      return definitions.get(fqcn);
+      return;
     }
-    return definitions.putIfAbsent(fqcn, definition.get());
+
+    if (suppliers.containsKey(fqcn)) {
+      return;
+    }
+
+    suppliers.put(fqcn, supplier);
   }
 
-  public TypeDef registerIfAbsent(TypeDef definition) {
-    if (definition != null) {
-      definitions.putIfAbsent(definition.getFullyQualifiedName(), definition);
+  public void registerIfAbsent(TypeDef definition) {
+    if (definition == null) {
+      return;
     }
-    return definition;
+
+    String fqcn = definition.getFullyQualifiedName();
+    if (definitions.containsKey(fqcn)) {
+      return;
+    } else {
+      definitions.put(fqcn, definition);
+    }
   }
 
   public TypeDef register(TypeDef definition) {
@@ -129,19 +143,36 @@ public class DefinitionRepository {
     return Collections.unmodifiableSet(result);
   }
 
+  public boolean hasDefinition(String fullyQualifiedName) {
+    return definitions.containsKey(fullyQualifiedName) || suppliers.containsKey(fullyQualifiedName);
+  }
+
   public TypeDef getDefinition(String fullyQualifiedName) {
-    return definitions.get(fullyQualifiedName);
+    if (definitions.containsKey(fullyQualifiedName)) {
+      return definitions.get(fullyQualifiedName);
+    }
+    if (suppliers.containsKey(fullyQualifiedName)) {
+      TypeDef typeDef = suppliers.get(fullyQualifiedName).get();
+      if (!definitions.containsKey(fullyQualifiedName)) {
+        definitions.put(fullyQualifiedName, typeDef);
+        return typeDef;
+      } else {
+        return definitions.get(fullyQualifiedName);
+      }
+    }
+    return null;
   }
 
   public TypeDef getDefinition(TypeRef type) {
     if (type instanceof ClassRef) {
-      return definitions.get(((ClassRef) type).getFullyQualifiedName());
+      return getDefinition(((ClassRef) type).getFullyQualifiedName());
     }
     return null;
   }
 
   public Collection<TypeDef> getDefinitions() {
-    return definitions.values();
+    return Stream.concat(definitions.keySet().stream(), suppliers.keySet().stream()).distinct().map(k -> getDefinition(k))
+        .collect(Collectors.toSet());
   }
 
   public void updateReferenceMap() {
