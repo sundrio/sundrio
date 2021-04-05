@@ -67,10 +67,7 @@ public class Nodes {
       Set<TypeDef> all = new LinkedHashSet(clazzes);
       for (TypeDef clazz : clazzes) {
         if (isEntryPoint(clazz)) {
-          nodes.add(TO_TREE.apply(NodeContext.builder()
-              .withItem(clazz)
-              .withAll(all)
-              .build()));
+          nodes.add(TO_TREE.apply(NodeContext.builder().withItem(clazz).withAll(all).build()));
         }
       }
       return nodes;
@@ -87,10 +84,7 @@ public class Nodes {
       Collections.sort(nextCandidates, new CandidateComparator(context));
 
       for (TypeDef next : nextCandidates) {
-        NodeContext nextContext = context.contextOfChild(next)
-            .addToVisited(visited)
-            .addToVisited(next)
-            .build();
+        NodeContext nextContext = context.contextOfChild(next).addToVisited(visited).addToVisited(next).build();
 
         Node<TypeDef> subGraph = TO_TREE.apply(nextContext);
         //Let's keep track of types used so far in the loop so that we avoid using the same types, in different branches of the tree:
@@ -138,15 +132,9 @@ public class Nodes {
         CodegenContext.getContext().getDefinitionRepository().register(child.getItem(), IS_GENERATED);
       }
 
-      TypeDef rootType = new TypeDefBuilder(item.getItem())
-          .withExtendsList(interfaces)
-          .withParameters()
-          .withMethods()
-          .build();
+      TypeDef rootType = new TypeDefBuilder(item.getItem()).withExtendsList(interfaces).withParameters().withMethods().build();
 
-      return new TypeDefBuilder(Generics.UNWRAP.apply(rootType))
-          .withMethods(new ArrayList<Method>())
-          .build();
+      return new TypeDefBuilder(Generics.UNWRAP.apply(rootType)).withMethods(new ArrayList<Method>()).build();
     }
   };
 
@@ -162,9 +150,16 @@ public class Nodes {
           toCombine.add(apply(v));
         }
 
-        ClassRef nextClazz = toCombine.size() == 1
-            ? toCombine.iterator().next()
-            : Combine.TYPEREFS.apply(Generify.CLASSREFS.apply(toCombine)).toInternalReference();
+        ClassRef nextClazz;
+        TypeDef nextClazzDef;
+
+        if (toCombine.size() != 1) {
+          nextClazzDef = Combine.TYPEREFS.apply(Generify.CLASSREFS.apply(toCombine));
+          nextClazz = nextClazzDef.toInternalReference();
+        } else {
+          nextClazz = toCombine.iterator().next();
+          nextClazzDef = null;
+        }
 
         if (TypeDefUtils.isCardinalityMultiple(clazz)) {
           //1st pass create the self ref
@@ -173,6 +168,7 @@ public class Nodes {
           toReCombine.add(selfRef);
           TypeDef reCombinedType = Combine.TYPEREFS.apply(toReCombine);
           final ClassRef reCombinedRef = reCombinedType.toInternalReference();
+          DslContextManager.getContext().getDefinitionRepository().register(reCombinedType, IS_GENERATED);
 
           reCombinedType = new TypeDefBuilder(reCombinedType).accept(new TypedVisitor<TypeDefBuilder>() {
             public void visit(TypeDefBuilder builder) {
@@ -192,19 +188,21 @@ public class Nodes {
           //2nd pass recreate the combination
           ClassRef updatedSelfRef = transition(clazz, reCombined);
           toReCombine = new LinkedHashSet<ClassRef>(toCombine);
+          toReCombine.remove(selfRef);
           toReCombine.add(updatedSelfRef);
-          reCombined = Combine.TYPEREFS.apply(toReCombine).toInternalReference();
+          //          reCombinedType = Combine.TYPEREFS.apply(toReCombine);
+          reCombinedType = new TypeDefBuilder(reCombinedType).withExtendsList(new ArrayList<>(toReCombine)).build();
+          reCombined = reCombinedType.toInternalReference();
           DslContextManager.getContext().getDefinitionRepository().register(reCombinedType, IS_GENERATED);
-          DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
+
+          //          DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
           return transition(clazz, reCombined);
         } else {
           //If we have a couple of classes to combine that are non-multiple
           // we may end up with intermediate garbage in the registry, which are masking the real thing
-          if (!isTransition(nextClazz)
-          //&&
-          //DslContextManager.getContext().getDefinitionRepository().getDefinition(nextClazz.getDefinition().getFullyQualifiedName()) == null
-          ) {
-            DslContextManager.getContext().getDefinitionRepository().register(nextClazz.getDefinition(), IS_GENERATED);
+          if (!isTransition(nextClazz) && nextClazzDef != null && DslContextManager.getContext().getDefinitionRepository()
+              .getDefinition(nextClazz.getDefinition().getFullyQualifiedName()) == null) {
+            DslContextManager.getContext().getDefinitionRepository().register(nextClazzDef, IS_GENERATED);
           }
           return transition(clazz, nextClazz);
         }
@@ -269,9 +267,7 @@ public class Nodes {
           TypeDef current;
 
           if (multiple) {
-            current = new TypeDefBuilder(clazz)
-                .addToAttributes(CARDINALITY_MULTIPLE, false)
-                .build();
+            current = new TypeDefBuilder(clazz).addToAttributes(CARDINALITY_MULTIPLE, false).build();
 
             all.remove(clazz);
             all.add(current);
@@ -279,10 +275,7 @@ public class Nodes {
             current = clazz;
           }
 
-          Node node = TO_TREE.apply(NodeContext.builder()
-              .withItem(current)
-              .withAll(all)
-              .build());
+          Node node = TO_TREE.apply(NodeContext.builder().withItem(current).withAll(all).build());
 
           Set<TypeDef> scopeClasses = scopeClasses(node);
           for (TypeDef scopeClass : scopeClasses) {
@@ -291,21 +284,18 @@ public class Nodes {
           ClassRef scopeInterface = TO_TRANSITION.apply(node);
 
           result.removeAll(scopeClasses);
-          result.add(new TypeDefBuilder(clazz)
-              .withKind(Kind.INTERFACE)
+          TypeDef typeDef = new TypeDefBuilder(clazz).withKind(Kind.INTERFACE)
               .withPackageName(scopeInterface.getDefinition().getPackageName())
-              .withName(scopeInterface.getDefinition().getName() + SCOPE_SUFFIX)
-              .withExtendsList(scopeInterface)
-              .withMethods()
-              .addToAttributes(CARDINALITY_MULTIPLE, multiple)
-              .addToAttributes(KEYWORDS, scopeKeywords(scopeClasses))
+              .withName(scopeInterface.getDefinition().getName() + SCOPE_SUFFIX).withExtendsList(scopeInterface).withMethods()
+              .addToAttributes(CARDINALITY_MULTIPLE, multiple).addToAttributes(KEYWORDS, scopeKeywords(scopeClasses))
               .accept(new TypedVisitor<TypeDefBuilder>() {
                 public void visit(TypeDefBuilder builder) {
                   builder.getAttributes().remove(BEGIN_SCOPE);
                   builder.getAttributes().remove(END_SCOPE);
                 }
-              })
-              .build());
+              }).build();
+          DslContextManager.getContext().getDefinitionRepository().register(typeDef, IS_GENERATED);
+          result.add(typeDef);
         }
       }
       return result;
