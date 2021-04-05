@@ -260,7 +260,7 @@ public class TypeDef extends ModifierSupport {
       }
     }
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(getFullyQualifiedName())
         .withArguments(actualArguments)
         .withAttributes(getAttributes())
         .build();
@@ -281,7 +281,7 @@ public class TypeDef extends ModifierSupport {
       }
     }
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(getFullyQualifiedName())
         .withArguments(actualArguments)
         .withAttributes(getAttributes())
         .build();
@@ -306,7 +306,7 @@ public class TypeDef extends ModifierSupport {
       arguments.add(parameter.toReference());
     }
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(getFullyQualifiedName())
         .withArguments(arguments)
         .withAttributes(getAttributes())
         .build();
@@ -317,7 +317,7 @@ public class TypeDef extends ModifierSupport {
    */
   public ClassRef toUnboundedReference() {
     return new ClassRefBuilder()
-        .withDefinition(this)
+        .withFullyQualifiedName(getFullyQualifiedName())
         .withArguments(new TypeRef[0])
         .build();
   }
