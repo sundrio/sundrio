@@ -562,10 +562,7 @@ public class ClazzAs {
 
       if (validationEnabled) {
         ClassRef validatorRef = new ClassRefBuilder()
-            .withNewDefinition()
-            .withPackageName("javax.validation")
-            .withName("Validator")
-            .endDefinition()
+            .withFullyQualifiedName("javax.validation.Validator")
             .build();
 
         Property validatorProperty = new PropertyBuilder()
