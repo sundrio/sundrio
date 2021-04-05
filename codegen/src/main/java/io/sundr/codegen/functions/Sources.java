@@ -95,37 +95,42 @@ public class Sources {
   private static Function<Node, String> PACKAGENAME = new Function<Node, String>() {
 
     public String apply(Node node) {
+      String name = null;
       if (node instanceof NamedNode) {
-        String name = ((NamedNode) node).getName();
-        Node current = node;
-        while (!(current instanceof CompilationUnit)) {
-          current = current.getParentNode();
-        }
+        name = ((NamedNode) node).getName();
+      }
 
-        CompilationUnit compilationUnit = (CompilationUnit) current;
+      if (node instanceof AnnotationExpr) {
+        name = ((AnnotationExpr) node).getName().getName();
+      }
 
-        for (ImportDeclaration importDecl : compilationUnit.getImports()) {
-          NameExpr importExpr = importDecl.getName();
-          if (importExpr instanceof QualifiedNameExpr) {
-            QualifiedNameExpr qualifiedNameExpr = (QualifiedNameExpr) importExpr;
-            String className = qualifiedNameExpr.getName();
-            if (name.equals(className)) {
-              return qualifiedNameExpr.getQualifier().toString();
-            }
-          } else if (importDecl.getName().getName().endsWith(SEPARATOR + name)) {
-            String importName = importDecl.getName().getName();
-            return importName.substring(0, importName.length() - name.length() - 1);
+      Node current = node;
+      while (!(current instanceof CompilationUnit)) {
+        current = current.getParentNode();
+      }
+
+      CompilationUnit compilationUnit = (CompilationUnit) current;
+
+      for (ImportDeclaration importDecl : compilationUnit.getImports()) {
+        NameExpr importExpr = importDecl.getName();
+        if (importExpr instanceof QualifiedNameExpr) {
+          QualifiedNameExpr qualifiedNameExpr = (QualifiedNameExpr) importExpr;
+          String className = qualifiedNameExpr.getName();
+          if (name.equals(className)) {
+            return qualifiedNameExpr.getQualifier().toString();
           }
-        }
-
-        try {
-          Class.forName(JAVA_LANG + "." + name);
-          return JAVA_LANG;
-        } catch (ClassNotFoundException ex) {
-          return compilationUnit.getPackage().getPackageName();
+        } else if (importDecl.getName().getName().endsWith(SEPARATOR + name)) {
+          String importName = importDecl.getName().getName();
+          return importName.substring(0, importName.length() - name.length() - 1);
         }
       }
-      return null;
+
+      try {
+        Class.forName(JAVA_LANG + "." + name);
+        return JAVA_LANG;
+      } catch (ClassNotFoundException ex) {
+        return compilationUnit.getPackage().getPackageName();
+      }
     }
   };
 
@@ -157,8 +162,7 @@ public class Sources {
             packageName = importName.substring(0, importName.length() - name.length() - 1);
           }
           if (className != null && !className.isEmpty()) {
-            imports
-                .add(new ClassRefBuilder().withNewDefinition().withName(className).withPackageName(packageName).and().build());
+            imports.add(new ClassRefBuilder().withFullyQualifiedName(packageName + "." + className).build());
           }
         }
       }
@@ -181,22 +185,15 @@ public class Sources {
           if (type instanceof ClassOrInterfaceType) {
             TypeRef intermediateRef = CLASS_OR_TYPEPARAM_REF.apply((ClassOrInterfaceType) type);
             if (intermediateRef instanceof ClassRef) {
-              arguments.add(new ClassRefBuilder((ClassRef) intermediateRef)
-                  .withDimensions(dimensions)
-                  .build());
+              arguments.add(new ClassRefBuilder((ClassRef) intermediateRef).withDimensions(dimensions).build());
             } else if (intermediateRef instanceof TypeParamRef) {
-              arguments.add(new TypeParamRefBuilder((TypeParamRef) intermediateRef)
-                  .withDimensions(dimensions)
-                  .build());
+              arguments.add(new TypeParamRefBuilder((TypeParamRef) intermediateRef).withDimensions(dimensions).build());
             } else {
               throw new IllegalStateException("Expected class or type param reference");
             }
           } else {
             String name = referenceType.toString();
-            arguments.add(new TypeParamRefBuilder()
-                .withName(name)
-                .withDimensions(dimensions)
-                .build());
+            arguments.add(new TypeParamRefBuilder().withName(name).withDimensions(dimensions).build());
           }
         } else if (arg instanceof WildcardType) {
           WildcardType wildcardType = (WildcardType) arg;
@@ -216,27 +213,17 @@ public class Sources {
         return new TypeParamRefBuilder().withName(boundName).build();
       }
 
-      String fqn = boundPackage + "." + boundName;
-      TypeDef knownDefinition = DefinitionRepository.getRepository().getDefinition(fqn);
-
-      if (knownDefinition != null) {
-        return new ClassRefBuilder().withDefinition(knownDefinition).withArguments(arguments).build();
-        // TODO:The lines below more accurate, however the fail in some circumstances with more recent version of JDK
-        // as some of the known type definition are missing parameters.
-        // return arguments.isEmpty()
-        //            ? new ClassRefBuilder().withDefinition(knownDefinition).build()
-        //            : knownDefinition.toReference(arguments);
-      } else if (classOrInterfaceType.getTypeArgs().isEmpty() && boundName.length() == 1) {
+      String fqcn = boundPackage + "." + boundName;
+      // TODO:The lines below more accurate, however the fail in some circumstances with more recent version of JDK
+      // as some of the known type definition are missing parameters.
+      // return arguments.isEmpty()
+      //            ? new ClassRefBuilder().withDefinition(knownDefinition).build()
+      //            : knownDefinition.toReference(arguments);
+      if (classOrInterfaceType.getTypeArgs().isEmpty() && boundName.length() == 1) {
         //We are doing our best here to distinguish between class refs and type parameter refs.
         return new TypeParamRefBuilder().withName(boundName).build();
       } else {
-        return new ClassRefBuilder()
-            .withNewDefinition()
-            .withPackageName(boundPackage)
-            .withName(boundName)
-            .endDefinition()
-            .withArguments(arguments)
-            .build();
+        return new ClassRefBuilder().withFullyQualifiedName(fqcn).withArguments(arguments).build();
       }
     }
   };
@@ -277,10 +264,7 @@ public class Sources {
       for (ClassOrInterfaceType classOrInterfaceType : typeParameter.getTypeBound()) {
         bounds.add((ClassRef) CLASS_OR_TYPEPARAM_REF.apply(classOrInterfaceType));
       }
-      return new TypeParamDefBuilder()
-          .withName(typeParameter.getName())
-          .withBounds(bounds)
-          .build();
+      return new TypeParamDefBuilder().withName(typeParameter.getName()).withBounds(bounds).build();
     }
   };
 
@@ -289,13 +273,7 @@ public class Sources {
     public AnnotationRef apply(AnnotationExpr annotation) {
       String name = annotation.getName().getName();
       String packageName = PACKAGENAME.apply(annotation);
-      return new AnnotationRefBuilder()
-          .withNewClassRef()
-          .withNewDefinition()
-          .withName(name)
-          .withPackageName(packageName)
-          .endDefinition()
-          .endClassRef()
+      return new AnnotationRefBuilder().withNewClassRef().withFullyQualifiedName(packageName + "." + name).endClassRef()
           .build();
     }
   };
@@ -354,10 +332,9 @@ public class Sources {
           if (bodyDeclaration instanceof FieldDeclaration) {
             FieldDeclaration fieldDeclaration = (FieldDeclaration) bodyDeclaration;
             for (VariableDeclarator var : fieldDeclaration.getVariables()) {
-              TypeRef typeRef = checkAgainstTypeParamRef(TYPEREF.apply(fieldDeclaration.getType()), parameters);
-              properties.add(new PropertyBuilder()
-                  .withName(var.getId().getName())
-                  .withTypeRef(typeRef)
+              TypeRef fieldDeclRef = TYPEREF.apply(fieldDeclaration.getType());
+              TypeRef typeRef = checkAgainstTypeParamRef(fieldDeclRef, parameters);
+              properties.add(new PropertyBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
                   .withModifiers(fieldDeclaration.getModifiers())
                   .addToAttributes(Attributeable.INIT, var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
                   .build());
@@ -391,12 +368,8 @@ public class Sources {
                 typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
               }
 
-              arguments.add(new PropertyBuilder()
-                  .withName(parameter.getId().getName())
-                  .withTypeRef(typeRef)
-                  .withModifiers(parameter.getModifiers())
-                  .withAnnotations(paramAnnotations)
-                  .build());
+              arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+                  .withModifiers(parameter.getModifiers()).withAnnotations(paramAnnotations).build());
             }
 
             List<TypeParamDef> typeParamDefs = new ArrayList<TypeParamDef>();
@@ -405,18 +378,11 @@ public class Sources {
             }
 
             TypeRef returnType = checkAgainstTypeParamRef(TYPEREF.apply(methodDeclaration.getType()), parameters);
-            methods.add(new MethodBuilder()
-                .withName(methodDeclaration.getName())
-                .withDefaultMethod(methodDeclaration.isDefault())
-                .withModifiers(methodDeclaration.getModifiers())
-                .withParameters(typeParamDefs)
-                .withVarArgPreferred(preferVarArg)
-                .withReturnType(returnType)
-                .withExceptions(exceptions)
-                .withArguments(arguments)
-                .withAnnotations(methodAnnotations)
-                .withBlock(BLOCK.apply(methodDeclaration.getBody()))
-                .build());
+            methods.add(new MethodBuilder().withName(methodDeclaration.getName())
+                .withDefaultMethod(methodDeclaration.isDefault()).withModifiers(methodDeclaration.getModifiers())
+                .withParameters(typeParamDefs).withVarArgPreferred(preferVarArg).withReturnType(returnType)
+                .withExceptions(exceptions).withArguments(arguments).withAnnotations(methodAnnotations)
+                .withBlock(BLOCK.apply(methodDeclaration.getBody())).build());
 
           } else if (bodyDeclaration instanceof ConstructorDeclaration) {
             ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
@@ -437,37 +403,21 @@ public class Sources {
                 ctorParamAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
               }
               TypeRef typeRef = checkAgainstTypeParamRef(TYPEREF.apply(parameter.getType()), parameters);
-              arguments.add(new PropertyBuilder()
-                  .withName(parameter.getId().getName())
-                  .withTypeRef(typeRef)
-                  .withModifiers(parameter.getModifiers())
-                  .withAnnotations(ctorParamAnnotations)
-                  .build());
+              arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+                  .withModifiers(parameter.getModifiers()).withAnnotations(ctorParamAnnotations).build());
             }
-            constructors.add(new MethodBuilder()
-                .withModifiers(constructorDeclaration.getModifiers())
-                .withExceptions(exceptions)
-                .withArguments(arguments)
-                .withAnnotations(ctorAnnotations)
-                .withBlock(BLOCK.apply(constructorDeclaration.getBlock()))
-                .build());
+            constructors.add(new MethodBuilder().withModifiers(constructorDeclaration.getModifiers()).withExceptions(exceptions)
+                .withArguments(arguments).withAnnotations(ctorAnnotations)
+                .withBlock(BLOCK.apply(constructorDeclaration.getBlock())).build());
           }
         }
 
-        return DefinitionRepository.getRepository().register(new TypeDefBuilder()
-            .withKind(kind)
-            .withPackageName(PACKAGENAME.apply(type))
-            .withName(decl.getName())
-            .withModifiers(type.getModifiers())
-            .withParameters(parameters)
-            .withExtendsList(extendsList)
-            .withImplementsList(implementsList)
-            .withProperties(properties)
-            .withMethods(methods)
-            .withConstructors(constructors)
-            .withAnnotations(annotations)
-            .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
-            .build());
+        return DefinitionRepository.getRepository()
+            .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
+                .withModifiers(type.getModifiers()).withParameters(parameters).withExtendsList(extendsList)
+                .withImplementsList(implementsList).withProperties(properties).withMethods(methods)
+                .withConstructors(constructors).withAnnotations(annotations)
+                .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
       }
 
       if (type instanceof AnnotationDeclaration) {
@@ -483,11 +433,8 @@ public class Sources {
               attributes.put(Attributeable.DEFAULT_VALUE, annotationMemberDeclaration.getDefaultValue().toString());
             }
             TypeRef returnType = TYPEREF.apply(annotationMemberDeclaration.getType());
-            methods.add(new MethodBuilder()
-                .withName(annotationMemberDeclaration.getName())
-                .withModifiers(annotationMemberDeclaration.getModifiers())
-                .withReturnType(returnType)
-                .withAttributes(attributes)
+            methods.add(new MethodBuilder().withName(annotationMemberDeclaration.getName())
+                .withModifiers(annotationMemberDeclaration.getModifiers()).withReturnType(returnType).withAttributes(attributes)
                 .build());
           }
         }
@@ -497,15 +444,10 @@ public class Sources {
           annotations.add(ANNOTATIONREF.apply(annotationExpr));
         }
 
-        return DefinitionRepository.getRepository().register(new TypeDefBuilder()
-            .withKind(kind)
-            .withPackageName(PACKAGENAME.apply(type))
-            .withName(decl.getName())
-            .withModifiers(type.getModifiers())
-            .withMethods(methods)
-            .withAnnotations(annotations)
-            .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
-            .build());
+        return DefinitionRepository.getRepository()
+            .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
+                .withModifiers(type.getModifiers()).withMethods(methods).withAnnotations(annotations)
+                .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
       }
       throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");
     }
