@@ -213,19 +213,11 @@ public class ClassTo {
 
       references.stream()
           .filter(c -> !c.equals(item))
+          .filter(c -> !c.getName().startsWith("sun.") && !c.getName().toString().startsWith("com.sun."))
           .forEach(c -> {
             String referenceFQCN = c.getName().replaceAll(Pattern.quote("$"), ".");
             DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> apply(c));
           });
-
-      // for (Class reference : references) {
-      //   String referenceFQCN = reference.getName();
-      //   TypeDef existing = DefinitionRepository.getRepository().getDefinition(referenceFQCN);
-      //   if (existing == null) {
-      //     DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> apply(reference));
-      //   }
-      //   //        DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> TYPEDEF.apply(reference));
-      // }
 
       return result;
     }

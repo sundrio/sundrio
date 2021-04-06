@@ -196,6 +196,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
       Set<TypeElement> references = new HashSet<>(context.getReferences());
       references.stream()
           .filter(t -> !t.equals(classElement))
+          .filter(t -> !t.toString().startsWith("sun.") && !t.toString().startsWith("com.sun."))
           .forEach(t -> {
             String fqcn = t.toString();
             TypeDef existing = DefinitionRepository.getRepository().getDefinition(fqcn);
