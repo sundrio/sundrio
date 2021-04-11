@@ -16,47 +16,18 @@
 
 package io.sundr.codegen.functions;
 
+import io.sundr.FunctionFactory;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.*;
+
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import io.sundr.FunctionFactory;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.AnnotationRefBuilder;
-import io.sundr.codegen.model.AttributeKey;
-import io.sundr.codegen.model.Attributeable;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.PrimitiveRefBuilder;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
-import io.sundr.codegen.model.TypeParamRefBuilder;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRefBuilder;
-import io.sundr.codegen.model.WildcardRefBuilder;
 
 public class ClassTo {
 
@@ -165,7 +136,7 @@ public class ClassTo {
       List<Method> constructors = new ArrayList<Method>();
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
 
-      if (item.getSuperclass() != null && kind == Kind.INTERFACE) {
+      if (item.getSuperclass() != null) {
         extendsList.add((ClassRef) TYPEREF.apply(item.getSuperclass()));
       }
 

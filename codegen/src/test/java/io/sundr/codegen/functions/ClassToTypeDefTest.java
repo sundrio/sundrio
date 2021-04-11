@@ -16,21 +16,21 @@
 
 package io.sundr.codegen.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import io.sundr.codegen.model.ClassRef;
+import io.sundr.codegen.model.Property;
+import io.sundr.codegen.model.TypeDef;
+import io.sundr.example.Child;
+import io.sundr.example.Interfazz;
+import io.sundr.example.Person;
+import io.sundr.example.Super;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
-
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.example.Person;
+import static org.junit.Assert.*;
 
 public class ClassToTypeDefTest {
 
@@ -69,11 +69,18 @@ public class ClassToTypeDefTest {
     });
   }
 
+  @Test
+  public void extendsListShouldWork() {
+    TypeDef typeDef = ClassTo.TYPEDEF.apply(Child.class);
+    assertTrue(typeDef.getExtendsList().stream().anyMatch(c -> c.getFullyQualifiedName().equals(Super.class.getName())));
+    assertTrue(typeDef.getImplementsList().stream().anyMatch(c -> c.getFullyQualifiedName().equals(Interfazz.class.getName())));
+  }
+
   public static Optional<ClassRef> findClassRef(TypeDef def, String propertyName) {
     return def.getProperties().stream()
-        .filter(p -> propertyName.equals(p.getName()))
-        .filter(p -> p.getTypeRef() instanceof ClassRef)
-        .map(p -> (ClassRef) p.getTypeRef())
-        .findFirst();
+            .filter(p -> propertyName.equals(p.getName()))
+            .filter(p -> p.getTypeRef() instanceof ClassRef)
+            .map(p -> (ClassRef) p.getTypeRef())
+            .findFirst();
   }
 }
