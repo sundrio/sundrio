@@ -19,6 +19,7 @@ package io.sundr.codegen.functions;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
+import io.sundr.codegen.model.TypeRef;
 import io.sundr.example.Child;
 import io.sundr.example.Interfazz;
 import io.sundr.example.Person;
@@ -72,7 +73,15 @@ public class ClassToTypeDefTest {
   @Test
   public void extendsListShouldWork() {
     TypeDef typeDef = ClassTo.TYPEDEF.apply(Child.class);
-    assertTrue(typeDef.getExtendsList().stream().anyMatch(c -> c.getFullyQualifiedName().equals(Super.class.getName())));
+    List<ClassRef> extendsList = typeDef.getExtendsList();
+    assertNotNull(extendsList);
+    assertEquals(1, extendsList.size());
+    ClassRef classRef = extendsList.get(0);
+    assertEquals(Super.class.getName(), classRef.getFullyQualifiedName());
+    List<TypeRef> arguments = classRef.getArguments();
+    assertEquals(2, arguments.size());
+    assertEquals("String", arguments.get(0).toString());
+    assertEquals("Other", arguments.get(1).toString());
     assertTrue(typeDef.getImplementsList().stream().anyMatch(c -> c.getFullyQualifiedName().equals(Interfazz.class.getName())));
   }
 
