@@ -129,18 +129,18 @@ public class ClassTo {
         return TypeDef.OBJECT;
       }
       Kind kind = KIND.apply(item);
-      List<ClassRef> extendsList = new ArrayList<ClassRef>();
-      List<ClassRef> implementsList = new ArrayList<ClassRef>();
-      List<Property> properties = new ArrayList<Property>();
-      List<Method> methods = new ArrayList<Method>();
-      List<Method> constructors = new ArrayList<Method>();
-      List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+      List<ClassRef> extendsList = new ArrayList<>();
+      List<ClassRef> implementsList = new ArrayList<>();
+      List<Property> properties = new ArrayList<>();
+      List<Method> methods = new ArrayList<>();
+      List<Method> constructors = new ArrayList<>();
+      List<TypeParamDef> parameters = new ArrayList<>();
 
       if (item.getSuperclass() != null) {
-        extendsList.add((ClassRef) TYPEREF.apply(item.getSuperclass()));
+        extendsList.add((ClassRef) TYPEREF.apply(item.getGenericSuperclass()));
       }
 
-      for (Class interfaceClass : item.getInterfaces()) {
+      for (Type interfaceClass : item.getGenericInterfaces()) {
         TypeRef ref = TYPEREF.apply(interfaceClass);
         if (ref instanceof ClassRef) {
           implementsList.add((ClassRef) ref);
@@ -153,7 +153,7 @@ public class ClassTo {
       properties.addAll(getProperties(item, references));
 
       for (TypeVariable typeVariable : item.getTypeParameters()) {
-        List<ClassRef> bounds = new ArrayList<ClassRef>();
+        List<ClassRef> bounds = new ArrayList<>();
         for (Type boundType : typeVariable.getBounds()) {
           TypeRef typeRef = TYPEREF.apply(boundType);
           if (typeRef instanceof ClassRef) {
