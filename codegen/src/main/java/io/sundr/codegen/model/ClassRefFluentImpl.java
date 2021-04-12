@@ -23,10 +23,10 @@ import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
 import io.sundr.builder.VisitableBuilder;
+import io.sundr.codegen.DefinitionRepository;
 
 public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFluentImpl<A> implements ClassRefFluent<A> {
 
-  private TypeDef definition;
   private String fullyQualifiedName;
   private int dimensions;
   private List<VisitableBuilder<? extends TypeRef, ?>> arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
@@ -35,7 +35,6 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
   }
 
   public ClassRefFluentImpl(ClassRef instance) {
-    this.withDefinition(instance.getDefinition());
     this.withFullyQualifiedName(instance.getFullyQualifiedName());
     this.withDimensions(instance.getDimensions());
     this.withArguments(instance.getArguments());
@@ -49,42 +48,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
    */
   @Deprecated
   public TypeDef getDefinition() {
-    return this.definition;
-  }
-
-  @Override
-  public TypeDef buildDefinition() {
-    return this.definition;
-  }
-
-  public A withDefinition(TypeDef definition) {
-    this.definition = definition;
-    this.fullyQualifiedName = definition.getFullyQualifiedName();
-    return (A) this;
-  }
-
-  public Boolean hasDefinition() {
-    return this.definition != null;
-  }
-
-  public ClassRefFluent.DefinitionNested<A> withNewDefinition() {
-    return new DefinitionNestedImpl();
-  }
-
-  public ClassRefFluent.DefinitionNested<A> withNewDefinitionLike(TypeDef item) {
-    return new DefinitionNestedImpl(item);
-  }
-
-  public ClassRefFluent.DefinitionNested<A> editDefinition() {
-    return withNewDefinitionLike(getDefinition());
-  }
-
-  public ClassRefFluent.DefinitionNested<A> editOrNewDefinition() {
-    return withNewDefinitionLike(getDefinition() != null ? getDefinition() : new TypeDefBuilder().build());
-  }
-
-  public ClassRefFluent.DefinitionNested<A> editOrNewDefinitionLike(TypeDef item) {
-    return withNewDefinitionLike(getDefinition() != null ? getDefinition() : item);
+    return DefinitionRepository.getRepository().getDefinition(this.fullyQualifiedName);
   }
 
   public String getFullyQualifiedName() {
@@ -795,8 +759,6 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     if (!super.equals(o))
       return false;
     ClassRefFluentImpl that = (ClassRefFluentImpl) o;
-    if (definition != null ? !definition.equals(that.definition) : that.definition != null)
-      return false;
     if (fullyQualifiedName != null ? !fullyQualifiedName.equals(that.fullyQualifiedName) : that.fullyQualifiedName != null)
       return false;
     if (dimensions != that.dimensions)
@@ -804,29 +766,6 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     if (arguments != null ? !arguments.equals(that.arguments) : that.arguments != null)
       return false;
     return true;
-  }
-
-  public class DefinitionNestedImpl<N> extends TypeDefFluentImpl<ClassRefFluent.DefinitionNested<N>>
-      implements ClassRefFluent.DefinitionNested<N>, Nested<N> {
-
-    private final TypeDefBuilder builder;
-
-    DefinitionNestedImpl(TypeDef item) {
-      this.builder = new TypeDefBuilder(this, item);
-    }
-
-    DefinitionNestedImpl() {
-      this.builder = new TypeDefBuilder(this);
-    }
-
-    public N and() {
-      return (N) ClassRefFluentImpl.this.withDefinition(builder.build());
-    }
-
-    public N endDefinition() {
-      return and();
-    }
-
   }
 
   public class PrimitiveRefArgumentsNestedImpl<N> extends PrimitiveRefFluentImpl<ClassRefFluent.PrimitiveRefArgumentsNested<N>>

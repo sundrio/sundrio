@@ -36,7 +36,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   private List<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
   private List<MethodBuilder> constructors = new ArrayList<MethodBuilder>();
   private List<MethodBuilder> methods = new ArrayList<MethodBuilder>();
-  private TypeDefBuilder outerType;
+  private String outerTypeName;
   private List<TypeDefBuilder> innerTypes = new ArrayList<TypeDefBuilder>();
 
   public TypeDefFluentImpl() {
@@ -54,7 +54,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     this.withProperties(instance.getProperties());
     this.withConstructors(instance.getConstructors());
     this.withMethods(instance.getMethods());
-    this.withOuterType(instance.getOuterType());
+    this.withOuterTypeName(instance.getOuterTypeName());
     this.withInnerTypes(instance.getInnerTypes());
     this.withModifiers(instance.getModifiers());
     this.withAttributes(instance.getAttributes());
@@ -1611,45 +1611,17 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * @return The buildable object.
    */
   @Deprecated
-  public TypeDef getOuterType() {
-    return this.outerType != null ? this.outerType.build() : null;
+  public String getOuterTypeName() {
+    return this.outerTypeName;
   }
 
-  public TypeDef buildOuterType() {
-    return this.outerType != null ? this.outerType.build() : null;
-  }
-
-  public A withOuterType(TypeDef outerType) {
-    _visitables.get("outerType").remove(this.outerType);
-    if (outerType != null) {
-      this.outerType = new TypeDefBuilder(outerType);
-      _visitables.get("outerType").add(this.outerType);
-    }
+  public A withOuterTypeName(String outerTypeName) {
+    this.outerTypeName = outerTypeName;
     return (A) this;
   }
 
-  public Boolean hasOuterType() {
-    return this.outerType != null;
-  }
-
-  public TypeDefFluent.OuterTypeNested<A> withNewOuterType() {
-    return new OuterTypeNestedImpl();
-  }
-
-  public TypeDefFluent.OuterTypeNested<A> withNewOuterTypeLike(TypeDef item) {
-    return new OuterTypeNestedImpl(item);
-  }
-
-  public TypeDefFluent.OuterTypeNested<A> editOuterType() {
-    return withNewOuterTypeLike(getOuterType());
-  }
-
-  public TypeDefFluent.OuterTypeNested<A> editOrNewOuterType() {
-    return withNewOuterTypeLike(getOuterType() != null ? getOuterType() : new TypeDefBuilder().build());
-  }
-
-  public TypeDefFluent.OuterTypeNested<A> editOrNewOuterTypeLike(TypeDef item) {
-    return withNewOuterTypeLike(getOuterType() != null ? getOuterType() : item);
+  public Boolean hasOuterTypeName() {
+    return this.outerTypeName != null;
   }
 
   public A addToInnerTypes(int index, TypeDef item) {
@@ -1875,7 +1847,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
       return false;
     if (methods != null ? !methods.equals(that.methods) : that.methods != null)
       return false;
-    if (outerType != null ? !outerType.equals(that.outerType) : that.outerType != null)
+    if (outerTypeName != null ? !outerTypeName.equals(that.outerTypeName) : that.outerTypeName != null)
       return false;
     if (innerTypes != null ? !innerTypes.equals(that.innerTypes) : that.innerTypes != null)
       return false;
@@ -2064,29 +2036,6 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
 
   }
 
-  public class OuterTypeNestedImpl<N> extends TypeDefFluentImpl<TypeDefFluent.OuterTypeNested<N>>
-      implements TypeDefFluent.OuterTypeNested<N>, Nested<N> {
-
-    private final TypeDefBuilder builder;
-
-    OuterTypeNestedImpl(TypeDef item) {
-      this.builder = new TypeDefBuilder(this, item);
-    }
-
-    OuterTypeNestedImpl() {
-      this.builder = new TypeDefBuilder(this);
-    }
-
-    public N and() {
-      return (N) TypeDefFluentImpl.this.withOuterType(builder.build());
-    }
-
-    public N endOuterType() {
-      return and();
-    }
-
-  }
-
   public class InnerTypesNestedImpl<N> extends TypeDefFluentImpl<TypeDefFluent.InnerTypesNested<N>>
       implements TypeDefFluent.InnerTypesNested<N>, Nested<N> {
 
@@ -2112,5 +2061,4 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     }
 
   }
-
 }

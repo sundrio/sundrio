@@ -27,6 +27,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
+import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeParamDef;
 import io.sundr.codegen.model.TypeParamRef;
@@ -52,8 +53,8 @@ public class Constants {
   public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
   public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
-  public static final TypeRef PRIMITIVE_BOOLEAN_REF = TYPEREF.apply(boolean.class);
-  public static final TypeRef PRIMITIVE_INT_REF = TYPEREF.apply(int.class);
+  public static final PrimitiveRef PRIMITIVE_BOOLEAN_REF = (PrimitiveRef) TYPEREF.apply(boolean.class);
+  public static final PrimitiveRef PRIMITIVE_INT_REF = (PrimitiveRef) TYPEREF.apply(int.class);
 
   public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
   public static final TypeDef OBJECT = TypeDef.OBJECT;

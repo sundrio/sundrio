@@ -33,22 +33,6 @@ public interface ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFlue
   @Deprecated
   public TypeDef getDefinition();
 
-  public TypeDef buildDefinition();
-
-  public A withDefinition(TypeDef definition);
-
-  public Boolean hasDefinition();
-
-  public ClassRefFluent.DefinitionNested<A> withNewDefinition();
-
-  public ClassRefFluent.DefinitionNested<A> withNewDefinitionLike(TypeDef item);
-
-  public ClassRefFluent.DefinitionNested<A> editDefinition();
-
-  public ClassRefFluent.DefinitionNested<A> editOrNewDefinition();
-
-  public ClassRefFluent.DefinitionNested<A> editOrNewDefinitionLike(TypeDef item);
-
   public String getFullyQualifiedName();
 
   public A withFullyQualifiedName(String fullyQualifiedName);

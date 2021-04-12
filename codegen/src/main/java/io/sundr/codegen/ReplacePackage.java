@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Set;
 
 import io.sundr.builder.Builder;
+import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.Visitor;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
+import io.sundr.codegen.model.ClassRefFluent;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.PropertyBuilder;
 import io.sundr.codegen.model.TypeDef;
@@ -35,10 +37,17 @@ public class ReplacePackage implements Visitor<Builder> {
 
   private final String target;
   private final String replacement;
+  private final TypedVisitor<ClassRefFluent<?>> visitor;
 
   public ReplacePackage(String target, String replacement) {
     this.target = target;
     this.replacement = replacement;
+    this.visitor = new TypedVisitor<ClassRefFluent<?>>() {
+      @Override
+      public void visit(ClassRefFluent<?> ref) {
+        ref.withFullyQualifiedName(ref.getFullyQualifiedName().replaceFirst(target, replacement));
+      }
+    };
   }
 
   public void visit(Builder builder) {
@@ -56,11 +65,7 @@ public class ReplacePackage implements Visitor<Builder> {
   private void visitMethodBuilder(MethodBuilder builder) {
     if (builder.getReturnType() instanceof ClassRef) {
       ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.getReturnType());
-      if (classRefBuilder.getDefinition() != null && classRefBuilder.getDefinition().getPackageName() != null
-          && classRefBuilder.getDefinition().getPackageName().equals(target)) {
-        classRefBuilder.editDefinition().withPackageName(replacement).endDefinition();
-      }
-      builder.withReturnType(classRefBuilder.accept(this).build());
+      builder.withReturnType(classRefBuilder.accept(visitor, this).build());
     }
   }
 
@@ -68,28 +73,17 @@ public class ReplacePackage implements Visitor<Builder> {
 
     if (builder.getTypeRef() instanceof ClassRef) {
       ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.getTypeRef());
-      if (classRefBuilder.getDefinition() != null && classRefBuilder.getDefinition().getPackageName() != null
-          && classRefBuilder.getDefinition().getPackageName().equals(target)) {
-        classRefBuilder.editDefinition().withPackageName(replacement).endDefinition();
-      }
-      builder.withTypeRef(classRefBuilder.accept(this).build());
+      builder.withTypeRef(classRefBuilder.accept(visitor, this).build());
     }
   }
 
   private void visitClassRefBuilder(ClassRefBuilder builder) {
-
-    builder.withFullyQualifiedName(builder.getFullyQualifiedName().replace(target, replacement));
-
-    if (builder.getDefinition() != null && builder.getDefinition().getPackageName() != null
-        && builder.getDefinition().getPackageName().equals(target)) {
-      builder.editDefinition().withPackageName(replacement).endDefinition();
-    }
+    builder.withFullyQualifiedName(builder.getFullyQualifiedName().replace(target, replacement)).accept(visitor);
 
     List<TypeRef> updatedArguments = new ArrayList<TypeRef>();
     for (TypeRef arg : builder.getArguments()) {
       if (arg instanceof ClassRef && ((ClassRef) arg).getDefinition().getPackageName().equals(target)) {
-        updatedArguments
-            .add(new ClassRefBuilder((ClassRef) arg).editDefinition().withPackageName(replacement).endDefinition().build());
+        updatedArguments.add(new ClassRefBuilder((ClassRef) arg).accept(visitor).build());
       } else {
         updatedArguments.add(arg);
       }

@@ -33,26 +33,24 @@ public class ClassRef extends TypeRef {
   public static final String BRACKETS = "[]";
 
   public static final ClassRef OBJECT = new ClassRefBuilder()
-      .withDefinition(TypeDef.OBJECT)
+      .withFullyQualifiedName("java.lang.Object")
       .build();
 
-  private final TypeDef definition;
   private final String fullyQualifiedName;
   private final int dimensions;
   private final List<TypeRef> arguments;
 
-  public ClassRef(TypeDef definition, String fullyQualifiedName, int dimensions, List<TypeRef> arguments,
+  public ClassRef(String fullyQualifiedName, int dimensions, List<TypeRef> arguments,
       Map<AttributeKey, Object> attributes) {
     super(attributes);
-    this.definition = definition != null ? definition : new TypeDefBuilder().build();
     this.dimensions = dimensions;
     this.arguments = arguments;
-    this.fullyQualifiedName = fullyQualifiedName != null ? fullyQualifiedName
-        : (definition != null ? definition.getFullyQualifiedName() : null);
+    this.fullyQualifiedName = fullyQualifiedName;
   }
 
   public TypeDef getDefinition() {
-    return definition;
+    return new TypeDefBuilder()
+        .build();
   }
 
   public String getFullyQualifiedName() {
@@ -99,7 +97,7 @@ public class ClassRef extends TypeRef {
       return true;
     }
 
-    return definition.isAssignableFrom(((ClassRef) other).getDefinition());
+    return getDefinition().isAssignableFrom(((ClassRef) other).getDefinition());
   }
 
   public Set<ClassRef> getReferences() {
@@ -120,8 +118,10 @@ public class ClassRef extends TypeRef {
   private boolean requiresFullyQualifiedName() {
     String currentPackage = PackageScope.get();
     if (currentPackage != null) {
-      if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
-        String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(), currentPackage);
+      if (getDefinition() != null && getDefinition().getPackageName() != null
+          && getDefinition().getFullyQualifiedName() != null) {
+        String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(getDefinition().getPackageName(),
+            currentPackage);
         if (!conflictingFQCN.equals(getFullyQualifiedName())
             && DefinitionRepository.getRepository().getDefinition(conflictingFQCN) != null) {
           return true;
@@ -130,8 +130,8 @@ public class ClassRef extends TypeRef {
     }
 
     Map<String, String> referenceMap = DefinitionRepository.getRepository().getReferenceMap();
-    if (referenceMap != null && referenceMap.containsKey(definition.getName())) {
-      String fqn = referenceMap.get(definition.getName());
+    if (referenceMap != null && referenceMap.containsKey(getDefinition().getName())) {
+      String fqn = referenceMap.get(getDefinition().getName());
       if (!getDefinition().getFullyQualifiedName().equals(fqn)) {
         return true;
       }
@@ -157,14 +157,14 @@ public class ClassRef extends TypeRef {
 
     if (dimensions != classRef.dimensions)
       return false;
-    if (definition != null ? !definition.equals(classRef.definition) : classRef.definition != null)
+    if (getDefinition() != null ? !getDefinition().equals(classRef.getDefinition()) : classRef.getDefinition() != null)
       return false;
     return arguments != null ? arguments.equals(classRef.arguments) : classRef.arguments == null;
   }
 
   @Override
   public int hashCode() {
-    int result = definition != null ? definition.hashCode() : 0;
+    int result = getDefinition() != null ? getDefinition().hashCode() : 0;
     result = 31 * result + dimensions;
     result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
     return result;
