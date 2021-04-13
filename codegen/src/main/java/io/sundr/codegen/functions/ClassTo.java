@@ -142,8 +142,12 @@ public class ClassTo {
 
       if (item.getSuperclass() != null) {
         extendsList.add((ClassRef) TYPEREF.apply(item.getGenericSuperclass()));
+        references.add(item.getSuperclass());
       }
 
+      for (Class interfaceClass : item.getInterfaces()) {
+        references.add(interfaceClass);
+      }
       for (Type interfaceClass : item.getGenericInterfaces()) {
         TypeRef ref = TYPEREF.apply(interfaceClass);
         if (ref instanceof ClassRef) {
