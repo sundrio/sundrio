@@ -16,11 +16,6 @@
 
 package io.sundr.codegen.functions;
 
-import io.sundr.FunctionFactory;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.*;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
@@ -29,9 +24,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.sundr.FunctionFactory;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.model.*;
+import io.sundr.codegen.model.Method;
+
 public class ClassTo {
 
   private static final String ARGUMENT_PREFIX = "arg";
+  private static final Set<Class> references = new HashSet<>();
 
   public static final Function<Class, Kind> KIND = FunctionFactory.cache(new Function<Class, Kind>() {
     public Kind apply(Class item) {
@@ -72,6 +73,9 @@ public class ClassTo {
         List<TypeRef> arguments = new ArrayList<TypeRef>();
         for (Type arg : parameterizedType.getActualTypeArguments()) {
           arguments.add(TYPEREF.apply(arg));
+          if (arg instanceof Class) {
+            references.add((Class) arg);
+          }
         }
         return new ClassRefBuilder((ClassRef) TYPEREF.apply(rawType))
             .withArguments(arguments)
@@ -147,7 +151,6 @@ public class ClassTo {
         }
       }
 
-      Set<Class> references = new HashSet<Class>();
       constructors.addAll(getConstructors(item, references));
       methods.addAll(getMethods(item, references));
       properties.addAll(getProperties(item, references));
@@ -182,12 +185,14 @@ public class ClassTo {
           .withImplementsList(implementsList)
           .build());
 
-      references.stream()
+      Set<Class> copy = new HashSet<>(references);
+      copy.stream()
           .filter(c -> !c.equals(item))
           .filter(c -> !c.getName().startsWith("sun.") && !c.getName().toString().startsWith("com.sun."))
           .forEach(c -> {
             String referenceFQCN = c.getName().replaceAll(Pattern.quote("$"), ".");
             DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> apply(c));
+            references.remove(c);
           });
 
       return result;
