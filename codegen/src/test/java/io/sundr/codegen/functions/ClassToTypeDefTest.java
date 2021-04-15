@@ -16,6 +16,15 @@
 
 package io.sundr.codegen.functions;
 
+import static org.junit.Assert.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.junit.Test;
+
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Property;
 import io.sundr.codegen.model.TypeDef;
@@ -24,14 +33,6 @@ import io.sundr.example.Child;
 import io.sundr.example.Interfazz;
 import io.sundr.example.Person;
 import io.sundr.example.Super;
-import org.junit.Test;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.*;
 
 public class ClassToTypeDefTest {
 
@@ -87,9 +88,9 @@ public class ClassToTypeDefTest {
 
   public static Optional<ClassRef> findClassRef(TypeDef def, String propertyName) {
     return def.getProperties().stream()
-            .filter(p -> propertyName.equals(p.getName()))
-            .filter(p -> p.getTypeRef() instanceof ClassRef)
-            .map(p -> (ClassRef) p.getTypeRef())
-            .findFirst();
+        .filter(p -> propertyName.equals(p.getName()))
+        .filter(p -> p.getTypeRef() instanceof ClassRef)
+        .map(p -> (ClassRef) p.getTypeRef())
+        .findFirst();
   }
 }

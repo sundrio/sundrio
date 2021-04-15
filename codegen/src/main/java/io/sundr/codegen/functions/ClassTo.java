@@ -64,6 +64,9 @@ public class ClassTo {
           target = ((GenericArrayType) target).getGenericComponentType();
           dimensions++;
         }
+        if (target instanceof Class) {
+          references.add((Class) target);
+        }
         TypeRef targetRef = TYPEREF.apply(target);
         return targetRef.withDimensions(dimensions + targetRef.getDimensions());
 
@@ -76,6 +79,9 @@ public class ClassTo {
           if (arg instanceof Class) {
             references.add((Class) arg);
           }
+        }
+        if (rawType instanceof Class) {
+          references.add((Class) rawType);
         }
         return new ClassRefBuilder((ClassRef) TYPEREF.apply(rawType))
             .withArguments(arguments)
@@ -92,6 +98,7 @@ public class ClassTo {
             dimensions++;
           }
           TypeRef targetRef = TYPEREF.apply(target);
+          references.add(target);
           return targetRef.withDimensions(dimensions + targetRef.getDimensions());
         }
 
@@ -142,8 +149,12 @@ public class ClassTo {
 
       if (item.getSuperclass() != null) {
         extendsList.add((ClassRef) TYPEREF.apply(item.getGenericSuperclass()));
+        references.add(item.getSuperclass());
       }
 
+      for (Class interfaceClass : item.getInterfaces()) {
+        references.add(interfaceClass);
+      }
       for (Type interfaceClass : item.getGenericInterfaces()) {
         TypeRef ref = TYPEREF.apply(interfaceClass);
         if (ref instanceof ClassRef) {
@@ -187,34 +198,15 @@ public class ClassTo {
 
       Set<Class> copy = new HashSet<>(references);
       copy.stream()
+          .peek(c -> references.remove(c))
           .filter(c -> !c.equals(item))
           .filter(c -> !c.getName().startsWith("sun.") && !c.getName().toString().startsWith("com.sun."))
           .forEach(c -> {
             String referenceFQCN = c.getName().replaceAll(Pattern.quote("$"), ".");
             DefinitionRepository.getRepository().registerIfAbsent(referenceFQCN, () -> apply(c));
-            references.remove(c);
           });
 
       return result;
-    }
-  };
-
-  private static final Function<Class, TypeDef> INTERNAL_SHALLOW_TYPEDEF = new Function<Class, TypeDef>() {
-
-    public TypeDef apply(Class item) {
-      if (Object.class.equals(item)) {
-        return TypeDef.OBJECT;
-      }
-      Kind kind = KIND.apply(item);
-      String outerFQCN = item.getDeclaringClass() != null ? item.getDeclaringClass().getName() : null;
-      return new TypeDefBuilder()
-          .withKind(kind)
-          .withOuterTypeName(outerFQCN)
-          .withName(item.getSimpleName())
-          .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
-          .withModifiers(item.getModifiers())
-          .withParameters()
-          .build();
     }
   };
 
