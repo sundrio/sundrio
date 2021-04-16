@@ -18,7 +18,7 @@ package io.sundr.codegen.model;
 
 import java.util.Map;
 
-public abstract class TypeRef extends AttributeSupport {
+public abstract class TypeRef extends AttributeSupport implements Renderable {
 
   public TypeRef(Map<AttributeKey, Object> attributes) {
     super(attributes);

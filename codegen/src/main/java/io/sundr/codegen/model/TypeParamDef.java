@@ -21,7 +21,7 @@ import java.util.Map;
 
 import io.sundr.codegen.utils.StringUtils;
 
-public class TypeParamDef extends AttributeSupport {
+public class TypeParamDef extends AttributeSupport implements Renderable {
 
   private final String name;
   private final List<ClassRef> bounds;

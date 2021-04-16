@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Property extends ModifierSupport {
+public class Property extends ModifierSupport implements Renderable {
 
   private final List<AnnotationRef> annotations;
   private final TypeRef typeRef;
