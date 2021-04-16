@@ -28,7 +28,7 @@ import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 
-import io.sundr.codegen.PackageScope;
+import io.sundr.codegen.DefinitionScope;
 import io.sundr.codegen.model.TypeDef;
 
 public class CodeGenerator<M> {
@@ -116,9 +116,9 @@ public class CodeGenerator<M> {
   public void generate() throws IOException {
     if (model instanceof TypeDef) {
       TypeDef typeDef = (TypeDef) model;
-      PackageScope.set(typeDef.getPackageName());
+      DefinitionScope.set(typeDef);
       GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
-      PackageScope.clear();
+      DefinitionScope.clear();
     } else {
       GeneratorUtils.generate(context.getVelocityContext(), writer, getTemplate());
     }

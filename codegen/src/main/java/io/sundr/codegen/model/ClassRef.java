@@ -28,7 +28,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.PackageScope;
+import io.sundr.codegen.DefinitionScope;
 import io.sundr.codegen.utils.StringUtils;
 
 public class ClassRef extends TypeRef {
@@ -145,7 +145,7 @@ public class ClassRef extends TypeRef {
    */
   private boolean requiresFullyQualifiedName() {
     TypeDef definition = getDefinition();
-    String currentPackage = PackageScope.get();
+    String currentPackage = DefinitionScope.get() != null ? DefinitionScope.get().getPackageName() : null;
     if (currentPackage != null) {
       if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
         String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(), currentPackage);
