@@ -238,4 +238,33 @@ public class ClassRef extends TypeRef {
     }
     return sb.toString();
   }
+
+  @Override
+  public String render(TypeDef enclosingType) {
+    StringBuilder sb = new StringBuilder();
+    TypeDef definition = getDefinition();
+    if (definition == null) {
+      sb.append(UNKNOWN);
+    } else {
+      if (requiresFullyQualifiedName(enclosingType) && definition.getOuterTypeName() == null) {
+        sb.append(definition.getPackageName()).append(DOT);
+      }
+
+      if (definition.getOuterTypeName() != null) {
+        sb.append(definition.getOuterTypeName());
+        sb.append(".");
+      }
+      sb.append(definition.getName());
+    }
+    if (arguments.size() > 0) {
+      sb.append(LT);
+      sb.append(StringUtils.join(arguments, a -> a.render(enclosingType), COMA));
+      sb.append(GT);
+    }
+
+    for (int i = 0; i < dimensions; i++) {
+      sb.append(BRACKETS);
+    }
+    return sb.toString();
+  }
 }

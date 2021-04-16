@@ -30,7 +30,7 @@ public interface Renderable {
    * @return the {@link String} representation of the object as it's meant to appear in the generated code.
    */
   default String render() {
-    return toString();
+    return render(null);
   }
 
   /**
