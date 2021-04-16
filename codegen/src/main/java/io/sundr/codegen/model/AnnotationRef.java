@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class AnnotationRef extends AttributeSupport {
+public class AnnotationRef extends AttributeSupport implements Renderable {
 
   private final ClassRef classRef;
   private final Map<String, Object> parameters;
