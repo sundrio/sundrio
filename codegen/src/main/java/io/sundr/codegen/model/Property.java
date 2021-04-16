@@ -112,6 +112,36 @@ public class Property extends ModifierSupport implements Renderable {
   }
 
   @Override
+  public String render(TypeDef enclosingType) {
+    StringBuilder sb = new StringBuilder();
+
+    if (comments != null && !comments.isEmpty()) {
+      sb.append(comments.stream().collect(Collectors.joining(NEWLINE)));
+    }
+
+    if (isPublic()) {
+      sb.append(PUBLIC).append(SPACE);
+    } else if (isProtected()) {
+      sb.append(PROTECTED).append(SPACE);
+    } else if (isPrivate()) {
+      sb.append(PRIVATE).append(SPACE);
+    }
+
+    if (isStatic()) {
+      sb.append(STATIC).append(SPACE);
+    }
+
+    if (isFinal()) {
+      sb.append(FINAL).append(SPACE);
+    }
+
+    sb.append(typeRef.render(enclosingType)).append(SPACE);
+    sb.append(name);
+
+    return sb.toString();
+  }
+
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
 

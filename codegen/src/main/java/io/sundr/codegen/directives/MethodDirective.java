@@ -29,6 +29,7 @@ import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
 
+import io.sundr.codegen.DefinitionScope;
 import io.sundr.codegen.model.Method;
 
 public class MethodDirective extends Directive {
@@ -81,7 +82,7 @@ public class MethodDirective extends Directive {
     if (method != null) {
       String onetab = tab(level * 4);
       String twotabs = tab((level + 1) * 4);
-      writer.append(onetab).append(method.render());
+      writer.append(onetab).append(method.render(DefinitionScope.get()));
       List<String> lines = getLines(block);
       List<String> indentedLines = lines.stream().map(l -> twotabs + l).collect(Collectors.toList());
       if (hasBody) {

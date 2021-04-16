@@ -168,6 +168,98 @@ public class Method extends ModifierSupport implements Renderable {
    * @return
    */
   @Override
+  public String render(TypeDef enclosingType) {
+    StringBuilder sb = new StringBuilder();
+
+    if (!comments.isEmpty()) {
+      sb.append(NEWLINE).append(OC).append(NEWLINE);
+      for (String c : comments) {
+        sb.append(SPACE).append(STAR).append(SPACE).append(c).append(NEWLINE);
+      }
+      sb.append(SPACE).append(CC).append(NEWLINE);
+    }
+
+    for (AnnotationRef annotationRef : annotations) {
+      sb.append(annotationRef.render(enclosingType)).append(SPACE);
+    }
+
+    if (isPublic()) {
+      sb.append(PUBLIC).append(SPACE);
+    } else if (isProtected()) {
+      sb.append(PROTECTED).append(SPACE);
+    } else if (isPrivate()) {
+      sb.append(PRIVATE).append(SPACE);
+    } else if (isDefaultMethod()) {
+      sb.append(DEFAULT).append(SPACE);
+    }
+
+    if (isSynchronized()) {
+      sb.append(SYNCHRONIZED).append(SPACE);
+    }
+
+    if (isStatic()) {
+      sb.append(STATIC).append(SPACE);
+    }
+
+    if (isAbstract()) {
+      sb.append(ABSTRACT).append(SPACE);
+    }
+
+    if (isFinal()) {
+      sb.append(FINAL).append(SPACE);
+    }
+
+    if (parameters != null && !parameters.isEmpty()) {
+      sb.append(LT);
+      sb.append(StringUtils.join(parameters, p -> p.render(enclosingType), COMA));
+      sb.append(GT);
+    }
+
+    if (name != null) {
+      sb.append(returnType.render(enclosingType));
+      sb.append(SPACE).append(name);
+    } else if (enclosingType != null
+        && enclosingType.getFullyQualifiedName().equals(((ClassRef) returnType).getFullyQualifiedName())) {
+      //This is a constructor for a top-level class
+      sb.append(enclosingType.getName());
+    } else {
+      //This is a constructor
+      String fqcn = ((ClassRef) returnType).getFullyQualifiedName();
+      String className = fqcn.substring(fqcn.lastIndexOf(".") + 1);
+      sb.append(className);
+    }
+
+    sb.append(OP);
+    if (!varArgPreferred) {
+      sb.append(StringUtils.join(arguments, a -> a.render(enclosingType), COMA));
+    } else if (!arguments.isEmpty()) {
+      List<Property> args = arguments.subList(0, arguments.size() - 1);
+      Property varArg = arguments.get(arguments.size() - 1);
+      sb.append(StringUtils.join(args, a -> a.render(enclosingType), COMA));
+      if (!args.isEmpty()) {
+        sb.append(COMA);
+      }
+      if (varArg.getTypeRef().getDimensions() == 1) {
+        sb.append(varArg.getTypeRef().withDimensions(0)).append(VARARG).append(SPACE);
+      } else {
+        sb.append(varArg.getTypeRef().render(enclosingType)).append(SPACE);
+      }
+      sb.append(varArg.getName());
+    }
+    sb.append(CP);
+
+    if (exceptions != null && !exceptions.isEmpty()) {
+      sb.append(SPACE).append(THROWS).append(SPACE).append(join(exceptions, e -> e.render(enclosingType), COMA));
+    }
+
+    return sb.toString();
+  }
+
+  /**
+   *
+   * @return
+   */
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
 
@@ -220,7 +312,9 @@ public class Method extends ModifierSupport implements Renderable {
       sb.append(SPACE).append(name);
     } else {
       //This is a constructor
-      sb.append(((ClassRef) returnType).getDefinition().getName());
+      String fqcn = ((ClassRef) returnType).getFullyQualifiedName();
+      String className = fqcn.substring(fqcn.lastIndexOf(".") + 1);
+      sb.append(className);
     }
 
     sb.append(OP);
