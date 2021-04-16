@@ -213,20 +213,7 @@ public class ClassRef extends TypeRef {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    TypeDef definition = getDefinition();
-    if (definition == null) {
-      sb.append(UNKNOWN);
-    } else {
-      if (requiresFullyQualifiedName() && definition.getOuterTypeName() == null) {
-        sb.append(definition.getPackageName()).append(DOT);
-      }
-
-      if (definition.getOuterTypeName() != null) {
-        sb.append(definition.getOuterTypeName());
-        sb.append(".");
-      }
-      sb.append(definition.getName());
-    }
+    sb.append(fullyQualifiedName);
     if (arguments.size() > 0) {
       sb.append(LT);
       sb.append(StringUtils.join(arguments, COMA));

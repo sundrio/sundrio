@@ -75,8 +75,8 @@ public class ClassToTypeDefTest {
     assertEquals(Super.class.getName(), classRef.getFullyQualifiedName());
     List<TypeRef> arguments = classRef.getArguments();
     assertEquals(2, arguments.size());
-    assertEquals("String", arguments.get(0).toString());
-    assertEquals("Other", arguments.get(1).toString());
+    assertEquals("String", arguments.get(0).render());
+    assertEquals("Other", arguments.get(1).render());
     assertTrue(typeDef.getImplementsList().stream().anyMatch(c -> c.getFullyQualifiedName().equals(Interfazz.class.getName())));
   }
 

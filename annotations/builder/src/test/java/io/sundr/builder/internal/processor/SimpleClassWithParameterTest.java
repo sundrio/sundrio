@@ -77,9 +77,12 @@ public class SimpleClassWithParameterTest extends AbstractProcessorTest {
     assertEquals("VisitableBuilder", superClass.getDefinition().getName());
     assertEquals(2, superClass.getArguments().size());
     Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
-    assertEquals("SimpleClassWithParameter<N>", argIterator.next().toString());
-    assertEquals("SimpleClassWithParameterBuilder<N>", argIterator.next().toString());
-
+    TypeRef ref = argIterator.next();
+    assertEquals("SimpleClassWithParameter<N>", ref.render());
+    assertEquals("testpackage.SimpleClassWithParameter<N>", ref.toString());
+    ref = argIterator.next();
+    assertEquals("SimpleClassWithParameterBuilder<N>", ref.render());
+    assertEquals("testpackage.SimpleClassWithParameterBuilder<N>", ref.toString());
   }
 
   @Test
