@@ -23,7 +23,7 @@ import java.util.Set;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.PackageScope;
+import io.sundr.codegen.DefinitionScope;
 import io.sundr.codegen.utils.StringUtils;
 
 @Buildable(lazyCollectionInitEnabled = false)
@@ -116,12 +116,11 @@ public class ClassRef extends TypeRef {
    * to a class with the same name but different package has been made already.
    */
   private boolean requiresFullyQualifiedName() {
-    String currentPackage = PackageScope.get();
+    TypeDef definition = getDefinition();
+    String currentPackage = DefinitionScope.get() != null ? DefinitionScope.get().getPackageName() : null;
     if (currentPackage != null) {
-      if (getDefinition() != null && getDefinition().getPackageName() != null
-          && getDefinition().getFullyQualifiedName() != null) {
-        String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(getDefinition().getPackageName(),
-            currentPackage);
+      if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
+        String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(), currentPackage);
         if (!conflictingFQCN.equals(getFullyQualifiedName())
             && DefinitionRepository.getRepository().getDefinition(conflictingFQCN) != null) {
           return true;
@@ -130,8 +129,8 @@ public class ClassRef extends TypeRef {
     }
 
     Map<String, String> referenceMap = DefinitionRepository.getRepository().getReferenceMap();
-    if (referenceMap != null && referenceMap.containsKey(getDefinition().getName())) {
-      String fqn = referenceMap.get(getDefinition().getName());
+    if (referenceMap != null && referenceMap.containsKey(definition.getName())) {
+      String fqn = referenceMap.get(definition.getName());
       if (!getDefinition().getFullyQualifiedName().equals(fqn)) {
         return true;
       }

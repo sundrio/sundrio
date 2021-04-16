@@ -16,20 +16,22 @@
 
 package io.sundr.codegen;
 
-public class PackageScope {
+import io.sundr.codegen.model.TypeDef;
 
-  private static String pkg;
+public class DefinitionScope {
 
-  public static void set(String pkg) {
-    PackageScope.pkg = pkg;
+  private static TypeDef definition;
+
+  public static void set(TypeDef definition) {
+    DefinitionScope.definition = definition;
   }
 
-  public static String get() {
-    return PackageScope.pkg;
+  public static TypeDef get() {
+    return DefinitionScope.definition;
   }
 
   public static void clear() {
-    PackageScope.pkg = null;
+    DefinitionScope.definition = null;
   }
 
 }
