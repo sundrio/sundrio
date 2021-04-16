@@ -54,7 +54,7 @@ public class FieldDirective extends Directive {
 
   private void writeField(Writer writer, Property field, String block) throws IOException {
     if (field != null) {
-      writer.append(field.toString());
+      writer.append(field.render());
 
       if (field.getAttribute(INIT) != null) {
         writer.append(" = ").append(getDefaultValue(field));

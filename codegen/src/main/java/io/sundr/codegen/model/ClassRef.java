@@ -142,6 +142,7 @@ public class ClassRef extends TypeRef {
   /**
    * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
    * to a class with the same name but different package has been made already.
+   * 
    * @return true if the reference needs to use the fqcn.
    */
   private boolean requiresFullyQualifiedName() {
@@ -151,6 +152,7 @@ public class ClassRef extends TypeRef {
   /**
    * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
    * to a class with the same name but different package has been made already.
+   * 
    * @param enclosingType The type that encloses the current reference.
    * @return true if the reference needs to use the fqcn.
    */

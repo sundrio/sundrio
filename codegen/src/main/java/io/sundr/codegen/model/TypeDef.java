@@ -29,7 +29,7 @@ import java.util.Set;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.utils.StringUtils;
 
-public class TypeDef extends ModifierSupport {
+public class TypeDef extends ModifierSupport implements Renderable {
 
   public static TypeDef OBJECT = new TypeDefBuilder()
       .withPackageName("java.lang")
