@@ -142,10 +142,21 @@ public class ClassRef extends TypeRef {
   /**
    * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
    * to a class with the same name but different package has been made already.
+   * @return true if the reference needs to use the fqcn.
    */
   private boolean requiresFullyQualifiedName() {
+    return requiresFullyQualifiedName(DefinitionScope.get());
+  }
+
+  /**
+   * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
+   * to a class with the same name but different package has been made already.
+   * @param enclosingType The type that encloses the current reference.
+   * @return true if the reference needs to use the fqcn.
+   */
+  private boolean requiresFullyQualifiedName(TypeDef enclosingType) {
     TypeDef definition = getDefinition();
-    String currentPackage = DefinitionScope.get() != null ? DefinitionScope.get().getPackageName() : null;
+    String currentPackage = enclosingType != null ? enclosingType.getPackageName() : null;
     if (currentPackage != null) {
       if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
         String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(), currentPackage);
