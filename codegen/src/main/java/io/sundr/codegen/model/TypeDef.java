@@ -423,6 +423,52 @@ public class TypeDef extends ModifierSupport implements Renderable {
   }
 
   @Override
+  public String render() {
+    StringBuilder sb = new StringBuilder();
+    for (AnnotationRef annotationRef : annotations) {
+      sb.append(annotationRef.toString()).append(SPACE);
+    }
+
+    if (isPublic()) {
+      sb.append(PUBLIC).append(SPACE);
+    } else if (isProtected()) {
+      sb.append(PROTECTED).append(SPACE);
+    } else if (isPrivate()) {
+      sb.append(PRIVATE).append(SPACE);
+    }
+    if (isStatic()) {
+      sb.append(STATIC).append(SPACE);
+    }
+    if (isAbstract()) {
+      sb.append(ABSTRACT).append(SPACE);
+    }
+    if (isFinal()) {
+      sb.append(FINAL).append(SPACE);
+    }
+
+    sb.append(kind.name().toLowerCase()).append(SPACE);
+    sb.append(name);
+
+    if (parameters != null && !parameters.isEmpty()) {
+      sb.append(LT);
+      sb.append(StringUtils.join(parameters, p -> p.render(this), COMA));
+      sb.append(GT);
+    }
+
+    if (extendsList != null && !extendsList.isEmpty()
+        && (extendsList.size() != 1 || !extendsList.contains(OBJECT.toReference()))) {
+      sb.append(SPACE).append(EXTENDS).append(SPACE);
+      sb.append(StringUtils.join(extendsList, e -> e.render(this), COMA));
+    }
+
+    if (implementsList != null && !implementsList.isEmpty()) {
+      sb.append(SPACE).append(IMPLEMENTS).append(SPACE);
+      sb.append(StringUtils.join(implementsList, i -> i.render(this), COMA));
+    }
+    return sb.toString();
+  }
+
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     for (AnnotationRef annotationRef : annotations) {

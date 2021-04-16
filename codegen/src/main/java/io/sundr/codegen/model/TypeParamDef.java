@@ -70,6 +70,17 @@ public class TypeParamDef extends AttributeSupport implements Renderable {
   }
 
   @Override
+  public String render() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name);
+    if (bounds != null && !bounds.isEmpty()) {
+      sb.append(" extends ");
+      sb.append(StringUtils.join(bounds, Renderable::render, ","));
+    }
+    return sb.toString();
+  }
+
+  @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append(name);
