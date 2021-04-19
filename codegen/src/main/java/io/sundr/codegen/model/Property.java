@@ -90,24 +90,36 @@ public class Property extends ModifierSupport implements Renderable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o)
+  public boolean equals(Object obj) {
+    if (this == obj)
       return true;
-    if (o == null || getClass() != o.getClass())
+    if (obj == null)
       return false;
-
-    Property property = (Property) o;
-
-    if (typeRef != null ? !typeRef.equals(property.typeRef) : property.typeRef != null)
+    if (getClass() != obj.getClass())
       return false;
-    return name != null ? name.equals(property.name) : property.name == null;
-
+    Property other = (Property) obj;
+    if (modifiers != other.modifiers)
+      return false;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (typeRef == null) {
+      if (other.typeRef != null)
+        return false;
+    } else if (!typeRef.equals(other.typeRef))
+      return false;
+    return true;
   }
 
   @Override
   public int hashCode() {
-    int result = typeRef != null ? typeRef.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + modifiers;
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((typeRef == null) ? 0 : typeRef.hashCode());
     return result;
   }
 

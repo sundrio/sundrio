@@ -29,7 +29,7 @@ public class ModifierSupport extends AttributeSupport {
   public static final String FINAL = "final";
   public static final String SYNCHRONIZED = "synchronized";
 
-  private final int modifiers;
+  protected final int modifiers;
 
   public ModifierSupport(int modifiers, Map<AttributeKey, Object> attributes) {
     super(attributes);

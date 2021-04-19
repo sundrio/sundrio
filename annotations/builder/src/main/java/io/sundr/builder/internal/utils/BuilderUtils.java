@@ -202,7 +202,7 @@ public class BuilderUtils {
    */
   public static boolean methodHasArgument(Method method, Property property) {
     for (Property candidate : method.getArguments()) {
-      if (candidate.equals(property)) {
+      if (candidate.getName().equals(property.getName()) && candidate.getTypeRef().equals(property.getTypeRef())) {
         return true;
       }
     }
