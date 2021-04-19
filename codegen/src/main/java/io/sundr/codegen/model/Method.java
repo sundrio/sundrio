@@ -139,27 +139,54 @@ public class Method extends ModifierSupport implements Renderable {
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o)
+  public boolean equals(Object obj) {
+    if (this == obj)
       return true;
-    if (o == null || getClass() != o.getClass())
+    if (obj == null)
       return false;
-
-    Method method = (Method) o;
-
-    if (parameters != null ? !parameters.equals(method.parameters) : method.parameters != null)
+    if (getClass() != obj.getClass())
       return false;
-    if (name != null ? !name.equals(method.name) : method.name != null)
+    Method other = (Method) obj;
+    if (arguments == null) {
+      if (other.arguments != null)
+        return false;
+    } else if (!arguments.equals(other.arguments))
       return false;
-    return arguments != null ? arguments.equals(method.arguments) : method.arguments == null;
-
+    if (exceptions == null) {
+      if (other.exceptions != null)
+        return false;
+    } else if (!exceptions.equals(other.exceptions))
+      return false;
+    if (modifiers != other.modifiers)
+      return false;
+    if (name == null) {
+      if (other.name != null)
+        return false;
+    } else if (!name.equals(other.name))
+      return false;
+    if (parameters == null) {
+      if (other.parameters != null)
+        return false;
+    } else if (!parameters.equals(other.parameters))
+      return false;
+    if (returnType == null) {
+      if (other.returnType != null)
+        return false;
+    } else if (!returnType.equals(other.returnType))
+      return false;
+    return true;
   }
 
   @Override
   public int hashCode() {
-    int result = parameters != null ? parameters.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (arguments != null ? arguments.hashCode() : 0);
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
+    result = prime * result + ((exceptions == null) ? 0 : exceptions.hashCode());
+    result = prime * result + modifiers;
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+    result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
     return result;
   }
 
