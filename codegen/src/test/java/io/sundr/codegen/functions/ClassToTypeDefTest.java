@@ -16,23 +16,16 @@
 
 package io.sundr.codegen.functions;
 
-import static org.junit.Assert.*;
+import io.sundr.codegen.model.*;
+import io.sundr.example.*;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
-
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.example.Child;
-import io.sundr.example.Interfazz;
-import io.sundr.example.Person;
-import io.sundr.example.Super;
+import static org.junit.Assert.*;
 
 public class ClassToTypeDefTest {
 
@@ -86,11 +79,31 @@ public class ClassToTypeDefTest {
     assertTrue(typeDef.getImplementsList().stream().anyMatch(c -> c.getFullyQualifiedName().equals(Interfazz.class.getName())));
   }
 
+  @Test
+  public void annotationsShouldHaveParameters() {
+    final TypeDef typeDef = ClassTo.TYPEDEF.apply(Other.class);
+    final List<Property> properties = typeDef.getProperties();
+    final Property foo = properties.stream().filter(p -> p.getName().equals("foo")).findFirst()
+            .orElseThrow(RuntimeException::new);
+    List<AnnotationRef> annotations = foo.getAnnotations();
+    assertEquals(1, annotations.size());
+    AnnotationRef annotationRef = annotations.get(0);
+    assertTrue(annotationRef.toString().contains("TestAnnotation"));
+    assertEquals(Other.FOO_NAME, annotationRef.getParameters().get("name"));
+    final Method something = typeDef.getMethods().stream().filter(p -> p.getName().equals("something")).findFirst()
+            .orElseThrow(RuntimeException::new);
+    annotations = something.getAnnotations();
+    assertEquals(1, annotations.size());
+    annotationRef = annotations.get(0);
+    assertEquals(Other.SOMETHING_NAME, annotationRef.getParameters().get("name"));
+    assertArrayEquals(new int[]{1, 2, 3, 5, 7}, (int[]) annotationRef.getParameters().get("values"));
+  }
+
   public static Optional<ClassRef> findClassRef(TypeDef def, String propertyName) {
     return def.getProperties().stream()
-        .filter(p -> propertyName.equals(p.getName()))
-        .filter(p -> p.getTypeRef() instanceof ClassRef)
-        .map(p -> (ClassRef) p.getTypeRef())
-        .findFirst();
+            .filter(p -> propertyName.equals(p.getName()))
+            .filter(p -> p.getTypeRef() instanceof ClassRef)
+            .map(p -> (ClassRef) p.getTypeRef())
+            .findFirst();
   }
 }
