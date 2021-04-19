@@ -231,7 +231,7 @@ public class Method extends ModifierSupport implements Renderable {
 
     sb.append(OP);
     if (!varArgPreferred) {
-      sb.append(StringUtils.join(arguments, a -> a.render(enclosingType), COMA));
+      sb.append(StringUtils.join(arguments, a -> new PropertyBuilder(a).withModifiers(0).build().render(enclosingType), COMA));
     } else if (!arguments.isEmpty()) {
       List<Property> args = arguments.subList(0, arguments.size() - 1);
       Property varArg = arguments.get(arguments.size() - 1);
@@ -319,7 +319,7 @@ public class Method extends ModifierSupport implements Renderable {
 
     sb.append(OP);
     if (!varArgPreferred) {
-      sb.append(StringUtils.join(arguments, COMA));
+      sb.append(StringUtils.join(arguments, a -> new PropertyBuilder(a).withModifiers(0).build().toString(), COMA));
     } else if (!arguments.isEmpty()) {
       List<Property> args = arguments.subList(0, arguments.size() - 1);
       Property varArg = arguments.get(arguments.size() - 1);

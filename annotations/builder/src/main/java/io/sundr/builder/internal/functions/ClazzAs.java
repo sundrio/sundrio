@@ -250,10 +250,10 @@ public class ClazzAs {
             .addToAttributes(OUTER_INTERFACE, fluentType)
             .addToAttributes(OUTER_CLASS, fluentImplType)
             .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
-            .accept(new InitEnricher()).build();
+            .build();
 
         Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
-        toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).build();
+        toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
 
         if (isArray) {
           Property asList = arrayAsList(toAdd);
