@@ -88,6 +88,8 @@ public class ClazzAs {
             .addToAttributes(OUTER_INTERFACE, fluentType)
             .addToAttributes(OUTER_CLASS, fluentImplType)
             .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
+            .withComments()
+            .withAnnotations()
             .build();
 
         boolean isBuildable = isBuildable(unwrapped);
@@ -250,6 +252,8 @@ public class ClazzAs {
             .addToAttributes(OUTER_INTERFACE, fluentType)
             .addToAttributes(OUTER_CLASS, fluentImplType)
             .addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
+            .withComments()
+            .withAnnotations()
             .build();
 
         Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);

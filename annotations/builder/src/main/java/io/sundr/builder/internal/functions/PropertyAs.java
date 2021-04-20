@@ -260,6 +260,7 @@ public final class PropertyAs {
           .withExtendsList(superClassFluent)
           .withImplementsList(nestedInterfaceRef,
               BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()))
+          .withInnerTypes()
           .build();
     }
 
@@ -313,6 +314,8 @@ public final class PropertyAs {
           .withImplementsList()
           .withExtendsList(BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()),
               superClassFluent)
+
+          .withInnerTypes()
           .build();
     }
   };
