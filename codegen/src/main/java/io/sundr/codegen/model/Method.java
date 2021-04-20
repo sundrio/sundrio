@@ -27,7 +27,7 @@ import java.util.Set;
 
 import io.sundr.codegen.utils.StringUtils;
 
-public class Method extends ModifierSupport implements Renderable {
+public class Method extends ModifierSupport implements Renderable, Commentable, Annotatable {
 
   public static final String DEFAULT = "default";
 

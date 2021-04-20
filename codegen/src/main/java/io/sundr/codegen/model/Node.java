@@ -35,7 +35,8 @@ public interface Node {
 
   String OC = "/**";
   String STAR = "*";
-  String CC = "*/";
+  String CLP = " * ";
+  String CC = " */";
 
   String OP = "(";
   String CP = ")";
