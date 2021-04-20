@@ -16,6 +16,11 @@
 
 package io.sundr.codegen.functions;
 
+import io.sundr.FunctionFactory;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.model.Method;
+import io.sundr.codegen.model.*;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
@@ -23,11 +28,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import io.sundr.FunctionFactory;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.*;
-import io.sundr.codegen.model.Method;
 
 public class ClassTo {
 
@@ -121,17 +121,11 @@ public class ClassTo {
   });
 
   public static final Function<Class<? extends Annotation>, AnnotationRef> ANNOTATIONTYPEREF = FunctionFactory
-      .cache(new Function<Class<? extends Annotation>, AnnotationRef>() {
-
-        @Override
-        public AnnotationRef apply(Class<? extends Annotation> item) {
-          //An annotation can't be a primitive or a void type, so its safe to cast.
-          ClassRef classRef = (ClassRef) TYPEREF.apply(item);
-          Map<String, Object> parameters;
-
-          return new AnnotationRefBuilder().withClassRef(classRef).build();
-        }
-      });
+          .cache(item -> {
+            //An annotation can't be a primitive or a void type, so its safe to cast.
+            ClassRef classRef = (ClassRef) TYPEREF.apply(item);
+            return new AnnotationRefBuilder().withClassRef(classRef).build();
+          });
 
   private static final Function<Class, TypeDef> INTERNAL_TYPEDEF = new Function<Class, TypeDef>() {
     public TypeDef apply(Class item) {
@@ -238,9 +232,7 @@ public class ClassTo {
     Set<Property> properties = new HashSet<Property>();
     for (Field field : item.getDeclaredFields()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
-      for (Annotation annotation : field.getDeclaredAnnotations()) {
-        annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
-      }
+      processAnnotatedElement(field, annotationRefs);
 
       if (field.getGenericType() instanceof Class) {
         references.add((Class) field.getGenericType());
@@ -254,49 +246,43 @@ public class ClassTo {
             .collect(Collectors.toList()));
       }
       properties.add(new PropertyBuilder()
-          .withName(field.getName())
-          .withModifiers(field.getModifiers())
-          .withAnnotations(annotationRefs)
-          .withTypeRef(TYPEREF.apply(field.getGenericType()))
-          .build());
+              .withName(field.getName())
+              .withModifiers(field.getModifiers())
+              .withAnnotations(annotationRefs)
+              .withTypeRef(TYPEREF.apply(field.getGenericType()))
+              .build());
     }
     return properties;
+  }
+
+  private static void processAnnotatedElement(AnnotatedElement field, List<AnnotationRef> annotationRefs) {
+    for (Annotation annotation : field.getDeclaredAnnotations()) {
+      final Class<? extends Annotation> annotationType = annotation.annotationType();
+      AnnotationRef annotationRef = ANNOTATIONTYPEREF.apply(annotationType);
+      Map<String, Object> parameters = new HashMap<>();
+      for (java.lang.reflect.Method method : annotationType.getDeclaredMethods()) {
+        final String name = method.getName();
+        try {
+          final Object value = method.invoke(annotation, (Object[]) null);
+          parameters.put(name, value);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+          System.out.printf("Couldn't retrieve '%s' parameter value for %s%n", name, annotationType.getName());
+        }
+      }
+      annotationRef = new AnnotationRefBuilder(annotationRef).withParameters(parameters).build();
+
+      annotationRefs.add(annotationRef);
+    }
   }
 
   private static Set<Method> getConstructors(Class item, Set<Class> references) {
     Set<Method> constructors = new HashSet<Method>();
     for (java.lang.reflect.Constructor constructor : item.getDeclaredConstructors()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
-      for (Annotation annotation : constructor.getDeclaredAnnotations()) {
-        annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
-      }
-
       List<ClassRef> exceptionRefs = new ArrayList<>();
-      for (Class exceptionType : constructor.getExceptionTypes()) {
-        exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
-      }
-
       List<Property> arguments = new ArrayList<Property>();
-      for (int i = 1; i <= constructor.getGenericParameterTypes().length; i++) {
-        Type argumentType = constructor.getGenericParameterTypes()[i - 1];
-        arguments.add(new PropertyBuilder()
-            .withName(ARGUMENT_PREFIX + i)
-            .withTypeRef(TYPEREF.apply(argumentType))
-            .build());
-
-        if (argumentType instanceof Class) {
-          references.add((Class) argumentType);
-        }
-      }
-
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
-      for (Type type : constructor.getGenericParameterTypes()) {
-
-        TypeParamDef typeParamDef = TYPEPARAMDEF.apply(type);
-        if (typeParamDef != null) {
-          parameters.add(typeParamDef);
-        }
-      }
+      processMethod(references, constructor, annotationRefs, exceptionRefs, arguments, parameters);
 
       constructors.add(new MethodBuilder()
           .withName(constructor.getName())
@@ -314,53 +300,58 @@ public class ClassTo {
     Set<Method> methods = new HashSet<Method>();
     for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
       List<AnnotationRef> annotationRefs = new ArrayList<>();
-      for (Annotation annotation : method.getDeclaredAnnotations()) {
-        annotationRefs.add(ANNOTATIONTYPEREF.apply(annotation.annotationType()));
-      }
-
       List<ClassRef> exceptionRefs = new ArrayList<>();
-      for (Class exceptionType : method.getExceptionTypes()) {
-        exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
-      }
-
       List<Property> arguments = new ArrayList<Property>();
-      for (int i = 1; i <= method.getGenericParameterTypes().length; i++) {
-        Type argumentType = method.getGenericParameterTypes()[i - 1];
-        arguments.add(new PropertyBuilder()
-            .withName(ARGUMENT_PREFIX + i)
-            .withTypeRef(TYPEREF.apply(argumentType))
-            .build());
-
-        if (argumentType instanceof Class) {
-          references.add((Class) argumentType);
-        }
-      }
-
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
-      for (Type type : method.getGenericParameterTypes()) {
+      processMethod(references, method, annotationRefs, exceptionRefs, arguments, parameters);
 
-        TypeParamDef typeParamDef = TYPEPARAMDEF.apply(type);
-        if (typeParamDef != null) {
-          parameters.add(typeParamDef);
-        }
-      }
       Map<AttributeKey, Object> attributes = new HashMap<>();
       if (method.getDefaultValue() != null) {
         attributes.put(Attributeable.DEFAULT_VALUE, method.getDefaultValue());
       }
 
       methods.add(new MethodBuilder()
-          .withName(method.getName())
-          .withDefaultMethod(method.isDefault())
-          .withModifiers(method.getModifiers())
-          .withReturnType(TYPEREF.apply(method.getReturnType()))
-          .withArguments(arguments)
-          .withParameters(parameters)
-          .withExceptions(exceptionRefs)
-          .withAnnotations(annotationRefs)
-          .withAttributes(attributes)
-          .build());
+              .withName(method.getName())
+              .withDefaultMethod(method.isDefault())
+              .withModifiers(method.getModifiers())
+              .withReturnType(TYPEREF.apply(method.getReturnType()))
+              .withArguments(arguments)
+              .withParameters(parameters)
+              .withExceptions(exceptionRefs)
+              .withAnnotations(annotationRefs)
+              .withAttributes(attributes)
+              .build());
     }
     return methods;
+  }
+
+  private static void processMethod(Set<Class> references, java.lang.reflect.Executable method,
+                                    List<AnnotationRef> annotationRefs, List<ClassRef> exceptionRefs, List<Property> arguments,
+                                    List<TypeParamDef> parameters) {
+    processAnnotatedElement(method, annotationRefs);
+
+    for (Class exceptionType : method.getExceptionTypes()) {
+      exceptionRefs.add((ClassRef) TYPEREF.apply(exceptionType));
+    }
+
+    for (int i = 1; i <= method.getGenericParameterTypes().length; i++) {
+      Type argumentType = method.getGenericParameterTypes()[i - 1];
+      arguments.add(new PropertyBuilder()
+              .withName(ARGUMENT_PREFIX + i)
+              .withTypeRef(TYPEREF.apply(argumentType))
+              .build());
+
+      if (argumentType instanceof Class) {
+        references.add((Class) argumentType);
+      }
+    }
+
+    for (Type type : method.getGenericParameterTypes()) {
+
+      TypeParamDef typeParamDef = TYPEPARAMDEF.apply(type);
+      if (typeParamDef != null) {
+        parameters.add(typeParamDef);
+      }
+    }
   }
 }
