@@ -91,7 +91,7 @@ public class ClassDirective extends Directive {
 
   private void writeClazz(Writer writer, TypeDef type, String block) throws IOException {
     if (type != null) {
-      writer.append(type.render());
+      writer.append(type.renderSignature());
       writer.append(block).append(NEWLINE);
     }
   }

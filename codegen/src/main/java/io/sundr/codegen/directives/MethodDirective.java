@@ -82,7 +82,7 @@ public class MethodDirective extends Directive {
     if (method != null) {
       String onetab = tab(level * 4);
       String twotabs = tab((level + 1) * 4);
-      writer.append(onetab).append(method.render(DefinitionScope.get()));
+      writer.append(onetab).append(method.renderSignature(DefinitionScope.get()));
       List<String> lines = getLines(block);
       List<String> indentedLines = lines.stream().map(l -> twotabs + l).collect(Collectors.toList());
       if (hasBody) {

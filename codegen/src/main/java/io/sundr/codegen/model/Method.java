@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.sundr.codegen.utils.StringUtils;
 
@@ -190,50 +191,17 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     return result;
   }
 
-  /**
-   *
-   * @return
-   */
-  @Override
-  public String render(TypeDef enclosingType) {
+  public String renderSignature(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
+    renderSignature(sb, enclosingType);
+    return sb.toString();
+  }
 
-    if (!comments.isEmpty()) {
-      sb.append(NEWLINE).append(OC).append(NEWLINE);
-      for (String c : comments) {
-        sb.append(SPACE).append(STAR).append(SPACE).append(c).append(NEWLINE);
-      }
-      sb.append(SPACE).append(CC).append(NEWLINE);
-    }
-
-    for (AnnotationRef annotationRef : annotations) {
-      sb.append(annotationRef.render(enclosingType)).append(SPACE);
-    }
-
-    if (isPublic()) {
-      sb.append(PUBLIC).append(SPACE);
-    } else if (isProtected()) {
-      sb.append(PROTECTED).append(SPACE);
-    } else if (isPrivate()) {
-      sb.append(PRIVATE).append(SPACE);
-    } else if (isDefaultMethod()) {
+  public void renderSignature(StringBuilder sb, TypeDef enclosingType) {
+    if (isDefaultMethod()) {
       sb.append(DEFAULT).append(SPACE);
-    }
-
-    if (isSynchronized()) {
-      sb.append(SYNCHRONIZED).append(SPACE);
-    }
-
-    if (isStatic()) {
-      sb.append(STATIC).append(SPACE);
-    }
-
-    if (isAbstract()) {
-      sb.append(ABSTRACT).append(SPACE);
-    }
-
-    if (isFinal()) {
-      sb.append(FINAL).append(SPACE);
+    } else {
+      renderModifiers(sb);
     }
 
     if (parameters != null && !parameters.isEmpty()) {
@@ -278,7 +246,28 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     if (exceptions != null && !exceptions.isEmpty()) {
       sb.append(SPACE).append(THROWS).append(SPACE).append(join(exceptions, e -> e.render(enclosingType), COMA));
     }
+  }
 
+  /**
+   *
+   * @return
+   */
+  @Override
+  public String render(TypeDef enclosingType) {
+    StringBuilder sb = new StringBuilder();
+    renderSignature(sb, enclosingType);
+    boolean renderBody = isDefaultMethod() || (enclosingType != null && enclosingType.getKind() != Kind.INTERFACE);
+
+    if (renderBody) {
+      String indent = enclosingType != null && enclosingType.getOuterTypeName() != null ? "    " : "  ";
+      sb.append(SPACE).append(OB).append(NEWLINE);
+      if (getBlock() != null) {
+        sb.append(getBlock().getStatements().stream().map(s -> indent + "  " + s + NEWLINE).collect(Collectors.joining()));
+      }
+      sb.append(indent).append(CB);
+    } else {
+      sb.append(SEMICOLN);
+    }
     return sb.toString();
   }
 
@@ -302,30 +291,10 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
       sb.append(annotationRef.toString()).append(SPACE);
     }
 
-    if (isPublic()) {
-      sb.append(PUBLIC).append(SPACE);
-    } else if (isProtected()) {
-      sb.append(PROTECTED).append(SPACE);
-    } else if (isPrivate()) {
-      sb.append(PRIVATE).append(SPACE);
-    } else if (isDefaultMethod()) {
+    if (isDefaultMethod()) {
       sb.append(DEFAULT).append(SPACE);
-    }
-
-    if (isSynchronized()) {
-      sb.append(SYNCHRONIZED).append(SPACE);
-    }
-
-    if (isStatic()) {
-      sb.append(STATIC).append(SPACE);
-    }
-
-    if (isAbstract()) {
-      sb.append(ABSTRACT).append(SPACE);
-    }
-
-    if (isFinal()) {
-      sb.append(FINAL).append(SPACE);
+    } else {
+      renderModifiers(sb);
     }
 
     if (parameters != null && !parameters.isEmpty()) {
