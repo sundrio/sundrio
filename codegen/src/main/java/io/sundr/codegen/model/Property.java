@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.sundr.codegen.Constants;
+
 public class Property extends ModifierSupport implements Renderable, Commentable, Annotatable {
 
   private final List<AnnotationRef> annotations;
@@ -87,6 +89,15 @@ public class Property extends ModifierSupport implements Renderable, Commentable
       }
     }
     return refs;
+  }
+
+  protected String getDefaultValue() {
+    Object value = getAttribute(INIT);
+    if (Constants.STRING_REF.equals(getTypeRef()) && !String.valueOf(value).startsWith("\"")) {
+      return "\"" + value + "\"";
+    } else {
+      return String.valueOf(value);
+    }
   }
 
   @Override
