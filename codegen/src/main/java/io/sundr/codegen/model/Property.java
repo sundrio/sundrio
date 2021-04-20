@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Property extends ModifierSupport implements Renderable {
+public class Property extends ModifierSupport implements Renderable, Commentable, Annotatable {
 
   private final List<AnnotationRef> annotations;
   private final TypeRef typeRef;
@@ -127,10 +127,6 @@ public class Property extends ModifierSupport implements Renderable {
   public String render(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
 
-    if (comments != null && !comments.isEmpty()) {
-      sb.append(comments.stream().collect(Collectors.joining(NEWLINE)));
-    }
-
     if (isPublic()) {
       sb.append(PUBLIC).append(SPACE);
     } else if (isProtected()) {
@@ -156,10 +152,6 @@ public class Property extends ModifierSupport implements Renderable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-
-    // if (comments != null && !comments.isEmpty()) {
-    //   sb.append(comments.stream().collect(Collectors.joining(NEWLINE)));
-    // }
 
     if (isPublic()) {
       sb.append(PUBLIC).append(SPACE);
