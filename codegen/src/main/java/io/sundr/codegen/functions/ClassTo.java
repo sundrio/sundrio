@@ -261,11 +261,12 @@ public class ClassTo {
       AnnotationRef annotationRef = ANNOTATIONTYPEREF.apply(annotationType);
       Map<String, Object> parameters = new HashMap<>();
       for (java.lang.reflect.Method method : annotationType.getDeclaredMethods()) {
+        final String name = method.getName();
         try {
           final Object value = method.invoke(annotation, (Object[]) null);
-          parameters.put(method.getName(), value);
+          parameters.put(name, value);
         } catch (IllegalAccessException | InvocationTargetException e) {
-          throw new RuntimeException(e);
+          System.out.printf("Couldn't retrieve '%s' parameter value for %s%n", name, annotationType.getName());
         }
       }
       annotationRef = new AnnotationRefBuilder(annotationRef).withParameters(parameters).build();
@@ -310,9 +311,9 @@ public class ClassTo {
       }
 
       methods.add(new MethodBuilder()
-          .withName(method.getName())
-          .withDefaultMethod(method.isDefault())
-          .withModifiers(method.getModifiers())
+              .withName(method.getName())
+              .withDefaultMethod(method.isDefault())
+              .withModifiers(method.getModifiers())
               .withReturnType(TYPEREF.apply(method.getReturnType()))
               .withArguments(arguments)
               .withParameters(parameters)
