@@ -64,12 +64,17 @@ public class AnnotationRef extends AttributeSupport implements Renderable {
   }
 
   private static String toString(Object value) {
-    if (value instanceof Collection) {
+    if (value == null) {
+      return "null";
+    } else if (value instanceof Collection) {
       return OB + ((Collection) value).stream().map(AnnotationRef::toString).collect(Collectors.joining(",")) + CB;
-    } else if (value instanceof PrimitiveRef) {
+    } else if (value instanceof PrimitiveRef || value instanceof Number || value instanceof Boolean
+        || value.getClass().isPrimitive()) {
       return String.valueOf(value);
     } else if (value instanceof ClassRef) {
       return ((ClassRef) value).getFullyQualifiedName() + ".class";
+    } else if (value instanceof Class) {
+      return ((Class) value).getSimpleName() + ".class";
     } else if (value instanceof AnnotationRef) {
       return value.toString();
     } else {
