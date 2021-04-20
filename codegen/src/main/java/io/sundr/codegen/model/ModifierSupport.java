@@ -71,4 +71,33 @@ public class ModifierSupport extends AttributeSupport {
   public int getModifiers() {
     return modifiers;
   }
+
+  public void renderModifiers(StringBuilder sb) {
+    if (isPublic()) {
+      sb.append(PUBLIC).append(SPACE);
+    } else if (isProtected()) {
+      sb.append(PROTECTED).append(SPACE);
+    } else if (isPrivate()) {
+      sb.append(PRIVATE).append(SPACE);
+    }
+    if (isSynchronized()) {
+      sb.append(SYNCHRONIZED).append(SPACE);
+    }
+    if (isStatic()) {
+      sb.append(STATIC).append(SPACE);
+    }
+    if (isAbstract()) {
+      sb.append(ABSTRACT).append(SPACE);
+    }
+    if (isFinal()) {
+      sb.append(FINAL).append(SPACE);
+    }
+  }
+
+  public String renderModifiers() {
+    StringBuilder sb = new StringBuilder();
+    renderModifiers(sb);
+    return sb.toString();
+  }
+
 }

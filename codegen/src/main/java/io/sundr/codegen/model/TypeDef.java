@@ -422,29 +422,14 @@ public class TypeDef extends ModifierSupport implements Renderable {
     return refs;
   }
 
-  @Override
-  public String render() {
+  public String renderSignature() {
     StringBuilder sb = new StringBuilder();
-    for (AnnotationRef annotationRef : annotations) {
-      sb.append(annotationRef.toString()).append(SPACE);
-    }
+    renderSignature(sb);
+    return sb.toString();
+  }
 
-    if (isPublic()) {
-      sb.append(PUBLIC).append(SPACE);
-    } else if (isProtected()) {
-      sb.append(PROTECTED).append(SPACE);
-    } else if (isPrivate()) {
-      sb.append(PRIVATE).append(SPACE);
-    }
-    if (isStatic()) {
-      sb.append(STATIC).append(SPACE);
-    }
-    if (isAbstract()) {
-      sb.append(ABSTRACT).append(SPACE);
-    }
-    if (isFinal()) {
-      sb.append(FINAL).append(SPACE);
-    }
+  public void renderSignature(StringBuilder sb) {
+    renderModifiers(sb);
 
     sb.append(kind.name().toLowerCase()).append(SPACE);
     sb.append(name);
@@ -465,6 +450,65 @@ public class TypeDef extends ModifierSupport implements Renderable {
       sb.append(SPACE).append(IMPLEMENTS).append(SPACE);
       sb.append(StringUtils.join(implementsList, i -> i.render(this), COMA));
     }
+  }
+
+  @Override
+  public String render() {
+    StringBuilder sb = new StringBuilder();
+    String indent = outerTypeName == null ? "  " : "    ";
+    String halfIndent = outerTypeName == null ? "" : "  ";
+
+    // We only need to render those for the outermost type
+    if (outerTypeName == null) {
+      sb.append("package ").append(getPackageName()).append(SEMICOLN).append(NEWLINE);
+      sb.append(NEWLINE);
+      for (String i : getImports()) {
+        sb.append("import ").append(i).append(SEMICOLN).append(NEWLINE);
+      }
+    }
+
+    sb.append(NEWLINE);
+    for (AnnotationRef annotationRef : annotations) {
+      sb.append(annotationRef.toString()).append(SPACE);
+    }
+
+    sb.append(NEWLINE);
+    renderSignature(sb);
+    sb.append(OB).append(NEWLINE).append(indent);
+
+    if (kind != Kind.INTERFACE) {
+      for (Method constructors : getConstructors()) {
+        sb.append(constructors.renderComments(indent));
+        sb.append(constructors.renderAnnotations(indent));
+        sb.append(constructors.render(this));
+        sb.append(NEWLINE).append(indent);
+      }
+
+      for (Property field : getProperties()) {
+        sb.append(field.renderComments(indent));
+        sb.append(field.renderAnnotations(indent));
+        sb.append(field.render(this));
+        if (field.getAttribute(INIT) != null) {
+          sb.append(" = ").append(field.getDefaultValue());
+        }
+
+        sb.append(SEMICOLN).append(NEWLINE).append(indent);
+      }
+    }
+
+    for (Method method : getMethods()) {
+      sb.append(method.renderComments(indent));
+      sb.append(method.renderAnnotations(indent));
+      sb.append(method.render(this));
+      sb.append(NEWLINE).append(indent);
+    }
+
+    for (TypeDef innerType : innerTypes) {
+      sb.append(innerType.render());
+      sb.append(NEWLINE).append(indent);
+    }
+
+    sb.append(NEWLINE).append(halfIndent).append(CB);
     return sb.toString();
   }
 
@@ -475,22 +519,7 @@ public class TypeDef extends ModifierSupport implements Renderable {
       sb.append(annotationRef.toString()).append(SPACE);
     }
 
-    if (isPublic()) {
-      sb.append(PUBLIC).append(SPACE);
-    } else if (isProtected()) {
-      sb.append(PROTECTED).append(SPACE);
-    } else if (isPrivate()) {
-      sb.append(PRIVATE).append(SPACE);
-    }
-    if (isStatic()) {
-      sb.append(STATIC).append(SPACE);
-    }
-    if (isAbstract()) {
-      sb.append(ABSTRACT).append(SPACE);
-    }
-    if (isFinal()) {
-      sb.append(FINAL).append(SPACE);
-    }
+    renderModifiers(sb);
 
     sb.append(kind.name().toLowerCase()).append(SPACE);
     sb.append(name);
