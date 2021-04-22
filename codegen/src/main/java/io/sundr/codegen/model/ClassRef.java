@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.DefinitionScope;
 import io.sundr.codegen.utils.StringUtils;
 
 public class ClassRef extends TypeRef {
@@ -139,53 +138,6 @@ public class ClassRef extends TypeRef {
     return refs;
   }
 
-  /**
-   * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
-   * to a class with the same name but different package has been made already.
-   * 
-   * @return true if the reference needs to use the fqcn.
-   */
-  private boolean requiresFullyQualifiedName() {
-    return requiresFullyQualifiedName(DefinitionScope.get());
-  }
-
-  /**
-   * Checks if the ref needs to be done by fully qualified name. Why? Because an other reference
-   * to a class with the same name but different package has been made already.
-   * 
-   * @param enclosingType The type that encloses the current reference.
-   * @return true if the reference needs to use the fqcn.
-   */
-  private boolean requiresFullyQualifiedName(TypeDef enclosingType) {
-    TypeDef definition = getDefinition();
-    String currentPackage = enclosingType != null ? enclosingType.getPackageName() : null;
-    if (currentPackage != null) {
-      if (definition != null && definition.getPackageName() != null && definition.getFullyQualifiedName() != null) {
-        String conflictingFQCN = getDefinition().getFullyQualifiedName().replace(definition.getPackageName(), currentPackage);
-        if (!conflictingFQCN.equals(getFullyQualifiedName())
-            && DefinitionRepository.getRepository().getDefinition(conflictingFQCN) != null) {
-          return true;
-        }
-      }
-    }
-
-    Map<String, String> referenceMap = DefinitionRepository.getRepository().getReferenceMap();
-    if (referenceMap != null && referenceMap.containsKey(definition.getName())) {
-      String fqn = referenceMap.get(definition.getName());
-      if (!getDefinition().getFullyQualifiedName().equals(fqn)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public String getName() {
-    if (requiresFullyQualifiedName()) {
-      return getDefinition().getFullyQualifiedName();
-    }
-    return getDefinition().getName();
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -229,20 +181,7 @@ public class ClassRef extends TypeRef {
   @Override
   public String render(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
-    TypeDef definition = getDefinition();
-    if (definition == null) {
-      sb.append(UNKNOWN);
-    } else {
-      if (requiresFullyQualifiedName(enclosingType) && definition.getOuterTypeName() == null) {
-        sb.append(definition.getPackageName()).append(DOT);
-      }
-
-      if (definition.getOuterTypeName() != null) {
-        sb.append(definition.getOuterTypeName());
-        sb.append(".");
-      }
-      sb.append(definition.getName());
-    }
+    sb.append(fullyQualifiedName);
     if (arguments.size() > 0) {
       sb.append(LT);
       sb.append(StringUtils.join(arguments, a -> a.render(enclosingType), COMA));

@@ -109,7 +109,7 @@ public final class TypeUtils {
   public static TypeParamDef getParameterDefinition(TypeRef typeRef, Collection<TypeParamDef> parameters) {
     String name;
     if (typeRef instanceof ClassRef) {
-      name = ((ClassRef) typeRef).getName();
+      name = ((ClassRef) typeRef).getFullyQualifiedName();
     } else if (typeRef instanceof TypeParamRef) {
       name = ((TypeParamRef) typeRef).getName();
     } else if (typeRef instanceof PrimitiveRef) {

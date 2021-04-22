@@ -245,7 +245,12 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     });
 
     for (ClassRef ref : refs) {
-      String key = ref.getName();
+      if (ref.getFullyQualifiedName() == null || ref.getFullyQualifiedName().isEmpty()) {
+        throw new IllegalStateException("ClassRef should have a fully qualified name!");
+      }
+      String key = !ref.getFullyQualifiedName().contains(".")
+          ? ref.getFullyQualifiedName()
+          : ref.getFullyQualifiedName().substring(ref.getFullyQualifiedName().lastIndexOf(".") + 1);
 
       if (BuilderUtils.isBuildable(ref)) {
 

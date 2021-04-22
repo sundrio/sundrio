@@ -141,19 +141,14 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
     try {
       FileObject fileObject = filer.getResource(StandardLocation.CLASS_PATH, "", selector.value());
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileObject.openInputStream()))) {
-        System.out.println("Reading transformation resources from:" + selector.value() + ".");
         List<String> lines = reader.lines().map(String::trim).filter(l -> !StringUtils.isNullOrEmpty(l))
             .collect(Collectors.toList());
-        lines.forEach(System.out::println);
         Map<String, TypeDef> map = lines.stream()
             .map(l -> elements.getTypeElement(l))
             .filter(e -> e instanceof TypeElement)
             .map(e -> ElementTo.TYPEDEF.apply(e))
             .collect(Collectors.toMap(e -> e.getFullyQualifiedName(), e -> e));
 
-        for (Map.Entry<String, TypeDef> entry : map.entrySet()) {
-          System.out.println("Adding transformation resource:" + entry.getValue().getFullyQualifiedName());
-        }
         definitions.putAll(map);
       }
 
