@@ -84,10 +84,10 @@ public class SimpleClassTest extends AbstractProcessorTest {
     Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
     TypeRef ref = argIterator.next();
     assertEquals("testpackage.SimpleClass", ref.toString());
-    assertEquals("SimpleClass", ref.render());
+    assertEquals("testpackage.SimpleClass", ref.render());
     ref = argIterator.next();
     assertEquals("testpackage.SimpleClassBuilder", ref.toString());
-    assertEquals("SimpleClassBuilder", ref.render());
+    assertEquals("testpackage.SimpleClassBuilder", ref.render());
   }
 
   @Test

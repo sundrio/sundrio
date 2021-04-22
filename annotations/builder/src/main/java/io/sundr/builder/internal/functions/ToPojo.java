@@ -917,7 +917,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     ClassRef boxed = (ClassRef) TypeAs.BOXED_OF.apply(propertyRef);
     String parse = TypeAs.PARSER_OF.apply(propertyRef);
 
-    String boxedName = boxed.getName();
+    String boxedName = boxed.getFullyQualifiedName();
     if (parse != null) {
       return indent(ref) + boxedName + "." + parse + "(String.valueOf(" + ref + " instanceof Map ? ((Map)" + ref
           + ").getOrDefault(\"" + key + "\",\"" + dv + "\") : \"" + dv + "\"))";

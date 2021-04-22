@@ -316,7 +316,7 @@ class ToMethod {
 
       if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
         TypeDef builder = BUILDER.apply(((ClassRef) unwrapped).getDefinition());
-        String builderClass = builder.toReference().getName();
+        String builderClass = builder.toReference().getFullyQualifiedName();
         statements.add(new StringStatement(
             "if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "(" + argumentName
                 + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");} return (" + returnType + ") this;"));
@@ -699,7 +699,7 @@ class ToMethod {
           if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
             final ClassRef targetType = (ClassRef) unwrapped;
 
-            String targetClass = targetType.getName();
+            String targetClass = targetType.getFullyQualifiedName();
             parameters.addAll(targetType.getDefinition().getParameters());
             String builderClass = targetClass + "Builder";
 
@@ -750,7 +750,7 @@ class ToMethod {
 
             statements.add(new StringStatement("for (" + targetType.toString() + " item : items) { "));
             statements.add(createAddToDescendants("addTo", descendants, false));
-            statements.add(createAddToDescendantsFallback(targetType.getName(), propertyName));
+            statements.add(createAddToDescendantsFallback(targetType.getFullyQualifiedName(), propertyName));
             statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
@@ -844,7 +844,7 @@ class ToMethod {
         private Statement createAddToDescendants(final String prefix, Set<Property> descendants, final boolean useIndex) {
           return new StringStatement(StringUtils.join(descendants, item -> {
             TypeRef itemRef = combine(UNWRAP_COLLECTION_OF, ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
-            String className = ((ClassRef) itemRef).getName();
+            String className = ((ClassRef) itemRef).getFullyQualifiedName();
             String methodName = prefix + item.getNameCapitalized();
             return "if (item instanceof " + className + "){" + methodName + "(" + (useIndex ? "index, " : "") + "(" + className
                 + ")item);}\n";
@@ -895,7 +895,7 @@ class ToMethod {
                 propertyName = attrValue.getName();
               }
             }
-            String targetClass = targetType.getName();
+            String targetClass = targetType.getFullyQualifiedName();
             parameters.addAll(targetType.getDefinition().getParameters());
             String builderClass = targetClass + "Builder";
 
@@ -910,12 +910,12 @@ class ToMethod {
             statements.add(new StringStatement(
                 "for (" + targetType.toString() + " item : items) {" + StringUtils.join(descendants, item1 -> {
                   TypeRef itemRef = combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item1.getTypeRef());
-                  String className = ((ClassRef) itemRef).getName();
+                  String className = ((ClassRef) itemRef).getFullyQualifiedName();
                   String removeFromMethodName = "removeFrom" + item1.getNameCapitalized();
                   return "if (item instanceof " + className + "){" + removeFromMethodName + "((" + className + ")item);}\n";
                 }, " else ")));
 
-            statements.add(createRemoveFromDescendantsFallback(targetType.getName(), property.getName()));
+            statements.add(createRemoveFromDescendantsFallback(targetType.getFullyQualifiedName(), property.getName()));
             statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
             methods.add(new MethodBuilder()
@@ -1102,7 +1102,8 @@ class ToMethod {
         .withReturnType(rewraped)
         .withArguments(keyProperty)
         .withNewBlock()
-        .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ");")
+        .addNewStringStatementStatement(
+            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
         .build();
@@ -1115,7 +1116,8 @@ class ToMethod {
         .withArguments(keyProperty, valueProperty)
         .withNewBlock()
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ", " + valueProperty.getName() + ");")
+            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ", " + valueProperty.getName()
+                + ");")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
         .build();
@@ -1135,8 +1137,9 @@ class ToMethod {
         .addNewStringStatementStatement("if (toEdit instanceof " + fullyQualifiedValueType
             + " == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + "
             + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
-        .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ", ("
-            + fullyQualifiedValueType + ") toEdit);")
+        .addNewStringStatementStatement(
+            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
+                + fullyQualifiedValueType + ") toEdit);")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
         .build();
@@ -1155,10 +1158,12 @@ class ToMethod {
         .addNewStringStatementStatement("if (toEdit instanceof " + fullyQualifiedValueType
             + " == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + "
             + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
-        .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ", ("
-            + fullyQualifiedValueType + ") toEdit);")
+        .addNewStringStatementStatement(
+            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
+                + fullyQualifiedValueType + ") toEdit);")
         .addNewStringStatementStatement("}")
-        .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + keyProperty.getName() + ");")
+        .addNewStringStatementStatement(
+            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER.apply(targetType.getDefinition()).toInternalReference())
         .build();
@@ -1271,7 +1276,7 @@ class ToMethod {
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "();")
+        .addNewStringStatementStatement("return new " + rewrapedImpl.getFullyQualifiedName() + "();")
         .endBlock()
         .build();
 
@@ -1354,9 +1359,9 @@ class ToMethod {
 
     String statement = isOptional(baseType)
         ? "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null  && get" + methodNameBase
-            + "().isPresent() ? get" + methodNameBase + "().get() : new " + builderType.getName() + "().build());"
+            + "().isPresent() ? get" + methodNameBase + "().get() : new " + builderType.getFullyQualifiedName() + "().build());"
         : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): new "
-            + builderType.getName() + "().build());";
+            + builderType.getFullyQualifiedName() + "().build());";
     return new MethodBuilder()
         .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
         .withParameters(parameters)
@@ -1467,7 +1472,8 @@ class ToMethod {
         .withTypeRef(baseType)
         .endArgument()
         .withNewBlock()
-        .addNewStringStatementStatement("return new " + rewrapedImpl.getName() + "(" + (isCollection ? "-1, " : "") + "item);")
+        .addNewStringStatementStatement(
+            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + (isCollection ? "-1, " : "") + "item);")
         .endBlock()
         .build();
 
@@ -1495,7 +1501,7 @@ class ToMethod {
         .addToArguments(0, INDEX)
         .withName(method.getName().replaceFirst("add", "set"))
         .editBlock()
-        .withStatements(new StringStatement("return new " + rewrapedImpl.getName() + "(index, item);"))
+        .withStatements(new StringStatement("return new " + rewrapedImpl.getFullyQualifiedName() + "(index, item);"))
         .endBlock()
         .build();
   };

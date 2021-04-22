@@ -116,7 +116,8 @@ public final class PropertyAs {
         }
         argumentsWithItem.add(new PropertyBuilder().withName("item").withTypeRef(unwrapped).build());
 
-        statementsWithItem.add(new StringStatement("this.builder = new " + builderType.getName() + "(this, item);"));
+        statementsWithItem
+            .add(new StringStatement("this.builder = new " + builderType.getFullyQualifiedName() + "(this, item);"));
         constructors.add(new MethodBuilder()
             .withName("")
             .withReturnType(nestedRef)
@@ -126,7 +127,7 @@ public final class PropertyAs {
             .endBlock()
             .build());
 
-        statementsWithoutItem.add(new StringStatement("this.builder = new " + builderType.getName() + "(this);"));
+        statementsWithoutItem.add(new StringStatement("this.builder = new " + builderType.getFullyQualifiedName() + "(this);"));
         constructors.add(new MethodBuilder()
             .withName("")
             .withReturnType(nestedRef)
