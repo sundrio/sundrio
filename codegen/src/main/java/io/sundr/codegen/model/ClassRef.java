@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.utils.StringUtils;
 
-public class ClassRef extends TypeRef {
+public class ClassRef extends TypeRef implements Nameable {
 
   public static final String UNKNOWN = "<unknown>";
   public static final String BRACKETS = "[]";
