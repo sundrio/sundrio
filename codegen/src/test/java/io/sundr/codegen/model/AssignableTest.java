@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.Assignable;
 
 public class AssignableTest {
 
@@ -60,29 +61,29 @@ public class AssignableTest {
 
   @Test
   public void testWithTypeDef() {
-    assertTrue(collection.isAssignableFrom(list));
-    assertTrue(collection.isAssignableFrom(arrayList));
+    assertTrue(Assignable.isAssignable(collection).from(list));
+    assertTrue(Assignable.isAssignable(collection).from(arrayList));
 
-    assertTrue(list.isAssignableFrom(arrayList));
-    assertTrue(arrayList.isAssignableFrom(arrayList));
+    assertTrue(Assignable.isAssignable(list).from(arrayList));
+    assertTrue(Assignable.isAssignable(arrayList).from(arrayList));
 
-    assertFalse(list.isAssignableFrom(collection));
-    assertFalse(arrayList.isAssignableFrom(collection));
+    assertFalse(Assignable.isAssignable(list).from(collection));
+    assertFalse(Assignable.isAssignable(arrayList).from(collection));
 
-    assertFalse(arrayList.isAssignableFrom(list));
+    assertFalse(Assignable.isAssignable(arrayList).from(list));
   }
 
   @Test
   public void testWithClassRef() {
-    assertTrue(collectionRef.isAssignableFrom(listRef));
-    assertTrue(collectionRef.isAssignableFrom(arrayListRef));
+    assertTrue(Assignable.isAssignable(collectionRef).from(listRef));
+    assertTrue(Assignable.isAssignable(collectionRef).from(arrayListRef));
 
-    assertTrue(listRef.isAssignableFrom(arrayListRef));
-    assertTrue(arrayListRef.isAssignableFrom(arrayListRef));
+    assertTrue(Assignable.isAssignable(listRef).from(arrayListRef));
+    assertTrue(Assignable.isAssignable(arrayListRef).from(arrayListRef));
 
-    assertFalse(listRef.isAssignableFrom(collectionRef));
-    assertFalse(arrayListRef.isAssignableFrom(collectionRef));
+    assertFalse(Assignable.isAssignable(listRef).from(collectionRef));
+    assertFalse(Assignable.isAssignable(arrayListRef).from(collectionRef));
 
-    assertFalse(arrayListRef.isAssignableFrom(listRef));
+    assertFalse(Assignable.isAssignable(arrayListRef).from(listRef));
   }
 }

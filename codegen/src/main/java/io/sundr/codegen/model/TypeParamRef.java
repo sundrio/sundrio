@@ -63,8 +63,4 @@ public class TypeParamRef extends TypeRef {
   public String toString() {
     return name;
   }
-
-  public boolean isAssignableFrom(TypeRef ref) {
-    return this.equals(ref);
-  }
 }

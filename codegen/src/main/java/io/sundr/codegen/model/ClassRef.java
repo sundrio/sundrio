@@ -16,21 +16,15 @@
 
 package io.sundr.codegen.model;
 
-import static io.sundr.codegen.utils.Predicates.after;
-import static io.sundr.codegen.utils.Predicates.until;
-
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.utils.StringUtils;
 
-public class ClassRef extends TypeRef implements Nameable {
+public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
 
   public static final String UNKNOWN = "<unknown>";
   public static final String BRACKETS = "[]";
@@ -52,32 +46,7 @@ public class ClassRef extends TypeRef implements Nameable {
   }
 
   public TypeDef getDefinition() {
-    TypeDef def = DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
-    if (def != null) {
-      return def;
-    }
-    Predicate<String> isLowerCase = w -> Character.isUpperCase(w.charAt(0));
-    Predicate<String> inPackage = until(isLowerCase);
-    Predicate<String> outOfPackage = after(isLowerCase);
-
-    String packageName = Arrays.stream(fullyQualifiedName.split("\\.")).filter(inPackage).collect(Collectors.joining("."));
-    String className = Arrays.stream(fullyQualifiedName.split("\\.")).filter(outOfPackage).collect(Collectors.joining("."));
-
-    String ownerClassName = className.contains(".") ? className.substring(0, className.indexOf(".")) : null;
-
-    if (ownerClassName != null) {
-      className = className.substring(ownerClassName.length() + 1);
-      return new TypeDefBuilder()
-          .withName(className)
-          .withPackageName(packageName)
-          .withOuterTypeName(packageName + "." + ownerClassName)
-          .build();
-    }
-
-    return new TypeDefBuilder()
-        .withName(className)
-        .withPackageName(packageName)
-        .build();
+    return map(GetDefinition.FUNCTION);
   }
 
   public String getFullyQualifiedName() {
@@ -94,37 +63,6 @@ public class ClassRef extends TypeRef implements Nameable {
 
   public ClassRef withDimensions(int dimensions) {
     return new ClassRefBuilder(this).withDimensions(dimensions).build();
-  }
-
-  public boolean isAssignableFrom(TypeRef other) {
-    if (this == other) {
-      return true;
-    } else if (other == null) {
-      return false;
-    } else if (other instanceof PrimitiveRef) {
-      if (getDefinition() == null) {
-        return false;
-      }
-
-      if (getDefinition() != null && !JAVA_LANG.equals(getDefinition().getPackageName())) {
-        return false;
-      }
-
-      if (!getDefinition().getName().toUpperCase().startsWith(((PrimitiveRef) other).getName().toUpperCase())) {
-        return false;
-      }
-      return true;
-    }
-
-    if (!(other instanceof ClassRef)) {
-      return false;
-    }
-
-    if (this == other || this.equals(other)) {
-      return true;
-    }
-
-    return getDefinition().isAssignableFrom(((ClassRef) other).getDefinition());
   }
 
   public Set<ClassRef> getReferences() {

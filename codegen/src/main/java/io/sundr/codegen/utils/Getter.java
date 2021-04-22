@@ -21,6 +21,7 @@ import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 
 import io.sundr.SundrException;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.Assignable;
 import io.sundr.codegen.model.Method;
 import io.sundr.codegen.model.MethodBuilder;
 import io.sundr.codegen.model.Property;
@@ -144,7 +145,7 @@ public class Getter {
    * In strict mode it will not strip non-alphanumeric characters.
    */
   private static boolean isApplicable(Method method, Property property, boolean strict, boolean acceptPrefixless) {
-    if (!method.getReturnType().isAssignableFrom(property.getTypeRef())) {
+    if (!Assignable.isAssignable(method.getReturnType()).from(property.getTypeRef())) {
       return false;
     }
 
