@@ -41,32 +41,6 @@ public class PrimitiveRef extends TypeRef {
     return new PrimitiveRefBuilder(this).withDimensions(dimensions).build();
   }
 
-  public boolean isAssignableFrom(TypeRef o) {
-    if (this == o) {
-      return true;
-    } else if (o == null) {
-      return false;
-    } else if (o instanceof ClassRef) {
-      if (!((ClassRef) o).getDefinition().getPackageName().equals(JAVA_LANG)) {
-        return false;
-      }
-      if (!((ClassRef) o).getDefinition().getName().toUpperCase().startsWith(name.toUpperCase())) {
-        return false;
-      }
-      return true;
-    }
-
-    if (o == null || getClass() != o.getClass())
-      return false;
-
-    PrimitiveRef that = (PrimitiveRef) o;
-
-    if (dimensions != that.dimensions)
-      return false;
-    return name != null ? name.equals(that.name) : that.name == null;
-
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)

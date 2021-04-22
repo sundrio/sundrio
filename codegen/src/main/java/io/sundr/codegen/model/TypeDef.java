@@ -26,10 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.utils.StringUtils;
 
-public class TypeDef extends ModifierSupport implements Renderable, Nameable {
+public class TypeDef extends ModifierSupport implements Renderable, Nameable, Mappable<TypeDef> {
 
   public static TypeDef OBJECT = new TypeDefBuilder()
       .withPackageName("java.lang")
@@ -125,37 +124,6 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable {
     return sb.toString();
   }
 
-  public boolean isAssignableFrom(TypeDef o) {
-    if (this == o || this.equals(o)) {
-      return true;
-    }
-
-    if (getFullyQualifiedName().equals(o.getFullyQualifiedName())) {
-      return true;
-    }
-
-    if (packageName == null && "java.lang".equals(o.packageName) && name.equalsIgnoreCase(o.name)) {
-      return true;
-    }
-    if (o.packageName == null && "java.lang".equals(packageName) && name.equalsIgnoreCase(o.name)) {
-      return true;
-    }
-
-    for (ClassRef e : o.getExtendsList()) {
-      if (isAssignableFrom(e.getDefinition())) {
-        return true;
-      }
-    }
-
-    for (ClassRef i : o.getImplementsList()) {
-      if (isAssignableFrom(i.getDefinition())) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   public Kind getKind() {
     return kind;
   }
@@ -202,10 +170,6 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable {
 
   public String getOuterTypeName() {
     return outerTypeName;
-  }
-
-  public TypeDef getOuterType() {
-    return DefinitionRepository.getRepository().getDefinition(outerTypeName);
   }
 
   public List<TypeDef> getInnerTypes() {

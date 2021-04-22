@@ -59,6 +59,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.functions.Assignable;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
@@ -691,7 +692,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     }
 
     TypeRef getterTypeRef = getter.getReturnType();
-    if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions() && propertyTypeRef.isAssignableFrom(getterTypeRef)) {
+    if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions()
+        && Assignable.isAssignable(propertyTypeRef).from(getterTypeRef)) {
       return readObjectProperty(ref, source, property);
     }
 
@@ -853,7 +855,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     }
 
     TypeRef getterTypeRef = getter.getReturnType();
-    if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions() && propertyTypeRef.isAssignableFrom(getterTypeRef)) {
+    if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions()
+        && Assignable.isAssignable(propertyTypeRef).from(getterTypeRef)) {
       return readObjectValue(ref, source, property);
     }
 

@@ -38,6 +38,7 @@ import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.visitors.InitEnricher;
+import io.sundr.codegen.functions.TypeAssignalbe;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -187,7 +188,7 @@ public class Descendants {
   public static boolean isDescendant(TypeDef item, TypeDef candidate) {
     if (item == null || candidate == null) {
       return false;
-    } else if (candidate.isAssignableFrom(item)) {
+    } else if (candidate.map(TypeAssignalbe.from(item))) {
       return true;
     }
     return false;

@@ -24,8 +24,6 @@ public abstract class TypeRef extends AttributeSupport implements Renderable {
     super(attributes);
   }
 
-  public abstract boolean isAssignableFrom(TypeRef ref);
-
   public abstract int getDimensions();
 
   public abstract TypeRef withDimensions(int dimensions);

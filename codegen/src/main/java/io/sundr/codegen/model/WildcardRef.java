@@ -77,8 +77,4 @@ public class WildcardRef extends TypeRef {
     }
     return sb.toString();
   }
-
-  public boolean isAssignableFrom(TypeRef ref) {
-    return false;
-  }
 }
