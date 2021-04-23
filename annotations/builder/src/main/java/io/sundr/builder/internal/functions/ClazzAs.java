@@ -40,6 +40,7 @@ import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Block;
 import io.sundr.codegen.model.ClassRef;
@@ -734,18 +735,18 @@ public class ClazzAs {
         Boolean hasSuperClass = pojo.getProperties()
             .stream()
             .filter(p -> p.getTypeRef() instanceof ClassRef && p.getName().equals(Getter.propertyNameSafe(m)))
-            .map(p -> ((ClassRef) p.getTypeRef()).getDefinition())
+            .map(p -> GetDefinition.of((ClassRef) p.getTypeRef()))
             .flatMap(c -> c.getExtendsList().stream())
             .count() > 0;
 
-        if (ref.getDefinition().isAnnotation()) {
+        if (GetDefinition.of(ref).isAnnotation()) {
           TypeDef generatedType = TypeUtils.allProperties(pojo)
               .stream()
               .filter(p -> p.getName().equals(m.getName()))
               .map(p -> p.getTypeRef())
               .filter(r -> r instanceof ClassRef)
               .map(r -> (ClassRef) r)
-              .map(c -> c.getDefinition())
+              .map(c -> GetDefinition.of(c))
               .findFirst()
               .orElse(null);
 
@@ -758,7 +759,7 @@ public class ClazzAs {
                   .append(".stream().map(i ->")
                   .append("new ").append(generatedType.getName()).append("(")
                   .append(ctor.getArguments().stream()
-                      .map(p -> Getter.find(((ClassRef) m.getReturnType()).getDefinition(), p, true))
+                      .map(p -> Getter.find(GetDefinition.of((ClassRef) m.getReturnType()), p, true))
                       .map(g -> g.getName())
                       .map(s -> "i." + s + "()").collect(Collectors.joining(", ")))
                   .append(")")
@@ -768,7 +769,7 @@ public class ClazzAs {
               sb.append(".with").append(StringUtils.capitalizeFirst(trimmedName)).append("(")
                   .append("new ").append(generatedType.getName()).append("(")
                   .append(ctor.getArguments().stream()
-                      .map(p -> Getter.find(((ClassRef) m.getReturnType()).getDefinition(), p, true))
+                      .map(p -> Getter.find(GetDefinition.of((ClassRef) m.getReturnType()), p, true))
                       .map(g -> g.getName())
                       .map(s -> "instance." + m.getName() + "()." + s + "()").collect(Collectors.joining(", ")))
                   .append(")")

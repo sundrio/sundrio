@@ -50,6 +50,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
 import io.sundr.codegen.model.ClassRef;
@@ -252,7 +253,7 @@ public final class TypeDefUtils {
   }
 
   public static Set<ClassRef> extractInterfacesFromClassRef(ClassRef classRef) {
-    return extractInterfacesFromType(classRef.getDefinition());
+    return extractInterfacesFromType(GetDefinition.of(classRef));
   }
 
   public static String toInterfaceName(String name) {

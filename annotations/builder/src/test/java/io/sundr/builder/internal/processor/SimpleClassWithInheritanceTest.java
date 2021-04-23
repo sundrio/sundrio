@@ -53,7 +53,7 @@ public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
     assertEquals(1, fluent.getExtendsList().size());
 
     ClassRef superClass = fluent.getExtendsList().iterator().next();
-    assertEquals("SimpleClassFluent", superClass.getDefinition().getName());
+    assertEquals("SimpleClassFluent", superClass.getName());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());
   }
@@ -68,7 +68,7 @@ public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
     assertEquals(1, fluentImpl.getExtendsList().size());
 
     ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
-    assertEquals("SimpleClassFluentImpl", superClass.getDefinition().getName());
+    assertEquals("SimpleClassFluentImpl", superClass.getName());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());
   }
@@ -83,7 +83,7 @@ public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
     assertEquals(1, builder.getExtendsList().size());
 
     ClassRef superClass = builder.getImplementsList().iterator().next();
-    assertEquals(builderContext.getVisitableBuilderInterface().getName(), superClass.getDefinition().getName());
+    assertEquals(builderContext.getVisitableBuilderInterface().getName(), superClass.getName());
     assertEquals(2, superClass.getArguments().size());
     Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
     TypeRef ref = argIterator.next();

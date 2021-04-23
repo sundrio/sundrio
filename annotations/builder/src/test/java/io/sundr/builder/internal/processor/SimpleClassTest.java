@@ -46,7 +46,7 @@ public class SimpleClassTest extends AbstractProcessorTest {
     assertEquals(1, fluent.getExtendsList().size());
 
     ClassRef superClass = fluent.getExtendsList().iterator().next();
-    assertEquals("Fluent", superClass.getDefinition().getName());
+    assertEquals("Fluent", superClass.getName());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());
   }
@@ -64,7 +64,7 @@ public class SimpleClassTest extends AbstractProcessorTest {
     assertTrue(hasMethod(fluentImpl, "removeFromTags", ClassTo.TYPEREF.apply(String.class).withDimensions(1)));
 
     ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
-    assertEquals("BaseFluent", superClass.getDefinition().getName());
+    assertEquals("BaseFluent", superClass.getName());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());
   }
@@ -79,7 +79,7 @@ public class SimpleClassTest extends AbstractProcessorTest {
     assertEquals(1, builder.getExtendsList().size());
 
     ClassRef superClass = builder.getImplementsList().iterator().next();
-    assertEquals("VisitableBuilder", superClass.getDefinition().getName());
+    assertEquals("VisitableBuilder", superClass.getName());
     assertEquals(2, superClass.getArguments().size());
     Iterator<TypeRef> argIterator = superClass.getArguments().iterator();
     TypeRef ref = argIterator.next();

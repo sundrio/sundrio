@@ -257,25 +257,25 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         //Add the builder
         String builderKey = key + "Builder";
         if (!definitionRepository.customMappingExists(builderKey)) {
-          definitionRepository.putCustomMapping(builderKey, ref.getDefinition().getFullyQualifiedName() + "Builder");
+          definitionRepository.putCustomMapping(builderKey, ref.getFullyQualifiedName() + "Builder");
         }
 
         //Add the editable
         String editableKey = "Editable" + key;
         if (!definitionRepository.customMappingExists(editableKey)) {
-          definitionRepository.putCustomMapping(editableKey, "Editable" + ref.getDefinition().getFullyQualifiedName());
+          definitionRepository.putCustomMapping(editableKey, "Editable" + ref.getFullyQualifiedName());
         }
 
         //Add the builder
         String fluentKey = key + "Fluent";
         if (!definitionRepository.customMappingExists(fluentKey)) {
-          definitionRepository.putCustomMapping(fluentKey, ref.getDefinition().getFullyQualifiedName() + "Fluent");
+          definitionRepository.putCustomMapping(fluentKey, ref.getFullyQualifiedName() + "Fluent");
         }
 
         //Add the builder
         String fluentImplKey = key + "FluentImpl";
         if (!definitionRepository.customMappingExists(fluentImplKey)) {
-          definitionRepository.putCustomMapping(fluentImplKey, ref.getDefinition().getFullyQualifiedName() + "FluentImpl");
+          definitionRepository.putCustomMapping(fluentImplKey, ref.getFullyQualifiedName() + "FluentImpl");
         }
       }
     }

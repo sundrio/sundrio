@@ -79,7 +79,7 @@ public class Getter {
       if (!current.getExtendsList().iterator().hasNext()) {
         break;
       }
-      String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+      String fqn = current.getExtendsList().iterator().next().getFullyQualifiedName();
       current = DefinitionRepository.getRepository().getDefinition(fqn);
     }
     throw new SundrException(

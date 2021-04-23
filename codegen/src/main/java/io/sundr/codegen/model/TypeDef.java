@@ -297,18 +297,17 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
   public Set<String> getImports() {
     final Set<String> imports = new LinkedHashSet<String>();
     for (ClassRef ref : getReferenceMap().values()) {
-      TypeDef definition = ref.getDefinition();
-      if (definition.getPackageName() == null ||
-          definition.getPackageName().isEmpty() ||
-          definition.getPackageName().equals(packageName) ||
-          definition.getName().equals(name)) {
+      if (ref.getPackageName() == null ||
+          ref.getPackageName().isEmpty() ||
+          ref.getPackageName().equals(packageName) ||
+          ref.getName().equals(name)) {
         continue;
-      } else if (definition.getFullyQualifiedName().startsWith("com.ibm.jit.JITHelpers")
-          || definition.getFullyQualifiedName().equals("java.lang.StringCompressionFlag")) {
+      } else if (ref.getFullyQualifiedName().startsWith("com.ibm.jit.JITHelpers")
+          || ref.getFullyQualifiedName().equals("java.lang.StringCompressionFlag")) {
         // When using openj9 these imports leak into the generated code, causing issues. Let's ignore them
         continue;
       } else {
-        imports.add(ref.getDefinition().getFullyQualifiedName());
+        imports.add(ref.getFullyQualifiedName());
       }
     }
     return imports;
@@ -330,7 +329,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
     });
 
     for (ClassRef ref : refs) {
-      String key = ref.getDefinition().getName();
+      String key = ref.getName();
       if (!mapping.containsKey(key)) {
         mapping.put(key, ref);
       }

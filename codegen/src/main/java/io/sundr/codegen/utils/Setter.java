@@ -52,7 +52,7 @@ public class Setter {
       if (!current.getExtendsList().iterator().hasNext()) {
         break;
       }
-      String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+      String fqn = current.getExtendsList().iterator().next().getFullyQualifiedName();
       current = DefinitionRepository.getRepository().getDefinition(fqn);
     }
     throw new SundrException(
@@ -107,7 +107,7 @@ public class Setter {
       }
 
       if (!current.getExtendsList().isEmpty()) {
-        String fqn = current.getExtendsList().iterator().next().getDefinition().getFullyQualifiedName();
+        String fqn = current.getExtendsList().iterator().next().getFullyQualifiedName();
         current = DefinitionRepository.getRepository().getDefinition(fqn);
       } else {
         current = null;

@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
@@ -43,7 +44,7 @@ public class BuildableRepository {
 
   public TypeDef getBuildable(TypeRef type) {
     if (type instanceof ClassRef) {
-      return buildables.get(((ClassRef) type).getDefinition().getFullyQualifiedName());
+      return buildables.get(GetDefinition.of((ClassRef) type).getFullyQualifiedName());
     }
     return null;
   }
@@ -54,7 +55,7 @@ public class BuildableRepository {
 
   public boolean isBuildable(TypeRef type) {
     if (type instanceof ClassRef) {
-      return isBuildable(((ClassRef) type).getDefinition());
+      return isBuildable(GetDefinition.of((ClassRef) type));
     }
     return false;
   }

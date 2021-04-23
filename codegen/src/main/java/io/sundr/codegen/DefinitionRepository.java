@@ -202,9 +202,9 @@ public class DefinitionRepository {
     });
 
     for (ClassRef classRef : refs) {
-      String key = classRef.getDefinition().getName();
+      String key = classRef.getName();
       if (!mapping.containsKey(key)) {
-        mapping.put(key, classRef.getDefinition().getFullyQualifiedName());
+        mapping.put(key, classRef.getFullyQualifiedName());
       }
     }
 

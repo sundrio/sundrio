@@ -43,7 +43,7 @@ public class ClassToTypeDefTest {
     assertTrue(personType.isPresent());
     personType.ifPresent(p -> {
       assertEquals("io.sundr.example.Person.Type", p.getFullyQualifiedName());
-      Set<String> properties = p.getDefinition().getProperties().stream().map(Property::getName).collect(Collectors.toSet());
+      Set<String> properties = GetDefinition.of(p).getProperties().stream().map(Property::getName).collect(Collectors.toSet());
       assertTrue(properties.contains("O_MINUS"));
     });
 
@@ -51,15 +51,17 @@ public class ClassToTypeDefTest {
     assertTrue(addresses.isPresent());
     addresses.ifPresent(l -> {
       ClassRef address = (ClassRef) l.getArguments().get(0);
-      Optional<ClassRef> addressType = findClassRef(address.getDefinition(), "type");
-      assertFalse(address.getDefinition().getProperties().isEmpty());
-      address.getDefinition().getProperties().stream().peek(p -> {
+      TypeDef addressDef = GetDefinition.of(address);
+      Optional<ClassRef> addressType = findClassRef(addressDef, "type");
+      assertFalse(addressDef.getProperties().isEmpty());
+      addressDef.getProperties().stream().peek(p -> {
         System.out.println(p.getTypeRef() + " " + p.getName());
       }).collect(Collectors.toList());
       assertTrue(addressType.isPresent());
       addressType.ifPresent(a -> {
         assertEquals("io.sundr.example.Address.Type", a.getFullyQualifiedName());
-        Set<String> properties = a.getDefinition().getProperties().stream().map(Property::getName).collect(Collectors.toSet());
+        Set<String> properties = GetDefinition.of(a).getProperties().stream().map(Property::getName)
+            .collect(Collectors.toSet());
         assertTrue(properties.contains("WORK"));
       });
     });

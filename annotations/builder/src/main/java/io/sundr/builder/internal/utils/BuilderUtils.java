@@ -54,6 +54,7 @@ import io.sundr.codegen.functions.ClassAssignable;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.Optionals;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.Attributeable;
@@ -101,7 +102,7 @@ public class BuilderUtils {
       return true;
     }
 
-    String builderFQCN = ref.getDefinition().getFullyQualifiedName() + "Builder";
+    String builderFQCN = ref.getFullyQualifiedName() + "Builder";
     TypeDef builder = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(builderFQCN);
     if (builder == null) {
       return false;
@@ -129,7 +130,7 @@ public class BuilderUtils {
    */
   public static List<ClassRef> findBuildableReferences(ClassRef ref) {
     List<ClassRef> result = new ArrayList<>();
-    TypeDef def = new TypeDefBuilder(ref.getDefinition())
+    TypeDef def = new TypeDefBuilder(GetDefinition.of(ref))
         .accept(new TypedVisitor<ClassRefBuilder>() {
           @Override
           public void visit(ClassRefBuilder builder) {
@@ -232,7 +233,7 @@ public class BuilderUtils {
     DefinitionRepository repository = DefinitionRepository.getRepository();
     TypeDef def = repository.getDefinition(item);
     if (def == null && item instanceof ClassRef) {
-      def = ((ClassRef) item).getDefinition();
+      def = GetDefinition.of((ClassRef) item);
     }
     return hasDefaultConstructor(def);
   }
@@ -264,7 +265,7 @@ public class BuilderUtils {
         .apply(property.getTypeRef());
 
     if (unwrapped instanceof ClassRef) {
-      for (Method candidate : ((ClassRef) unwrapped).getDefinition().getConstructors()) {
+      for (Method candidate : GetDefinition.of((ClassRef) unwrapped).getConstructors()) {
         if (isInlineable(candidate)) {
           result.add(candidate);
         }
@@ -301,7 +302,7 @@ public class BuilderUtils {
     for (Property argument : method.getArguments()) {
       if (!(argument.getTypeRef() instanceof ClassRef)) {
         continue;
-      } else if (((ClassRef) argument.getTypeRef()).getDefinition().getFullyQualifiedName().startsWith("java.lang")) {
+      } else if (((ClassRef) argument.getTypeRef()).getFullyQualifiedName().startsWith("java.lang")) {
         continue;
       } else {
         return false;
@@ -442,7 +443,7 @@ public class BuilderUtils {
       if (unwrapped instanceof ClassRef) {
         ClassRef classRef = (ClassRef) unwrapped;
 
-        String candidateFqn = classRef.getFullyQualifiedName().replace(classRef.getDefinition().getPackageName(),
+        String candidateFqn = classRef.getFullyQualifiedName().replace(classRef.getPackageName(),
             currentPackage);
 
         //If classRef is inside the current package.
@@ -452,18 +453,18 @@ public class BuilderUtils {
 
         //If candidate is imported and different that the actual name, do a diff
         if (originType.getImports().contains(candidateFqn)
-            && !classRef.getDefinition().getFullyQualifiedName().equals(candidateFqn)) {
+            && !classRef.getFullyQualifiedName().equals(candidateFqn)) {
           return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
         }
 
         //If not then we compare against what has been found in the map.
-        String fqcn = map.get(classRef.getDefinition().getName());
+        String fqcn = map.get(classRef.getName());
         TypeDef mainDef = fqcn != null ? DefinitionRepository.getRepository().getDefinition(fqcn) : null;
         boolean mainBuildable = mainDef != null ? isBuildable(mainDef) : false;
 
         if (fqcn == null) {
-          System.out.println("Warning: Expected to find class with name:" + classRef.getDefinition().getName());
-        } else if (!classRef.getDefinition().getFullyQualifiedName().equals(fqcn) && mainBuildable) {
+          System.out.println("Warning: Expected to find class with name:" + classRef.getName());
+        } else if (!classRef.getFullyQualifiedName().equals(fqcn) && mainBuildable) {
           return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(fqcn, classRef.getFullyQualifiedName()));
         }
       }
@@ -473,9 +474,9 @@ public class BuilderUtils {
 
   public static ClassRef buildableRef(TypeRef typeRef) {
     ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
-    return isAbstract(unwrapped) || unwrapped.getDefinition().getKind() == Kind.INTERFACE
+    return isAbstract(unwrapped) || GetDefinition.of(unwrapped).getKind() == Kind.INTERFACE
         ? TypeAs.VISITABLE_BUILDER.apply(unwrapped)
-        : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
+        : TypeAs.BUILDER.apply(GetDefinition.of(unwrapped)).toInternalReference();
   }
 
   public static Property arrayAsList(Property property) {
@@ -504,7 +505,7 @@ public class BuilderUtils {
     ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
     ClassRef classRef = (ClassRef) typeRef;
     ClassRef builderType = !TypeUtils.isConcrete(unwrapped) ? TypeAs.VISITABLE_BUILDER.apply(unwrapped)
-        : TypeAs.BUILDER.apply(unwrapped.getDefinition()).toInternalReference();
+        : TypeAs.BUILDER.apply(GetDefinition.of(unwrapped)).toInternalReference();
 
     if (TypeUtils.isList(classRef)) {
       ClassRef listRef = Collections.ARRAY_LIST.toReference(builderType);
@@ -605,7 +606,7 @@ public class BuilderUtils {
 
     //If base fluent is the superclass just skip.
     final BuilderContext context = BuilderContextManager.getContext();
-    final String superClassFQN = superClass.getDefinition().getFullyQualifiedName();
+    final String superClassFQN = superClass.getFullyQualifiedName();
     if (!context.getBaseFluentClass().getFullyQualifiedName().equals(superClassFQN)
         && !OBJECT_FULLY_QUALIFIED_NAME.equals(superClassFQN)) {
       statements.add(new StringStatement("if (!super.equals(o)) return false;"));
@@ -619,7 +620,7 @@ public class BuilderUtils {
         statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.")
             .append(name).append(") return false;").toString()));
       } else if (property.getTypeRef() instanceof ClassRef
-          && Descendants.isDescendant(type, ((ClassRef) property.getTypeRef()).getDefinition())) {
+          && Descendants.isDescendant(type, GetDefinition.of((ClassRef) property.getTypeRef()))) {
         statements.add(new StringStatement(new StringBuilder()
             .append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name)
             .append(".equals(that.").append(name).append(") :")

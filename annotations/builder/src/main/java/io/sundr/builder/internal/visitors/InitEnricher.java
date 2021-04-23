@@ -35,6 +35,7 @@ import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.functions.Construct;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.functions.Collections;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.Optionals;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
@@ -72,9 +73,9 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
     TypeRef targetType = unwrapped;
     if (isBuildable || hasDescendants) {
       ClassRef unwarppedClassRef = (unwrapped instanceof ClassRef) ? (ClassRef) unwrapped : null;
-      targetType = isAbstract(unwarppedClassRef) || unwarppedClassRef.getDefinition().getKind() == Kind.INTERFACE
+      targetType = isAbstract(unwarppedClassRef) || GetDefinition.of(unwarppedClassRef).getKind() == Kind.INTERFACE
           ? TypeAs.VISITABLE_BUILDER.apply(unwarppedClassRef)
-          : TypeAs.BUILDER.apply(unwarppedClassRef.getDefinition()).toInternalReference();
+          : TypeAs.BUILDER.apply(GetDefinition.of(unwarppedClassRef)).toInternalReference();
     }
 
     boolean isArray = TypeUtils.isArray(typeRef);

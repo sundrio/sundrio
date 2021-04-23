@@ -63,6 +63,7 @@ import io.sundr.codegen.functions.Assignable;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.AnnotationRefBuilder;
 import io.sundr.codegen.model.AttributeKey;
@@ -189,10 +190,10 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             if (superClass != null) {
               ClassRef superClassRef = superClass.toInternalReference();
               extendsList.add(superClassRef);
-              BuilderContextManager.getContext().getBuildableRepository().register(superClassRef.getDefinition());
+              BuilderContextManager.getContext().getBuildableRepository().register(GetDefinition.of(superClassRef));
               BuilderUtils.findBuildableReferences(superClassRef)
                   .stream()
-                  .forEach(b -> BuilderContextManager.getContext().getBuildableRepository().register(b.getDefinition()));
+                  .forEach(b -> BuilderContextManager.getContext().getBuildableRepository().register(GetDefinition.of(b)));
 
             }
           }
@@ -242,7 +243,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           //If return type is an annotation also convert the annotation.
           if (method.getReturnType() instanceof ClassRef) {
             ClassRef ref = (ClassRef) method.getReturnType();
-            if (ref.getDefinition().isAnnotation()) {
+            if (GetDefinition.of(ref).isAnnotation()) {
 
               AnnotationRef inheritedPojoRef = (pojoRef != null ? new AnnotationRefBuilder(pojoRef)
                   : new AnnotationRefBuilder())
@@ -251,9 +252,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                       .removeFromParameters("interfaces")
                       .build();
 
-              TypeDef p = hasPojoAnnotation(ref.getDefinition())
-                  ? POJO.apply(ref.getDefinition())
-                  : POJO.apply(new TypeDefBuilder(ref.getDefinition())
+              TypeDef p = hasPojoAnnotation(GetDefinition.of(ref))
+                  ? POJO.apply(GetDefinition.of(ref))
+                  : POJO.apply(new TypeDefBuilder(GetDefinition.of(ref))
                       .withAnnotations(annotationRefs)
                       .addToAnnotations(inheritedPojoRef)
                       .withAttributes(item.getAttributes())
@@ -589,13 +590,13 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         TypeUtils.allProperties(generatedPojo).stream()
             .filter(p -> p.getTypeRef() instanceof ClassRef)
             .map(p -> (ClassRef) p.getTypeRef())
-            .filter(c -> !adapterPackage.equals(c.getDefinition().getPackageName()))
+            .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
             .collect(toList());
 
         adapterImports.addAll(TypeUtils.allProperties(generatedPojo).stream()
             .filter(p -> p.getTypeRef() instanceof ClassRef)
             .map(p -> (ClassRef) p.getTypeRef())
-            .filter(c -> !adapterPackage.equals(c.getDefinition().getPackageName()))
+            .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
             .collect(toList()));
 
         adapterMethods.add(staticAdapter);
@@ -628,7 +629,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
   private static boolean hasPojoAnnotation(TypeDef typeDef) {
     return typeDef.getAnnotations().stream()
-        .filter(a -> a.getClassRef().getDefinition().getFullyQualifiedName().equals(Pojo.class.getTypeName()))
+        .filter(a -> GetDefinition.of(a.getClassRef()).getFullyQualifiedName().equals(Pojo.class.getTypeName()))
         .findAny().isPresent();
   }
 
@@ -700,8 +701,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     if (property.getTypeRef().getDimensions() > 0) {
       return readArrayProperty(ref, source, property);
     }
-    if (property.getTypeRef() instanceof ClassRef && ((ClassRef) getterTypeRef).getDefinition().isAnnotation()) {
-      return readAnnotationProperty(ref + "." + getter.getName() + "()", ((ClassRef) getterTypeRef).getDefinition(), property);
+    if (property.getTypeRef() instanceof ClassRef && GetDefinition.of((ClassRef) getterTypeRef).isAnnotation()) {
+      return readAnnotationProperty(ref + "." + getter.getName() + "()", GetDefinition.of((ClassRef) getterTypeRef), property);
     }
     return readObjectProperty(ref, source, property);
   }
@@ -755,8 +756,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     if (propertyTypeRef instanceof ClassRef && getterTypeRef instanceof ClassRef) {
       String nextRef = variables.pop();
       try {
-        TypeDef propertyType = ((ClassRef) propertyTypeRef).getDefinition();
-        TypeDef getterType = ((ClassRef) getterTypeRef).getDefinition();
+        TypeDef propertyType = GetDefinition.of((ClassRef) propertyTypeRef);
+        TypeDef getterType = GetDefinition.of((ClassRef) getterTypeRef);
         sb.append("Arrays.asList(")
             .append(ref).append(".").append(getter.getName()).append("())")
             .append(".stream().map(").append(nextRef).append(" ->").append(convertReference(nextRef, getterType, propertyType))
@@ -796,7 +797,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
    * @return The code.
    */
   private static String readAnnotationProperty(String ref, TypeDef source, Property property) {
-    return convertReference(ref, source, ((ClassRef) property.getTypeRef()).getDefinition());
+    return convertReference(ref, source, GetDefinition.of((ClassRef) property.getTypeRef()));
   }
 
   //
@@ -865,14 +866,14 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     }
 
     if (getterTypeRef instanceof ClassRef) {
-      TypeDef getterTypeDef = ((ClassRef) getterTypeRef).getDefinition();
+      TypeDef getterTypeDef = GetDefinition.of((ClassRef) getterTypeRef);
       if (getterTypeDef.isEnum()) {
         return readEnumValue(ref, source, property);
       }
       if (getterTypeDef.isAnnotation()) {
         return readAnnotationValue("((Map)(" + ref + " instanceof Map ? ((Map)" + ref + ").get(\""
             + getterOf(source, property).getName() + "\") : " + getDefaultValue(property) + "))",
-            ((ClassRef) getterTypeRef).getDefinition(), property);
+            GetDefinition.of((ClassRef) getterTypeRef), property);
       }
     }
     return readObjectValue(ref, source, property);
@@ -890,7 +891,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     TypeRef propertyRef = property.getTypeRef();
     if (propertyRef instanceof ClassRef) {
       ClassRef classRef = (ClassRef) propertyRef;
-      if (classRef.getDefinition().isEnum()) {
+      if (GetDefinition.of(classRef).isEnum()) {
         return readEnumValue(ref, source, property);
       }
       if (propertyRef.getDimensions() > 0) {
@@ -993,8 +994,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     if (propertyTypeRef instanceof ClassRef && getterTypeRef instanceof ClassRef) {
       String nextRef = variables.pop();
       try {
-        TypeDef propertyType = ((ClassRef) propertyTypeRef).getDefinition();
-        TypeDef getterType = ((ClassRef) getterTypeRef).getDefinition();
+        TypeDef propertyType = GetDefinition.of((ClassRef) propertyTypeRef);
+        TypeDef getterType = GetDefinition.of((ClassRef) getterTypeRef);
         if (Constants.STRING.equals(getterType)) {
           sb.append(ref + " instanceof Map ? toStringArray(((Map)" + ref + ").get(\"" + getter.getName()
               + "\")) : toStringArray(" + ref + ")");
@@ -1042,13 +1043,13 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
    * @return The code.
    */
   private static String readAnnotationValue(String ref, TypeDef source, Property property) {
-    return convertMap(ref, source, ((ClassRef) property.getTypeRef()).getDefinition());
+    return convertMap(ref, source, GetDefinition.of((ClassRef) property.getTypeRef()));
   }
 
   private void populateReferences(ClassRef ref, List<ClassRef> refs) {
     if (!refs.contains(ref) && !TypeUtils.isJdkType(ref)) {
       refs.add(ref);
-      TypeUtils.allProperties(ref.getDefinition()).stream()
+      TypeUtils.allProperties(GetDefinition.of(ref)).stream()
           .filter(p -> p.getTypeRef() instanceof ClassRef)
           .forEach(p -> populateReferences((ClassRef) p.getTypeRef(), refs));
     }

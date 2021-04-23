@@ -33,6 +33,7 @@ import javax.lang.model.element.Modifier;
 import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Collections;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.PrimitiveRef;
 import io.sundr.codegen.model.Property;
@@ -82,8 +83,7 @@ public final class TypeUtils {
   public static boolean isInstanceOf(TypeRef type, TypeDef targetType, Function<TypeRef, Boolean> function) {
     if (type instanceof ClassRef) {
       ClassRef classRef = (ClassRef) type;
-      TypeDef definition = classRef.getDefinition();
-      if (definition.getFullyQualifiedName().equals(targetType.getFullyQualifiedName())) {
+      if (classRef.getFullyQualifiedName().equals(targetType.getFullyQualifiedName())) {
         return true;
       }
 
@@ -91,6 +91,7 @@ public final class TypeUtils {
         return false;
       }
 
+      TypeDef definition = classRef.map(GetDefinition.FUNCTION);
       for (TypeRef i : definition.getImplementsList()) {
         if (function.apply(i)) {
           return true;
@@ -258,7 +259,7 @@ public final class TypeUtils {
   public static boolean isEnum(TypeRef typeRef) {
     if (typeRef instanceof ClassRef) {
       ClassRef classRef = (ClassRef) typeRef;
-      return classRef.getDefinition().isEnum();
+      return classRef.map(GetDefinition.FUNCTION).isEnum();
     }
     return false;
   }
@@ -273,7 +274,7 @@ public final class TypeUtils {
     DefinitionRepository repository = DefinitionRepository.getRepository();
     TypeDef def = repository.getDefinition(typeRef);
     if (def == null && typeRef instanceof ClassRef) {
-      def = ((ClassRef) typeRef).getDefinition();
+      def = ((ClassRef) typeRef).map(GetDefinition.FUNCTION);
     }
     return def != null ? def.isAbstract() : false;
   }
@@ -288,7 +289,7 @@ public final class TypeUtils {
     DefinitionRepository repository = DefinitionRepository.getRepository();
     TypeDef def = repository.getDefinition(typeRef);
     if (def == null && typeRef instanceof ClassRef) {
-      def = ((ClassRef) typeRef).getDefinition();
+      def = ((ClassRef) typeRef).map(GetDefinition.FUNCTION);
     }
     return def != null ? !def.isAbstract() && !def.isInterface() : false;
   }
@@ -389,7 +390,7 @@ public final class TypeUtils {
       return false;
     }
 
-    return JAVA_UTIL_OPTIONAL.equals(((ClassRef) type).getDefinition().getFullyQualifiedName());
+    return JAVA_UTIL_OPTIONAL.equals(((ClassRef) type).map(GetDefinition.FUNCTION).getFullyQualifiedName());
   }
 
   /**
@@ -403,7 +404,7 @@ public final class TypeUtils {
       return false;
     }
 
-    return JAVA_UTIL_OPTIONAL_INT.equals(((ClassRef) type).getDefinition().getFullyQualifiedName());
+    return JAVA_UTIL_OPTIONAL_INT.equals(((ClassRef) type).map(GetDefinition.FUNCTION).getFullyQualifiedName());
   }
 
   /**
@@ -417,7 +418,7 @@ public final class TypeUtils {
       return false;
     }
 
-    return JAVA_UTIL_OPTIONAL_DOUBLE.equals(((ClassRef) type).getDefinition().getFullyQualifiedName());
+    return JAVA_UTIL_OPTIONAL_DOUBLE.equals(((ClassRef) type).map(GetDefinition.FUNCTION).getFullyQualifiedName());
   }
 
   /**
@@ -431,7 +432,7 @@ public final class TypeUtils {
       return false;
     }
 
-    return JAVA_UTIL_OPTIONAL_LONG.equals(((ClassRef) type).getDefinition().getFullyQualifiedName());
+    return JAVA_UTIL_OPTIONAL_LONG.equals(((ClassRef) type).map(GetDefinition.FUNCTION).getFullyQualifiedName());
   }
 
   /**
@@ -444,7 +445,7 @@ public final class TypeUtils {
       return false;
     }
 
-    String packageName = ((ClassRef) type).getDefinition().getPackageName();
+    String packageName = ((ClassRef) type).map(GetDefinition.FUNCTION).getPackageName();
     if (packageName.startsWith("java.")) {
       return true;
     } else if (packageName.startsWith("sun.")) {
@@ -515,7 +516,7 @@ public final class TypeUtils {
     }
     Set<TypeDef> hierarchy = new HashSet<>();
     hierarchy.add(typeDef);
-    hierarchy.addAll(typeDef.getExtendsList().stream().flatMap(s -> unrollHierarchy(s.getDefinition()).stream())
+    hierarchy.addAll(typeDef.getExtendsList().stream().flatMap(s -> unrollHierarchy(s.map(GetDefinition.FUNCTION)).stream())
         .collect(Collectors.toSet()));
     return hierarchy;
   }

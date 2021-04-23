@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.TypeDef;
 import io.sundr.codegen.model.TypeRef;
@@ -44,7 +45,7 @@ public class SwaggerRepository {
 
   public TypeDef getApi(TypeRef type) {
     if (type instanceof ClassRef) {
-      return apis.get(((ClassRef) type).getDefinition().getFullyQualifiedName());
+      return apis.get(((ClassRef) type).getFullyQualifiedName());
     }
     return null;
   }
@@ -55,7 +56,7 @@ public class SwaggerRepository {
 
   public boolean isApi(TypeRef type) {
     if (type instanceof ClassRef) {
-      return isApi(((ClassRef) type).getDefinition());
+      return isApi(GetDefinition.of((ClassRef) type));
     }
     return false;
   }
@@ -73,7 +74,7 @@ public class SwaggerRepository {
 
   public TypeDef getModel(TypeRef type) {
     if (type instanceof ClassRef) {
-      return models.get(((ClassRef) type).getDefinition().getFullyQualifiedName());
+      return models.get(((ClassRef) type).getFullyQualifiedName());
     }
     return null;
   }
@@ -84,7 +85,7 @@ public class SwaggerRepository {
 
   public boolean isModel(TypeRef type) {
     if (type instanceof ClassRef) {
-      return isModel(((ClassRef) type).getDefinition());
+      return isModel(GetDefinition.of((ClassRef) type));
     }
     return false;
   }
