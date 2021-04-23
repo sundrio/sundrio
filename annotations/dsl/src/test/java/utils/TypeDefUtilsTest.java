@@ -108,12 +108,12 @@ public class TypeDefUtilsTest {
     Assert.assertThat(combined.getExtendsList().size(), CoreMatchers.is(2));
     Assert.assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
-        .filter(s -> s.equals("MethodAInterface<" + T + ">"))
+        .filter(s -> s.equals("utils.MethodAInterface<" + T + ">"))
         .findAny().isPresent());
 
     Assert.assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
-        .filter(s -> s.equals("MethodBInterface<" + T + ">"))
+        .filter(s -> s.equals("utils.MethodBInterface<" + T + ">"))
         .findAny().isPresent());
 
   }
@@ -136,12 +136,12 @@ public class TypeDefUtilsTest {
     Assert.assertThat(combined.getExtendsList().size(), CoreMatchers.is(2));
     Assert.assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
-        .filter(s -> s.equals("MethodAInterface<T>"))
+        .filter(s -> s.equals("utils.MethodAInterface<T>"))
         .findAny().isPresent());
 
     Assert.assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
-        .filter(s -> s.equals("MethodBInterface<T>"))
+        .filter(s -> s.equals("utils.MethodBInterface<T>"))
         .findAny().isPresent());
 
     assertEquals(combined.getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT_REF);
@@ -165,12 +165,12 @@ public class TypeDefUtilsTest {
 
     Assert.assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
-        .filter(s -> s.equals("MethodAInterface<T>"))
+        .filter(s -> s.equals("utils.MethodAInterface<T>"))
         .findAny().isPresent());
 
     Assert.assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
-        .filter(s -> s.equals("MethodBInterface<T>"))
+        .filter(s -> s.equals("utils.MethodBInterface<T>"))
         .findAny().isPresent());
 
     assertEquals(combined.getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT_REF);
