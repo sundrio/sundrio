@@ -41,6 +41,10 @@ public @interface ExternalBuildables {
 
   BuildableReference[] refs() default {};
 
+  boolean includeInterfaces() default true;
+
+  boolean includeAbstractClasses() default true;
+
   String[] value() default {};
 
   String[] includes() default {};
