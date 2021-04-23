@@ -37,6 +37,7 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
@@ -99,7 +100,7 @@ public class DslProcessor extends JavaGeneratingProcessor {
               for (Method m : current.getMethods()) {
                 TypeRef returnType = m.getReturnType();
                 if (returnType instanceof ClassRef) {
-                  TypeDef toUnwrap = ((ClassRef) returnType).getDefinition();
+                  TypeDef toUnwrap = GetDefinition.of((ClassRef) returnType);
                   methods
                       .add(new MethodBuilder(m).withReturnType(Generics.UNWRAP.apply(toUnwrap).toInternalReference()).build());
                 } else if (returnType.getAttributes().containsKey(ORIGINAL_REF)) {

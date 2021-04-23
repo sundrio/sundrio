@@ -43,6 +43,7 @@ import java.util.function.Function;
 
 import javax.lang.model.element.Modifier;
 
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -94,7 +95,7 @@ public class Combine {
       if (interfaces.isEmpty()) {
         interfaces.add(fallback);
         terminatingTypes.addAll(getTerminatingTypes(fallback));
-        for (TypeParamDef candidate : extractParameters(fallback.getDefinition())) {
+        for (TypeParamDef candidate : extractParameters(GetDefinition.of(fallback))) {
           if (!candidate.equals(TRANSPARENT)) {
             parameters.add(candidate);
           }
@@ -211,7 +212,7 @@ public class Combine {
     public String apply(Collection<ClassRef> types) {
       final Function<ClassRef, String> toString = new Function<ClassRef, String>() {
         public String apply(ClassRef item) {
-          return stripSuffix(item.getDefinition().getName());
+          return stripSuffix(item.getName());
         }
       };
 
@@ -219,7 +220,7 @@ public class Combine {
 
       return toInterfaceName(prefix + StringUtils.compact(StringUtils.join(types, new Function<ClassRef, String>() {
         public String apply(ClassRef item) {
-          String str = stripPrefix(stripSuffix(item.getDefinition().getName()));
+          String str = stripPrefix(stripSuffix(item.getName()));
           if (str.length() > prefix.length()) {
             return str.substring(prefix.length());
           } else {
@@ -235,7 +236,7 @@ public class Combine {
     public String apply(List<ClassRef> types) {
       Iterator<ClassRef> iterator = types.iterator();
       if (iterator.hasNext()) {
-        return iterator.next().getDefinition().getPackageName();
+        return iterator.next().getPackageName();
       }
       return "";
     }
@@ -322,7 +323,7 @@ public class Combine {
   private static String createKeyForClasses(Collection<ClassRef> alternatives) {
     List<TypeDef> typeDefs = new LinkedList<TypeDef>();
     for (ClassRef classRef : alternatives) {
-      typeDefs.add(classRef.getDefinition());
+      typeDefs.add(GetDefinition.of(classRef));
     }
     return createKeyForTypes(typeDefs);
   }

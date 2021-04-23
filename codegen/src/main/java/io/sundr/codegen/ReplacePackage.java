@@ -82,7 +82,7 @@ public class ReplacePackage implements Visitor<Builder> {
 
     List<TypeRef> updatedArguments = new ArrayList<TypeRef>();
     for (TypeRef arg : builder.getArguments()) {
-      if (arg instanceof ClassRef && ((ClassRef) arg).getDefinition().getPackageName().equals(target)) {
+      if (arg instanceof ClassRef && ((ClassRef) arg).getPackageName().equals(target)) {
         updatedArguments.add(new ClassRefBuilder((ClassRef) arg).accept(visitor).build());
       } else {
         updatedArguments.add(arg);
@@ -99,7 +99,7 @@ public class ReplacePackage implements Visitor<Builder> {
       Set<ClassRef> updatedImports = new LinkedHashSet<ClassRef>();
 
       for (ClassRef classRef : (Set<ClassRef>) builder.getAttributes().get(TypeDef.ALSO_IMPORT)) {
-        if (target.equals(classRef.getDefinition().getPackageName())) {
+        if (target.equals(classRef.getPackageName())) {
           updatedImports.add(new ClassRefBuilder(classRef).accept(this).build());
         } else {
           updatedImports.add(classRef);

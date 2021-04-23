@@ -37,6 +37,7 @@ import javax.lang.model.element.Modifier;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.ClassRefBuilder;
 import io.sundr.codegen.model.Kind;
@@ -68,7 +69,7 @@ public final class PropertyAs {
           .apply(item.getTypeRef());
 
       if (unwrapped instanceof ClassRef) {
-        TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
+        TypeDef baseType = GetDefinition.of((ClassRef) unwrapped);
         ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType).toReference();
 
         TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
@@ -156,7 +157,7 @@ public final class PropertyAs {
       //TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
 
       if (unwrapped instanceof ClassRef) {
-        TypeDef baseType = ((ClassRef) unwrapped).getDefinition();
+        TypeDef baseType = GetDefinition.of((ClassRef) unwrapped);
         TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
 
         TypeDef nestedType = NESTED_INTERFACE_TYPE.apply(item);
@@ -229,7 +230,7 @@ public final class PropertyAs {
 
       if (typeDef == null) {
         if (typeRef instanceof ClassRef) {
-          typeDef = ((ClassRef) typeRef).getDefinition();
+          typeDef = GetDefinition.of((ClassRef) typeRef);
         } else {
           throw new IllegalStateException(
               "Could not find definition from property: [" + item + "] neither in the repo nor via the object tree.");
@@ -282,7 +283,7 @@ public final class PropertyAs {
 
       if (typeDef == null) {
         if (typeRef instanceof ClassRef) {
-          typeDef = ((ClassRef) typeRef).getDefinition();
+          typeDef = GetDefinition.of((ClassRef) typeRef);
         } else {
           throw new IllegalStateException(
               "Could not find definition from property: [" + item + "] neither in the repo nor via the object tree.");
@@ -331,7 +332,7 @@ public final class PropertyAs {
 
       if (typeDef == null) {
         if (typeRef instanceof ClassRef) {
-          typeDef = ((ClassRef) typeRef).getDefinition();
+          typeDef = GetDefinition.of((ClassRef) typeRef);
         } else {
           throw new IllegalStateException(
               "Could not find definition from property: [" + property + "] neither in the repo nor via the object tree.");

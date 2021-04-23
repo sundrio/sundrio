@@ -41,6 +41,7 @@ import java.util.function.Function;
 
 import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.CodegenContext;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 import io.sundr.codegen.model.Kind;
 import io.sundr.codegen.model.Method;
@@ -175,7 +176,7 @@ public class Nodes {
               List<ClassRef> updatedInterfaces = new ArrayList<ClassRef>();
               for (ClassRef interfaceRef : builder.getExtendsList()) {
                 if (interfaceRef.equals(selfRef)) {
-                  updatedInterfaces.add(selfRef.getDefinition().toReference(reCombinedRef));
+                  updatedInterfaces.add(GetDefinition.of(selfRef).toReference(reCombinedRef));
                 } else {
                   updatedInterfaces.add(interfaceRef);
                 }
@@ -201,7 +202,7 @@ public class Nodes {
           //If we have a couple of classes to combine that are non-multiple
           // we may end up with intermediate garbage in the registry, which are masking the real thing
           if (!isTransition(nextClazz) && nextClazzDef != null && DslContextManager.getContext().getDefinitionRepository()
-              .getDefinition(nextClazz.getDefinition().getFullyQualifiedName()) == null) {
+              .getDefinition(nextClazz.getFullyQualifiedName()) == null) {
             DslContextManager.getContext().getDefinitionRepository().register(nextClazzDef, IS_GENERATED);
           }
           return transition(clazz, nextClazz);
@@ -285,8 +286,8 @@ public class Nodes {
 
           result.removeAll(scopeClasses);
           TypeDef typeDef = new TypeDefBuilder(clazz).withKind(Kind.INTERFACE)
-              .withPackageName(scopeInterface.getDefinition().getPackageName())
-              .withName(scopeInterface.getDefinition().getName() + SCOPE_SUFFIX).withExtendsList(scopeInterface).withMethods()
+              .withPackageName(scopeInterface.getPackageName())
+              .withName(scopeInterface.getName() + SCOPE_SUFFIX).withExtendsList(scopeInterface).withMethods()
               .addToAttributes(CARDINALITY_MULTIPLE, multiple).addToAttributes(KEYWORDS, scopeKeywords(scopeClasses))
               .accept(new TypedVisitor<TypeDefBuilder>() {
                 public void visit(TypeDefBuilder builder) {

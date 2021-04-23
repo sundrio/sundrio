@@ -34,6 +34,10 @@ public class GetDefinition implements Function<ClassRef, TypeDef> {
 
   public static GetDefinition FUNCTION = new GetDefinition();
 
+  public static TypeDef of(ClassRef classRef) {
+    return FUNCTION.apply(classRef);
+  }
+
   @Override
   public TypeDef apply(ClassRef t) {
     String fullyQualifiedName = t.getFullyQualifiedName();

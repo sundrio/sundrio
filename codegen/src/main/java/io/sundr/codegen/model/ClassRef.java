@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.utils.StringUtils;
 
 public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
@@ -43,10 +42,6 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
     this.dimensions = dimensions;
     this.arguments = arguments;
     this.fullyQualifiedName = fullyQualifiedName;
-  }
-
-  public TypeDef getDefinition() {
-    return map(GetDefinition.FUNCTION);
   }
 
   public String getFullyQualifiedName() {

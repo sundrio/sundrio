@@ -21,6 +21,7 @@ import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.model.ClassRef;
 
 public class TypeNamed extends BaseMatcher<ClassRef> {
@@ -34,7 +35,7 @@ public class TypeNamed extends BaseMatcher<ClassRef> {
   public boolean matches(Object item) {
     if (item instanceof ClassRef) {
       ClassRef type = (ClassRef) item;
-      if (type.getDefinition().toString().equals(expectedValue)) {
+      if (GetDefinition.of(type).toString().equals(expectedValue)) {
         return true;
       }
     }

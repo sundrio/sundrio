@@ -38,6 +38,7 @@ import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.visitors.InitEnricher;
+import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.TypeAssignalbe;
 import io.sundr.codegen.model.AnnotationRef;
 import io.sundr.codegen.model.ClassRef;
@@ -93,7 +94,7 @@ public class Descendants {
             if (unwrapped instanceof ClassRef) {
               ClassRef candidate = (ClassRef) unwrapped;
 
-              for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
+              for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(GetDefinition.of(candidate))) {
                 ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
                     .build();
 
@@ -124,7 +125,7 @@ public class Descendants {
             if (unwrapped instanceof ClassRef) {
               ClassRef candidate = (ClassRef) unwrapped;
 
-              for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
+              for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(GetDefinition.of(candidate))) {
                 ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
                     .build();
 
@@ -152,7 +153,7 @@ public class Descendants {
             }
           } else if (baseType instanceof ClassRef) {
             ClassRef candidate = (ClassRef) baseType;
-            for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(candidate.getDefinition())) {
+            for (TypeDef descendant : BUILDABLE_DECENDANTS.apply(GetDefinition.of(candidate))) {
               ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
                   .build();
 
