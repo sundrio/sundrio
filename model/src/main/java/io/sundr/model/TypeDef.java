@@ -16,6 +16,7 @@
 
 package io.sundr.model;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,15 +30,8 @@ import java.util.stream.Collectors;
 
 public class TypeDef extends ModifierSupport implements Renderable, Nameable, Mappable<TypeDef> {
 
-  public static TypeDef OBJECT = new TypeDefBuilder()
-      .withPackageName(JAVA_LANG)
-      .withName("Object")
-      .build();
-
-  public static TypeDef ENUM = new TypeDefBuilder()
-      .withPackageName(JAVA_LANG)
-      .withName("Enum")
-      .build();
+  public static TypeDef OBJECT = new TypeDef(JAVA_LANG_OBJECT);
+  public static TypeDef ENUM = new TypeDef(JAVA_LANG_ENUM);
 
   public static ClassRef OBJECT_REF = OBJECT.toReference();
   public static ClassRef ENUM_REF = ENUM.toReference();
@@ -78,6 +72,23 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
     this.innerTypes = setOuterType(innerTypes, this);
   }
 
+  protected TypeDef(String fullyQualifiedName) {
+    super(Modifier.PUBLIC, Collections.emptyMap());
+    this.kind = Kind.CLASS;
+    this.name = Nameable.getClassName(fullyQualifiedName);
+    this.packageName = Nameable.getPackageName(fullyQualifiedName);
+    this.comments = Collections.emptyList();
+    this.annotations = Collections.emptyList();
+    this.extendsList = Collections.emptyList();
+    this.implementsList = Collections.emptyList();
+    this.parameters = Collections.emptyList();
+    this.properties = Collections.emptyList();
+    this.constructors = Collections.emptyList();
+    this.methods = Collections.emptyList();
+    this.innerTypes = Collections.emptyList();
+    this.outerTypeName = null;
+  }
+
   /**
    * The method adapts constructor method to the current class. It unsets any name that may be
    * presetn in the method. It also sets as a return type a reference to the current type.
@@ -85,10 +96,9 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
   private static List<Method> adaptConstructors(List<Method> methods, TypeDef target) {
     List<Method> adapted = new ArrayList<Method>();
     for (Method m : methods) {
-      adapted.add(new MethodBuilder(m)
-          .withName(null)
-          .withReturnType(target.toUnboundedReference())
-          .build());
+      adapted.add(new Method(m.getComments(), m.getAnnotations(), m.getParameters(), /* constructors don't have names */ null,
+          target.toUnboundedReference(), m.getArguments(), m.isVarArgPreferred(), m.getExceptions(), false, m.getBlock(),
+          m.getModifiers(), m.getAttributes()));
     }
     return adapted;
   }
@@ -99,8 +109,10 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
       if (outer.getFullyQualifiedName().equals(typeDef.getOuterTypeName())) {
         updated.add(typeDef);
       } else {
-        updated.add(new TypeDefBuilder(typeDef).withOuterTypeName(outer.getFullyQualifiedName())
-            .withPackageName(outer.getPackageName()).build());
+        updated.add(new TypeDef(typeDef.getKind(), outer.getPackageName(), typeDef.getName(), typeDef.getComments(),
+            typeDef.getAnnotations(), typeDef.getExtendsList(), typeDef.getImplementsList(), typeDef.getParameters(),
+            typeDef.getProperties(), typeDef.getConstructors(), typeDef.getMethods(), outer.getFullyQualifiedName(),
+            typeDef.getInnerTypes(), typeDef.getModifiers(), typeDef.getAttributes()));
       }
     }
     return updated;
@@ -230,11 +242,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
         actualArguments.add(new WildcardRef());
       }
     }
-    return new ClassRefBuilder()
-        .withFullyQualifiedName(this.getFullyQualifiedName())
-        .withArguments(actualArguments)
-        .withAttributes(getAttributes())
-        .build();
+    return new ClassRef(this.getFullyQualifiedName(), 0, actualArguments, getAttributes());
   }
 
   /**
@@ -251,11 +259,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
         actualArguments.add(new WildcardRef());
       }
     }
-    return new ClassRefBuilder()
-        .withFullyQualifiedName(this.getFullyQualifiedName())
-        .withArguments(actualArguments)
-        .withAttributes(getAttributes())
-        .build();
+    return new ClassRef(this.getFullyQualifiedName(), 0, actualArguments, getAttributes());
   }
 
   /**
@@ -276,21 +280,15 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
     for (TypeParamDef parameter : parameters) {
       arguments.add(parameter.toReference());
     }
-    return new ClassRefBuilder()
-        .withFullyQualifiedName(this.getFullyQualifiedName())
-        .withArguments(arguments)
-        .withAttributes(getAttributes())
-        .build();
+
+    return new ClassRef(getFullyQualifiedName(), 0, arguments, getAttributes());
   }
 
   /**
    * Creates a {@link ClassRef} without bounds.
    */
   public ClassRef toUnboundedReference() {
-    return new ClassRefBuilder()
-        .withFullyQualifiedName(this.getFullyQualifiedName())
-        .withArguments(new TypeRef[0])
-        .build();
+    return new ClassRef(getFullyQualifiedName(), 0, Collections.emptyList(), getAttributes());
   }
 
   public Set<String> getImports() {

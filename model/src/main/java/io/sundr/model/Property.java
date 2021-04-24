@@ -89,6 +89,13 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     return refs;
   }
 
+  /**
+   * This is only used for rendering method arguments, where we usually string modifiers.
+   */
+  protected Property withoutModiers() {
+    return new Property(annotations, typeRef, name, comments, 0, getAttributes());
+  }
+
   protected String getDefaultValue() {
     Object value = getAttribute(INIT);
     if (getTypeRef() instanceof ClassRef && ((ClassRef) getTypeRef()).getFullyQualifiedName().equals(JAVA_LANG_STRING)

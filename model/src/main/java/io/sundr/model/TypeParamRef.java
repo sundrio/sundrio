@@ -38,7 +38,7 @@ public class TypeParamRef extends TypeRef {
   }
 
   public TypeParamRef withDimensions(int dimensions) {
-    return new TypeParamRefBuilder(this).withDimensions(dimensions).build();
+    return new TypeParamRef(this.getName(), dimensions, getAttributes());
   }
 
   @Override

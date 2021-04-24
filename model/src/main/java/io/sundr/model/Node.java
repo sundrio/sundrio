@@ -53,5 +53,6 @@ public interface Node {
   String JAVA_LANG = "java.lang";
   String JAVA_LANG_STRING = "java.lang.String";
   String JAVA_LANG_OBJECT = "java.lang.Object";
+  String JAVA_LANG_ENUM = "java.lang.Enum";
 
 }
