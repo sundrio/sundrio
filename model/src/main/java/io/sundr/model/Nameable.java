@@ -42,8 +42,7 @@ public interface Nameable extends Node {
    * @return the name
    */
   default String getName() {
-    return Arrays.stream(getFullyQualifiedName().split(PACKAGE_SEPARATOR_REGEX)).filter(after(IS_UPPER_CASE))
-        .collect(Collectors.joining(DOT));
+    return getClassName(getFullyQualifiedName());
   }
 
   /**
@@ -52,7 +51,16 @@ public interface Nameable extends Node {
    * @return the package name.
    */
   default String getPackageName() {
-    return Arrays.stream(getFullyQualifiedName().split(PACKAGE_SEPARATOR_REGEX)).filter(until(IS_UPPER_CASE))
+    return getPackageName(getFullyQualifiedName());
+  }
+
+  static String getClassName(String fullyQualifiedName) {
+    return Arrays.stream(fullyQualifiedName.split(PACKAGE_SEPARATOR_REGEX)).filter(after(IS_UPPER_CASE))
+        .collect(Collectors.joining(DOT));
+  }
+
+  static String getPackageName(String fullyQualifiedName) {
+    return Arrays.stream(fullyQualifiedName.split(PACKAGE_SEPARATOR_REGEX)).filter(until(IS_UPPER_CASE))
         .collect(Collectors.joining(DOT));
   }
 

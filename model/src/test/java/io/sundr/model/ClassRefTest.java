@@ -19,20 +19,22 @@ package io.sundr.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
+
 import org.junit.Test;
 
 public class ClassRefTest {
 
+  ClassRef SOME_CLASS = new ClassRef("my.pkg.SomeClass", 0, Collections.emptyList(), Collections.emptyMap());
+
   @Test
   public void shouldGetClassName() throws Exception {
-    ClassRef c = new ClassRefBuilder().withFullyQualifiedName("my.pkg.SomeClass").build();
-    assertEquals("SomeClass", c.getName());
+    assertEquals("SomeClass", SOME_CLASS.getName());
   }
 
   @Test
   public void shouldGetPackageName() throws Exception {
-    ClassRef c = new ClassRefBuilder().withFullyQualifiedName("my.pkg.SomeClass").build();
-    assertEquals("my.pkg", c.getPackageName());
+    assertEquals("my.pkg", SOME_CLASS.getPackageName());
   }
 
 }

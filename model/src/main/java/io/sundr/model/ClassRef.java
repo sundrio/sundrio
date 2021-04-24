@@ -16,6 +16,7 @@
 
 package io.sundr.model;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,7 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
   public static final String UNKNOWN = "<unknown>";
   public static final String BRACKETS = "[]";
 
-  public static final ClassRef OBJECT = new ClassRefBuilder()
-      .withFullyQualifiedName("java.lang.Object")
-      .build();
+  public static final ClassRef OBJECT = new ClassRef(JAVA_LANG_OBJECT, 0, Collections.emptyList(), Collections.emptyMap());
 
   private final String fullyQualifiedName;
   private final int dimensions;
@@ -56,7 +55,7 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
   }
 
   public ClassRef withDimensions(int dimensions) {
-    return new ClassRefBuilder(this).withDimensions(dimensions).build();
+    return new ClassRef(this.getFullyQualifiedName(), dimensions, getArguments(), getAttributes());
   }
 
   public Set<ClassRef> getReferences() {

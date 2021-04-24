@@ -222,7 +222,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
 
     sb.append(OP);
     if (!varArgPreferred) {
-      sb.append(arguments.stream().map(a -> (String) new PropertyBuilder(a).withModifiers(0).build().render(enclosingType))
+      sb.append(arguments.stream().map(a -> (String) a.withoutModiers().render(enclosingType))
           .collect(Collectors.joining(COMA)));
     } else if (!arguments.isEmpty()) {
       List<Property> args = arguments.subList(0, arguments.size() - 1);
@@ -313,7 +313,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
 
     sb.append(OP);
     if (!varArgPreferred) {
-      sb.append(arguments.stream().map(a -> (String) new PropertyBuilder(a).withModifiers(0).build().toString())
+      sb.append(arguments.stream().map(a -> (String) a.withoutModiers().toString())
           .collect(Collectors.joining(COMA)));
     } else if (!arguments.isEmpty()) {
       List<Property> args = arguments.subList(0, arguments.size() - 1);

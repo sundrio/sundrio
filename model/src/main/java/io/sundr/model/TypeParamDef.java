@@ -62,10 +62,7 @@ public class TypeParamDef extends AttributeSupport implements Renderable {
   }
 
   public TypeParamRef toReference() {
-    return new TypeParamRefBuilder()
-        .withName(name)
-        .withAttributes(getAttributes())
-        .build();
+    return new TypeParamRef(name, 0, getAttributes());
   }
 
   @Override

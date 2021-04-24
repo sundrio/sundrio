@@ -38,7 +38,7 @@ public class PrimitiveRef extends TypeRef {
   }
 
   public PrimitiveRef withDimensions(int dimensions) {
-    return new PrimitiveRefBuilder(this).withDimensions(dimensions).build();
+    return new PrimitiveRef(this.getName(), dimensions, getAttributes());
   }
 
   @Override
