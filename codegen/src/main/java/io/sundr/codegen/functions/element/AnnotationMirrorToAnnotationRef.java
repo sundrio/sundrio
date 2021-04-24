@@ -29,10 +29,10 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
 
 import io.sundr.codegen.converters.TypeRefTypeVisitor;
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.AnnotationRefBuilder;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.ClassRef;
+import io.sundr.model.TypeRef;
 
 public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirror, AnnotationRef> {
 

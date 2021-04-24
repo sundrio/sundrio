@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.codegen.functions.Collections;
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.AttributeKey;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.AttributeKey;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Property;
+import io.sundr.model.PropertyBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamRef;
 
 public class Constants {
 

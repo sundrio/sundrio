@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import io.sundr.codegen.model.*;
 import io.sundr.example.*;
+import io.sundr.model.*;
 
 public class ClassToTypeDefTest {
 

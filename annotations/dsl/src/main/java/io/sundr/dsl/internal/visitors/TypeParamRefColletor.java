@@ -19,9 +19,9 @@ package io.sundr.dsl.internal.visitors;
 import java.util.Collection;
 
 import io.sundr.builder.TypedVisitor;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.TypeParamRef;
+import io.sundr.model.TypeRef;
 
 public class TypeParamRefColletor extends TypedVisitor<ClassRefBuilder> {
 

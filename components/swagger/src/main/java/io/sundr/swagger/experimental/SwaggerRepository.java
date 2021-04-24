@@ -23,9 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
 public class SwaggerRepository {
 

@@ -27,8 +27,8 @@ import javax.lang.model.element.VariableElement;
 
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.element.ElementContext;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.model.Kind;
+import io.sundr.model.TypeDefBuilder;
 
 public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Void> {
 

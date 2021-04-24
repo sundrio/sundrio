@@ -27,12 +27,12 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.VariableElement;
 
 import io.sundr.codegen.CodegenContext;
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.Property;
+import io.sundr.model.PropertyBuilder;
+import io.sundr.model.TypeRef;
 
 public class VariableElementToProperty implements Function<VariableElement, Property> {
 

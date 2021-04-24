@@ -23,7 +23,7 @@ import static io.sundr.dsl.internal.utils.GraphUtils.getMethods;
 import java.util.Collection;
 import java.util.Set;
 
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 /**
  * Function that determines if a set of visited keywords contains ALL of the specified requirements.

@@ -19,13 +19,16 @@ package io.sundr.codegen.utils;
 import static io.sundr.codegen.Constants.VOID;
 import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 
+import java.util.Arrays;
+
 import io.sundr.SundrException;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Assignable;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.Property;
+import io.sundr.model.StringStatement;
+import io.sundr.model.TypeDef;
 
 public class Getter {
 
@@ -198,7 +201,7 @@ public class Getter {
         .withName(name(property))
         .withReturnType(property.getTypeRef())
         .withNewBlock()
-        .addNewStringStatementStatement("return this." + property + ";")
+        .withProvider(() -> Arrays.asList(new StringStatement("return this." + property + ";")))
         .endBlock()
         .build();
   }

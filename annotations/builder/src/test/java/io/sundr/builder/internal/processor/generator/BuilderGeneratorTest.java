@@ -26,8 +26,8 @@ import org.junit.Test;
 
 import io.sundr.builder.Constants;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 
 public class BuilderGeneratorTest {
 

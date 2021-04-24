@@ -25,7 +25,7 @@ import javax.lang.model.type.TypeMirror;
 import io.sundr.FunctionFactory;
 import io.sundr.codegen.functions.element.ElementContext;
 import io.sundr.codegen.functions.element.TypeElementToTypeDef;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public class ElementTo {
 

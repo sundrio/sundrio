@@ -26,8 +26,8 @@ import java.util.stream.Stream;
 
 import io.sundr.FunctionFactory;
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.*;
-import io.sundr.codegen.model.Method;
+import io.sundr.model.*;
+import io.sundr.model.Method;
 
 public class ClassTo {
 

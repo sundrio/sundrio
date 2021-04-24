@@ -21,10 +21,10 @@ import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.codegen.model.Attributeable.ALSO_IMPORT;
-import static io.sundr.codegen.model.Attributeable.INIT;
-import static io.sundr.codegen.model.Attributeable.INIT_FUNCTION;
-import static io.sundr.codegen.model.Attributeable.LAZY_INIT;
+import static io.sundr.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.model.Attributeable.INIT;
+import static io.sundr.model.Attributeable.INIT_FUNCTION;
+import static io.sundr.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 
 import java.util.Arrays;
@@ -37,12 +37,12 @@ import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.Optionals;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Kind;
+import io.sundr.model.Property;
+import io.sundr.model.PropertyBuilder;
+import io.sundr.model.TypeRef;
 import io.sundr.codegen.utils.TypeUtils;
 
 public class InitEnricher extends TypedVisitor<PropertyBuilder> {

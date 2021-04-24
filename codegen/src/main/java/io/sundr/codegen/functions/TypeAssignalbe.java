@@ -19,9 +19,9 @@ package io.sundr.codegen.functions;
 
 import java.util.function.Function;
 
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Node;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Node;
+import io.sundr.model.TypeDef;
 
 public class TypeAssignalbe implements Function<TypeDef, Boolean> {
 

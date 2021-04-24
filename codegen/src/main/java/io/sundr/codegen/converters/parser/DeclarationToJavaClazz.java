@@ -24,9 +24,9 @@ import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.model.Kind;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 
 public class DeclarationToJavaClazz implements Function<ClassOrInterfaceDeclaration, TypeDef> {
 

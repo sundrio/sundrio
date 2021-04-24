@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.directives;
 
-import static io.sundr.codegen.model.Attributeable.INIT;
+import static io.sundr.model.Attributeable.INIT;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -27,7 +27,7 @@ import org.apache.velocity.runtime.parser.node.Node;
 
 import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionScope;
-import io.sundr.codegen.model.Property;
+import io.sundr.model.Property;
 
 public class FieldDirective extends Directive {
 

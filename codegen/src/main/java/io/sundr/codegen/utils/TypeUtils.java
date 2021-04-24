@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.utils;
 
-import static io.sundr.codegen.model.TypeDef.OBJECT;
+import static io.sundr.model.TypeDef.OBJECT;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,16 +34,16 @@ import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.PrimitiveRef;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeParamRefBuilder;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.PrimitiveRef;
+import io.sundr.model.Property;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
+import io.sundr.model.TypeParamRef;
+import io.sundr.model.TypeParamRefBuilder;
+import io.sundr.model.TypeRef;
 
 public final class TypeUtils {
 
@@ -158,7 +158,7 @@ public final class TypeUtils {
   }
 
   /**
-   * Sets one {@link io.sundr.codegen.model.TypeDef} as a generic of an other.
+   * Sets one {@link io.sundr.model.TypeDef} as a generic of an other.
    *
    * @param base The base type.
    * @param parameters The parameter types.
@@ -171,7 +171,7 @@ public final class TypeUtils {
   }
 
   /**
-   * Sets one {@link io.sundr.codegen.model.TypeDef} as a super class of an other.
+   * Sets one {@link io.sundr.model.TypeDef} as a super class of an other.
    *
    * @param base The base type.
    * @param superClass The super type.
@@ -184,7 +184,7 @@ public final class TypeUtils {
   }
 
   /**
-   * Sets one {@link io.sundr.codegen.model.TypeDef} as an interface of an other.
+   * Sets one {@link io.sundr.model.TypeDef} as an interface of an other.
    *
    * @param base The base type.
    * @param superClass The super type.

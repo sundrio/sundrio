@@ -31,11 +31,11 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import io.sundr.codegen.model.AttributeKey;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.AttributeKey;
+import io.sundr.model.ClassRef;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeRef;
 
 public class DefinitionRepository {
 

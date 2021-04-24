@@ -28,12 +28,12 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.Method;
+import io.sundr.model.Property;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeRef;
 
 public class ElementContext {
 

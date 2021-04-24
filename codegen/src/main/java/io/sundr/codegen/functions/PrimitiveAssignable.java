@@ -19,10 +19,10 @@ package io.sundr.codegen.functions;
 
 import java.util.function.Function;
 
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Node;
-import io.sundr.codegen.model.PrimitiveRef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Node;
+import io.sundr.model.PrimitiveRef;
+import io.sundr.model.TypeRef;
 
 public class PrimitiveAssignable implements Function<PrimitiveRef, Boolean> {
 

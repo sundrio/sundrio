@@ -35,10 +35,10 @@ import com.sun.tools.javac.util.Context;
 
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.PrimitiveRef;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.PrimitiveRef;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
 @Ignore
 public class ConverterTest {

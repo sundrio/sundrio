@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.model;
+package io.sundr.model;
 
 import static org.junit.Assert.*;
 

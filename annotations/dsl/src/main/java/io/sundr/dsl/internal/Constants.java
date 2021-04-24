@@ -19,14 +19,14 @@ package io.sundr.dsl.internal;
 import java.util.Set;
 
 import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.model.AttributeKey;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeParamRefBuilder;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.AttributeKey;
+import io.sundr.model.ClassRef;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
+import io.sundr.model.TypeParamRef;
+import io.sundr.model.TypeParamRefBuilder;
+import io.sundr.model.TypeRef;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 
 public final class Constants {

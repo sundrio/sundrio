@@ -42,8 +42,8 @@ import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
 
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 import io.sundr.dsl.internal.processor.DslContext;
 import io.sundr.dsl.internal.type.functions.Combine;
 import io.sundr.dsl.internal.type.functions.Generics;

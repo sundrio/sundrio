@@ -26,10 +26,10 @@ import javax.lang.model.type.TypeMirror;
 
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.converters.TypeRefTypeVisitor;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.TypeRef;
+import io.sundr.model.VoidRef;
 
 public class TypeMirrorToTypeRef implements Function<TypeMirror, TypeRef> {
 
