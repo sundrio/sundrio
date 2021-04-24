@@ -26,9 +26,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.model.ClassRef;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 
 public class GetDefinition implements Function<ClassRef, TypeDef> {
 

@@ -24,10 +24,10 @@ import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
 
 public class ClassOrInterfaceTypeToTypeDef implements Function<ClassOrInterfaceType, TypeDef> {
 

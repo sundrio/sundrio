@@ -20,9 +20,9 @@ import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 
 import io.sundr.SundrException;
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.Method;
+import io.sundr.model.Property;
+import io.sundr.model.TypeDef;
 
 public class Setter {
 

@@ -51,16 +51,16 @@ import javax.lang.model.element.Modifier;
 
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.Attributeable;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.Attributeable;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeRef;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.annotations.Begin;
@@ -85,11 +85,11 @@ public final class TypeDefUtils {
   }
 
   /**
-   * Convert an {@link javax.lang.model.element.ExecutableElement} to a {@link io.sundr.codegen.model.TypeDef}
+   * Convert an {@link javax.lang.model.element.ExecutableElement} to a {@link io.sundr.model.TypeDef}
    *
    * @param context The context of the operation.
    * @param executableElement The target element.
-   * @return An instance of {@link io.sundr.codegen.model.TypeDef} that describes the interface.
+   * @return An instance of {@link io.sundr.model.TypeDef} that describes the interface.
    */
   public static TypeDef executableToInterface(DslContext context, ExecutableElement executableElement) {
     //Do generate the interface
@@ -188,11 +188,11 @@ public final class TypeDefUtils {
 
   /**
    * Convert a {@link Collection} of {@link javax.lang.model.element.ExecutableElement}s to a {@link java.util.Set} of
-   * {@link io.sundr.codegen.model.TypeDef}es.
+   * {@link io.sundr.model.TypeDef}es.
    *
    * @param context The context of the operation.
    * @param elements The target elements.
-   * @return A set of {@link io.sundr.codegen.model.TypeDef} that describes the interfaces.
+   * @return A set of {@link io.sundr.model.TypeDef} that describes the interfaces.
    */
   public static Set<TypeDef> executablesToInterfaces(DslContext context, Collection<ExecutableElement> elements) {
     Map<String, TypeDef> byName = new LinkedHashMap<String, TypeDef>();

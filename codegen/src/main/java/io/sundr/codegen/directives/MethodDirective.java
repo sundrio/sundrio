@@ -30,7 +30,7 @@ import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
 
 import io.sundr.codegen.DefinitionScope;
-import io.sundr.codegen.model.Method;
+import io.sundr.model.Method;
 
 public class MethodDirective extends Directive {
 

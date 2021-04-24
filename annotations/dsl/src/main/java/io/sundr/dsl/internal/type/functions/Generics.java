@@ -29,14 +29,14 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.sundr.builder.TypedVisitor;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
+import io.sundr.model.TypeParamRef;
+import io.sundr.model.TypeRef;
 
 public class Generics {
 

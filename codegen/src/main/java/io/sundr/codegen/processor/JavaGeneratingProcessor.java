@@ -32,7 +32,7 @@ import javax.tools.StandardLocation;
 import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.generator.CodeGeneratorContext;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public abstract class JavaGeneratingProcessor extends AbstractProcessor {
 
@@ -41,7 +41,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
   protected CodeGeneratorContext context = new CodeGeneratorContext();
 
   /**
-   * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
+   * Generates a source file from the specified {@link io.sundr.model.TypeDef}.
    *
    * @param model The model of the class to generate.
    * @param resourceName The template to use.
@@ -58,7 +58,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
   }
 
   /**
-   * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
+   * Generates a source file from the specified {@link io.sundr.model.TypeDef}.
    *
    * @param model The model of the class to generate.
    * @param fileObject Where to save the generated class.
@@ -82,7 +82,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
   }
 
   /**
-   * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
+   * Generates a source file from the specified {@link io.sundr.model.TypeDef}.
    *
    * @param model The model of the class to generate.
    * @param content The template to use.
@@ -103,7 +103,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
   }
 
   /**
-   * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
+   * Generates a source file from the specified {@link io.sundr.model.TypeDef}.
    *
    * @param model The model of the class to generate.
    * @param parameters The external parameters to pass to the template.
@@ -137,7 +137,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
   }
 
   /**
-   * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
+   * Generates a source file from the specified {@link io.sundr.model.TypeDef}.
    *
    * @param model The model of the class to generate.
    * @param outputPath Where to save the generated class.
@@ -149,7 +149,7 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
   }
 
   /**
-   * Generates a source file from the specified {@link io.sundr.codegen.model.TypeDef}.
+   * Generates a source file from the specified {@link io.sundr.model.TypeDef}.
    *
    * @param model The model of the class to generate.
    * @param outputPath Where to save the generated class.

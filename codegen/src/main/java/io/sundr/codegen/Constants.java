@@ -27,13 +27,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import io.sundr.codegen.model.PrimitiveRef;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRef;
-import io.sundr.codegen.model.WildcardRef;
+import io.sundr.model.PrimitiveRef;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamRef;
+import io.sundr.model.TypeRef;
+import io.sundr.model.VoidRef;
+import io.sundr.model.WildcardRef;
 
 public class Constants {
 

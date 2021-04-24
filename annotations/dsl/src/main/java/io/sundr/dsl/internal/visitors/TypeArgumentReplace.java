@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.sundr.builder.TypedVisitor;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.TypeRef;
 
 public class TypeArgumentReplace extends TypedVisitor<ClassRefBuilder> {
 

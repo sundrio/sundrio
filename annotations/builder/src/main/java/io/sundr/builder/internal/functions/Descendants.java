@@ -40,14 +40,14 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.TypeAssignalbe;
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Kind;
+import io.sundr.model.Property;
+import io.sundr.model.PropertyBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
 public class Descendants {
 

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public class NodeRepository {
 

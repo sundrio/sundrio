@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.function.Function;
 
 import io.sundr.FunctionFactory;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
 public class Collections {
 

@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.sundr.builder.TypedVisitor;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
 
 public class TypeParamDefReplace extends TypedVisitor<TypeDefBuilder> {
 

@@ -57,35 +57,35 @@ import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.AnnotationRef;
-import io.sundr.codegen.model.AnnotationRefBuilder;
-import io.sundr.codegen.model.AttributeKey;
-import io.sundr.codegen.model.Attributeable;
-import io.sundr.codegen.model.Block;
-import io.sundr.codegen.model.BlockBuilder;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.PrimitiveRef;
-import io.sundr.codegen.model.PrimitiveRefBuilder;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.PropertyBuilder;
-import io.sundr.codegen.model.StringStatement;
-import io.sundr.codegen.model.StringStatementBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
-import io.sundr.codegen.model.TypeParamRef;
-import io.sundr.codegen.model.TypeParamRefBuilder;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRef;
-import io.sundr.codegen.model.WildcardRef;
-import io.sundr.codegen.model.WildcardRefBuilder;
 import io.sundr.codegen.utils.IOUtils;
 import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.AttributeKey;
+import io.sundr.model.Attributeable;
+import io.sundr.model.Block;
+import io.sundr.model.BlockBuilder;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.PrimitiveRef;
+import io.sundr.model.PrimitiveRefBuilder;
+import io.sundr.model.Property;
+import io.sundr.model.PropertyBuilder;
+import io.sundr.model.StringStatement;
+import io.sundr.model.StringStatementBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
+import io.sundr.model.TypeParamRef;
+import io.sundr.model.TypeParamRefBuilder;
+import io.sundr.model.TypeRef;
+import io.sundr.model.VoidRef;
+import io.sundr.model.WildcardRef;
+import io.sundr.model.WildcardRefBuilder;
 
 public class Sources {
 
@@ -286,13 +286,15 @@ public class Sources {
 
   private static final Function<BlockStmt, Block> BLOCK = new Function<BlockStmt, Block>() {
     public Block apply(BlockStmt block) {
-      List<io.sundr.codegen.model.Statement> statements = new ArrayList<io.sundr.codegen.model.Statement>();
+      List<io.sundr.model.Statement> statements = new ArrayList<io.sundr.model.Statement>();
       if (block != null) {
         for (Statement stmt : block.getStmts()) {
           statements.add(STATEMENT.apply(stmt));
         }
       }
-      return new BlockBuilder().withStatements(statements).build();
+      return new BlockBuilder()
+          .withProvider(() -> statements)
+          .build();
     }
   };
 

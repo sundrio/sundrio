@@ -18,12 +18,12 @@ package io.sundr.dsl.internal.type.functions;
 
 import java.util.function.Function;
 
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Method;
+import io.sundr.model.Property;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
 
 public final class Merge {
 

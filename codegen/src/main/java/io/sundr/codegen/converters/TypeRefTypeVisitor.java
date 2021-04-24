@@ -34,11 +34,11 @@ import javax.lang.model.util.AbstractTypeVisitor6;
 
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.element.ElementContext;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.PrimitiveRefBuilder;
-import io.sundr.codegen.model.TypeParamRefBuilder;
-import io.sundr.codegen.model.TypeRef;
-import io.sundr.codegen.model.VoidRefBuilder;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.PrimitiveRefBuilder;
+import io.sundr.model.TypeParamRefBuilder;
+import io.sundr.model.TypeRef;
+import io.sundr.model.VoidRefBuilder;
 
 public class TypeRefTypeVisitor extends AbstractTypeVisitor6<TypeRef, Integer> {
 

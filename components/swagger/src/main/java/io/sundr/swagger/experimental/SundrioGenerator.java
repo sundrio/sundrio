@@ -25,12 +25,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.Property;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.Property;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 import io.swagger.codegen.ClientOptInput;
 import io.swagger.codegen.Generator;
 import io.swagger.codegen.ignore.CodegenIgnoreProcessor;

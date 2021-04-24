@@ -28,10 +28,10 @@ import com.sun.tools.javac.util.Context;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
+import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 
 public class ClazzAsTest {
 

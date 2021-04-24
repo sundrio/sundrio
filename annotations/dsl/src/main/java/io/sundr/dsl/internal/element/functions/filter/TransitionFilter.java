@@ -19,7 +19,7 @@ package io.sundr.dsl.internal.element.functions.filter;
 import java.util.Collection;
 import java.util.function.Function;
 
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 /**
  * A Function that determines if a set of visited keyword types satisfies some requirements.

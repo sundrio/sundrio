@@ -24,9 +24,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.ClassRefBuilder;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.TypeDef;
 
 public class CollectionsTest {
 

@@ -22,7 +22,7 @@ import org.junit.Test;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public class PareserTest {
 

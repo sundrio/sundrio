@@ -23,7 +23,7 @@ import java.util.function.Function;
 import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.TypeRef;
 
 public class TypeParameterToJavaType implements Function<TypeParameter, TypeRef> {
 

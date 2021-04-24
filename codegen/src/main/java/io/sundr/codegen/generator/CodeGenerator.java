@@ -29,7 +29,7 @@ import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 
 import io.sundr.codegen.DefinitionScope;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public class CodeGenerator<M> {
 

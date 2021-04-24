@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public class AndTransitionFilter implements TransitionFilter {
 

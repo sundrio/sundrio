@@ -24,9 +24,9 @@ import java.util.function.Function;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
 
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
+import io.sundr.model.ClassRef;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
 
 public class TypePrameterElementToTypeParamDef implements Function<TypeParameterElement, TypeParamDef> {
 

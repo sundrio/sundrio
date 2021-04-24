@@ -14,14 +14,14 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 import io.sundr.codegen.CodegenContext;
-import io.sundr.codegen.model.AttributeKey;
-import io.sundr.codegen.model.Attributeable;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.MethodBuilder;
-import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.model.AttributeKey;
+import io.sundr.model.Attributeable;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.TypeRef;
 
 public class ExecutableElementToMethod implements Function<ExecutableElement, Method> {
 

@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import io.sundr.builder.internal.functions.ToPojo;
 import io.sundr.codegen.functions.Sources;
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public class SimpleAnnotationTest extends AbstractProcessorTest {
 

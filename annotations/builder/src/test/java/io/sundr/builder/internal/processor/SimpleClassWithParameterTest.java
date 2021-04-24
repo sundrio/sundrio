@@ -24,10 +24,10 @@ import org.junit.Test;
 
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.codegen.functions.Sources;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
 public class SimpleClassWithParameterTest extends AbstractProcessorTest {
 

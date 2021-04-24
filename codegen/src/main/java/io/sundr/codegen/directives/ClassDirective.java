@@ -25,7 +25,7 @@ import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import io.sundr.codegen.model.TypeDef;
+import io.sundr.model.TypeDef;
 
 public class ClassDirective extends Directive {
 

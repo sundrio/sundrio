@@ -42,15 +42,15 @@ import javax.lang.model.util.ElementFilter;
 
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.ClassRef;
-import io.sundr.codegen.model.Kind;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeDefBuilder;
-import io.sundr.codegen.model.TypeParamDef;
-import io.sundr.codegen.model.TypeParamDefBuilder;
-import io.sundr.codegen.model.TypeRef;
 import io.sundr.codegen.utils.StringUtils;
 import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
+import io.sundr.model.TypeRef;
 
 public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
 

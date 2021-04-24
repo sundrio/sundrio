@@ -29,9 +29,9 @@ import com.sun.tools.javac.util.Context;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.TypeDef;
-import io.sundr.codegen.model.TypeRef;
+import io.sundr.model.Method;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
 public class AbstractProcessorTest {
 
