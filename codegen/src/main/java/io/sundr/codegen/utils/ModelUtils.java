@@ -42,9 +42,10 @@ public final class ModelUtils {
       throw new IllegalArgumentException("Invalid element. A package element can't be used to retrieve a class element");
     } else if (element instanceof TypeElement) {
       return (TypeElement) element;
-    } else {
+    } else if (element == null) {
+      return null;
+    } else
       return getClassElement(element.getEnclosingElement());
-    }
   }
 
   public static String getClassName(Element element) {
