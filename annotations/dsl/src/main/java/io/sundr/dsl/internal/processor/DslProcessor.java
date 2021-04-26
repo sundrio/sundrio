@@ -38,13 +38,6 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.model.ClassRef;
-import io.sundr.model.Kind;
-import io.sundr.model.Method;
-import io.sundr.model.MethodBuilder;
-import io.sundr.model.TypeDef;
-import io.sundr.model.TypeDefBuilder;
-import io.sundr.model.TypeRef;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.codegen.utils.TypeUtils;
@@ -54,6 +47,13 @@ import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.graph.functions.Nodes;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeRef;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {

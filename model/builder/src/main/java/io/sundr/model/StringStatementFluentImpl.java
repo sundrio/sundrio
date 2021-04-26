@@ -5,29 +5,31 @@ import java.lang.Object;
 import java.lang.String;
 import java.util.function.Supplier;
 
-public class StringStatementFluentImpl<A extends StringStatementFluent<A>> extends StatementFluentImpl<A>
+import io.sundr.builder.BaseFluent;
+
+public class StringStatementFluentImpl<A extends StringStatementFluent<A>> extends BaseFluent<A>
     implements StringStatementFluent<A> {
 
-  private Supplier<String> provider;
+  private Supplier<String> supplier;
 
   public StringStatementFluentImpl() {
   }
 
   public StringStatementFluentImpl(StringStatement instance) {
-    this.withProvider(instance.getProvider());
+    this.withSupplier(instance.getSupplier());
   }
 
-  public Supplier<String> getProvider() {
-    return this.provider;
+  public Supplier<String> getSupplier() {
+    return this.supplier;
   }
 
-  public <T> A withProvider(Supplier<String> provider) {
-    this.provider = provider;
+  public <T extends Object> A withSupplier(Supplier<String> supplier) {
+    this.supplier = supplier;
     return (A) this;
   }
 
-  public Boolean hasProvider() {
-    return this.provider != null;
+  public Boolean hasSupplier() {
+    return this.supplier != null;
   }
 
   public boolean equals(Object o) {
@@ -35,16 +37,14 @@ public class StringStatementFluentImpl<A extends StringStatementFluent<A>> exten
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    if (!super.equals(o))
-      return false;
     StringStatementFluentImpl that = (StringStatementFluentImpl) o;
-    if (provider != null ? !provider.equals(that.provider) : that.provider != null)
+    if (supplier != null ? !supplier.equals(that.supplier) : that.supplier != null)
       return false;
     return true;
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(provider, super.hashCode());
+    return java.util.Objects.hash(supplier, super.hashCode());
   }
 
 }

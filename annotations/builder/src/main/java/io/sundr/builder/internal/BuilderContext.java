@@ -30,10 +30,10 @@ import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.ReplacePackage;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Sources;
+import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
-import io.sundr.codegen.utils.TypeUtils;
 
 public class BuilderContext {
 

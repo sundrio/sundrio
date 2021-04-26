@@ -18,18 +18,18 @@ package io.sundr.model;
 
 import java.util.function.Supplier;
 
-public class StringStatement extends Statement {
+public class StringStatement implements Statement {
 
-  private final Supplier<String> provider;
+  private final Supplier<String> supplier;
   private final Object[] parameters;
 
-  public StringStatement(Supplier<String> provider) {
-    this.provider = provider;
+  public StringStatement(Supplier<String> supplier) {
+    this.supplier = supplier;
     this.parameters = new Object[] {};
   }
 
-  public StringStatement(Supplier<String> provider, Object[] parameters) {
-    this.provider = provider;
+  private StringStatement(Supplier<String> supplier, Object[] parameters) {
+    this.supplier = supplier;
     this.parameters = parameters;
   }
 
@@ -41,12 +41,12 @@ public class StringStatement extends Statement {
     this(() -> String.format(data, parameters));
   }
 
-  public Supplier<String> getProvider() {
-    return provider;
+  public Supplier<String> getSupplier() {
+    return supplier;
   }
 
   @Override
   public String toString() {
-    return provider.get();
+    return supplier.get();
   }
 }

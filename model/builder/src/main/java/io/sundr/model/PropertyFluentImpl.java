@@ -12,15 +12,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.Nested;
+import io.sundr.builder.VisitableBuilder;
 
 public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSupportFluentImpl<A> implements PropertyFluent<A> {
 
-  private List<AnnotationRefBuilder> annotations;
-  private io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> typeRef;
+  private List<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
+  private VisitableBuilder<? extends TypeRef, ?> typeRef;
   private String name;
-  private List<String> comments;
+  private List<String> comments = new ArrayList<String>();
 
   public PropertyFluentImpl() {
   }
@@ -606,7 +606,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<io.sundr.model.PropertyFluent.AnnotationsNested<N>>
-      implements io.sundr.model.PropertyFluent.AnnotationsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.PropertyFluent.AnnotationsNested<N>, Nested<N> {
     private final AnnotationRefBuilder builder;
     private final int index;
 
@@ -633,7 +633,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
 
   public class TypeParamRefTypeNestedImpl<N>
       extends TypeParamRefFluentImpl<io.sundr.model.PropertyFluent.TypeParamRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.TypeParamRefTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.PropertyFluent.TypeParamRefTypeNested<N>, Nested<N> {
     private final TypeParamRefBuilder builder;
 
     TypeParamRefTypeNestedImpl(TypeParamRef item) {
@@ -657,7 +657,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
 
   public class WildcardRefTypeNestedImpl<N>
       extends WildcardRefFluentImpl<io.sundr.model.PropertyFluent.WildcardRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.WildcardRefTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.PropertyFluent.WildcardRefTypeNested<N>, Nested<N> {
     private final WildcardRefBuilder builder;
 
     WildcardRefTypeNestedImpl(WildcardRef item) {
@@ -680,7 +680,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public class ClassRefTypeNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.PropertyFluent.ClassRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.ClassRefTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.PropertyFluent.ClassRefTypeNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
 
     ClassRefTypeNestedImpl(ClassRef item) {
@@ -704,7 +704,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
 
   public class PrimitiveRefTypeNestedImpl<N>
       extends PrimitiveRefFluentImpl<io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<N>, Nested<N> {
     private final PrimitiveRefBuilder builder;
 
     PrimitiveRefTypeNestedImpl(PrimitiveRef item) {
@@ -727,7 +727,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public class VoidRefTypeNestedImpl<N> extends VoidRefFluentImpl<io.sundr.model.PropertyFluent.VoidRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.VoidRefTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.PropertyFluent.VoidRefTypeNested<N>, Nested<N> {
     private final VoidRefBuilder builder;
 
     VoidRefTypeNestedImpl(VoidRef item) {

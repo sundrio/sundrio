@@ -3,10 +3,10 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.VisitableBuilder;
 
 public class TypeParamRefBuilder extends TypeParamRefFluentImpl<TypeParamRefBuilder>
-    implements io.sundr.model.builder.VisitableBuilder<TypeParamRef, TypeParamRefBuilder> {
+    implements VisitableBuilder<TypeParamRef, TypeParamRefBuilder> {
 
   TypeParamRefFluent<?> fluent;
   Boolean validationEnabled;

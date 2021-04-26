@@ -4,9 +4,9 @@ import java.lang.Boolean;
 import java.lang.Object;
 import java.util.Map;
 
-import io.sundr.model.builder.Fluent;
+import io.sundr.builder.Fluent;
 
-public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends io.sundr.model.builder.Fluent<A> {
+public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A> {
 
   public A addToAttributes(AttributeKey key, Object value);
 

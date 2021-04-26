@@ -19,7 +19,7 @@ package io.sundr.codegen;
 
 import io.sundr.builder.annotations.ExternalBuildables;
 
-@ExternalBuildables(generateBuilderPackage = true, builderPackage = "io.sundr.model.builder", lazyCollectionInitEnabled = true, includeAbstractClasses = true, includeInterfaces = false, value = "io.sundr.model", excludes = {
+@ExternalBuildables(lazyCollectionInitEnabled = false, lazyMapInitEnabled = false, includeAbstractClasses = true, includeInterfaces = false, value = "io.sundr.model", excludes = {
     "io.sundr.model.AttributeKey" })
 public class Config {
 

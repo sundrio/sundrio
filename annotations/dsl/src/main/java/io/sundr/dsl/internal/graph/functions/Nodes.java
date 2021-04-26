@@ -42,11 +42,6 @@ import java.util.function.Function;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.model.ClassRef;
-import io.sundr.model.Kind;
-import io.sundr.model.Method;
-import io.sundr.model.TypeDef;
-import io.sundr.model.TypeDefBuilder;
 import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.processor.DslContextManager;
@@ -55,6 +50,11 @@ import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.type.functions.Generify;
 import io.sundr.dsl.internal.utils.GraphUtils;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 
 public class Nodes {
 

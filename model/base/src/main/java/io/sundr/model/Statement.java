@@ -16,5 +16,5 @@
 
 package io.sundr.model;
 
-public class Statement {
+public interface Statement {
 }

@@ -3,10 +3,10 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.VisitableBuilder;
 
 public class AttributeSupportBuilder extends AttributeSupportFluentImpl<AttributeSupportBuilder>
-    implements io.sundr.model.builder.VisitableBuilder<AttributeSupport, AttributeSupportBuilder> {
+    implements VisitableBuilder<AttributeSupport, AttributeSupportBuilder> {
 
   AttributeSupportFluent<?> fluent;
   Boolean validationEnabled;

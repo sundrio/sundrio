@@ -3,10 +3,10 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.VisitableBuilder;
 
 public class StringStatementBuilder extends StringStatementFluentImpl<StringStatementBuilder>
-    implements io.sundr.model.builder.VisitableBuilder<StringStatement, StringStatementBuilder> {
+    implements VisitableBuilder<StringStatement, StringStatementBuilder> {
 
   StringStatementFluent<?> fluent;
   Boolean validationEnabled;
@@ -35,7 +35,7 @@ public class StringStatementBuilder extends StringStatementFluentImpl<StringStat
 
   public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withProvider(instance.getProvider());
+    fluent.withSupplier(instance.getSupplier());
     this.validationEnabled = validationEnabled;
   }
 
@@ -45,12 +45,12 @@ public class StringStatementBuilder extends StringStatementFluentImpl<StringStat
 
   public StringStatementBuilder(StringStatement instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withProvider(instance.getProvider());
+    this.withSupplier(instance.getSupplier());
     this.validationEnabled = validationEnabled;
   }
 
   public StringStatement build() {
-    StringStatement buildable = new StringStatement(fluent.getProvider());
+    StringStatement buildable = new StringStatement(fluent.getSupplier());
     return buildable;
   }
 

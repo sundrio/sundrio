@@ -45,10 +45,6 @@ import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_LIST;
 import static io.sundr.codegen.functions.Collections.IS_MAP;
 import static io.sundr.codegen.functions.Collections.IS_SET;
-import static io.sundr.model.Attributeable.ALSO_IMPORT;
-import static io.sundr.model.Attributeable.INIT;
-import static io.sundr.model.Attributeable.INIT_FUNCTION;
-import static io.sundr.model.Attributeable.LAZY_INIT;
 import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
@@ -61,6 +57,10 @@ import static io.sundr.codegen.utils.TypeUtils.isOptionalInt;
 import static io.sundr.codegen.utils.TypeUtils.isOptionalLong;
 import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
 import static io.sundr.codegen.utils.TypeUtils.isSet;
+import static io.sundr.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.model.Attributeable.INIT;
+import static io.sundr.model.Attributeable.INIT_FUNCTION;
+import static io.sundr.model.Attributeable.LAZY_INIT;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,11 +81,13 @@ import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.Singularize;
+import io.sundr.codegen.utils.Getter;
+import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.EditableMethod;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
@@ -95,9 +97,6 @@ import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
-import io.sundr.codegen.utils.Getter;
-import io.sundr.codegen.utils.StringUtils;
-import io.sundr.codegen.utils.TypeUtils;
 
 class ToMethod {
 
@@ -171,7 +170,7 @@ class ToMethod {
       this.customizer = customizer;
     }
 
-    private EditableMethod method(Property property, TypeRef unwrapped) {
+    private Method method(Property property, TypeRef unwrapped) {
       final MethodBuilder methodBuilder = new MethodBuilder()
           .withComments()
           .withAnnotations()
@@ -205,7 +204,7 @@ class ToMethod {
   private enum MatchingType {
     BUILD("item.build()", "null"), HAS("true", "false"), GET("item", "null"), REMOVE(null, null);
 
-    private EditableMethod method(Property property, TypeRef returnType, TypeDef predicate, TypeRef builderRef,
+    private Method method(Property property, TypeRef returnType, TypeDef predicate, TypeRef builderRef,
         List<AnnotationRef> annotations, List<String> comments) {
       return new MethodBuilder()
           .withComments(comments)

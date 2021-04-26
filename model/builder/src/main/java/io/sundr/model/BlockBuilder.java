@@ -3,10 +3,9 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.VisitableBuilder;
 
-public class BlockBuilder extends BlockFluentImpl<BlockBuilder>
-    implements io.sundr.model.builder.VisitableBuilder<Block, BlockBuilder> {
+public class BlockBuilder extends BlockFluentImpl<BlockBuilder> implements VisitableBuilder<Block, BlockBuilder> {
 
   BlockFluent<?> fluent;
   Boolean validationEnabled;
@@ -35,7 +34,7 @@ public class BlockBuilder extends BlockFluentImpl<BlockBuilder>
 
   public BlockBuilder(BlockFluent<?> fluent, Block instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withProvider(instance.getProvider());
+    fluent.withStatements(instance.getStatements());
     this.validationEnabled = validationEnabled;
   }
 
@@ -45,12 +44,12 @@ public class BlockBuilder extends BlockFluentImpl<BlockBuilder>
 
   public BlockBuilder(Block instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withProvider(instance.getProvider());
+    this.withStatements(instance.getStatements());
     this.validationEnabled = validationEnabled;
   }
 
   public Block build() {
-    Block buildable = new Block(fluent.getProvider());
+    Block buildable = new Block(fluent.getStatements());
     return buildable;
   }
 

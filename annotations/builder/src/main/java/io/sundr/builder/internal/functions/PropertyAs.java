@@ -38,6 +38,7 @@ import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.GetDefinition;
+import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
@@ -51,7 +52,6 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
-import io.sundr.codegen.utils.TypeUtils;
 
 public final class PropertyAs {
 

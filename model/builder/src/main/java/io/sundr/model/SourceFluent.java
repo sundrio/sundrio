@@ -7,10 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Fluent;
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Fluent;
+import io.sundr.builder.Nested;
 
-public interface SourceFluent<A extends SourceFluent<A>> extends io.sundr.model.builder.Fluent<A> {
+public interface SourceFluent<A extends SourceFluent<A>> extends Fluent<A> {
 
   public A addToTypes(int index, TypeDef item);
 
@@ -68,8 +68,7 @@ public interface SourceFluent<A extends SourceFluent<A>> extends io.sundr.model.
 
   public io.sundr.model.SourceFluent.TypesNested<A> editMatchingType(Predicate<TypeDefBuilder> predicate);
 
-  public interface TypesNested<N>
-      extends io.sundr.model.builder.Nested<N>, TypeDefFluent<io.sundr.model.SourceFluent.TypesNested<N>> {
+  public interface TypesNested<N> extends Nested<N>, TypeDefFluent<io.sundr.model.SourceFluent.TypesNested<N>> {
 
     public N and();
 

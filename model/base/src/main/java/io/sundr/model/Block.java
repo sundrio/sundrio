@@ -17,30 +17,17 @@
 package io.sundr.model;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 public class Block {
 
-  private final Supplier<List<Statement>> provider;
+  private List<Statement> statements;
 
-  public Block(Supplier<List<Statement>> provider) {
-    this.provider = provider;
-  }
-
-  public Block(final List<Statement> statements) {
-    this.provider = new Supplier<List<Statement>>() {
-      @Override
-      public List<Statement> get() {
-        return statements;
-      }
-    };
+  public Block(List<Statement> statements) {
+    this.statements = statements;
   }
 
   public List<Statement> getStatements() {
-    return provider.get();
+    return statements;
   }
 
-  public Supplier<List<Statement>> getProvider() {
-    return provider;
-  }
 }

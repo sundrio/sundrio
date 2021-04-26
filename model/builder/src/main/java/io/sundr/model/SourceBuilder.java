@@ -3,10 +3,9 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.VisitableBuilder;
 
-public class SourceBuilder extends SourceFluentImpl<SourceBuilder>
-    implements io.sundr.model.builder.VisitableBuilder<Source, SourceBuilder> {
+public class SourceBuilder extends SourceFluentImpl<SourceBuilder> implements VisitableBuilder<Source, SourceBuilder> {
 
   SourceFluent<?> fluent;
   Boolean validationEnabled;

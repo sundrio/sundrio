@@ -29,8 +29,8 @@ import io.sundr.FunctionFactory;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.codegen.functions.Collections;
-import io.sundr.model.*;
 import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.model.*;
 
 public class TypeAs {
   @SuppressWarnings("unchecked")

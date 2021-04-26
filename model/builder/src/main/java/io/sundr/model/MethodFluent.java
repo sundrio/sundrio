@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFluent<A> {
 
@@ -386,23 +386,22 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
   public io.sundr.model.MethodFluent.BlockNested<A> editOrNewBlockLike(Block item);
 
   public interface AnnotationsNested<N>
-      extends io.sundr.model.builder.Nested<N>, AnnotationRefFluent<io.sundr.model.MethodFluent.AnnotationsNested<N>> {
+      extends Nested<N>, AnnotationRefFluent<io.sundr.model.MethodFluent.AnnotationsNested<N>> {
 
     public N and();
 
     public N endAnnotation();
   }
 
-  public interface ParametersNested<N>
-      extends io.sundr.model.builder.Nested<N>, TypeParamDefFluent<io.sundr.model.MethodFluent.ParametersNested<N>> {
+  public interface ParametersNested<N> extends Nested<N>, TypeParamDefFluent<io.sundr.model.MethodFluent.ParametersNested<N>> {
 
     public N and();
 
     public N endParameter();
   }
 
-  public interface TypeParamRefReturnTypeNested<N> extends io.sundr.model.builder.Nested<N>,
-      TypeParamRefFluent<io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<N>> {
+  public interface TypeParamRefReturnTypeNested<N>
+      extends Nested<N>, TypeParamRefFluent<io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<N>> {
 
     public N and();
 
@@ -410,7 +409,7 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public interface WildcardRefReturnTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, WildcardRefFluent<io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<N>> {
+      extends Nested<N>, WildcardRefFluent<io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<N>> {
 
     public N and();
 
@@ -418,15 +417,15 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public interface ClassRefReturnTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.MethodFluent.ClassRefReturnTypeNested<N>> {
+      extends Nested<N>, ClassRefFluent<io.sundr.model.MethodFluent.ClassRefReturnTypeNested<N>> {
 
     public N and();
 
     public N endClassRefReturnType();
   }
 
-  public interface PrimitiveRefReturnTypeNested<N> extends io.sundr.model.builder.Nested<N>,
-      PrimitiveRefFluent<io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<N>> {
+  public interface PrimitiveRefReturnTypeNested<N>
+      extends Nested<N>, PrimitiveRefFluent<io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<N>> {
 
     public N and();
 
@@ -434,31 +433,28 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public interface VoidRefReturnTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, VoidRefFluent<io.sundr.model.MethodFluent.VoidRefReturnTypeNested<N>> {
+      extends Nested<N>, VoidRefFluent<io.sundr.model.MethodFluent.VoidRefReturnTypeNested<N>> {
 
     public N and();
 
     public N endVoidRefReturnType();
   }
 
-  public interface ArgumentsNested<N>
-      extends io.sundr.model.builder.Nested<N>, PropertyFluent<io.sundr.model.MethodFluent.ArgumentsNested<N>> {
+  public interface ArgumentsNested<N> extends Nested<N>, PropertyFluent<io.sundr.model.MethodFluent.ArgumentsNested<N>> {
 
     public N and();
 
     public N endArgument();
   }
 
-  public interface ExceptionsNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.MethodFluent.ExceptionsNested<N>> {
+  public interface ExceptionsNested<N> extends Nested<N>, ClassRefFluent<io.sundr.model.MethodFluent.ExceptionsNested<N>> {
 
     public N and();
 
     public N endException();
   }
 
-  public interface BlockNested<N>
-      extends io.sundr.model.builder.Nested<N>, BlockFluent<io.sundr.model.MethodFluent.BlockNested<N>> {
+  public interface BlockNested<N> extends Nested<N>, BlockFluent<io.sundr.model.MethodFluent.BlockNested<N>> {
 
     public N and();
 

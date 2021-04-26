@@ -280,7 +280,7 @@ public class Sources {
 
   private static final Function<Statement, StringStatement> STATEMENT = new Function<Statement, StringStatement>() {
     public StringStatement apply(Statement stmt) {
-      return new StringStatementBuilder().withProvider(() -> stmt.toString()).build();
+      return new StringStatementBuilder().withSupplier(() -> stmt.toString()).build();
     }
   };
 
@@ -293,7 +293,7 @@ public class Sources {
         }
       }
       return new BlockBuilder()
-          .withProvider(() -> statements)
+          .withStatements(statements)
           .build();
     }
   };
