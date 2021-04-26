@@ -95,10 +95,14 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
           for (TypeElement typeElement : typeElements) {
             final boolean isLazyCollectionInitEnabled = generated.lazyCollectionInitEnabled();
             final boolean isLazyMapInitEnabled = generated.lazyMapInitEnabled();
+            final boolean includeInterfaces = generated.includeInterfaces();
+            final boolean includeAbstractClasses = generated.includeAbstractClasses();
 
             TypeDef original = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement));
             String fqcn = original.getFullyQualifiedName();
-            boolean isBuildable = original.getKind() != Kind.ENUM && !original.isAbstract()
+            boolean isBuildable = original.getKind() != Kind.ENUM
+                && (includeAbstractClasses || !original.isAbstract())
+                && (includeInterfaces || original.getKind() != Kind.INTERFACE)
                 && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());
 
             TypeDef b = new TypeDefBuilder(original)
@@ -115,7 +119,15 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                   }
                 }).build();
 
-            if (b.getKind() == Kind.ENUM || b.isAbstract()) {
+            if (b.getKind() == Kind.ENUM) {
+              continue;
+            }
+
+            if (b.isAbstract() && !includeAbstractClasses) {
+              continue;
+            }
+
+            if (b.getKind() == Kind.INTERFACE && !includeInterfaces) {
               continue;
             }
 
@@ -134,6 +146,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, generated)) {
           final boolean isLazyCollectionInitEnabled = generated.lazyCollectionInitEnabled();
           final boolean isLazyMapInitEnabled = generated.lazyMapInitEnabled();
+          final boolean includeInterfaces = generated.includeInterfaces();
+          final boolean includeAbstractClasses = generated.includeAbstractClasses();
 
           TypeDef original = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref));
           String fqcn = original.getFullyQualifiedName();
@@ -155,6 +169,17 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
               }).build();
 
           if (r.getKind() == Kind.ENUM || r.isAbstract()) {
+            continue;
+          }
+          if (r.getKind() == Kind.ENUM) {
+            continue;
+          }
+
+          if (r.isAbstract() && !includeAbstractClasses) {
+            continue;
+          }
+
+          if (r.getKind() == Kind.INTERFACE && !includeInterfaces) {
             continue;
           }
 
