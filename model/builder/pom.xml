@@ -24,8 +24,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.sundr</groupId>
-    <artifactId>sundr-model-builder</artifactId>
-    <name>Sundrio :: Model :: Builder</name>
+    <artifactId>sundr-model</artifactId>
+    <name>Sundrio :: Model :: Model (Base and Builder)</name>
 
     <dependencies>
       <dependency>
