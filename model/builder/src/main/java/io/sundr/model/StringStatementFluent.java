@@ -1,14 +1,17 @@
 package io.sundr.model;
 
 import java.lang.Boolean;
+import java.lang.Object;
 import java.lang.String;
 import java.util.function.Supplier;
 
-public interface StringStatementFluent<A extends StringStatementFluent<A>> extends StatementFluent<A> {
+import io.sundr.builder.Fluent;
 
-  public Supplier<String> getProvider();
+public interface StringStatementFluent<A extends StringStatementFluent<A>> extends Fluent<A> {
 
-  public <T> A withProvider(Supplier<String> provider);
+  public Supplier<String> getSupplier();
 
-  public Boolean hasProvider();
+  public <T extends Object> A withSupplier(Supplier<String> supplier);
+
+  public Boolean hasSupplier();
 }

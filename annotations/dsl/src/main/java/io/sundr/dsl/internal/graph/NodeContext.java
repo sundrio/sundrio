@@ -24,9 +24,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.sundr.model.TypeDef;
 import io.sundr.dsl.internal.utils.GraphUtils;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
+import io.sundr.model.TypeDef;
 
 public class NodeContext {
 

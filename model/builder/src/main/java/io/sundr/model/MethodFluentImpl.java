@@ -12,19 +12,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.Nested;
+import io.sundr.builder.VisitableBuilder;
 
 public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupportFluentImpl<A> implements MethodFluent<A> {
 
-  private List<String> comments;
-  private List<AnnotationRefBuilder> annotations;
-  private List<TypeParamDefBuilder> parameters;
+  private List<String> comments = new ArrayList<String>();
+  private List<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
+  private List<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
   private String name;
-  private io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> returnType;
-  private List<PropertyBuilder> arguments;
+  private VisitableBuilder<? extends TypeRef, ?> returnType;
+  private List<PropertyBuilder> arguments = new ArrayList<PropertyBuilder>();
   private boolean varArgPreferred;
-  private List<ClassRefBuilder> exceptions;
+  private List<ClassRefBuilder> exceptions = new ArrayList<ClassRefBuilder>();
   private boolean defaultMethod;
   private BlockBuilder block;
 
@@ -1328,7 +1328,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<io.sundr.model.MethodFluent.AnnotationsNested<N>>
-      implements io.sundr.model.MethodFluent.AnnotationsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.AnnotationsNested<N>, Nested<N> {
     private final AnnotationRefBuilder builder;
     private final int index;
 
@@ -1354,7 +1354,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public class ParametersNestedImpl<N> extends TypeParamDefFluentImpl<io.sundr.model.MethodFluent.ParametersNested<N>>
-      implements io.sundr.model.MethodFluent.ParametersNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.ParametersNested<N>, Nested<N> {
     private final TypeParamDefBuilder builder;
     private final int index;
 
@@ -1381,7 +1381,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public class TypeParamRefReturnTypeNestedImpl<N>
       extends TypeParamRefFluentImpl<io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<N>, Nested<N> {
     private final TypeParamRefBuilder builder;
 
     TypeParamRefReturnTypeNestedImpl(TypeParamRef item) {
@@ -1405,7 +1405,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public class WildcardRefReturnTypeNestedImpl<N>
       extends WildcardRefFluentImpl<io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<N>, Nested<N> {
     private final WildcardRefBuilder builder;
 
     WildcardRefReturnTypeNestedImpl(WildcardRef item) {
@@ -1429,7 +1429,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public class ClassRefReturnTypeNestedImpl<N>
       extends ClassRefFluentImpl<io.sundr.model.MethodFluent.ClassRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.ClassRefReturnTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.ClassRefReturnTypeNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
 
     ClassRefReturnTypeNestedImpl(ClassRef item) {
@@ -1453,7 +1453,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public class PrimitiveRefReturnTypeNestedImpl<N>
       extends PrimitiveRefFluentImpl<io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<N>, Nested<N> {
     private final PrimitiveRefBuilder builder;
 
     PrimitiveRefReturnTypeNestedImpl(PrimitiveRef item) {
@@ -1476,7 +1476,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public class VoidRefReturnTypeNestedImpl<N> extends VoidRefFluentImpl<io.sundr.model.MethodFluent.VoidRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.VoidRefReturnTypeNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.VoidRefReturnTypeNested<N>, Nested<N> {
     private final VoidRefBuilder builder;
 
     VoidRefReturnTypeNestedImpl(VoidRef item) {
@@ -1499,7 +1499,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public class ArgumentsNestedImpl<N> extends PropertyFluentImpl<io.sundr.model.MethodFluent.ArgumentsNested<N>>
-      implements io.sundr.model.MethodFluent.ArgumentsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.ArgumentsNested<N>, Nested<N> {
     private final PropertyBuilder builder;
     private final int index;
 
@@ -1525,7 +1525,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public class ExceptionsNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.MethodFluent.ExceptionsNested<N>>
-      implements io.sundr.model.MethodFluent.ExceptionsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.ExceptionsNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
     private final int index;
 
@@ -1551,7 +1551,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public class BlockNestedImpl<N> extends BlockFluentImpl<io.sundr.model.MethodFluent.BlockNested<N>>
-      implements io.sundr.model.MethodFluent.BlockNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.MethodFluent.BlockNested<N>, Nested<N> {
     private final BlockBuilder builder;
 
     BlockNestedImpl(Block item) {

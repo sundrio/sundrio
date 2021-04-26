@@ -48,11 +48,11 @@ import io.sundr.codegen.annotations.AnnotationSelector;
 import io.sundr.codegen.annotations.PackageSelector;
 import io.sundr.codegen.annotations.ResourceSelector;
 import io.sundr.codegen.functions.ElementTo;
-import io.sundr.model.TypeDef;
-import io.sundr.model.TypeDefBuilder;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.codegen.utils.StringUtils;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
 

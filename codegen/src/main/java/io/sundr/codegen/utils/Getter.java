@@ -19,8 +19,6 @@ package io.sundr.codegen.utils;
 import static io.sundr.codegen.Constants.VOID;
 import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
 
-import java.util.Arrays;
-
 import io.sundr.SundrException;
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.Assignable;
@@ -201,7 +199,7 @@ public class Getter {
         .withName(name(property))
         .withReturnType(property.getTypeRef())
         .withNewBlock()
-        .withProvider(() -> Arrays.asList(new StringStatement("return this." + property + ";")))
+        .addToStatements(new StringStatement("return this." + property + ";"))
         .endBlock()
         .build();
   }

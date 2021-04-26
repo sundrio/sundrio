@@ -19,6 +19,7 @@ package io.sundr.dsl.internal;
 import java.util.Set;
 
 import io.sundr.codegen.functions.ClassTo;
+import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeDef;
@@ -27,7 +28,6 @@ import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeParamRefBuilder;
 import io.sundr.model.TypeRef;
-import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 
 public final class Constants {
 

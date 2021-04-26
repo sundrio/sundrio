@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
-import io.sundr.model.TypeDef;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
+import io.sundr.model.TypeDef;
 
 public final class GraphUtils {
 

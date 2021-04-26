@@ -27,7 +27,6 @@ public class ReplacePackageTest {
   @Test
   public void testMoveToPackage() {
     TypeDef baseFluent = Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java");
-    System.out.println("BaseFluent:" + baseFluent.render());
     TypeDef refactored = new TypeDefBuilder(baseFluent).accept(new ReplacePackage("io.sundr.builder", "my.pkg")).build();
     System.out.println(refactored);
   }

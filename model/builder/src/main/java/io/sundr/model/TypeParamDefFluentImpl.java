@@ -12,13 +12,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends AttributeSupportFluentImpl<A>
     implements TypeParamDefFluent<A> {
 
   private String name;
-  private List<ClassRefBuilder> bounds;
+  private List<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
 
   public TypeParamDefFluentImpl() {
   }
@@ -310,7 +310,7 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
   }
 
   public class BoundsNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.TypeParamDefFluent.BoundsNested<N>>
-      implements io.sundr.model.TypeParamDefFluent.BoundsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeParamDefFluent.BoundsNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
     private final int index;
 

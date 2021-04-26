@@ -44,6 +44,11 @@ import java.util.function.Function;
 import javax.lang.model.element.Modifier;
 
 import io.sundr.codegen.functions.GetDefinition;
+import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.dsl.internal.utils.TypeDefUtils;
+import io.sundr.dsl.internal.visitors.TypeParamDefColletor;
+import io.sundr.dsl.internal.visitors.TypeParamRefColletor;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
@@ -52,11 +57,6 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
-import io.sundr.codegen.utils.StringUtils;
-import io.sundr.codegen.utils.TypeUtils;
-import io.sundr.dsl.internal.utils.TypeDefUtils;
-import io.sundr.dsl.internal.visitors.TypeParamDefColletor;
-import io.sundr.dsl.internal.visitors.TypeParamRefColletor;
 
 public class Combine {
 

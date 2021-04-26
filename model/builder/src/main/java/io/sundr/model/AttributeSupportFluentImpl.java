@@ -5,12 +5,12 @@ import java.lang.Object;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.sundr.model.builder.BaseFluent;
+import io.sundr.builder.BaseFluent;
 
-public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> extends io.sundr.model.builder.BaseFluent<A>
+public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> extends BaseFluent<A>
     implements AttributeSupportFluent<A> {
 
-  private Map<AttributeKey, Object> attributes;
+  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
 
   public AttributeSupportFluentImpl() {
   }

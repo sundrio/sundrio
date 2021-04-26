@@ -24,11 +24,11 @@ import static io.sundr.builder.Constants.TO_STRING_ARRAY_SNIPPET;
 import static io.sundr.builder.internal.functions.ClazzAs.BUILDER;
 import static io.sundr.builder.internal.functions.ClazzAs.POJO;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
+import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
+import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 import static java.util.stream.Collectors.*;
 
 import java.nio.file.Path;
@@ -51,7 +51,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
-import io.sundr.Provider;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Pojo;
@@ -64,11 +63,13 @@ import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.functions.GetDefinition;
+import io.sundr.codegen.utils.Getter;
+import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
-import io.sundr.model.Block;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
@@ -81,9 +82,6 @@ import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
-import io.sundr.codegen.utils.Getter;
-import io.sundr.codegen.utils.StringUtils;
-import io.sundr.codegen.utils.TypeUtils;
 
 public class ToPojo implements Function<TypeDef, TypeDef> {
 
@@ -532,23 +530,19 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
         .addNewArgument().withName("o").withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument()
         .withName("equals")
-        .withBlock(new Block(new Provider<List<Statement>>() {
-          @Override
-          public List<Statement> get() {
-            return BuilderUtils.toEquals(generatedPojo, fields);
-          }
-        })).build();
+        .withNewBlock()
+        .withStatements(BuilderUtils.toEquals(generatedPojo, fields))
+        .endBlock()
+        .build();
 
     Method hashCode = new MethodBuilder()
         .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
         .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF)
         .withName("hashCode")
-        .withBlock(new Block(new Provider<List<Statement>>() {
-          @Override
-          public List<Statement> get() {
-            return BuilderUtils.toHashCode(fields);
-          }
-        })).build();
+        .withNewBlock()
+        .withStatements(BuilderUtils.toHashCode(fields))
+        .endBlock()
+        .build();
 
     additionalMethods.add(equals);
     additionalMethods.add(hashCode);

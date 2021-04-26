@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends AttributeSupportFluent<A> {
 
@@ -93,8 +93,7 @@ public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Att
 
   public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate);
 
-  public interface BoundsNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.TypeParamDefFluent.BoundsNested<N>> {
+  public interface BoundsNested<N> extends Nested<N>, ClassRefFluent<io.sundr.model.TypeParamDefFluent.BoundsNested<N>> {
 
     public N and();
 

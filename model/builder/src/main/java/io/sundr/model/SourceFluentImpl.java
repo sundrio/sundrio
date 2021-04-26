@@ -10,13 +10,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.BaseFluent;
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.BaseFluent;
+import io.sundr.builder.Nested;
 
-public class SourceFluentImpl<A extends SourceFluent<A>> extends io.sundr.model.builder.BaseFluent<A>
-    implements SourceFluent<A> {
+public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> implements SourceFluent<A> {
 
-  private List<TypeDefBuilder> types;
+  private List<TypeDefBuilder> types = new ArrayList<TypeDefBuilder>();
 
   public SourceFluentImpl() {
   }
@@ -253,7 +252,7 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends io.sundr.model.
   }
 
   public class TypesNestedImpl<N> extends TypeDefFluentImpl<io.sundr.model.SourceFluent.TypesNested<N>>
-      implements io.sundr.model.SourceFluent.TypesNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.SourceFluent.TypesNested<N>, Nested<N> {
     private final TypeDefBuilder builder;
     private final int index;
 

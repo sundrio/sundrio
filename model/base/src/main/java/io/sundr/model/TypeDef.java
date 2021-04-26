@@ -104,6 +104,10 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
   }
 
   private static List<TypeDef> setOuterType(List<TypeDef> types, TypeDef outer) {
+    if (types == null) {
+      return Collections.emptyList();
+    }
+
     List<TypeDef> updated = new ArrayList<TypeDef>();
     for (TypeDef typeDef : types) {
       if (outer.getFullyQualifiedName().equals(typeDef.getOuterTypeName())) {

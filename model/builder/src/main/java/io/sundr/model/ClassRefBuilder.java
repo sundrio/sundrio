@@ -3,10 +3,10 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.VisitableBuilder;
 
 public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
-    implements io.sundr.model.builder.VisitableBuilder<ClassRef, ClassRefBuilder> {
+    implements VisitableBuilder<ClassRef, ClassRefBuilder> {
 
   ClassRefFluent<?> fluent;
   Boolean validationEnabled;

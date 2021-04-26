@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.Nested;
+import io.sundr.builder.VisitableBuilder;
 
 public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFluent<A> {
 
@@ -17,9 +17,9 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public Boolean hasBoundKind();
 
-  public A addToBounds(io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder);
+  public A addToBounds(VisitableBuilder<? extends TypeRef, ?> builder);
 
-  public A addToBounds(int index, io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder);
+  public A addToBounds(int index, VisitableBuilder<? extends TypeRef, ?> builder);
 
   public A addToBounds(int index, TypeRef item);
 
@@ -29,13 +29,13 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public A addAllToBounds(Collection<TypeRef> items);
 
-  public A removeFromBounds(io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder);
+  public A removeFromBounds(VisitableBuilder<? extends TypeRef, ?> builder);
 
   public A removeFromBounds(TypeRef... items);
 
   public A removeAllFromBounds(Collection<TypeRef> items);
 
-  public A removeMatchingFromBounds(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public A removeMatchingFromBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
   /**
    * This method has been deprecated, please use method buildBounds instead.
@@ -53,9 +53,9 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public TypeRef buildLastBound();
 
-  public TypeRef buildMatchingBound(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public TypeRef buildMatchingBound(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
-  public Boolean hasMatchingBound(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public Boolean hasMatchingBound(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
   public A withBounds(List<TypeRef> bounds);
 
@@ -75,8 +75,7 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public A removeAllFromTypeParamRefBounds(Collection<TypeParamRef> items);
 
-  public A removeMatchingFromTypeParamRefBounds(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public A removeMatchingFromTypeParamRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
   public io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<A> setNewTypeParamRefBoundLike(int index, TypeParamRef item);
 
@@ -96,8 +95,7 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public A removeAllFromWildcardRefBounds(Collection<WildcardRef> items);
 
-  public A removeMatchingFromWildcardRefBounds(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public A removeMatchingFromWildcardRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
   public io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<A> setNewWildcardRefBoundLike(int index, WildcardRef item);
 
@@ -117,7 +115,7 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public A removeAllFromClassRefBounds(Collection<ClassRef> items);
 
-  public A removeMatchingFromClassRefBounds(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public A removeMatchingFromClassRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
   public io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<A> setNewClassRefBoundLike(int index, ClassRef item);
 
@@ -137,8 +135,7 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public A removeAllFromPrimitiveRefBounds(Collection<PrimitiveRef> items);
 
-  public A removeMatchingFromPrimitiveRefBounds(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public A removeMatchingFromPrimitiveRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
   public io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<A> setNewPrimitiveRefBoundLike(int index, PrimitiveRef item);
 
@@ -158,7 +155,7 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public A removeAllFromVoidRefBounds(Collection<VoidRef> items);
 
-  public A removeMatchingFromVoidRefBounds(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate);
+  public A removeMatchingFromVoidRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate);
 
   public io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<A> setNewVoidRefBoundLike(int index, VoidRef item);
 
@@ -166,8 +163,8 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
 
   public io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBoundLike(VoidRef item);
 
-  public interface TypeParamRefBoundsNested<N> extends io.sundr.model.builder.Nested<N>,
-      TypeParamRefFluent<io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<N>> {
+  public interface TypeParamRefBoundsNested<N>
+      extends Nested<N>, TypeParamRefFluent<io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<N>> {
 
     public N and();
 
@@ -175,7 +172,7 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
   }
 
   public interface WildcardRefBoundsNested<N>
-      extends io.sundr.model.builder.Nested<N>, WildcardRefFluent<io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<N>> {
+      extends Nested<N>, WildcardRefFluent<io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<N>> {
 
     public N and();
 
@@ -183,15 +180,15 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
   }
 
   public interface ClassRefBoundsNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<N>> {
+      extends Nested<N>, ClassRefFluent<io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<N>> {
 
     public N and();
 
     public N endClassRefBound();
   }
 
-  public interface PrimitiveRefBoundsNested<N> extends io.sundr.model.builder.Nested<N>,
-      PrimitiveRefFluent<io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<N>> {
+  public interface PrimitiveRefBoundsNested<N>
+      extends Nested<N>, PrimitiveRefFluent<io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<N>> {
 
     public N and();
 
@@ -199,7 +196,7 @@ public interface WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeR
   }
 
   public interface VoidRefBoundsNested<N>
-      extends io.sundr.model.builder.Nested<N>, VoidRefFluent<io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<N>> {
+      extends Nested<N>, VoidRefFluent<io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<N>> {
 
     public N and();
 

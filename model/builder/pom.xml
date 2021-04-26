@@ -30,6 +30,11 @@
     <dependencies>
       <dependency>
         <groupId>io.sundr</groupId>
+        <artifactId>sundr-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.sundr</groupId>
         <artifactId>sundr-model-base</artifactId>
         <version>${project.version}</version>
       </dependency>

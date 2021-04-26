@@ -12,14 +12,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.Nested;
+import io.sundr.builder.VisitableBuilder;
 
 public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFluentImpl<A> implements ClassRefFluent<A> {
 
   private String fullyQualifiedName;
   private int dimensions;
-  private List<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> arguments;
+  private List<VisitableBuilder<? extends TypeRef, ?>> arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
 
   public ClassRefFluentImpl() {
   }
@@ -97,18 +97,18 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return true;
   }
 
-  public A addToArguments(io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder) {
+  public A addToArguments(VisitableBuilder<? extends TypeRef, ?> builder) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     _visitables.get("arguments").add(builder);
     this.arguments.add(builder);
     return (A) this;
   }
 
-  public A addToArguments(int index, io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder) {
+  public A addToArguments(int index, VisitableBuilder<? extends TypeRef, ?> builder) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     _visitables.get("arguments").add(index, builder);
     this.arguments.add(index, builder);
@@ -199,9 +199,9 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return (A) this;
   }
 
-  public A removeFromArguments(io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder) {
+  public A removeFromArguments(VisitableBuilder<? extends TypeRef, ?> builder) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     _visitables.get("arguments").remove(builder);
     this.arguments.remove(builder);
@@ -254,13 +254,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return (A) this;
   }
 
-  public A removeMatchingFromArguments(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromArguments(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
     if (arguments == null)
       return (A) this;
-    final Iterator<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
+    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
     final List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -295,8 +295,8 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return this.arguments.get(arguments.size() - 1).build();
   }
 
-  public TypeRef buildMatchingArgument(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
-    for (io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> item : arguments) {
+  public TypeRef buildMatchingArgument(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
+    for (VisitableBuilder<? extends TypeRef, ?> item : arguments) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -304,8 +304,8 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return null;
   }
 
-  public Boolean hasMatchingArgument(Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
-    for (io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> item : arguments) {
+  public Boolean hasMatchingArgument(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
+    for (VisitableBuilder<? extends TypeRef, ?> item : arguments) {
       if (predicate.test(item)) {
         return true;
       }
@@ -318,7 +318,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
       _visitables.get("arguments").removeAll(this.arguments);
     }
     if (arguments != null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
       for (TypeRef item : arguments) {
         this.addToArguments(item);
       }
@@ -346,7 +346,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToTypeParamRefArguments(int index, TypeParamRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
     _visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);
@@ -356,7 +356,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A setToTypeParamRefArguments(int index, TypeParamRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
     if (index < 0 || index >= _visitables.get("arguments").size()) {
@@ -374,7 +374,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToTypeParamRefArguments(TypeParamRef... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (TypeParamRef item : items) {
       TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
@@ -386,7 +386,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addAllToTypeParamRefArguments(Collection<TypeParamRef> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (TypeParamRef item : items) {
       TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
@@ -418,14 +418,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return (A) this;
   }
 
-  public A removeMatchingFromTypeParamRefArguments(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromTypeParamRefArguments(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
     if (arguments == null)
       return (A) this;
-    final Iterator<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
+    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
     final List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -449,7 +448,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToWildcardRefArguments(int index, WildcardRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     WildcardRefBuilder builder = new WildcardRefBuilder(item);
     _visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);
@@ -459,7 +458,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A setToWildcardRefArguments(int index, WildcardRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     WildcardRefBuilder builder = new WildcardRefBuilder(item);
     if (index < 0 || index >= _visitables.get("arguments").size()) {
@@ -477,7 +476,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToWildcardRefArguments(WildcardRef... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (WildcardRef item : items) {
       WildcardRefBuilder builder = new WildcardRefBuilder(item);
@@ -489,7 +488,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addAllToWildcardRefArguments(Collection<WildcardRef> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (WildcardRef item : items) {
       WildcardRefBuilder builder = new WildcardRefBuilder(item);
@@ -521,14 +520,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return (A) this;
   }
 
-  public A removeMatchingFromWildcardRefArguments(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromWildcardRefArguments(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
     if (arguments == null)
       return (A) this;
-    final Iterator<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
+    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
     final List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -552,7 +550,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToClassRefArguments(int index, ClassRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     _visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);
@@ -562,7 +560,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A setToClassRefArguments(int index, ClassRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= _visitables.get("arguments").size()) {
@@ -580,7 +578,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToClassRefArguments(ClassRef... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -592,7 +590,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addAllToClassRefArguments(Collection<ClassRef> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -624,14 +622,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return (A) this;
   }
 
-  public A removeMatchingFromClassRefArguments(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromClassRefArguments(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
     if (arguments == null)
       return (A) this;
-    final Iterator<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
+    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
     final List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -654,7 +651,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToPrimitiveRefArguments(int index, PrimitiveRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
     _visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);
@@ -664,7 +661,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A setToPrimitiveRefArguments(int index, PrimitiveRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
     if (index < 0 || index >= _visitables.get("arguments").size()) {
@@ -682,7 +679,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToPrimitiveRefArguments(PrimitiveRef... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (PrimitiveRef item : items) {
       PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
@@ -694,7 +691,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addAllToPrimitiveRefArguments(Collection<PrimitiveRef> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (PrimitiveRef item : items) {
       PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
@@ -726,14 +723,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return (A) this;
   }
 
-  public A removeMatchingFromPrimitiveRefArguments(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromPrimitiveRefArguments(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
     if (arguments == null)
       return (A) this;
-    final Iterator<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
+    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
     final List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -757,7 +753,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToVoidRefArguments(int index, VoidRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     VoidRefBuilder builder = new VoidRefBuilder(item);
     _visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);
@@ -767,7 +763,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A setToVoidRefArguments(int index, VoidRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     VoidRefBuilder builder = new VoidRefBuilder(item);
     if (index < 0 || index >= _visitables.get("arguments").size()) {
@@ -785,7 +781,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addToVoidRefArguments(VoidRef... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (VoidRef item : items) {
       VoidRefBuilder builder = new VoidRefBuilder(item);
@@ -797,7 +793,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public A addAllToVoidRefArguments(Collection<VoidRef> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
     }
     for (VoidRef item : items) {
       VoidRefBuilder builder = new VoidRefBuilder(item);
@@ -829,14 +825,13 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
     return (A) this;
   }
 
-  public A removeMatchingFromVoidRefArguments(
-      Predicate<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromVoidRefArguments(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
     if (arguments == null)
       return (A) this;
-    final Iterator<io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
+    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
     final List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      io.sundr.model.builder.VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -880,7 +875,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public class TypeParamRefArgumentsNestedImpl<N>
       extends TypeParamRefFluentImpl<io.sundr.model.ClassRefFluent.TypeParamRefArgumentsNested<N>>
-      implements io.sundr.model.ClassRefFluent.TypeParamRefArgumentsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.ClassRefFluent.TypeParamRefArgumentsNested<N>, Nested<N> {
     private final TypeParamRefBuilder builder;
     private final int index;
 
@@ -907,7 +902,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public class WildcardRefArgumentsNestedImpl<N>
       extends WildcardRefFluentImpl<io.sundr.model.ClassRefFluent.WildcardRefArgumentsNested<N>>
-      implements io.sundr.model.ClassRefFluent.WildcardRefArgumentsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.ClassRefFluent.WildcardRefArgumentsNested<N>, Nested<N> {
     private final WildcardRefBuilder builder;
     private final int index;
 
@@ -934,7 +929,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public class ClassRefArgumentsNestedImpl<N>
       extends ClassRefFluentImpl<io.sundr.model.ClassRefFluent.ClassRefArgumentsNested<N>>
-      implements io.sundr.model.ClassRefFluent.ClassRefArgumentsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.ClassRefFluent.ClassRefArgumentsNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
     private final int index;
 
@@ -961,7 +956,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
 
   public class PrimitiveRefArgumentsNestedImpl<N>
       extends PrimitiveRefFluentImpl<io.sundr.model.ClassRefFluent.PrimitiveRefArgumentsNested<N>>
-      implements io.sundr.model.ClassRefFluent.PrimitiveRefArgumentsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.ClassRefFluent.PrimitiveRefArgumentsNested<N>, Nested<N> {
     private final PrimitiveRefBuilder builder;
     private final int index;
 
@@ -987,7 +982,7 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
   }
 
   public class VoidRefArgumentsNestedImpl<N> extends VoidRefFluentImpl<io.sundr.model.ClassRefFluent.VoidRefArgumentsNested<N>>
-      implements io.sundr.model.ClassRefFluent.VoidRefArgumentsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.ClassRefFluent.VoidRefArgumentsNested<N>, Nested<N> {
     private final VoidRefBuilder builder;
     private final int index;
 

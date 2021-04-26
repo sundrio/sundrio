@@ -3,10 +3,10 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 
-import io.sundr.model.builder.VisitableBuilder;
+import io.sundr.builder.VisitableBuilder;
 
 public class PrimitiveRefBuilder extends PrimitiveRefFluentImpl<PrimitiveRefBuilder>
-    implements io.sundr.model.builder.VisitableBuilder<PrimitiveRef, PrimitiveRefBuilder> {
+    implements VisitableBuilder<PrimitiveRef, PrimitiveRefBuilder> {
 
   PrimitiveRefFluent<?> fluent;
   Boolean validationEnabled;

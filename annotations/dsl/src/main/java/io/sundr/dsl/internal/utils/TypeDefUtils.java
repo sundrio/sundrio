@@ -51,16 +51,6 @@ import javax.lang.model.element.Modifier;
 
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.model.AnnotationRef;
-import io.sundr.model.Attributeable;
-import io.sundr.model.ClassRef;
-import io.sundr.model.Kind;
-import io.sundr.model.Method;
-import io.sundr.model.MethodBuilder;
-import io.sundr.model.TypeDef;
-import io.sundr.model.TypeDefBuilder;
-import io.sundr.model.TypeParamDef;
-import io.sundr.model.TypeRef;
 import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.annotations.Begin;
@@ -77,6 +67,16 @@ import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import io.sundr.dsl.internal.processor.DslContext;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.type.functions.Merge;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.Attributeable;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeRef;
 
 public final class TypeDefUtils {
 

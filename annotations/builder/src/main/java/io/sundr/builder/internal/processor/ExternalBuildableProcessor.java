@@ -48,11 +48,11 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.functions.ElementTo;
+import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.model.Kind;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
-import io.sundr.codegen.utils.ModelUtils;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("io.sundr.builder.annotations.ExternalBuildables")

@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFluent<A> {
 
@@ -582,15 +582,14 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
   public io.sundr.model.TypeDefFluent.InnerTypesNested<A> editMatchingInnerType(Predicate<TypeDefBuilder> predicate);
 
   public interface AnnotationsNested<N>
-      extends io.sundr.model.builder.Nested<N>, AnnotationRefFluent<io.sundr.model.TypeDefFluent.AnnotationsNested<N>> {
+      extends Nested<N>, AnnotationRefFluent<io.sundr.model.TypeDefFluent.AnnotationsNested<N>> {
 
     public N and();
 
     public N endAnnotation();
   }
 
-  public interface ExtendsListNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.TypeDefFluent.ExtendsListNested<N>> {
+  public interface ExtendsListNested<N> extends Nested<N>, ClassRefFluent<io.sundr.model.TypeDefFluent.ExtendsListNested<N>> {
 
     public N and();
 
@@ -598,47 +597,42 @@ public interface TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public interface ImplementsListNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.TypeDefFluent.ImplementsListNested<N>> {
+      extends Nested<N>, ClassRefFluent<io.sundr.model.TypeDefFluent.ImplementsListNested<N>> {
 
     public N and();
 
     public N endImplementsList();
   }
 
-  public interface ParametersNested<N>
-      extends io.sundr.model.builder.Nested<N>, TypeParamDefFluent<io.sundr.model.TypeDefFluent.ParametersNested<N>> {
+  public interface ParametersNested<N> extends Nested<N>, TypeParamDefFluent<io.sundr.model.TypeDefFluent.ParametersNested<N>> {
 
     public N and();
 
     public N endParameter();
   }
 
-  public interface PropertiesNested<N>
-      extends io.sundr.model.builder.Nested<N>, PropertyFluent<io.sundr.model.TypeDefFluent.PropertiesNested<N>> {
+  public interface PropertiesNested<N> extends Nested<N>, PropertyFluent<io.sundr.model.TypeDefFluent.PropertiesNested<N>> {
 
     public N and();
 
     public N endProperty();
   }
 
-  public interface ConstructorsNested<N>
-      extends io.sundr.model.builder.Nested<N>, MethodFluent<io.sundr.model.TypeDefFluent.ConstructorsNested<N>> {
+  public interface ConstructorsNested<N> extends Nested<N>, MethodFluent<io.sundr.model.TypeDefFluent.ConstructorsNested<N>> {
 
     public N and();
 
     public N endConstructor();
   }
 
-  public interface MethodsNested<N>
-      extends io.sundr.model.builder.Nested<N>, MethodFluent<io.sundr.model.TypeDefFluent.MethodsNested<N>> {
+  public interface MethodsNested<N> extends Nested<N>, MethodFluent<io.sundr.model.TypeDefFluent.MethodsNested<N>> {
 
     public N and();
 
     public N endMethod();
   }
 
-  public interface InnerTypesNested<N>
-      extends io.sundr.model.builder.Nested<N>, TypeDefFluent<io.sundr.model.TypeDefFluent.InnerTypesNested<N>> {
+  public interface InnerTypesNested<N> extends Nested<N>, TypeDefFluent<io.sundr.model.TypeDefFluent.InnerTypesNested<N>> {
 
     public N and();
 

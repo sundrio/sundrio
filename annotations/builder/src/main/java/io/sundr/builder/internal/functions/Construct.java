@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import io.sundr.codegen.utils.StringUtils;
 import io.sundr.model.Method;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
-import io.sundr.codegen.utils.StringUtils;
 
 public class Construct implements Function<List<String>, String> {
 

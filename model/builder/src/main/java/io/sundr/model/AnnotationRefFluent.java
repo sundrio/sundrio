@@ -6,7 +6,7 @@ import java.lang.Object;
 import java.lang.String;
 import java.util.Map;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public interface AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends AttributeSupportFluent<A> {
 
@@ -48,8 +48,7 @@ public interface AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends A
 
   public Boolean hasParameters();
 
-  public interface ClassRefNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.AnnotationRefFluent.ClassRefNested<N>> {
+  public interface ClassRefNested<N> extends Nested<N>, ClassRefFluent<io.sundr.model.AnnotationRefFluent.ClassRefNested<N>> {
 
     public N and();
 

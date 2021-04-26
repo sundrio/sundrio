@@ -12,23 +12,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSupportFluentImpl<A> implements TypeDefFluent<A> {
 
   private Kind kind;
   private String packageName;
   private String name;
-  private List<String> comments;
-  private List<AnnotationRefBuilder> annotations;
-  private List<ClassRefBuilder> extendsList;
-  private List<ClassRefBuilder> implementsList;
-  private List<TypeParamDefBuilder> parameters;
-  private List<PropertyBuilder> properties;
-  private List<MethodBuilder> constructors;
-  private List<MethodBuilder> methods;
+  private List<String> comments = new ArrayList<String>();
+  private List<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
+  private List<ClassRefBuilder> extendsList = new ArrayList<ClassRefBuilder>();
+  private List<ClassRefBuilder> implementsList = new ArrayList<ClassRefBuilder>();
+  private List<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
+  private List<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
+  private List<MethodBuilder> constructors = new ArrayList<MethodBuilder>();
+  private List<MethodBuilder> methods = new ArrayList<MethodBuilder>();
   private String outerTypeName;
-  private List<TypeDefBuilder> innerTypes;
+  private List<TypeDefBuilder> innerTypes = new ArrayList<TypeDefBuilder>();
 
   public TypeDefFluentImpl() {
   }
@@ -2093,7 +2093,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<io.sundr.model.TypeDefFluent.AnnotationsNested<N>>
-      implements io.sundr.model.TypeDefFluent.AnnotationsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.AnnotationsNested<N>, Nested<N> {
     private final AnnotationRefBuilder builder;
     private final int index;
 
@@ -2119,7 +2119,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class ExtendsListNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.TypeDefFluent.ExtendsListNested<N>>
-      implements io.sundr.model.TypeDefFluent.ExtendsListNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.ExtendsListNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
     private final int index;
 
@@ -2145,7 +2145,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class ImplementsListNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.TypeDefFluent.ImplementsListNested<N>>
-      implements io.sundr.model.TypeDefFluent.ImplementsListNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.ImplementsListNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
     private final int index;
 
@@ -2171,7 +2171,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class ParametersNestedImpl<N> extends TypeParamDefFluentImpl<io.sundr.model.TypeDefFluent.ParametersNested<N>>
-      implements io.sundr.model.TypeDefFluent.ParametersNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.ParametersNested<N>, Nested<N> {
     private final TypeParamDefBuilder builder;
     private final int index;
 
@@ -2197,7 +2197,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class PropertiesNestedImpl<N> extends PropertyFluentImpl<io.sundr.model.TypeDefFluent.PropertiesNested<N>>
-      implements io.sundr.model.TypeDefFluent.PropertiesNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.PropertiesNested<N>, Nested<N> {
     private final PropertyBuilder builder;
     private final int index;
 
@@ -2223,7 +2223,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class ConstructorsNestedImpl<N> extends MethodFluentImpl<io.sundr.model.TypeDefFluent.ConstructorsNested<N>>
-      implements io.sundr.model.TypeDefFluent.ConstructorsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.ConstructorsNested<N>, Nested<N> {
     private final MethodBuilder builder;
     private final int index;
 
@@ -2249,7 +2249,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class MethodsNestedImpl<N> extends MethodFluentImpl<io.sundr.model.TypeDefFluent.MethodsNested<N>>
-      implements io.sundr.model.TypeDefFluent.MethodsNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.MethodsNested<N>, Nested<N> {
     private final MethodBuilder builder;
     private final int index;
 
@@ -2275,7 +2275,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
   }
 
   public class InnerTypesNestedImpl<N> extends TypeDefFluentImpl<io.sundr.model.TypeDefFluent.InnerTypesNested<N>>
-      implements io.sundr.model.TypeDefFluent.InnerTypesNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.TypeDefFluent.InnerTypesNested<N>, Nested<N> {
     private final TypeDefBuilder builder;
     private final int index;
 

@@ -42,12 +42,12 @@ import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
 
-import io.sundr.model.TypeDef;
-import io.sundr.model.TypeDefBuilder;
 import io.sundr.dsl.internal.processor.DslContext;
 import io.sundr.dsl.internal.type.functions.Combine;
 import io.sundr.dsl.internal.type.functions.Generics;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 
 public class TypeDefUtilsTest {
 

@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupportFluent<A> {
 
@@ -188,7 +188,7 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
   public A addNewComment(String arg1);
 
   public interface AnnotationsNested<N>
-      extends io.sundr.model.builder.Nested<N>, AnnotationRefFluent<io.sundr.model.PropertyFluent.AnnotationsNested<N>> {
+      extends Nested<N>, AnnotationRefFluent<io.sundr.model.PropertyFluent.AnnotationsNested<N>> {
 
     public N and();
 
@@ -196,7 +196,7 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public interface TypeParamRefTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, TypeParamRefFluent<io.sundr.model.PropertyFluent.TypeParamRefTypeNested<N>> {
+      extends Nested<N>, TypeParamRefFluent<io.sundr.model.PropertyFluent.TypeParamRefTypeNested<N>> {
 
     public N and();
 
@@ -204,7 +204,7 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public interface WildcardRefTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, WildcardRefFluent<io.sundr.model.PropertyFluent.WildcardRefTypeNested<N>> {
+      extends Nested<N>, WildcardRefFluent<io.sundr.model.PropertyFluent.WildcardRefTypeNested<N>> {
 
     public N and();
 
@@ -212,7 +212,7 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public interface ClassRefTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, ClassRefFluent<io.sundr.model.PropertyFluent.ClassRefTypeNested<N>> {
+      extends Nested<N>, ClassRefFluent<io.sundr.model.PropertyFluent.ClassRefTypeNested<N>> {
 
     public N and();
 
@@ -220,15 +220,14 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public interface PrimitiveRefTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, PrimitiveRefFluent<io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<N>> {
+      extends Nested<N>, PrimitiveRefFluent<io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<N>> {
 
     public N and();
 
     public N endPrimitiveRefType();
   }
 
-  public interface VoidRefTypeNested<N>
-      extends io.sundr.model.builder.Nested<N>, VoidRefFluent<io.sundr.model.PropertyFluent.VoidRefTypeNested<N>> {
+  public interface VoidRefTypeNested<N> extends Nested<N>, VoidRefFluent<io.sundr.model.PropertyFluent.VoidRefTypeNested<N>> {
 
     public N and();
 

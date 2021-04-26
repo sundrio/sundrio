@@ -23,14 +23,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
 
+import io.sundr.dsl.internal.visitors.TypeArgumentReplace;
+import io.sundr.dsl.internal.visitors.TypeParamDefReplace;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
-import io.sundr.dsl.internal.visitors.TypeArgumentReplace;
-import io.sundr.dsl.internal.visitors.TypeParamDefReplace;
 
 public class Generify {
 

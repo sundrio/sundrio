@@ -21,6 +21,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.sundr.builder.Builder;
+import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.ClassRefFluent;
@@ -29,9 +32,6 @@ import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
-import io.sundr.model.builder.Builder;
-import io.sundr.model.builder.TypedVisitor;
-import io.sundr.model.builder.Visitor;
 
 public class ReplacePackage implements Visitor<Builder> {
 

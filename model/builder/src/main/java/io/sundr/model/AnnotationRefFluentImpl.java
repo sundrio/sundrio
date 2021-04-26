@@ -7,13 +7,13 @@ import java.lang.String;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.sundr.model.builder.Nested;
+import io.sundr.builder.Nested;
 
 public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends AttributeSupportFluentImpl<A>
     implements AnnotationRefFluent<A> {
 
   private ClassRefBuilder classRef;
-  private Map<String, Object> parameters;
+  private Map<String, Object> parameters = new LinkedHashMap<String, Object>();
 
   public AnnotationRefFluentImpl() {
   }
@@ -152,7 +152,7 @@ public class AnnotationRefFluentImpl<A extends AnnotationRefFluent<A>> extends A
   }
 
   public class ClassRefNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.AnnotationRefFluent.ClassRefNested<N>>
-      implements io.sundr.model.AnnotationRefFluent.ClassRefNested<N>, io.sundr.model.builder.Nested<N> {
+      implements io.sundr.model.AnnotationRefFluent.ClassRefNested<N>, Nested<N> {
     private final ClassRefBuilder builder;
 
     ClassRefNestedImpl(ClassRef item) {
