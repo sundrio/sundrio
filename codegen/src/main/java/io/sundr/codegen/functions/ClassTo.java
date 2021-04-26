@@ -16,11 +16,6 @@
 
 package io.sundr.codegen.functions;
 
-import io.sundr.FunctionFactory;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.model.Method;
-import io.sundr.codegen.model.*;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
@@ -28,6 +23,11 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import io.sundr.FunctionFactory;
+import io.sundr.codegen.DefinitionRepository;
+import io.sundr.codegen.model.*;
+import io.sundr.codegen.model.Method;
 
 public class ClassTo {
 
@@ -121,11 +121,11 @@ public class ClassTo {
   });
 
   public static final Function<Class<? extends Annotation>, AnnotationRef> ANNOTATIONTYPEREF = FunctionFactory
-          .cache(item -> {
-            //An annotation can't be a primitive or a void type, so its safe to cast.
-            ClassRef classRef = (ClassRef) TYPEREF.apply(item);
-            return new AnnotationRefBuilder().withClassRef(classRef).build();
-          });
+      .cache(item -> {
+        //An annotation can't be a primitive or a void type, so its safe to cast.
+        ClassRef classRef = (ClassRef) TYPEREF.apply(item);
+        return new AnnotationRefBuilder().withClassRef(classRef).build();
+      });
 
   private static final Function<Class, TypeDef> INTERNAL_TYPEDEF = new Function<Class, TypeDef>() {
     public TypeDef apply(Class item) {
@@ -246,11 +246,11 @@ public class ClassTo {
             .collect(Collectors.toList()));
       }
       properties.add(new PropertyBuilder()
-              .withName(field.getName())
-              .withModifiers(field.getModifiers())
-              .withAnnotations(annotationRefs)
-              .withTypeRef(TYPEREF.apply(field.getGenericType()))
-              .build());
+          .withName(field.getName())
+          .withModifiers(field.getModifiers())
+          .withAnnotations(annotationRefs)
+          .withTypeRef(TYPEREF.apply(field.getGenericType()))
+          .build());
     }
     return properties;
   }
@@ -311,23 +311,23 @@ public class ClassTo {
       }
 
       methods.add(new MethodBuilder()
-              .withName(method.getName())
-              .withDefaultMethod(method.isDefault())
-              .withModifiers(method.getModifiers())
-              .withReturnType(TYPEREF.apply(method.getReturnType()))
-              .withArguments(arguments)
-              .withParameters(parameters)
-              .withExceptions(exceptionRefs)
-              .withAnnotations(annotationRefs)
-              .withAttributes(attributes)
-              .build());
+          .withName(method.getName())
+          .withDefaultMethod(method.isDefault())
+          .withModifiers(method.getModifiers())
+          .withReturnType(TYPEREF.apply(method.getReturnType()))
+          .withArguments(arguments)
+          .withParameters(parameters)
+          .withExceptions(exceptionRefs)
+          .withAnnotations(annotationRefs)
+          .withAttributes(attributes)
+          .build());
     }
     return methods;
   }
 
   private static void processMethod(Set<Class> references, java.lang.reflect.Executable method,
-                                    List<AnnotationRef> annotationRefs, List<ClassRef> exceptionRefs, List<Property> arguments,
-                                    List<TypeParamDef> parameters) {
+      List<AnnotationRef> annotationRefs, List<ClassRef> exceptionRefs, List<Property> arguments,
+      List<TypeParamDef> parameters) {
     processAnnotatedElement(method, annotationRefs);
 
     for (Class exceptionType : method.getExceptionTypes()) {
@@ -337,9 +337,9 @@ public class ClassTo {
     for (int i = 1; i <= method.getGenericParameterTypes().length; i++) {
       Type argumentType = method.getGenericParameterTypes()[i - 1];
       arguments.add(new PropertyBuilder()
-              .withName(ARGUMENT_PREFIX + i)
-              .withTypeRef(TYPEREF.apply(argumentType))
-              .build());
+          .withName(ARGUMENT_PREFIX + i)
+          .withTypeRef(TYPEREF.apply(argumentType))
+          .build());
 
       if (argumentType instanceof Class) {
         references.add((Class) argumentType);

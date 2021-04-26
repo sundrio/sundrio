@@ -7,7 +7,7 @@ public class Other {
   @TestAnnotation(name = FOO_NAME)
   private String foo;
 
-  @TestAnnotation(name = SOMETHING_NAME, values = {1, 2, 3, 5, 7})
+  @TestAnnotation(name = SOMETHING_NAME, values = { 1, 2, 3, 5, 7 })
   private void something() {
   }
 }
