@@ -30,7 +30,6 @@
 
 
     <modules>
-        <module>codegen</module>
         <module>crud</module>
         <module>curator-dsl</module>
         <module>kubernetes-dsl</module>
