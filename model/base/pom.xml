@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>sundr-model-base</artifactId>
-    <name>Sundrio :: Model</name>
+    <name>Sundrio :: Model :: Base</name>
 
     <dependencies>
       <dependency>
