@@ -50,7 +50,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.Descendants;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.functions.ClassAssignable;
+import io.sundr.codegen.functions.Assignable;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
@@ -113,7 +113,7 @@ public class BuilderUtils {
         .filter(m -> "build".equals(m.getName()))
         .filter(m -> m.getReturnType() instanceof ClassRef)
         .map(m -> (ClassRef) m.getReturnType())
-        .filter(r -> r.map(ClassAssignable.from(r)))
+        .filter(r -> Assignable.isAssignable(r).from(ref))
         .count() > 0;
   }
 

@@ -17,27 +17,20 @@
 
 package io.sundr.codegen.functions;
 
-import java.util.function.Function;
-
 import io.sundr.model.ClassRef;
 import io.sundr.model.Node;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.TypeRef;
 
-public class PrimitiveAssignable implements Function<PrimitiveRef, Boolean> {
+public class PrimitiveAssignable {
 
-  private final TypeRef other;
+  private final PrimitiveRef t;
 
-  private PrimitiveAssignable(TypeRef other) {
-    this.other = other;
+  public PrimitiveAssignable(PrimitiveRef t) {
+    this.t = t;
   }
 
-  public static PrimitiveAssignable from(TypeRef other) {
-    return new PrimitiveAssignable(other);
-  }
-
-  @Override
-  public Boolean apply(PrimitiveRef t) {
+  public Boolean from(TypeRef other) {
     if (t == other) {
       return true;
     } else if (other == null) {
