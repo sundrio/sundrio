@@ -21,10 +21,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.utils.StringUtils;
@@ -126,6 +128,10 @@ public class TypeDef extends ModifierSupport {
   }
 
   public boolean isAssignableFrom(TypeDef o) {
+    return isAssignableFrom(o, new HashSet<>());
+  }
+
+  private boolean isAssignableFrom(TypeDef o, Set<String> visited) {
     if (this == o || this.equals(o)) {
       return true;
     }
@@ -141,14 +147,22 @@ public class TypeDef extends ModifierSupport {
       return true;
     }
 
+    if (visited.contains(o.getFullyQualifiedName())) {
+      return false;
+    }
+    visited.add(o.getFullyQualifiedName());
     for (ClassRef e : o.getExtendsList()) {
-      if (isAssignableFrom(e.getDefinition())) {
+      if (getFullyQualifiedName().equals(e.getFullyQualifiedName())) {
+        return true;
+      } else if (isAssignableFrom(e.getDefinition(), visited)) {
         return true;
       }
     }
 
     for (ClassRef i : o.getImplementsList()) {
-      if (isAssignableFrom(i.getDefinition())) {
+      if (getFullyQualifiedName().equals(i.getFullyQualifiedName())) {
+        return true;
+      } else if (isAssignableFrom(i.getDefinition(), visited)) {
         return true;
       }
     }
