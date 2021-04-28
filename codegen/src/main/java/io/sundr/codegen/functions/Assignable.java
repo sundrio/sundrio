@@ -43,9 +43,9 @@ public class Assignable {
 
     public boolean from(TypeRef other) {
       if (type instanceof ClassRef) {
-        return ClassAssignable.from(other).apply((ClassRef) type);
+        return new ClassAssignable((ClassRef) type).from(other);
       } else if (type instanceof PrimitiveRef) {
-        return PrimitiveAssignable.from(other).apply((PrimitiveRef) type);
+        return new PrimitiveAssignable((PrimitiveRef) type).from(other);
       } else if (type instanceof TypeParamRef) {
         return type.equals(other);
       }
@@ -62,7 +62,7 @@ public class Assignable {
     }
 
     public boolean from(TypeDef other) {
-      return TypeAssignalbe.from(other).apply(type);
+      return new TypeAssignable(type).from(other);
     }
   }
 }

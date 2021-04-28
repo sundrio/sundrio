@@ -17,26 +17,25 @@
 
 package io.sundr.codegen.functions;
 
-import java.util.function.Function;
+import java.util.HashSet;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.Node;
 import io.sundr.model.TypeDef;
 
-public class TypeAssignalbe implements Function<TypeDef, Boolean> {
+public class TypeAssignable {
 
-  private final TypeDef other;
+  private final TypeDef t;
 
-  private TypeAssignalbe(TypeDef other) {
-    this.other = other;
+  public TypeAssignable(TypeDef t) {
+    this.t = t;
   }
 
-  public static TypeAssignalbe from(TypeDef other) {
-    return new TypeAssignalbe(other);
+  public Boolean from(TypeDef other) {
+    return from(other, new HashSet<>());
   }
 
-  @Override
-  public Boolean apply(TypeDef t) {
+  public Boolean from(TypeDef other, HashSet<String> visited) {
     if (t == other || t.equals(other)) {
       return true;
     }
@@ -54,22 +53,30 @@ public class TypeAssignalbe implements Function<TypeDef, Boolean> {
       return true;
     }
 
+    if (visited.contains(other.getFullyQualifiedName())) {
+      return false;
+    }
+    visited.add(t.getFullyQualifiedName());
+
     for (ClassRef e : other.getExtendsList()) {
-      //This can be a little confusing, so we practically check if the TypeDef t is assignable from the definition of the candidate superclass
-      if (t.map(TypeAssignalbe.from(e.map(GetDefinition.FUNCTION)))) {
+      if (t.getFullyQualifiedName().equals(e.getFullyQualifiedName())) {
+        return true;
+      } else if (from(GetDefinition.of(e), visited)) {
+        //This can be a little confusing, so we practically check if the TypeDef t is assignable from the definition of the candidate superclass
         return true;
       }
     }
 
     for (ClassRef i : other.getImplementsList()) {
-      //This can be a little confusing, so we practically check if the TypeDef t is assignable from the definition of the candidate interface
-      if (t.map(TypeAssignalbe.from(i.map(GetDefinition.FUNCTION)))) {
+      if (t.getFullyQualifiedName().equals(i.getFullyQualifiedName())) {
+        return true;
+      }
+      if (from(GetDefinition.of(i), visited)) {
+        //This can be a little confusing, so we practically check if the TypeDef t is assignable from the definition of the candidate interface
         return true;
       }
     }
 
     return false;
-
   }
-
 }

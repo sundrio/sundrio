@@ -17,29 +17,21 @@
 
 package io.sundr.codegen.functions;
 
-import java.util.function.Function;
-
 import io.sundr.model.ClassRef;
 import io.sundr.model.Node;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 
-public class ClassAssignable implements Function<ClassRef, Boolean> {
+public class ClassAssignable {
 
-  private final TypeRef other;
+  private final ClassRef t;
 
-  private ClassAssignable(TypeRef other) {
-    this.other = other;
+  public ClassAssignable(ClassRef t) {
+    this.t = t;
   }
 
-  public static ClassAssignable from(TypeRef other) {
-    return new ClassAssignable(other);
-  }
-
-  @Override
-  public Boolean apply(ClassRef t) {
-
+  public Boolean from(TypeRef other) {
     if (t == other || t.equals(other)) {
       return true;
     } else if (other == null) {
