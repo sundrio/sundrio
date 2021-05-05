@@ -92,6 +92,7 @@
     <modules>
         <module>core</module>
         <module>model</module>
+        <module>adapters</module>
         <module>codegen</module>
         <module>maven-plugin</module>
         <module>annotations</module>

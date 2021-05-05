@@ -14,16 +14,11 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen;
+package io.sundr.api;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -44,8 +39,6 @@ public class DefinitionRepository {
   private final ConcurrentMap<String, TypeDef> definitions = new ConcurrentHashMap<String, TypeDef>();
   private final ConcurrentMap<String, Supplier<TypeDef>> suppliers = new ConcurrentHashMap<String, Supplier<TypeDef>>();
 
-  private Map<String, String> snapshot;
-
   private DefinitionRepository() {
   }
 
@@ -56,7 +49,7 @@ public class DefinitionRepository {
     return INSTANCE;
   }
 
-  public void registerIfAbsent(String fqcn, Supplier<TypeDef> supplier) {
+  public synchronized void registerIfAbsent(String fqcn, Supplier<TypeDef> supplier) {
     if (definitions.containsKey(fqcn)) {
       return;
     }
@@ -68,7 +61,7 @@ public class DefinitionRepository {
     suppliers.put(fqcn, supplier);
   }
 
-  public void registerIfAbsent(TypeDef definition) {
+  public synchronized void registerIfAbsent(TypeDef definition) {
     if (definition == null) {
       return;
     }
@@ -81,12 +74,12 @@ public class DefinitionRepository {
     }
   }
 
-  public TypeDef register(TypeDef definition) {
+  public synchronized TypeDef register(TypeDef definition) {
     definitions.put(definition.getFullyQualifiedName(), definition);
     return definition;
   }
 
-  public TypeDef register(TypeDef definition, String... flags) {
+  public synchronized TypeDef register(TypeDef definition, String... flags) {
     TypeDefBuilder builder = new TypeDefBuilder(definition);
     for (String flag : flags) {
       builder.addToAttributes(new AttributeKey<Boolean>(flag, Boolean.class), true);
@@ -94,7 +87,7 @@ public class DefinitionRepository {
     return register(builder.build());
   }
 
-  public TypeDef register(TypeDef definition, AttributeKey<Boolean>... flags) {
+  public synchronized TypeDef register(TypeDef definition, AttributeKey<Boolean>... flags) {
     TypeDefBuilder builder = new TypeDefBuilder(definition);
     for (AttributeKey<Boolean> flag : flags) {
       builder.addToAttributes(flag, true);
@@ -102,7 +95,7 @@ public class DefinitionRepository {
     return register(builder.build());
   }
 
-  public Set<TypeDef> getDefinitions(String... flags) {
+  public synchronized Set<TypeDef> getDefinitions(String... flags) {
     Set<TypeDef> result = new LinkedHashSet<TypeDef>();
     for (TypeDef candidate : definitions.values()) {
       boolean matches = true;
@@ -121,7 +114,7 @@ public class DefinitionRepository {
     return Collections.unmodifiableSet(result);
   }
 
-  public Set<TypeDef> getDefinitions(AttributeKey<Boolean>... attributeKeys) {
+  public synchronized Set<TypeDef> getDefinitions(AttributeKey<Boolean>... attributeKeys) {
 
     Set<TypeDef> result = new LinkedHashSet<TypeDef>();
     for (TypeDef candidate : definitions.values()) {
@@ -140,11 +133,11 @@ public class DefinitionRepository {
     return Collections.unmodifiableSet(result);
   }
 
-  public boolean hasDefinition(String fullyQualifiedName) {
+  public synchronized boolean hasDefinition(String fullyQualifiedName) {
     return definitions.containsKey(fullyQualifiedName) || suppliers.containsKey(fullyQualifiedName);
   }
 
-  public TypeDef getDefinition(String fullyQualifiedName) {
+  public synchronized TypeDef getDefinition(String fullyQualifiedName) {
     if (definitions.containsKey(fullyQualifiedName)) {
       return definitions.get(fullyQualifiedName);
     }
@@ -160,55 +153,19 @@ public class DefinitionRepository {
     return null;
   }
 
-  public TypeDef getDefinition(TypeRef type) {
+  public synchronized TypeDef getDefinition(TypeRef type) {
     if (type instanceof ClassRef) {
       return getDefinition(((ClassRef) type).getFullyQualifiedName());
     }
     return null;
   }
 
-  public Collection<TypeDef> getDefinitions() {
+  public synchronized Collection<TypeDef> getDefinitions() {
     return Stream.concat(definitions.keySet().stream(), suppliers.keySet().stream()).distinct().map(k -> getDefinition(k))
         .collect(Collectors.toSet());
   }
 
-  public void updateReferenceMap() {
-    snapshot = getReferenceMapInternal();
-  }
-
-  public Map<String, String> getReferenceMap() {
-    if (snapshot == null) {
-      snapshot = getReferenceMapInternal();
-    }
-    return snapshot;
-  }
-
-  private Map<String, String> getReferenceMapInternal() {
-    Map<String, String> mapping = new HashMap<String, String>();
-    List<ClassRef> refs = new ArrayList<ClassRef>();
-    for (TypeDef typeDef : getDefinitions()) {
-      refs.add(typeDef.toInternalReference());
-    }
-
-    //It's best to have predictable order, so that we can generate uniform code.
-    Collections.sort(refs, new Comparator<ClassRef>() {
-      @Override
-      public int compare(ClassRef o1, ClassRef o2) {
-        return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
-      }
-    });
-
-    for (ClassRef classRef : refs) {
-      String key = classRef.getName();
-      if (!mapping.containsKey(key)) {
-        mapping.put(key, classRef.getFullyQualifiedName());
-      }
-    }
-
-    return mapping;
-  }
-
-  public void clear() {
+  public synchronized void clear() {
     definitions.clear();
   }
 }

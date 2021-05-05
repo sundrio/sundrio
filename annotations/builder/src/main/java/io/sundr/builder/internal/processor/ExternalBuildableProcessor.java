@@ -202,7 +202,6 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
     }
 
     generateLocalDependenciesIfNeeded();
-    addCustomMappings(ctx);
     ctx.getDefinitionRepository().updateReferenceMap();
     generateBuildables(ctx, buildables);
     generatePojos(ctx, buildables);

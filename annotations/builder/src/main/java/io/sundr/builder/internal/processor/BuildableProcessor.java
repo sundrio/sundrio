@@ -109,8 +109,6 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
       return true;
     }
     generateLocalDependenciesIfNeeded();
-    addCustomMappings(ctx);
-
     ctx.getDefinitionRepository().updateReferenceMap();
     generateBuildables(ctx, buildables);
     generatePojos(ctx, buildables);

@@ -27,8 +27,6 @@ import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +43,6 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.ClassRef;
@@ -221,64 +218,6 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
             builder.withArguments(updatedArguments);
           }
         }).build();
-  }
-
-  /**
-   * Create a mapping from class name to {@link ClassRef}.
-   *
-   * @param builderContext The builder context.
-   */
-  public void addCustomMappings(BuilderContext builderContext) {
-    DefinitionRepository definitionRepository = builderContext.getDefinitionRepository();
-
-    List<ClassRef> refs = new ArrayList<ClassRef>();
-    for (TypeDef typeDef : builderContext.getDefinitionRepository().getDefinitions()) {
-      refs.add(typeDef.toInternalReference());
-    }
-
-    //It's best to have predictable order, so that we can generate uniform code.
-    Collections.sort(refs, new Comparator<ClassRef>() {
-      @Override
-      public int compare(ClassRef o1, ClassRef o2) {
-        return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
-      }
-    });
-
-    for (ClassRef ref : refs) {
-      if (ref.getFullyQualifiedName() == null || ref.getFullyQualifiedName().isEmpty()) {
-        throw new IllegalStateException("ClassRef should have a fully qualified name!");
-      }
-      String key = !ref.getFullyQualifiedName().contains(".")
-          ? ref.getFullyQualifiedName()
-          : ref.getFullyQualifiedName().substring(ref.getFullyQualifiedName().lastIndexOf(".") + 1);
-
-      if (BuilderUtils.isBuildable(ref)) {
-
-        //Add the builder
-        String builderKey = key + "Builder";
-        if (!definitionRepository.customMappingExists(builderKey)) {
-          definitionRepository.putCustomMapping(builderKey, ref.getFullyQualifiedName() + "Builder");
-        }
-
-        //Add the editable
-        String editableKey = "Editable" + key;
-        if (!definitionRepository.customMappingExists(editableKey)) {
-          definitionRepository.putCustomMapping(editableKey, "Editable" + ref.getFullyQualifiedName());
-        }
-
-        //Add the builder
-        String fluentKey = key + "Fluent";
-        if (!definitionRepository.customMappingExists(fluentKey)) {
-          definitionRepository.putCustomMapping(fluentKey, ref.getFullyQualifiedName() + "Fluent");
-        }
-
-        //Add the builder
-        String fluentImplKey = key + "FluentImpl";
-        if (!definitionRepository.customMappingExists(fluentImplKey)) {
-          definitionRepository.putCustomMapping(fluentImplKey, ref.getFullyQualifiedName() + "FluentImpl");
-        }
-      }
-    }
   }
 
   public void generateBuildables(BuilderContext ctx, Set<TypeDef> buildables) {
