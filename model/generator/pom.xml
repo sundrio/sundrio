@@ -17,13 +17,12 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>sundr-pom</artifactId>
+        <artifactId>sundr-model-pom</artifactId>
         <groupId>io.sundr</groupId>
         <version>0.40-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
     <artifactId>sundr-model-generator</artifactId>
     <name>Sundrio :: Model :: Generator</name>
 
