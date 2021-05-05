@@ -265,16 +265,20 @@ public class BuilderUtils {
         .apply(property.getTypeRef());
 
     if (unwrapped instanceof ClassRef) {
-      for (Method candidate : GetDefinition.of((ClassRef) unwrapped).getConstructors()) {
-        if (isInlineable(candidate)) {
-          result.add(candidate);
+      //We only want to inline buildable types
+      if (isBuildable(unwrapped)) {
+        for (Method candidate : GetDefinition.of((ClassRef) unwrapped).getConstructors()) {
+          if (isInlineable(candidate)) {
+            result.add(candidate);
+          }
         }
       }
     }
 
     //We try both types to make sure...
     TypeDef fromRepo = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
-    if (fromRepo != null) {
+    //We only want to inline buildable types
+    if (fromRepo != null && isBuildable(fromRepo)) {
       for (Method candidate : fromRepo.getConstructors()) {
         if (isInlineable(candidate)) {
           result.add(candidate);
