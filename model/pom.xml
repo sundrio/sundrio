@@ -23,7 +23,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
     <artifactId>sundr-model-pom</artifactId>
     <name>Sundrio :: Model :: POM</name>
     <packaging>pom</packaging>
