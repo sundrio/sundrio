@@ -266,7 +266,10 @@ public class ClassTo {
           final Object value = method.invoke(annotation, (Object[]) null);
           parameters.put(name, value);
         } catch (IllegalAccessException | InvocationTargetException e) {
-          System.out.printf("Couldn't retrieve '%s' parameter value for %s%n", name, annotationType.getName());
+          //Let's not pollute output with internal jdk stuff. 
+          if (!annotationType.getName().startsWith("jdk.")) {
+            System.out.printf("Couldn't retrieve '%s' parameter value for %s%n", name, annotationType.getName());
+          }
         }
       }
       annotationRef = new AnnotationRefBuilder(annotationRef).withParameters(parameters).build();
