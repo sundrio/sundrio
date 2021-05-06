@@ -31,6 +31,8 @@
       <module>base</module>
       <module>generator</module>
       <module>builder</module>
+      <module>repo</module>
+      <module>utils</module>
     </modules>
 
 </project>
