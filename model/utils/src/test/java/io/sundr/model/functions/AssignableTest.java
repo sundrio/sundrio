@@ -14,15 +14,19 @@
  *    limitations under the License.
  */
 
-package io.sundr.model;
+package io.sundr.model.functions;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.functions.Assignable;
+import io.sundr.model.ClassRef;
+import io.sundr.model.Kind;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class AssignableTest {
 
