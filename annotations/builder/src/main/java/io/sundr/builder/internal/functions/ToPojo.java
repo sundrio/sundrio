@@ -24,7 +24,7 @@ import static io.sundr.builder.Constants.TO_STRING_ARRAY_SNIPPET;
 import static io.sundr.builder.internal.functions.ClazzAs.BUILDER;
 import static io.sundr.builder.internal.functions.ClazzAs.POJO;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
+import static io.sundr.codegen.utils.Strings.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
@@ -64,7 +64,7 @@ import io.sundr.codegen.functions.Collections;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.utils.Getter;
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.Strings;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
@@ -124,7 +124,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     List<ClassRef> additionalImports = new ArrayList<>();
     List<AnnotationRef> annotationRefs = new ArrayList<>();
 
-    String pojoName = StringUtils.toPojoName(item.getName(), "Default", "");
+    String pojoName = Strings.toPojoName(item.getName(), "Default", "");
     String relativePath = ".";
 
     AnnotationRef pojoRef = null;
@@ -162,7 +162,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           } else if (params.containsKey("prefix") || params.containsKey("suffix")) {
             String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
             String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
-            pojoName = StringUtils.toPojoName(item.getName(), prefix, suffix);
+            pojoName = Strings.toPojoName(item.getName(), prefix, suffix);
           } else if (params.containsKey("relativePath")) {
             //When the package is different and there is no name clash, just use the same name unless explicitly specified.
             pojoName = item.getName();
@@ -224,7 +224,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         Method constructor = findBuildableConstructor(superClass);
         if (constructor != null) {
           for (Property p : constructor.getArguments()) {
-            String name = StringUtils.toFieldName(p.getName());
+            String name = Strings.toFieldName(p.getName());
             superClassFields.put(p.getName(), p);
           }
         }
@@ -280,9 +280,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
               .withAttributes(fieldAttributes)
               .build());
 
-          if (!superClassFields.containsKey(StringUtils.toFieldName(name))) {
+          if (!superClassFields.containsKey(Strings.toFieldName(name))) {
             Property field = new PropertyBuilder()
-                .withName(StringUtils.toFieldName(name))
+                .withName(Strings.toFieldName(name))
                 .withTypeRef(returnType)
                 .withModifiers(mutable ? TypeUtils.modifiersToInt(Modifier.PRIVATE)
                     : TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
@@ -292,7 +292,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             Method getter = new MethodBuilder(Getter.forProperty(field))
                 .withModifiers(modifiersToInt(Modifier.PUBLIC))
                 .withNewBlock()
-                .withStatements(new StringStatement("return this." + StringUtils.toFieldName(name) + ";"))
+                .withStatements(new StringStatement("return this." + Strings.toFieldName(name) + ";"))
                 .endBlock()
                 .build();
 
@@ -304,7 +304,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                   .withReturnType(Constants.PRIMITIVE_BOOLEAN_REF)
                   .withNewBlock()
                   .withStatements(new StringStatement(
-                      "return this." + StringUtils.toFieldName(name) + " != null &&  this." + StringUtils.toFieldName(name)
+                      "return this." + Strings.toFieldName(name) + " != null &&  this." + Strings.toFieldName(name)
                           + ";"))
                   .endBlock()
                   .build();
@@ -324,10 +324,10 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
       StringBuilder sb = new StringBuilder();
       sb.append("super(");
-      sb.append(StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+      sb.append(Strings.join(constructor.getArguments(), new Function<Property, String>() {
         @Override
         public String apply(Property item) {
-          return StringUtils.toFieldName(item.getName());
+          return Strings.toFieldName(item.getName());
         }
       }, ", "));
       sb.append(");");
@@ -365,7 +365,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           @Override
           public void visit(PropertyBuilder b) {
             String name = b.getName();
-            b.withName(StringUtils.toFieldName(name));
+            b.withName(Strings.toFieldName(name));
             //DEFAULT_VALUE is something that is available in Annotation types, but when the annotation becomes a Pojo
             //That piece of information is lost (as is the case with our super-classs). Let's work-around it.
             if (superClassFields.containsKey(name)) {
@@ -424,7 +424,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           }
 
           sb.append(
-              ".with" + StringUtils.capitalizeFirst(StringUtils.toFieldName(m.getName())) + "(" + defaultValue + ")");
+              ".with" + Strings.capitalizeFirst(Strings.toFieldName(m.getName())) + "(" + defaultValue + ")");
         }
       }
       sb.append(";");
@@ -558,7 +558,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             .equals(String.valueOf(r.getParameters().getOrDefault("withMapAdapterMethod", "false")));
         List<Method> adapterMethods = new ArrayList<>();
 
-        if (StringUtils.isNullOrEmpty(name) && StringUtils.isNullOrEmpty(prefix) && StringUtils.isNullOrEmpty(suffix)) {
+        if (Strings.isNullOrEmpty(name) && Strings.isNullOrEmpty(prefix) && Strings.isNullOrEmpty(suffix)) {
           suffix = "Adapter";
         }
 
@@ -604,7 +604,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         TypeDef mapper = new TypeDefBuilder()
             .withModifiers(modifiersToInt(Modifier.PUBLIC))
             .withPackageName(adapterPackage)
-            .withName(!StringUtils.isNullOrEmpty(name) ? name : StringUtils.toPojoName(generatedPojo.getName(), prefix, suffix))
+            .withName(!Strings.isNullOrEmpty(name) ? name : Strings.toPojoName(generatedPojo.getName(), prefix, suffix))
             .withMethods(adapterMethods)
             .addToAttributes(ALSO_IMPORT, adapterImports)
             .build();

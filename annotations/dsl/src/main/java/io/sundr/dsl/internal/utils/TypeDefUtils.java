@@ -16,7 +16,7 @@
 
 package io.sundr.dsl.internal.utils;
 
-import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
+import static io.sundr.codegen.utils.Strings.capitalizeFirst;
 import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.CLASSES;

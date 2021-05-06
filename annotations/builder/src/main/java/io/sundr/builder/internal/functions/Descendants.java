@@ -22,8 +22,8 @@ import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.ORIGIN_TYPEDEF;
 import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_MAP;
-import static io.sundr.codegen.utils.StringUtils.compact;
-import static io.sundr.codegen.utils.StringUtils.deCapitalizeFirst;
+import static io.sundr.codegen.utils.Strings.compact;
+import static io.sundr.codegen.utils.Strings.deCapitalizeFirst;
 
 import java.util.LinkedHashSet;
 import java.util.Map;

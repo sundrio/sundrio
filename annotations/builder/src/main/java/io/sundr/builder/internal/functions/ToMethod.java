@@ -45,8 +45,8 @@ import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
 import static io.sundr.codegen.functions.Collections.IS_LIST;
 import static io.sundr.codegen.functions.Collections.IS_MAP;
 import static io.sundr.codegen.functions.Collections.IS_SET;
-import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
+import static io.sundr.codegen.utils.Strings.capitalizeFirst;
+import static io.sundr.codegen.utils.Strings.loadResourceQuietly;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.codegen.utils.TypeUtils.isArray;
 import static io.sundr.codegen.utils.TypeUtils.isList;
@@ -82,7 +82,7 @@ import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.Singularize;
 import io.sundr.codegen.utils.Getter;
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.Strings;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
@@ -842,7 +842,7 @@ class ToMethod {
         }
 
         private Statement createAddToDescendants(final String prefix, Set<Property> descendants, final boolean useIndex) {
-          return new StringStatement(StringUtils.join(descendants, item -> {
+          return new StringStatement(Strings.join(descendants, item -> {
             TypeRef itemRef = combine(UNWRAP_COLLECTION_OF, ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
             String className = ((ClassRef) itemRef).getFullyQualifiedName();
             String methodName = prefix + item.getNameCapitalized();
@@ -908,7 +908,7 @@ class ToMethod {
             final ClassRef targetType = (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
             statements.add(new StringStatement(
-                "for (" + targetType.toString() + " item : items) {" + StringUtils.join(descendants, item1 -> {
+                "for (" + targetType.toString() + " item : items) {" + Strings.join(descendants, item1 -> {
                   TypeRef itemRef = combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item1.getTypeRef());
                   String className = ((ClassRef) itemRef).getFullyQualifiedName();
                   String removeFromMethodName = "removeFrom" + item1.getNameCapitalized();
@@ -1306,7 +1306,7 @@ class ToMethod {
       String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
       String delegateName = delegatePrefix + property.getNameCapitalized();
 
-      String args = StringUtils.join(constructor.getArguments(), Property::getName, ", ");
+      String args = Strings.join(constructor.getArguments(), Property::getName, ", ");
 
       result.add(new MethodBuilder()
           .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))

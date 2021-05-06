@@ -18,7 +18,7 @@ package io.sundr.dsl.internal.graph;
 
 import java.util.Set;
 
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.Strings;
 
 public class Node<T> {
 
@@ -41,7 +41,7 @@ public class Node<T> {
   @Override
   public String toString() {
     return item + "[" +
-        StringUtils.join(transitions, ",") +
+        Strings.join(transitions, ",") +
         "]";
   }
 }
