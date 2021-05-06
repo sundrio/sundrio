@@ -15,7 +15,7 @@
  * 
 **/
 
-package io.sundr.api;
+package io.sundr.adapter.api;
 
 import java.util.function.Function;
 
