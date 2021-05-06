@@ -14,20 +14,18 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen.utils;
+package io.sundr.model.utils;
 
 import static org.junit.Assert.*;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.sundr.codegen.Constants;
-
-public class TypeUtilsTest {
+public class TypesTest {
 
   @Test
   public void isBoolean() {
-    Assert.assertTrue(TypeUtils.isBoolean(Constants.BOOLEAN_REF));
-    Assert.assertTrue(TypeUtils.isBoolean(Constants.PRIMITIVE_BOOLEAN_REF));
+    Assert.assertTrue(Types.isBoolean(Types.BOOLEAN_REF));
+    Assert.assertTrue(Types.isBoolean(Types.PRIMITIVE_BOOLEAN_REF));
   }
 }
