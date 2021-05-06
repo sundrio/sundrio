@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import io.sundr.example.*;
 import io.sundr.model.*;
+import io.sundr.model.functions.*;
 
 public class ClassToTypeDefTest {
 
