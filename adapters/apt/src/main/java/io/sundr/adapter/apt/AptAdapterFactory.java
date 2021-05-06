@@ -15,18 +15,22 @@
  * 
 **/
 
-package io.sundr.api;
+package io.sundr.adapter.apt;
 
-public class AdapterContext {
+import javax.lang.model.element.TypeElement;
 
-  private final DefinitionRepository definitionRepository;
+import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterFactory;
 
-  public AdapterContext(DefinitionRepository definitionRepository) {
-    this.definitionRepository = definitionRepository;
+public class AptAdapterFactory implements AdapterFactory<TypeElement, AptContext> {
+
+  @Override
+  public Class<TypeElement> getType() {
+    return TypeElement.class;
   }
 
-  public DefinitionRepository getDefinitionRepository() {
-    return definitionRepository;
+  @Override
+  public Adapter<TypeElement> create(AptContext context) {
+    return new AptAdapter(context);
   }
-
 }

@@ -73,6 +73,7 @@
         <sun.tools.version>8</sun.tools.version>
         <validation.api.version>2.0.1.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
+        <compile-testing.version>0.5</compile-testing.version>
 
         <!-- Transitive Versions -->
         <commons-collections.version>3.2.2</commons-collections.version>
@@ -252,6 +253,34 @@
                          <version>${sun.tools.version}</version>
                          <optional>true</optional>
                      </dependency>
+                   <dependency>
+                     <groupId>com.google.testing.compile</groupId>
+                     <artifactId>compile-testing</artifactId>
+                     <version>${compile-testing.version}</version>
+                     <scope>test</scope>
+                   </dependency>
+                 </dependencies>
+             </dependencyManagement>
+        </profile>
+        <profile>
+             <id>jdk9+</id>
+             <activation>
+                 <jdk>[1.9,)</jdk>
+             </activation>
+             <dependencyManagement>
+                 <dependencies>
+                   <dependency>
+                     <groupId>com.google.testing.compile</groupId>
+                     <artifactId>compile-testing</artifactId>
+                     <version>${compile-testing.version}</version>
+                     <scope>test</scope>
+                     <exclusions>
+                       <exclusion>
+                         <groupId>com.sun</groupId>
+                         <artifactId>tools</artifactId>
+                       </exclusion>
+                     </exclusions>
+                   </dependency>
                  </dependencies>
              </dependencyManagement>
         </profile>

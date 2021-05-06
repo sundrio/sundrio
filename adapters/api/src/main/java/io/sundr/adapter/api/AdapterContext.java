@@ -15,23 +15,26 @@
  * 
 **/
 
-package io.sundr.api;
+package io.sundr.adapter.api;
 
-public interface AdapterFactory<T> {
+import java.lang.reflect.ParameterizedType;
 
-  /**
-   * The type of {@link Adapter} this factory supports.
-   * 
-   * @return the type
-   */
-  Class<T> getType();
+import io.sundr.model.repo.DefinitionRepository;
 
-  /**
-   * Create an instance of {@link Adapter} for the given {@link AdapterContext}.
-   * 
-   * @param ctx The {@link AdapterContext}
-   * @return the {@link Adapter}
-   */
-  public Adapter<T> create(AdapterContext ctx);
+public class AdapterContext<T> {
 
+  private final DefinitionRepository definitionRepository;
+
+  public AdapterContext(DefinitionRepository definitionRepository) {
+    this.definitionRepository = definitionRepository;
+  }
+
+  public DefinitionRepository getDefinitionRepository() {
+    return definitionRepository;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Class<T> getType() {
+    return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+  }
 }

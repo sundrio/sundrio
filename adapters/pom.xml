@@ -24,7 +24,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.sundr</groupId>
-    <artifactId>sundr-adapters-pom</artifactId>
+    <artifactId>sundr-adapter-pom</artifactId>
     <name>Sundrio :: Adapters :: POM</name>
     <packaging>pom</packaging>
 

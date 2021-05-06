@@ -15,7 +15,7 @@
  * 
 **/
 
-package io.sundr.api;
+package io.sundr.adapter.api;
 
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -25,16 +25,17 @@ import io.sundr.model.TypeDef;
 
 public class Adapters {
 
-  public static <T> TypeDef adapt(T input, AdapterContext ctx) {
+  public static <T> TypeDef adapt(T input, AdapterContext<T> ctx) {
     if (input == null) {
       throw new IllegalArgumentException("Adapter.adapt(null) is now allowed!");
     }
-    return getAdapter((Class<T>) input.getClass(), ctx).map(a -> a.adapt(input))
+    return getAdapter(ctx).map(a -> a.adapt(input))
         .orElseThrow(() -> new IllegalStateException("No adapter found for: " + input.getClass()));
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> Optional<Adapter<T>> getAdapter(Class<T> type, AdapterContext ctx) {
+  public static <T> Optional<Adapter<T>> getAdapter(AdapterContext<T> ctx) {
+    Class<T> type = ctx.getType();
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class).spliterator(), false)
         .filter(f -> f.getType().isAssignableFrom(type))
         .map(f -> (Adapter<T>) f.create(ctx))
