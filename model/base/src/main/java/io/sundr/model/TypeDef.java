@@ -89,6 +89,10 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
     this.outerTypeName = null;
   }
 
+  public static TypeDef forName(String fullyQualifiedName) {
+    return new TypeDef(fullyQualifiedName);
+  }
+
   /**
    * The method adapts constructor method to the current class. It unsets any name that may be
    * presetn in the method. It also sets as a return type a reference to the current type.
