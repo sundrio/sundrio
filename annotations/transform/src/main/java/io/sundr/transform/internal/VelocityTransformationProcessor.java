@@ -50,7 +50,7 @@ import io.sundr.codegen.annotations.ResourceSelector;
 import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
 import io.sundr.codegen.utils.ModelUtils;
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.Strings;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.transform.annotations.VelocityTransformation;
@@ -141,7 +141,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
     try {
       FileObject fileObject = filer.getResource(StandardLocation.CLASS_PATH, "", selector.value());
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileObject.openInputStream()))) {
-        List<String> lines = reader.lines().map(String::trim).filter(l -> !StringUtils.isNullOrEmpty(l))
+        List<String> lines = reader.lines().map(String::trim).filter(l -> !Strings.isNullOrEmpty(l))
             .collect(Collectors.toList());
         Map<String, TypeDef> map = lines.stream()
             .map(l -> elements.getTypeElement(l))

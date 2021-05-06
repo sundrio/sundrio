@@ -41,7 +41,7 @@ import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.utils.Strings;
 
 public abstract class AbstractSundrioMojo extends AbstractMojo {
 
@@ -126,12 +126,12 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
       InvocationResult result = invoker.execute(request);
       if (result.getExitCode() != 0) {
         throw new IllegalStateException(
-            "Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]",
+            "Error invoking Maven goals:[" + Strings.join(executionRequest.getGoals(), ", ") + "]",
             result.getExecutionException());
       }
     } catch (MavenInvocationException e) {
       throw new IllegalStateException(
-          "Error invoking Maven goals:[" + StringUtils.join(executionRequest.getGoals(), ", ") + "]", e);
+          "Error invoking Maven goals:[" + Strings.join(executionRequest.getGoals(), ", ") + "]", e);
     }
   }
 }

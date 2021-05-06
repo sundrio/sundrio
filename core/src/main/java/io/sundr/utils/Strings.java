@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.utils;
+package io.sundr.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public final class StringUtils {
+public final class Strings {
 
   private static final String SPLITTER_REGEX = "(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])";
 
@@ -47,7 +47,7 @@ public final class StringUtils {
     }
   }
 
-  private StringUtils() {
+  private Strings() {
     //Utility Class
   }
 
@@ -154,7 +154,7 @@ public final class StringUtils {
     InputStream is = null;
     BufferedReader in = null;
     try {
-      is = StringUtils.class.getClassLoader().getResourceAsStream(resourceName);
+      is = Strings.class.getClassLoader().getResourceAsStream(resourceName);
       in = new BufferedReader(new InputStreamReader(is));
       String line = null;
       StringBuffer sb = new StringBuffer();

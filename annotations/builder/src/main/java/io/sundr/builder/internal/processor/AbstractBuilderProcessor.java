@@ -23,7 +23,7 @@ import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.codegen.Constants.EMPTY;
-import static io.sundr.codegen.utils.StringUtils.loadResourceQuietly;
+import static io.sundr.codegen.utils.Strings.loadResourceQuietly;
 
 import java.io.IOException;
 import java.util.ArrayList;

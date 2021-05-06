@@ -43,7 +43,7 @@ import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.utils.Getter;
 import io.sundr.codegen.utils.Setter;
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.Strings;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
@@ -567,7 +567,7 @@ public class ClazzAs {
     sb.append("return new ").append(pojoBuilder.getName()).append("()");
 
     for (Method m : source.getMethods()) {
-      String trimmedName = StringUtils.deCapitalizeFirst(m.getName().replaceAll("^get", "").replaceAll("^is", ""));
+      String trimmedName = Strings.deCapitalizeFirst(m.getName().replaceAll("^get", "").replaceAll("^is", ""));
       if (m.getReturnType() instanceof ClassRef) {
         ClassRef ref = (ClassRef) m.getReturnType();
         Boolean hasSuperClass = pojo.getProperties()
@@ -591,7 +591,7 @@ public class ClazzAs {
           if (generatedType != null) {
             Method ctor = BuilderUtils.findBuildableConstructor(generatedType);
             if (m.getReturnType().getDimensions() > 0) {
-              sb.append(".addAllTo").append(StringUtils.capitalizeFirst(trimmedName)).append("(")
+              sb.append(".addAllTo").append(Strings.capitalizeFirst(trimmedName)).append("(")
                   .append("Arrays.asList(")
                   .append("instance.").append(m.getName()).append("())")
                   .append(".stream().map(i ->")
@@ -604,7 +604,7 @@ public class ClazzAs {
                   .append(")")
                   .append(".collect(Collectors.toList()))");
             } else {
-              sb.append(".with").append(StringUtils.capitalizeFirst(trimmedName)).append("(")
+              sb.append(".with").append(Strings.capitalizeFirst(trimmedName)).append("(")
                   .append("new ").append(generatedType.getName()).append("(")
                   .append(ctor.getArguments().stream()
                       .map(p -> Getter.find(GetDefinition.of((ClassRef) m.getReturnType()), p, true))
@@ -617,7 +617,7 @@ public class ClazzAs {
           }
         }
       }
-      String withMethod = "with" + (StringUtils.capitalizeFirst(trimmedName));
+      String withMethod = "with" + (Strings.capitalizeFirst(trimmedName));
 
       if (TypeUtils.hasProperty(pojo, trimmedName)) {
         sb.append(".").append(withMethod).append("(").append("instance.").append(m.getName()).append("())");
@@ -682,7 +682,7 @@ public class ClazzAs {
 
     statements.add(new StringStatement(new StringBuilder()
         .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
-        .append(StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+        .append(Strings.join(constructor.getArguments(), new Function<Property, String>() {
           public String apply(Property item) {
             return "fluent." + Getter.name(item) + "()";
           }
@@ -740,7 +740,7 @@ public class ClazzAs {
         .withReturnType(constructorType.toReference())
         .withNewBlock()
         .addNewStringStatementStatement(
-            "super(" + StringUtils.join(constructor.getArguments(), new Function<Property, String>() {
+            "super(" + Strings.join(constructor.getArguments(), new Function<Property, String>() {
               public String apply(Property item) {
                 return item.getName();
               }

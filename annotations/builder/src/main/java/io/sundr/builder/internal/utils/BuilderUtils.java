@@ -19,7 +19,7 @@ package io.sundr.builder.internal.utils;
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.internal.functions.TypeAs.*;
-import static io.sundr.codegen.utils.StringUtils.capitalizeFirst;
+import static io.sundr.codegen.utils.Strings.capitalizeFirst;
 import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;

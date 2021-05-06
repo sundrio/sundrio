@@ -16,7 +16,7 @@
 
 package io.sundr.codegen.generator;
 
-import static io.sundr.codegen.utils.StringUtils.loadResource;
+import static io.sundr.utils.Strings.loadResource;
 
 import java.io.IOException;
 import java.io.Writer;

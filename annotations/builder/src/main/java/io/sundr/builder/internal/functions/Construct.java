@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.Strings;
 import io.sundr.model.Method;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
@@ -57,7 +57,7 @@ public class Construct implements Function<List<String>, String> {
 
   @Override
   public String apply(List<String> item) {
-    if (StringUtils.isNullOrEmpty(staticFactoryMethod)) {
+    if (Strings.isNullOrEmpty(staticFactoryMethod)) {
       return usingConstructor(item);
     }
     return usingStaticFactoryMethod(item);

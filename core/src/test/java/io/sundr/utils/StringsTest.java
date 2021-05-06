@@ -14,14 +14,14 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen.utils;
+package io.sundr.utils;
 
-import static io.sundr.codegen.utils.StringUtils.*;
+import static io.sundr.utils.Strings.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class StringUtilsTest {
+public class StringsTest {
 
   @Test
   public void testCompact() throws Exception {

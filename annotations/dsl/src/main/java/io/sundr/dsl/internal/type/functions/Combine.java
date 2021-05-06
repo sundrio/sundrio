@@ -44,7 +44,7 @@ import java.util.function.Function;
 import javax.lang.model.element.Modifier;
 
 import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.codegen.utils.Strings;
 import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
 import io.sundr.dsl.internal.visitors.TypeParamDefColletor;
@@ -193,9 +193,9 @@ public class Combine {
         }
       };
 
-      final String prefix = StringUtils.getPrefix(types, toString);
+      final String prefix = Strings.getPrefix(types, toString);
 
-      return toInterfaceName(prefix + StringUtils.compact(StringUtils.join(types, new Function<TypeDef, String>() {
+      return toInterfaceName(prefix + Strings.compact(Strings.join(types, new Function<TypeDef, String>() {
         public String apply(TypeDef item) {
           String str = stripPrefix(stripSuffix(item.getName()));
           if (str.length() > prefix.length()) {
@@ -216,9 +216,9 @@ public class Combine {
         }
       };
 
-      final String prefix = StringUtils.getPrefix(types, toString);
+      final String prefix = Strings.getPrefix(types, toString);
 
-      return toInterfaceName(prefix + StringUtils.compact(StringUtils.join(types, new Function<ClassRef, String>() {
+      return toInterfaceName(prefix + Strings.compact(Strings.join(types, new Function<ClassRef, String>() {
         public String apply(ClassRef item) {
           String str = stripPrefix(stripSuffix(item.getName()));
           if (str.length() > prefix.length()) {
@@ -335,7 +335,7 @@ public class Combine {
         return left.getFullyQualifiedName().compareTo(right.getFullyQualifiedName());
       }
     });
-    return StringUtils.join(clazzes, new Function<TypeDef, String>() {
+    return Strings.join(clazzes, new Function<TypeDef, String>() {
       public String apply(TypeDef item) {
         return item.getFullyQualifiedName();
       }
