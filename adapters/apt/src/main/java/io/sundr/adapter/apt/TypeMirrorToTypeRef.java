@@ -44,6 +44,10 @@ public class TypeMirrorToTypeRef implements Function<TypeMirror, TypeRef> {
       return new VoidRef();
     }
 
+    if (item == null) {
+      throw new IllegalArgumentException("TypeMirror cannot be null.");
+    }
+
     Element element = AptContext.getContext().getTypes().asElement(item);
     TypeRef typeRef = item.accept(new TypeRefTypeVisitor(context), 0);
     if (typeRef instanceof ClassRef && element instanceof TypeElement) {

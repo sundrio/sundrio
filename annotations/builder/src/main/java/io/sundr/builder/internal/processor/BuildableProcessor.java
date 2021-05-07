@@ -36,16 +36,18 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.apt.AptContext;
+import io.sundr.adapter.apt.utils.Apt;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.repo.DefinitionRepository;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes("io.sundr.builder.annotations.Buildable")
@@ -67,9 +69,10 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
           continue;
         }
 
+        AptContext aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
         ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(),
             buildable.builderPackage());
-        TypeDef b = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
+        TypeDef b = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(element), aptContext))
             .addToAttributes(BUILDABLE, buildable)
             .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
@@ -86,7 +89,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         buildables.add(b);
 
         for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
-          TypeDef r = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref)))
+          TypeDef r = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(ref), aptContext))
               .addToAttributes(BUILDABLE, buildable)
               .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
               .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())

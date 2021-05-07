@@ -57,17 +57,25 @@ public final class Types {
 
   public static final TypeDef BOOLEAN = TypeDef.forName(Boolean.class.getName());
   public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
+
   public static final PrimitiveRef PRIMITIVE_BOOLEAN_REF = new PrimitiveRefBuilder().withName("boolean").build();
+  public static final PrimitiveRef PRIMITIVE_BYTE_REF = new PrimitiveRefBuilder().withName("byte").build();
+  public static final PrimitiveRef PRIMITIVE_CHAR_REF = new PrimitiveRefBuilder().withName("char").build();
+  public static final PrimitiveRef PRIMITIVE_SHORT_REF = new PrimitiveRefBuilder().withName("short").build();
+  public static final PrimitiveRef PRIMITIVE_INT_REF = new PrimitiveRefBuilder().withName("int").build();
+  public static final PrimitiveRef PRIMITIVE_LONG_REF = new PrimitiveRefBuilder().withName("long").build();
+  public static final PrimitiveRef PRIMITIVE_DOUBLE_REF = new PrimitiveRefBuilder().withName("double").build();
+  public static final PrimitiveRef PRIMITIVE_FLOAT_REF = new PrimitiveRefBuilder().withName("float").build();
 
   public static TypeRef[] PRIMITIVE_TYPES = {
-      new PrimitiveRefBuilder().withName("boolean").build(),
-      new PrimitiveRefBuilder().withName("byte").build(),
-      new PrimitiveRefBuilder().withName("char").build(),
-      new PrimitiveRefBuilder().withName("short").build(),
-      new PrimitiveRefBuilder().withName("int").build(),
-      new PrimitiveRefBuilder().withName("long").build(),
-      new PrimitiveRefBuilder().withName("double").build(),
-      new PrimitiveRefBuilder().withName("float").build()
+      PRIMITIVE_BOOLEAN_REF,
+      PRIMITIVE_BYTE_REF,
+      PRIMITIVE_CHAR_REF,
+      PRIMITIVE_SHORT_REF,
+      PRIMITIVE_INT_REF,
+      PRIMITIVE_LONG_REF,
+      PRIMITIVE_DOUBLE_REF,
+      PRIMITIVE_FLOAT_REF
   };
 
   public static TypeRef[] BOXED_PRIMITIVE_TYPES = {

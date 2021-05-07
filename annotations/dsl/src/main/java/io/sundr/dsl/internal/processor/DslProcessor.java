@@ -19,6 +19,7 @@ package io.sundr.dsl.internal.processor;
 import static io.sundr.dsl.internal.Constants.IS_GENERATED;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_REF;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.executablesToInterfaces;
+import static io.sundr.model.utils.Types.modifiersToInt;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,10 +38,8 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import io.sundr.codegen.functions.GetDefinition;
+import io.sundr.adapter.apt.utils.Apt;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
-import io.sundr.codegen.utils.ModelUtils;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.graph.NodeContext;
@@ -54,6 +53,7 @@ import io.sundr.model.MethodBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
 public class DslProcessor extends JavaGeneratingProcessor {
@@ -121,10 +121,10 @@ public class DslProcessor extends JavaGeneratingProcessor {
 
           //Do generate the DSL interface
           interfacesToGenerate.add(new TypeDefBuilder()
-              .withPackageName(ModelUtils.getPackageElement(element).toString())
+              .withPackageName(Apt.getPackageElement(element).toString())
               .withName(targetInterface)
               .withKind(Kind.INTERFACE)
-              .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+              .withModifiers(modifiersToInt(Modifier.PUBLIC))
               .withMethods(methods)
               .build());
 

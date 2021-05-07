@@ -22,7 +22,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
 
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -50,13 +53,13 @@ public class AptAdapterFactoryTest {
     types = rule.getTypes();
   }
 
-  private Optional<Adapter<TypeElement>> createAdapter() {
+  private Optional<Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement>> createAdapter() {
     return Adapters.getAdapter(AptContext.create(elements, types, DefinitionRepository.getRepository()));
   }
 
   @Test
   public void shouldCreateAptAdapter() throws Exception {
-    Optional<Adapter<TypeElement>> adapter = createAdapter();
+    Optional<Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement>> adapter = createAdapter();
     assertTrue(adapter.isPresent());
   }
 
@@ -64,10 +67,10 @@ public class AptAdapterFactoryTest {
   public void shouldAdaptList() throws Exception {
     String fqcn = "java.util.List";
     TypeElement element = elements.getTypeElement(fqcn);
-    Optional<Adapter<TypeElement>> adapter = createAdapter();
+    Optional<Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement>> adapter = createAdapter();
     assertTrue(adapter.isPresent());
     adapter.ifPresent(a -> {
-      TypeDef def = a.adapt(element);
+      TypeDef def = a.adaptType(element);
       assertEquals(def.getFullyQualifiedName(), fqcn);
     });
   }

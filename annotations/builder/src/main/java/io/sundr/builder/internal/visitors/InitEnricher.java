@@ -21,11 +21,11 @@ import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.model.Attributeable.LAZY_INIT;
+import static io.sundr.model.utils.Types.isAbstract;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,16 +34,16 @@ import java.util.List;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.functions.Construct;
 import io.sundr.builder.internal.functions.TypeAs;
-import io.sundr.codegen.functions.Collections;
-import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.functions.Optionals;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.utils.Collections;
+import io.sundr.model.utils.Optionals;
+import io.sundr.model.utils.Types;
 
 public class InitEnricher extends TypedVisitor<PropertyBuilder> {
 
@@ -78,14 +78,14 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
           : TypeAs.BUILDER.apply(GetDefinition.of(unwarppedClassRef)).toInternalReference();
     }
 
-    boolean isArray = TypeUtils.isArray(typeRef);
-    boolean isSet = TypeUtils.isSet(typeRef);
-    boolean isList = TypeUtils.isList(typeRef);
-    boolean isMap = TypeUtils.isMap(typeRef);
-    boolean isOptional = TypeUtils.isOptional(typeRef);
-    boolean isOptionalInt = TypeUtils.isOptionalInt(typeRef);
-    boolean isOptionalDouble = TypeUtils.isOptionalDouble(typeRef);
-    boolean isOptionalLong = TypeUtils.isOptionalLong(typeRef);
+    boolean isArray = Types.isArray(typeRef);
+    boolean isSet = Types.isSet(typeRef);
+    boolean isList = Types.isList(typeRef);
+    boolean isMap = Types.isMap(typeRef);
+    boolean isOptional = Types.isOptional(typeRef);
+    boolean isOptionalInt = Types.isOptionalInt(typeRef);
+    boolean isOptionalDouble = Types.isOptionalDouble(typeRef);
+    boolean isOptionalLong = Types.isOptionalLong(typeRef);
 
     if (isArray || isList) {
       ClassRef listRef = Collections.ARRAY_LIST.toReference(targetType);

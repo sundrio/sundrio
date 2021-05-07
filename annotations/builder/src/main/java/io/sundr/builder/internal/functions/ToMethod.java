@@ -40,27 +40,27 @@ import static io.sundr.codegen.Constants.BOOLEAN_REF;
 import static io.sundr.codegen.Constants.N_REF;
 import static io.sundr.codegen.Constants.Q;
 import static io.sundr.codegen.Constants.T_REF;
-import static io.sundr.codegen.functions.Collections.COLLECTION;
-import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
-import static io.sundr.codegen.functions.Collections.IS_LIST;
-import static io.sundr.codegen.functions.Collections.IS_MAP;
-import static io.sundr.codegen.functions.Collections.IS_SET;
-import static io.sundr.codegen.utils.Strings.capitalizeFirst;
-import static io.sundr.codegen.utils.Strings.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.isAbstract;
-import static io.sundr.codegen.utils.TypeUtils.isArray;
-import static io.sundr.codegen.utils.TypeUtils.isList;
-import static io.sundr.codegen.utils.TypeUtils.isMap;
-import static io.sundr.codegen.utils.TypeUtils.isOptional;
-import static io.sundr.codegen.utils.TypeUtils.isOptionalDouble;
-import static io.sundr.codegen.utils.TypeUtils.isOptionalInt;
-import static io.sundr.codegen.utils.TypeUtils.isOptionalLong;
-import static io.sundr.codegen.utils.TypeUtils.isPrimitive;
-import static io.sundr.codegen.utils.TypeUtils.isSet;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.model.Attributeable.LAZY_INIT;
+import static io.sundr.model.utils.Collections.COLLECTION;
+import static io.sundr.model.utils.Collections.IS_COLLECTION;
+import static io.sundr.model.utils.Collections.IS_LIST;
+import static io.sundr.model.utils.Collections.IS_MAP;
+import static io.sundr.model.utils.Collections.IS_SET;
+import static io.sundr.model.utils.Types.isAbstract;
+import static io.sundr.model.utils.Types.isArray;
+import static io.sundr.model.utils.Types.isList;
+import static io.sundr.model.utils.Types.isMap;
+import static io.sundr.model.utils.Types.isOptional;
+import static io.sundr.model.utils.Types.isOptionalDouble;
+import static io.sundr.model.utils.Types.isOptionalInt;
+import static io.sundr.model.utils.Types.isOptionalLong;
+import static io.sundr.model.utils.Types.isPrimitive;
+import static io.sundr.model.utils.Types.isSet;
+import static io.sundr.utils.Strings.capitalizeFirst;
+import static io.sundr.utils.Strings.loadResourceQuietly;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,12 +78,7 @@ import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.codegen.functions.Singularize;
-import io.sundr.codegen.utils.Getter;
-import io.sundr.codegen.utils.Strings;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
@@ -97,6 +92,11 @@ import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.model.utils.Getter;
+import io.sundr.model.utils.Types;
+import io.sundr.utils.Strings;
 
 class ToMethod {
 
@@ -174,7 +174,7 @@ class ToMethod {
       final MethodBuilder methodBuilder = new MethodBuilder()
           .withComments()
           .withAnnotations()
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withName(customizer.methodPrefix(property) + type.name + Singularize.FUNCTION.apply(property.getNameCapitalized()))
           .withReturnType(unwrapped);
       type.addIndexIfNeeded(methodBuilder);
@@ -209,7 +209,7 @@ class ToMethod {
       return new MethodBuilder()
           .withComments(comments)
           .withAnnotations(annotations)
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withName(operationName() + Singularize.FUNCTION.apply(property.getNameCapitalized()))
           .addNewArgument()
           .withName("predicate")
@@ -263,7 +263,7 @@ class ToMethod {
       }
 
       return new MethodBuilder()
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withParameters(parameters)
           .withName(methodName)
           .withReturnType(returnType)
@@ -357,7 +357,7 @@ class ToMethod {
     Property arrayProperty = new PropertyBuilder(property).withTypeRef(arrayType).build();
 
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(arrayProperty)
@@ -395,7 +395,7 @@ class ToMethod {
 
     methods.add(
         new MethodBuilder()
-            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
             .withName(methodName)
             .withReturnType(returnType)
             .withArguments(property)
@@ -409,7 +409,7 @@ class ToMethod {
     Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped).build();
     methods.add(
         new MethodBuilder()
-            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
             .withName(methodName)
             .withReturnType(returnType)
             .withArguments(genericProperty)
@@ -443,7 +443,7 @@ class ToMethod {
     }
 
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(methodName)
         .withReturnType(BOOLEAN_REF)
         .withArguments()
@@ -510,7 +510,7 @@ class ToMethod {
     Method getter = new MethodBuilder()
         .withComments(comments)
         .withAnnotations(annotations)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(getterName)
         .withReturnType(property.getTypeRef())
         .withArguments(new Property[] {})
@@ -579,7 +579,7 @@ class ToMethod {
     Method getter = new MethodBuilder()
         .withAnnotations(annotations)
         .withComments(comments)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(getterName)
         .withReturnType(property.getTypeRef())
         .withArguments()
@@ -659,7 +659,7 @@ class ToMethod {
           }
 
           Method addSingleItemAtIndex = new MethodBuilder()
-              .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
               .withParameters(parameters)
               .withName(addVarargMethodName)
               .withReturnType(returnType)
@@ -676,7 +676,7 @@ class ToMethod {
               .build();
 
           Method setSingleItemAtIndex = new MethodBuilder()
-              .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
               .withParameters(parameters)
               .withName(setMethodName)
               .withReturnType(returnType)
@@ -770,7 +770,7 @@ class ToMethod {
                 .build();
 
             methods.add(new MethodBuilder()
-                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
                 .withParameters(parameters)
                 .withName(addVarargMethodName)
                 .withReturnType(returnType)
@@ -785,7 +785,7 @@ class ToMethod {
                 .build());
 
             methods.add(new MethodBuilder()
-                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
                 .withParameters(parameters)
                 .withName(addVarargMethodName)
                 .withReturnType(returnType)
@@ -807,7 +807,7 @@ class ToMethod {
           }
 
           Method addVaragToCollection = new MethodBuilder()
-              .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
               .withParameters(parameters)
               .withName(addVarargMethodName)
               .withReturnType(returnType)
@@ -821,7 +821,7 @@ class ToMethod {
               .build();
 
           Method addAllToCollection = new MethodBuilder()
-              .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
               .withParameters(parameters)
               .withName(addAllMethodName)
               .withReturnType(returnType)
@@ -919,7 +919,7 @@ class ToMethod {
             statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
             methods.add(new MethodBuilder()
-                .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
                 .withParameters(parameters)
                 .withName(removeVarargMethodName)
                 .withReturnType(returnType)
@@ -938,7 +938,7 @@ class ToMethod {
           }
 
           Method removeVarargFromCollection = new MethodBuilder()
-              .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
               .withName(removeVarargMethodName)
               .withParameters(parameters)
               .withReturnType(returnType)
@@ -950,7 +950,7 @@ class ToMethod {
               .build();
 
           Method removeAllFromCollection = new MethodBuilder()
-              .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
               .withParameters(parameters)
               .withName(removeAllMethdoName)
               .withReturnType(returnType)
@@ -965,13 +965,13 @@ class ToMethod {
           methods.add(removeAllFromCollection);
 
           if (isBuildable(unwrapped)) {
-            if (TypeUtils.isConcrete(unwrapped) && !property.hasAttribute(DESCENDANT_OF)) {
+            if (Types.isConcrete(unwrapped) && !property.hasAttribute(DESCENDANT_OF)) {
               TypeRef builder = BUILDER.apply(GetDefinition.of((ClassRef) unwrapped)).toInternalReference();
               alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
               alsoImport.add((ClassRef) builderType);
               methods.add(new MethodBuilder()
                   .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-                  .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
                   .withReturnType(returnType)
                   .withParameters(parameters)
                   .withName(removeMatchingMethodName)
@@ -1003,7 +1003,7 @@ class ToMethod {
               alsoImport.add((ClassRef) builderType);
               methods.add(new MethodBuilder()
                   .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-                  .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
                   .withReturnType(returnType)
                   .withParameters(parameters)
                   .withName(removeMatchingMethodName)
@@ -1044,7 +1044,7 @@ class ToMethod {
     Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
     String methodName = "addTo" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(mapProperty)
@@ -1097,7 +1097,7 @@ class ToMethod {
 
     Method addNewValueTo = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName("addNewValueTo" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty)
@@ -1110,7 +1110,7 @@ class ToMethod {
 
     Method addNewValueLikeTo = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName("addNewValueLikeTo" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty, valueProperty)
@@ -1124,7 +1124,7 @@ class ToMethod {
 
     Method editValueIn = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName("editValueIn" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty)
@@ -1146,7 +1146,7 @@ class ToMethod {
 
     Method editOrAddValueIn = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName("editOrAddValueIn" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty)
@@ -1184,7 +1184,7 @@ class ToMethod {
     Property valueProperty = new PropertyBuilder().withName("value").withTypeRef(valueType).build();
     String methodName = "addTo" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(new Property[] { keyProperty, valueProperty })
@@ -1203,7 +1203,7 @@ class ToMethod {
     Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
     String methodName = "removeFrom" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(mapProperty)
@@ -1223,7 +1223,7 @@ class ToMethod {
     Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
     String methodName = "removeFrom" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(keyProperty)
@@ -1271,7 +1271,7 @@ class ToMethod {
         : property.getNameCapitalized()));
 
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1309,7 +1309,7 @@ class ToMethod {
       String args = Strings.join(constructor.getArguments(), Property::getName, ", ");
 
       result.add(new MethodBuilder()
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(returnType)
           .withArguments(constructor.getArguments())
           .withName(ownName)
@@ -1363,7 +1363,7 @@ class ToMethod {
         : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): new "
             + builderType.getFullyQualifiedName() + "().build());";
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1413,7 +1413,7 @@ class ToMethod {
         : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): item);";
 
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1463,7 +1463,7 @@ class ToMethod {
         : property.getNameCapitalized()) + suffix);
 
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1545,7 +1545,7 @@ class ToMethod {
         : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "());";
 
     Method base = new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
@@ -1616,9 +1616,9 @@ class ToMethod {
     public Method apply(Property property) {
       String classPrefix = getClassPrefix(property);
 
-      boolean isArray = TypeUtils.isArray(property.getTypeRef());
-      boolean isList = TypeUtils.isList(property.getTypeRef());
-      boolean isMap = TypeUtils.isMap(property.getTypeRef());
+      boolean isArray = Types.isArray(property.getTypeRef());
+      boolean isList = Types.isList(property.getTypeRef());
+      boolean isMap = Types.isMap(property.getTypeRef());
 
       String prefix = "with";
       if (isArray || isList) {
@@ -1641,7 +1641,7 @@ class ToMethod {
       }
 
       return new MethodBuilder()
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(N_REF)
           .withName("and")
           .withNewBlock()
@@ -1671,7 +1671,7 @@ class ToMethod {
             : property.getNameCapitalized());
 
     return new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withReturnType(N_REF)
         .withName(methodName)
         .withNewBlock()

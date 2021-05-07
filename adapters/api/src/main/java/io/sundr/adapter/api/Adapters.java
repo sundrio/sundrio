@@ -25,20 +25,20 @@ import io.sundr.model.TypeDef;
 
 public class Adapters {
 
-  public static <T> TypeDef adapt(T input, AdapterContext<T> ctx) {
+  public static <C extends AdapterContext, T, R, P, M> TypeDef adapt(T input, C ctx) {
     if (input == null) {
       throw new IllegalArgumentException("Adapter.adapt(null) is now allowed!");
     }
-    return getAdapter(ctx).map(a -> a.adapt(input))
-        .orElseThrow(() -> new IllegalStateException("No adapter found for: " + input.getClass()));
+    return getAdapter(ctx).map(a -> a.adaptType(input))
+        .orElseThrow(() -> new IllegalStateException("No adapter found for: " + ctx.getClass()));
   }
 
   @SuppressWarnings("unchecked")
-  public static <T> Optional<Adapter<T>> getAdapter(AdapterContext<T> ctx) {
-    Class<T> type = ctx.getType();
-    return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class).spliterator(), false)
-        .filter(f -> f.getType().isAssignableFrom(type))
-        .map(f -> (Adapter<T>) f.create(ctx))
+  public static <C extends AdapterContext, T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapter(C ctx) {
+    Class contextType = ctx.getClass();
+    return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, ctx.getClass().getClassLoader()).spliterator(), false)
+        .filter(f -> f.getContextType().isAssignableFrom(contextType))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
         .findFirst();
   }
 

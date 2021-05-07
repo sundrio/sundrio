@@ -37,8 +37,6 @@ import javax.lang.model.element.Modifier;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
@@ -52,6 +50,8 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.utils.Types;
 
 public final class PropertyAs {
 
@@ -61,9 +61,9 @@ public final class PropertyAs {
   public static final Function<Property, TypeDef> NESTED_CLASS = new Function<Property, TypeDef>() {
 
     public TypeDef apply(Property item) {
-      boolean isArray = TypeUtils.isArray(item.getTypeRef());
-      boolean isList = TypeUtils.isList(item.getTypeRef());
-      boolean isMap = TypeUtils.isMap(item.getTypeRef());
+      boolean isArray = Types.isArray(item.getTypeRef());
+      boolean isList = Types.isList(item.getTypeRef());
+      boolean isMap = Types.isMap(item.getTypeRef());
 
       TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF)
           .apply(item.getTypeRef());
@@ -201,7 +201,7 @@ public final class PropertyAs {
 
         return new TypeDefBuilder(nestedType)
             .withAnnotations()
-            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
             .withProperties(properties)
             .withMethods(nestedMethods)
             .withConstructors(constructors)

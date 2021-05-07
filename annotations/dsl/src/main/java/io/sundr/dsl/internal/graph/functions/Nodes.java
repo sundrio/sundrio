@@ -39,9 +39,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
+import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.TypedVisitor;
-import io.sundr.codegen.CodegenContext;
-import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.processor.DslContextManager;
@@ -55,6 +54,7 @@ import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.functions.GetDefinition;
 
 public class Nodes {
 
@@ -130,7 +130,7 @@ public class Nodes {
       for (Node<TypeDef> child : item.getTransitions()) {
         ClassRef transitionInterface = TO_TRANSITION.apply(child);
         interfaces.add(transitionInterface);
-        CodegenContext.getContext().getDefinitionRepository().register(child.getItem(), IS_GENERATED);
+        AptContext.getContext().getDefinitionRepository().register(child.getItem(), IS_GENERATED);
       }
 
       TypeDef rootType = new TypeDefBuilder(item.getItem()).withExtendsList(interfaces).withParameters().withMethods().build();

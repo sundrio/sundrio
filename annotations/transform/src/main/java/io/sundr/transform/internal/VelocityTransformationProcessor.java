@@ -43,18 +43,19 @@ import javax.lang.model.util.Types;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
-import io.sundr.codegen.CodegenContext;
+import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.apt.AptContext;
+import io.sundr.adapter.apt.utils.Apt;
 import io.sundr.codegen.annotations.AnnotationSelector;
 import io.sundr.codegen.annotations.PackageSelector;
 import io.sundr.codegen.annotations.ResourceSelector;
-import io.sundr.codegen.functions.ElementTo;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
-import io.sundr.codegen.utils.ModelUtils;
-import io.sundr.codegen.utils.Strings;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.transform.annotations.VelocityTransformation;
 import io.sundr.transform.annotations.VelocityTransformations;
+import io.sundr.utils.Strings;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({ "io.sundr.transform.annotations.VelocityTransformation",
@@ -66,7 +67,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
     Elements elements = processingEnv.getElementUtils();
     Types types = processingEnv.getTypeUtils();
     Filer filer = processingEnv.getFiler();
-    CodegenContext.create(elements, types);
+    AptContext aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
 
     Map<VelocityTransformation, Map<String, TypeDef>> annotatedTypes = new HashMap<>();
     for (TypeElement typeElement : annotations) {
@@ -85,7 +86,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
           }
         }
 
-        TypeDef def = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(element)))
+        TypeDef def = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(element), aptContext))
             .build();
 
         for (VelocityTransformation t : all) {
@@ -143,10 +144,11 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(fileObject.openInputStream()))) {
         List<String> lines = reader.lines().map(String::trim).filter(l -> !Strings.isNullOrEmpty(l))
             .collect(Collectors.toList());
+        AptContext aptContext = AptContext.getContext();
         Map<String, TypeDef> map = lines.stream()
             .map(l -> elements.getTypeElement(l))
             .filter(e -> e instanceof TypeElement)
-            .map(e -> ElementTo.TYPEDEF.apply(e))
+            .map(e -> Adapters.adapt(e, aptContext))
             .collect(Collectors.toMap(e -> e.getFullyQualifiedName(), e -> e));
 
         definitions.putAll(map);
@@ -160,9 +162,8 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
   public void selectAnnotated(RoundEnvironment env, Types types, AnnotationSelector selector,
       Map<String, TypeDef> definitions) {
     for (Object o : env.getElementsAnnotatedWith((TypeElement) types.asElement(annotationMirror(selector)))) {
-
       if (o instanceof TypeElement) {
-        TypeDef typeDef = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement((Element) o)))
+        TypeDef typeDef = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement((Element) o), AptContext.getContext()))
             .build();
         definitions.put(typeDef.getFullyQualifiedName(), typeDef);
       }
@@ -188,7 +189,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
     }
 
     for (TypeElement typeElement : typeElements) {
-      TypeDef typeDef = new TypeDefBuilder(ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement)))
+      TypeDef typeDef = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(typeElement), AptContext.getContext()))
           .build();
 
       Matcher m = pattern.matcher(typeDef.getName());

@@ -32,9 +32,9 @@ import io.sundr.model.PrimitiveRef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 
-public abstract class AbstractAdapterTest<T, C extends AdapterContext<T>> {
+public abstract class AbstractAdapterTest<T, C extends AdapterContext> {
 
-  public abstract AdapterContext<T> getContext();
+  public abstract C getContext();
 
   public abstract T getInput(Class type);
 

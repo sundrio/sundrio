@@ -18,7 +18,7 @@ package io.sundr.dsl.internal.graph;
 
 import java.util.Set;
 
-import io.sundr.codegen.utils.Strings;
+import io.sundr.utils.Strings;
 
 public class Node<T> {
 

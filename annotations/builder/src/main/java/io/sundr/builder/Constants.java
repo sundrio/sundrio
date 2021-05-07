@@ -18,7 +18,7 @@ package io.sundr.builder;
 
 import static io.sundr.codegen.functions.ClassTo.ANNOTATIONTYPEREF;
 import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
-import static io.sundr.codegen.utils.TypeUtils.typeGenericOf;
+import static io.sundr.model.utils.Types.typeGenericOf;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.ExternalBuildables;
-import io.sundr.codegen.functions.Collections;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
@@ -38,6 +37,7 @@ import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamRef;
+import io.sundr.model.utils.Collections;
 
 public class Constants {
 

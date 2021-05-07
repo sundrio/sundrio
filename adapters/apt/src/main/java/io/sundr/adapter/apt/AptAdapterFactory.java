@@ -17,20 +17,24 @@
 
 package io.sundr.adapter.apt;
 
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 import io.sundr.adapter.api.Adapter;
 import io.sundr.adapter.api.AdapterFactory;
 
-public class AptAdapterFactory implements AdapterFactory<TypeElement, AptContext> {
+public class AptAdapterFactory
+    implements AdapterFactory<AptContext, TypeElement, TypeMirror, VariableElement, ExecutableElement> {
 
   @Override
-  public Class<TypeElement> getType() {
-    return TypeElement.class;
+  public Class<AptContext> getContextType() {
+    return AptContext.class;
   }
 
   @Override
-  public Adapter<TypeElement> create(AptContext context) {
+  public Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement> create(AptContext context) {
     return new AptAdapter(context);
   }
 }

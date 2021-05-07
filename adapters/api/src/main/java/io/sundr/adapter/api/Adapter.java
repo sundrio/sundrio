@@ -19,15 +19,34 @@ package io.sundr.adapter.api;
 
 import java.util.function.Function;
 
+import io.sundr.model.Method;
+import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
-public interface Adapter<T> {
+public interface Adapter<T, R, P, M> {
 
-  Class<T> getType();
+  Function<T, TypeDef> getTypeAdapterFunction();
 
-  Function<T, TypeDef> getFunction();
+  Function<R, TypeRef> getReferenceAdapterFunction();
 
-  default TypeDef adapt(T input) {
-    return getFunction().apply(input);
+  Function<M, Method> getMethodAdapterFunction();
+
+  Function<P, Property> getPropertyAdapterFunction();
+
+  default TypeDef adaptType(T input) {
+    return getTypeAdapterFunction().apply(input);
+  }
+
+  default Method adaptMethod(M method) {
+    return getMethodAdapterFunction().apply(method);
+  }
+
+  default Property adaptProperty(P property) {
+    return getPropertyAdapterFunction().apply(property);
+  }
+
+  default TypeRef adaptReference(R ref) {
+    return getReferenceAdapterFunction().apply(ref);
   }
 }

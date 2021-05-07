@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import io.sundr.codegen.utils.Strings;
 import io.sundr.model.Method;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
+import io.sundr.utils.Strings;
 
 public class Construct implements Function<List<String>, String> {
 
@@ -100,8 +100,9 @@ public class Construct implements Function<List<String>, String> {
         return;
       }
     }
-    throw new IllegalArgumentException("No constructor found for " + typeDef.getName() + " with " + arguments + " arguments.");
-
+    throw new IllegalArgumentException(
+        "No constructor found for " + typeDef.getName() + " with " + arguments + " arguments. Found:"
+            + typeDef.getConstructors().stream().map(Method::toString).collect(Collectors.joining("\n\t", "\t", "\n")));
   }
 
   /**

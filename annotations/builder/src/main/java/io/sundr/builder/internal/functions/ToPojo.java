@@ -24,11 +24,11 @@ import static io.sundr.builder.Constants.TO_STRING_ARRAY_SNIPPET;
 import static io.sundr.builder.internal.functions.ClazzAs.BUILDER;
 import static io.sundr.builder.internal.functions.ClazzAs.POJO;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
-import static io.sundr.codegen.utils.Strings.loadResourceQuietly;
-import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
+import static io.sundr.model.utils.Types.modifiersToInt;
+import static io.sundr.utils.Strings.loadResourceQuietly;
 import static java.util.stream.Collectors.*;
 
 import java.nio.file.Path;
@@ -51,21 +51,16 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 
+import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Pojo;
+import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.Constants;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.functions.Assignable;
 import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.functions.Collections;
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.utils.Getter;
-import io.sundr.codegen.utils.Strings;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.AttributeKey;
@@ -82,6 +77,13 @@ import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.Assignable;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.model.utils.Collections;
+import io.sundr.model.utils.Getter;
+import io.sundr.model.utils.Types;
+import io.sundr.utils.Strings;
 
 public class ToPojo implements Function<TypeDef, TypeDef> {
 
@@ -116,7 +118,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
     List<Property> constructorArgs = new ArrayList<>();
     List<TypeDef> types = new ArrayList<TypeDef>();
-    TypeUtils.visitParents(item, types);
+    Types.visitParents(item, types);
 
     TypeDef superClass = null;
     List<ClassRef> extendsList = new ArrayList<>();
@@ -172,15 +174,17 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             adapters.addAll((List) params.getOrDefault("adapter", new ArrayList<>()));
           }
 
-          String superClassName = TypeUtils.toClassName(r.getParameters().getOrDefault("superClass", ""));
+          String superClassName = Types.toClassName(r.getParameters().getOrDefault("superClass", ""));
           if (!superClassName.isEmpty()) {
             superClassName = superClassName.replaceAll("\\.class$", "");
             superClass = DefinitionRepository.getRepository().getDefinition(superClassName);
 
             if (superClass == null) {
+              BuilderContext context = BuilderContextManager.getContext();
+              AptContext aptContext = AptContext.create(context.getElements(), context.getTypes(),
+                  context.getDefinitionRepository());
               superClass = new TypeDefBuilder(
-                  ElementTo.TYPEDEF.apply(BuilderContextManager.getContext().getElements().getTypeElement(superClassName)))
-                      .build();
+                  Adapters.adapt(aptContext.getElements().getTypeElement(superClassName), aptContext)).build();
 
               BuilderContextManager.getContext().getDefinitionRepository().register(superClass);
               BuilderContextManager.getContext().getBuildableRepository().register(superClass);
@@ -236,7 +240,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           String name = Getter.propertyNameSafe(method);
           TypeRef returnType = method.getReturnType();
           if (autobox) {
-            returnType = TypeUtils.box(returnType);
+            returnType = Types.box(returnType);
           }
           //If return type is an annotation also convert the annotation.
           if (method.getReturnType() instanceof ClassRef) {
@@ -276,7 +280,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           arguments.add(new PropertyBuilder()
               .withName(name)
               .withTypeRef(returnType)
-              .withModifiers(TypeUtils.modifiersToInt())
+              .withModifiers(Types.modifiersToInt())
               .withAttributes(fieldAttributes)
               .build());
 
@@ -284,8 +288,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             Property field = new PropertyBuilder()
                 .withName(Strings.toFieldName(name))
                 .withTypeRef(returnType)
-                .withModifiers(mutable ? TypeUtils.modifiersToInt(Modifier.PRIVATE)
-                    : TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+                .withModifiers(mutable ? Types.modifiersToInt(Modifier.PRIVATE)
+                    : Types.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
                 .withAttributes(fieldAttributes)
                 .build();
 
@@ -526,7 +530,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     }
 
     Method equals = new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
         .addNewArgument().withName("o").withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument()
         .withName("equals")
@@ -536,7 +540,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         .build();
 
     Method hashCode = new MethodBuilder()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF)
         .withName("hashCode")
         .withNewBlock()
@@ -576,18 +580,18 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           adapterImports.add(COLLECTORS);
         }
         List<ClassRef> generatedRefs = new ArrayList<>();
-        TypeUtils.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef)
+        Types.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef)
             .forEach(i -> populateReferences((ClassRef) i, generatedRefs));
         adapterImports.addAll(generatedRefs);
         adapterImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
 
-        TypeUtils.allProperties(generatedPojo).stream()
+        Types.allProperties(generatedPojo).stream()
             .filter(p -> p.getTypeRef() instanceof ClassRef)
             .map(p -> (ClassRef) p.getTypeRef())
             .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
             .collect(toList());
 
-        adapterImports.addAll(TypeUtils.allProperties(generatedPojo).stream()
+        adapterImports.addAll(Types.allProperties(generatedPojo).stream()
             .filter(p -> p.getTypeRef() instanceof ClassRef)
             .map(p -> (ClassRef) p.getTypeRef())
             .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
@@ -1041,9 +1045,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
   }
 
   private void populateReferences(ClassRef ref, List<ClassRef> refs) {
-    if (!refs.contains(ref) && !TypeUtils.isJdkType(ref)) {
+    if (!refs.contains(ref) && !Types.isJdkType(ref)) {
       refs.add(ref);
-      TypeUtils.allProperties(GetDefinition.of(ref)).stream()
+      Types.allProperties(GetDefinition.of(ref)).stream()
           .filter(p -> p.getTypeRef() instanceof ClassRef)
           .forEach(p -> populateReferences((ClassRef) p.getTypeRef(), refs));
     }

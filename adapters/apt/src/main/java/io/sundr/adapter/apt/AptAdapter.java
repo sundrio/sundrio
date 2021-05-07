@@ -18,29 +18,47 @@ package io.sundr.adapter.apt;
 
 import java.util.function.Function;
 
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
-import io.sundr.FunctionFactory;
 import io.sundr.adapter.api.Adapter;
+import io.sundr.model.Method;
+import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
-public class AptAdapter implements Adapter<TypeElement> {
+public class AptAdapter implements Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement> {
 
   private final AptContext context;
-  private final Function<TypeElement, TypeDef> function;
+  private final Function<TypeElement, TypeDef> typeAdapterFunction;
+  private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
+  private final Function<VariableElement, Property> propertyAdapterFunction;
+  private final Function<ExecutableElement, Method> methodAdapterFunction;
 
   @Override
-  public Function<TypeElement, TypeDef> getFunction() {
-    return function;
-  }
-
-  @Override
-  public Class getType() {
-    return TypeElement.class;
+  public Function<TypeElement, TypeDef> getTypeAdapterFunction() {
+    return typeAdapterFunction;
   }
 
   public AptAdapter(AptContext context) {
     this.context = context;
-    this.function = FunctionFactory.cache(new TypeElementToTypeDef(context));
+    this.typeAdapterFunction = context.getTypeElementToTypeDef();
+    this.referenceAdapterFunction = context.getTypeMirrorToTypeRef();
+    this.propertyAdapterFunction = context.getVariableElementToProperty();
+    this.methodAdapterFunction = context.getExecutableElementToMethod();
+  }
+
+  public Function<TypeMirror, TypeRef> getReferenceAdapterFunction() {
+    return referenceAdapterFunction;
+  }
+
+  public Function<VariableElement, Property> getPropertyAdapterFunction() {
+    return propertyAdapterFunction;
+  }
+
+  public Function<ExecutableElement, Method> getMethodAdapterFunction() {
+    return methodAdapterFunction;
   }
 }

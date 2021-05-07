@@ -42,13 +42,14 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.apt.AptContext;
+import io.sundr.adapter.apt.utils.Apt;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.utils.ModelUtils;
 import io.sundr.model.Kind;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
@@ -98,7 +99,8 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
             final boolean includeInterfaces = generated.includeInterfaces();
             final boolean includeAbstractClasses = generated.includeAbstractClasses();
 
-            TypeDef original = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(typeElement));
+            AptContext aptContext = AptContext.create(ctx.getElements(), ctx.getTypes(), ctx.getDefinitionRepository());
+            TypeDef original = Adapters.adapt(typeElement, aptContext);
             String fqcn = original.getFullyQualifiedName();
             boolean isBuildable = original.getKind() != Kind.ENUM
                 && (includeAbstractClasses || !original.isAbstract())
@@ -149,7 +151,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
           final boolean includeInterfaces = generated.includeInterfaces();
           final boolean includeAbstractClasses = generated.includeAbstractClasses();
 
-          TypeDef original = ElementTo.TYPEDEF.apply(ModelUtils.getClassElement(ref));
+          AptContext aptContext = AptContext.create(ctx.getElements(), ctx.getTypes(), ctx.getDefinitionRepository());
+
+          TypeDef original = Adapters.adapt(Apt.getClassElement(ref), aptContext);
           String fqcn = original.getFullyQualifiedName();
           boolean isBuildable = original.getKind() != Kind.ENUM && !original.isAbstract()
               && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());

@@ -17,6 +17,7 @@
 package io.sundr.builder.internal;
 
 import static io.sundr.builder.Constants.INLINEABLE;
+import static io.sundr.model.utils.Types.newTypeParamRef;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -24,22 +25,21 @@ import java.util.ArrayList;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.annotations.Inline;
-import io.sundr.codegen.CodegenContext;
-import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.ReplacePackage;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.codegen.functions.Sources;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class BuilderContext {
 
   private final Elements elements;
   private final Types types;
-  private final CodegenContext codegenContext;
+  private final AptContext aptContext;
 
   private final TypeDef visitorInterface;
   private final TypeDef typedVisitorInterface;
@@ -66,7 +66,7 @@ public class BuilderContext {
     this.elements = elements;
     this.types = types;
     this.validationEnabled = validationEnabled;
-    this.codegenContext = CodegenContext.create(elements, types);
+    this.aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
     this.generateBuilderPackage = generateBuilderPackage;
     this.builderPackage = builderPackage;
     this.inlineables = inlineables;
@@ -237,7 +237,7 @@ public class BuilderContext {
         .withName(inline.prefix() + (!inline.name().isEmpty() ? inline.name() : INLINEABLE.getName()) + inline.suffix())
         .withParameters(INLINEABLE.getParameters())
         .addNewMethod()
-        .withReturnType(TypeUtils.newTypeParamRef("T"))
+        .withReturnType(newTypeParamRef("T"))
         .withName(inline.value())
         .and()
         .build();
@@ -256,6 +256,10 @@ public class BuilderContext {
   }
 
   public DefinitionRepository getDefinitionRepository() {
-    return codegenContext.getDefinitionRepository();
+    return aptContext.getDefinitionRepository();
+  }
+
+  public AptContext getAptContext() {
+    return aptContext;
   }
 }

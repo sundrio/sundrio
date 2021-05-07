@@ -44,17 +44,45 @@ public class Collections {
 
   public static final TypeDef MAP = new TypeDefBuilder(TypeDef.forName(Map.class.getName())).withParameters(K, V).build();
   public static final TypeDef LINKED_HASH_MAP = new TypeDefBuilder(TypeDef.forName(LinkedHashMap.class.getName()))
-      .withImplementsList(MAP.toReference(K.toReference(), V.toReference())).build();
+      .addNewConstructor()
+      .endConstructor()
+      .addNewConstructor()
+      .addNewArgument()
+      .withName("m")
+      .withTypeRef(MAP.toReference(K.toReference(), V.toReference()))
+      .endArgument()
+      .endConstructor()
+      .withImplementsList(MAP.toReference(K.toReference(), V.toReference()))
+      .build();
 
   public static final TypeDef LIST = new TypeDefBuilder(TypeDef.forName(List.class.getName())).withParameters(E)
       .withExtendsList(COLLECTION.toReference(E.toReference())).build();
+
   public static final TypeDef ARRAY_LIST = new TypeDefBuilder(TypeDef.forName(ArrayList.class.getName())).withParameters(E)
+      .addNewConstructor()
+      .endConstructor()
+      .addNewConstructor()
+      .addNewArgument()
+      .withName("c")
+      .withTypeRef(COLLECTION.toReference(E.toReference()))
+      .endArgument()
+      .endConstructor()
       .withImplementsList(LIST.toReference(E.toReference())).build();
 
   public static final TypeDef SET = new TypeDefBuilder(TypeDef.forName(Set.class.getName())).withParameters(E)
       .withExtendsList(COLLECTION.toReference(E.toReference())).build();
+
   public static final TypeDef LINKED_HASH_SET = new TypeDefBuilder(TypeDef.forName(LinkedHashSet.class.getName()))
-      .withParameters(E).withImplementsList(SET.toReference(E.toReference())).build();
+      .withParameters(E)
+      .addNewConstructor()
+      .endConstructor()
+      .addNewConstructor()
+      .addNewArgument()
+      .withName("c")
+      .withTypeRef(COLLECTION.toReference(E.toReference()))
+      .endArgument()
+      .endConstructor()
+      .withImplementsList(SET.toReference(E.toReference())).build();
 
   public static final Function<TypeRef, Boolean> IS_LIST = new Function<TypeRef, Boolean>() {
     public Boolean apply(TypeRef type) {

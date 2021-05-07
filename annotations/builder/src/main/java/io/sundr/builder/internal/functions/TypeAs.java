@@ -28,9 +28,9 @@ import javax.lang.model.element.Modifier;
 import io.sundr.FunctionFactory;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.functions.Collections;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.*;
+import io.sundr.model.utils.Collections;
+import io.sundr.model.utils.Types;
 
 public class TypeAs {
   @SuppressWarnings("unchecked")
@@ -45,7 +45,7 @@ public class TypeAs {
   }
 
   static final Function<TypeDef, TypeDef> SHALLOW_BUILDER = item -> new TypeDefBuilder(item)
-      .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
       .withName(item.getName() + "Builder")
       .withInnerTypes()
       .build();
@@ -56,7 +56,7 @@ public class TypeAs {
 
     return new TypeDefBuilder(item)
         .withKind(Kind.INTERFACE)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(item.getName() + "Fluent")
         .withParameters(parameters)
         .withInnerTypes()
@@ -89,7 +89,7 @@ public class TypeAs {
 
     return new TypeDefBuilder(item)
         .withKind(Kind.INTERFACE)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(item.getName() + "Fluent")
         .withPackageName(item.getPackageName())
         .withParameters(parameters)
@@ -125,7 +125,7 @@ public class TypeAs {
 
       return new TypeDefBuilder(item)
           .withKind(Kind.CLASS)
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withName(item.getName() + "FluentImpl")
           .withPackageName(item.getPackageName())
           .withParameters(parameters)
@@ -157,7 +157,7 @@ public class TypeAs {
     parameters.add(builder.toInternalReference());
     return new TypeDefBuilder(item)
         .withKind(Kind.CLASS)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName(item.getName() + "Builder")
         .withParameters(item.getParameters())
         .withInnerTypes()
@@ -171,7 +171,7 @@ public class TypeAs {
     List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
     return new TypeDefBuilder(item)
         .withKind(Kind.CLASS)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withName("Editable" + item.getName())
         .withParameters(parameters)
         .withExtendsList(item.toInternalReference())
@@ -241,26 +241,26 @@ public class TypeAs {
   public static final Function<TypeRef, TypeRef> UNWRAP_OPTIONAL_OF = type -> {
     if (type instanceof ClassRef) {
       ClassRef classRef = (ClassRef) type;
-      if (TypeUtils.isOptional(classRef)) {
+      if (Types.isOptional(classRef)) {
         return classRef.getArguments().get(0);
       }
 
-      if (TypeUtils.isOptionalInt(classRef)) {
+      if (Types.isOptionalInt(classRef)) {
         return new TypeDefBuilder().withPackageName("java.lang").withName("Integer").build().toReference();
       }
 
-      if (TypeUtils.isOptionalLong(classRef)) {
+      if (Types.isOptionalLong(classRef)) {
         return new TypeDefBuilder().withPackageName("java.lang").withName("Long").build().toReference();
       }
 
-      if (TypeUtils.isOptionalDouble(classRef)) {
+      if (Types.isOptionalDouble(classRef)) {
         return new TypeDefBuilder().withPackageName("java.lang").withName("Double").build().toReference();
       }
     }
     return type;
   };
 
-  public static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(TypeUtils::box);
+  public static final Function<TypeRef, TypeRef> BOXED_OF = FunctionFactory.cache(Types::box);
 
   static final Function<TypeRef, String> PARSER_OF = FunctionFactory.cache(type -> {
     int index = 0;
