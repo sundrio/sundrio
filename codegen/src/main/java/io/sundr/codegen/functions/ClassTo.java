@@ -17,17 +17,48 @@
 package io.sundr.codegen.functions;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.sundr.FunctionFactory;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.model.*;
+import io.sundr.model.AnnotationRef;
+import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.AttributeKey;
+import io.sundr.model.Attributeable;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Kind;
 import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.PrimitiveRefBuilder;
+import io.sundr.model.Property;
+import io.sundr.model.PropertyBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
+import io.sundr.model.TypeParamRefBuilder;
+import io.sundr.model.TypeRef;
+import io.sundr.model.VoidRefBuilder;
+import io.sundr.model.WildcardRefBuilder;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class ClassTo {
 
@@ -109,6 +140,7 @@ public class ClassTo {
           for (TypeVariable v : c.getTypeParameters()) {
             arguments.add(TYPEREF.apply(v));
           }
+          references.add((Class) item);
           String fqcn = c.getName().replaceAll(Pattern.quote("$"), ".");
           return new ClassRefBuilder()
               .withFullyQualifiedName(fqcn)

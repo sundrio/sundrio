@@ -22,10 +22,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
 
 public class BuildableRepository {
 

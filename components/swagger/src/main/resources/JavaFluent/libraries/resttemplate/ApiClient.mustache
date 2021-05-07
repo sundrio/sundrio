@@ -29,7 +29,7 @@ import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConve
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
+import org.springframework.util.Strings;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -78,7 +78,7 @@ public class ApiClient {
         }
 
         private String collectionToString(Collection<? extends CharSequence> collection) {
-            return StringUtils.collectionToDelimitedString(collection, separator);
+            return Strings.collectionToDelimitedString(collection, separator);
         }
     }
     
@@ -468,7 +468,7 @@ public class ApiClient {
                 return Collections.singletonList(mediaType);
             }
         }
-        return MediaType.parseMediaTypes(StringUtils.arrayToCommaDelimitedString(accepts));
+        return MediaType.parseMediaTypes(Strings.arrayToCommaDelimitedString(accepts));
     }
 
     /**

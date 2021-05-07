@@ -83,6 +83,7 @@
 
         <!-- Maven Plugin Versions -->
         <compiler.plugin.version>3.6.0</compiler.plugin.version>
+        <jar.plugin.version>3.2.0</jar.plugin.version>
         <invoker.plugin.version>2.0.0</invoker.plugin.version>
         <release.plugin.version>2.5.3</release.plugin.version>
         <surefire.plugin.version>3.0.0-M3</surefire.plugin.version>

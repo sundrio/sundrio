@@ -42,6 +42,11 @@
     <dependencies>
         <dependency>
             <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-apt</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sundr</groupId>
             <artifactId>sundr-codegen</artifactId>
             <version>${project.version}</version>
         </dependency>

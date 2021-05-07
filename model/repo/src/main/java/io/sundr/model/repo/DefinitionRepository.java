@@ -16,9 +16,14 @@
 
 package io.sundr.model.repo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -38,6 +43,8 @@ public class DefinitionRepository {
 
   private final ConcurrentMap<String, TypeDef> definitions = new ConcurrentHashMap<String, TypeDef>();
   private final ConcurrentMap<String, Supplier<TypeDef>> suppliers = new ConcurrentHashMap<String, Supplier<TypeDef>>();
+
+  private Map<String, String> snapshot;
 
   private DefinitionRepository() {
   }
@@ -163,6 +170,42 @@ public class DefinitionRepository {
   public synchronized Collection<TypeDef> getDefinitions() {
     return Stream.concat(definitions.keySet().stream(), suppliers.keySet().stream()).distinct().map(k -> getDefinition(k))
         .collect(Collectors.toSet());
+  }
+
+  public synchronized void updateReferenceMap() {
+    snapshot = getReferenceMapInternal();
+  }
+
+  public synchronized Map<String, String> getReferenceMap() {
+    if (snapshot == null) {
+      snapshot = getReferenceMapInternal();
+    }
+    return snapshot;
+  }
+
+  private Map<String, String> getReferenceMapInternal() {
+    Map<String, String> mapping = new HashMap<String, String>();
+    List<ClassRef> refs = new ArrayList<ClassRef>();
+    for (TypeDef typeDef : getDefinitions()) {
+      refs.add(typeDef.toInternalReference());
+    }
+
+    //It's best to have predictable order, so that we can generate uniform code.
+    Collections.sort(refs, new Comparator<ClassRef>() {
+      @Override
+      public int compare(ClassRef o1, ClassRef o2) {
+        return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
+      }
+    });
+
+    for (ClassRef classRef : refs) {
+      String key = classRef.getName();
+      if (!mapping.containsKey(key)) {
+        mapping.put(key, classRef.getFullyQualifiedName());
+      }
+    }
+
+    return mapping;
   }
 
   public synchronized void clear() {

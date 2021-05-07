@@ -38,7 +38,7 @@ import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.repo.DefinitionRepository;
 
-public class AptContext extends AdapterContext<TypeElement> {
+public class AptContext extends AdapterContext {
 
   private static AptContext INSTANCE;
 

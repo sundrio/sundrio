@@ -19,8 +19,7 @@ package io.sundr.dsl.internal.processor;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import io.sundr.codegen.CodegenContext;
-import io.sundr.codegen.DefinitionRepository;
+import io.sundr.adapter.apt.AptContext;
 import io.sundr.dsl.internal.element.functions.ToClasses;
 import io.sundr.dsl.internal.element.functions.ToKeywords;
 import io.sundr.dsl.internal.element.functions.ToRequiresAll;
@@ -28,12 +27,13 @@ import io.sundr.dsl.internal.element.functions.ToRequiresAny;
 import io.sundr.dsl.internal.element.functions.ToRequiresNoneOf;
 import io.sundr.dsl.internal.element.functions.ToRequiresOnly;
 import io.sundr.dsl.internal.graph.NodeRepository;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class DslContext {
 
   private final Elements elements;
   private final Types types;
-  private final CodegenContext codegenContext;
+  private final AptContext aptContext;
 
   private final ToRequiresAny toRequiresAny;
   private final ToRequiresAll toRequiresAll;
@@ -47,7 +47,7 @@ public class DslContext {
   public DslContext(Elements elements, Types types) {
     this.elements = elements;
     this.types = types;
-    this.codegenContext = CodegenContext.create(elements, types);
+    this.aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
     this.toRequiresAny = new ToRequiresAny(elements);
     this.toRequiresAll = new ToRequiresAll(elements);
     this.toRequiresNoneOf = new ToRequiresNoneOf(elements);
@@ -64,8 +64,8 @@ public class DslContext {
     return types;
   }
 
-  public CodegenContext getCodegenContext() {
-    return codegenContext;
+  public AptContext getAptContext() {
+    return aptContext;
   }
 
   public NodeRepository getNodeRepository() {
@@ -73,7 +73,7 @@ public class DslContext {
   }
 
   public DefinitionRepository getDefinitionRepository() {
-    return codegenContext.getDefinitionRepository();
+    return aptContext.getDefinitionRepository();
   }
 
   public ToRequiresAny getToRequiresAny() {

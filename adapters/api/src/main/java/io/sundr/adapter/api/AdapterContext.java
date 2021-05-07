@@ -17,11 +17,9 @@
 
 package io.sundr.adapter.api;
 
-import java.lang.reflect.ParameterizedType;
-
 import io.sundr.model.repo.DefinitionRepository;
 
-public class AdapterContext<T> {
+public class AdapterContext {
 
   private final DefinitionRepository definitionRepository;
 
@@ -31,10 +29,5 @@ public class AdapterContext<T> {
 
   public DefinitionRepository getDefinitionRepository() {
     return definitionRepository;
-  }
-
-  @SuppressWarnings("unchecked")
-  public Class<T> getType() {
-    return (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
   }
 }

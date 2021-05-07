@@ -81,6 +81,12 @@
 
         <dependency>
             <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-apt</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
             <artifactId>sundr-codegen</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -100,11 +106,17 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
-
+        <dependency>
+          <groupId>com.google.testing.compile</groupId>
+          <artifactId>compile-testing</artifactId>
+          <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

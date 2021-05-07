@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.sundr.codegen.utils.StringUtils;
+import io.sundr.utils.Strings;
 import io.swagger.codegen.v3.CliOption;
 import io.swagger.codegen.v3.CodegenModel;
 import io.swagger.codegen.v3.CodegenOperation;
@@ -375,7 +375,7 @@ public class JavaFluentCodegen extends JavaClientCodegen {
       StringBuilder sb = new StringBuilder();
       sb.append(removePackage(ref, basePackage, subPackage))
           .append("<")
-          .append(StringUtils.join(args, new Function<String, String>() {
+          .append(Strings.join(args, new Function<String, String>() {
             @Override
             public String apply(String s) {
               return removePackage(s, basePackage, subPackage);

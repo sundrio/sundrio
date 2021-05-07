@@ -56,9 +56,7 @@ import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 
-import io.sundr.codegen.DefinitionRepository;
 import io.sundr.codegen.utils.IOUtils;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.AttributeKey;
@@ -86,6 +84,8 @@ import io.sundr.model.TypeRef;
 import io.sundr.model.VoidRef;
 import io.sundr.model.WildcardRef;
 import io.sundr.model.WildcardRefBuilder;
+import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.model.utils.Types;
 
 public class Sources {
 
@@ -457,7 +457,7 @@ public class Sources {
     //To be more accurate we need to check if there is a matching type parameter definition
     //and if so, return a reference to that (rather than consider it a class).
     private TypeRef checkAgainstTypeParamRef(TypeRef typeRef, Collection<TypeParamDef> parameters) {
-      TypeParamDef parameterDef = TypeUtils.getParameterDefinition(typeRef, parameters);
+      TypeParamDef parameterDef = Types.getParameterDefinition(typeRef, parameters);
       if (parameterDef != null) {
         return parameterDef.toReference();
       }

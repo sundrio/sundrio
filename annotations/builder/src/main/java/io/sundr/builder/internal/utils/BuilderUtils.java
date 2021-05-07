@@ -19,12 +19,12 @@ package io.sundr.builder.internal.utils;
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.internal.functions.TypeAs.*;
-import static io.sundr.codegen.utils.Strings.capitalizeFirst;
-import static io.sundr.codegen.utils.TypeUtils.isAbstract;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.LAZY_INIT;
+import static io.sundr.model.utils.Types.isAbstract;
+import static io.sundr.utils.Strings.capitalizeFirst;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +41,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 
+import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.*;
@@ -49,14 +51,7 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.Descendants;
 import io.sundr.builder.internal.functions.TypeAs;
-import io.sundr.codegen.DefinitionRepository;
-import io.sundr.codegen.functions.Assignable;
 import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.functions.Collections;
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.functions.Optionals;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
@@ -73,6 +68,12 @@ import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.Assignable;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.model.utils.Collections;
+import io.sundr.model.utils.Optionals;
+import io.sundr.model.utils.Types;
 
 public class BuilderUtils {
 
@@ -320,7 +321,8 @@ public class BuilderUtils {
       return ClassTo.TYPEDEF.apply(inline.type());
     } catch (MirroredTypeException e) {
       Element element = context.getTypes().asElement(e.getTypeMirror());
-      return ElementTo.TYPEDEF.apply((TypeElement) element);
+      AptContext aptContext = AptContext.create(context.getElements(), context.getTypes(), context.getDefinitionRepository());
+      return Adapters.adapt((TypeElement) element, aptContext);
     }
   }
 
@@ -337,7 +339,8 @@ public class BuilderUtils {
       }
 
       Element element = context.getTypes().asElement(e.getTypeMirror());
-      return ElementTo.TYPEDEF.apply((TypeElement) element);
+      AptContext aptContext = AptContext.create(context.getElements(), context.getTypes(), context.getDefinitionRepository());
+      return Adapters.adapt((TypeElement) element, aptContext);
     }
   }
 
@@ -458,7 +461,7 @@ public class BuilderUtils {
         //If candidate is imported and different that the actual name, do a diff
         if (originType.getImports().contains(candidateFqn)
             && !classRef.getFullyQualifiedName().equals(candidateFqn)) {
-          return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
+          return capitalizeFirst(Types.fullyQualifiedNameDiff(candidateFqn, classRef.getFullyQualifiedName()));
         }
 
         //If not then we compare against what has been found in the map.
@@ -469,7 +472,7 @@ public class BuilderUtils {
         if (fqcn == null) {
           System.out.println("Warning: Expected to find class with name:" + classRef.getName());
         } else if (!classRef.getFullyQualifiedName().equals(fqcn) && mainBuildable) {
-          return capitalizeFirst(TypeUtils.fullyQualifiedNameDiff(fqcn, classRef.getFullyQualifiedName()));
+          return capitalizeFirst(Types.fullyQualifiedNameDiff(fqcn, classRef.getFullyQualifiedName()));
         }
       }
     }
@@ -488,7 +491,7 @@ public class BuilderUtils {
     TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
     ClassRef listRef = Collections.ARRAY_LIST.toReference(BOXED_OF.apply(unwrapped));
 
-    if (TypeUtils.isPrimitive(unwrapped)) {
+    if (Types.isPrimitive(unwrapped)) {
       return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(BOXED_OF.apply(unwrapped)))
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
           .addToAttributes(INIT,
@@ -508,10 +511,10 @@ public class BuilderUtils {
     TypeRef typeRef = property.getTypeRef();
     ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
     ClassRef classRef = (ClassRef) typeRef;
-    ClassRef builderType = !TypeUtils.isConcrete(unwrapped) ? TypeAs.VISITABLE_BUILDER.apply(unwrapped)
+    ClassRef builderType = !Types.isConcrete(unwrapped) ? TypeAs.VISITABLE_BUILDER.apply(unwrapped)
         : TypeAs.BUILDER.apply(GetDefinition.of(unwrapped)).toInternalReference();
 
-    if (TypeUtils.isList(classRef)) {
+    if (Types.isList(classRef)) {
       ClassRef listRef = Collections.ARRAY_LIST.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(builderType))
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
@@ -523,7 +526,7 @@ public class BuilderUtils {
           .build();
     }
 
-    if (TypeUtils.isSet(classRef)) {
+    if (Types.isSet(classRef)) {
       ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
           .addToAttributes(LAZY_INIT, " new " + setRef + "()")
@@ -535,28 +538,28 @@ public class BuilderUtils {
           .build();
     }
 
-    if (TypeUtils.isOptionalLong(classRef)) {
+    if (Types.isOptionalLong(classRef)) {
       ClassRef optionalRef = Optionals.OPTIONAL_LONG.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalLong.empty()")
           .build();
     }
 
-    if (TypeUtils.isOptionalDouble(classRef)) {
+    if (Types.isOptionalDouble(classRef)) {
       ClassRef optionalRef = Optionals.OPTIONAL_DOUBLE.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalDouble.empty()")
           .build();
     }
 
-    if (TypeUtils.isOptionalInt(classRef)) {
+    if (Types.isOptionalInt(classRef)) {
       ClassRef optionalRef = Optionals.OPTIONAL_INT.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalInt.empty()")
           .build();
     }
 
-    if (TypeUtils.isOptional(classRef)) {
+    if (Types.isOptional(classRef)) {
       ClassRef optionalRef = Optionals.OPTIONAL.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " Optional.empty()")
@@ -564,7 +567,7 @@ public class BuilderUtils {
           .build();
     }
 
-    if (TypeUtils.isConcrete(builderType) && BuilderUtils.hasDefaultConstructor(builderType)
+    if (Types.isConcrete(builderType) && BuilderUtils.hasDefaultConstructor(builderType)
         && property.hasAttribute(DEFAULT_VALUE)) {
       return new PropertyBuilder(property).withTypeRef(builderType)
           .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
@@ -620,7 +623,7 @@ public class BuilderUtils {
 
     for (Property property : properties) {
       String name = property.getName();
-      if (TypeUtils.isPrimitive(property.getTypeRef())) {
+      if (Types.isPrimitive(property.getTypeRef())) {
         statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.")
             .append(name).append(") return false;").toString()));
       } else if (property.getTypeRef() instanceof ClassRef

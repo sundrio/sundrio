@@ -20,10 +20,10 @@ import static io.sundr.builder.Constants.BUILDABLE_ENABLED;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERATED;
 import static io.sundr.builder.Constants.ORIGIN_TYPEDEF;
-import static io.sundr.codegen.functions.Collections.IS_COLLECTION;
-import static io.sundr.codegen.functions.Collections.IS_MAP;
-import static io.sundr.codegen.utils.Strings.compact;
-import static io.sundr.codegen.utils.Strings.deCapitalizeFirst;
+import static io.sundr.model.utils.Collections.IS_COLLECTION;
+import static io.sundr.model.utils.Collections.IS_MAP;
+import static io.sundr.utils.Strings.compact;
+import static io.sundr.utils.Strings.deCapitalizeFirst;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -38,8 +38,6 @@ import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.visitors.InitEnricher;
-import io.sundr.codegen.functions.Assignable;
-import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -48,6 +46,8 @@ import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.Assignable;
+import io.sundr.model.functions.GetDefinition;
 
 public class Descendants {
 

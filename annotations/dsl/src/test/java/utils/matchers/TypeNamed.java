@@ -21,8 +21,8 @@ import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 
-import io.sundr.codegen.functions.GetDefinition;
 import io.sundr.model.ClassRef;
+import io.sundr.model.functions.GetDefinition;
 
 public class TypeNamed extends BaseMatcher<ClassRef> {
 

@@ -18,8 +18,8 @@ package io.sundr.codegen;
 
 import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 import static io.sundr.codegen.functions.ClassTo.TYPEREF;
-import static io.sundr.codegen.utils.TypeUtils.newTypeParamDef;
-import static io.sundr.codegen.utils.TypeUtils.newTypeParamRef;
+import static io.sundr.model.utils.Types.newTypeParamDef;
+import static io.sundr.model.utils.Types.newTypeParamRef;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;

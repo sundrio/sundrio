@@ -18,8 +18,8 @@ package io.sundr.builder.internal.functions;
 
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
-import static io.sundr.codegen.utils.TypeUtils.isAbstract;
-import static io.sundr.codegen.utils.TypeUtils.modifiersToInt;
+import static io.sundr.model.utils.Types.isAbstract;
+import static io.sundr.model.utils.Types.modifiersToInt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,19 +32,13 @@ import javax.lang.model.element.Modifier;
 
 import io.sundr.FunctionFactory;
 import io.sundr.SundrException;
-import io.sundr.builder.Constants;
+import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.InitEnricher;
-import io.sundr.codegen.CodegenContext;
 import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.utils.Getter;
-import io.sundr.codegen.utils.Setter;
-import io.sundr.codegen.utils.Strings;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -59,6 +53,11 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.utils.Getter;
+import io.sundr.model.utils.Setter;
+import io.sundr.model.utils.Types;
+import io.sundr.utils.Strings;
 
 public class ClazzAs {
 
@@ -87,14 +86,14 @@ public class ClazzAs {
             .addToAttributes(GENERIC_TYPE_REF, genericType.toReference()).withComments().withAnnotations().build();
 
         boolean isBuildable = isBuildable(unwrapped);
-        boolean isArray = TypeUtils.isArray(toAdd.getTypeRef());
-        boolean isSet = TypeUtils.isSet(toAdd.getTypeRef());
-        boolean isList = TypeUtils.isList(toAdd.getTypeRef());
-        boolean isMap = TypeUtils.isMap(toAdd.getTypeRef());
+        boolean isArray = Types.isArray(toAdd.getTypeRef());
+        boolean isSet = Types.isSet(toAdd.getTypeRef());
+        boolean isList = Types.isList(toAdd.getTypeRef());
+        boolean isMap = Types.isMap(toAdd.getTypeRef());
         boolean isMapWithBuildableValue = isMap && isBuildable(TypeAs.UNWRAP_MAP_VALUE_OF.apply(unwrapped));
         boolean isAbstract = isAbstract(unwrapped);
-        boolean isOptional = TypeUtils.isOptional(toAdd.getTypeRef()) || TypeUtils.isOptionalInt(toAdd.getTypeRef())
-            || TypeUtils.isOptionalDouble(toAdd.getTypeRef()) || TypeUtils.isOptionalLong(toAdd.getTypeRef());
+        boolean isOptional = Types.isOptional(toAdd.getTypeRef()) || Types.isOptionalInt(toAdd.getTypeRef())
+            || Types.isOptionalDouble(toAdd.getTypeRef()) || Types.isOptionalLong(toAdd.getTypeRef());
 
         Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
         toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
@@ -159,7 +158,7 @@ public class ClazzAs {
           nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
         } else if (!descendants.isEmpty()) {
           for (Property descendant : descendants) {
-            if (TypeUtils.isCollection(descendant.getTypeRef())) {
+            if (Types.isCollection(descendant.getTypeRef())) {
               methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
               methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
             } else {
@@ -194,9 +193,9 @@ public class ClazzAs {
       //The generic letter is always the last
       final TypeParamDef genericType = fluentImplType.getParameters().get(fluentImplType.getParameters().size() - 1);
 
-      Method emptyConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).build();
+      Method emptyConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).build();
 
-      Method instanceConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
+      Method instanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
           .withTypeRef(item.toInternalReference()).withName("instance").and().withNewBlock()
           .withStatements(toInstanceConstructorBody(item, "")).endBlock().build();
 
@@ -215,16 +214,16 @@ public class ClazzAs {
         }
 
         final boolean isBuildable = isBuildable(unwrapped);
-        final boolean isArray = TypeUtils.isArray(property.getTypeRef());
-        final boolean isSet = TypeUtils.isSet(property.getTypeRef());
-        final boolean isList = TypeUtils.isList(property.getTypeRef());
-        final boolean isMap = TypeUtils.isMap(property.getTypeRef());
+        final boolean isArray = Types.isArray(property.getTypeRef());
+        final boolean isSet = Types.isSet(property.getTypeRef());
+        final boolean isList = Types.isList(property.getTypeRef());
+        final boolean isMap = Types.isMap(property.getTypeRef());
         final boolean isMapWithBuildableValue = isMap && isBuildable(TypeAs.UNWRAP_MAP_VALUE_OF.apply(unwrapped));
         final boolean isAbstract = isAbstract(unwrapped);
-        boolean isOptional = TypeUtils.isOptional(property.getTypeRef()) || TypeUtils.isOptionalInt(property.getTypeRef())
-            || TypeUtils.isOptionalDouble(property.getTypeRef()) || TypeUtils.isOptionalLong(property.getTypeRef());
+        boolean isOptional = Types.isOptional(property.getTypeRef()) || Types.isOptionalInt(property.getTypeRef())
+            || Types.isOptionalDouble(property.getTypeRef()) || Types.isOptionalLong(property.getTypeRef());
 
-        Property toAdd = new PropertyBuilder(property).withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE))
+        Property toAdd = new PropertyBuilder(property).withModifiers(Types.modifiersToInt(Modifier.PRIVATE))
             .addToAttributes(ORIGIN_TYPEDEF, item).addToAttributes(OUTER_INTERFACE, fluentType)
             .addToAttributes(OUTER_CLASS, fluentImplType).addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
             .withComments().withAnnotations().build();
@@ -292,7 +291,7 @@ public class ClazzAs {
         } else if (!descendants.isEmpty()) {
           properties.add(buildableField(toAdd));
           for (Property descendant : descendants) {
-            if (TypeUtils.isCollection(descendant.getTypeRef())) {
+            if (Types.isCollection(descendant.getTypeRef())) {
               methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
               methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
             } else {
@@ -311,7 +310,7 @@ public class ClazzAs {
         }
       }
 
-      Method equals = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      Method equals = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(ClassTo.TYPEREF.apply(boolean.class)).addNewArgument().withName("o")
           .withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
           .withStatements(BuilderUtils.toEquals(fluentImplType, properties)).endBlock()
@@ -323,7 +322,7 @@ public class ClazzAs {
           // }))
           .build();
 
-      Method hashCode = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      Method hashCode = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF).withName("hashCode").withNewBlock()
           .withStatements(BuilderUtils.toHashCode(properties)).endBlock()
           // .withBlock(new Block(new Provider<List<Statement>>() {
@@ -365,10 +364,10 @@ public class ClazzAs {
       fields.add(fluentProperty);
       fields.add(validationEnabledProperty);
 
-      Method emptyConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).withNewBlock()
+      Method emptyConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withNewBlock()
           .addNewStringStatementStatement("this(true);").endBlock().build();
 
-      Method validationEnabledConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      Method validationEnabledConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .addNewArgument().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock().addToStatements(new StringStatement(new Supplier<String>() {
             @Override
@@ -378,11 +377,11 @@ public class ClazzAs {
             }
           })).endBlock().build();
 
-      Method fluentConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
+      Method fluentConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock().addNewStringStatementStatement("this(fluent, true);")
           .endBlock().build();
 
-      Method fluentAndValidationConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      Method fluentAndValidationConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument()
           .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
           .addToStatements(new StringStatement(new Supplier<String>() {
@@ -393,13 +392,13 @@ public class ClazzAs {
             }
           })).endBlock().build();
 
-      Method instanceAndFluentCosntructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      Method instanceAndFluentCosntructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(instanceRef)
           .withName("instance").and().withNewBlock().addNewStringStatementStatement("this(fluent, instance, true);").endBlock()
           .build();
 
       Method instanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
           .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
           .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock()
@@ -408,12 +407,12 @@ public class ClazzAs {
           .endBlock()
           .build();
 
-      Method instanceConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
+      Method instanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
           .withTypeRef(instanceRef).withName("instance").and().withNewBlock()
           .addNewStringStatementStatement("this(instance,true);").endBlock().build();
 
       Method instanceAndValidationEnabledConstructor = new MethodBuilder()
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(instanceRef)
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(instanceRef)
           .withName("instance").and().addNewArgument().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
           .withName("validationEnabled").and()
           .withNewBlock()
@@ -431,7 +430,7 @@ public class ClazzAs {
       constructors.add(instanceConstructor);
       constructors.add(instanceAndValidationEnabledConstructor);
 
-      Method build = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(modifiers)).withReturnType(instanceRef)
+      Method build = new MethodBuilder().withModifiers(Types.modifiersToInt(modifiers)).withReturnType(instanceRef)
           .withName("build")
           .withNewBlock()
           .withStatements(toBuild(item, item))
@@ -439,7 +438,7 @@ public class ClazzAs {
           .build();
       methods.add(build);
 
-      Method equals = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      Method equals = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(ClassTo.TYPEREF.apply(boolean.class)).addNewArgument().withName("o")
           .withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument().withName("equals")
           .withNewBlock()
@@ -447,7 +446,7 @@ public class ClazzAs {
           .endBlock()
           .build();
 
-      Method hashCode = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+      Method hashCode = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF).withName("hashCode")
           .withNewBlock()
           .withStatements(BuilderUtils.toHashCode(fields))
@@ -463,7 +462,7 @@ public class ClazzAs {
         Property validatorProperty = new PropertyBuilder().withName("validator").withTypeRef(validatorRef).build();
 
         fields.add(validatorProperty);
-        Method validatorConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        Method validatorConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
             .addNewArgument().withTypeRef(validatorRef).withName("validator").and().withNewBlock()
             .addToStatements(new StringStatement(new Supplier<String>() {
               @Override
@@ -474,7 +473,7 @@ public class ClazzAs {
             })).endBlock().build();
 
         Method instanceAndFluentAndValidatorCosntructor = new MethodBuilder()
-            .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
             .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
             .withTypeRef(validatorRef).withName("validator").and()
             .withNewBlock()
@@ -484,7 +483,7 @@ public class ClazzAs {
             .endBlock()
             .build();
 
-        Method instanceAndValidatorConstructor = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        Method instanceAndValidatorConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
             .addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument().withTypeRef(validatorRef)
             .withName("validator").and()
             .withNewBlock()
@@ -500,7 +499,7 @@ public class ClazzAs {
       }
 
       return BuilderContextManager.getContext().getDefinitionRepository()
-          .register(new TypeDefBuilder(builderType).withAnnotations().withModifiers(TypeUtils.modifiersToInt(modifiers))
+          .register(new TypeDefBuilder(builderType).withAnnotations().withModifiers(Types.modifiersToInt(modifiers))
               .withProperties(fields).withConstructors(constructors).withMethods(methods).build());
     }
 
@@ -515,7 +514,7 @@ public class ClazzAs {
       return new TypeDefBuilder(BUILDER.apply(item)).withAnnotations().accept(new TypedVisitor<MethodBuilder>() {
         public void visit(MethodBuilder builder) {
           if (builder.getName() != null && builder.getName().equals("build")) {
-            builder.withModifiers(TypeUtils.modifiersToInt(modifiers));
+            builder.withModifiers(Types.modifiersToInt(modifiers));
             builder.withReturnType(editable.toInternalReference());
             builder.withNewBlock().withStatements(toBuild(editable, editable)).endBlock();
           }
@@ -539,7 +538,7 @@ public class ClazzAs {
         constructors.add(superConstructorOf(constructor, editableType));
       }
 
-      Method edit = new MethodBuilder().withModifiers(TypeUtils.modifiersToInt(modifiers))
+      Method edit = new MethodBuilder().withModifiers(Types.modifiersToInt(modifiers))
           .withReturnType(builderType.toInternalReference()).withName("edit").withNewBlock()
           .addToStatements(new StringStatement(new Supplier<String>() {
             @Override
@@ -551,9 +550,9 @@ public class ClazzAs {
       methods.add(edit);
 
       //We need to treat the editable classes as buildables themselves.
-      return CodegenContext.getContext().getDefinitionRepository()
+      return AptContext.getContext().getDefinitionRepository()
           .register(BuilderContextManager.getContext().getBuildableRepository()
-              .register(new TypeDefBuilder(editableType).withAnnotations().withModifiers(TypeUtils.modifiersToInt(modifiers))
+              .register(new TypeDefBuilder(editableType).withAnnotations().withModifiers(Types.modifiersToInt(modifiers))
                   .withConstructors(constructors).withMethods(methods).addToAttributes(BUILDABLE_ENABLED, true)
                   .addToAttributes(GENERATED, true) // We want to know that its a generated type...
                   .build()));
@@ -578,7 +577,7 @@ public class ClazzAs {
             .count() > 0;
 
         if (GetDefinition.of(ref).isAnnotation()) {
-          TypeDef generatedType = TypeUtils.allProperties(pojo)
+          TypeDef generatedType = Types.allProperties(pojo)
               .stream()
               .filter(p -> p.getName().equals(m.getName()))
               .map(p -> p.getTypeRef())
@@ -619,7 +618,7 @@ public class ClazzAs {
       }
       String withMethod = "with" + (Strings.capitalizeFirst(trimmedName));
 
-      if (TypeUtils.hasProperty(pojo, trimmedName)) {
+      if (Types.hasProperty(pojo, trimmedName)) {
         sb.append(".").append(withMethod).append("(").append("instance.").append(m.getName()).append("())");
       }
     }
@@ -692,7 +691,7 @@ public class ClazzAs {
 
     TypeDef target = clazz;
     List<TypeDef> parents = new ArrayList<TypeDef>();
-    TypeUtils.visitParents(target, parents);
+    Types.visitParents(target, parents);
     for (TypeDef c : parents) {
       if (!isBuildable(c)) {
         continue;

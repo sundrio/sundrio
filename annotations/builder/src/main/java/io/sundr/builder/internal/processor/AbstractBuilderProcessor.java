@@ -23,7 +23,7 @@ import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.codegen.Constants.EMPTY;
-import static io.sundr.codegen.utils.Strings.loadResourceQuietly;
+import static io.sundr.utils.Strings.loadResourceQuietly;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +44,6 @@ import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.processor.JavaGeneratingProcessor;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
@@ -54,6 +53,7 @@ import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.utils.Types;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
@@ -134,13 +134,13 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     Property builderProperty = new PropertyBuilder()
         .withTypeRef(TypeAs.BUILDER.apply(type).toInternalReference())
         .withName(BUILDER)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withModifiers(Types.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
         .build();
 
     Property functionProperty = new PropertyBuilder()
         .withTypeRef(functionType)
         .withName(FUNCTION)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withModifiers(Types.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
         .build();
 
     Method inlineMethod = new MethodBuilder()
@@ -149,7 +149,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         .withNewBlock()
         .addNewStringStatementStatement(BUILD_AND_APPLY_FUNCTION)
         .endBlock()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .build();
 
     constructors.add(new MethodBuilder()
@@ -159,7 +159,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         .withName(FUNCTION)
         .withTypeRef(functionType)
         .and()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withNewBlock()
         .addNewStringStatementStatement(String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
         .endBlock()
@@ -176,7 +176,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
         .withName(FUNCTION)
         .withTypeRef(functionType)
         .and()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withNewBlock()
         .addNewStringStatementStatement(String.format(NEW_BULDER_WITH_ITEM_AND_SET_FUNCTION_FORMAT, builderType.getName()))
         .endBlock()
@@ -190,7 +190,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
           .withName(ITEM)
           .withTypeRef(type.toInternalReference())
           .and()
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withNewBlock()
           .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(),
               String.format(EMPTY_FUNCTION_TEXT, type.toInternalReference(), returnType.toInternalReference(),
@@ -201,7 +201,7 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
 
     return new TypeDefBuilder(shallowInlineType)
         .withAnnotations()
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withConstructors(constructors)
         .addToProperties(builderProperty, functionProperty)
         .addToMethods(inlineMethod)

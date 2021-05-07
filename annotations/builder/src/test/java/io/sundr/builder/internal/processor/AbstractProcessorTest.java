@@ -22,23 +22,38 @@ import java.util.concurrent.Callable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import com.sun.tools.javac.model.JavacElements;
-import com.sun.tools.javac.model.JavacTypes;
-import com.sun.tools.javac.util.Context;
+import org.junit.Before;
+import org.junit.Rule;
 
+import com.google.testing.compile.CompilationRule;
+
+import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.codegen.CodegenContext;
 import io.sundr.model.Method;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class AbstractProcessorTest {
 
-  final Context context = new Context();
-  final Elements elements = JavacElements.instance(context);
-  final Types types = JavacTypes.instance(context);
-  final BuilderContext builderContext = BuilderContextManager.create(elements, types);
+  public @Rule CompilationRule rule = new CompilationRule();
+
+  private Elements elements;
+  private Types types;
+  private AptContext context;
+  protected BuilderContext builderContext;
+
+  @Before
+  public void setup() {
+    elements = rule.getElements();
+    types = rule.getTypes();
+    context = AptContext.create(elements, types, DefinitionRepository.getRepository());
+    builderContext = BuilderContextManager.create(elements, types);
+    CodegenContext.create(elements, types);
+  }
 
   final Inline inline = new Inline() {
     public Class<? extends Annotation> annotationType() {

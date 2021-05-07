@@ -16,7 +16,6 @@
 
 package io.sundr.dsl.internal.utils;
 
-import static io.sundr.codegen.utils.Strings.capitalizeFirst;
 import static io.sundr.dsl.internal.Constants.BEGIN_SCOPE;
 import static io.sundr.dsl.internal.Constants.CARDINALITY_MULTIPLE;
 import static io.sundr.dsl.internal.Constants.CLASSES;
@@ -36,6 +35,7 @@ import static io.sundr.dsl.internal.Constants.TERMINATING_TYPES;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT_REF;
 import static io.sundr.dsl.internal.Constants.VOID_REF;
+import static io.sundr.utils.Strings.capitalizeFirst;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,10 +49,8 @@ import java.util.Set;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 
-import io.sundr.codegen.functions.ElementTo;
-import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.utils.ModelUtils;
-import io.sundr.codegen.utils.TypeUtils;
+import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.apt.utils.Apt;
 import io.sundr.dsl.annotations.Begin;
 import io.sundr.dsl.annotations.End;
 import io.sundr.dsl.annotations.EntryPoint;
@@ -77,6 +75,8 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.utils.Types;
 
 public final class TypeDefUtils {
 
@@ -123,8 +123,10 @@ public final class TypeDefUtils {
 
     TypeRef returnType;
     if (isTerminal(executableElement)) {
-      returnType = isVoid(executableElement) ? VOID_REF
-          : ElementTo.DEEP.getTypeMirrorToTypeRef().apply(executableElement.getReturnType());
+      returnType = isVoid(executableElement)
+          ? VOID_REF
+          : Adapters.getAdapter(context.getAptContext()).map(a -> a.adaptReference(executableElement.getReturnType()))
+              .orElseThrow(() -> new IllegalStateException("Could not find adapter for AptContext!"));
     } else {
       returnType = TRANSPARENT_REF;
     }
@@ -148,7 +150,8 @@ public final class TypeDefUtils {
 
     TypeParamDef paremeterType = Generics.MAP.apply(returnType);
 
-    Method sourceMethod = ElementTo.DEEP.getExecutableElementToMethod().apply(executableElement);
+    Method sourceMethod = Adapters.getAdapter(context.getAptContext()).map(a -> a.adaptMethod(executableElement))
+        .orElseThrow(() -> new IllegalStateException("Could not find adapter for AptContext!"));
     List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
     for (AnnotationRef candidate : sourceMethod.getAnnotations()) {
       if (!candidate.getClassRef().getFullyQualifiedName().startsWith("io.sundr")) {
@@ -157,7 +160,7 @@ public final class TypeDefUtils {
     }
     Method targetMethod = new MethodBuilder(sourceMethod)
         .withAnnotations(annotations)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withReturnType(paremeterType.toReference())
         .withName(methodName)
         .build();
@@ -165,11 +168,11 @@ public final class TypeDefUtils {
     String interfaceName = targetInterfaceName != null ? targetInterfaceName.value() : toInterfaceName(targetMethod.getName());
 
     return new TypeDefBuilder()
-        .withPackageName(ModelUtils.getPackageElement(executableElement).toString())
+        .withPackageName(Apt.getPackageElement(executableElement).toString())
         .withName(interfaceName)
         .withParameters(paremeterType)
         .withKind(Kind.INTERFACE)
-        .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .addToAttributes(ORIGINAL_RETURN_TYPE, returnType)
         .addToAttributes(IS_ENTRYPOINT, isEntryPoint)
         .addToAttributes(IS_TERMINAL, isTerminal)

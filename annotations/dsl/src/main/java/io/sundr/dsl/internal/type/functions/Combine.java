@@ -43,9 +43,6 @@ import java.util.function.Function;
 
 import javax.lang.model.element.Modifier;
 
-import io.sundr.codegen.functions.GetDefinition;
-import io.sundr.codegen.utils.Strings;
-import io.sundr.codegen.utils.TypeUtils;
 import io.sundr.dsl.internal.utils.TypeDefUtils;
 import io.sundr.dsl.internal.visitors.TypeParamDefColletor;
 import io.sundr.dsl.internal.visitors.TypeParamRefColletor;
@@ -57,6 +54,9 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.utils.Types;
+import io.sundr.utils.Strings;
 
 public class Combine {
 
@@ -106,7 +106,7 @@ public class Combine {
 
       TypeDef combination = new TypeDefBuilder()
           .withKind(Kind.INTERFACE)
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withName(className)
           .withPackageName(packageName)
           .withExtendsList(interfaces)
@@ -169,7 +169,7 @@ public class Combine {
 
       TypeDef combination = new TypeDefBuilder()
           .withKind(Kind.INTERFACE)
-          .withModifiers(TypeUtils.modifiersToInt(Modifier.PUBLIC))
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withName(className)
           .withPackageName(packageName)
           .withExtendsList(interfaces)

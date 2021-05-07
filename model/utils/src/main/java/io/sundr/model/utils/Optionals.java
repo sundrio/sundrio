@@ -22,16 +22,63 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.function.Function;
 
+import javax.lang.model.element.Modifier;
+
 import io.sundr.FunctionFactory;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeRef;
 
 public class Optionals {
 
-  public static final TypeDef OPTIONAL = TypeDef.forName(Optional.class.getName());
-  public static final TypeDef OPTIONAL_INT = TypeDef.forName(OptionalInt.class.getName());
-  public static final TypeDef OPTIONAL_DOUBLE = TypeDef.forName(OptionalDouble.class.getName());
-  public static final TypeDef OPTIONAL_LONG = TypeDef.forName(OptionalLong.class.getName());
+  public static TypeParamDef E = new TypeParamDefBuilder().withName("E").build();
+
+  public static final TypeDef OPTIONAL = new TypeDefBuilder(TypeDef.forName(Optional.class.getName()))
+      .withParameters(E)
+      .addNewMethod()
+      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withName("of")
+      .addNewArgument()
+      .withName("value")
+      .withTypeRef(E.toReference())
+      .endArgument()
+      .endMethod()
+      .build();
+
+  public static final TypeDef OPTIONAL_INT = new TypeDefBuilder(TypeDef.forName(OptionalInt.class.getName()))
+      .addNewMethod()
+      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withName("of")
+      .addNewArgument()
+      .withName("value")
+      .withTypeRef(Types.PRIMITIVE_INT_REF)
+      .endArgument()
+      .endMethod()
+      .build();
+
+  public static final TypeDef OPTIONAL_DOUBLE = new TypeDefBuilder(TypeDef.forName(OptionalDouble.class.getName()))
+      .addNewMethod()
+      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withName("of")
+      .addNewArgument()
+      .withName("value")
+      .withTypeRef(Types.PRIMITIVE_DOUBLE_REF)
+      .endArgument()
+      .endMethod()
+      .build();
+
+  public static final TypeDef OPTIONAL_LONG = new TypeDefBuilder(TypeDef.forName(OptionalLong.class.getName()))
+      .addNewMethod()
+      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withName("of")
+      .addNewArgument()
+      .withName("value")
+      .withTypeRef(Types.PRIMITIVE_LONG_REF)
+      .endArgument()
+      .endMethod()
+      .build();
 
   public static final Function<TypeRef, Boolean> IS_OPTIONAL = FunctionFactory.cache(new Function<TypeRef, Boolean>() {
     public Boolean apply(TypeRef type) {
