@@ -26,10 +26,11 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.apt.AptContext;
+import io.sundr.adapter.source.SourceContext;
+import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.codegen.ReplacePackage;
 import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.functions.Sources;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -40,6 +41,7 @@ public class BuilderContext {
   private final Elements elements;
   private final Types types;
   private final AptContext aptContext;
+  private final SourceContext sourceContext;
 
   private final TypeDef visitorInterface;
   private final TypeDef typedVisitorInterface;
@@ -67,6 +69,7 @@ public class BuilderContext {
     this.types = types;
     this.validationEnabled = validationEnabled;
     this.aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
+    this.sourceContext = new SourceContext(aptContext.getDefinitionRepository());
     this.generateBuilderPackage = generateBuilderPackage;
     this.builderPackage = builderPackage;
     this.inlineables = inlineables;
@@ -77,59 +80,59 @@ public class BuilderContext {
     DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(ArrayList.class));
     DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(Iterable.class));
 
-    visitorInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitor.java"))
+    visitorInterface = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Visitor.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
     typedVisitorInterface = new TypeDefBuilder(
-        Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/TypedVisitor.java"))
+        Sources.readTypeDefFromResource("io/sundr/builder/TypedVisitor.java", sourceContext))
             .accept(new ReplacePackage("io.sundr.builder", builderPackage))
             .build();
 
     pathAwareVisitorClass = new TypeDefBuilder(
-        Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/PathAwareTypedVisitor.java"))
+        Sources.readTypeDefFromResource("io/sundr/builder/PathAwareTypedVisitor.java", sourceContext))
             .accept(new ReplacePackage("io.sundr.builder", builderPackage))
             .build();
 
-    visitableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Visitable.java"))
+    visitableInterface = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Visitable.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    builderInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Builder.java"))
+    builderInterface = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Builder.java", sourceContext))
         .withPackageName(builderPackage)
         .build();
 
     visitableBuilderInterface = new TypeDefBuilder(
-        Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableBuilder.java"))
+        Sources.readTypeDefFromResource("io/sundr/builder/VisitableBuilder.java", sourceContext))
             .accept(new ReplacePackage("io.sundr.builder", builderPackage))
             .build();
 
-    fluentInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Fluent.java"))
+    fluentInterface = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Fluent.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    nestedInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Nested.java"))
+    nestedInterface = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Nested.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    editableInterface = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Editable.java"))
+    editableInterface = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Editable.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    inlineableBase = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/Inlineable.java"))
+    inlineableBase = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Inlineable.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    visitableMapClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/VisitableMap.java"))
+    visitableMapClass = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/VisitableMap.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    baseFluentClass = new TypeDefBuilder(Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java"))
+    baseFluentClass = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/BaseFluent.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    validationUtils = new TypeDefBuilder(Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
-        .apply(BuilderContext.class.getResourceAsStream("/io/sundr/builder/internal/resources/ValidationUtils.java")))
+    validationUtils = new TypeDefBuilder(Sources.readTypeDefFromStream(
+        BuilderContext.class.getResourceAsStream("/io/sundr/builder/internal/resources/ValidationUtils.java"), sourceContext))
             .accept(new ReplacePackage("io.sundr.builder.internal.resources", builderPackage))
             .withAnnotations(new ArrayList<>())
             .build();
