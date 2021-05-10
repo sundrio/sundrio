@@ -36,10 +36,12 @@ public class TypeAssignable {
   }
 
   public Boolean from(TypeDef other, HashSet<String> visited) {
+    if (other.getFullyQualifiedName().equals(Node.JAVA_LANG_OBJECT)) {
+      return false;
+    }
     if (t == other || t.equals(other)) {
       return true;
     }
-
     if (t.getFullyQualifiedName().equals(other.getFullyQualifiedName())) {
       return true;
     }

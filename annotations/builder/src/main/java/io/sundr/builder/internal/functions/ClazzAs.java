@@ -19,7 +19,6 @@ package io.sundr.builder.internal.functions;
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.model.utils.Types.isAbstract;
-import static io.sundr.model.utils.Types.modifiersToInt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +37,6 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.InitEnricher;
-import io.sundr.codegen.functions.ClassTo;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -311,7 +309,7 @@ public class ClazzAs {
       }
 
       Method equals = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .withReturnType(ClassTo.TYPEREF.apply(boolean.class)).addNewArgument().withName("o")
+          .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
           .withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
           .withStatements(BuilderUtils.toEquals(fluentImplType, properties)).endBlock()
           // .withBlock(new Block(new Provider<List<Statement>>() {
@@ -323,7 +321,7 @@ public class ClazzAs {
           .build();
 
       Method hashCode = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF).withName("hashCode").withNewBlock()
+          .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_INT_REF).withName("hashCode").withNewBlock()
           .withStatements(BuilderUtils.toHashCode(properties)).endBlock()
           // .withBlock(new Block(new Provider<List<Statement>>() {
           //   @Override
@@ -358,7 +356,7 @@ public class ClazzAs {
       final List<Property> fields = new ArrayList<Property>();
 
       Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
-      Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
+      Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.model.utils.Types.BOOLEAN_REF)
           .withName("validationEnabled").build();
 
       fields.add(fluentProperty);
@@ -368,7 +366,7 @@ public class ClazzAs {
           .addNewStringStatementStatement("this(true);").endBlock().build();
 
       Method validationEnabledConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .addNewArgument().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").and()
+          .addNewArgument().withTypeRef(io.sundr.model.utils.Types.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock().addToStatements(new StringStatement(new Supplier<String>() {
             @Override
             public String get() {
@@ -383,7 +381,7 @@ public class ClazzAs {
 
       Method fluentAndValidationConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument()
-          .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
+          .withTypeRef(io.sundr.model.utils.Types.BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
           .addToStatements(new StringStatement(new Supplier<String>() {
             @Override
             public String get() {
@@ -400,7 +398,7 @@ public class ClazzAs {
       Method instanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
           .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
           .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
-          .withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF).withName("validationEnabled").and()
+          .withTypeRef(Types.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock()
           .addAllToStatements(toInstanceConstructorBody(item, "fluent"))
           .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
@@ -413,7 +411,7 @@ public class ClazzAs {
 
       Method instanceAndValidationEnabledConstructor = new MethodBuilder()
           .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(instanceRef)
-          .withName("instance").and().addNewArgument().withTypeRef(io.sundr.codegen.Constants.BOOLEAN_REF)
+          .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
           .withName("validationEnabled").and()
           .withNewBlock()
           .addAllToStatements(toInstanceConstructorBody(item, "this"))
@@ -439,15 +437,15 @@ public class ClazzAs {
       methods.add(build);
 
       Method equals = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .withReturnType(ClassTo.TYPEREF.apply(boolean.class)).addNewArgument().withName("o")
-          .withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument().withName("equals")
+          .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
+          .withTypeRef(Types.OBJECT_REF).endArgument().withName("equals")
           .withNewBlock()
           .withStatements(BuilderUtils.toEquals(builderType, fields))
           .endBlock()
           .build();
 
       Method hashCode = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF).withName("hashCode")
+          .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_INT_REF).withName("hashCode")
           .withNewBlock()
           .withStatements(BuilderUtils.toHashCode(fields))
           .endBlock()

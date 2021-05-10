@@ -16,7 +16,6 @@
 
 package io.sundr.codegen;
 
-import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
 import static io.sundr.codegen.functions.ClassTo.TYPEREF;
 import static io.sundr.model.utils.Types.newTypeParamDef;
 import static io.sundr.model.utils.Types.newTypeParamRef;
@@ -27,13 +26,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 
-import io.sundr.model.PrimitiveRef;
+import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.VoidRef;
 import io.sundr.model.WildcardRef;
+import io.sundr.model.utils.Types;
 
 public class Constants {
 
@@ -50,26 +51,25 @@ public class Constants {
   public static final VoidRef VOID = new VoidRef();
   public static final WildcardRef Q = new WildcardRef();
 
-  public static final TypeDef BOOLEAN = TYPEDEF.apply(Boolean.class);
-  public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
+  public static final TypeDef TYPE = TypeDef.forName(Type.class.getName());
+  public static final TypeDef CLASS = new TypeDefBuilder(TypeDef.forName(Class.class.getName()))
+      .withKind(Kind.INTERFACE)
+      .withParameters(T)
+      .withExtendsList(TYPE.toInternalReference())
+      .build();
 
-  public static final PrimitiveRef PRIMITIVE_BOOLEAN_REF = (PrimitiveRef) TYPEREF.apply(boolean.class);
-  public static final PrimitiveRef PRIMITIVE_INT_REF = (PrimitiveRef) TYPEREF.apply(int.class);
-
-  public static final TypeDef CLASS = TYPEDEF.apply(Class.class);
   public static final TypeDef OBJECT = TypeDef.OBJECT;
   public static final TypeRef OBJECT_REF = TypeDef.OBJECT.toReference();
 
-  public static final TypeDef STRING = TYPEDEF.apply(String.class);
+  public static final TypeDef STRING = TypeDef.forName(String.class.getName());
   public static final TypeRef STRING_REF = STRING.toReference();
 
-  public static final TypeDef ARRAY = TYPEDEF.apply(Array.class);
-  public static final TypeDef TYPE = TYPEDEF.apply(Type.class);
-  public static final TypeDef TYPE_VARIABLE = TYPEDEF.apply(TypeVariable.class);
-  public static final TypeDef GENERIC_ARRAY_TYPE = TYPEDEF.apply(GenericArrayType.class);
-  public static final TypeDef PARAMETERIZED_TYPE = TYPEDEF.apply(ParameterizedType.class);
-  public static final TypeRef INT_REF = TYPEREF.apply(int.class);
-  public static final TypeDef BOXED_VOID = TYPEDEF.apply(Void.class);
+  public static final TypeDef ARRAY = TypeDef.forName(Array.class.getName());
+  public static final TypeDef TYPE_VARIABLE = TypeDef.forName(TypeVariable.class.getName());
+  public static final TypeDef GENERIC_ARRAY_TYPE = TypeDef.forName(GenericArrayType.class.getName());
+  public static final TypeDef PARAMETERIZED_TYPE = TypeDef.forName(ParameterizedType.class.getName());
+  public static final TypeRef INT_REF = Types.PRIMITIVE_INT_REF;
+  public static final TypeDef BOXED_VOID = TypeDef.forName(Void.class.getName());
 
   public static Class[] PRIMITIVES = { boolean.class, byte.class, char.class, short.class, int.class, long.class, double.class,
       float.class };

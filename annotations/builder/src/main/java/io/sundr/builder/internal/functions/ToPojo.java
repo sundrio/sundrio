@@ -302,10 +302,10 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
             fields.add(field);
             getters.add(getter);
-            if (field.getTypeRef().equals(Constants.BOOLEAN_REF)) {
+            if (field.getTypeRef().equals(Types.BOOLEAN_REF)) {
               Method primitiveGetter = new MethodBuilder(getter)
                   .withName("is" + getter.getName().replaceAll("^get", ""))
-                  .withReturnType(Constants.PRIMITIVE_BOOLEAN_REF)
+                  .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
                   .withNewBlock()
                   .withStatements(new StringStatement(
                       "return this." + Strings.toFieldName(name) + " != null &&  this." + Strings.toFieldName(name)
@@ -532,7 +532,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     Method equals = new MethodBuilder()
         .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
         .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
-        .addNewArgument().withName("o").withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument()
+        .addNewArgument().withName("o").withTypeRef(Types.OBJECT.toReference()).endArgument()
         .withName("equals")
         .withNewBlock()
         .withStatements(BuilderUtils.toEquals(generatedPojo, fields))
@@ -541,7 +541,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
     Method hashCode = new MethodBuilder()
         .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-        .withReturnType(io.sundr.codegen.Constants.PRIMITIVE_INT_REF)
+        .withReturnType(Types.PRIMITIVE_INT_REF)
         .withName("hashCode")
         .withNewBlock()
         .withStatements(BuilderUtils.toHashCode(fields))
