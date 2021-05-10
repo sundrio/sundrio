@@ -16,6 +16,7 @@
 
 package io.sundr.model;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,7 +29,11 @@ public class TypeParamDef extends AttributeSupport implements Renderable {
   public TypeParamDef(String name, List<ClassRef> bounds, Map<AttributeKey, Object> attributes) {
     super(attributes);
     this.name = name;
-    this.bounds = bounds;
+    // To ensure that the resulting object will be the same regardless of how it was created, we need to ensure that we skip the Object as a bound
+    this.bounds = bounds == null || bounds.isEmpty()
+        ? Collections.emptyList()
+        : bounds.stream().filter(b -> !b.getFullyQualifiedName().equals(TypeDef.OBJECT.getFullyQualifiedName()))
+            .collect(Collectors.toList());
   }
 
   public String getName() {

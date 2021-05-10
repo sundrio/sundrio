@@ -27,6 +27,7 @@ import javax.lang.model.type.TypeMirror;
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamDefBuilder;
+import io.sundr.model.TypeRef;
 
 public class TypePrameterElementToTypeParamDef implements Function<TypeParameterElement, TypeParamDef> {
 
@@ -37,11 +38,13 @@ public class TypePrameterElementToTypeParamDef implements Function<TypeParameter
   }
 
   public TypeParamDef apply(TypeParameterElement item) {
-    List<ClassRef> typeRefs = new ArrayList();
+    List<ClassRef> typeRefs = new ArrayList<>();
 
     for (TypeMirror typeMirror : item.getBounds()) {
-      // TODO: Fix this
-      // typeRefs.add(toTypeRef.apply(typeMirror));
+      TypeRef typeRef = context.getTypeMirrorToTypeRef().apply(typeMirror);
+      if (typeRef instanceof ClassRef) {
+        typeRefs.add((ClassRef) context.getTypeMirrorToTypeRef().apply(typeMirror));
+      }
     }
 
     return new TypeParamDefBuilder().withName(item.getSimpleName().toString()).withBounds(typeRefs).build();

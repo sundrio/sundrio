@@ -45,7 +45,6 @@ import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
-import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeRef;
 import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
@@ -112,28 +111,8 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
     }
 
     for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
-      List<ClassRef> genericBounds = new ArrayList<ClassRef>();
-      try {
-        if (!typeParameter.getBounds().isEmpty()) {
-          TypeMirror bound = typeParameter.getBounds().get(0);
-          if (!OBJECT_BOUND.equals(bound.toString())) {
-            TypeRef boundRef = context.getTypeMirrorToTypeRef().apply(bound);
-            if (boundRef instanceof ClassRef) {
-              genericBounds.add((ClassRef) boundRef);
-            } else {
-              throw new IllegalStateException("Parameter bound: [" + boundRef + "] not mapped to a class ref.");
-            }
-          }
-        }
-
-        TypeParamDef genericType = new TypeParamDefBuilder().withName(typeParameter.getSimpleName().toString())
-            .withBounds(genericBounds).build();
-
-        genericTypes.add(genericType);
-
-      } catch (Exception e) {
-        // ignore
-      }
+      TypeParamDef genericType = context.getTypeParamElementToTypeParamDef().apply(typeParameter);
+      genericTypes.add(genericType);
     }
 
     TypeDef baseType = new TypeDefBuilder()
