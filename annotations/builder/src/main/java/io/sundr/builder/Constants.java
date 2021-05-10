@@ -16,28 +16,26 @@
 
 package io.sundr.builder;
 
-import static io.sundr.codegen.functions.ClassTo.ANNOTATIONTYPEREF;
-import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
-import static io.sundr.model.utils.Types.typeGenericOf;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Kind;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.utils.Collections;
+import io.sundr.model.utils.Types;
 
 public class Constants {
 
@@ -80,27 +78,55 @@ public class Constants {
   public static final AttributeKey<ExternalBuildables> EXTERNAL_BUILDABLE = new AttributeKey<ExternalBuildables>(
       "EXTERNAL_BUILDABLE", ExternalBuildables.class);
 
-  public static final AnnotationRef BUILDABLE_ANNOTATION = ANNOTATIONTYPEREF.apply(Buildable.class);
-  public static final AnnotationRef DEPRECATED_ANNOTATION = ANNOTATIONTYPEREF.apply(Deprecated.class);
+  public static final AnnotationRef BUILDABLE_ANNOTATION = new AnnotationRefBuilder()
+      .withNewClassRef()
+      .withFullyQualifiedName(Buildable.class.getName())
+      .endClassRef()
+      .build();
 
-  public static final ClassRef ARRAYS = TYPEDEF.apply(Arrays.class).toInternalReference();
-  public static final ClassRef COLLECTORS = TYPEDEF.apply(Collectors.class).toInternalReference();
+  public static final AnnotationRef DEPRECATED_ANNOTATION = new AnnotationRefBuilder()
+      .withNewClassRef()
+      .withFullyQualifiedName(Deprecated.class.getName())
+      .endClassRef()
+      .build();
+
+  public static final ClassRef ARRAYS = new ClassRefBuilder().withFullyQualifiedName(Arrays.class.getName()).build();
+  public static final ClassRef COLLECTORS = new ClassRefBuilder().withFullyQualifiedName(Collectors.class.getName()).build();
 
   public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(io.sundr.codegen.Constants.INT_REF)
       .build();
 
-  public static final TypeDef BUILDER = typeGenericOf(TYPEDEF.apply(Builder.class), io.sundr.codegen.Constants.T);
-  public static final TypeDef BASE_FLUENT = typeGenericOf(TYPEDEF.apply(BaseFluent.class), io.sundr.codegen.Constants.T);
-  public static final TypeDef EDITABLE = typeGenericOf(TYPEDEF.apply(Editable.class), io.sundr.codegen.Constants.T);
-  public static final TypeDef FLUENT = typeGenericOf(TYPEDEF.apply(Fluent.class), io.sundr.codegen.Constants.T);
-  public static final TypeDef FUNCTION = typeGenericOf(TYPEDEF.apply(Function.class), io.sundr.codegen.Constants.I,
-      io.sundr.codegen.Constants.O);
-  public static final TypeDef PREDICATE = typeGenericOf(TYPEDEF.apply(Predicate.class), io.sundr.codegen.Constants.T);
-  public static final TypeDef INLINEABLE = typeGenericOf(TYPEDEF.apply(Inlineable.class), io.sundr.codegen.Constants.T);
-  public static final TypeDef NESTED = typeGenericOf(TYPEDEF.apply(Nested.class), io.sundr.codegen.Constants.N);
-  public static final TypeDef VISITOR = typeGenericOf(TYPEDEF.apply(Visitor.class), io.sundr.codegen.Constants.V);
-  public static final TypeDef TYPED_VISITOR = typeGenericOf(TYPEDEF.apply(TypedVisitor.class), io.sundr.codegen.Constants.V);
-  public static final TypeDef VISITABLE = TYPEDEF.apply(Visitable.class);
+  public static final TypeDef FUNCTION = new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName("java.util.function")
+      .withName("Function").withParameters(io.sundr.codegen.Constants.I, io.sundr.codegen.Constants.O)
+      .addNewMethod()
+      .withName("apply")
+      .withReturnType(io.sundr.codegen.Constants.O.toReference())
+      .addNewArgument()
+      .withName("item")
+      .withTypeRef(io.sundr.codegen.Constants.I.toReference())
+      .endArgument()
+      .endMethod()
+      .build();
+
+  public static final TypeDef PREDICATE = new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName("java.util.function")
+      .withName("Predicate").withParameters(io.sundr.codegen.Constants.I)
+      .addNewMethod()
+      .withName("test")
+      .withReturnType(Types.BOOLEAN_REF)
+      .addNewArgument()
+      .withName("item")
+      .withTypeRef(io.sundr.codegen.Constants.I.toReference())
+      .endArgument()
+      .endMethod()
+      .build();
+
+  public static final TypeDef INLINEABLE = new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName("io.sundr.builder")
+      .withName("Inlineable").withParameters(io.sundr.codegen.Constants.T)
+      .addNewMethod()
+      .withName("update")
+      .withReturnType(io.sundr.codegen.Constants.T.toReference())
+      .endMethod()
+      .build();
 
   //The classes below are created programmatically rather than by class to avoid bringing in more deps
   public static final ClassRef VALIDATION = new TypeDefBuilder()

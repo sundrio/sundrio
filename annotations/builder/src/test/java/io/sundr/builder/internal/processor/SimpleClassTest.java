@@ -23,18 +23,21 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
+import io.sundr.adapter.source.SourceContext;
+import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.codegen.functions.ClassTo;
-import io.sundr.codegen.functions.Sources;
 import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleClassTest extends AbstractProcessorTest {
 
-  TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
-      .apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
+  private final SourceContext sourceContext = new SourceContext(DefinitionRepository.getRepository());
+
+  TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleClass.java", sourceContext);
 
   @Test
   public void testFluent() {
@@ -60,8 +63,10 @@ public class SimpleClassTest extends AbstractProcessorTest {
     assertEquals("SimpleClassFluentImpl", fluentImpl.getName());
     assertEquals(1, fluentImpl.getExtendsList().size());
 
-    assertTrue(hasMethod(fluentImpl, "addToTags", ClassTo.TYPEREF.apply(String.class).withDimensions(1)));
-    assertTrue(hasMethod(fluentImpl, "removeFromTags", ClassTo.TYPEREF.apply(String.class).withDimensions(1)));
+    assertTrue(hasMethod(fluentImpl, "addToTags",
+        new ClassRefBuilder().withFullyQualifiedName(String.class.getName()).withDimensions(1).build()));
+    assertTrue(hasMethod(fluentImpl, "removeFromTags",
+        new ClassRefBuilder().withFullyQualifiedName(String.class.getName()).withDimensions(1).build()));
 
     ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
     assertEquals("BaseFluent", superClass.getName());

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -39,11 +40,22 @@ public class Collections {
   public static final TypeParamDef V = new TypeParamDef("V", java.util.Collections.emptyList(),
       java.util.Collections.emptyMap());
 
-  public static final TypeDef COLLECTION = new TypeDefBuilder(TypeDef.forName(Collection.class.getName())).withParameters(E)
+  public static final TypeDef ITERABLE = new TypeDefBuilder(TypeDef.forName(Iterable.class.getName()))
+      .withKind(Kind.INTERFACE)
+      .withParameters(E)
       .build();
 
-  public static final TypeDef MAP = new TypeDefBuilder(TypeDef.forName(Map.class.getName())).withParameters(K, V).build();
+  public static final TypeDef COLLECTION = new TypeDefBuilder(TypeDef.forName(Collection.class.getName())).withParameters(E)
+      .withKind(Kind.INTERFACE)
+      .withExtendsList(ITERABLE.toReference(E.toReference()))
+      .build();
+
+  public static final TypeDef MAP = new TypeDefBuilder(TypeDef.forName(Map.class.getName())).withParameters(K, V)
+      .withKind(Kind.INTERFACE)
+      .build();
+
   public static final TypeDef LINKED_HASH_MAP = new TypeDefBuilder(TypeDef.forName(LinkedHashMap.class.getName()))
+      .withKind(Kind.CLASS)
       .addNewConstructor()
       .endConstructor()
       .addNewConstructor()
@@ -56,9 +68,11 @@ public class Collections {
       .build();
 
   public static final TypeDef LIST = new TypeDefBuilder(TypeDef.forName(List.class.getName())).withParameters(E)
+      .withKind(Kind.INTERFACE)
       .withExtendsList(COLLECTION.toReference(E.toReference())).build();
 
   public static final TypeDef ARRAY_LIST = new TypeDefBuilder(TypeDef.forName(ArrayList.class.getName())).withParameters(E)
+      .withKind(Kind.CLASS)
       .addNewConstructor()
       .endConstructor()
       .addNewConstructor()
@@ -70,9 +84,11 @@ public class Collections {
       .withImplementsList(LIST.toReference(E.toReference())).build();
 
   public static final TypeDef SET = new TypeDefBuilder(TypeDef.forName(Set.class.getName())).withParameters(E)
+      .withKind(Kind.INTERFACE)
       .withExtendsList(COLLECTION.toReference(E.toReference())).build();
 
   public static final TypeDef LINKED_HASH_SET = new TypeDefBuilder(TypeDef.forName(LinkedHashSet.class.getName()))
+      .withKind(Kind.CLASS)
       .withParameters(E)
       .addNewConstructor()
       .endConstructor()

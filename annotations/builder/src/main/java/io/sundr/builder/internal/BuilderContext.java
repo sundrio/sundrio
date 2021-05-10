@@ -30,7 +30,6 @@ import io.sundr.adapter.source.SourceContext;
 import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.codegen.ReplacePackage;
-import io.sundr.codegen.functions.ClassTo;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -77,8 +76,14 @@ public class BuilderContext {
     buildableRepository = new BuildableRepository();
 
     //We often have issues with these classes, like missing generics etc. So let's register them correctly from the beggining.
-    DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(ArrayList.class));
-    DefinitionRepository.getRepository().register(ClassTo.TYPEDEF.apply(Iterable.class));
+    // aptContext.getDefinitionRepository().register(Collections.ITERABLE);
+    // aptContext.getDefinitionRepository().register(Collections.COLLECTION);
+    // aptContext.getDefinitionRepository().register(Collections.LIST);
+    // aptContext.getDefinitionRepository().register(Collections.ARRAY_LIST);
+    // aptContext.getDefinitionRepository().register(Collections.SET);
+    // aptContext.getDefinitionRepository().register(Collections.LINKED_HASH_SET);
+    // aptContext.getDefinitionRepository().register(Collections.MAP);
+    // aptContext.getDefinitionRepository().register(Collections.LINKED_HASH_MAP);
 
     visitorInterface = new TypeDefBuilder(Sources.readTypeDefFromResource("io/sundr/builder/Visitor.java", sourceContext))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))

@@ -18,7 +18,6 @@ package io.sundr.dsl.internal;
 
 import java.util.Set;
 
-import io.sundr.codegen.functions.ClassTo;
 import io.sundr.dsl.internal.element.functions.filter.TransitionFilter;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
@@ -62,7 +61,7 @@ public final class Constants {
   public static final String[] REMOVABLE_PREFIXES = { "With" };
   public static final String INTERFACE_SUFFIX = "Interface";
 
-  public static final TypeDef VOID = ClassTo.TYPEDEF.apply(Void.class);
+  public static final TypeDef VOID = TypeDef.forName(Void.class.getName());
   public static final ClassRef VOID_REF = VOID.toInternalReference();
 
   public static final TypeParamDef TRANSPARENT = new TypeParamDefBuilder().withName("T").addToAttributes(IS_GENERIC, true)

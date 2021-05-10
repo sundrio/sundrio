@@ -16,8 +16,6 @@
 
 package io.sundr.model.utils;
 
-import static io.sundr.model.TypeDef.OBJECT;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,6 +52,9 @@ public final class Types {
   private static final String JAVA_UTIL_OPTIONAL_LONG = "java.util.OptionalLong";
   private static final String OTHER = "other";
   private static final String DOT_REGEX = "\\.";
+
+  public static final TypeDef OBJECT = TypeDef.OBJECT;
+  public static final TypeRef OBJECT_REF = OBJECT.toInternalReference();
 
   public static final TypeDef BOOLEAN = TypeDef.forName(Boolean.class.getName());
   public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
