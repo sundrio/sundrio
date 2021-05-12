@@ -17,12 +17,12 @@
 package io.sundr.builder;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class VisitableMap extends HashMap<String, List<Visitable>> implements Iterable<Visitable> {
 
@@ -35,11 +35,7 @@ public class VisitableMap extends HashMap<String, List<Visitable>> implements It
   }
 
   public List<Visitable> aggregate() {
-    ArrayList<Visitable> all = new ArrayList();
-    for (Collection<Visitable> list : this.values()) {
-      all.addAll(list);
-    }
-    return all;
+    return values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
   }
 
   @Override
