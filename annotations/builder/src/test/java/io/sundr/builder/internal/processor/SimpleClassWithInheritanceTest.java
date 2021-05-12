@@ -24,19 +24,21 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.sundr.adapter.source.SourceContext;
+import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.codegen.functions.Sources;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
 
-  TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
-      .apply(getClass().getClassLoader().getResourceAsStream("SimpleClass.java"));
-  TypeDef simpleClassWithDateDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
-      .apply(getClass().getClassLoader().getResourceAsStream("SimpleClassWithDate.java"));
+  SourceContext context = new SourceContext(DefinitionRepository.getRepository());
+
+  TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleClass.java", context);
+  TypeDef simpleClassWithDateDef = Sources.readTypeDefFromResource("SimpleClassWithDate.java", context);
 
   @Before
   public void setUp() {

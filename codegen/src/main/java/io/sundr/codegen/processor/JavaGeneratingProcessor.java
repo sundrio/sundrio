@@ -16,11 +16,15 @@
 
 package io.sundr.codegen.processor;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.FilerException;
@@ -29,14 +33,18 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 
-import io.sundr.codegen.functions.Sources;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.generator.CodeGeneratorContext;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
+import io.sundr.utils.Patterns;
 
 public abstract class JavaGeneratingProcessor extends AbstractProcessor {
 
   private static final String SOURCE_SUFFIX = ".java";
+
+  public static final String PACKAGE = ".*package\\s+(.*)\\s*\\;";
+  public static final String CLASS_NAME = ".*(enum|class|interface)\\s+(\\w+).*\\{";
 
   protected CodeGeneratorContext context = new CodeGeneratorContext();
 
@@ -187,10 +195,23 @@ public abstract class JavaGeneratingProcessor extends AbstractProcessor {
           .generate();
 
       ByteArrayInputStream bis = new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
-      return Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF.apply(bis);
+      return parseTypeDef(bis);
     } catch (IOException e) {
       return null;
     }
+  }
+
+  private static TypeDef parseTypeDef(InputStream is) {
+    String text = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).lines()
+        .collect(Collectors.joining("\n"));
+    return parseTypeDef(text);
+  }
+
+  private static TypeDef parseTypeDef(String text) {
+    String pkg = Patterns.match(text, PACKAGE).orElse(null);
+    String name = Patterns.match(text, CLASS_NAME, 2)
+        .orElseThrow(() -> new IllegalStateException("Cannot extract fully qualified name from generated code."));
+    return new TypeDefBuilder().withPackageName(pkg).withName(name).build();
   }
 
   /**

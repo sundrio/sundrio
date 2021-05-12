@@ -19,14 +19,16 @@ package io.sundr.builder.internal.processor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import io.sundr.adapter.source.SourceContext;
+import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ToPojo;
-import io.sundr.codegen.functions.Sources;
 import io.sundr.model.TypeDef;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleAnnotationTest extends AbstractProcessorTest {
 
-  TypeDef simpleClassDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
-      .apply(getClass().getClassLoader().getResourceAsStream("SimpleAnnotation.java"));
+  TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleAnnotation.java",
+      new SourceContext(DefinitionRepository.getRepository()));
 
   @Test
   public void testPojo() {
