@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> {
 
@@ -46,48 +48,19 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
   }
 
   public static <T> ArrayList<T> build(List<? extends Builder<? extends T>> list) {
-    if (list == null) {
-      return null;
-    }
-    ArrayList<T> result = new ArrayList<T>();
-    for (Builder<? extends T> builder : list) {
-      result.add(builder.build());
-    }
-    return result;
+    return list == null ? null : new ArrayList<T>(list.stream().map(Builder::build).collect(Collectors.toList()));
   }
 
   public static <T> List<T> build(Set<? extends Builder<? extends T>> set) {
-    if (set == null) {
-      return null;
-    }
-
-    List<T> result = new ArrayList<T>();
-    for (Builder<? extends T> builder : set) {
-      result.add(builder.build());
-    }
-    return result;
+    return set == null ? null : set.stream().map(Builder::build).collect(Collectors.toList());
   }
 
   public static <T> ArrayList<T> aggregate(List<? extends T>... lists) {
-    ArrayList<T> result = new ArrayList<T>();
-
-    for (List<? extends T> list : lists) {
-      if (list != null) {
-        result.addAll(list);
-      }
-    }
-    return result;
+    return new ArrayList(Arrays.stream(lists).filter(Objects::nonNull).collect(Collectors.toList()));
   }
 
   public static <T> LinkedHashSet<T> aggregate(Set<? extends T>... sets) {
-    LinkedHashSet<T> result = new LinkedHashSet<T>();
-
-    for (Set<? extends T> set : sets) {
-      if (set != null) {
-        result.addAll(set);
-      }
-    }
-    return result;
+    return new LinkedHashSet(Arrays.stream(sets).filter(Objects::nonNull).collect(Collectors.toSet()));
   }
 
   private static <V extends Visitor, F> Boolean canVisit(V visitor, F fluent) {
@@ -134,11 +107,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
   }
 
   public F accept(Visitor... visitors) {
-    if (isPathAwareVisitorArray(visitors)) {
-      return acceptPathAware(asPathAwareVisitorArray(visitors));
-    } else {
-      return acceptInternal(visitors);
-    }
+    return isPathAwareVisitorArray(visitors) ? acceptPathAware(asPathAwareVisitorArray(visitors)) : acceptInternal(visitors);
   }
 
   @Override

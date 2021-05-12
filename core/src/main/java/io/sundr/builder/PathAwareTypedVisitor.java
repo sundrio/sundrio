@@ -57,13 +57,7 @@ public class PathAwareTypedVisitor<V, P> extends TypedVisitor<V> {
   }
 
   public P getParent() {
-    int size = path.size();
-    int parentIndex = size - 2;
-    if (parentIndex >= 0) {
-      return (P) path.get(parentIndex);
-    } else {
-      return null;
-    }
+    return path.size() - 2 >= 0 ? (P) path.get(path.size() - 2) : null;
   }
 
   public List<Object> getPath() {
@@ -72,27 +66,14 @@ public class PathAwareTypedVisitor<V, P> extends TypedVisitor<V> {
 
   @Override
   public Class<V> getType() {
-    Class<V> superType = super.getType();
-    if (superType != null) {
-      return superType;
-    }
-    return delegate.getType();
+    return super.getType() != null ? super.getType() : delegate.getType();
   }
 
   public Class<P> getParentType() {
-    if (parentType != null) {
-      return parentType;
-    }
-    return delegate.getParentType();
+    return parentType != null ? parentType : delegate.getParentType();
   }
 
   Class getActualParentType() {
-    int size = path.size();
-    int parentIndex = size - 2;
-    if (parentIndex >= 0) {
-      return path.get(parentIndex).getClass();
-    } else {
-      return Void.class;
-    }
+    return path.size() - 2 >= 0 ? path.get(path.size() - 2).getClass() : Void.class;
   }
 }
