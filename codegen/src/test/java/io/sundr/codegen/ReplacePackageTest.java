@@ -18,7 +18,6 @@ package io.sundr.codegen;
 
 import org.junit.Test;
 
-import io.sundr.codegen.functions.Sources;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 
@@ -26,8 +25,8 @@ public class ReplacePackageTest {
 
   @Test
   public void testMoveToPackage() {
-    TypeDef baseFluent = Sources.FROM_CLASSPATH_TO_SINGLE_TYPEDEF.apply("io/sundr/builder/BaseFluent.java");
-    TypeDef refactored = new TypeDefBuilder(baseFluent).accept(new ReplacePackage("io.sundr.builder", "my.pkg")).build();
+    TypeDef original = new TypeDefBuilder().withPackageName("io.sundr.codegen").withName("SomeClass").build();
+    TypeDef refactored = new TypeDefBuilder(original).accept(new ReplacePackage("io.sundr.codegen", "my.pkg")).build();
     System.out.println(refactored);
   }
 }

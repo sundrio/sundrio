@@ -22,17 +22,20 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
+import io.sundr.adapter.source.SourceContext;
+import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.codegen.functions.Sources;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleClassWithParameterTest extends AbstractProcessorTest {
 
-  TypeDef simpleClassWithParameterDef = Sources.FROM_INPUTSTEAM_TO_SINGLE_TYPEDEF
-      .apply(getClass().getClassLoader().getResourceAsStream("SimpleClassWithParameter.java"));
+  private final SourceContext context = new SourceContext(DefinitionRepository.getRepository());
+
+  TypeDef simpleClassWithParameterDef = Sources.readTypeDefFromResource("SimpleClassWithParameter.java", context);
 
   @Test
   public void testFluent() {

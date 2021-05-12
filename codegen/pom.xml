@@ -49,10 +49,6 @@
               </filters>
                  <relocations>
                    <relocation>
-                     <pattern>com.github.javaparser</pattern>
-                     <shadedPattern>io.sundr.shaded.com.github.javaparser</shadedPattern>
-                   </relocation>
-                   <relocation>
                      <pattern>org.apache.velocity</pattern>
                      <shadedPattern>io.sundr.shaded.org.apache.velocity</shadedPattern>
                    </relocation>
@@ -78,10 +74,6 @@
             <groupId>io.sundr</groupId>
             <artifactId>sundr-model-utils</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.javaparser</groupId>
-            <artifactId>javaparser-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
