@@ -18,6 +18,7 @@ package io.sundr.model;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -242,15 +243,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
    * @param arguments The arguments to be passed to the reference.
    */
   public ClassRef toReference(TypeRef... arguments) {
-    List<TypeRef> actualArguments = new ArrayList<TypeRef>();
-    for (int i = 0; i < parameters.size(); i++) {
-      if (i < arguments.length) {
-        actualArguments.add(arguments[i]);
-      } else {
-        actualArguments.add(new WildcardRef());
-      }
-    }
-    return new ClassRef(this.getFullyQualifiedName(), 0, actualArguments, getAttributes());
+    return toReference(Arrays.asList(arguments));
   }
 
   /**
