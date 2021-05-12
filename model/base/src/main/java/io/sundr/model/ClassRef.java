@@ -42,6 +42,10 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
     this.fullyQualifiedName = fullyQualifiedName;
   }
 
+  public static ClassRef forName(String fullyQualifiedName) {
+    return new ClassRef(fullyQualifiedName, 0, Collections.emptyList(), Collections.emptyMap());
+  }
+
   public String getFullyQualifiedName() {
     return fullyQualifiedName;
   }
