@@ -18,6 +18,8 @@ package io.sundr.model.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,6 +32,7 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.VoidRef;
 
 public class Collections {
 
@@ -45,17 +48,38 @@ public class Collections {
       .withParameters(E)
       .build();
 
-  public static final TypeDef COLLECTION = new TypeDefBuilder(TypeDef.forName(Collection.class.getName())).withParameters(E)
+  public static final TypeDef ITERATOR = new TypeDefBuilder(TypeDef.forName(Iterator.class.getName()))
       .withKind(Kind.INTERFACE)
+      .withParameters(E)
+      .addNewMethod()
+      .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
+      .withName("hasNext")
+      .endMethod()
+      .addNewMethod()
+      .withReturnType(E.toReference())
+      .withName("next")
+      .endMethod()
+      .addNewMethod()
+      .withDefaultMethod(true)
+      .withReturnType(new VoidRef())
+      .withName("remove")
+      .endMethod()
+      .build();
+
+  public static final TypeDef COLLECTION = new TypeDefBuilder(TypeDef.forName(Collection.class.getName()))
+      .withKind(Kind.INTERFACE)
+      .withParameters(E)
       .withExtendsList(ITERABLE.toReference(E.toReference()))
       .build();
 
-  public static final TypeDef MAP = new TypeDefBuilder(TypeDef.forName(Map.class.getName())).withParameters(K, V)
+  public static final TypeDef MAP = new TypeDefBuilder(TypeDef.forName(Map.class.getName()))
       .withKind(Kind.INTERFACE)
+      .withParameters(K, V)
       .build();
 
-  public static final TypeDef LINKED_HASH_MAP = new TypeDefBuilder(TypeDef.forName(LinkedHashMap.class.getName()))
+  public static final TypeDef HASH_MAP = new TypeDefBuilder(TypeDef.forName(HashMap.class.getName()))
       .withKind(Kind.CLASS)
+      .withParameters(K, V)
       .addNewConstructor()
       .endConstructor()
       .addNewConstructor()
@@ -67,12 +91,28 @@ public class Collections {
       .withImplementsList(MAP.toReference(K.toReference(), V.toReference()))
       .build();
 
-  public static final TypeDef LIST = new TypeDefBuilder(TypeDef.forName(List.class.getName())).withParameters(E)
+  public static final TypeDef LINKED_HASH_MAP = new TypeDefBuilder(TypeDef.forName(LinkedHashMap.class.getName()))
+      .withKind(Kind.CLASS)
+      .withParameters(K, V)
+      .addNewConstructor()
+      .endConstructor()
+      .addNewConstructor()
+      .addNewArgument()
+      .withName("m")
+      .withTypeRef(MAP.toReference(K.toReference(), V.toReference()))
+      .endArgument()
+      .endConstructor()
+      .withImplementsList(MAP.toReference(K.toReference(), V.toReference()))
+      .build();
+
+  public static final TypeDef LIST = new TypeDefBuilder(TypeDef.forName(List.class.getName()))
       .withKind(Kind.INTERFACE)
+      .withParameters(E)
       .withExtendsList(COLLECTION.toReference(E.toReference())).build();
 
-  public static final TypeDef ARRAY_LIST = new TypeDefBuilder(TypeDef.forName(ArrayList.class.getName())).withParameters(E)
+  public static final TypeDef ARRAY_LIST = new TypeDefBuilder(TypeDef.forName(ArrayList.class.getName()))
       .withKind(Kind.CLASS)
+      .withParameters(E)
       .addNewConstructor()
       .endConstructor()
       .addNewConstructor()
@@ -83,8 +123,9 @@ public class Collections {
       .endConstructor()
       .withImplementsList(LIST.toReference(E.toReference())).build();
 
-  public static final TypeDef SET = new TypeDefBuilder(TypeDef.forName(Set.class.getName())).withParameters(E)
+  public static final TypeDef SET = new TypeDefBuilder(TypeDef.forName(Set.class.getName()))
       .withKind(Kind.INTERFACE)
+      .withParameters(E)
       .withExtendsList(COLLECTION.toReference(E.toReference())).build();
 
   public static final TypeDef LINKED_HASH_SET = new TypeDefBuilder(TypeDef.forName(LinkedHashSet.class.getName()))
