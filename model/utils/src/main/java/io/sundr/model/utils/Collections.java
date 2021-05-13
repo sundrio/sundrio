@@ -165,4 +165,13 @@ public class Collections {
     }
   };
 
+  /**
+   * Checks if a {@link TypeRef} is a {@link Collection}.
+   * 
+   * @param type The type to check.
+   * @return True if its a Collection.
+   */
+  public static boolean isCollection(TypeRef type) {
+    return IS_COLLECTION.apply(type);
+  }
 }
