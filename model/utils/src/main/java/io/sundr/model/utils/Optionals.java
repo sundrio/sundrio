@@ -103,4 +103,44 @@ public class Optionals {
       return Types.isInstanceOf(type, OPTIONAL_LONG, IS_OPTIONAL_LONG);
     }
   });
+
+  /**
+   * Checks if a {@link TypeRef} is a {@link java.util.Optional}.
+   * 
+   * @param type The type to check.
+   * @return True if its a {@link java.util.Optional}.
+   */
+  public static boolean isOptional(TypeRef type) {
+    return IS_OPTIONAL.apply(type);
+  }
+
+  /**
+   * Checks if a {@link TypeRef} is a {@link java.util.OptionalInt}.
+   * 
+   * @param type The type to check.
+   * @return True if its a {@link java.util.OptionalInt}.
+   */
+  public static boolean isOptionalInt(TypeRef type) {
+    return IS_OPTIONAL_INT.apply(type);
+  }
+
+  /**
+   * Checks if a {@link TypeRef} is a {@link java.util.OptionalDouble}.
+   * 
+   * @param type The type to check.
+   * @return True if its a {@link java.util.OptionalDouble}.
+   */
+  public static boolean isOptionalDouble(TypeRef type) {
+    return IS_OPTIONAL_DOUBLE.apply(type);
+  }
+
+  /**
+   * Checks if a {@link TypeRef} is a {@link java.util.OptionalLong}.
+   * 
+   * @param type The type to check.
+   * @return True if its a {@link java.util.OptionalLong}.
+   */
+  public static boolean isOptionalLong(TypeRef type) {
+    return IS_OPTIONAL_LONG.apply(type);
+  }
 }
