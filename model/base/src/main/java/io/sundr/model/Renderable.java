@@ -38,7 +38,7 @@ public interface Renderable {
    * This is slightly different from the `toString()` method as `toString()` is mostly needed for logging / debugging.
    * In contrast with its no-arg equivallent this method is idempotent.
    *
-   * @param enclosingType The type that encoses the current {@link Renderable).
+   * @param enclosingType The type that encoses the current {@link Renderable}.
    * @return the {@link String} representation of the object as it's meant to appear in the generated code.
    */
   default String render(TypeDef enclosingType) {

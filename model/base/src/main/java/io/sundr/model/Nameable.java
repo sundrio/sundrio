@@ -30,7 +30,7 @@ public interface Nameable extends Node {
 
   /**
    * Get the fully qualified name of the type.
-   * The expected format is <<package>>.<<outerClass>>.<<inerClass>>.
+   * The expected format is package.outerClass.inerClass
    * 
    * @return the fully qualified name
    */

@@ -246,10 +246,6 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     }
   }
 
-  /**
-   *
-   * @return
-   */
   @Override
   public String render(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
@@ -269,10 +265,6 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     return sb.toString();
   }
 
-  /**
-   *
-   * @return
-   */
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();

@@ -26,6 +26,9 @@ public interface Annotatable extends Node {
 
   /**
    * Render the annotations.
+   * 
+   * @param indent the indentation to use for rendering the annotations
+   * @return the rendered annotations.
    */
   default String renderAnnotations(String indent) {
     StringBuilder sb = new StringBuilder();

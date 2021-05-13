@@ -31,6 +31,9 @@ public interface Commentable extends Node {
 
   /**
    * Render the comments.
+   * 
+   * @param indent the identation to use for the comments
+   * @return the rendered comments as a string.
    */
   default String renderComments(String indent) {
     StringBuilder sb = new StringBuilder();

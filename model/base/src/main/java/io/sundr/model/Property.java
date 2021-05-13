@@ -91,6 +91,8 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   /**
    * This is only used for rendering method arguments, where we usually string modifiers.
+   * 
+   * @return the property without any modifiers
    */
   protected Property withoutModiers() {
     return new Property(annotations, typeRef, name, comments, 0, getAttributes());

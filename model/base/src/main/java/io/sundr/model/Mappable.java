@@ -23,6 +23,10 @@ public interface Mappable<F> {
 
   /**
    * Accepts a converter {@link Function} and applies it to the current object.
+   * 
+   * @param <T> the mapping output
+   * @param mapper the mapper function to use
+   * @return the result of the mapping
    */
   default <T> T map(Function<F, T> mapper) {
     return mapper.apply((F) this);
