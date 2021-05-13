@@ -58,6 +58,8 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
+import io.sundr.model.Nameable;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Statement;
@@ -78,6 +80,7 @@ import io.sundr.model.utils.Types;
 public class BuilderUtils {
 
   private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
+  private static final String[] NON_INLINABLE_PACKAGES = { "java", "javax", "sun", "com.sun" };
 
   private BuilderUtils() {
   }
@@ -266,23 +269,26 @@ public class BuilderUtils {
         .apply(property.getTypeRef());
 
     if (unwrapped instanceof ClassRef) {
-      //We only want to inline buildable types
-      if (isBuildable(unwrapped)) {
+      ClassRef classRef = (ClassRef) unwrapped;
+      //We need to handle `new String(String str)` as a special case of Inlineable constructor and deprecate Inlineables of it before we acutally remove it, so here goes...
+      if (classRef.getFullyQualifiedName().equals(String.class.getName())) {
+        return Stream
+            .of(GetDefinition.of(classRef).getConstructors().stream().filter(m -> m.getArguments().size() == 1).findFirst()
+                .orElse(new MethodBuilder()
+                    .withName("String")
+                    .addNewArgument()
+                    .withTypeRef(classRef)
+                    .endArgument()
+                    .build()))
+            .collect(Collectors.toSet());
+      }
+      //We only want to inline non java types
+      String pkg = Nameable.getPackageName(((ClassRef) unwrapped).getFullyQualifiedName());
+      if (!Stream.of(NON_INLINABLE_PACKAGES).filter(s -> pkg.startsWith(s)).findAny().isPresent()) {
         for (Method candidate : GetDefinition.of((ClassRef) unwrapped).getConstructors()) {
           if (isInlineable(candidate)) {
             result.add(candidate);
           }
-        }
-      }
-    }
-
-    //We try both types to make sure...
-    TypeDef fromRepo = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(unwrapped);
-    //We only want to inline buildable types
-    if (fromRepo != null && isBuildable(fromRepo)) {
-      for (Method candidate : fromRepo.getConstructors()) {
-        if (isInlineable(candidate)) {
-          result.add(candidate);
         }
       }
     }
