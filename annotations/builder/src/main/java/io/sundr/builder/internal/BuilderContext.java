@@ -612,7 +612,7 @@ public class BuilderContext {
         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
         .withName("build")
         .withParameters(T)
-        .withReturnType(Collections.LIST.toReference(T.toReference()))
+        .withReturnType(Collections.ARRAY_LIST.toReference(T.toReference()))
         .addNewArgument()
         .withTypeRef(Collections.SET.toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS)
             .withBounds(builderInterface
@@ -622,7 +622,7 @@ public class BuilderContext {
         .endArgument()
         .withNewBlock()
         .addNewStringStatementStatement(
-            "return set == null ? null : set.stream().map(Builder::build).collect(Collectors.toList());")
+            "return set == null ? null : new ArrayList<>(set.stream().map(Builder::build).collect(Collectors.toList()));")
         .endBlock()
         .endMethod()
 
