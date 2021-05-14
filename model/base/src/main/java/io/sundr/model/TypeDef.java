@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TypeDef extends ModifierSupport implements Renderable, Nameable, Mappable<TypeDef> {
+public class TypeDef extends ModifierSupport implements Renderable, Nameable, Annotatable, Commentable, Mappable<TypeDef> {
 
   public static TypeDef OBJECT = new TypeDef(JAVA_LANG_OBJECT);
   public static TypeDef ENUM = new TypeDef(JAVA_LANG_ENUM);
@@ -278,6 +278,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
   /**
    * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties
    * etc). It uses as arguments the same 'letters' as the parameters definition.
+   * 
    * @return a {@link ClassRef} for the currnet type, using the type parameter names as as arguments.
    */
   public ClassRef toInternalReference() {
@@ -291,6 +292,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, Ma
 
   /**
    * Creates a {@link ClassRef} without bounds.
+   * 
    * @return a {@link ClassRef} for the currnet type, with the specified type arguments
    */
   public ClassRef toUnboundedReference() {
