@@ -25,12 +25,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.sundr.SundrException;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeDef;
@@ -40,6 +43,7 @@ import io.sundr.model.TypeRef;
 public class DefinitionRepository {
 
   private static DefinitionRepository INSTANCE;
+  private static DefinitionRepository SCOPE;
 
   private final ConcurrentMap<String, TypeDef> definitions = new ConcurrentHashMap<String, TypeDef>();
   private final ConcurrentMap<String, Supplier<TypeDef>> suppliers = new ConcurrentHashMap<String, Supplier<TypeDef>>();
@@ -50,10 +54,21 @@ public class DefinitionRepository {
   }
 
   public static synchronized final DefinitionRepository getRepository() {
+    if (SCOPE != null) {
+      return SCOPE;
+    }
     if (INSTANCE == null) {
       INSTANCE = new DefinitionRepository();
     }
     return INSTANCE;
+  }
+
+  public static WithRepo withRepository(DefinitionRepository repository) {
+    return new WithRepo(repository);
+  }
+
+  public static WithRepo withNewRepository() {
+    return new WithRepo(new DefinitionRepository());
   }
 
   public synchronized void registerIfAbsent(String fqcn, Supplier<TypeDef> supplier) {
@@ -210,5 +225,29 @@ public class DefinitionRepository {
 
   public synchronized void clear() {
     definitions.clear();
+  }
+
+  public static class WithRepo {
+
+    private final DefinitionRepository repository;
+
+    public synchronized <V> V apply(Function<DefinitionRepository, V> function) {
+      return function.apply(repository);
+    }
+
+    public synchronized <V> V call(Callable<V> callable) {
+      try {
+        SCOPE = repository;
+        return callable.call();
+      } catch (Exception e) {
+        throw new SundrException(e);
+      } finally {
+        SCOPE = null;
+      }
+    }
+
+    public WithRepo(DefinitionRepository repository) {
+      this.repository = repository;
+    }
   }
 }
