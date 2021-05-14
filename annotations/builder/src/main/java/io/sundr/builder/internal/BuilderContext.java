@@ -154,9 +154,6 @@ public class BuilderContext {
 
     typedVisitorInterface = new TypeDefBuilder()
         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.ABSTRACT))
-        .addNewAnnotation()
-        .withClassRef(functionalInterfaceType.toInternalReference())
-        .endAnnotation()
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("TypedVisitor")
@@ -252,9 +249,6 @@ public class BuilderContext {
 
     pathAwareVisitorClass = new TypeDefBuilder()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
-        .addNewAnnotation()
-        .withClassRef(functionalInterfaceType.toInternalReference())
-        .endAnnotation()
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("PathAwareTypedVisitor")
@@ -426,12 +420,9 @@ public class BuilderContext {
         .withName("Fluent")
         .addNewParameter()
         .withName("F")
-        .addNewBound()
-        .withArguments(F.toReference())
-        .withNewFullyQualifiedName("io.sundr.builder.Fluent")
-        .endBound()
+        .withBounds(
+            new ClassRefBuilder().withFullyQualifiedName("io.sundr.builder.Fluent").withArguments(F.toReference()).build())
         .endParameter()
-        .withParameters(F)
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
@@ -479,9 +470,6 @@ public class BuilderContext {
 
     visitableMapClass = new TypeDefBuilder()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
-        .addNewAnnotation()
-        .withClassRef(functionalInterfaceType.toInternalReference())
-        .endAnnotation()
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("VisitableMap")
