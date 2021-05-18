@@ -24,7 +24,7 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.sundr.adapter.source.SourceContext;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.model.ClassRef;
@@ -35,7 +35,7 @@ import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
 
-  SourceContext context = new SourceContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
 
   TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleClass.java", context);
   TypeDef simpleClassWithDateDef = Sources.readTypeDefFromResource("SimpleClassWithDate.java", context);

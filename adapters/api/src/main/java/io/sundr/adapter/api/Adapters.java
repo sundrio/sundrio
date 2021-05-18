@@ -92,15 +92,6 @@ public class Adapters {
         .findFirst();
   }
 
-  @SuppressWarnings("unchecked")
-  public static <C extends AdapterContext, T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapter(C ctx) {
-    Class contextType = ctx.getClass();
-    return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, ctx.getClass().getClassLoader()).spliterator(), false)
-        .filter(f -> f.getContextType().isAssignableFrom(contextType))
-        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
-        .findFirst();
-  }
-
   public static WithContext withContext(AdapterContext ctx) {
     return new WithContext(ctx);
   }

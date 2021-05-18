@@ -25,13 +25,14 @@ import java.util.Set;
 import java.util.function.Function;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 
 public class ReflectionAdapter implements Adapter<Class, Type, Field, Method> {
 
-  private final ReflectionContext context;
+  private final AdapterContext context;
   private final Function<Class, TypeDef> typeAdapterFunction;
   private final Function<Type, TypeRef> referenceAdapterFunction;
   private final Function<Field, Property> propertyAdapterFunction;
@@ -43,7 +44,7 @@ public class ReflectionAdapter implements Adapter<Class, Type, Field, Method> {
     return typeAdapterFunction;
   }
 
-  public ReflectionAdapter(ReflectionContext context) {
+  public ReflectionAdapter(AdapterContext context) {
     this.context = context;
     this.referenceAdapterFunction = new TypeToTypeRef(references);
     this.typeAdapterFunction = new ClassToTypeDef(context, references, referenceAdapterFunction,

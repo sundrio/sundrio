@@ -125,8 +125,7 @@ public final class TypeDefUtils {
     if (isTerminal(executableElement)) {
       returnType = isVoid(executableElement)
           ? VOID_REF
-          : Adapters.getAdapter(context.getAptContext()).map(a -> a.adaptReference(executableElement.getReturnType()))
-              .orElseThrow(() -> new IllegalStateException("Could not find adapter for AptContext!"));
+          : Adapters.adaptReference(executableElement.getReturnType(), context.getAptContext());
     } else {
       returnType = TRANSPARENT_REF;
     }
@@ -150,8 +149,7 @@ public final class TypeDefUtils {
 
     TypeParamDef paremeterType = Generics.MAP.apply(returnType);
 
-    Method sourceMethod = Adapters.getAdapter(context.getAptContext()).map(a -> a.adaptMethod(executableElement))
-        .orElseThrow(() -> new IllegalStateException("Could not find adapter for AptContext!"));
+    Method sourceMethod = Adapters.adaptMethod(executableElement, context.getAptContext());
     List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
     for (AnnotationRef candidate : sourceMethod.getAnnotations()) {
       if (!candidate.getClassRef().getFullyQualifiedName().startsWith("io.sundr")) {

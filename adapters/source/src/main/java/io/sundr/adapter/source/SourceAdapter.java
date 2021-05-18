@@ -25,6 +25,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
@@ -33,7 +34,7 @@ import io.sundr.model.TypeRef;
 public class SourceAdapter
     implements Adapter<TypeDeclaration, ClassOrInterfaceType, FieldDeclaration, MethodDeclaration> {
 
-  private final SourceContext context;
+  private final AdapterContext context;
   private final Function<TypeDeclaration, TypeDef> typeAdapterFunction;
   private final Function<ClassOrInterfaceType, TypeRef> referenceAdapterFunction;
   private final Function<FieldDeclaration, Property> propertyAdapterFunction;
@@ -44,7 +45,7 @@ public class SourceAdapter
     return typeAdapterFunction;
   }
 
-  public SourceAdapter(SourceContext context) {
+  public SourceAdapter(AdapterContext context) {
     this.context = context;
     this.typeAdapterFunction = new TypeDeclarationToTypeDef(context);
     this.referenceAdapterFunction = null;

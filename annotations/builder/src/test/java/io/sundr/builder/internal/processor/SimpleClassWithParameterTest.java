@@ -22,9 +22,8 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
-import io.sundr.adapter.reflect.ReflectionContext;
-import io.sundr.adapter.source.SourceContext;
 import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.model.ClassRef;
@@ -35,10 +34,9 @@ import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleClassWithParameterTest extends AbstractProcessorTest {
 
-  private final SourceContext context = new SourceContext(DefinitionRepository.getRepository());
-  private final ReflectionContext reflectionContext = new ReflectionContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
 
-  TypeDef stringDef = Adapters.adaptType(String.class, reflectionContext);
+  TypeDef stringDef = Adapters.adaptType(String.class, context);
   TypeDef simpleClassWithParameterDef = Sources.readTypeDefFromResource("SimpleClassWithParameter.java", context);
 
   @Test

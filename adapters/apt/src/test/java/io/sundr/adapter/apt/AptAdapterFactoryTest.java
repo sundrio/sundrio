@@ -54,7 +54,8 @@ public class AptAdapterFactoryTest {
   }
 
   private Optional<Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement>> createAdapter() {
-    return Adapters.getAdapter(AptContext.create(elements, types, DefinitionRepository.getRepository()));
+    return Adapters.getAdapterForType(TypeElement.class,
+        AptContext.create(elements, types, DefinitionRepository.getRepository()));
   }
 
   @Test

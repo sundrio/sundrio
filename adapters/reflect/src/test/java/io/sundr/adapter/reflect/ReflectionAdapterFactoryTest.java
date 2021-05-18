@@ -27,15 +27,16 @@ import java.util.Optional;
 import org.junit.Test;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class ReflectionAdapterFactoryTest {
 
-  private final ReflectionContext context = new ReflectionContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
 
   private Optional<Adapter<Class, Type, Field, Method>> createAdapter() {
-    return Adapters.getAdapter(context);
+    return Adapters.getAdapterForType(Class.class, context);
   }
 
   @Test

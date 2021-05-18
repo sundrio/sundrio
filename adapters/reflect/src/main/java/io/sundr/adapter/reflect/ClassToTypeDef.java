@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.AttributeKey;
@@ -55,14 +56,14 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
 
   private static final String ARGUMENT_PREFIX = "arg";
 
-  private final ReflectionContext context;
+  private final AdapterContext context;
   private final Set<Class> references;
   private final Function<Type, TypeRef> typeToTypeRef;
   private final Function<Type, TypeParamDef> typeToTypeParamDef;
   private final Function<Class<? extends Annotation>, AnnotationRef> annotationTypeToAnnotationRef;
   private final Function<Class, Kind> classToKind;
 
-  public ClassToTypeDef(ReflectionContext context, Set<Class> references, Function<Type, TypeRef> typeToTypeRef,
+  public ClassToTypeDef(AdapterContext context, Set<Class> references, Function<Type, TypeRef> typeToTypeRef,
       Function<Type, TypeParamDef> typeToTypeParamDef,
       Function<Class<? extends Annotation>, AnnotationRef> annotationTypeToAnnotationRef,
       Function<Class, Kind> classToKind) {

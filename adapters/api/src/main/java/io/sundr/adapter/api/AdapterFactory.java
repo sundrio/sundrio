@@ -17,14 +17,7 @@
 
 package io.sundr.adapter.api;
 
-public interface AdapterFactory<C extends AdapterContext, T, R, P, M> {
-
-  /**
-   * The type of {@link AdapterContext} this factory supports.
-   * 
-   * @return the type
-   */
-  Class<C> getContextType();
+public interface AdapterFactory<T, R, P, M> {
 
   /**
    * The type of type adapter this factory supports.
@@ -60,6 +53,6 @@ public interface AdapterFactory<C extends AdapterContext, T, R, P, M> {
    * @param ctx The {@link AdapterContext}
    * @return the {@link Adapter}
    */
-  public Adapter<T, R, P, M> create(C ctx);
+  public Adapter<T, R, P, M> create(AdapterContext ctx);
 
 }

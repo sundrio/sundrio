@@ -30,6 +30,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.source.utils.Sources;
 import io.sundr.model.TypeDef;
@@ -37,10 +38,10 @@ import io.sundr.model.repo.DefinitionRepository;
 
 public class SourceAdapterFactoryTest {
 
-  private final SourceContext context = new SourceContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
 
   private Optional<Adapter<TypeDeclaration, ClassOrInterfaceType, FieldDeclaration, MethodDeclaration>> createAdapter() {
-    return Adapters.getAdapter(context);
+    return Adapters.getAdapterForType(TypeDeclaration.class, context);
   }
 
   @Test

@@ -41,9 +41,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
 
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.apt.AptContext;
-import io.sundr.adapter.reflect.ReflectionContext;
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.annotations.*;
@@ -324,7 +324,7 @@ public class BuilderUtils {
 
   public static TypeDef getInlineType(BuilderContext context, Inline inline) {
     try {
-      return Adapters.adaptType(inline.type(), new ReflectionContext(context.getDefinitionRepository()));
+      return Adapters.adaptType(inline.type(), new AdapterContext(context.getDefinitionRepository()));
     } catch (MirroredTypeException e) {
       Element element = context.getTypes().asElement(e.getTypeMirror());
       AptContext aptContext = AptContext.create(context.getElements(), context.getTypes(), context.getDefinitionRepository());
@@ -338,7 +338,7 @@ public class BuilderUtils {
       if (returnType == null) {
         return fallback;
       }
-      return Adapters.adaptType(inline.returnType(), new ReflectionContext(context.getDefinitionRepository()));
+      return Adapters.adaptType(inline.returnType(), new AdapterContext(context.getDefinitionRepository()));
     } catch (MirroredTypeException e) {
       if (None.FQN.equals(e.getTypeMirror().toString())) {
         return fallback;
