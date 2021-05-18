@@ -18,15 +18,19 @@ package io.sundr.adapter.apt;
 
 import java.util.function.Function;
 
+import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.model.AnnotationRef;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
 
 public class AptAdapter implements Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement> {
@@ -37,17 +41,23 @@ public class AptAdapter implements Adapter<TypeElement, TypeMirror, VariableElem
   private final Function<VariableElement, Property> propertyAdapterFunction;
   private final Function<ExecutableElement, Method> methodAdapterFunction;
 
-  @Override
-  public Function<TypeElement, TypeDef> getTypeAdapterFunction() {
-    return typeAdapterFunction;
-  }
+  private final Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction;
+  private final Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction;
 
   public AptAdapter(AptContext context) {
     this.context = context;
-    this.typeAdapterFunction = context.getTypeElementToTypeDef();
-    this.referenceAdapterFunction = context.getTypeMirrorToTypeRef();
-    this.propertyAdapterFunction = context.getVariableElementToProperty();
-    this.methodAdapterFunction = context.getExecutableElementToMethod();
+    this.referenceAdapterFunction = new TypeMirrorToTypeRef(context);
+    this.annotationAdapterFunction = new AnnotationMirrorToAnnotationRef(context, referenceAdapterFunction);
+    this.typeParamAdapterFunction = new TypePrameterElementToTypeParamDef(context, referenceAdapterFunction);
+    this.propertyAdapterFunction = new VariableElementToProperty(context, referenceAdapterFunction, annotationAdapterFunction);
+    this.methodAdapterFunction = new ExecutableElementToMethod(context, referenceAdapterFunction, propertyAdapterFunction,
+        annotationAdapterFunction);
+    this.typeAdapterFunction = new TypeElementToTypeDef(context, referenceAdapterFunction, propertyAdapterFunction,
+        methodAdapterFunction, annotationAdapterFunction, typeParamAdapterFunction);
+  }
+
+  public Function<TypeElement, TypeDef> getTypeAdapterFunction() {
+    return typeAdapterFunction;
   }
 
   public Function<TypeMirror, TypeRef> getReferenceAdapterFunction() {

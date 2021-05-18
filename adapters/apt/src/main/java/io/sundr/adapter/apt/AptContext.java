@@ -16,53 +16,30 @@
 
 package io.sundr.adapter.apt;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.api.AdapterContext;
-import io.sundr.model.AnnotationRef;
-import io.sundr.model.Method;
-import io.sundr.model.Property;
-import io.sundr.model.TypeDef;
-import io.sundr.model.TypeParamDef;
-import io.sundr.model.TypeRef;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class AptContext extends AdapterContext {
 
-  private static AptContext INSTANCE;
-
   private final Types types;
   private final Elements elements;
 
-  private final Function<TypeMirror, TypeRef> typeMirrorToTypeRef;
-  private final Function<TypeElement, TypeDef> typeElementToTypeDef;
-  private final Function<AnnotationMirror, AnnotationRef> annotationMirrorToAnnotationRef;
-  private final Function<VariableElement, Property> variableElementToProperty;
-  private final Function<ExecutableElement, Method> executableElementToMethod;
-  private final Function<TypeParameterElement, TypeParamDef> typeParamElementToTypeParamDef;
+  private static AptContext INSTANCE;
   private final Set<TypeElement> references = new HashSet<>();
 
   private AptContext(Elements elements, Types types, DefinitionRepository repository) {
     super(repository);
     this.types = types;
     this.elements = elements;
-    this.typeMirrorToTypeRef = new TypeMirrorToTypeRef(this);
-    this.typeElementToTypeDef = new TypeElementToTypeDef(this);
-    this.annotationMirrorToAnnotationRef = new AnnotationMirrorToAnnotationRef(this);
-    this.variableElementToProperty = new VariableElementToProperty(this);
-    this.executableElementToMethod = new ExecutableElementToMethod(this);
-    this.typeParamElementToTypeParamDef = new TypePrameterElementToTypeParamDef(this);
   }
 
   public synchronized static AptContext create(Elements elements, Types types, DefinitionRepository repository) {
@@ -89,32 +66,7 @@ public class AptContext extends AdapterContext {
     return true;
   }
 
-  public Function<TypeMirror, TypeRef> getTypeMirrorToTypeRef() {
-    return typeMirrorToTypeRef;
-  }
-
-  public Function<TypeElement, TypeDef> getTypeElementToTypeDef() {
-    return typeElementToTypeDef;
-  }
-
-  public Function<AnnotationMirror, AnnotationRef> getAnnotationMirrorToAnnotationRef() {
-    return annotationMirrorToAnnotationRef;
-  }
-
-  public Function<VariableElement, Property> getVariableElementToProperty() {
-    return variableElementToProperty;
-  }
-
-  public Function<ExecutableElement, Method> getExecutableElementToMethod() {
-    return executableElementToMethod;
-  }
-
-  public Function<TypeParameterElement, TypeParamDef> getTypeParamElementToTypeParamDef() {
-    return typeParamElementToTypeParamDef;
-  }
-
   public Set<TypeElement> getReferences() {
     return this.references;
   }
-
 }

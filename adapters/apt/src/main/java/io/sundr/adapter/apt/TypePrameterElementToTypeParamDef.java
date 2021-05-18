@@ -32,18 +32,20 @@ import io.sundr.model.TypeRef;
 public class TypePrameterElementToTypeParamDef implements Function<TypeParameterElement, TypeParamDef> {
 
   private final AptContext context;
+  private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
 
-  public TypePrameterElementToTypeParamDef(AptContext context) {
+  public TypePrameterElementToTypeParamDef(AptContext context, Function<TypeMirror, TypeRef> referenceAdapterFunction) {
     this.context = context;
+    this.referenceAdapterFunction = referenceAdapterFunction;
   }
 
   public TypeParamDef apply(TypeParameterElement item) {
     List<ClassRef> typeRefs = new ArrayList<>();
 
     for (TypeMirror typeMirror : item.getBounds()) {
-      TypeRef typeRef = context.getTypeMirrorToTypeRef().apply(typeMirror);
+      TypeRef typeRef = referenceAdapterFunction.apply(typeMirror);
       if (typeRef instanceof ClassRef) {
-        typeRefs.add((ClassRef) context.getTypeMirrorToTypeRef().apply(typeMirror));
+        typeRefs.add((ClassRef) referenceAdapterFunction.apply(typeMirror));
       }
     }
 

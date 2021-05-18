@@ -40,8 +40,11 @@ import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
+import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -60,9 +63,23 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
   private static final String NEWLINE_PATTERN = "\r|\n";
 
   private final AptContext context;
+  private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
+  private final Function<VariableElement, Property> propertyAdapterFunction;
+  private final Function<ExecutableElement, Method> methodAdapterFunction;
+  private final Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction;
+  private final Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction;
 
-  public TypeElementToTypeDef(AptContext context) {
+  public TypeElementToTypeDef(AptContext context, Function<TypeMirror, TypeRef> referenceAdapterFunction,
+      Function<VariableElement, Property> propertyAdapterFunction,
+      Function<ExecutableElement, Method> methodAdapterFunction,
+      Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction,
+      Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction) {
     this.context = context;
+    this.referenceAdapterFunction = referenceAdapterFunction;
+    this.propertyAdapterFunction = propertyAdapterFunction;
+    this.methodAdapterFunction = methodAdapterFunction;
+    this.annotationAdapterFunction = annotationAdapterFunction;
+    this.typeParamAdapterFunction = typeParamAdapterFunction;
   }
 
   @Override
@@ -80,7 +97,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
     } else if (superClass.toString().equals(TypeDef.OBJECT.getFullyQualifiedName())) {
       // ignore
     } else {
-      superClassType = context.getTypeMirrorToTypeRef().apply(superClass);
+      superClassType = referenceAdapterFunction.apply(superClass);
     }
 
     List<TypeParamDef> genericTypes = new ArrayList<TypeParamDef>();
@@ -102,7 +119,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
             .collect(Collectors.toList());
 
     for (TypeMirror interfaceTypeMirrror : classElement.getInterfaces()) {
-      TypeRef interfaceType = context.getTypeMirrorToTypeRef().apply(interfaceTypeMirrror);
+      TypeRef interfaceType = referenceAdapterFunction.apply(interfaceTypeMirrror);
       if (interfaceType instanceof ClassRef) {
         interfaces.add((ClassRef) interfaceType);
       } else {
@@ -111,7 +128,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
     }
 
     for (TypeParameterElement typeParameter : classElement.getTypeParameters()) {
-      TypeParamDef genericType = context.getTypeParamElementToTypeParamDef().apply(typeParameter);
+      TypeParamDef genericType = typeParamAdapterFunction.apply(typeParameter);
       genericTypes.add(genericType);
     }
 
@@ -146,12 +163,12 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
     TypeDefBuilder builder = new TypeDefBuilder(baseType).withInnerTypes(innerTypes);
 
     for (ExecutableElement constructor : ElementFilter.constructorsIn(classElement.getEnclosedElements())) {
-      builder.addToConstructors(context.getExecutableElementToMethod().apply(constructor));
+      builder.addToConstructors(methodAdapterFunction.apply(constructor));
     }
 
     // Populate Fields
     for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
-      builder.addToProperties(context.getVariableElementToProperty().apply(variableElement));
+      builder.addToProperties(propertyAdapterFunction.apply(variableElement));
     }
 
     Set<ExecutableElement> allMethods = new LinkedHashSet<ExecutableElement>();
@@ -159,11 +176,11 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
     allMethods.addAll(getInheritedMethods(classElement));
 
     for (ExecutableElement method : allMethods) {
-      builder.addToMethods(context.getExecutableElementToMethod().apply(method));
+      builder.addToMethods(methodAdapterFunction.apply(method));
     }
 
     for (AnnotationMirror annotationMirror : classElement.getAnnotationMirrors()) {
-      builder.addToAnnotations(context.getAnnotationMirrorToAnnotationRef().apply(annotationMirror));
+      builder.addToAnnotations(annotationAdapterFunction.apply(annotationMirror));
     }
     //Let's register the full blown definition
     TypeDef result = context.getDefinitionRepository().register(builder.build());
@@ -203,4 +220,5 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
     }
     return result;
   }
+
 }

@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
 
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Property;
@@ -38,18 +39,23 @@ public class VariableElementToProperty implements Function<VariableElement, Prop
   private static final String NEWLINE_PATTERN = "\r|\n";
 
   private final AptContext context;
+  private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
+  private final Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction;
 
-  public VariableElementToProperty(AptContext context) {
+  public VariableElementToProperty(AptContext context, Function<TypeMirror, TypeRef> referenceAdapterFunction,
+      Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction) {
     this.context = context;
+    this.referenceAdapterFunction = referenceAdapterFunction;
+    this.annotationAdapterFunction = annotationAdapterFunction;
   }
 
   public Property apply(final VariableElement variableElement) {
     String name = variableElement.getSimpleName().toString();
 
-    TypeRef type = context.getTypeMirrorToTypeRef().apply(variableElement.asType());
+    TypeRef type = referenceAdapterFunction.apply(variableElement.asType());
     List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
     for (AnnotationMirror annotationMirror : variableElement.getAnnotationMirrors()) {
-      annotations.add(context.getAnnotationMirrorToAnnotationRef().apply(annotationMirror));
+      annotations.add(annotationAdapterFunction.apply(annotationMirror));
     }
 
     String comments = context.getElements().getDocComment(variableElement);
