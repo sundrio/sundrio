@@ -86,7 +86,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
           }
         }
 
-        TypeDef def = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(element), aptContext))
+        TypeDef def = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement(element), aptContext))
             .build();
 
         for (VelocityTransformation t : all) {
@@ -148,7 +148,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
         Map<String, TypeDef> map = lines.stream()
             .map(l -> elements.getTypeElement(l))
             .filter(e -> e instanceof TypeElement)
-            .map(e -> Adapters.adapt(e, aptContext))
+            .map(e -> Adapters.adaptType(e, aptContext))
             .collect(Collectors.toMap(e -> e.getFullyQualifiedName(), e -> e));
 
         definitions.putAll(map);
@@ -163,7 +163,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
       Map<String, TypeDef> definitions) {
     for (Object o : env.getElementsAnnotatedWith((TypeElement) types.asElement(annotationMirror(selector)))) {
       if (o instanceof TypeElement) {
-        TypeDef typeDef = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement((Element) o), AptContext.getContext()))
+        TypeDef typeDef = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement((Element) o), AptContext.getContext()))
             .build();
         definitions.put(typeDef.getFullyQualifiedName(), typeDef);
       }
@@ -189,7 +189,7 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
     }
 
     for (TypeElement typeElement : typeElements) {
-      TypeDef typeDef = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(typeElement), AptContext.getContext()))
+      TypeDef typeDef = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement(typeElement), AptContext.getContext()))
           .build();
 
       Matcher m = pattern.matcher(typeDef.getName());

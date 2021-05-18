@@ -184,7 +184,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
               AptContext aptContext = AptContext.create(context.getElements(), context.getTypes(),
                   context.getDefinitionRepository());
               superClass = new TypeDefBuilder(
-                  Adapters.adapt(aptContext.getElements().getTypeElement(superClassName), aptContext)).build();
+                  Adapters.adaptType(aptContext.getElements().getTypeElement(superClassName), aptContext)).build();
 
               BuilderContextManager.getContext().getDefinitionRepository().register(superClass);
               BuilderContextManager.getContext().getBuildableRepository().register(superClass);

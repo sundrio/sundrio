@@ -72,7 +72,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         AptContext aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
         ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(),
             buildable.builderPackage());
-        TypeDef b = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(element), aptContext))
+        TypeDef b = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement(element), aptContext))
             .addToAttributes(BUILDABLE, buildable)
             .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
@@ -89,7 +89,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         buildables.add(b);
 
         for (TypeElement ref : BuilderUtils.getBuildableReferences(ctx, buildable)) {
-          TypeDef r = new TypeDefBuilder(Adapters.adapt(Apt.getClassElement(ref), aptContext))
+          TypeDef r = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement(ref), aptContext))
               .addToAttributes(BUILDABLE, buildable)
               .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
               .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())

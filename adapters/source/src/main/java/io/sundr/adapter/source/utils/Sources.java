@@ -56,7 +56,7 @@ public class Sources {
    */
   public static List<TypeDef> readTypeDefsFromStream(InputStream is, SourceContext ctx) {
     CompilationUnit cu = Sources.FROM_INPUTSTREAM_TO_COMPILATIONUNIT.apply(is);
-    return cu.getTypes().stream().map(t -> Adapters.adapt(t, ctx)).collect(Collectors.toList());
+    return cu.getTypes().stream().map(t -> Adapters.adaptType(t, ctx)).collect(Collectors.toList());
   }
 
   /**
@@ -121,7 +121,7 @@ public class Sources {
    */
   public static List<TypeDef> readTypeDefsFromResource(String resourceName, SourceContext ctx) {
     CompilationUnit cu = Sources.FROM_CLASSPATH_TO_COMPILATIONUNIT.apply(resourceName);
-    return cu.getTypes().stream().map(t -> Adapters.adapt(t, ctx)).collect(Collectors.toList());
+    return cu.getTypes().stream().map(t -> Adapters.adaptType(t, ctx)).collect(Collectors.toList());
   }
 
   private static final Function<File, CompilationUnit> FROM_FILE_TO_COMPILATIONUNIT = file -> {
