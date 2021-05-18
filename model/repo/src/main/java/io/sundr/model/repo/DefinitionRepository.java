@@ -53,6 +53,17 @@ public class DefinitionRepository {
   private DefinitionRepository() {
   }
 
+  /**
+   * Get or create a DefinitionRepository.
+   * This is a traditional Singleton getInstance() method with a twist ...
+   * Along with the static final instance that is used by common singletons this also uses a scoped instance.
+   * The scoped instance is something that may be used in the context of a {@link Function} or a {@link Callable}.
+   * So, when this method is used from within a call to Definition.withRepository(repo).call(...) it will return the value of
+   * repo instead of the Singleton intance.
+   * The same goes for Definition.withNewRepository(repo -> { ... }).
+   * 
+   * @return the scoped instance if called from within withRepo/withNewRepo lambda, or the singleton instance otherwise.
+   */
   public static synchronized final DefinitionRepository getRepository() {
     if (SCOPE != null) {
       return SCOPE;
@@ -61,6 +72,15 @@ public class DefinitionRepository {
       INSTANCE = new DefinitionRepository();
     }
     return INSTANCE;
+  }
+
+  /**
+   * Create a new instance of the repository, without messing with the singleton
+   * 
+   * @return a new instance
+   */
+  public static DefinitionRepository createRepository() {
+    return new DefinitionRepository();
   }
 
   public static WithRepo withRepository(DefinitionRepository repository) {
@@ -229,10 +249,21 @@ public class DefinitionRepository {
 
   public static class WithRepo {
 
+    public WithRepo(DefinitionRepository repository) {
+      this.repository = repository;
+    }
+
     private final DefinitionRepository repository;
 
     public synchronized <V> V apply(Function<DefinitionRepository, V> function) {
-      return function.apply(repository);
+      try {
+        SCOPE = repository;
+        return function.apply(repository);
+      } catch (Exception e) {
+        throw new SundrException(e);
+      } finally {
+        SCOPE = null;
+      }
     }
 
     public synchronized <V> V call(Callable<V> callable) {
@@ -244,10 +275,6 @@ public class DefinitionRepository {
       } finally {
         SCOPE = null;
       }
-    }
-
-    public WithRepo(DefinitionRepository repository) {
-      this.repository = repository;
     }
   }
 }
