@@ -26,6 +26,7 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
@@ -44,15 +45,16 @@ public class AptAdapter implements Adapter<TypeElement, TypeMirror, VariableElem
   private final Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction;
   private final Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction;
 
-  public AptAdapter(AptContext context) {
-    this.context = context;
-    this.referenceAdapterFunction = new TypeMirrorToTypeRef(context);
-    this.annotationAdapterFunction = new AnnotationMirrorToAnnotationRef(context, referenceAdapterFunction);
-    this.typeParamAdapterFunction = new TypePrameterElementToTypeParamDef(context, referenceAdapterFunction);
-    this.propertyAdapterFunction = new VariableElementToProperty(context, referenceAdapterFunction, annotationAdapterFunction);
-    this.methodAdapterFunction = new ExecutableElementToMethod(context, referenceAdapterFunction, propertyAdapterFunction,
+  public AptAdapter(AdapterContext context) {
+    this.context = AptContext.create(context);
+    this.referenceAdapterFunction = new TypeMirrorToTypeRef(this.context);
+    this.annotationAdapterFunction = new AnnotationMirrorToAnnotationRef(this.context, referenceAdapterFunction);
+    this.typeParamAdapterFunction = new TypePrameterElementToTypeParamDef(this.context, referenceAdapterFunction);
+    this.propertyAdapterFunction = new VariableElementToProperty(this.context, referenceAdapterFunction,
         annotationAdapterFunction);
-    this.typeAdapterFunction = new TypeElementToTypeDef(context, referenceAdapterFunction, propertyAdapterFunction,
+    this.methodAdapterFunction = new ExecutableElementToMethod(this.context, referenceAdapterFunction, propertyAdapterFunction,
+        annotationAdapterFunction);
+    this.typeAdapterFunction = new TypeElementToTypeDef(this.context, referenceAdapterFunction, propertyAdapterFunction,
         methodAdapterFunction, annotationAdapterFunction, typeParamAdapterFunction);
   }
 

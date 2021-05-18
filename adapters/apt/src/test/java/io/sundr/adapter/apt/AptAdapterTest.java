@@ -29,7 +29,7 @@ import com.google.testing.compile.CompilationRule;
 import io.sundr.adapter.testing.AbstractAdapterTest;
 import io.sundr.model.repo.DefinitionRepository;
 
-public class AptAdapterTest extends AbstractAdapterTest<TypeElement, AptContext> {
+public class AptAdapterTest extends AbstractAdapterTest<TypeElement> {
 
   public @Rule CompilationRule rule = new CompilationRule();
 

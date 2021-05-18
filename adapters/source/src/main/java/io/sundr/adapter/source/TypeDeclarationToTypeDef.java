@@ -43,6 +43,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
 
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
@@ -66,12 +67,12 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
   private static final Function<AnnotationExpr, AnnotationRef> ANNOTATIONREF = new AnnotationExprToAnnotationRef();
   private static final Function<BlockStmt, Block> BLOCK = new BlockStmtToBlock();
 
-  private final SourceContext context;
+  private final AdapterContext context;
   private final Function<TypeParameter, TypeParamDef> typeParameterToTypeParamDef;
   private final Function<ClassOrInterfaceType, TypeRef> classOrInterfaceToTypeRef;
   private final Function<Type, TypeRef> typeToTypeRef;
 
-  public TypeDeclarationToTypeDef(SourceContext context) {
+  public TypeDeclarationToTypeDef(AdapterContext context) {
     this.context = context;
     this.classOrInterfaceToTypeRef = new ClassOrInterfaceToTypeRef();
     this.typeToTypeRef = new TypeToTypeRef(classOrInterfaceToTypeRef);

@@ -16,15 +16,16 @@
 
 package io.sundr.adapter.reflect;
 
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.testing.AbstractAdapterTest;
 import io.sundr.model.repo.DefinitionRepository;
 
-public class ReflectionAdapterTest extends AbstractAdapterTest<Class, ReflectionContext> {
+public class ReflectionAdapterTest extends AbstractAdapterTest<Class> {
 
-  private ReflectionContext context = new ReflectionContext(DefinitionRepository.getRepository());
+  private AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
 
   @Override
-  public ReflectionContext getContext() {
+  public AdapterContext getContext() {
     return context;
   }
 

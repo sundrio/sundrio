@@ -21,13 +21,13 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import io.sundr.adapter.source.SourceContext;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class SourcesTest {
 
-  private final SourceContext context = new SourceContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
 
   @Test
   public void shouldAdaptList() throws Exception {

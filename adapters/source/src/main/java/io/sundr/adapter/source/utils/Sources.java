@@ -30,8 +30,8 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
-import io.sundr.adapter.source.SourceContext;
 import io.sundr.model.TypeDef;
 
 public class Sources {
@@ -44,7 +44,7 @@ public class Sources {
    * @param is the {@link InputStream}
    * @return the first {@link TypeDef} instance, or throw an exception if none is found.
    */
-  public static TypeDef readTypeDefFromStream(InputStream is, SourceContext ctx) {
+  public static TypeDef readTypeDefFromStream(InputStream is, AdapterContext ctx) {
     return readTypeDefsFromStream(is, ctx).stream().findFirst().orElseThrow(() -> new IllegalStateException(NO_TYPE_FOUND));
   }
 
@@ -54,7 +54,7 @@ public class Sources {
    * @param is the {@link InputStream}
    * @return a {@link List} of {@link TypeDef} instances.
    */
-  public static List<TypeDef> readTypeDefsFromStream(InputStream is, SourceContext ctx) {
+  public static List<TypeDef> readTypeDefsFromStream(InputStream is, AdapterContext ctx) {
     CompilationUnit cu = Sources.FROM_INPUTSTREAM_TO_COMPILATIONUNIT.apply(is);
     return cu.getTypes().stream().map(t -> Adapters.adaptType(t, ctx)).collect(Collectors.toList());
   }
@@ -105,10 +105,10 @@ public class Sources {
    * Read the first {@link TypeDef} instance from a classpath resource.
    * 
    * @param resourceName the {@link InputStream}
-   * @param ctx the {@link SourceContext}
+   * @param ctx the {@link AdapterContext}
    * @return the first {@link TypeDef} instance, or throw an exception if none is found.
    */
-  public static TypeDef readTypeDefFromResource(String resourceName, SourceContext ctx) {
+  public static TypeDef readTypeDefFromResource(String resourceName, AdapterContext ctx) {
     return readTypeDefsFromResource(resourceName, ctx).stream().findFirst()
         .orElseThrow(() -> new IllegalStateException(NO_TYPE_FOUND));
   }
@@ -119,7 +119,7 @@ public class Sources {
    * @param resourceName the {@link InputStream}
    * @return a {@link List} of {@link TypeDef} instances.
    */
-  public static List<TypeDef> readTypeDefsFromResource(String resourceName, SourceContext ctx) {
+  public static List<TypeDef> readTypeDefsFromResource(String resourceName, AdapterContext ctx) {
     CompilationUnit cu = Sources.FROM_CLASSPATH_TO_COMPILATIONUNIT.apply(resourceName);
     return cu.getTypes().stream().map(t -> Adapters.adaptType(t, ctx)).collect(Collectors.toList());
   }

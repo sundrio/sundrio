@@ -23,18 +23,14 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.AdapterFactory;
 
 public class SourceAdapterFactory
-    implements AdapterFactory<SourceContext, TypeDeclaration, ClassOrInterfaceType, FieldDeclaration, MethodDeclaration> {
+    implements AdapterFactory<TypeDeclaration, ClassOrInterfaceType, FieldDeclaration, MethodDeclaration> {
 
   @Override
-  public Class getContextType() {
-    return SourceContext.class;
-  }
-
-  @Override
-  public Adapter<TypeDeclaration, ClassOrInterfaceType, FieldDeclaration, MethodDeclaration> create(SourceContext ctx) {
+  public Adapter<TypeDeclaration, ClassOrInterfaceType, FieldDeclaration, MethodDeclaration> create(AdapterContext ctx) {
     return new SourceAdapter(ctx);
   }
 

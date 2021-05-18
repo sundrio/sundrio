@@ -22,17 +22,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.AdapterFactory;
 
-public class ReflectionAdapterFactory implements AdapterFactory<ReflectionContext, Class, Type, Field, Method> {
+public class ReflectionAdapterFactory implements AdapterFactory<Class, Type, Field, Method> {
 
   @Override
-  public Class<ReflectionContext> getContextType() {
-    return ReflectionContext.class;
-  }
-
-  @Override
-  public Adapter<Class, Type, Field, Method> create(ReflectionContext ctx) {
+  public Adapter<Class, Type, Field, Method> create(AdapterContext ctx) {
     return new ReflectionAdapter(ctx);
   }
 

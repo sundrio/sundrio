@@ -48,6 +48,28 @@ public class AptContext extends AdapterContext {
     return attributes;
   }
 
+  public synchronized static AptContext create(AdapterContext context) {
+    Types types = context.getAttribute(TYPES_KEY);
+    Elements elements = context.getAttribute(ELEMENTS_KEY);
+
+    if (elements == null) {
+      elements = INSTANCE != null ? INSTANCE.getElements() : null;
+      if (elements == null) {
+        throw new IllegalStateException("AptContext requires javax.lang.model.util.Elements utilitiy.");
+      }
+    }
+
+    if (types == null) {
+      types = INSTANCE != null ? INSTANCE.getTypes() : null;
+      if (types == null) {
+        throw new IllegalStateException("AptContext requires javax.lang.model.util.Types utilitiy.");
+      }
+    }
+
+    INSTANCE = new AptContext(elements, types, context.getDefinitionRepository());
+    return INSTANCE;
+  }
+
   public synchronized static AptContext create(Elements elements, Types types, DefinitionRepository repository) {
     INSTANCE = new AptContext(elements, types, repository);
     return INSTANCE;
@@ -55,7 +77,7 @@ public class AptContext extends AdapterContext {
 
   public synchronized static AptContext getContext() {
     if (INSTANCE == null) {
-      throw new IllegalStateException("CodeGenContext has not been created, yet.");
+      throw new IllegalStateException("AptContext has not been created, yet.");
     }
     return INSTANCE;
   }
