@@ -37,4 +37,24 @@ public class AptAdapterFactory
   public Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement> create(AptContext context) {
     return new AptAdapter(context);
   }
+
+  @Override
+  public Class<TypeElement> getTypeAdapterType() {
+    return TypeElement.class;
+  }
+
+  @Override
+  public Class<TypeMirror> getReferenceAdapterType() {
+    return TypeMirror.class;
+  }
+
+  @Override
+  public Class<ExecutableElement> getMethodAdapterType() {
+    return ExecutableElement.class;
+  }
+
+  @Override
+  public Class<VariableElement> getPropertyAdapterType() {
+    return VariableElement.class;
+  }
 }

@@ -27,6 +27,34 @@ public interface AdapterFactory<C extends AdapterContext, T, R, P, M> {
   Class<C> getContextType();
 
   /**
+   * The type of type adapter this factory supports.
+   * 
+   * @return the type
+   */
+  Class<T> getTypeAdapterType();
+
+  /**
+   * The type of reference adapter this factory supports.
+   * 
+   * @return the type
+   */
+  Class<R> getReferenceAdapterType();
+
+  /**
+   * The type of method adapter this factory supports.
+   * 
+   * @return the type
+   */
+  Class<M> getMethodAdapterType();
+
+  /**
+   * The type of property adapter this factory supports.
+   * 
+   * @return the type
+   */
+  Class<P> getPropertyAdapterType();
+
+  /**
    * Create an instance of {@link Adapter} for the given {@link AdapterContext}.
    * 
    * @param ctx The {@link AdapterContext}
