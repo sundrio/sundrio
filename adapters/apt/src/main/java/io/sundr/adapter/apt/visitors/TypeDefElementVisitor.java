@@ -16,6 +16,8 @@
 
 package io.sundr.adapter.apt.visitors;
 
+import java.util.function.Function;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ElementVisitor;
@@ -27,17 +29,21 @@ import javax.lang.model.element.VariableElement;
 
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.model.Kind;
+import io.sundr.model.Method;
+import io.sundr.model.Property;
+import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeParamDef;
 
 public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Void> {
 
   private final TypeDefBuilder builder = new TypeDefBuilder();
 
   private final AptContext context;
-
-  public TypeDefElementVisitor(AptContext context) {
-    this.context = context;
-  }
+  private final Function<TypeElement, TypeDef> typeAdapterFunction;
+  private final Function<VariableElement, Property> propertyAdapterFunction;
+  private final Function<ExecutableElement, Method> methodAdapterFunction;
+  private final Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction;
 
   public TypeDefBuilder visit(Element e, Void aVoid) {
     return builder.withName(e.getSimpleName().toString());
@@ -46,7 +52,7 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
   public TypeDefBuilder visit(Element e) {
     if (e instanceof TypeElement) {
       return new TypeDefBuilder(context.getDefinitionRepository()
-          .register(new TypeDefBuilder(context.getTypeElementToTypeDef().apply((TypeElement) e)).build()));
+          .register(new TypeDefBuilder(typeAdapterFunction.apply((TypeElement) e)).build()));
     }
     String name = e.getSimpleName().toString();
     builder.withName(name);
@@ -76,19 +82,29 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
   }
 
   public TypeDefBuilder visitVariable(VariableElement e, Void aVoid) {
-    return builder.addToProperties(context.getVariableElementToProperty().apply(e));
+    return builder.addToProperties(propertyAdapterFunction.apply(e));
   }
 
   public TypeDefBuilder visitExecutable(ExecutableElement e, Void aVoid) {
-    return builder.addToMethods(context.getExecutableElementToMethod().apply(e));
+    return builder.addToMethods(methodAdapterFunction.apply(e));
   }
 
   public TypeDefBuilder visitTypeParameter(TypeParameterElement e, Void aVoid) {
-    return builder.addToParameters(context.getTypeParamElementToTypeParamDef().apply(e));
+    return builder.addToParameters(typeParamAdapterFunction.apply(e));
   }
 
   public TypeDefBuilder visitUnknown(Element e, Void aVoid) {
     return builder;
   }
 
+  public TypeDefElementVisitor(AptContext context, Function<TypeElement, TypeDef> typeAdapterFunction,
+      Function<VariableElement, Property> propertyAdapterFunction,
+      Function<ExecutableElement, Method> methodAdapterFunction,
+      Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction) {
+    this.context = context;
+    this.typeAdapterFunction = typeAdapterFunction;
+    this.propertyAdapterFunction = propertyAdapterFunction;
+    this.methodAdapterFunction = methodAdapterFunction;
+    this.typeParamAdapterFunction = typeParamAdapterFunction;
+  }
 }
