@@ -17,14 +17,46 @@
 
 package io.sundr.adapter.api;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.sundr.model.AttributeKey;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class AdapterContext {
 
   private final DefinitionRepository definitionRepository;
+  private final Map<AttributeKey, Object> attributes;
 
   public AdapterContext(DefinitionRepository definitionRepository) {
+    this(definitionRepository, new HashMap<>());
+  }
+
+  public AdapterContext(DefinitionRepository definitionRepository, Map<AttributeKey, Object> attributes) {
     this.definitionRepository = definitionRepository;
+    this.attributes = attributes;
+  }
+
+  public Map<AttributeKey, Object> getAttributes() {
+    if (attributes == null) {
+      return null;
+    }
+    return Collections.unmodifiableMap(attributes);
+  }
+
+  public <T> T getAttribute(AttributeKey<T> key) {
+    if (attributes == null) {
+      return null;
+    }
+    return (T) attributes.get(key);
+  }
+
+  public <T> boolean hasAttribute(AttributeKey<T> key) {
+    if (attributes == null) {
+      return false;
+    }
+    return attributes.containsKey(key);
   }
 
   public DefinitionRepository getDefinitionRepository() {
