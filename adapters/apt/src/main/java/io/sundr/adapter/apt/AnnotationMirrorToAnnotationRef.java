@@ -40,9 +40,11 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
   private static final String EMPTY = "";
 
   private final AptContext context;
+  private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
 
-  public AnnotationMirrorToAnnotationRef(AptContext context) {
+  public AnnotationMirrorToAnnotationRef(AptContext context, Function<TypeMirror, TypeRef> referenceAdapterFunction) {
     this.context = context;
+    this.referenceAdapterFunction = referenceAdapterFunction;
   }
 
   @Override
@@ -69,7 +71,7 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
     } else if (value instanceof AnnotationValue) {
       return ((AnnotationValue) value).getValue();
     } else if (value instanceof TypeMirror) {
-      return context.getTypeMirrorToTypeRef().apply((TypeMirror) value);
+      return referenceAdapterFunction.apply((TypeMirror) value);
     } else {
       return value;
     }

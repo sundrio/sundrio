@@ -26,20 +26,26 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.api.AdapterContext;
+import io.sundr.model.AttributeKey;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class AptContext extends AdapterContext {
 
-  private final Types types;
-  private final Elements elements;
+  private static final AttributeKey<Types> TYPES_KEY = new AttributeKey<>(Types.class);
+  private static final AttributeKey<Elements> ELEMENTS_KEY = new AttributeKey<>(Elements.class);
 
   private static AptContext INSTANCE;
   private final Set<TypeElement> references = new HashSet<>();
 
   private AptContext(Elements elements, Types types, DefinitionRepository repository) {
-    super(repository);
-    this.types = types;
-    this.elements = elements;
+    super(repository, createAttributes(elements, types));
+  }
+
+  private static Map<AttributeKey, Object> createAttributes(Elements elements, Types types) {
+    Map<AttributeKey, Object> attributes = new HashMap<>();
+    attributes.put(ELEMENTS_KEY, elements);
+    attributes.put(TYPES_KEY, types);
+    return attributes;
   }
 
   public synchronized static AptContext create(Elements elements, Types types, DefinitionRepository repository) {
@@ -55,11 +61,11 @@ public class AptContext extends AdapterContext {
   }
 
   public Types getTypes() {
-    return types;
+    return getAttribute(TYPES_KEY);
   }
 
   public Elements getElements() {
-    return elements;
+    return getAttribute(ELEMENTS_KEY);
   }
 
   public boolean isDeep() {

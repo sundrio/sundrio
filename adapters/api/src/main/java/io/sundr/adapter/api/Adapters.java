@@ -29,8 +29,16 @@ public class Adapters {
     if (input == null) {
       throw new IllegalArgumentException("Adapter.adapt(null) is now allowed!");
     }
-    return getAdapter(ctx).map(a -> a.adaptType(input))
+    return getAdapter(input.getClass(), ctx).map(a -> a.adaptType(input))
         .orElseThrow(() -> new IllegalStateException("No adapter found for: " + ctx.getClass()));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapter(Class type, AdapterContext ctx) {
+    return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getTypeAdapterType().isAssignableFrom(type))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .findFirst();
   }
 
   @SuppressWarnings("unchecked")

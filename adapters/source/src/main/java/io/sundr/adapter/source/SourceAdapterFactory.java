@@ -37,4 +37,24 @@ public class SourceAdapterFactory
   public Adapter<TypeDeclaration, ClassOrInterfaceType, FieldDeclaration, MethodDeclaration> create(SourceContext ctx) {
     return new SourceAdapter(ctx);
   }
+
+  @Override
+  public Class<TypeDeclaration> getTypeAdapterType() {
+    return TypeDeclaration.class;
+  }
+
+  @Override
+  public Class<ClassOrInterfaceType> getReferenceAdapterType() {
+    return ClassOrInterfaceType.class;
+  }
+
+  @Override
+  public Class<MethodDeclaration> getMethodAdapterType() {
+    return MethodDeclaration.class;
+  }
+
+  @Override
+  public Class<FieldDeclaration> getPropertyAdapterType() {
+    return FieldDeclaration.class;
+  }
 }

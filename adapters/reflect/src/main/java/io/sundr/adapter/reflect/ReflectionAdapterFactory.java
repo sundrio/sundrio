@@ -35,4 +35,24 @@ public class ReflectionAdapterFactory implements AdapterFactory<ReflectionContex
   public Adapter<Class, Type, Field, Method> create(ReflectionContext ctx) {
     return new ReflectionAdapter(ctx);
   }
+
+  @Override
+  public Class<Class> getTypeAdapterType() {
+    return Class.class;
+  }
+
+  @Override
+  public Class<Type> getReferenceAdapterType() {
+    return Type.class;
+  }
+
+  @Override
+  public Class<Method> getMethodAdapterType() {
+    return Method.class;
+  }
+
+  @Override
+  public Class<Field> getPropertyAdapterType() {
+    return Field.class;
+  }
 }
