@@ -40,7 +40,7 @@ public class SimpleClassTest extends AbstractProcessorTest {
   private final SourceContext sourceContext = new SourceContext(DefinitionRepository.getRepository());
   private final ReflectionContext reflectionContext = new ReflectionContext(DefinitionRepository.getRepository());
 
-  TypeDef stringDef = Adapters.adapt(String.class, reflectionContext);
+  TypeDef stringDef = Adapters.adaptType(String.class, reflectionContext);
   TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleClass.java", sourceContext);
 
   @Test

@@ -100,7 +100,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
             final boolean includeAbstractClasses = generated.includeAbstractClasses();
 
             AptContext aptContext = AptContext.create(ctx.getElements(), ctx.getTypes(), ctx.getDefinitionRepository());
-            TypeDef original = Adapters.adapt(typeElement, aptContext);
+            TypeDef original = Adapters.adaptType(typeElement, aptContext);
             String fqcn = original.getFullyQualifiedName();
             boolean isBuildable = original.getKind() != Kind.ENUM
                 && (includeAbstractClasses || !original.isAbstract())
@@ -153,7 +153,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
 
           AptContext aptContext = AptContext.create(ctx.getElements(), ctx.getTypes(), ctx.getDefinitionRepository());
 
-          TypeDef original = Adapters.adapt(Apt.getClassElement(ref), aptContext);
+          TypeDef original = Adapters.adaptType(Apt.getClassElement(ref), aptContext);
           String fqcn = original.getFullyQualifiedName();
           boolean isBuildable = original.getKind() != Kind.ENUM && !original.isAbstract()
               && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());

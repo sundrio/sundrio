@@ -41,7 +41,7 @@ public abstract class AbstractAdapterTest<T, C extends AdapterContext> {
   @Test
   public void testWithSimpleClass() {
     T input = getInput(SimpleClass.class);
-    TypeDef typeDef = Adapters.adapt(input, getContext());
+    TypeDef typeDef = Adapters.adaptType(input, getContext());
     assertNotNull(typeDef);
     assertEquals("SimpleClass", typeDef.getName());
   }
@@ -49,7 +49,7 @@ public abstract class AbstractAdapterTest<T, C extends AdapterContext> {
   @Test
   public void testWithArray() {
     T input = getInput(ClassWithArray.class);
-    TypeDef typeDef = Adapters.adapt(input, getContext());
+    TypeDef typeDef = Adapters.adaptType(input, getContext());
     assertNotNull(typeDef);
     assertEquals("ClassWithArray", typeDef.getName());
     assertEquals(1, typeDef.getProperties().size());
@@ -62,7 +62,7 @@ public abstract class AbstractAdapterTest<T, C extends AdapterContext> {
   @Test
   public void testWithPrimitiveArray() {
     T input = getInput(ClassWithPrimitiveArray.class);
-    TypeDef typeDef = Adapters.adapt(input, getContext());
+    TypeDef typeDef = Adapters.adaptType(input, getContext());
 
     assertNotNull(typeDef);
     assertEquals("ClassWithPrimitiveArray", typeDef.getName());
@@ -76,7 +76,7 @@ public abstract class AbstractAdapterTest<T, C extends AdapterContext> {
   @Test
   public void testWithParam() {
     T input = getInput(ClassWithParam.class);
-    TypeDef typeDef = Adapters.adapt(input, getContext());
+    TypeDef typeDef = Adapters.adaptType(input, getContext());
     assertNotNull(typeDef);
 
     assertEquals("ClassWithParam", typeDef.getName());
@@ -90,7 +90,7 @@ public abstract class AbstractAdapterTest<T, C extends AdapterContext> {
   @Test
   public void testWithSelfRefParam() {
     T input = getInput(ClassWithSelfRefParam.class);
-    TypeDef typeDef = Adapters.adapt(input, getContext());
+    TypeDef typeDef = Adapters.adaptType(input, getContext());
     assertNotNull(typeDef);
 
     assertEquals("ClassWithSelfRefParam", typeDef.getName());

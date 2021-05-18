@@ -38,7 +38,7 @@ public class SimpleClassWithParameterTest extends AbstractProcessorTest {
   private final SourceContext context = new SourceContext(DefinitionRepository.getRepository());
   private final ReflectionContext reflectionContext = new ReflectionContext(DefinitionRepository.getRepository());
 
-  TypeDef stringDef = Adapters.adapt(String.class, reflectionContext);
+  TypeDef stringDef = Adapters.adaptType(String.class, reflectionContext);
   TypeDef simpleClassWithParameterDef = Sources.readTypeDefFromResource("SimpleClassWithParameter.java", context);
 
   @Test

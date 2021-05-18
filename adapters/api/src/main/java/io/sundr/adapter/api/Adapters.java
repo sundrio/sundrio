@@ -21,22 +21,73 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 
+import io.sundr.model.Method;
+import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeRef;
 
 public class Adapters {
 
-  public static <C extends AdapterContext, T, R, P, M> TypeDef adapt(T input, C ctx) {
+  public static <T, R, P, M> TypeDef adaptType(T input, AdapterContext ctx) {
     if (input == null) {
-      throw new IllegalArgumentException("Adapter.adapt(null) is now allowed!");
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
     }
-    return getAdapter(input.getClass(), ctx).map(a -> a.adaptType(input))
-        .orElseThrow(() -> new IllegalStateException("No adapter found for: " + ctx.getClass()));
+    return getAdapterForType(input.getClass(), ctx).map(a -> a.adaptType(input))
+        .orElseThrow(() -> new IllegalStateException("No adapter found for type: " + input.getClass()));
+  }
+
+  public static <T, R, P, M> TypeRef adaptReference(R input, AdapterContext ctx) {
+    if (input == null) {
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
+    }
+    return getAdapterForReference(input.getClass(), ctx).map(a -> a.adaptReference(input))
+        .orElseThrow(() -> new IllegalStateException("No adapter found for reference: " + input.getClass()));
+  }
+
+  public static <T, R, P, M> Property adaptProperty(P input, AdapterContext ctx) {
+    if (input == null) {
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
+    }
+    return getAdapterForProperty(input.getClass(), ctx).map(a -> a.adaptProperty(input))
+        .orElseThrow(() -> new IllegalStateException("No adapter found for property: " + input.getClass()));
+  }
+
+  public static <T, R, P, M> Method adaptMethod(M input, AdapterContext ctx) {
+    if (input == null) {
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
+    }
+    return getAdapterForMethod(input.getClass(), ctx).map(a -> a.adaptMethod(input))
+        .orElseThrow(() -> new IllegalStateException("No adapter found for method: " + input.getClass()));
   }
 
   @SuppressWarnings("unchecked")
-  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapter(Class type, AdapterContext ctx) {
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForType(Class type, AdapterContext ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
         .filter(f -> f.getTypeAdapterType().isAssignableFrom(type))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .findFirst();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForReference(Class type, AdapterContext ctx) {
+    return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getReferenceAdapterType().isAssignableFrom(type))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .findFirst();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForProperty(Class type, AdapterContext ctx) {
+    return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getPropertyAdapterType().isAssignableFrom(type))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .findFirst();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForMethod(Class type, AdapterContext ctx) {
+    return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getMethodAdapterType().isAssignableFrom(type))
         .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
         .findFirst();
   }
@@ -62,8 +113,21 @@ public class Adapters {
       this.ctx = ctx;
     }
 
-    public <T> TypeDef adapt(T input) {
-      return Adapters.adapt(input, ctx);
+    public <T> TypeDef adaptType(T input) {
+      return Adapters.adaptType(input, ctx);
     }
+
+    public <R> TypeRef adaptReference(R input) {
+      return Adapters.adaptReference(input, ctx);
+    }
+
+    public <P> Property adaptProperty(P input) {
+      return Adapters.adaptProperty(input, ctx);
+    }
+
+    public <M> Method adaptMethod(M input) {
+      return Adapters.adaptMethod(input, ctx);
+    }
+
   }
 }
