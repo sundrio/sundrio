@@ -21,6 +21,10 @@ public final class AttributeKey<T> {
   private final String name;
   private final Class<T> type;
 
+  public AttributeKey(Class type) {
+    this(type.getName(), type);
+  }
+
   public AttributeKey(String name, Class type) {
     this.name = name;
     this.type = type;
