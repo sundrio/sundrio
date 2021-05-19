@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.adapter.testing.domain;
+package io.sundr.adapter.testing.general;
 
 public class ClassWithParam<T> {
 

@@ -17,8 +17,10 @@
 
 package io.sundr.adapter.apt;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +30,7 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.type.TypeMirror;
 
+import io.sundr.SundrException;
 import io.sundr.adapter.apt.visitors.TypeRefTypeVisitor;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
@@ -65,7 +68,11 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
 
   private Object mapAnnotationValue(Object value) {
     if (value instanceof Collection) {
-      return ((Collection) value).stream().map(this::mapAnnotationValue).collect(Collectors.toList());
+      List list = (List) ((Collection) value).stream().map(this::mapAnnotationValue).collect(Collectors.toList());
+      if (list.isEmpty()) {
+        return null;
+      }
+      return toArray(list);
     } else if (value instanceof AnnotationMirror) {
       return apply((AnnotationMirror) value);
     } else if (value instanceof AnnotationValue) {
@@ -77,4 +84,58 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
     }
   }
 
+  /**
+   * Convert the specified {@link List} into an array.
+   * 
+   * @return an {@link Object} instance that holds the array.
+   */
+  private static Object toArray(List list) {
+    if (list == null || list.size() == 0) {
+      return null;
+    }
+    try {
+      Class type = toPrimitive(list.get(0).getClass());
+      Object result = Array.newInstance(type, list.size());
+      for (int i = 0; i < list.size(); i++) {
+        Array.set(result, i, list.get(i));
+      }
+      return result;
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new SundrException(e);
+    }
+  }
+
+  /**
+   * Converts boxed type into into its primitve equivalent.
+   * This method also supports {@link com.sun.tools.javac.code.Symbol$VarSymbol} which are used internally and that makes the
+   * method extremely falky.
+   * 
+   * @return a matching primitve or the input type if no match was found.
+   */
+  private static Class toPrimitive(Class t) {
+    String s = t.toString(); //We need to compare using toString() to cover `Symbol$VarSymbol`.
+    if (s.contains(Boolean.class.getName())) {
+      return boolean.class;
+    }
+    if (s.contains(Character.class.getName())) {
+      return char.class;
+    }
+    if (s.contains(Short.class.getName())) {
+      return short.class;
+    }
+    if (s.contains(Integer.class.getName())) {
+      return int.class;
+    }
+    if (s.contains(Long.class.getName())) {
+      return long.class;
+    }
+    if (s.contains(Double.class.getName())) {
+      return double.class;
+    }
+    if (s.contains(Float.class.getName())) {
+      return float.class;
+    }
+    return t;
+  }
 }

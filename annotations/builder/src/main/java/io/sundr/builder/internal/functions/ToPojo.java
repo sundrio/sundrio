@@ -31,6 +31,7 @@ import static io.sundr.model.utils.Types.modifiersToInt;
 import static io.sundr.utils.Strings.loadResourceQuietly;
 import static java.util.stream.Collectors.*;
 
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -171,7 +172,13 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
           }
 
           if (params.containsKey("adapter")) {
-            adapters.addAll((List) params.getOrDefault("adapter", new ArrayList<>()));
+            Object adapter = params.get("adapter");
+            if (adapter != null && adapter.getClass().isArray()) {
+              int length = Array.getLength(adapter);
+              for (int i = 0; i < length; i++) {
+                adapters.add(Array.get(adapter, i));
+              }
+            }
           }
 
           String superClassName = Types.toClassName(r.getParameters().getOrDefault("superClass", ""));

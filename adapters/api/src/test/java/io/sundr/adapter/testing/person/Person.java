@@ -15,7 +15,7 @@
  * 
 **/
 
-package io.sundr.example;
+package io.sundr.adapter.testing.person;
 
 import java.util.List;
 import java.util.Optional;
