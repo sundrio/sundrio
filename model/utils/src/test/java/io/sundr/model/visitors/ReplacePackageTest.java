@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen;
+package io.sundr.model.visitors;
 
 import org.junit.Test;
 

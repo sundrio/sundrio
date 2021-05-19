@@ -42,7 +42,6 @@ import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.codegen.Constants;
-import io.sundr.codegen.ReplacePackage;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -58,6 +57,7 @@ import io.sundr.model.WildcardRef.BoundKind;
 import io.sundr.model.WildcardRefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.model.utils.Collections;
+import io.sundr.model.visitors.ReplacePackage;
 
 public class BuilderContext {
 
