@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen;
+package io.sundr.model.visitors;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
