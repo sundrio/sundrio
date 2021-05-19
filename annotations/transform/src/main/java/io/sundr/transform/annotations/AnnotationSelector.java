@@ -14,8 +14,9 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen.annotations;
+package io.sundr.transform.annotations;
 
+import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -23,12 +24,12 @@ import java.lang.annotation.Target;
 
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
-public @interface ResourceSelector {
+public @interface AnnotationSelector {
 
   /**
    * The package to use for selecting classes.
    * 
    * @return
    */
-  String value();
+  Class<? extends Annotation> value();
 }

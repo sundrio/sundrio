@@ -21,10 +21,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import io.sundr.codegen.annotations.AnnotationSelector;
-import io.sundr.codegen.annotations.PackageSelector;
-import io.sundr.codegen.annotations.ResourceSelector;
-
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface VelocityTransformations {
