@@ -31,7 +31,6 @@ import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.codegen.CodegenContext;
 import io.sundr.model.Method;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
@@ -52,7 +51,6 @@ public class AbstractProcessorTest {
     types = rule.getTypes();
     context = AptContext.create(elements, types, DefinitionRepository.getRepository());
     builderContext = BuilderContextManager.create(elements, types);
-    CodegenContext.create(elements, types);
   }
 
   final Inline inline = new Inline() {
