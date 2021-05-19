@@ -15,23 +15,9 @@
  * 
 **/
 
-package io.sundr.adapter.source.utils;
+package io.sundr.adapter.api;
 
-import static org.junit.Assert.assertNotNull;
+public interface AdapterContextAware {
 
-import org.junit.Test;
-
-import io.sundr.adapter.api.AdapterContext;
-import io.sundr.model.TypeDef;
-import io.sundr.model.repo.DefinitionRepository;
-
-public class SourcesTest {
-
-  private final AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
-
-  @Test
-  public void shouldAdaptList() throws Exception {
-    TypeDef typeDef = Sources.readTypeDefFromResource("java/util/List.java", context);
-    assertNotNull(typeDef);
-  }
+  AdapterContext getAdapterContext();
 }

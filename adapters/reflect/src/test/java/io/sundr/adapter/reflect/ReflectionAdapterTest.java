@@ -22,7 +22,7 @@ import io.sundr.model.repo.DefinitionRepository;
 
 public class ReflectionAdapterTest extends AbstractAdapterTest<Class> {
 
-  private AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
+  private AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
 
   @Override
   public AdapterContext getContext() {
