@@ -1,4 +1,4 @@
-## Sundrio: compile time tooling for generating stuff.
+## Sundrio: Code generation toolkit for Java
 
 * [![CircleCI](https://circleci.com/gh/sundrio/sundrio/tree/master.svg?style=svg)](https://circleci.com/gh/sundrio/sundrio/tree/master)
 * [![Maven Central](https://img.shields.io/maven-central/v/io.sundr/sundr-core.svg?maxAge=2592000)](http://search.maven.org/#search%7Cga%7C1%7Cg%3Aio.sundr%20a%3Asundr-core)
@@ -12,19 +12,34 @@ Writing things like:
 - and more...
 
 is a great experience the first time, but a real burden from there after.
-This project was created to generate the boilerplate on compile time for you.
+
+Existing tooling is something that works in very strict context, e.g. via annotation processing, maven/gradle tooling etc, but is rarelly portable to an other (are coupled with the context).
+For example, some tools work via annotation processing, other works via maven/gradle plugins, other programmatically, but it's quite rare to see tools that can handle all three styles / contexts.
+
+Sundrio, provides an abstract way of representing java code, that allows you to represent, manipulate and generate code, regardless of the context.
+In addition, it provides adapters that can be used adapt/convert existing representations to the sundrio model.
+
+On top of this model, it provides tools that perform tasks, like builder generators, dsl generations and more. 
 
 # Features
 
-- Java compile time generators (annotation processors)
-    - [Builder Generator](annotations/builder/readme.md)
-    - [DSL Generator](annotations/dsl/readme.md)
-    - [Velocity Transformer](annotations/transform/readme.md)
-    - [Resourceify](annotations/resourcecify/readme.md)
+- Java 
+    - [Java code model](model/readme.md)
+    - [Adapters](adapters/readme.md)
+      - [Annotation processing](adapters/apt/readme.md)
+      - [Reflection](adapters/reflection/readme.md)
+      - [Github Java Parser](adapters/source/readme.md)
+    - Annotation processors
+      - [Builder Generator](annotations/builder/readme.md)
+      - [DSL Generator](annotations/dsl/readme.md)
+      - [Velocity Transformer](annotations/transform/readme.md)
+      - [Resourceify](annotations/resourcecify/readme.md)
 
-- Maven tooling generators
+- Maven 
     - [Maven Bom Generator](maven-plugin/readme.md)
 
+
+*Note*: Currently, builder generators, dsl generators etc are bound to annotation processing, but we are currently working on decoupling them from apt.
 
 # Compiling 
 
@@ -39,7 +54,6 @@ To avoid referencing to that path, which is known to cause issues, its required 
 # Projects using sundrio
 
 - [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-model)
-- [Fabric8 Docker Client](https://github.com/fabric8io/docker-client)
-- [Snowdrop Service Catalog Client](https://github.com/snowdrop/service-catalog-java-api)
+- [Official Kubernetes Client](https://github.com/kubernetes-client/java)
 - [Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
-- [Ap4k](https://github.com/ap4k/ap4k/)
+- [Dekorate](https://github.com/dekorateio/dekorate/)
