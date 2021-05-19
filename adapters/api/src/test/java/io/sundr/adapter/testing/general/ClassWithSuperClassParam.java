@@ -15,16 +15,8 @@
  * 
 **/
 
-package io.sundr.example;
+package io.sundr.adapter.testing.general;
 
-public class Address {
+public class ClassWithSuperClassParam extends ClassWithParam<String> {
 
-  private String street;
-  private int number;
-  private String zipCode;
-  private Type type;
-
-  enum Type {
-    HOME, WORK
-  }
 }
