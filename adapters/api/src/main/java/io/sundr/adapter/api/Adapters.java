@@ -28,7 +28,7 @@ import io.sundr.model.TypeRef;
 
 public class Adapters {
 
-  public static <T, R, P, M> TypeDef adaptType(T input, AdapterContext ctx) {
+  public static <T, R, P, M> TypeDef adaptType(T input, AdapterContextAware ctx) {
     if (input == null) {
       throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
     }
@@ -36,7 +36,7 @@ public class Adapters {
         .orElseThrow(() -> new IllegalStateException("No adapter found for type: " + input.getClass()));
   }
 
-  public static <T, R, P, M> TypeRef adaptReference(R input, AdapterContext ctx) {
+  public static <T, R, P, M> TypeRef adaptReference(R input, AdapterContextAware ctx) {
     if (input == null) {
       throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
     }
@@ -44,7 +44,7 @@ public class Adapters {
         .orElseThrow(() -> new IllegalStateException("No adapter found for reference: " + input.getClass()));
   }
 
-  public static <T, R, P, M> Property adaptProperty(P input, AdapterContext ctx) {
+  public static <T, R, P, M> Property adaptProperty(P input, AdapterContextAware ctx) {
     if (input == null) {
       throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
     }
@@ -52,7 +52,7 @@ public class Adapters {
         .orElseThrow(() -> new IllegalStateException("No adapter found for property: " + input.getClass()));
   }
 
-  public static <T, R, P, M> Method adaptMethod(M input, AdapterContext ctx) {
+  public static <T, R, P, M> Method adaptMethod(M input, AdapterContextAware ctx) {
     if (input == null) {
       throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
     }
@@ -61,34 +61,34 @@ public class Adapters {
   }
 
   @SuppressWarnings("unchecked")
-  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForType(Class type, AdapterContext ctx) {
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForType(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
         .filter(f -> f.getTypeAdapterType().isAssignableFrom(type))
-        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
   }
 
   @SuppressWarnings("unchecked")
-  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForReference(Class type, AdapterContext ctx) {
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForReference(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
         .filter(f -> f.getReferenceAdapterType().isAssignableFrom(type))
-        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
   }
 
   @SuppressWarnings("unchecked")
-  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForProperty(Class type, AdapterContext ctx) {
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForProperty(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
         .filter(f -> f.getPropertyAdapterType().isAssignableFrom(type))
-        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
   }
 
   @SuppressWarnings("unchecked")
-  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForMethod(Class type, AdapterContext ctx) {
+  public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForMethod(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
         .filter(f -> f.getMethodAdapterType().isAssignableFrom(type))
-        .map(f -> (Adapter<T, R, P, M>) f.create(ctx))
+        .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
   }
 

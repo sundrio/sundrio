@@ -36,6 +36,7 @@ import org.junit.Test;
 import com.google.testing.compile.CompilationRule;
 
 import io.sundr.adapter.api.Adapter;
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
@@ -54,8 +55,8 @@ public class AptAdapterFactoryTest {
   }
 
   private Optional<Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement>> createAdapter() {
-    return Adapters.getAdapterForType(TypeElement.class,
-        AptContext.create(elements, types, DefinitionRepository.getRepository()));
+    AptContext.create(elements, types, DefinitionRepository.getRepository());
+    return Adapters.getAdapterForType(TypeElement.class, AdapterContext.getContext());
   }
 
   @Test

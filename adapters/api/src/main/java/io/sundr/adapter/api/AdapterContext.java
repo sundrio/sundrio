@@ -17,49 +17,50 @@
 
 package io.sundr.adapter.api;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import io.sundr.model.AttributeKey;
+import io.sundr.model.AttributeSupport;
 import io.sundr.model.repo.DefinitionRepository;
 
-public class AdapterContext {
+public class AdapterContext extends AttributeSupport implements AdapterContextAware {
+
+  protected static AdapterContext INSTANCE;
 
   private final DefinitionRepository definitionRepository;
-  private final Map<AttributeKey, Object> attributes;
 
-  public AdapterContext(DefinitionRepository definitionRepository) {
+  private AdapterContext(DefinitionRepository definitionRepository) {
     this(definitionRepository, new HashMap<>());
   }
 
-  public AdapterContext(DefinitionRepository definitionRepository, Map<AttributeKey, Object> attributes) {
+  private AdapterContext(DefinitionRepository definitionRepository, Map<AttributeKey, Object> attributes) {
+    super(attributes);
     this.definitionRepository = definitionRepository;
-    this.attributes = attributes;
   }
 
-  public Map<AttributeKey, Object> getAttributes() {
-    if (attributes == null) {
-      return null;
-    }
-    return Collections.unmodifiableMap(attributes);
+  public synchronized static AdapterContext create(DefinitionRepository definitionRepository) {
+    return create(definitionRepository, new HashMap<>());
   }
 
-  public <T> T getAttribute(AttributeKey<T> key) {
-    if (attributes == null) {
-      return null;
-    }
-    return (T) attributes.get(key);
+  public synchronized static AdapterContext create(DefinitionRepository definitionRepository,
+      Map<AttributeKey, Object> attributes) {
+    INSTANCE = new AdapterContext(definitionRepository, attributes);
+    return INSTANCE;
   }
 
-  public <T> boolean hasAttribute(AttributeKey<T> key) {
-    if (attributes == null) {
-      return false;
+  public synchronized static AdapterContext getContext() {
+    if (INSTANCE != null) {
+      return INSTANCE;
     }
-    return attributes.containsKey(key);
+    return create(DefinitionRepository.getRepository());
   }
 
   public DefinitionRepository getDefinitionRepository() {
     return definitionRepository;
+  }
+
+  public AdapterContext getAdapterContext() {
+    return this;
   }
 }

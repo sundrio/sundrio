@@ -33,7 +33,7 @@ import io.sundr.model.repo.DefinitionRepository;
 
 public class ReflectionAdapterFactoryTest {
 
-  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
 
   private Optional<Adapter<Class, Type, Field, Method>> createAdapter() {
     return Adapters.getAdapterForType(Class.class, context);

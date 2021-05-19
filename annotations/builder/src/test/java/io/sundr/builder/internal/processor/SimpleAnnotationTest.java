@@ -28,7 +28,7 @@ import io.sundr.model.repo.DefinitionRepository;
 public class SimpleAnnotationTest extends AbstractProcessorTest {
 
   TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleAnnotation.java",
-      new AdapterContext(DefinitionRepository.getRepository()));
+      AdapterContext.create(DefinitionRepository.getRepository()));
 
   @Test
   public void testPojo() {

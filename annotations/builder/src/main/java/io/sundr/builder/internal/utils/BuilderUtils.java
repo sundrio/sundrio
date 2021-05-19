@@ -324,11 +324,11 @@ public class BuilderUtils {
 
   public static TypeDef getInlineType(BuilderContext context, Inline inline) {
     try {
-      return Adapters.adaptType(inline.type(), new AdapterContext(context.getDefinitionRepository()));
+      return Adapters.adaptType(inline.type(), AdapterContext.create(context.getDefinitionRepository()));
     } catch (MirroredTypeException e) {
       Element element = context.getTypes().asElement(e.getTypeMirror());
       AptContext aptContext = AptContext.create(context.getElements(), context.getTypes(), context.getDefinitionRepository());
-      return Adapters.adaptType((TypeElement) element, aptContext);
+      return Adapters.adaptType((TypeElement) element, aptContext.getAdapterContext());
     }
   }
 
@@ -338,7 +338,7 @@ public class BuilderUtils {
       if (returnType == null) {
         return fallback;
       }
-      return Adapters.adaptType(inline.returnType(), new AdapterContext(context.getDefinitionRepository()));
+      return Adapters.adaptType(inline.returnType(), AdapterContext.create(context.getDefinitionRepository()));
     } catch (MirroredTypeException e) {
       if (None.FQN.equals(e.getTypeMirror().toString())) {
         return fallback;
@@ -346,7 +346,7 @@ public class BuilderUtils {
 
       Element element = context.getTypes().asElement(e.getTypeMirror());
       AptContext aptContext = AptContext.create(context.getElements(), context.getTypes(), context.getDefinitionRepository());
-      return Adapters.adaptType((TypeElement) element, aptContext);
+      return Adapters.adaptType((TypeElement) element, aptContext.getAdapterContext());
     }
   }
 

@@ -26,19 +26,23 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.api.AdapterContext;
+import io.sundr.adapter.api.AdapterContextAware;
 import io.sundr.model.AttributeKey;
+import io.sundr.model.AttributeSupport;
 import io.sundr.model.repo.DefinitionRepository;
 
-public class AptContext extends AdapterContext {
+public class AptContext extends AttributeSupport implements AdapterContextAware {
 
   private static final AttributeKey<Types> TYPES_KEY = new AttributeKey<>(Types.class);
   private static final AttributeKey<Elements> ELEMENTS_KEY = new AttributeKey<>(Elements.class);
-
   private static AptContext INSTANCE;
+
+  private final AdapterContext adapterContext;
   private final Set<TypeElement> references = new HashSet<>();
 
   private AptContext(Elements elements, Types types, DefinitionRepository repository) {
-    super(repository, createAttributes(elements, types));
+    super(createAttributes(elements, types));
+    this.adapterContext = AdapterContext.create(repository, getAttributes());
   }
 
   private static Map<AttributeKey, Object> createAttributes(Elements elements, Types types) {
@@ -48,25 +52,25 @@ public class AptContext extends AdapterContext {
     return attributes;
   }
 
-  public synchronized static AptContext create(AdapterContext context) {
-    Types types = context.getAttribute(TYPES_KEY);
-    Elements elements = context.getAttribute(ELEMENTS_KEY);
+  public synchronized static AptContext create(AdapterContext adapterContext) {
+    Types types = adapterContext.getAttribute(TYPES_KEY);
+    Elements elements = adapterContext.getAttribute(ELEMENTS_KEY);
 
     if (elements == null) {
-      elements = INSTANCE != null ? INSTANCE.getElements() : null;
+      elements = INSTANCE != null ? INSTANCE.getAttribute(ELEMENTS_KEY) : null;
       if (elements == null) {
         throw new IllegalStateException("AptContext requires javax.lang.model.util.Elements utilitiy.");
       }
     }
 
     if (types == null) {
-      types = INSTANCE != null ? INSTANCE.getTypes() : null;
+      types = INSTANCE != null ? INSTANCE.getAttribute(TYPES_KEY) : null;
       if (types == null) {
         throw new IllegalStateException("AptContext requires javax.lang.model.util.Types utilitiy.");
       }
     }
 
-    INSTANCE = new AptContext(elements, types, context.getDefinitionRepository());
+    INSTANCE = new AptContext(elements, types, adapterContext.getDefinitionRepository());
     return INSTANCE;
   }
 
@@ -92,6 +96,14 @@ public class AptContext extends AdapterContext {
 
   public boolean isDeep() {
     return true;
+  }
+
+  public AdapterContext getAdapterContext() {
+    return adapterContext;
+  }
+
+  public DefinitionRepository getDefinitionRepository() {
+    return adapterContext.getDefinitionRepository();
   }
 
   public Set<TypeElement> getReferences() {

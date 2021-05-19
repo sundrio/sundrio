@@ -26,6 +26,7 @@ import org.junit.Rule;
 
 import com.google.testing.compile.CompilationRule;
 
+import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.testing.AbstractAdapterTest;
 import io.sundr.model.repo.DefinitionRepository;
 
@@ -45,8 +46,8 @@ public class AptAdapterTest extends AbstractAdapterTest<TypeElement> {
   }
 
   @Override
-  public AptContext getContext() {
-    return context;
+  public AdapterContext getContext() {
+    return context.getAdapterContext();
   }
 
   @Override

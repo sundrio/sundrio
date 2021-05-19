@@ -35,7 +35,7 @@ import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
 
-  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
 
   TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleClass.java", context);
   TypeDef simpleClassWithDateDef = Sources.readTypeDefFromResource("SimpleClassWithDate.java", context);

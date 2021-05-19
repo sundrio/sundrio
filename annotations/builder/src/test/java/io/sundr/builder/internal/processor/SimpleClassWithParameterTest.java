@@ -34,7 +34,7 @@ import io.sundr.model.repo.DefinitionRepository;
 
 public class SimpleClassWithParameterTest extends AbstractProcessorTest {
 
-  private final AdapterContext context = new AdapterContext(DefinitionRepository.getRepository());
+  private final AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
 
   TypeDef stringDef = Adapters.adaptType(String.class, context);
   TypeDef simpleClassWithParameterDef = Sources.readTypeDefFromResource("SimpleClassWithParameter.java", context);
