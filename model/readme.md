@@ -1,4 +1,4 @@
-# Sundrio Model
+# Sundrio Java Model
 
 There are multiple ways java types are represented. To name a few:
 
