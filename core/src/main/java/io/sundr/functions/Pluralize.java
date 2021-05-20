@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.functions;
+package io.sundr.functions;
 
 import java.util.Arrays;
 import java.util.List;
