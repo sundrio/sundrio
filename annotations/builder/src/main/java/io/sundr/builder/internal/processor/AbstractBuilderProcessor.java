@@ -22,7 +22,6 @@ import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
-import static io.sundr.codegen.Constants.EMPTY;
 import static io.sundr.utils.Strings.loadResourceQuietly;
 
 import java.io.IOException;
@@ -56,6 +55,8 @@ import io.sundr.model.TypeRef;
 import io.sundr.model.utils.Types;
 
 public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
+
+  public static final String EMPTY = "";
 
   void generateLocalDependenciesIfNeeded() {
     BuilderContext context = BuilderContextManager.getContext();

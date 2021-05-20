@@ -60,7 +60,6 @@ import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.Constants;
 import io.sundr.codegen.functions.ClassTo;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
@@ -511,9 +510,9 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         .withName("toStringArray")
         .addNewArgument()
         .withName("o")
-        .withTypeRef(Constants.OBJECT.toInternalReference())
+        .withTypeRef(Types.OBJECT.toInternalReference())
         .endArgument()
-        .withReturnType(Constants.STRING_REF.withDimensions(1))
+        .withReturnType(Types.STRING_REF.withDimensions(1))
         .withNewBlock()
         .addToStatements(new StringStatement(TO_STRING_ARRAY_TEXT))
         .endBlock()
@@ -1002,7 +1001,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
       try {
         TypeDef propertyType = GetDefinition.of((ClassRef) propertyTypeRef);
         TypeDef getterType = GetDefinition.of((ClassRef) getterTypeRef);
-        if (Constants.STRING.equals(getterType)) {
+        if (Types.STRING.equals(getterType)) {
           sb.append(ref + " instanceof Map ? toStringArray(((Map)" + ref + ").get(\"" + getter.getName()
               + "\")) : toStringArray(" + ref + ")");
         } else {
@@ -1115,7 +1114,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
       }
       return sb.toString();
     }
-    if (Constants.STRING_REF.equals(typeRef) && value != null && !String.valueOf(value).startsWith("\"")) {
+    if (Types.STRING_REF.equals(typeRef) && value != null && !String.valueOf(value).startsWith("\"")) {
       return "\"" + value + "\"";
     } else if (value instanceof Element) {
       Element element = (Element) value;

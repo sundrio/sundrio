@@ -25,9 +25,9 @@ import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import io.sundr.codegen.Constants;
 import io.sundr.codegen.DefinitionScope;
 import io.sundr.model.Property;
+import io.sundr.model.utils.Types;
 
 public class FieldDirective extends Directive {
 
@@ -67,7 +67,7 @@ public class FieldDirective extends Directive {
   private String getDefaultValue(Property field) {
     Object value = field.getAttribute(INIT);
 
-    if (Constants.STRING_REF.equals(field.getTypeRef()) && !String.valueOf(value).startsWith("\"")) {
+    if (Types.STRING_REF.equals(field.getTypeRef()) && !String.valueOf(value).startsWith("\"")) {
       return "\"" + value + "\"";
     } else {
       return String.valueOf(value);

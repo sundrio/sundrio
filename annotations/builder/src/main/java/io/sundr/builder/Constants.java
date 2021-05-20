@@ -93,38 +93,38 @@ public class Constants {
   public static final ClassRef ARRAYS = new ClassRefBuilder().withFullyQualifiedName(Arrays.class.getName()).build();
   public static final ClassRef COLLECTORS = new ClassRefBuilder().withFullyQualifiedName(Collectors.class.getName()).build();
 
-  public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(io.sundr.codegen.Constants.INT_REF)
+  public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(io.sundr.model.utils.Types.INT_REF)
       .build();
 
   public static final TypeDef FUNCTION = new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName("java.util.function")
-      .withName("Function").withParameters(io.sundr.codegen.Constants.I, io.sundr.codegen.Constants.O)
+      .withName("Function").withParameters(io.sundr.model.utils.Types.I, io.sundr.model.utils.Types.O)
       .addNewMethod()
       .withName("apply")
-      .withReturnType(io.sundr.codegen.Constants.O.toReference())
+      .withReturnType(io.sundr.model.utils.Types.O.toReference())
       .addNewArgument()
       .withName("item")
-      .withTypeRef(io.sundr.codegen.Constants.I.toReference())
+      .withTypeRef(io.sundr.model.utils.Types.I.toReference())
       .endArgument()
       .endMethod()
       .build();
 
   public static final TypeDef PREDICATE = new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName("java.util.function")
-      .withName("Predicate").withParameters(io.sundr.codegen.Constants.I)
+      .withName("Predicate").withParameters(io.sundr.model.utils.Types.I)
       .addNewMethod()
       .withName("test")
       .withReturnType(Types.BOOLEAN_REF)
       .addNewArgument()
       .withName("item")
-      .withTypeRef(io.sundr.codegen.Constants.I.toReference())
+      .withTypeRef(io.sundr.model.utils.Types.I.toReference())
       .endArgument()
       .endMethod()
       .build();
 
   public static final TypeDef INLINEABLE = new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName("io.sundr.builder")
-      .withName("Inlineable").withParameters(io.sundr.codegen.Constants.T)
+      .withName("Inlineable").withParameters(io.sundr.model.utils.Types.T)
       .addNewMethod()
       .withName("update")
-      .withReturnType(io.sundr.codegen.Constants.T.toReference())
+      .withReturnType(io.sundr.model.utils.Types.T.toReference())
       .endMethod()
       .build();
 

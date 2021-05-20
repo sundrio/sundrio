@@ -24,7 +24,7 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_MAP_KEY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_MAP_VALUE_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
-import static io.sundr.codegen.Constants.N;
+import static io.sundr.model.utils.Types.N;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -310,7 +310,7 @@ public class ClazzAs {
 
       Method equals = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
-          .withTypeRef(io.sundr.codegen.Constants.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
+          .withTypeRef(Types.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
           .withStatements(BuilderUtils.toEquals(fluentImplType, properties)).endBlock()
           // .withBlock(new Block(new Provider<List<Statement>>() {
           //   @Override
@@ -653,7 +653,7 @@ public class ClazzAs {
 
     TypeDef target = clazz;
     //Iterate parent objects and check for properties with setters but not ctor arguments.
-    while (target != null && !io.sundr.codegen.Constants.OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
+    while (target != null && !Types.OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
       for (Property property : target.getProperties()) {
         if (!hasBuildableConstructorWithArgument(target, property) && Setter.has(target, property)) {
           String withName = "with" + property.getNameCapitalized();
