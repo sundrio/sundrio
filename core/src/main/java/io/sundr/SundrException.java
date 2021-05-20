@@ -34,13 +34,13 @@ public class SundrException extends RuntimeException {
     super(cause);
   }
 
-  public RuntimeException launderThrowable(Throwable cause) {
+  public static RuntimeException launderThrowable(Throwable cause) {
     if (cause instanceof RuntimeException) {
       return (RuntimeException) cause;
     } else if (cause instanceof Error) {
       throw (Error) cause;
     } else {
-      throw new SundrException("An error has occurred.", cause);
+      return new SundrException("An error has occurred.", cause);
     }
   }
 }
