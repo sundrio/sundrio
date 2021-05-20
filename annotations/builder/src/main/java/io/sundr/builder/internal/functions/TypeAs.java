@@ -17,7 +17,7 @@
 package io.sundr.builder.internal.functions;
 
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
-import static io.sundr.codegen.Constants.*;
+import static io.sundr.model.utils.Types.*;
 
 import java.util.ArrayList;
 import java.util.List;

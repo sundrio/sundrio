@@ -18,6 +18,9 @@ package io.sundr.builder.internal;
 
 import static io.sundr.builder.Constants.INLINEABLE;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.model.utils.Types.CLASS;
+import static io.sundr.model.utils.Types.STRING_REF;
+import static io.sundr.model.utils.Types.TYPE;
 import static io.sundr.model.utils.Types.modifiersToInt;
 import static io.sundr.model.utils.Types.newTypeParamRef;
 
@@ -41,7 +44,6 @@ import javax.lang.model.util.Types;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
-import io.sundr.codegen.Constants;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -163,7 +165,7 @@ public class BuilderContext {
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("getType")
-        .withReturnType(Constants.CLASS.toReference(V.toReference()))
+        .withReturnType(CLASS.toReference(V.toReference()))
         .withNewBlock()
         .addNewStringStatementStatement("return (Class<V>) getTypeArguments(TypedVisitor.class, getClass()).get(0);")
         .endBlock()
@@ -171,10 +173,10 @@ public class BuilderContext {
 
         .addNewMethod()
         .withName("getClass")
-        .withReturnType(Constants.CLASS.toReference(new WildcardRef()))
+        .withReturnType(CLASS.toReference(new WildcardRef()))
         .addNewArgument()
         .withName("type")
-        .withTypeRef(Constants.TYPE.toInternalReference())
+        .withTypeRef(TYPE.toInternalReference())
         .endArgument()
         .withNewBlock()
         .addNewStringStatementStatement(
@@ -185,13 +187,13 @@ public class BuilderContext {
         .addNewMethod()
         .withParameters(T)
         .withName("getTypeArguments")
-        .withReturnType(Collections.LIST.toReference(Constants.CLASS.toReference()))
+        .withReturnType(Collections.LIST.toReference(CLASS.toReference()))
         .addNewArgument()
-        .withTypeRef(Constants.CLASS.toReference(T.toReference()))
+        .withTypeRef(CLASS.toReference(T.toReference()))
         .withName("baseClass")
         .endArgument()
         .addNewArgument()
-        .withTypeRef(Constants.CLASS.toReference(new WildcardRefBuilder().withBounds(T.toReference()).build()))
+        .withTypeRef(CLASS.toReference(new WildcardRefBuilder().withBounds(T.toReference()).build()))
         .withName("childClass")
         .endArgument()
         .withNewBlock()
@@ -268,7 +270,7 @@ public class BuilderContext {
 
         .addNewProperty()
         .withName("parentType")
-        .withTypeRef(Constants.CLASS.toReference(P.toReference()))
+        .withTypeRef(CLASS.toReference(P.toReference()))
         .endProperty()
 
         .addNewConstructor()
@@ -341,7 +343,7 @@ public class BuilderContext {
 
         .addNewMethod()
         .withName("getParentType")
-        .withReturnType(Constants.CLASS.toReference(P.toReference()))
+        .withReturnType(CLASS.toReference(P.toReference()))
         .withNewBlock()
         .addNewStringStatementStatement(
             "return parentType != null ? parentType : delegate.getParentType();")
@@ -351,7 +353,7 @@ public class BuilderContext {
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PROTECTED))
         .withName("getActualParentType")
-        .withReturnType(Constants.CLASS.toReference())
+        .withReturnType(CLASS.toReference())
         .withNewBlock()
         .addNewStringStatementStatement("return path.size() - 2 >= 0 ? path.get(path.size() - 2).getClass() : Void.class;")
         .endBlock()
@@ -385,7 +387,7 @@ public class BuilderContext {
         .withDefaultMethod(true)
         .withReturnType(T.toReference())
         .addNewArgument()
-        .withTypeRef(Constants.CLASS.toReference(V.toReference()))
+        .withTypeRef(CLASS.toReference(V.toReference()))
         .withName("type")
         .endArgument()
         .addNewArgument()
@@ -473,7 +475,7 @@ public class BuilderContext {
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("VisitableMap")
-        .withExtendsList(Collections.HASH_MAP.toReference(Constants.STRING_REF,
+        .withExtendsList(Collections.HASH_MAP.toReference(STRING_REF,
             Collections.LIST.toReference(visitableInterface.toReference())))
         .withImplementsList(Collections.ITERABLE.toReference(visitableInterface.toReference()))
 
@@ -551,7 +553,7 @@ public class BuilderContext {
 
         .addNewProperty()
         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL))
-        .withTypeRef(Constants.STRING_REF)
+        .withTypeRef(STRING_REF)
         .withName("VISIT")
         .addToAttributes(Attributeable.INIT, "visit")
         .endProperty()
@@ -744,7 +746,7 @@ public class BuilderContext {
         .withParameters(V)
         .withReturnType(F.toReference())
         .addNewArgument()
-        .withTypeRef(Constants.CLASS.toReference(V.toReference()))
+        .withTypeRef(CLASS.toReference(V.toReference()))
         .withName("type")
         .endArgument()
         .addNewArgument()
