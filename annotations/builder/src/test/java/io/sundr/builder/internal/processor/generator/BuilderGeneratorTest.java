@@ -16,8 +16,6 @@
 
 package io.sundr.builder.internal.processor.generator;
 
-import static io.sundr.codegen.functions.ClassTo.TYPEDEF;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -28,10 +26,9 @@ import io.sundr.builder.Constants;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.utils.Types;
 
 public class BuilderGeneratorTest {
-
-  private static final TypeDef INTEGER = TYPEDEF.apply(Integer.class);
 
   @Test
   public void testFluentTemplate() throws IOException {
@@ -42,11 +39,11 @@ public class BuilderGeneratorTest {
         .addNewConstructor()
         .addNewArgument()
         .withName("w")
-        .withTypeRef(INTEGER.toReference())
+        .withTypeRef(Types.INT_REF)
         .endArgument()
         .addNewArgument()
         .withName("w")
-        .withTypeRef(INTEGER.toReference())
+        .withTypeRef(Types.INT_REF)
         .endArgument()
         .endConstructor()
         .build();
