@@ -60,7 +60,6 @@ import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.ClassTo;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.AttributeKey;
@@ -538,7 +537,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
 
     Method equals = new MethodBuilder()
         .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-        .withReturnType(ClassTo.TYPEREF.apply(boolean.class))
+        .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
         .addNewArgument().withName("o").withTypeRef(Types.OBJECT.toReference()).endArgument()
         .withName("equals")
         .withNewBlock()
