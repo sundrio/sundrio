@@ -79,7 +79,7 @@ import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.functions.Singularize;
+import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;

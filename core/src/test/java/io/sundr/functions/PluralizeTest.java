@@ -14,22 +14,22 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.functions;
+package io.sundr.functions;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class SingularizeTest {
+public class PluralizeTest {
 
   @Test
-  public void testSingularize() {
+  public void testPluralize() {
 
-    assertEquals("address", Singularize.FUNCTION.apply("addresses"));
-    assertEquals("ADDRESS", Singularize.FUNCTION.apply("ADDRESSES"));
-
-    assertEquals("number", Singularize.FUNCTION.apply("numbers"));
-    assertEquals("NUMBER", Singularize.FUNCTION.apply("NUMBERS"));
+    assertEquals("addresses", Pluralize.FUNCTION.apply("address"));
+    assertEquals("numbers", Pluralize.FUNCTION.apply("number"));
+    assertEquals("vertices", Pluralize.FUNCTION.apply("vertex"));
+    assertEquals("endpoints", Pluralize.FUNCTION.apply("endpoints"));
+    assertEquals("ingresses", Pluralize.FUNCTION.apply("ingress"));
   }
 
 }

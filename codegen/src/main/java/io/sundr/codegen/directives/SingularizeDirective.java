@@ -23,7 +23,7 @@ import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import io.sundr.codegen.functions.Singularize;
+import io.sundr.functions.Singularize;
 
 public class SingularizeDirective extends Directive {
 
