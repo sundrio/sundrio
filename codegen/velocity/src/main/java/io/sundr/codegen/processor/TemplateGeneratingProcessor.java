@@ -39,7 +39,7 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.utils.Patterns;
 
-public abstract class JavaGeneratingProcessor extends AbstractProcessor {
+public abstract class TemplateGeneratingProcessor extends AbstractProcessor {
 
   private static final String SOURCE_SUFFIX = ".java";
 
