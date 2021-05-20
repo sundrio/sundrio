@@ -24,7 +24,6 @@ import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 import static io.sundr.utils.Strings.loadResourceQuietly;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +41,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
-import io.sundr.codegen.processor.JavaGeneratingProcessor;
+import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
@@ -54,7 +53,7 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
 import io.sundr.model.utils.Types;
 
-public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
+public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingProcessor {
 
   public static final String EMPTY = "";
 
@@ -63,39 +62,22 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     try {
       if (context.getGenerateBuilderPackage() && !Constants.DEFAULT_BUILDER_PACKAGE.equals(context.getBuilderPackage())) {
 
-        generateFromResources(context.getVisitableInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        generateFromResources(context.getVisitorInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        generateFromResources(context.getTypedVisitorInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+        generate(context.getVisitableInterface());
+        generate(context.getVisitorInterface());
+        generate(context.getTypedVisitorInterface());
+        generate(context.getPathAwareVisitorClass());
 
-        generateFromResources(context.getPathAwareVisitorClass(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-        generateFromResources(context.getVisitableBuilderInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        generateFromResources(context.getVisitableMapClass(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        generateFromResources(context.getBuilderInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-        generateFromResources(context.getFluentInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-        generateFromResources(context.getBaseFluentClass(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-        generateFromResources(context.getNestedInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        generateFromResources(context.getEditableInterface(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
+        generate(context.getVisitableBuilderInterface());
+        generate(context.getVisitableMapClass());
+        generate(context.getBuilderInterface());
+        generate(context.getFluentInterface());
+        generate(context.getBaseFluentClass());
+        generate(context.getNestedInterface());
+        generate(context.getEditableInterface());
       }
 
       if (context.isValidationEnabled() && !classExists(context.getBuilderPackage() + ".ValidationUtils")) {
-        generateFromResources(context.getValidationUtils(),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+        generate(context.getValidationUtils());
       }
     } catch (Exception e) {
       //
@@ -225,50 +207,36 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     int total = ctx.getBuildableRepository().getBuildables().size();
     int count = 0;
     for (TypeDef typeDef : buildables) {
-      try {
-        double percentage = 100d * (count++) / total;
-        System.err.printf("\033[2K%3d%% Generating: %s\r", Math.round(percentage), typeDef.getFullyQualifiedName());
+      double percentage = 100d * (count++) / total;
+      System.err.printf("\033[2K%3d%% Generating: %s\r", Math.round(percentage), typeDef.getFullyQualifiedName());
 
-        generateFromResources(ClazzAs.FLUENT_INTERFACE.apply(typeDef),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
+      generate(ClazzAs.FLUENT_INTERFACE.apply(typeDef));
+      if (typeDef.isInterface() || typeDef.isAnnotation()) {
+        continue;
+      }
 
-        if (typeDef.isInterface() || typeDef.isAnnotation()) {
-          continue;
+      generate(ClazzAs.FLUENT_IMPL.apply(typeDef));
+      if (typeDef.isAbstract()) {
+        continue;
+      }
+
+      if (typeDef.getAttributes().containsKey(EDITABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDITABLE_ENABLED)) {
+        generate(ClazzAs.EDITABLE_BUILDER.apply(typeDef));
+        generate(ClazzAs.EDITABLE.apply(typeDef));
+      } else {
+        generate(ClazzAs.BUILDER.apply(typeDef));
+      }
+
+      Buildable buildable = typeDef.getAttribute(BUILDABLE);
+      ExternalBuildables externalBuildables = typeDef.getAttribute(EXTERNAL_BUILDABLE);
+      if (buildable != null) {
+        for (final Inline inline : buildable.inline()) {
+          generate(inlineableOf(ctx, typeDef, inline));
         }
-
-        generateFromResources(ClazzAs.FLUENT_IMPL.apply(typeDef),
-            Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-        if (typeDef.isAbstract()) {
-          continue;
+      } else if (externalBuildables != null) {
+        for (final Inline inline : externalBuildables.inline()) {
+          generate(inlineableOf(ctx, typeDef, inline));
         }
-
-        if (typeDef.getAttributes().containsKey(EDITABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDITABLE_ENABLED)) {
-          generateFromResources(ClazzAs.EDITABLE_BUILDER.apply(typeDef),
-              Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
-          generateFromResources(ClazzAs.EDITABLE.apply(typeDef),
-              Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        } else {
-          generateFromResources(ClazzAs.BUILDER.apply(typeDef),
-              Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-        }
-
-        Buildable buildable = typeDef.getAttribute(BUILDABLE);
-        ExternalBuildables externalBuildables = typeDef.getAttribute(EXTERNAL_BUILDABLE);
-        if (buildable != null) {
-          for (final Inline inline : buildable.inline()) {
-            generateFromResources(inlineableOf(ctx, typeDef, inline),
-                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-          }
-        } else if (externalBuildables != null) {
-          for (final Inline inline : externalBuildables.inline()) {
-            generateFromResources(inlineableOf(ctx, typeDef, inline),
-                Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-          }
-        }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
       }
     }
   }
@@ -283,34 +251,29 @@ public abstract class AbstractBuilderProcessor extends JavaGeneratingProcessor {
     Set<TypeDef> additonalBuildables = new HashSet<>();
     Set<TypeDef> additionalTypes = new HashSet<>();
     for (TypeDef typeDef : buildables) {
-      try {
-        if (typeDef.isInterface() || typeDef.isAnnotation()) {
-          typeDef = ClazzAs.POJO.apply(typeDef);
-          builderContext.getDefinitionRepository().register(typeDef);
-          builderContext.getBuildableRepository().register(typeDef);
-          generateFromResources(typeDef,
-              Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-          additonalBuildables.add(typeDef);
+      if (typeDef.isInterface() || typeDef.isAnnotation()) {
+        typeDef = ClazzAs.POJO.apply(typeDef);
+        builderContext.getDefinitionRepository().register(typeDef);
+        builderContext.getBuildableRepository().register(typeDef);
+        generate(typeDef);
+        additonalBuildables.add(typeDef);
 
-          if (typeDef.hasAttribute(ADDITIONAL_BUILDABLES)) {
-            for (TypeDef also : typeDef.getAttribute(ADDITIONAL_BUILDABLES)) {
-              builderContext.getDefinitionRepository().register(also);
-              builderContext.getBuildableRepository().register(also);
-              generateFromResources(also, Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-              additonalBuildables.add(also);
-            }
-          }
-
-          if (typeDef.hasAttribute(ADDITIONAL_TYPES)) {
-            for (TypeDef also : typeDef.getAttribute(ADDITIONAL_TYPES)) {
-              builderContext.getDefinitionRepository().register(also);
-              generateFromResources(also, Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-              additionalTypes.add(also);
-            }
+        if (typeDef.hasAttribute(ADDITIONAL_BUILDABLES)) {
+          for (TypeDef also : typeDef.getAttribute(ADDITIONAL_BUILDABLES)) {
+            builderContext.getDefinitionRepository().register(also);
+            builderContext.getBuildableRepository().register(also);
+            generate(also);
+            additonalBuildables.add(also);
           }
         }
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+
+        if (typeDef.hasAttribute(ADDITIONAL_TYPES)) {
+          for (TypeDef also : typeDef.getAttribute(ADDITIONAL_TYPES)) {
+            builderContext.getDefinitionRepository().register(also);
+            generate(also);
+            additionalTypes.add(also);
+          }
+        }
       }
     }
     generateBuildables(builderContext, additonalBuildables);

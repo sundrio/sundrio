@@ -23,7 +23,6 @@ import java.io.IOException;
 import org.junit.Test;
 
 import io.sundr.builder.Constants;
-import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.utils.Types;
@@ -58,11 +57,13 @@ public class BuilderGeneratorTest {
     FileWriter fluentWriter = null;
     try {
       fluentWriter = new FileWriter(new File(dir, name));
-      new CodeGeneratorBuilder<TypeDef>()
-          .withModel(model)
-          .withWriter(fluentWriter)
-          .withTemplateResource(templateResource)
-          .build().generate();
+      /*
+       * new CodeGeneratorBuilder<TypeDef>()
+       * .withModel(model)
+       * .withWriter(fluentWriter)
+       * .withTemplateResource(templateResource)
+       * .build().generate();
+       */
     } catch (IOException e) {
       throw new RuntimeException(e);
     } finally {
