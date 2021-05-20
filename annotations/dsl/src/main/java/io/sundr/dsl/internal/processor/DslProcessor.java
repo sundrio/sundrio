@@ -21,7 +21,6 @@ import static io.sundr.dsl.internal.Constants.ORIGINAL_REF;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.executablesToInterfaces;
 import static io.sundr.model.utils.Types.modifiersToInt;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -39,7 +38,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.apt.utils.Apt;
-import io.sundr.codegen.processor.JavaGeneratingProcessor;
+import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
 import io.sundr.dsl.annotations.InterfaceName;
 import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.graph.NodeContext;
@@ -56,7 +55,7 @@ import io.sundr.model.TypeRef;
 import io.sundr.model.functions.GetDefinition;
 
 @SupportedAnnotationTypes("io.sundr.dsl.annotations.Dsl")
-public class DslProcessor extends JavaGeneratingProcessor {
+public class DslProcessor extends AbstractCodeGeneratingProcessor {
 
   public static final String DEFAULT_TEMPLATE_LOCATION = "templates/dsl/dsl.vm";
 
@@ -129,13 +128,8 @@ public class DslProcessor extends JavaGeneratingProcessor {
               .build());
 
           interfacesToGenerate.addAll(context.getDefinitionRepository().getDefinitions(IS_GENERATED));
-
-          try {
-            for (TypeDef clazz : interfacesToGenerate) {
-              generateFromResources(clazz, DEFAULT_TEMPLATE_LOCATION);
-            }
-          } catch (IOException e) {
-            throw new RuntimeException(e);
+          for (TypeDef clazz : interfacesToGenerate) {
+            generate(clazz);
           }
         }
       }
