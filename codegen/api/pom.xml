@@ -17,20 +17,28 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>sundr-pom</artifactId>
+        <artifactId>sundr-codegen-pom</artifactId>
         <groupId>io.sundr</groupId>
         <version>0.40-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sundr-codegen-pom</artifactId>
-    <name>Sundrio :: Code generation :: POM</name>
-    <packaging>pom</packaging>
+    <groupId>io.sundr</groupId>
+    <artifactId>sundr-codegen-api</artifactId>
+    <name>Sundrio :: Code generation :: API</name>
 
-    <modules>
-      <module>api</module>
-      <module>apt</module>
-      <module>velocity</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>
