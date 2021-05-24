@@ -16,51 +16,40 @@
 
 package io.sundr.codegen.apt.processor;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.tools.Diagnostic;
 
-import io.sundr.SundrException;
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.apt.AptContext;
+import io.sundr.codegen.api.CodeGenerator;
+import io.sundr.codegen.apt.AptOutput;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
 
 public abstract class AbstractCodeGeneratingProcessor extends AbstractProcessor {
 
   private final AtomicReference<AptContext> context = new AtomicReference<>();
-  private final Set<String> generated = new HashSet<>();
+  private CodeGenerator generator;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     context.set(AptContext.create(processingEnv.getElementUtils(), processingEnv.getTypeUtils(),
         DefinitionRepository.createRepository()));
+
+    generator = CodeGenerator.newGenerator(TypeDef.class)
+        .withOutput(new AptOutput(processingEnv.getFiler()))
+        .skipping(AbstractCodeGeneratingProcessor::classExists)
+        .build();
   }
 
   public void generate(TypeDef type) {
-    Filer filer = processingEnv.getFiler();
-    if (classExists(type)) {
-      printSkipping(type.getFullyQualifiedName(), "Class already exists.");
-      return;
+    if (generator == null) {
+      throw new IllegalStateException("CodeGenerator instance shoud not be null.");
     }
-    //Only generate each file once ...
-    if (generated.contains(type.getFullyQualifiedName())) {
-      return;
-    }
-    try (Writer writer = filer.createSourceFile(type.getFullyQualifiedName()).openWriter()) {
-      writer.write(type.render());
-      generated.add(type.getFullyQualifiedName());
-    } catch (IOException e) {
-      throw SundrException.launderThrowable(e);
-    }
+    generator.generate(type);
   }
 
   public AptContext getAptContext() {
@@ -73,10 +62,6 @@ public abstract class AbstractCodeGeneratingProcessor extends AbstractProcessor 
 
   public DefinitionRepository getDefinitionRepository() {
     return getAdapterContext().getDefinitionRepository();
-  }
-
-  private void printSkipping(String name, String msg) {
-    processingEnv.getMessager().printMessage(Diagnostic.Kind.OTHER, String.format("Skipping: %s. %-120s", name, msg));
   }
 
   /**
