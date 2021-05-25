@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.directives;
+package io.sundr.codegen.velocity.directives;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -23,9 +23,17 @@ import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.Node;
 
+import io.sundr.codegen.velocity.DirectiveProvider;
 import io.sundr.functions.Singularize;
 
 public class SingularizeDirective extends Directive {
+
+  public static class Provider implements DirectiveProvider {
+    @Override
+    public String getName() {
+      return Singularize.class.getName();
+    }
+  }
 
   private static final String SINGULRIZE = "singularize";
 

@@ -26,11 +26,11 @@ import org.apache.velocity.runtime.resource.ResourceManagerImpl;
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader;
 import org.apache.velocity.util.introspection.UberspectImpl;
 
-import io.sundr.codegen.directives.ClassDirective;
-import io.sundr.codegen.directives.FieldDirective;
-import io.sundr.codegen.directives.MethodDirective;
-import io.sundr.codegen.directives.PluralizeDirective;
-import io.sundr.codegen.directives.SingularizeDirective;
+import io.sundr.codegen.velocity.directives.ClassDirective;
+import io.sundr.codegen.velocity.directives.FieldDirective;
+import io.sundr.codegen.velocity.directives.MethodDirective;
+import io.sundr.codegen.velocity.directives.PluralizeDirective;
+import io.sundr.codegen.velocity.directives.SingularizeDirective;
 
 public class CodeGeneratorContext {
 

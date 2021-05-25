@@ -33,8 +33,11 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 
+import io.sundr.codegen.api.CodeGenerator;
+import io.sundr.codegen.apt.TypeDefAptOutput;
 import io.sundr.codegen.generator.CodeGeneratorBuilder;
 import io.sundr.codegen.generator.CodeGeneratorContext;
+import io.sundr.codegen.velocity.VelocityRenderer;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.utils.Patterns;
@@ -106,8 +109,12 @@ public abstract class TemplateGeneratingProcessor extends AbstractProcessor {
       printSkipping(newModel.getFullyQualifiedName(), "Class already exists.");
       return;
     }
-    generateFromStringTemplate(model, parameters, processingEnv.getFiler().createSourceFile(newModel.getFullyQualifiedName()),
-        content);
+
+    CodeGenerator.newGenerator(TypeDef.class)
+        .withIdentifier(TypeDef::getFullyQualifiedName)
+        .withOutput(new TypeDefAptOutput(processingEnv.getFiler()))
+        .withRenderer(VelocityRenderer.fromTemplate(content, parameters))
+        .generate(newModel);
   }
 
   /**
