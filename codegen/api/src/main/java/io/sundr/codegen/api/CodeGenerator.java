@@ -108,7 +108,7 @@ public class CodeGenerator<T> {
     this.identifier = identifier != null ? identifier
         : Identifiers.findIdentifier(type).map(Identifier::getFunction).orElse(o -> String.valueOf(o.hashCode()));
     this.renderer = renderer != null ? renderer : Renderers.findRenderer(type).map(Renderer::getFunction).orElse(null);
-    this.skip = skip != null ? skip : Predicates.distinct(t -> identifier.apply(t));
+    this.skip = skip != null ? skip : Predicates.distinct(t -> this.identifier.apply(t));
     this.onSkip = onSkip != null ? onSkip : ignore;
   }
 
@@ -134,7 +134,7 @@ public class CodeGenerator<T> {
 
     //Function like skip, onSkip, writer etc may need to access the specified Identifier.
     //So, let's wrap all code that may need the identifier into a lambda and ensure that the Identifiers is accessible to the lambda
-    //using Indentifier.getIdentifiers().
+    //using Indentifiers.getIdentifier().
     return Identifiers.withIdentifier(identifier).call(() -> {
       for (T item : items) {
         String id = identifier.apply(item);
