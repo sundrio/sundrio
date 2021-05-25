@@ -17,8 +17,6 @@
 package io.sundr.maven;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,7 +62,9 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import io.sundr.codegen.generator.CodeGeneratorBuilder;
+import io.sundr.codegen.api.CodeGenerator;
+import io.sundr.codegen.api.FileOutput;
+import io.sundr.codegen.velocity.VelocityRenderer;
 import io.sundr.maven.filter.ArtifactFilter;
 import io.sundr.maven.filter.CompositeFilter;
 import io.sundr.maven.filter.ExcludesFilter;
@@ -162,9 +162,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
       throw new MojoFailureException("Failed to create output dir for bom:" + bomDir.getAbsolutePath());
     }
     preProccessConfig(config);
-    FileWriter writer = null;
     try {
-      writer = new FileWriter(generatedBom);
       // Imported dependencies may have important additional information (eg. exclusions)
       // Taking both the artifacts and their related dependencies
       Map<Artifact, Dependency> dependencies = new LinkedHashMap<Artifact, Dependency>();
@@ -204,25 +202,18 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
       verifyBomDependencies(config, projectToGenerate);
 
       getLog().info("Generating BOM: " + config.getArtifactId());
-      new CodeGeneratorBuilder<Model>()
-          .withWriter(writer)
-          .withModel(projectToGenerate.getModel())
-          .withTemplateResource(bomTemplateResource)
-          .withTemplateUrl(bomTemplateUrl)
-          .build().generate();
+      FileOutput<Model> output = new FileOutput<>(generatedBom);
+
+      CodeGenerator.newGenerator(Model.class)
+          .withOutput(output)
+          .skipping(t -> false) //don't skip 
+          .withRenderer(VelocityRenderer.fromTemplateUrl(bomTemplateUrl))
+          .generate(projectToGenerate.getModel());
 
       return toBuild(getProject(), config);
 
     } catch (Exception e) {
       throw new MojoFailureException("Failed to generate bom.", e);
-    } finally {
-      try {
-        if (writer != null) {
-          writer.close();
-        }
-      } catch (IOException e) {
-        throw new MojoExecutionException("Failed to close the generated bom writer", e);
-      }
     }
   }
 

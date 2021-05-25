@@ -109,7 +109,19 @@
 
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-codegen</artifactId>
+            <artifactId>sundr-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-codegen-apt</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-codegen-velocity</artifactId>
             <version>${project.version}</version>
         </dependency>
 
