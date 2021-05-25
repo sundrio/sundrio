@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.Filer;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -46,7 +47,11 @@ import javax.tools.StandardLocation;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.adapter.apt.utils.Apt;
-import io.sundr.codegen.processor.JavaGeneratingProcessor;
+import io.sundr.codegen.api.CodeGenerator;
+import io.sundr.codegen.apt.GenericAptOutput;
+import io.sundr.codegen.apt.TypeDefAptOutput;
+import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
+import io.sundr.codegen.velocity.VelocityRenderer;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
@@ -60,7 +65,15 @@ import io.sundr.utils.Strings;
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedAnnotationTypes({ "io.sundr.transform.annotations.VelocityTransformation",
     "io.sundr.transform.annotations.VelocityTransformations" })
-public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
+public class VelocityTransformationProcessor extends AbstractCodeGeneratingProcessor {
+
+  @Override
+  public synchronized void init(ProcessingEnvironment processingEnv) {
+    super.init(processingEnv);
+    generator = CodeGenerator.newGenerator(TypeDef.class)
+        .withOutput(new TypeDefAptOutput(processingEnv.getFiler()))
+        .build();
+  }
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
@@ -122,12 +135,23 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
         Map<String, TypeDef> annotated = entry.getValue();
         try {
           if (transformation.gather()) {
-            generateFromStringTemplate(annotated, transformation.outputPath(),
-                readTemplate(filer, null, transformation.value()));
+            String template = readTemplate(filer, null, transformation.value());
+            VelocityRenderer<Map> renderer = new VelocityRenderer<>(template);
+
+            CodeGenerator.newGenerator(Map.class)
+                .withRenderer(renderer)
+                .withOutput(new GenericAptOutput<Map>(filer, transformation.outputPath()))
+                .generate(annotated);
+
           } else {
             for (TypeDef typeDef : annotated.values()) {
-              generateFromStringTemplate(typeDef, transformation.paremters(), transformation.outputPath(),
-                  readTemplate(filer, typeDef.getPackageName(), transformation.value()));
+              String template = readTemplate(filer, typeDef.getPackageName(), transformation.value());
+              VelocityRenderer<TypeDef> renderer = new VelocityRenderer<>(template);
+
+              CodeGenerator.newGenerator(TypeDef.class)
+                  .withRenderer(renderer)
+                  .withOutput(new TypeDefAptOutput(filer, renderer))
+                  .generate(typeDef);
             }
           }
         } catch (IOException e) {
@@ -234,5 +258,4 @@ public class VelocityTransformationProcessor extends JavaGeneratingProcessor {
     }
     return o.getCharContent(false).toString();
   }
-
 }
