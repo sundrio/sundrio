@@ -24,14 +24,14 @@ import javax.annotation.processing.ProcessingEnvironment;
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.codegen.api.CodeGenerator;
-import io.sundr.codegen.apt.AptOutput;
+import io.sundr.codegen.apt.TypeDefAptOutput;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
 
 public abstract class AbstractCodeGeneratingProcessor extends AbstractProcessor {
 
   private final AtomicReference<AptContext> context = new AtomicReference<>();
-  private CodeGenerator generator;
+  protected CodeGenerator generator;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -40,7 +40,7 @@ public abstract class AbstractCodeGeneratingProcessor extends AbstractProcessor 
         DefinitionRepository.createRepository()));
 
     generator = CodeGenerator.newGenerator(TypeDef.class)
-        .withOutput(new AptOutput(processingEnv.getFiler()))
+        .withOutput(new TypeDefAptOutput(processingEnv.getFiler()))
         .skipping(AbstractCodeGeneratingProcessor::classExists)
         .build();
   }

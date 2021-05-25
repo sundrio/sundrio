@@ -42,12 +42,12 @@
     <dependencies>
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-adapter-apt</artifactId>
+            <artifactId>sundr-codegen-apt</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-codegen</artifactId>
+            <artifactId>sundr-codegen-velocity</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
