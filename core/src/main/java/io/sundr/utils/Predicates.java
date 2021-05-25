@@ -48,6 +48,11 @@ public class Predicates {
     };
   }
 
+  public static <T> Predicate<T> distinct() {
+    Map<Object, Boolean> map = new ConcurrentHashMap<>();
+    return t -> map.putIfAbsent(t, Boolean.TRUE) == null;
+  }
+
   public static <T> Predicate<T> distinct(Function<? super T, Object> keyExtractor) {
     Map<Object, Boolean> map = new ConcurrentHashMap<>();
     return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
