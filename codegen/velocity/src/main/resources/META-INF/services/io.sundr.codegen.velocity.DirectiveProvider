@@ -1,0 +1,5 @@
+io.sundr.codegen.velocity.directives.ClassDirectiveProvider
+io.sundr.codegen.velocity.directives.FieldDirectiveProvider
+io.sundr.codegen.velocity.directives.MethodDirectiveProvider
+io.sundr.codegen.velocity.directives.SingularizeDirectiveProvider
+io.sundr.codegen.velocity.directives.PluralizeDirectiveProvider

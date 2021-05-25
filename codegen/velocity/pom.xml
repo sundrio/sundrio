@@ -63,12 +63,12 @@
     <dependencies>
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-core</artifactId>
+            <artifactId>sundr-codegen-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-model</artifactId>
+            <artifactId>sundr-codegen-apt</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

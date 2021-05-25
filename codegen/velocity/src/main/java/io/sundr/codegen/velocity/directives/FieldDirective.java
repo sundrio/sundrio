@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.codegen.directives;
+package io.sundr.codegen.velocity.directives;
 
 import static io.sundr.model.Attributeable.INIT;
 
