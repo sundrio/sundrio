@@ -30,22 +30,39 @@ import javax.tools.StandardLocation;
 
 import io.sundr.SundrException;
 import io.sundr.codegen.api.Output;
+import io.sundr.codegen.api.Renderer;
+import io.sundr.codegen.api.TypeDefRenderer;
 import io.sundr.model.TypeDef;
+import io.sundr.utils.Patterns;
 
-public class AptOutput implements Output<TypeDef> {
+public class TypeDefAptOutput implements Output<TypeDef> {
+
+  public static final String PACKAGE = ".*package\\s+(.*)\\s*\\;";
+  public static final String CLASS_NAME = ".*(enum|class|interface)\\s+(\\w+).*\\{";
 
   private final Filer filer;
+  private final Renderer<TypeDef> renderer;
   private final static StringWriter DEV_NULL = new StringWriter();
 
-  public AptOutput(Filer filer) {
+  public TypeDefAptOutput(Filer filer) {
+    this(filer, new TypeDefRenderer());
+  }
+
+  public TypeDefAptOutput(Filer filer, Renderer<TypeDef> renderer) {
     this.filer = filer;
+    this.renderer = renderer;
   }
 
   @Override
   public Function<TypeDef, Writer> getFunction() {
     return type -> {
       try {
-        FileObject fileObject = filer.getResource(StandardLocation.SOURCE_OUTPUT, type.getPackageName(), type.getName());
+        String rendered = renderer.render(type);
+        String pkg = Patterns.match(rendered, PACKAGE).orElse(null);
+        String name = Patterns.match(rendered, CLASS_NAME, 2)
+            .orElseThrow(() -> new IllegalStateException("Cannot extract fully qualified name from generated code."));
+
+        FileObject fileObject = filer.getResource(StandardLocation.SOURCE_OUTPUT, pkg, name);
         File file = Paths.get(fileObject.toUri()).toFile();
         //If file exists just send output to /dev/null
         return file.exists() ? DEV_NULL : filer.createSourceFile(type.getFullyQualifiedName()).openWriter();
