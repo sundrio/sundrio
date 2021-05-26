@@ -107,7 +107,9 @@ public class CodeGenerator<T> {
     this.output = output != null ? output : new SystemOutput<T>().getFunction();
     this.identifier = identifier != null ? identifier
         : Identifiers.findIdentifier(type).map(Identifier::getFunction).orElse(o -> String.valueOf(o.hashCode()));
-    this.renderer = renderer != null ? renderer : Renderers.findRenderer(type).map(Renderer::getFunction).orElse(null);
+    this.renderer = renderer != null ? renderer
+        : Renderers.findRenderer(type).map(Renderer::getFunction)
+            .orElseThrow(() -> new IllegalStateException("Renderer should not be null."));
     this.skip = skip != null ? skip : Predicates.distinct(t -> this.identifier.apply(t));
     this.onSkip = onSkip != null ? onSkip : ignore;
   }
@@ -124,14 +126,6 @@ public class CodeGenerator<T> {
    * @return true if generation was succesful, false otherwise
    */
   public boolean generate(T... items) {
-    if (renderer == null) {
-      throw new IllegalStateException("Renderer should not be null.");
-    }
-
-    if (output == null) {
-      throw new IllegalStateException("Output should not be null.");
-    }
-
     //Function like skip, onSkip, writer etc may need to access the specified Identifier.
     //So, let's wrap all code that may need the identifier into a lambda and ensure that the Identifiers is accessible to the lambda
     //using Indentifiers.getIdentifier().
