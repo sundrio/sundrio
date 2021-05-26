@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
 import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.api.TypeLookup;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.adapter.apt.utils.Apt;
 import io.sundr.codegen.api.CodeGenerator;
@@ -149,9 +151,13 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
               String template = readTemplate(filer, typeDef.getPackageName(), transformation.value());
               VelocityRenderer<TypeDef> renderer = new VelocityRenderer<>(template);
 
+              Function<TypeDef, String> identifier = t -> io.sundr.model.utils.Types
+                  .parseFullyQualifiedName(renderer.render(t));
               CodeGenerator.newGenerator(TypeDef.class)
                   .withRenderer(renderer)
+                  .withIdentifier(identifier)
                   .withOutput(new TypeDefAptOutput(filer, renderer))
+                  .skipping(t -> TypeLookup.lookup(identifier.apply(typeDef), AptContext.getContext()).isPresent())
                   .generate(typeDef);
             }
           }

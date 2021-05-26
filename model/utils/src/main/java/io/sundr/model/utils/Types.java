@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,8 +51,12 @@ import io.sundr.model.VoidRef;
 import io.sundr.model.WildcardRef;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.utils.Patterns;
 
 public final class Types {
+
+  public static final String PACKAGE = ".*package\\s+(.*)\\s*\\;";
+  public static final String CLASS_NAME = ".*(enum|class|interface)\\s+(\\w+).*\\{";
 
   private static final String JAVA_LANG_OBJECT = "java.lang.Object";
   private static final String JAVA_UTIL_OPTIONAL = "java.util.Optional";
@@ -645,5 +650,20 @@ public final class Types {
       visitParents(parent, types, visited);
     }
     types.add(type);
+  }
+
+  public static Optional<String> parsePackage(String content) {
+    return Patterns.match(content, PACKAGE);
+  }
+
+  public static Optional<String> parseName(String content) {
+    return Patterns.match(content, CLASS_NAME, 2);
+  }
+
+  public static String parseFullyQualifiedName(String content) {
+    Optional<String> pkg = parsePackage(content);
+    final String name = Patterns.match(content, CLASS_NAME, 2)
+        .orElseThrow(() -> new IllegalStateException("Cannot extract fully qualified name from generated code."));
+    return pkg.map(p -> p + "." + name).orElse(name);
   }
 }
