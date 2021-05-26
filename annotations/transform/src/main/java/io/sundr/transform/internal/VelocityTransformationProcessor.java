@@ -141,6 +141,7 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
             CodeGenerator.newGenerator(Map.class)
                 .withRenderer(renderer)
                 .withOutput(new GenericAptOutput<Map>(filer, transformation.outputPath()))
+                .skipping(i -> false)
                 .generate(annotated);
 
           } else {

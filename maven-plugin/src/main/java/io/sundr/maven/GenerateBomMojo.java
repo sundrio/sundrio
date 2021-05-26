@@ -204,10 +204,13 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
       getLog().info("Generating BOM: " + config.getArtifactId());
       FileOutput<Model> output = new FileOutput<>(generatedBom);
 
+      VelocityRenderer renderer = VelocityRenderer.fromTemplateUrl(bomTemplateUrl)
+          .orElse(VelocityRenderer.fromTemplate(bomTemplateResource)
+              .orElseThrow(() -> new IllegalStateException("Neither bom template URL nor bom template resource was found.")));
       CodeGenerator.newGenerator(Model.class)
           .withOutput(output)
           .skipping(t -> false) //don't skip 
-          .withRenderer(VelocityRenderer.fromTemplateUrl(bomTemplateUrl))
+          .withRenderer(renderer)
           .generate(projectToGenerate.getModel());
 
       return toBuild(getProject(), config);
