@@ -22,6 +22,7 @@ import static io.sundr.utils.Strings.loadResource;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URL;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.velocity.Template;
@@ -78,19 +79,22 @@ public class VelocityRenderer<T> implements Renderer<T> {
     this.template = this.velocityEngine.getTemplate(TEMPLATE);
   }
 
-  public static VelocityRenderer fromTemplate(String templateContent, String... parameters) {
-    return new VelocityRenderer<>(templateContent, parameters);
+  public static Optional<VelocityRenderer<?>> fromTemplate(String templateContent, String... parameters) {
+    return Optional.of(new VelocityRenderer<>(templateContent, parameters));
   }
 
-  public static VelocityRenderer fromTemplateUrl(URL templateUrl, String... parameters) {
+  public static Optional<VelocityRenderer<?>> fromTemplateUrl(URL templateUrl, String... parameters) {
     try {
+      if (templateUrl == null) {
+        return Optional.empty();
+      }
       return fromTemplate(loadResource(templateUrl), parameters);
     } catch (IOException e) {
       throw SundrException.launderThrowable(e);
     }
   }
 
-  public static VelocityRenderer fromTemplateResource(String templateResource, String... parameters) {
+  public static Optional<VelocityRenderer<?>> fromTemplateResource(String templateResource, String... parameters) {
     return fromTemplateUrl(VelocityContext.class.getResource(templateResource), parameters);
   }
 
