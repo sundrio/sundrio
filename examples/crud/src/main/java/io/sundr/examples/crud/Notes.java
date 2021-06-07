@@ -17,15 +17,15 @@
 
 package io.sundr.examples.crud;
 
-import io.sundr.transform.annotations.VelocityTransformation;
-import io.sundr.transform.annotations.VelocityTransformations;
+import io.sundr.transform.annotations.TemplateTransformation;
+import io.sundr.transform.annotations.TemplateTransformations;
 
 /**
  * The notes.
  */
-@VelocityTransformations({
-    @VelocityTransformation("/dao.vm"),
-    @VelocityTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
+@TemplateTransformations({
+    @TemplateTransformation("/dao.vm"),
+    @TemplateTransformation(value = "/dao-hub.vm", gather = true, outputPath = "io/sundr/examples/crud/DaoHub.java")
 })
 public class Notes {
 

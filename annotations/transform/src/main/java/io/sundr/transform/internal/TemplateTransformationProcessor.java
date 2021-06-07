@@ -19,6 +19,7 @@ package io.sundr.transform.internal;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,21 +54,22 @@ import io.sundr.codegen.api.CodeGenerator;
 import io.sundr.codegen.apt.GenericAptOutput;
 import io.sundr.codegen.apt.TypeDefAptOutput;
 import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
-import io.sundr.codegen.velocity.VelocityRenderer;
+import io.sundr.codegen.template.TemplateRenderer;
+import io.sundr.codegen.template.TemplateRenderers;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.transform.annotations.AnnotationSelector;
 import io.sundr.transform.annotations.PackageSelector;
 import io.sundr.transform.annotations.ResourceSelector;
-import io.sundr.transform.annotations.VelocityTransformation;
-import io.sundr.transform.annotations.VelocityTransformations;
+import io.sundr.transform.annotations.TemplateTransformation;
+import io.sundr.transform.annotations.TemplateTransformations;
 import io.sundr.utils.Strings;
 
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes({ "io.sundr.transform.annotations.VelocityTransformation",
-    "io.sundr.transform.annotations.VelocityTransformations" })
-public class VelocityTransformationProcessor extends AbstractCodeGeneratingProcessor {
+@SupportedAnnotationTypes({ "io.sundr.transform.annotations.TemplateTransformation",
+    "io.sundr.transform.annotations.TemplateTransformations" })
+public class TemplateTransformationProcessor extends AbstractCodeGeneratingProcessor {
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -84,19 +86,19 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
     Filer filer = processingEnv.getFiler();
     AptContext aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
 
-    Map<VelocityTransformation, Map<String, TypeDef>> annotatedTypes = new HashMap<>();
+    Map<TemplateTransformation, Map<String, TypeDef>> annotatedTypes = new HashMap<>();
     for (TypeElement typeElement : annotations) {
       for (Element element : env.getElementsAnnotatedWith(typeElement)) {
-        VelocityTransformations transformations = element.getAnnotation(VelocityTransformations.class);
-        VelocityTransformation transformation = element.getAnnotation(VelocityTransformation.class);
+        TemplateTransformations transformations = element.getAnnotation(TemplateTransformations.class);
+        TemplateTransformation transformation = element.getAnnotation(TemplateTransformation.class);
 
-        List<VelocityTransformation> all = new ArrayList<>();
+        List<TemplateTransformation> all = new ArrayList<>();
         if (transformation != null) {
           all.add(transformation);
         }
 
         if (transformations != null) {
-          for (VelocityTransformation t : transformations.value()) {
+          for (TemplateTransformation t : transformations.value()) {
             all.add(t);
           }
         }
@@ -104,7 +106,7 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
         TypeDef def = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement(element), aptContext))
             .build();
 
-        for (VelocityTransformation t : all) {
+        for (TemplateTransformation t : all) {
           if (!annotatedTypes.containsKey(t)) {
             annotatedTypes.put(t, new HashMap<>());
           }
@@ -132,14 +134,14 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
         }
       }
 
-      for (Map.Entry<VelocityTransformation, Map<String, TypeDef>> entry : annotatedTypes.entrySet()) {
-        VelocityTransformation transformation = entry.getKey();
+      for (Map.Entry<TemplateTransformation, Map<String, TypeDef>> entry : annotatedTypes.entrySet()) {
+        TemplateTransformation transformation = entry.getKey();
         Map<String, TypeDef> annotated = entry.getValue();
         try {
           if (transformation.gather()) {
-            String template = readTemplate(filer, null, transformation.value());
-            VelocityRenderer<Map> renderer = new VelocityRenderer<>(template);
-
+            URL templateUrl = readTemplateURL(filer, null, transformation.value());
+            TemplateRenderer<Map> renderer = TemplateRenderers.getTemplateRenderer(Map.class, templateUrl)
+                .orElseThrow(() -> new IllegalStateException("No template renderer found for:" + templateUrl));
             CodeGenerator.newGenerator(Map.class)
                 .withRenderer(renderer)
                 .withOutput(new GenericAptOutput<Map>(filer, transformation.outputPath()))
@@ -148,8 +150,9 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
 
           } else {
             for (TypeDef typeDef : annotated.values()) {
-              String template = readTemplate(filer, typeDef.getPackageName(), transformation.value());
-              VelocityRenderer<TypeDef> renderer = new VelocityRenderer<>(template);
+              URL templateUrl = readTemplateURL(filer, typeDef.getPackageName(), transformation.value());
+              TemplateRenderer<TypeDef> renderer = TemplateRenderers.getTemplateRenderer(TypeDef.class, templateUrl)
+                  .orElseThrow(() -> new IllegalStateException("No template renderer found for:" + templateUrl));
 
               Function<TypeDef, String> identifier = t -> io.sundr.model.utils.Types
                   .parseFullyQualifiedName(renderer.render(t));
@@ -239,10 +242,10 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
     }
   }
 
-  private String readTemplate(Filer filer, String pkg, String template) throws IOException {
+  private static FileObject getTemplateFileObject(Filer filer, String pkg, String template) throws IOException {
     FileObject o;
     if (template == null) {
-      throw new IllegalArgumentException("Template in:" + VelocityTransformation.class.getName() + " cannot be null.");
+      throw new IllegalArgumentException("Template in:" + TemplateTransformation.class.getName() + " cannot be null.");
     }
 
     String targetPkg = pkg == null || (template != null && template.startsWith("/"))
@@ -252,14 +255,26 @@ public class VelocityTransformationProcessor extends AbstractCodeGeneratingProce
     String targetTemplate = template.startsWith("/") ? template.substring(1) : template;
 
     try {
-      o = filer.getResource(StandardLocation.SOURCE_PATH, targetPkg, targetTemplate);
+      return filer.getResource(StandardLocation.SOURCE_PATH, targetPkg, targetTemplate);
     } catch (IOException e) {
       try {
-        o = filer.getResource(StandardLocation.CLASS_PATH, targetPkg, targetTemplate);
+        return filer.getResource(StandardLocation.CLASS_PATH, targetPkg, targetTemplate);
       } catch (IOException ex) {
         throw e;
       }
     }
+  }
+
+  private URL readTemplateURL(Filer filer, String pkg, String template) throws IOException {
+    FileObject o = getTemplateFileObject(filer, pkg, template);
+    if (o == null) {
+      throw new IOException("Template resource: " + template + " couldn't be found in sources or classpath.");
+    }
+    return o.toUri().toURL();
+  }
+
+  private String readTemplate(Filer filer, String pkg, String template) throws IOException {
+    FileObject o = getTemplateFileObject(filer, pkg, template);
     if (o == null) {
       throw new IOException("Template resource: " + template + " couldn't be found in sources or classpath.");
     }

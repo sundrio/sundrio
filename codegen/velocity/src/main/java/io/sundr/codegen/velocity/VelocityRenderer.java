@@ -38,9 +38,9 @@ import org.apache.velocity.runtime.resource.util.StringResourceRepository;
 import org.apache.velocity.util.introspection.UberspectImpl;
 
 import io.sundr.SundrException;
-import io.sundr.codegen.api.Renderer;
+import io.sundr.codegen.template.TemplateRenderer;
 
-public class VelocityRenderer<T> implements Renderer<T> {
+public class VelocityRenderer<T> extends TemplateRenderer<T> {
 
   private static final String TEMPLATE = "template";
   private static final String MODEL = "model";
