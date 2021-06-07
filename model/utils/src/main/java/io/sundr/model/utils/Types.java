@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 
 import io.sundr.model.ClassRef;
-import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.PrimitiveRefBuilder;
@@ -99,8 +98,26 @@ public final class Types {
   public static final TypeDef BOOLEAN = TypeDef.forName(Boolean.class.getName());
   public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
+  public static final TypeDef BYTE = TypeDef.forName(Byte.class.getName());
+  public static final TypeRef BYTE_REF = BYTE.toInternalReference();
+
+  public static final TypeDef CHARACTER = TypeDef.forName(Character.class.getName());
+  public static final TypeRef CHARACTER_REF = CHARACTER.toInternalReference();
+
+  public static final TypeDef SHORT = TypeDef.forName(Short.class.getName());
+  public static final TypeRef SHORT_REF = SHORT.toInternalReference();
+
   public static final TypeDef INT = TypeDef.forName(Integer.class.getName());
   public static final TypeRef INT_REF = INT.toInternalReference();
+
+  public static final TypeDef LONG = TypeDef.forName(Long.class.getName());
+  public static final TypeRef LONG_REF = LONG.toInternalReference();
+
+  public static final TypeDef DOUBLE = TypeDef.forName(Double.class.getName());
+  public static final TypeRef DOUBLE_REF = DOUBLE.toInternalReference();
+
+  public static final TypeDef FLOAT = TypeDef.forName(Float.class.getName());
+  public static final TypeRef FLOAT_REF = FLOAT.toInternalReference();
 
   public static final PrimitiveRef PRIMITIVE_BOOLEAN_REF = new PrimitiveRefBuilder().withName("boolean").build();
   public static final PrimitiveRef PRIMITIVE_BYTE_REF = new PrimitiveRefBuilder().withName("byte").build();
@@ -123,14 +140,14 @@ public final class Types {
   };
 
   public static TypeRef[] BOXED_PRIMITIVE_TYPES = {
-      new ClassRefBuilder().withFullyQualifiedName(Boolean.class.getName()).build(),
-      new ClassRefBuilder().withFullyQualifiedName(Byte.class.getName()).build(),
-      new ClassRefBuilder().withFullyQualifiedName(Character.class.getName()).build(),
-      new ClassRefBuilder().withFullyQualifiedName(Short.class.getName()).build(),
-      new ClassRefBuilder().withFullyQualifiedName(Integer.class.getName()).build(),
-      new ClassRefBuilder().withFullyQualifiedName(Long.class.getName()).build(),
-      new ClassRefBuilder().withFullyQualifiedName(Double.class.getName()).build(),
-      new ClassRefBuilder().withFullyQualifiedName(Float.class.getName()).build()
+      BOOLEAN_REF,
+      BYTE_REF,
+      CHARACTER_REF,
+      SHORT_REF,
+      INT_REF,
+      LONG_REF,
+      DOUBLE_REF,
+      FLOAT_REF
   };
 
   public static String[] BOXED_PARSE_METHOD = {

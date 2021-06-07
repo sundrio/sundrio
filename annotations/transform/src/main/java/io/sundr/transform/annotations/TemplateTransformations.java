@@ -23,12 +23,12 @@ import java.lang.annotation.Target;
 
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
-public @interface VelocityTransformations {
+public @interface TemplateTransformations {
 
   /**
    * @return a list of transformations to apply.
    */
-  VelocityTransformation[] value();
+  TemplateTransformation[] value();
 
   /**
    * @return a list of packages for selecting transformation target.

@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
-public @interface VelocityTransformation {
+public @interface TemplateTransformation {
 
   /**
    * @return the name of a classpath resource containing the template.

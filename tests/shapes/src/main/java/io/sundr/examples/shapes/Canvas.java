@@ -22,13 +22,13 @@ import java.util.Map;
 
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Inline;
-import io.sundr.transform.annotations.VelocityTransformation;
+import io.sundr.transform.annotations.TemplateTransformation;
 
 @Buildable(lazyMapInitEnabled = false, inline = {
     @Inline(type = Createable.class, value = "create", prefix = "Createable"),
     @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
 })
-@VelocityTransformation("transformation.vm") //This is just used to demonstrate how we can use velocity transformations.
+@TemplateTransformation("transformation.vm") //This is just used to demonstrate how we can use velocity transformations.
 public class Canvas {
 
   private final Shape canvasShape;
