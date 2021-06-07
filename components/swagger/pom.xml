@@ -45,7 +45,7 @@
     <dependencies>
         <dependency>
             <groupId>io.sundr</groupId>
-            <artifactId>sundr-codegen</artifactId>
+            <artifactId>sundr-codegen-api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
