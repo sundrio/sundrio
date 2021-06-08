@@ -33,6 +33,11 @@
             <artifactId>transform-annotations</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-codegen-velocity-nodeps</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

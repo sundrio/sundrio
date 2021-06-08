@@ -14,7 +14,7 @@
  *      limitations under the License.
  */
 
-package io.sundr.codegen;
+package io.sundr.codegen.velocity;
 
 import io.sundr.model.TypeDef;
 

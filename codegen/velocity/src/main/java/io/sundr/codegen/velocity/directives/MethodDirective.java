@@ -29,7 +29,7 @@ import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.ASTBlock;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import io.sundr.codegen.DefinitionScope;
+import io.sundr.codegen.velocity.DefinitionScope;
 import io.sundr.model.Method;
 
 public class MethodDirective extends Directive {
