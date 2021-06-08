@@ -32,6 +32,7 @@
       <module>apt</module>
       <module>template</module>
       <module>velocity</module>
+      <module>velocity-nodeps</module>
     </modules>
 
 </project>
