@@ -66,6 +66,7 @@
         <sun.tools.version>8</sun.tools.version>
         <validation.api.version>2.0.1.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
+        <st4.version>4.3</st4.version>
 
         <!-- Tooling Versions -->
         <aether.version>1.0.2.v20150114</aether.version>
