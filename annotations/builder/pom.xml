@@ -42,7 +42,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
-                <version>${invoker.plugin.version}</version>
+                <version>${maven-invoker-plugin.version}</version>
                 <configuration>
                     <debug>false</debug>
                     <projectsDirectory>src/it</projectsDirectory>

@@ -58,38 +58,43 @@
 
     <properties>
         <format.skip>false</format.skip>
-        <aether.version>1.0.2.v20150114</aether.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <javaparser.version>2.5.1</javaparser.version>
-        <swagger-annotations.version>1.5.17</swagger-annotations.version>
-        <swagger-codegen.version>3.0.1</swagger-codegen.version>
-        <swagger-codegen-generator.version>1.0.1</swagger-codegen-generator.version>
-        <junit.version>4.13.1</junit.version>
 
         <maven.version>3.3.1</maven.version>
         <maven.invoker.version>2.0.11</maven.invoker.version>
-        <maven.plugin.annotations.version>3.2</maven.plugin.annotations.version>
-        <maven-plugin-plugin-version>3.5</maven-plugin-plugin-version>
-        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+        <maven-plugin-annotations.version>3.2</maven-plugin-annotations.version>
 
         <sun.tools.version>8</sun.tools.version>
         <validation.api.version>2.0.1.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
-        <compile-testing.version>0.5</compile-testing.version>
+
+        <!-- Tooling Versions -->
+        <aether.version>1.0.2.v20150114</aether.version>
+        <javaparser.version>2.5.1</javaparser.version>
+        <swagger-annotations.version>1.5.17</swagger-annotations.version>
+        <swagger-codegen.version>3.0.1</swagger-codegen.version>
+        <swagger-codegen-generator.version>1.0.1</swagger-codegen-generator.version>
 
         <!-- Transitive Versions -->
         <commons-collections.version>3.2.2</commons-collections.version>
+
+        <!-- Maven Plugin Versions -->
+        <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
+        <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+        <maven-invoker-plugin.version>3.2.2</maven-invoker-plugin.version>
+        <maven-plugin-plugin.version>3.5</maven-plugin-plugin.version>
+        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+
         <!-- Formatting Plugins -->
         <formatter-maven-plugin.version>2.12.2</formatter-maven-plugin.version>
         <impsort-maven-plugin.version>1.4.1</impsort-maven-plugin.version>
 
-        <!-- Maven Plugin Versions -->
-        <compiler.plugin.version>3.6.0</compiler.plugin.version>
-        <jar.plugin.version>3.2.0</jar.plugin.version>
-        <invoker.plugin.version>2.0.0</invoker.plugin.version>
-        <release.plugin.version>2.5.3</release.plugin.version>
-        <surefire.plugin.version>3.0.0-M3</surefire.plugin.version>
-        <invoker.plugin.version>3.1.0</invoker.plugin.version>
+        <!-- Testing Version -->
+        <compile-testing.version>0.5</compile-testing.version>
+        <junit.version>4.13.1</junit.version>
+        <hamcrest.version>1.3</hamcrest.version>
+        
         <!--maven.javadoc.failOnError>false</maven.javadoc.failOnError-->
     </properties>
 
@@ -111,7 +116,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${surefire.plugin.version}</version>
+                    <version>${maven-surefire-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -120,7 +125,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>${release.plugin.version}</version>
+                <version>${maven-release-plugin.version}</version>
                 <configuration>
                     <preparationGoals>clean install</preparationGoals>
                 </configuration>
@@ -128,7 +133,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.plugin.version}</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
