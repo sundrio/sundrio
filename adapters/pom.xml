@@ -33,6 +33,7 @@
       <module>reflect</module>
       <module>apt</module>
       <module>source</module>
+      <module>source-nodeps</module>
     </modules>
 
 </project>
