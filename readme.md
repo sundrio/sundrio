@@ -1,6 +1,6 @@
 ## Sundrio: Code generation toolkit for Java
 
-* [![CircleCI](https://circleci.com/gh/sundrio/sundrio/tree/master.svg?style=svg)](https://circleci.com/gh/sundrio/sundrio/tree/master)
+* ![Build](https://github.com/sundrio/sundrio/actions/workflows/build.yml/badge.svg)
 * [![Maven Central](https://img.shields.io/maven-central/v/io.sundr/sundr-core.svg?maxAge=2592000)](http://search.maven.org/#search%7Cga%7C1%7Cg%3Aio.sundr%20a%3Asundr-core)
 
 # Overview
