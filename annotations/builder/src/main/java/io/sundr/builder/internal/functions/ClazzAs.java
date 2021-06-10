@@ -174,7 +174,8 @@ public class ClazzAs {
         }
       }
 
-      return new TypeDefBuilder(fluentType).withAnnotations().withInnerTypes(nestedClazzes).withMethods(methods).build();
+      return new TypeDefBuilder(fluentType).withComments("Generated").withAnnotations().withInnerTypes(nestedClazzes)
+          .withMethods(methods).build();
 
     }
   });
@@ -335,8 +336,9 @@ public class ClazzAs {
       methods.add(hashCode);
 
       return BuilderContextManager.getContext().getDefinitionRepository()
-          .register(new TypeDefBuilder(fluentImplType).withAnnotations().withConstructors(constructors)
-              .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(methods).build());
+          .register(
+              new TypeDefBuilder(fluentImplType).withComments("Generated").withAnnotations().withConstructors(constructors)
+                  .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(methods).build());
     }
   });
 
@@ -509,15 +511,16 @@ public class ClazzAs {
           : new Modifier[] { Modifier.PUBLIC };
 
       final TypeDef editable = EDITABLE.apply(item);
-      return new TypeDefBuilder(BUILDER.apply(item)).withAnnotations().accept(new TypedVisitor<MethodBuilder>() {
-        public void visit(MethodBuilder builder) {
-          if (builder.getName() != null && builder.getName().equals("build")) {
-            builder.withModifiers(Types.modifiersToInt(modifiers));
-            builder.withReturnType(editable.toInternalReference());
-            builder.withNewBlock().withStatements(toBuild(editable, editable)).endBlock();
-          }
-        }
-      }).build();
+      return new TypeDefBuilder(BUILDER.apply(item)).withComments("Generated").withAnnotations()
+          .accept(new TypedVisitor<MethodBuilder>() {
+            public void visit(MethodBuilder builder) {
+              if (builder.getName() != null && builder.getName().equals("build")) {
+                builder.withModifiers(Types.modifiersToInt(modifiers));
+                builder.withReturnType(editable.toInternalReference());
+                builder.withNewBlock().withStatements(toBuild(editable, editable)).endBlock();
+              }
+            }
+          }).build();
     }
   });
 
@@ -550,7 +553,9 @@ public class ClazzAs {
       //We need to treat the editable classes as buildables themselves.
       return AptContext.getContext().getDefinitionRepository()
           .register(BuilderContextManager.getContext().getBuildableRepository()
-              .register(new TypeDefBuilder(editableType).withAnnotations().withModifiers(Types.modifiersToInt(modifiers))
+              .register(new TypeDefBuilder(editableType)
+                  .withComments("Generated")
+                  .withAnnotations().withModifiers(Types.modifiersToInt(modifiers))
                   .withConstructors(constructors).withMethods(methods).addToAttributes(BUILDABLE_ENABLED, true)
                   .addToAttributes(GENERATED, true) // We want to know that its a generated type...
                   .build()));

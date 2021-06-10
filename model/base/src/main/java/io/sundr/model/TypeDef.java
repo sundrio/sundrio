@@ -435,12 +435,14 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
       }
     }
 
-    sb.append(NEWLINE);
+    if (comments != null && !comments.isEmpty()) {
+      sb.append(renderComments(SPACE));
+    }
+
     for (AnnotationRef annotationRef : annotations) {
       sb.append(annotationRef.toString()).append(SPACE);
     }
 
-    sb.append(NEWLINE);
     renderSignature(sb);
     sb.append(OB).append(NEWLINE).append(indent);
 

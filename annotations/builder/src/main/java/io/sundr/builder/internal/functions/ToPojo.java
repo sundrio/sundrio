@@ -612,6 +612,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         adapterMethods.add(staticToStringArray);
 
         TypeDef mapper = new TypeDefBuilder()
+            .withComments("Generated")
             .withModifiers(modifiersToInt(Modifier.PUBLIC))
             .withPackageName(adapterPackage)
             .withName(!Strings.isNullOrEmpty(name) ? name : Strings.toPojoName(generatedPojo.getName(), prefix, suffix))
@@ -624,6 +625,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     }
 
     return DefinitionRepository.getRepository().register(new TypeDefBuilder(generatedPojo)
+        .withComments("Generated")
         .addAllToMethods(additionalMethods)
         .addToAttributes(ALSO_IMPORT, additionalImports)
         .addToAttributes(ADDITIONAL_BUILDABLES, additionalBuildables)

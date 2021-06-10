@@ -43,7 +43,6 @@ public interface Commentable extends Node {
       sb.append(
           getComments().stream().map(line -> indent + CLP + line + NEWLINE).collect(Collectors.joining()));
       sb.append(indent).append(CC).append(NEWLINE);
-      sb.append(indent); //This one is to make sure that lines with comments are aligned with the rest
     }
     return sb.toString();
   }
