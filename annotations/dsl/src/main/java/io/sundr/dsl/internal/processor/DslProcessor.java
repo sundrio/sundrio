@@ -120,6 +120,7 @@ public class DslProcessor extends AbstractCodeGeneratingProcessor {
 
           //Do generate the DSL interface
           interfacesToGenerate.add(new TypeDefBuilder()
+              .withComments("Generated")
               .withPackageName(Apt.getPackageElement(element).toString())
               .withName(targetInterface)
               .withKind(Kind.INTERFACE)
