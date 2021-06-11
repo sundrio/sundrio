@@ -292,26 +292,28 @@ class ToMethod {
         fieldName = descendantOf.getName();
       }
 
-      if (isBuildable(unwrapped) && !IS_COLLECTION.apply(type) && !IS_MAP.apply(type)) {
-        statements.add(new StringStatement("_visitables.get(\"" + fieldName + "\").remove(this." + fieldName + ");"));
-      }
-
-      if (IS_COLLECTION.apply(type) || IS_MAP.apply(type)) {
-
-        if (IS_MAP.apply(type)) {
-          statements.add(new StringStatement("if (" + fieldName + " == null) { this." + fieldName + " =  null;} else {this."
-              + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(fieldName))
-              + ";} return (" + returnType + ") this;"));
-        } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
+      if (isBuildable(unwrapped)) {
+        if (IS_COLLECTION.apply(type)) {
           statements.add(new StringStatement("if (this." + fieldName + " != null) { _visitables.get(\"" + fieldName
               + "\").removeAll(this." + fieldName + ");}"));
-
-          String addToMethodName = "addTo" + property.getNameCapitalized();
-          statements.add(new StringStatement("if (" + argumentName + " != null) {this." + fieldName + " = "
-              + property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList()) + "; for (" + unwrapped.toString()
-              + " item : " + argumentName + "){this." + addToMethodName + "(item);}} else { this." + fieldName
-              + " = null;} return (" + returnType + ") this;"));
+        } else if (IS_MAP.apply(type)) {
+          // There is no such thing as buildable map yet.
+        } else {
+          statements.add(new StringStatement("_visitables.get(\"" + fieldName + "\").remove(this." + fieldName + ");"));
         }
+      }
+
+      if (IS_MAP.apply(type)) {
+        statements.add(new StringStatement("if (" + fieldName + " == null) { this." + fieldName + " =  null;} else {this."
+            + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(fieldName))
+            + ";} return (" + returnType + ") this;"));
+        return statements;
+      } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
+        String addToMethodName = "addTo" + property.getNameCapitalized();
+        statements.add(new StringStatement("if (" + argumentName + " != null) {this." + fieldName + " = "
+            + property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList()) + "; for (" + unwrapped.toString()
+            + " item : " + argumentName + "){this." + addToMethodName + "(item);}} else { this." + fieldName
+            + " = null;} return (" + returnType + ") this;"));
         return statements;
       }
 
