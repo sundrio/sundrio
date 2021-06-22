@@ -16,6 +16,7 @@
 
 package io.sundr.model;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class TypeParamRef extends TypeRef {
@@ -52,6 +53,10 @@ public class TypeParamRef extends TypeRef {
 
     return name != null ? name.equals(that.name) : that.name == null;
 
+  }
+
+  public ClassRef withErasure() {
+    return new ClassRef(Object.class.getName(), dimensions, Collections.emptyList(), getAttributes());
   }
 
   @Override
