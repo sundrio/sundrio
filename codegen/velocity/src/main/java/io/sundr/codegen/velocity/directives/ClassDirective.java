@@ -98,7 +98,7 @@ public class ClassDirective extends Directive {
         writer.append("  ").append(type.renderComments("  "));
       }
 
-      writer.append(type.renderSignature());
+      writer.append(type.renderDefinition());
       writer.append(block).append(NEWLINE);
     }
   }

@@ -187,13 +187,13 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     return result;
   }
 
-  public String renderSignature(TypeDef enclosingType) {
+  public String renderDefinition(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
-    renderSignature(sb, enclosingType);
+    renderDefinition(sb, enclosingType);
     return sb.toString();
   }
 
-  public void renderSignature(StringBuilder sb, TypeDef enclosingType) {
+  public void renderDefinition(StringBuilder sb, TypeDef enclosingType) {
     if (isDefaultMethod()) {
       sb.append(DEFAULT).append(SPACE);
     } else {
@@ -249,7 +249,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
   @Override
   public String render(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
-    renderSignature(sb, enclosingType);
+    renderDefinition(sb, enclosingType);
     boolean renderBody = isDefaultMethod() || (enclosingType != null && enclosingType.getKind() != Kind.INTERFACE);
 
     if (renderBody) {

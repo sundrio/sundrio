@@ -88,7 +88,7 @@ public class MethodDirective extends Directive {
       if (!method.getComments().isEmpty()) {
         writer.append(onetab).append(method.renderComments(onetab));
       }
-      writer.append(onetab).append(method.renderSignature(DefinitionScope.get()));
+      writer.append(onetab).append(method.renderDefinition(DefinitionScope.get()));
       List<String> lines = getLines(block);
       List<String> indentedLines = lines.stream().map(l -> twotabs + l).collect(Collectors.toList());
       if (hasBody) {

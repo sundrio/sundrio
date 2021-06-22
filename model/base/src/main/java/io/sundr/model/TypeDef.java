@@ -390,13 +390,13 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     return refs;
   }
 
-  public String renderSignature() {
+  public String renderDefinition() {
     StringBuilder sb = new StringBuilder();
-    renderSignature(sb);
+    renderDefinition(sb);
     return sb.toString();
   }
 
-  public void renderSignature(StringBuilder sb) {
+  public void renderDefinition(StringBuilder sb) {
     renderModifiers(sb);
 
     sb.append(kind.name().toLowerCase()).append(SPACE);
@@ -443,7 +443,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
       sb.append(annotationRef.toString()).append(SPACE);
     }
 
-    renderSignature(sb);
+    renderDefinition(sb);
     sb.append(OB).append(NEWLINE).append(indent);
 
     if (kind != Kind.INTERFACE) {
