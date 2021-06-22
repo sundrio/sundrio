@@ -95,6 +95,12 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     return block;
   }
 
+  public Method withErasure() {
+    return new Method(comments, annotations, parameters, name, returnType,
+        arguments.stream().map(Property::withErasure).collect(Collectors.toList()), varArgPreferred, exceptions, defaultMethod,
+        block, modifiers, getAttributes());
+  }
+
   public Set<ClassRef> getReferences() {
     Set<ClassRef> refs = new LinkedHashSet<ClassRef>();
 
@@ -185,6 +191,15 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
     result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
     return result;
+  }
+
+  public String getSignature() {
+    StringBuilder sb = new StringBuilder();
+    sb.append(name);
+    sb.append(OP);
+    sb.append(arguments.stream().map(a -> (String) a.withoutModiers().render()).collect(Collectors.joining(COMA)));
+    sb.append(CP);
+    return sb.toString();
   }
 
   public String renderDefinition(TypeDef enclosingType) {

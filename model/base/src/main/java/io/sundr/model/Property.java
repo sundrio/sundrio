@@ -98,6 +98,17 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     return new Property(annotations, typeRef, name, comments, 0, getAttributes());
   }
 
+  /**
+   * Get the property after the type erasure is applied.
+   * This in essense means that the type parameters are replaced by Object.
+   * 
+   * @return the 'erased` property.
+   */
+  public Property withErasure() {
+    return new Property(annotations, typeRef instanceof TypeParamRef ? ((TypeParamRef) typeRef).withErasure() : typeRef, name,
+        comments, 0, getAttributes());
+  }
+
   protected String getDefaultValue() {
     Object value = getAttribute(INIT);
     if (getTypeRef() instanceof ClassRef && ((ClassRef) getTypeRef()).getFullyQualifiedName().equals(JAVA_LANG_STRING)
