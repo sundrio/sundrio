@@ -216,7 +216,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
           .withName(method.getName())
           .withDefaultMethod(method.isDefault())
           .withModifiers(method.getModifiers())
-          .withReturnType(typeToTypeRef.apply(method.getReturnType()))
+          .withReturnType(typeToTypeRef.apply(method.getGenericReturnType()))
           .withArguments(arguments)
           .withParameters(parameters)
           .withExceptions(exceptionRefs)
