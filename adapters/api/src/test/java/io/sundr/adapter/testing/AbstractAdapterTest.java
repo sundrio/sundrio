@@ -16,8 +16,13 @@
 
 package io.sundr.adapter.testing;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +39,7 @@ import io.sundr.adapter.testing.general.ClassWithPrimitiveArray;
 import io.sundr.adapter.testing.general.ClassWithSelfRefParam;
 import io.sundr.adapter.testing.general.ClassWithSuperClassParam;
 import io.sundr.adapter.testing.general.SimpleClass;
+import io.sundr.adapter.testing.list.StringList;
 import io.sundr.adapter.testing.person.Address;
 import io.sundr.adapter.testing.person.Person;
 import io.sundr.model.AnnotationRef;
@@ -41,9 +47,12 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.Method;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.utils.TypeArguments;
+import io.sundr.model.utils.Types;
 
 public abstract class AbstractAdapterTest<T> {
 
@@ -185,6 +194,27 @@ public abstract class AbstractAdapterTest<T> {
         assertTrue(properties.contains("WORK"));
       });
     });
+  }
+
+  //
+  // List
+  //
+
+  @Test
+  public void testWithTypeParams() throws Exception {
+    java.lang.reflect.Method method = ArrayList.class.getDeclaredMethod("get", int.class);
+
+    T input = getInput(StringList.class);
+    TypeDef typeDef = Adapters.adaptType(input, getContext());
+    RichTypeDef stringList = TypeArguments.apply(typeDef);
+    //methods
+    assertFalse(stringList.getMethods().stream().anyMatch(m -> m.getName().equals("get")));
+    assertTrue(stringList.getAllMethods().stream()
+        .anyMatch(m -> m.getName().equals("get") && m.getReturnType().equals(Types.STRING_REF)));
+
+    //properties
+    assertFalse(stringList.getProperties().stream().anyMatch(m -> m.getName().equals("elementData")));
+    assertTrue(stringList.getAllProperties().stream().anyMatch(m -> m.getName().equals("elementData")));
   }
 
   public static Optional<ClassRef> findClassRef(TypeDef def, String propertyName) {
