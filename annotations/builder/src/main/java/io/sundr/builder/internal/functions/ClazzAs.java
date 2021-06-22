@@ -365,7 +365,7 @@ public class ClazzAs {
       fields.add(validationEnabledProperty);
 
       Method emptyConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withNewBlock()
-          .addNewStringStatementStatement("this(true);").endBlock().build();
+          .addNewStringStatementStatement("this(false);").endBlock().build();
 
       Method validationEnabledConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .addNewArgument().withTypeRef(io.sundr.model.utils.Types.BOOLEAN_REF).withName("validationEnabled").and()
@@ -378,7 +378,7 @@ public class ClazzAs {
           })).endBlock().build();
 
       Method fluentConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
-          .withTypeRef(fluent).withName("fluent").and().withNewBlock().addNewStringStatementStatement("this(fluent, true);")
+          .withTypeRef(fluent).withName("fluent").and().withNewBlock().addNewStringStatementStatement("this(fluent, false);")
           .endBlock().build();
 
       Method fluentAndValidationConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
@@ -394,7 +394,7 @@ public class ClazzAs {
 
       Method instanceAndFluentCosntructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(instanceRef)
-          .withName("instance").and().withNewBlock().addNewStringStatementStatement("this(fluent, instance, true);").endBlock()
+          .withName("instance").and().withNewBlock().addNewStringStatementStatement("this(fluent, instance, false);").endBlock()
           .build();
 
       Method instanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
@@ -409,8 +409,7 @@ public class ClazzAs {
 
       Method instanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
           .withTypeRef(instanceRef).withName("instance").and().withNewBlock()
-          .addNewStringStatementStatement("this(instance,true);").endBlock().build();
-
+          .addNewStringStatementStatement("this(instance,false);").endBlock().build();
       Method instanceAndValidationEnabledConstructor = new MethodBuilder()
           .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(instanceRef)
           .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
@@ -472,7 +471,7 @@ public class ClazzAs {
               }
             })).endBlock().build();
 
-        Method instanceAndFluentAndValidatorCosntructor = new MethodBuilder()
+        Method instanceAndFluentAndValidatorConstructor = new MethodBuilder()
             .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
             .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
             .withTypeRef(validatorRef).withName("validator").and()
@@ -493,9 +492,43 @@ public class ClazzAs {
             .endBlock()
             .build();
 
+        Method fluentAndValidatorConstructor = new MethodBuilder()
+            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+            .and().addNewArgument()
+            .withTypeRef(validatorRef).withName("validator").and()
+            .withNewBlock()
+            .addNewStringStatementStatement("this.fluent = fluent;")
+            .addNewStringStatementStatement("this.validator = validator;")
+            .addNewStringStatementStatement("this.validationEnabled = validator != null; ")
+            .endBlock()
+            .build();
+
+        Method usingValidation = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+            .withReturnType(builderType.toInternalReference())
+            .withName("usingValidation")
+            .withNewBlock()
+            .addNewStringStatementStatement("return new " + builderType.getName() + "(this, true);")
+            .endBlock()
+            .build();
+
+        Method usingValidator = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+            .withReturnType(builderType.toInternalReference())
+            .withName("usingValidator")
+            .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
+            .withNewBlock()
+            .addNewStringStatementStatement("return new " + builderType.getName() + "(this, validator);")
+            .endBlock()
+            .build();
+
+        BuilderContext context = BuilderContextManager.getContext();
+        methods.add(usingValidation);
+        if (context.isExternalvalidatorSupported()) {
+          methods.add(usingValidator);
+        }
         constructors.add(validatorConstructor);
-        constructors.add(instanceAndFluentAndValidatorCosntructor);
+        constructors.add(instanceAndFluentAndValidatorConstructor);
         constructors.add(instanceAndValidatorConstructor);
+        constructors.add(fluentAndValidatorConstructor);
       }
 
       return BuilderContextManager.getContext().getDefinitionRepository()
