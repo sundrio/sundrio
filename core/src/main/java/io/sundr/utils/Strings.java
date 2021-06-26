@@ -55,6 +55,10 @@ public final class Strings {
     return str == null || str.isEmpty();
   }
 
+  public static boolean isNotNullOrEmpty(String str) {
+    return !isNullOrEmpty(str);
+  }
+
   public static int indexOfAlphabetic(String str) {
     if (str == null || str.isEmpty()) {
       return -1;

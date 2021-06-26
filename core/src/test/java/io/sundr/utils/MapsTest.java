@@ -49,4 +49,12 @@ public class MapsTest {
     assertEquals("three", map.get(3));
   }
 
+  @Test
+  public void shouldCreateFromMapping() throws Exception {
+    Map<String, String> map = Maps.create("1=one, 2=two,3 = three");
+    assertEquals(3, map.size());
+    assertEquals("one", map.get("1"));
+    assertEquals("two", map.get("2"));
+    assertEquals("three", map.get("3"));
+  }
 }
