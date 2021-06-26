@@ -25,7 +25,6 @@ import java.util.Set;
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
-import io.sundr.model.functions.GetDefinition;
 
 public class SwaggerRepository {
 
@@ -54,9 +53,13 @@ public class SwaggerRepository {
     return type != null && apis.containsKey(type.getFullyQualifiedName());
   }
 
+  public boolean isApi(ClassRef classRef) {
+    return classRef != null && apis.containsKey(classRef.getFullyQualifiedName());
+  }
+
   public boolean isApi(TypeRef type) {
     if (type instanceof ClassRef) {
-      return isApi(GetDefinition.of((ClassRef) type));
+      return isApi(((ClassRef) type));
     }
     return false;
   }
@@ -83,9 +86,13 @@ public class SwaggerRepository {
     return type != null && models.containsKey(type.getFullyQualifiedName());
   }
 
+  public boolean isModel(ClassRef classRef) {
+    return classRef != null && models.containsKey(classRef.getFullyQualifiedName());
+  }
+
   public boolean isModel(TypeRef type) {
     if (type instanceof ClassRef) {
-      return isModel(GetDefinition.of((ClassRef) type));
+      return isModel(((ClassRef) type));
     }
     return false;
   }
