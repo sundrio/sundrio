@@ -18,16 +18,20 @@ package io.sundr.swagger.language;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.sundr.utils.Maps;
 import io.sundr.utils.Strings;
 import io.swagger.codegen.v3.CliOption;
 import io.swagger.codegen.v3.CodegenModel;
@@ -57,6 +61,8 @@ public class JavaFluentCodegen extends JavaClientCodegen {
   public static final String HAS_BUILDER_ARTIFACT = "hasBuilderArtifact";
   public static final String HAS_BUILDER_CLASSIFIER = "hasBuilderClassifier";
 
+  public static final String PACKAGE_MAPPINGS = "package-mappings";
+
   protected boolean generateBuilders = true;
   protected boolean editableEnabled = true;
   protected boolean validationEnabled = false;
@@ -68,6 +74,7 @@ public class JavaFluentCodegen extends JavaClientCodegen {
   protected String builderArtifactId = null;
   protected String builderVersion = null;
   protected String builderClassifier = null;
+  protected Map<String, String> packageMappings = null;
 
   public JavaFluentCodegen() {
     super();
@@ -89,6 +96,8 @@ public class JavaFluentCodegen extends JavaClientCodegen {
         "Flag that specifies wether the builder package should be generated or not."));
     cliOptions.add(CliOption.newBoolean(BUILDER_ARTIFACT,
         "The maven artifact that contains the builder utility classes. The format is <groupId>:<artifactId>:<version>(:<classifier>)"));
+
+    cliOptions.add(CliOption.newBoolean(PACKAGE_MAPPINGS, "Mappings for model/api package names."));
 
     supportedLibraries.put("okhttp-jackson", "HTTP client: OkHttp 2.7.5. JSON processing: Jackson 2.8.9.");
   }
@@ -163,6 +172,11 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     additionalProperties.put(HAS_BUILDER_ARTIFACT, !Strings.isNullOrEmpty(builderGroupId)
         && !Strings.isNullOrEmpty(builderArtifactId) && !Strings.isNullOrEmpty(builderVersion));
     additionalProperties.put(HAS_BUILDER_CLASSIFIER, !Strings.isNullOrEmpty(builderClassifier));
+
+    if (additionalProperties.containsKey(PACKAGE_MAPPINGS)) {
+      this.setPackageMappings(Maps.create(String.valueOf(additionalProperties.get(PACKAGE_MAPPINGS).toString())));
+    }
+    additionalProperties.put(PACKAGE_MAPPINGS, packageMappings);
 
     final String invokerFolder = (sourceFolder + File.separator + invokerPackage).replace(".", File.separator);
 
@@ -271,9 +285,8 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     }
 
     if (name.contains(".")) {
-
       String prefix = name.substring(0, name.lastIndexOf("."));
-      String newPackage = pkg + "." + prefix;
+      String newPackage = mapPackage(pkg + "." + prefix);
 
       String newName = name.substring(name.lastIndexOf(".") + 1);
       cm.name = newName;
@@ -310,7 +323,7 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     String name = (String) operation.get("classname");
     if (name.contains(".")) {
       String prefix = name.substring(0, name.lastIndexOf("."));
-      String newPackage = pkg + "." + prefix;
+      String newPackage = mapPackage(pkg + "." + prefix);
       String newName = name.substring(name.lastIndexOf(".") + 1);
       operation.put("classname", newName);
       operations.put("package", newPackage);
@@ -481,7 +494,7 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     super.addOperationToGroup(newTag, resourcePath, operation, co, operations);
   }
 
-  private static String removePackage(String name, String basePackage, String subPackage) {
+  private String removePackage(String name, String basePackage, String subPackage) {
     if (name == null || name.isEmpty()) {
       return name;
     }
@@ -506,7 +519,7 @@ public class JavaFluentCodegen extends JavaClientCodegen {
       if (prefix.equals(subPackage)) {
         return trimmed;
       } else {
-        return basePackage + "." + prefix + "." + trimmed;
+        return mapPackage(basePackage + "." + prefix) + "." + trimmed;
       }
     }
     return name;
@@ -519,12 +532,12 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
   @Override
   public String toModelFilename(String name) {
-    return name.replaceAll(Pattern.quote("."), File.separator);
+    return mapFileName(name);
   }
 
   @Override
   public String toModelTestFilename(String name) {
-    return super.toModelTestFilename(name).replaceAll(Pattern.quote("."), File.separator);
+    return mapFileName(name) + "Test";
   }
 
   @Override
@@ -544,7 +557,7 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
   @Override
   public String toApiDocFilename(String name) {
-    return super.toApiDocFilename(name);
+    return mapFileName(name);
   }
 
   @Override
@@ -554,12 +567,12 @@ public class JavaFluentCodegen extends JavaClientCodegen {
 
   @Override
   public String toApiFilename(String name) {
-    return name.replaceAll(Pattern.quote("."), File.separator);
+    return mapFileName(name);
   }
 
   @Override
   public String toApiTestFilename(String name) {
-    return super.toApiTestFilename(name).replaceAll(Pattern.quote("."), File.separator);
+    return mapFileName(name) + "Test";
   }
 
   @Override
@@ -668,6 +681,46 @@ public class JavaFluentCodegen extends JavaClientCodegen {
     return classMappings;
   }
 
+  public Map<String, String> getPackageMappings() {
+    return packageMappings;
+  }
+
+  public void setPackageMappings(Map<String, String> packageMappings) {
+    this.packageMappings = packageMappings;
+  }
+
+  private Optional<String> findPackageMappingKey(String pkg) {
+    return packageMappings.keySet().stream().sorted((l, r) -> l.length() - r.length()).filter(key -> pkg.contains(key))
+        .findFirst();
+  }
+
+  private String applyPackageMappings(String pkg) {
+    Optional<String> mappingKey = findPackageMappingKey(pkg);
+    if (mappingKey.isPresent()) {
+      String key = mappingKey.get();
+      return pkg.replaceAll(Pattern.quote(key), packageMappings.get(key));
+    }
+    return pkg;
+  }
+
+  private String mapPackage(String... parts) {
+    //Construct the pacakge from parts first.
+    String pkg = applyPackageMappings(Arrays.stream(parts).filter(Strings::isNotNullOrEmpty).collect(Collectors.joining(".")));
+    //Breakup and reconstruct package to make for empty mappings
+    return sanitizePackageName(
+        Arrays.stream(pkg.split("\\.")).map(String::trim).filter(Strings::isNotNullOrEmpty).collect(Collectors.joining(".")));
+  }
+
+  private String mapFileName(String name) {
+    String result = name;
+    for (String key : packageMappings.keySet()) {
+      if (result.contains(key)) {
+        result = result.replaceAll(Pattern.quote(key), packageMappings.get(key));
+      }
+    }
+    return result.replaceAll(Pattern.quote("."), File.separator).replaceAll(Pattern.quote("-"), ".");
+  }
+
   private static String className(String fqcn) {
     return !fqcn.contains(".") ? fqcn : fqcn.substring(fqcn.lastIndexOf(".") + 1);
   }
@@ -675,5 +728,14 @@ public class JavaFluentCodegen extends JavaClientCodegen {
   private static boolean importExists(String candidate, List<Map<String, String>> imports) {
     return imports.stream().flatMap(i -> i.values().stream()).map(i -> className(i))
         .filter(i -> i.equals(className(candidate))).findAny().isPresent();
+  }
+
+  private static String sanitizePackageName(String packageName) {
+    packageName = packageName.trim(); // FIXME: a parameter should not be assigned. Also declare the methods parameters as 'final'.
+    packageName = packageName.replaceAll("[^a-zA-Z0-9_\\.]", "_");
+    if (packageName == null || packageName.isEmpty()) {
+      return "invalidPackageName";
+    }
+    return packageName;
   }
 }
