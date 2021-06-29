@@ -227,6 +227,9 @@
     </dependencyManagement>
 
     <profiles>
+        <profile>
+            <id>normal</id>
+        </profile>
         <!-- modifies the plugin config inherited from oss-parent -->
         <profile>
             <id>sonatype-release-profile-extension</id>
