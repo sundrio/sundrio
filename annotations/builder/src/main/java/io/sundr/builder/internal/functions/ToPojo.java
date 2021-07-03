@@ -31,6 +31,7 @@ import static io.sundr.model.utils.Types.modifiersToInt;
 import static io.sundr.utils.Strings.loadResourceQuietly;
 import static java.util.stream.Collectors.*;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -120,8 +121,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     Types.visitParents(item, types);
 
     TypeDef superClass = null;
-    List<ClassRef> extendsList = new ArrayList<>();
-    List<ClassRef> implementsList = new ArrayList<>();
+    Set<ClassRef> extendsList = new HashSet<>();
+    Set<ClassRef> implementsList = new HashSet<>();
     List<ClassRef> additionalImports = new ArrayList<>();
     List<AnnotationRef> annotationRefs = new ArrayList<>();
 
@@ -238,6 +239,10 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
             superClassFields.put(p.getName(), p);
           }
         }
+      }
+
+      if (t.isInterface() && !Annotation.class.getName().equals(t.getFullyQualifiedName())) {
+        implementsList.add(t.toInternalReference());
       }
 
       for (Method method : t.getMethods()) {
@@ -402,8 +407,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         .withProperties(fields)
         .withConstructors(constructors)
         .withMethods(getters)
-        .withImplementsList(implementsList)
-        .withExtendsList(extendsList)
+        .withImplementsList(new ArrayList<>(implementsList))
+        .withExtendsList(new ArrayList<>(extendsList))
         .addToAttributes(item.getAttributes())
         .build();
 
