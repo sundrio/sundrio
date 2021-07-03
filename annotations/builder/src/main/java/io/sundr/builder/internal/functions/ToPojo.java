@@ -300,6 +300,8 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                 .build();
 
             Method getter = new MethodBuilder(Getter.forProperty(field))
+                .withAnnotations(method.getAnnotations())
+                .withComments(method.getComments())
                 .withModifiers(modifiersToInt(Modifier.PUBLIC))
                 .withNewBlock()
                 .withStatements(new StringStatement("return this." + Strings.toFieldName(name) + ";"))
