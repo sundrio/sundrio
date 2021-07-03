@@ -22,32 +22,16 @@ import javax.validation.constraints.Size;
 
 import io.sundr.builder.annotations.Buildable;
 
-public class Address {
+@Buildable(validationEnabled = true)
+public interface Address {
 
   @NotNull
-  private final String street;
+  String getStreet();
+
   @Min(1)
-  private final int number;
+  int getNumber();
+
   @Pattern(regexp = "[0-9]*")
   @Size(min = 4, max = 6)
-  private final String zipCode;
-
-  @Buildable(validationEnabled = true)
-  public Address(String street, int number, String zipCode) {
-    this.street = street;
-    this.number = number;
-    this.zipCode = zipCode;
-  }
-
-  public String getStreet() {
-    return street;
-  }
-
-  public int getNumber() {
-    return number;
-  }
-
-  public String getZipCode() {
-    return zipCode;
-  }
+  String getZipCode();
 }
