@@ -74,6 +74,11 @@ public class AptContext extends AttributeSupport implements AdapterContextAware 
     return INSTANCE;
   }
 
+  public synchronized static AptContext create(Elements elements, Types types) {
+    INSTANCE = new AptContext(elements, types, DefinitionRepository.createRepository());
+    return INSTANCE;
+  }
+
   public synchronized static AptContext create(Elements elements, Types types, DefinitionRepository repository) {
     INSTANCE = new AptContext(elements, types, repository);
     return INSTANCE;
