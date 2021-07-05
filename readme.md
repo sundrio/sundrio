@@ -8,7 +8,29 @@
 Writing things like:
 
 - Nested Builders
+    ```java
+        Pod pod = new PodBuilder()
+                         .withNewMetadata()
+                            .withName("my-pod")
+                         .endMetadata()
+                         .withNewSpec()
+                             .addNewContainer()
+                                 .withName("nginx")
+                                 .withImage("quay.io/sundrio/nginx")
+                                 .withImagePullPolicy("IfNotPresent")
+                             .endContainer()
+                         .endSpec()
+                         .build();
+    ```
 - Domain Specific Languages
+    ```java
+        DockerClient client = new DockerClient()
+        client.image().build().usingDockerFile("src/main/docker/Dockerfile.jvm")
+        client.image().withName("nginx").tag().inRepository("quay.io/sundrio/nginx").force().withTagName("1.0");
+        client.image().withName().push().withTag("1.0").toRegistry();
+        close();
+    ```
+    
 - and more...
 
 is a great experience the first time, but a real burden from there after.
@@ -47,6 +69,15 @@ The java code model is a fluent api that allows you to:
    - refactor/manipulate
    - render
 java code.
+
+To add it to your project:
+```xml
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+```
 
 ### A hello world example
 
@@ -88,6 +119,15 @@ The reflection adapter allows you to create `TypeDef` instances, from `Class` in
   TypeDef runnable = Adapters.adaptType(Runnable.class, AdapterContext.getContext());
 ```
 
+To add it to your project:
+```xml
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-reflect</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+```
+
 ### Annotation processor adapter
 
 The annotation processor adapter allows you to create `TypeDef` instances, from `TypeElement` instances.
@@ -99,6 +139,15 @@ A `TypeElement` is the way annotation processing facilities of the java compiler
 ```
 
 *Note*: An instance of javax.annotation.processing.ProcessingEnvironment (see processingEnv above) is passed to all annotation processors by the compiler.
+
+To add it to your project:
+```xml
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-apt</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+```
 
 ### Source adapter
 
@@ -119,6 +168,26 @@ A utility to simplify the step above is also provided:
    TypeDef runnable = Adapters.adaptType(new File("/path/to/Runnable.java"), AdapterContext.getContext());
 ```
 
+To add it to your project:
+```xml
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-source</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+```
+
+The dependency above comes with the [Github Java Parser](https://github.com/javaparser/javaparser) as a transitive dependency.
+If you would rather to have that dependency shaded istead:
+
+```xml
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-source-nodeps</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+```
+
 As all hello worlds, the example is as simple as it get, yet the code model is so rich that allows manipulating:
 
 - superclasses & interfaces
@@ -128,6 +197,19 @@ As all hello worlds, the example is as simple as it get, yet the code model is s
 - generic parameters
 
 Control is really find grained up to the point of statements, which at the moment are treated as strings. 
+
+
+# Modules
+The project also includes so modules that put the code model into the test. In other words they use code model in order to generate things like:
+
+- Fluent nested hierarchical builders
+- Domain specific languages
+- Template based code
+
+## [Builders](annotations/builder/readme.md)
+## [Domain Specific languages](annotations/dsl/readme.md)
+## [Template base code generator](annotations/transform/readme.md)
+
 
 # Compiling 
 
@@ -143,5 +225,5 @@ To avoid referencing to that path, which is known to cause issues, its required 
 
 - [Fabric8 Kubernetes Client](https://github.com/fabric8io/kubernetes-model)
 - [Official Kubernetes Client](https://github.com/kubernetes-client/java)
-- [Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
+- [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
 - [Dekorate](https://github.com/dekorateio/dekorate/)
