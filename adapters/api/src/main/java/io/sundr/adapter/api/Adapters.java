@@ -63,6 +63,7 @@ public class Adapters {
   @SuppressWarnings("unchecked")
   public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForType(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getTypeAdapterType() != null)
         .filter(f -> f.getTypeAdapterType().isAssignableFrom(type))
         .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
@@ -71,6 +72,7 @@ public class Adapters {
   @SuppressWarnings("unchecked")
   public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForReference(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getReferenceAdapterType() != null)
         .filter(f -> f.getReferenceAdapterType().isAssignableFrom(type))
         .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
@@ -79,6 +81,7 @@ public class Adapters {
   @SuppressWarnings("unchecked")
   public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForProperty(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getPropertyAdapterType() != null)
         .filter(f -> f.getPropertyAdapterType().isAssignableFrom(type))
         .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
@@ -87,6 +90,7 @@ public class Adapters {
   @SuppressWarnings("unchecked")
   public static <T, R, P, M> Optional<Adapter<T, R, P, M>> getAdapterForMethod(Class type, AdapterContextAware ctx) {
     return StreamSupport.stream(ServiceLoader.load(AdapterFactory.class, Adapter.class.getClassLoader()).spliterator(), false)
+        .filter(f -> f.getMethodAdapterType() != null)
         .filter(f -> f.getMethodAdapterType().isAssignableFrom(type))
         .map(f -> (Adapter<T, R, P, M>) f.create(ctx.getAdapterContext()))
         .findFirst();
