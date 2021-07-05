@@ -27,11 +27,11 @@ Writing things like:
         DockerClient client = new DockerClient()
         client.image().build().usingDockerFile("src/main/docker/Dockerfile.jvm")
         client.image().withName("nginx").tag().inRepository("quay.io/sundrio/nginx").force().withTagName("1.0");
-        client.image().withName().push().withTag("1.0").toRegistry();
+        client.image().withName("quay.io/sundrio/nginx").push().withTag("1.0").toRegistry();
         close();
     ```
     
-- and more...
+- and pretty much anything useful that requires a lot of boilerplate ...
 
 is a great experience the first time, but a real burden from there after.
 
@@ -198,9 +198,108 @@ As all hello worlds, the example is as simple as it get, yet the code model is s
 
 Control is really find grained up to the point of statements, which at the moment are treated as strings. 
 
+## Code manipulation
+
+So far we briefly covered ways for creating `TypeDef` instances that are representing Java code.
+Code generation usually requires the manipulation of the code.
+
+As already demonstrated, the code model comes with a rich set of fluent builders that allow manipulation of code. 
+
+### Using the builders
+
+For example let's take the `Runnable` interface (as demonstrated above) and give it a much more interesting name:
+
+```java
+  TypeDef runnable = Adapters.adaptType(Runnable.class, AdapterContext.getContext());
+  TypeDef forrest = new TypeDefBuilder(runnable).withName("Forrest").build();
+  System.out.println(forrest);
+  ```
+  
+The code above should have an output:
+
+```
+@FunctionalInterface
+public interface Forrest {
+    /**
+     * When an object implementing interface <code>Runnable</code> is used
+     * to create a thread, starting the thread causes the object's
+     * <code>run</code> method to be called in that separately executing
+     * thread.
+     * <p>
+     * The general contract of the method <code>run</code> is that it may
+     * take any action whatsoever.
+     *
+     * @see     java.lang.Thread#run()
+     */
+    public abstract void run();
+}
+```
+
+#### Using the visitor pattern
+
+Not all code manipulations are as simple as the example above.
+Let's consider a more realistic use case, of generating `DTO` class for our plain old java objects.
+Let's assume an imaginery Person class:
+
+```java
+public class Person extends Entity {
+  private final firstName;
+  private final lastName;
+  
+  public Person(String firstName, String lastName) {
+     this.firstName = firstName;
+     this.lastName = lastName;
+  }
+  
+  public String getFirstName() {
+     return this.firstName;
+  }
+  
+  public String getLastName() {
+     return this.lastName;
+  }
+
+  //More code ...
+}
+```
+
+We want to generate a `DTO` that
+
+- will have no superclass
+- will have no mehtods
+- all fields will be public
+
+Lucky for us, we don't need to traverse all properties one by one, we can just define a visitor for `Property` objects, that will perform the task for us.
+So how does this work? Each time we pass a visitor to the `Builder` it will traverse the object graph and if it finds an object that matches the type of the visitor, it will be passed to the Visitors `visit` method.
+In our case:
+
+```java
+  TypeDef person = Adapters.adaptType(Person.class, AdapterContext.getContext());
+  TypeDef dto = new TypeDefBuilder(person)
+                       .withName(person.getName() + "DTO")
+                       .withMethods(Collections.emptyList())
+                       .withConstructors(Collections.emptyList())
+                       .withExtendsList(Collections.emptyList())
+                       .accept(new TypedVisitor<PropertyBuilder>() {
+                             public void visit(PropertyBuilder property) {
+                                property.withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+                             }
+                        });
+  System.out.println(dto);
+  ```
+
+The output should be something like:
+
+```java
+public class PersonDTO {
+   public String firstName;
+   public String lastName;
+}
+```
 
 # Modules
-The project also includes so modules that put the code model into the test. In other words they use code model in order to generate things like:
+
+The project also includes so modules that put the code model & adapters into the test. In other words they use code model in order to generate things like:
 
 - Fluent nested hierarchical builders
 - Domain specific languages
