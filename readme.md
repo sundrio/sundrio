@@ -41,6 +41,94 @@ On top of this model, it provides tools that perform tasks, like builder generat
 
 *Note*: Currently, builder generators, dsl generators etc are bound to annotation processing, but we are currently working on decoupling them from apt.
 
+# Code Model 
+The java code model is a fluent api that allows you to:
+   - create
+   - refactor/manipulate
+   - render
+java code.
+
+### A hello world example
+
+This example demonstrate how we can create a `Greeter` interface with a `helloWorld` method and then print it`s code in the system output.
+
+```java
+  TypeDef greeter = new TypeDefBuilder()
+                        .withKind(Kind.Inteface)
+                        .withName("Greeter")
+                        .addNewMethod()
+                            .withName("helloWorld")
+                        .endMethod()
+                        .build();
+                        
+  System.out.println(greeter.render());
+```
+
+The output of the code above is expected to be:
+
+```java
+   interface Greeter {
+      void helloWorld();
+   }
+```
+
+## Adapters
+Having an api to create java source code programmatically is pretty handy at times, however it's more common to manipulate existing code or classes.
+So and `Adapter` api is provided and some core adapter implementations for:
+ 
+- Adapting classes via reflection
+- Adapting `TypeElement` via annotation processing
+- Adapting existing source
+
+### Reflection adapter
+
+The reflection adapter allows you to create `TypeDef` instances, from `Class` instances:
+
+```java
+  TypeDef runnable = Adapters.adaptType(Runnable.class, AdapterContext.getContext());
+```
+
+### Annotation processor adapter
+
+The annotation processor adapter allows you to create `TypeDef` instances, from `TypeElement` instances.
+A `TypeElement` is the way annotation processing facilities of the java compiler represent types.
+
+```java
+  AptContext aptContext = AptContext.create(processingEnv.getElementUtils(), processingEnv.getTypeUtils());
+  TypeDef runnable = Adapters.adaptType(Runnable.class, AdapterContext.getContext());
+```
+
+*Note*: An instance of javax.annotation.processing.ProcessingEnvironment (see processingEnv above) is passed to all annotation processors by the compiler.
+
+### Source adapter
+
+The source adapter allows you to parse java source files into `TypeDef` instances.
+The java parser used is under the hood is the [Github Java Parser](https://github.com/javaparser/javaparser).
+So, the adapters practically converts `TypeDeclaration` / `CompilationUnit` instances (github java parser) into `TypeDef` ones.
+
+```java
+   try (FileInputStream is = new FileInputStream(new File("/path/to/Runnable.java"))) {
+    CompilationUnit cu = JavaParser.parser(is);
+    TypeDef runnable = Adapters.adaptType(cu, AdapterContext.getContext());
+  }
+```
+
+A utility to simplify the step above is also provided:
+
+```java
+   TypeDef runnable = Adapters.adaptType(new File("/path/to/Runnable.java"), AdapterContext.getContext());
+```
+
+As all hello worlds, the example is as simple as it get, yet the code model is so rich that allows manipulating:
+
+- superclasses & interfaces
+- properties
+- methods
+- inner classes
+- generic parameters
+
+Control is really find grained up to the point of statements, which at the moment are treated as strings. 
+
 # Compiling 
 
 The project is meant to be compiled using java 8.
