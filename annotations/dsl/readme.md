@@ -170,8 +170,8 @@ A scope is treated as a single interface (also is implemented like one) that has
 Regardless of the style of prefernce (e.g. method names, keywords or annotations) on thing remain the same: "You define on each methods its requirements". In other words you always define what the previous steps should or should not be.
 There are times though tha
 
-The [Curator DSL Example](https://github.com/sundrio/sundrio/blob/master/examples/curator/src/main/java/io/sundr/examples/curator/CuratorDsl.java) is using the string style.
+The [Curator DSL Example](https://github.com/sundrio/sundrio/blob/master/examples/curator-dsl/src/main/java/io/sundr/examples/curator/CuratorDsl.java) is using the string style.
 
-The [Kubernetes DSL Example](https://github.com/sundrio/sundrio/blob/master/examples/kubernetes/src/main/java/io/sundr/examples/kubernetes/KubernetesDsl.java) is using the annotation style.
+The [Kubernetes DSL Example](https://github.com/sundrio/sundrio/blob/master/examples/kubernetes-dsl/src/main/java/io/sundr/examples/kubernetes/KubernetesDsl.java) is using the annotation style.
 
-A real example is the [Fabric8 Docker Client](https://github.com/fabric8io/docker-client) where the whole DSL is generated using this tool.
+A real example is the [Fabric8 Docker Client](https://github.com/fabric8io/docker-client) where the whole DSL is generated using this tool. The project might be currently archived, but its DSL was really innovative.
