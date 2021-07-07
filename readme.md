@@ -239,7 +239,7 @@ public interface Forrest {
 
 Not all code manipulations are as simple as the example above.
 Let's consider a more realistic use case, of generating `DTO` class for our plain old java objects.
-Let's assume an imaginery Person class:
+Let's assume an imaginary Person class:
 
 ```java
 public class Person extends Entity {
