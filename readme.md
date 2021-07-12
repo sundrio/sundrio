@@ -266,7 +266,7 @@ public class Person extends Entity {
 We want to generate a `DTO` that
 
 - will have no superclass
-- will have no mehtods
+- will have no methods
 - all fields will be public
 
 Lucky for us, we don't need to traverse all properties one by one, we can just define a visitor for `Property` objects, that will perform the task for us.
