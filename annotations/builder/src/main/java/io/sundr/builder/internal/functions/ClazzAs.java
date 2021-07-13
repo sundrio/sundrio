@@ -22,6 +22,7 @@ import static io.sundr.model.utils.Types.isAbstract;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -44,6 +45,7 @@ import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.Statement;
 import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
@@ -54,134 +56,148 @@ import io.sundr.model.TypeRef;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.utils.Getter;
 import io.sundr.model.utils.Setter;
+import io.sundr.model.utils.TypeArguments;
 import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
 public class ClazzAs {
 
-  public static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
-    public TypeDef apply(TypeDef item) {
-      List<Method> methods = new ArrayList<Method>();
-      List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
-      TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
-      TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
+  public static final Function<RichTypeDef, TypeDef> FLUENT_INTERFACE = FunctionFactory
+      .wrap(new Function<RichTypeDef, TypeDef>() {
+        public TypeDef apply(RichTypeDef item) {
+          List<Method> methods = new ArrayList<Method>();
+          List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
+          TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
+          TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
-      //The generic letter is always the last
-      final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
+          //The generic letter is always the last
+          final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
 
-      for (Property property : item.getProperties()) {
-        final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
-            .apply(property.getTypeRef());
-        if (property.isStatic()) {
-          continue;
-        }
-        if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
-          continue;
-        }
+          Map<String, Property> itemProperties = item.getProperties().stream()
+              .collect(Collectors.toMap(Property::getName, p -> p));
 
-        Property toAdd = new PropertyBuilder(property).withModifiers(0).addToAttributes(ORIGIN_TYPEDEF, item)
-            .addToAttributes(OUTER_INTERFACE, fluentType).addToAttributes(OUTER_CLASS, fluentImplType)
-            .addToAttributes(GENERIC_TYPE_REF, genericType.toReference()).withComments().withAnnotations().build();
+          for (Property property : item.getAllProperties()) {
+            final TypeRef unwrapped = TypeAs
+                .combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
+                .apply(property.getTypeRef());
 
-        boolean isBuildable = isBuildable(unwrapped);
-        boolean isArray = Types.isArray(toAdd.getTypeRef());
-        boolean isSet = Types.isSet(toAdd.getTypeRef());
-        boolean isList = Types.isList(toAdd.getTypeRef());
-        boolean isMap = Types.isMap(toAdd.getTypeRef());
-        boolean isMapWithBuildableValue = isMap && isBuildable(TypeAs.UNWRAP_MAP_VALUE_OF.apply(unwrapped));
-        boolean isAbstract = isAbstract(unwrapped);
-        boolean isOptional = Types.isOptional(toAdd.getTypeRef()) || Types.isOptionalInt(toAdd.getTypeRef())
-            || Types.isOptionalDouble(toAdd.getTypeRef()) || Types.isOptionalLong(toAdd.getTypeRef());
-
-        Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
-        toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
-
-        if (isArray) {
-          Property asList = arrayAsList(toAdd);
-          methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-          methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
-          methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(asList));
-          methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
-          toAdd = asList;
-        } else if (isSet || isList) {
-          methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
-          methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
-          methods.addAll(ToMethod.GETTER.apply(toAdd));
-          methods.add(ToMethod.WITH.apply(toAdd));
-          methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-        } else if (isMap) {
-          if (isMapWithBuildableValue && !isAbstract) {
-            methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(toAdd));
-          } else if (!descendants.isEmpty()) {
-            for (Property descendant : descendants) {
-              methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(descendant));
+            if (property.isStatic()) {
+              continue;
             }
-          }
-          methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
-          methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
-          methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
-          methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
-          methods.addAll(ToMethod.GETTER.apply(toAdd));
-          methods.add(ToMethod.WITH.apply(toAdd));
-        } else if (isOptional) {
-          methods.addAll(ToMethod.GETTER.apply(toAdd));
-          methods.addAll(ToMethod.WITH_OPTIONAL.apply(toAdd));
-        } else {
-          toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).accept(new InitEnricher()).build();
-          methods.addAll(ToMethod.GETTER.apply(toAdd));
-          methods.add(ToMethod.WITH.apply(toAdd));
-        }
-        methods.add(ToMethod.HAS.apply(toAdd));
-        methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
-
-        if (isMap) {
-          if (isMapWithBuildableValue && !isAbstract) {
-            nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
-          } else if (!descendants.isEmpty()) {
-            for (Property descendant : descendants) {
-              nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
+            if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
+              continue;
             }
-          }
-        } else if (isBuildable && !isAbstract) {
-          methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
-          methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
-          if (isList || isArray) {
-            methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
-            methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
-          } else if (!isSet) {
-            methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
-            methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
-            methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
-          }
-          nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
-        } else if (!descendants.isEmpty()) {
-          for (Property descendant : descendants) {
-            if (Types.isCollection(descendant.getTypeRef())) {
-              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
-              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+
+            boolean isInherited = !itemProperties.containsKey(property.getName());
+            boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
+            if (isInherited && !isGeneric) {
+              continue;
+            }
+
+            Property toAdd = new PropertyBuilder(property).withModifiers(0).addToAttributes(ORIGIN_TYPEDEF, item)
+                .addToAttributes(OUTER_INTERFACE, fluentType).addToAttributes(OUTER_CLASS, fluentImplType)
+                .addToAttributes(GENERIC_TYPE_REF, genericType.toReference()).withComments().withAnnotations().build();
+
+            boolean isBuildable = isBuildable(unwrapped);
+            boolean isArray = Types.isArray(toAdd.getTypeRef());
+            boolean isSet = Types.isSet(toAdd.getTypeRef());
+            boolean isList = Types.isList(toAdd.getTypeRef());
+            boolean isMap = Types.isMap(toAdd.getTypeRef());
+            boolean isMapWithBuildableValue = isMap && isBuildable(TypeAs.UNWRAP_MAP_VALUE_OF.apply(unwrapped));
+            boolean isAbstract = isAbstract(unwrapped);
+            boolean isOptional = Types.isOptional(toAdd.getTypeRef()) || Types.isOptionalInt(toAdd.getTypeRef())
+                || Types.isOptionalDouble(toAdd.getTypeRef()) || Types.isOptionalLong(toAdd.getTypeRef());
+
+            Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
+            toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
+
+            if (isArray) {
+              Property asList = arrayAsList(toAdd);
+              methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
+              methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
+              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(asList));
+              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
+              toAdd = asList;
+            } else if (isSet || isList) {
+              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
+              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
+              methods.addAll(ToMethod.GETTER.apply(toAdd));
+              methods.add(ToMethod.WITH.apply(toAdd));
+              methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
+            } else if (isMap) {
+              if (isMapWithBuildableValue && !isAbstract) {
+                methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(toAdd));
+              } else if (!descendants.isEmpty()) {
+                for (Property descendant : descendants) {
+                  methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(descendant));
+                }
+              }
+              methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
+              methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
+              methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
+              methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
+              methods.addAll(ToMethod.GETTER.apply(toAdd));
+              methods.add(ToMethod.WITH.apply(toAdd));
+            } else if (isOptional) {
+              methods.addAll(ToMethod.GETTER.apply(toAdd));
+              methods.addAll(ToMethod.WITH_OPTIONAL.apply(toAdd));
             } else {
-              methods.add(ToMethod.WITH.apply(descendant));
+              toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).accept(new InitEnricher())
+                  .build();
+              methods.addAll(ToMethod.GETTER.apply(toAdd));
+              methods.add(ToMethod.WITH.apply(toAdd));
             }
+            methods.add(ToMethod.HAS.apply(toAdd));
+            methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
 
-            if (isList || isArray) {
-              methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(descendant));
+            if (isMap) {
+              if (isMapWithBuildableValue && !isAbstract) {
+                nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
+              } else if (!descendants.isEmpty()) {
+                for (Property descendant : descendants) {
+                  nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
+                }
+              }
+            } else if (isBuildable && !isAbstract) {
+              methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
+              methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
+              if (isList || isArray) {
+                methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
+                methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
+              } else if (!isSet) {
+                methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
+                methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
+                methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
+              }
+              nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
+            } else if (!descendants.isEmpty()) {
+              for (Property descendant : descendants) {
+                if (Types.isCollection(descendant.getTypeRef())) {
+                  methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
+                  methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+                } else {
+                  methods.add(ToMethod.WITH.apply(descendant));
+                }
+
+                if (isList || isArray) {
+                  methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(descendant));
+                }
+                methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
+                methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
+                methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
+                nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
+              }
             }
-            methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
-            methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
-            methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
-            nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
           }
+
+          return new TypeDefBuilder(fluentType).withComments("Generated").withAnnotations().withInnerTypes(nestedClazzes)
+              .withMethods(methods).build();
+
         }
-      }
+      });
 
-      return new TypeDefBuilder(fluentType).withComments("Generated").withAnnotations().withInnerTypes(nestedClazzes)
-          .withMethods(methods).build();
-
-    }
-  });
-
-  public static final Function<TypeDef, TypeDef> FLUENT_IMPL = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
-    public TypeDef apply(TypeDef item) {
+  public static final Function<RichTypeDef, TypeDef> FLUENT_IMPL = FunctionFactory.wrap(new Function<RichTypeDef, TypeDef>() {
+    public TypeDef apply(RichTypeDef item) {
       List<Method> constructors = new ArrayList<Method>();
       List<Method> methods = new ArrayList<Method>();
       List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
@@ -201,7 +217,8 @@ public class ClazzAs {
       constructors.add(emptyConstructor);
       constructors.add(instanceConstructor);
 
-      for (final Property property : item.getProperties()) {
+      Map<String, Property> itemProperties = item.getProperties().stream().collect(Collectors.toMap(Property::getName, p -> p));
+      for (final Property property : item.getAllProperties()) {
         final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
             .apply(property.getTypeRef());
 
@@ -209,6 +226,11 @@ public class ClazzAs {
           continue;
         }
         if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
+          continue;
+        }
+        boolean isInherited = !itemProperties.containsKey(property.getName());
+        boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
+        if (isInherited && !isGeneric) {
           continue;
         }
 
@@ -342,8 +364,8 @@ public class ClazzAs {
     }
   });
 
-  public static final Function<TypeDef, TypeDef> BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
-    public TypeDef apply(final TypeDef item) {
+  public static final Function<RichTypeDef, TypeDef> BUILDER = FunctionFactory.wrap(new Function<RichTypeDef, TypeDef>() {
+    public TypeDef apply(final RichTypeDef item) {
       final boolean validationEnabled = item.hasAttribute(VALIDATION_ENABLED) ? item.getAttribute(VALIDATION_ENABLED) : false;
       final Modifier[] modifiers = item.isAbstract() ? new Modifier[] { Modifier.PUBLIC, Modifier.ABSTRACT }
           : new Modifier[] { Modifier.PUBLIC };
@@ -538,27 +560,28 @@ public class ClazzAs {
 
   });
 
-  public static final Function<TypeDef, TypeDef> EDITABLE_BUILDER = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
-    public TypeDef apply(final TypeDef item) {
-      final Modifier[] modifiers = item.isAbstract() ? new Modifier[] { Modifier.PUBLIC, Modifier.ABSTRACT }
-          : new Modifier[] { Modifier.PUBLIC };
+  public static final Function<RichTypeDef, TypeDef> EDITABLE_BUILDER = FunctionFactory
+      .wrap(new Function<RichTypeDef, TypeDef>() {
+        public TypeDef apply(final RichTypeDef item) {
+          final Modifier[] modifiers = item.isAbstract() ? new Modifier[] { Modifier.PUBLIC, Modifier.ABSTRACT }
+              : new Modifier[] { Modifier.PUBLIC };
 
-      final TypeDef editable = EDITABLE.apply(item);
-      return new TypeDefBuilder(BUILDER.apply(item)).withComments("Generated").withAnnotations()
-          .accept(new TypedVisitor<MethodBuilder>() {
-            public void visit(MethodBuilder builder) {
-              if (builder.getName() != null && builder.getName().equals("build")) {
-                builder.withModifiers(Types.modifiersToInt(modifiers));
-                builder.withReturnType(editable.toInternalReference());
-                builder.withNewBlock().withStatements(toBuild(editable, editable)).endBlock();
-              }
-            }
-          }).build();
-    }
-  });
+          final TypeDef editable = EDITABLE.apply(item);
+          return new TypeDefBuilder(BUILDER.apply(item)).withComments("Generated").withAnnotations()
+              .accept(new TypedVisitor<MethodBuilder>() {
+                public void visit(MethodBuilder builder) {
+                  if (builder.getName() != null && builder.getName().equals("build")) {
+                    builder.withModifiers(Types.modifiersToInt(modifiers));
+                    builder.withReturnType(editable.toInternalReference());
+                    builder.withNewBlock().withStatements(toBuild(editable, editable)).endBlock();
+                  }
+                }
+              }).build();
+        }
+      });
 
-  public static final Function<TypeDef, TypeDef> EDITABLE = FunctionFactory.wrap(new Function<TypeDef, TypeDef>() {
-    public TypeDef apply(TypeDef item) {
+  public static final Function<RichTypeDef, TypeDef> EDITABLE = FunctionFactory.wrap(new Function<RichTypeDef, TypeDef>() {
+    public TypeDef apply(RichTypeDef item) {
       Modifier[] modifiers = item.isAbstract() ? new Modifier[] { Modifier.PUBLIC, Modifier.ABSTRACT }
           : new Modifier[] { Modifier.PUBLIC };
 
@@ -595,7 +618,7 @@ public class ClazzAs {
     }
   });
 
-  public static final Function<TypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
+  public static final Function<RichTypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
 
   private static String staticAdapterBody(TypeDef pojo, TypeDef pojoBuilder, TypeDef source, boolean returnBuilder) {
     StringBuilder sb = new StringBuilder();

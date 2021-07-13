@@ -24,6 +24,7 @@ import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ToPojo;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.model.utils.TypeArguments;
 
 public class SimpleAnnotationTest extends AbstractProcessorTest {
 
@@ -33,7 +34,7 @@ public class SimpleAnnotationTest extends AbstractProcessorTest {
   @Test
   public void testPojo() {
     System.out.println(simpleClassDef);
-    TypeDef pojo = new ToPojo().apply(simpleClassDef);
+    TypeDef pojo = new ToPojo().apply(TypeArguments.apply(simpleClassDef));
     Assert.assertNotNull(pojo);
   }
 

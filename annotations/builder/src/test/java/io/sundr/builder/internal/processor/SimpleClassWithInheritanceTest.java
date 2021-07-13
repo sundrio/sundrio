@@ -29,16 +29,19 @@ import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.model.utils.TypeArguments;
 
 public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
 
   private final AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
 
   TypeDef simpleClassDef = Sources.readTypeDefFromResource("SimpleClass.java", context);
-  TypeDef simpleClassWithDateDef = Sources.readTypeDefFromResource("SimpleClassWithDate.java", context);
+  RichTypeDef simpleClassWithDateDef = TypeArguments
+      .apply(Sources.readTypeDefFromResource("SimpleClassWithDate.java", context));
 
   @Before
   public void setUp() {

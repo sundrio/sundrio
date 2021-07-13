@@ -48,9 +48,11 @@ import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.utils.TypeArguments;
 import io.sundr.model.utils.Types;
 
 public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingProcessor {
@@ -207,24 +209,25 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     int total = ctx.getBuildableRepository().getBuildables().size();
     int count = 0;
     for (TypeDef typeDef : buildables) {
+      RichTypeDef richTypeDef = TypeArguments.apply(typeDef);
       double percentage = 100d * (count++) / total;
       System.err.printf("\033[2K%3d%% Generating: %s\r", Math.round(percentage), typeDef.getFullyQualifiedName());
 
-      generate(ClazzAs.FLUENT_INTERFACE.apply(typeDef));
+      generate(ClazzAs.FLUENT_INTERFACE.apply(richTypeDef));
       if (typeDef.isInterface() || typeDef.isAnnotation()) {
         continue;
       }
 
-      generate(ClazzAs.FLUENT_IMPL.apply(typeDef));
+      generate(ClazzAs.FLUENT_IMPL.apply(richTypeDef));
       if (typeDef.isAbstract()) {
         continue;
       }
 
       if (typeDef.getAttributes().containsKey(EDITABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDITABLE_ENABLED)) {
-        generate(ClazzAs.EDITABLE_BUILDER.apply(typeDef));
-        generate(ClazzAs.EDITABLE.apply(typeDef));
+        generate(ClazzAs.EDITABLE_BUILDER.apply(richTypeDef));
+        generate(ClazzAs.EDITABLE.apply(richTypeDef));
       } else {
-        generate(ClazzAs.BUILDER.apply(typeDef));
+        generate(ClazzAs.BUILDER.apply(richTypeDef));
       }
 
       Buildable buildable = typeDef.getAttribute(BUILDABLE);
@@ -251,8 +254,9 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     Set<TypeDef> additonalBuildables = new HashSet<>();
     Set<TypeDef> additionalTypes = new HashSet<>();
     for (TypeDef typeDef : buildables) {
+      RichTypeDef richTypeDef = TypeArguments.apply(typeDef);
       if (typeDef.isInterface() || typeDef.isAnnotation()) {
-        typeDef = ClazzAs.POJO.apply(typeDef);
+        typeDef = ClazzAs.POJO.apply(richTypeDef);
         builderContext.getDefinitionRepository().register(typeDef);
         builderContext.getBuildableRepository().register(typeDef);
         generate(typeDef);
