@@ -17,9 +17,15 @@
 
 package io.sundr.model.visitors;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.sundr.builder.TypedVisitor;
+import io.sundr.model.AttributeKey;
+import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.MethodFluent;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
@@ -28,13 +34,23 @@ import io.sundr.utils.Maps;
 public class ApplyTypeParamMappingToMethod extends TypedVisitor<MethodFluent<?>> {
 
   private final Map<String, TypeRef> mappings;
+  private final Optional<AttributeKey<TypeParamRef>> attributeKey;
 
   public ApplyTypeParamMappingToMethod(String name, TypeRef typeRef) {
     this(Maps.create(name, typeRef));
   }
 
   public ApplyTypeParamMappingToMethod(Map<String, TypeRef> mappings) {
+    this(mappings, Optional.empty());
+  }
+
+  public ApplyTypeParamMappingToMethod(Map<String, TypeRef> mappings, AttributeKey<TypeParamRef> attributeKey) {
+    this(mappings, Optional.ofNullable(attributeKey));
+  }
+
+  public ApplyTypeParamMappingToMethod(Map<String, TypeRef> mappings, Optional<AttributeKey<TypeParamRef>> attributeKey) {
     this.mappings = mappings;
+    this.attributeKey = attributeKey;
   }
 
   @Override
@@ -46,6 +62,16 @@ public class ApplyTypeParamMappingToMethod extends TypedVisitor<MethodFluent<?>>
       TypeRef paramRef = mappings.get(key);
       if (paramRef != null) {
         method.withReturnType(paramRef);
+        attributeKey.ifPresent(k -> method.addToAttributes(k, typeParamRef));
+      }
+    } else if (typeRef instanceof ClassRef) {
+      ClassRef classRef = (ClassRef) typeRef;
+      if (classRef.getArguments().stream().anyMatch(a -> a instanceof TypeParamRef)) {
+        List<TypeRef> mappedArguments = classRef.getArguments().stream()
+            .map(a -> a instanceof TypeParamRef ? mappings.getOrDefault(((TypeParamRef) a).getName(), a) : a)
+            .collect(Collectors.toList());
+        method.withReturnType(new ClassRefBuilder(classRef).withArguments(mappedArguments).build());
+        attributeKey.ifPresent(k -> method.addToAttributes(k, classRef));
       }
     }
   }
