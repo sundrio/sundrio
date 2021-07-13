@@ -28,16 +28,19 @@ import io.sundr.adapter.source.utils.Sources;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.model.utils.TypeArguments;
 
 public class SimpleClassWithParameterTest extends AbstractProcessorTest {
 
   private final AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
 
   TypeDef stringDef = Adapters.adaptType(String.class, context);
-  TypeDef simpleClassWithParameterDef = Sources.readTypeDefFromResource("SimpleClassWithParameter.java", context);
+  RichTypeDef simpleClassWithParameterDef = TypeArguments
+      .apply(Sources.readTypeDefFromResource("SimpleClassWithParameter.java", context));
 
   @Test
   public void testFluent() {

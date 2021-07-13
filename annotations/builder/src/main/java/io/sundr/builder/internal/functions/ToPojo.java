@@ -72,6 +72,7 @@ import io.sundr.model.MethodBuilder;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.Statement;
 import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
@@ -82,10 +83,11 @@ import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.model.utils.Collections;
 import io.sundr.model.utils.Getter;
+import io.sundr.model.utils.TypeArguments;
 import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
-public class ToPojo implements Function<TypeDef, TypeDef> {
+public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   private static final String TO_STRING_ARRAY_TEXT = loadResourceQuietly(TO_STRING_ARRAY_SNIPPET);
 
@@ -108,7 +110,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
     }
   };
 
-  public TypeDef apply(TypeDef item) {
+  public TypeDef apply(RichTypeDef item) {
 
     List<Property> arguments = new CopyOnWriteArrayList<>();
     List<Property> fields = new CopyOnWriteArrayList<>();
@@ -266,12 +268,12 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
                       .build();
 
               TypeDef p = hasPojoAnnotation(GetDefinition.of(ref))
-                  ? POJO.apply(GetDefinition.of(ref))
-                  : POJO.apply(new TypeDefBuilder(GetDefinition.of(ref))
+                  ? POJO.apply(TypeArguments.apply(GetDefinition.of(ref)))
+                  : POJO.apply(TypeArguments.apply(new TypeDefBuilder(GetDefinition.of(ref))
                       .withAnnotations(annotationRefs)
                       .addToAnnotations(inheritedPojoRef)
                       .withAttributes(item.getAttributes())
-                      .build());
+                      .build()));
 
               additionalBuildables.add(p);
               //create a reference and apply dimension
@@ -412,7 +414,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
         .addToAttributes(item.getAttributes())
         .build();
 
-    TypeDef pojoBuilder = BUILDER.apply(generatedPojo);
+    TypeDef pojoBuilder = BUILDER.apply(TypeArguments.apply(generatedPojo));
 
     if (enableStaticBuilder) {
       Method staticBuilder = new MethodBuilder()
@@ -1133,7 +1135,7 @@ public class ToPojo implements Function<TypeDef, TypeDef> {
       String annotationFQCN = stringVal.substring(1);
       TypeDef annotationDef = DefinitionRepository.getRepository().getDefinition(annotationFQCN);
       if (annotationDef != null) {
-        TypeDef pojoDef = ClazzAs.POJO.apply(annotationDef);
+        TypeDef pojoDef = ClazzAs.POJO.apply(TypeArguments.apply(annotationDef));
 
         Optional<AnnotationRef> pojoAnnotation = getPojoAnnotation(pojoDef);
         Optional<Method> builderFromDefaults = getBuilderFromDefaults(pojoDef);

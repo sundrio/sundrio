@@ -32,6 +32,7 @@ import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.utils.TypeArguments;
 
 public class ClazzAsTest {
 
@@ -58,7 +59,7 @@ public class ClazzAsTest {
         .withConstructors(constructor)
         .build();
 
-    TypeDef result = ClazzAs.FLUENT_IMPL.apply(type);
+    TypeDef result = ClazzAs.FLUENT_IMPL.apply(TypeArguments.apply(type));
     System.out.println(result);
   }
 }
