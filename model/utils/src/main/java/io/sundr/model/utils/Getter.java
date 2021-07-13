@@ -18,15 +18,17 @@ package io.sundr.model.utils;
 
 import static io.sundr.utils.Strings.capitalizeFirst;
 
+import java.util.stream.Collectors;
+
 import io.sundr.SundrException;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.VoidRef;
 import io.sundr.model.functions.Assignable;
-import io.sundr.model.repo.DefinitionRepository;
 
 public class Getter {
 
@@ -55,37 +57,34 @@ public class Getter {
    * @return The getter method if found. Throws exception if no getter is matched.
    */
   public static Method find(TypeDef clazz, Property property, boolean acceptPrefixless) {
-    TypeDef current = clazz;
-    while (current != null && !current.equals(TypeDef.OBJECT)) {
-      //1st pass strict
-      for (Method method : current.getMethods()) {
-        if (isApplicable(method, property, true, false)) {
-          return method;
-        }
+    RichTypeDef richType = clazz instanceof RichTypeDef ? (RichTypeDef) clazz : TypeArguments.apply(clazz);
+    //1st pass strict
+    for (Method method : richType.getAllMethods()) {
+      if (isApplicable(method, property, true, false)) {
+        return method;
       }
-      //2nd pass relaxed
-      for (Method method : current.getMethods()) {
-        if (isApplicable(method, property, false, false)) {
-          return method;
-        }
+    }
+    //2nd pass relaxed
+    for (Method method : richType.getAllMethods()) {
+      if (isApplicable(method, property, false, false)) {
+        return method;
       }
+    }
 
-      //3nd pass more relaxed
-      if (acceptPrefixless) {
-        for (Method method : current.getMethods()) {
-          if (isApplicable(method, property, false, true)) {
-            return method;
-          }
+    //3nd pass more relaxed
+    if (acceptPrefixless) {
+      for (Method method : richType.getAllMethods()) {
+        if (isApplicable(method, property, false, true)) {
+          return method;
         }
       }
-      if (!current.getExtendsList().iterator().hasNext()) {
-        break;
-      }
-      String fqn = current.getExtendsList().iterator().next().getFullyQualifiedName();
-      current = DefinitionRepository.getRepository().getDefinition(fqn);
     }
     throw new SundrException(
-        "No getter found for property: " + property.getName() + " on class: " + clazz.getFullyQualifiedName());
+        "No getter found for property: [" + property.toString() + "] on class: " + clazz.getFullyQualifiedName()
+            + ", getters found: ["
+            + richType.getAllMethods().stream().filter(Getter::is).map(m -> m.getReturnType() + " " + m.getName())
+                .collect(Collectors.joining(","))
+            + "]");
   }
 
   /**
