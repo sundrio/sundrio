@@ -16,33 +16,19 @@
 
 package io.sundr.builder.internal.functions;
 
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-
 import org.junit.Test;
 
-import com.sun.tools.javac.model.JavacElements;
-import com.sun.tools.javac.model.JavacTypes;
-import com.sun.tools.javac.util.Context;
-
 import io.sundr.builder.Constants;
-import io.sundr.builder.internal.BuilderContext;
-import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.processor.AbstractProcessorTest;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 
-public class ClazzAsTest {
-
-  private final Context context = new Context();
-  private final Elements elements = JavacElements.instance(context);
-  private final Types types = JavacTypes.instance(context);
+public class ClazzAsTest extends AbstractProcessorTest {
 
   @Test
   public void testToFluent() {
-    BuilderContext builderContext = BuilderContextManager.create(elements, types);
-
     TypeDef type = new TypeDefBuilder()
         .withName("MyClass")
         .withPackageName(getClass().getPackage().getName())
