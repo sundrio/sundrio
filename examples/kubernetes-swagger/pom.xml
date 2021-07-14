@@ -142,6 +142,16 @@
               <swagger.codegen.skip>false</swagger.codegen.skip>
           </properties>
       </profile>
+      <profile>
+        <id>jdk16</id>
+        <!-- Swagger has issues with jdk16+ and requires special env set up so let's skip -->
+        <activation>
+          <jdk>[16,)</jdk>
+        </activation>
+        <properties>
+          <swagger.codegen.skip>true</swagger.codegen.skip>
+        </properties>
+      </profile>
   </profiles>
 
 </project>
