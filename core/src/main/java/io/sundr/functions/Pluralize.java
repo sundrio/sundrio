@@ -29,12 +29,12 @@ public enum Pluralize implements Function<String, String> {
 
   private static final List<Function<String, String>> PLURALS = Arrays.<Function<String, String>> asList(
       //Irregulars
-      new StringReplace("(p)eople$", "$1erson"),
-      new StringReplace("(m)en$", "$1an"),
-      new StringReplace("(c)hildren$", "$1hild"),
-      new StringReplace("(s)exes$", "$1ex"),
-      new StringReplace("(m)oves$", "$1ove"),
-      new StringReplace("(s)tadiums$", "$1tadium"),
+      new StringReplace("(p)erson$", "$1eople"),
+      new StringReplace("(m)an$", "$1en"),
+      new StringReplace("(c)hild$", "$1hildren"),
+      new StringReplace("(s)ex$", "$1exes"),
+      new StringReplace("(m)ove$", "$1oves"),
+      new StringReplace("(s)tadium$", "$1tadiums"),
 
       //Rules
       new StringReplace("(quiz)$", "$1zes"),
