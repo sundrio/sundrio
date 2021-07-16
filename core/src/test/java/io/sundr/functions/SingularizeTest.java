@@ -26,10 +26,12 @@ public class SingularizeTest {
   public void testSingularize() {
 
     assertEquals("address", Singularize.FUNCTION.apply("addresses"));
-    assertEquals("ADDRESS", Singularize.FUNCTION.apply("ADDRESSES"));
+    assertEquals("Address", Singularize.FUNCTION.apply("Addresses"));
 
     assertEquals("number", Singularize.FUNCTION.apply("numbers"));
-    assertEquals("NUMBER", Singularize.FUNCTION.apply("NUMBERS"));
-  }
+    assertEquals("Number", Singularize.FUNCTION.apply("Numbers"));
 
+    assertEquals("child", Singularize.FUNCTION.apply("children"));
+    assertEquals("Child", Singularize.FUNCTION.apply("Children"));
+  }
 }
