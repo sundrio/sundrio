@@ -20,21 +20,18 @@
         <artifactId>sundr-pom</artifactId>
         <groupId>io.sundr</groupId>
         <version>0.40-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
-    <artifactId>examples</artifactId>
-    <name>Sundrio :: Examples</name>
+    <groupId>io.sundr.examples</groupId>
+    <artifactId>builder-examples-pom</artifactId>
+    <name>Sundrio :: Examples :: Builder :: POM</name>
     <packaging>pom</packaging>
 
-
     <modules>
-        <module>builder</module>
-        <module>crud</module>
-        <module>curator-dsl</module>
-        <module>kubernetes-dsl</module>
-        <module>kubernetes-swagger</module>
-        <module>validation</module>
+      <module>hello-world</module>
+      <module>hello-nested</module>
     </modules>
+
 </project>
