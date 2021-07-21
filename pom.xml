@@ -106,7 +106,6 @@
         <module>maven-plugin</module>
         <module>annotations</module>
         <module>components</module>
-        <module>examples</module>
         <module>tests</module>
     </modules>
     
@@ -295,6 +294,13 @@
                  </dependencies>
              </dependencyManagement>
         </profile>
+        <profile>
+             <id>with-examples</id>
+             <modules>
+               <module>examples</module>
+             </modules>
+        </profile>
+ 
     </profiles>
 
     <distributionManagement>
