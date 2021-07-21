@@ -440,7 +440,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     }
 
     for (AnnotationRef annotationRef : annotations) {
-      sb.append(annotationRef.toString()).append(SPACE);
+      renderAnnotations(indent);
     }
 
     renderDefinition(sb);
