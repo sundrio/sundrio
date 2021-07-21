@@ -60,7 +60,7 @@ public class DefinitionRepository {
    * The scoped instance is something that may be used in the context of a {@link Function} or a {@link Callable}.
    * So, when this method is used from within a call to Definition.withRepository(repo).call(...) it will return the value of
    * repo instead of the Singleton intance.
-   * The same goes for Definition.withNewRepository(repo -> { ... }).
+   * The same goes for Definition.withNewRepository(repo -{@literal >} { ... }).
    * 
    * @return the scoped instance if called from within withRepo/withNewRepo lambda, or the singleton instance otherwise.
    */

@@ -121,7 +121,6 @@ public class CodeGenerator<T> {
   /**
    * Generate one or more items
    * 
-   * @param <T> the type of items to generate
    * @param items the items to generate
    * @return true if generation was succesful, false otherwise
    */

@@ -20,7 +20,7 @@ package io.sundr.codegen.api;
 import java.util.function.Function;
 
 /**
- * The part of the CodeGenerator that renders an instance of <T> into a {@link String}.
+ * The part of the CodeGenerator that renders an instance of {@literal <}T{@literal >} into a {@link String}.
  */
 public interface Renderer<T> {
 
@@ -36,7 +36,7 @@ public interface Renderer<T> {
   /**
    * The rendering method.
    * 
-   * @param the item to render
+   * @param item the item to render
    * @return the {@link String} representation of the item.
    */
   default String render(T item) {

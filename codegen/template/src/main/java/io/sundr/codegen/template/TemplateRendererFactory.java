@@ -40,7 +40,7 @@ public abstract class TemplateRendererFactory {
   /**
    * Check if the renderer supports the specified template.
    * 
-   * @param content The template content.
+   * @param templateUrl The template url.
    * @return true if content is supported, false otherwise.
    */
   public boolean accepts(URL templateUrl) {

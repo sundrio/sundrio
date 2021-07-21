@@ -30,7 +30,7 @@ public class ArtifactUtil {
   /**
    * Extracts the groupId from the specified coordinates
    * 
-   * @param the maven coordinates
+   * @param coordinates the maven coordinates
    * @return the groupId
    */
   public static String groupId(String coordinates) {
@@ -40,7 +40,7 @@ public class ArtifactUtil {
   /**
    * Extracts the artifactId from the specified coordinates
    * 
-   * @param the maven coordinates
+   * @param coordinates the maven coordinates
    * @return the artifactId
    */
   public static String artifactId(String coordinates) {
@@ -50,7 +50,7 @@ public class ArtifactUtil {
   /**
    * Extracts the version from the specified coordinates
    * 
-   * @param the maven coordinates
+   * @param coordinates the maven coordinates
    * @return the version
    */
   public static String version(String coordinates) {
@@ -60,7 +60,7 @@ public class ArtifactUtil {
   /**
    * Extracts the classifier from the specified coordinates
    * 
-   * @param the maven coordinates
+   * @param coordinates the maven coordinates
    * @return the classifier as an {@link Optional} string.
    */
   public static Optional<String> classifier(String coordinates) {
