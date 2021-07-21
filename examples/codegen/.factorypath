@@ -1,0 +1,6 @@
+<factorypath>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/sundr/sundr-core/0.30.5/sundr-core-0.30.5.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/sundr/builder-annotations/0.30.5/builder-annotations-0.30.5.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/sundr/sundr-codegen/0.30.5/sundr-codegen-0.30.5.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/io/sundr/resourcecify-annotations/0.30.5/resourcecify-annotations-0.30.5.jar" enabled="true" runInBatchMode="false"/>
+</factorypath>
