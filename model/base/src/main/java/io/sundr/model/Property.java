@@ -112,7 +112,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   protected String getDefaultValue() {
     Object value = getAttribute(INIT);
     if (getTypeRef() instanceof ClassRef && ((ClassRef) getTypeRef()).getFullyQualifiedName().equals(JAVA_LANG_STRING)
-        && !String.valueOf(value).startsWith("\"")) {
+        && getTypeRef().getDimensions() == 0 && !String.valueOf(value).startsWith("\"")) {
       return "\"" + value + "\"";
     } else {
       return String.valueOf(value);
