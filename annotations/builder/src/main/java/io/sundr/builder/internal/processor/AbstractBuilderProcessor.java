@@ -211,13 +211,11 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     for (TypeDef typeDef : buildables) {
       RichTypeDef richTypeDef = TypeArguments.apply(typeDef);
       double percentage = 100d * (count++) / total;
-      System.err.printf("\033[2K%3d%% Generating: %s\r", Math.round(percentage), typeDef.getFullyQualifiedName());
-
-      generate(ClazzAs.FLUENT_INTERFACE.apply(richTypeDef));
       if (typeDef.isInterface() || typeDef.isAnnotation()) {
         continue;
       }
-
+      System.err.printf("\033[2K%3d%% Generating: %s\r", Math.round(percentage), typeDef.getFullyQualifiedName());
+      generate(ClazzAs.FLUENT_INTERFACE.apply(richTypeDef));
       generate(ClazzAs.FLUENT_IMPL.apply(richTypeDef));
       if (typeDef.isAbstract()) {
         continue;
