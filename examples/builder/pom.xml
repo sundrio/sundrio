@@ -34,4 +34,16 @@
       <module>hello-nested</module>
     </modules>
 
+    <profiles>
+      <profile>
+        <id>jdk16+</id>
+        <activation>
+          <jdk>[16,)</jdk>
+        </activation>
+        <modules>
+          <module>hello-record</module>
+        </modules>
+      </profile>
+    </profiles>
+ 
 </project>
