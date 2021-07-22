@@ -60,7 +60,7 @@ public class Getter {
     RichTypeDef richType = clazz instanceof RichTypeDef ? (RichTypeDef) clazz : TypeArguments.apply(clazz);
     //1st pass strict
     for (Method method : richType.getAllMethods()) {
-      if (isApplicable(method, property, true, false)) {
+      if ((Record.is(clazz) && isApplicable(method, property, true, true)) || (isApplicable(method, property, true, false))) {
         return method;
       }
     }
