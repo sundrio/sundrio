@@ -221,7 +221,8 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         continue;
       }
 
-      if (typeDef.getAttributes().containsKey(EDITABLE_ENABLED) && (Boolean) typeDef.getAttributes().get(EDITABLE_ENABLED)) {
+      if (!typeDef.isFinal() && typeDef.getAttributes().containsKey(EDITABLE_ENABLED)
+          && (Boolean) typeDef.getAttributes().get(EDITABLE_ENABLED)) {
         generate(ClazzAs.EDITABLE_BUILDER.apply(richTypeDef));
         generate(ClazzAs.EDITABLE.apply(richTypeDef));
       } else {
