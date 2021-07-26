@@ -30,7 +30,7 @@ public class Adapters {
 
   public static <T, R, P, M> TypeDef adaptType(T input, AdapterContextAware ctx) {
     if (input == null) {
-      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is not allowed!");
     }
     return getAdapterForType(input.getClass(), ctx).map(a -> a.adaptType(input))
         .orElseThrow(() -> new IllegalStateException("No adapter found for type: " + input.getClass()));
@@ -38,7 +38,7 @@ public class Adapters {
 
   public static <T, R, P, M> TypeRef adaptReference(R input, AdapterContextAware ctx) {
     if (input == null) {
-      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is not allowed!");
     }
     return getAdapterForReference(input.getClass(), ctx).map(a -> a.adaptReference(input))
         .orElseThrow(() -> new IllegalStateException("No adapter found for reference: " + input.getClass()));
@@ -46,7 +46,7 @@ public class Adapters {
 
   public static <T, R, P, M> Property adaptProperty(P input, AdapterContextAware ctx) {
     if (input == null) {
-      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is not allowed!");
     }
     return getAdapterForProperty(input.getClass(), ctx).map(a -> a.adaptProperty(input))
         .orElseThrow(() -> new IllegalStateException("No adapter found for property: " + input.getClass()));
@@ -54,7 +54,7 @@ public class Adapters {
 
   public static <T, R, P, M> Method adaptMethod(M input, AdapterContextAware ctx) {
     if (input == null) {
-      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is now allowed!");
+      throw new IllegalArgumentException("Adapter.adapt(null, ctx) is not allowed!");
     }
     return getAdapterForMethod(input.getClass(), ctx).map(a -> a.adaptMethod(input))
         .orElseThrow(() -> new IllegalStateException("No adapter found for method: " + input.getClass()));
