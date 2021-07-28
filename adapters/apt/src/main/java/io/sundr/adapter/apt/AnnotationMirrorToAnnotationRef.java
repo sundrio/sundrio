@@ -36,11 +36,13 @@ import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.utils.Types;
 
 public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirror, AnnotationRef> {
 
   private static final String EMPTY_PARENTHESIS = "()";
   private static final String EMPTY = "";
+  private static final String ERROR = "<error>";
 
   private final AptContext context;
   private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
@@ -57,6 +59,7 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
     if (annotationType instanceof ClassRef) {
       for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : item.getElementValues()
           .entrySet()) {
+        checkEntry(entry);
         String key = entry.getKey().toString().replace(EMPTY_PARENTHESIS, EMPTY);
         Object value = mapAnnotationValue(entry.getValue().getValue());
         parameters.put(key, value);
@@ -81,6 +84,22 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
       return referenceAdapterFunction.apply((TypeMirror) value);
     } else {
       return value;
+    }
+  }
+
+  /**
+   * Checks if there is error extracting the specified annotation parameter
+   * 
+   * @param entry the entry that represents the annotation param.
+   */
+  private void checkEntry(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry) {
+    ExecutableElement key = entry.getKey();
+    Object value = entry.getValue().getValue();
+    if (ERROR.equals(value)) {
+      TypeRef returnType = referenceAdapterFunction.apply(key.getReturnType());
+      if (returnType.equals(Types.CLASS)) {
+        throw new SundrException("Failed to extract class parameter from annotation. " + Messages.POTENTIAL_UNRESOLVED_SYMBOL);
+      }
     }
   }
 

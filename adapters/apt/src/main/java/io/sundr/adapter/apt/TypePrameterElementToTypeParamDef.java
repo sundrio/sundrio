@@ -52,7 +52,8 @@ public class TypePrameterElementToTypeParamDef implements Function<TypeParameter
       }
     } catch (Exception e) {
       //if we can't process bound just return the type without any.
-      throw new SundrException("Failed to get bounds of type: " + item.toString() + ". This may be caused due to the compiler not being able to resolve a type. Please check for unresolved symbols!", e);
+      throw new SundrException("Failed to get bounds of type: " + item.toString() + "." + Messages.POTENTIAL_UNRESOLVED_SYMBOL,
+          e);
     }
 
     return new TypeParamDefBuilder().withName(item.getSimpleName().toString()).withBounds(typeRefs).build();

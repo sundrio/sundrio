@@ -30,6 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -40,6 +41,7 @@ import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 
+import io.sundr.SundrException;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
@@ -61,6 +63,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
   private static final String EMPTY_PARENTHESIS = "()";
   private static final String EMPTY = "";
   private static final String NEWLINE_PATTERN = "\r|\n";
+  private static final String ANY = "<any?>";
 
   private final AptContext context;
   private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
@@ -86,6 +89,12 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
   public TypeDef apply(TypeElement classElement) {
     // Check SuperClass
     Kind kind = Kind.CLASS;
+
+    Element enclosing = classElement.getEnclosingElement();
+    if (enclosing != null && ANY.equals(enclosing.getSimpleName().toString())) {
+      throw new SundrException("Failed to read class element:" + classElement.getQualifiedName().toString() + ". "
+          + Messages.POTENTIAL_UNRESOLVED_SYMBOL);
+    }
 
     TypeMirror superClass = classElement.getSuperclass();
     TypeRef superClassType = TypeDef.OBJECT_REF;
