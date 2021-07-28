@@ -24,6 +24,7 @@ import java.util.function.Function;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
 
+import io.sundr.SundrException;
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamDefBuilder;
@@ -42,11 +43,16 @@ public class TypePrameterElementToTypeParamDef implements Function<TypeParameter
   public TypeParamDef apply(TypeParameterElement item) {
     List<ClassRef> typeRefs = new ArrayList<>();
 
-    for (TypeMirror typeMirror : item.getBounds()) {
-      TypeRef typeRef = referenceAdapterFunction.apply(typeMirror);
-      if (typeRef instanceof ClassRef) {
-        typeRefs.add((ClassRef) referenceAdapterFunction.apply(typeMirror));
+    try {
+      for (TypeMirror typeMirror : item.getBounds()) {
+        TypeRef typeRef = referenceAdapterFunction.apply(typeMirror);
+        if (typeRef instanceof ClassRef) {
+          typeRefs.add((ClassRef) referenceAdapterFunction.apply(typeMirror));
+        }
       }
+    } catch (Exception e) {
+      //if we can't process bound just return the type without any.
+      throw new SundrException("Failed to get bounds of type: " + item.toString() + ". This may be caused due to the compiler not being able to resolve a type. Please check for unresolved symbols!", e);
     }
 
     return new TypeParamDefBuilder().withName(item.getSimpleName().toString()).withBounds(typeRefs).build();
