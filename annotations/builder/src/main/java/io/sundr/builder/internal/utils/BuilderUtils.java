@@ -356,7 +356,10 @@ public class BuilderUtils {
       try {
         result.add(context.getElements().getTypeElement(ref.value().getCanonicalName()));
       } catch (MirroredTypeException e) {
-        result.add(context.getElements().getTypeElement(e.getTypeMirror().toString()));
+        Element element = context.getTypes().asElement(e.getTypeMirror());
+        if (element instanceof TypeElement) {
+          result.add((TypeElement) element);
+        }
       }
     }
     return result;
@@ -368,7 +371,10 @@ public class BuilderUtils {
       try {
         result.add(context.getElements().getTypeElement(ref.value().getCanonicalName()));
       } catch (MirroredTypeException e) {
-        result.add(context.getElements().getTypeElement(e.getTypeMirror().toString()));
+        Element element = context.getTypes().asElement(e.getTypeMirror());
+        if (element instanceof TypeElement) {
+          result.add((TypeElement) element);
+        }
       }
     }
     return result;
