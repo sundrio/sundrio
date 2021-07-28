@@ -16,6 +16,8 @@
 
 package io.sundr.model;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -66,6 +68,13 @@ public class AnnotationRef extends AttributeSupport implements Renderable {
   private static String toString(Object value) {
     if (value == null) {
       return "null";
+    } else if (value.getClass().isArray()) {
+      int length = Array.getLength(value);
+      Object[] array = new Object[length];
+      for (int i = 0; i < length; i++) {
+        array[i] = Array.get(value, i);
+      }
+      return OB + Arrays.stream(array).map(AnnotationRef::toString).collect(Collectors.joining(",")) + CB;
     } else if (value instanceof Collection) {
       return OB + ((Collection) value).stream().map(AnnotationRef::toString).collect(Collectors.joining(",")) + CB;
     } else if (value instanceof PrimitiveRef || value instanceof Number || value instanceof Boolean
