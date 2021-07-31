@@ -272,7 +272,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
    * @return a {@link ClassRef} for the currnet type, with the specified type arguments
    */
   public ClassRef toReference(Collection<TypeRef> arguments) {
-    return toReference(arguments);
+    return toReference(new ArrayList<>(arguments));
   }
 
   /**
