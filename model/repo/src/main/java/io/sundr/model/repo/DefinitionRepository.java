@@ -245,6 +245,7 @@ public class DefinitionRepository {
 
   public synchronized void clear() {
     definitions.clear();
+    suppliers.clear();
   }
 
   public static class WithRepo {
