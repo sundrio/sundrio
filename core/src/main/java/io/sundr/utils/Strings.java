@@ -190,10 +190,10 @@ public final class Strings {
     try {
       is = resourceUrl.openStream();
       in = new BufferedReader(new InputStreamReader(is));
-      String line = null;
       StringBuffer sb = new StringBuffer();
-      while ((line = in.readLine()) != null) {
-        sb.append(line).append("\n");
+      int c = 0;
+      while ((c = in.read()) != -1) {
+        sb.append((char) c);
       }
       return sb.toString();
     } finally {

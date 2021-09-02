@@ -83,6 +83,10 @@ public class VelocityRenderer<T> extends TemplateRenderer<T> {
     return Optional.of(new VelocityRenderer<>(templateContent, parameters));
   }
 
+  public static <T> Optional<VelocityRenderer<T>> fromTemplate(String templateContent, Class<T> type, String... parameters) {
+    return Optional.of(new VelocityRenderer<T>(templateContent, parameters));
+  }
+
   public static Optional<VelocityRenderer<?>> fromTemplateUrl(URL templateUrl, String... parameters) {
     try {
       if (templateUrl == null) {
@@ -94,8 +98,24 @@ public class VelocityRenderer<T> extends TemplateRenderer<T> {
     }
   }
 
+  public static <T> Optional<VelocityRenderer<T>> fromTemplateUrl(URL templateUrl, Class<T> type, String... parameters) {
+    try {
+      if (templateUrl == null) {
+        return Optional.empty();
+      }
+      return fromTemplate(loadResource(templateUrl), type, parameters);
+    } catch (IOException e) {
+      throw SundrException.launderThrowable(e);
+    }
+  }
+
   public static Optional<VelocityRenderer<?>> fromTemplateResource(String templateResource, String... parameters) {
     return fromTemplateUrl(VelocityContext.class.getResource(templateResource), parameters);
+  }
+
+  public static <T> Optional<VelocityRenderer<T>> fromTemplateResource(String templateResource, Class<T> type,
+      String... parameters) {
+    return fromTemplateUrl(VelocityContext.class.getResource(templateResource), type, parameters);
   }
 
   @Override

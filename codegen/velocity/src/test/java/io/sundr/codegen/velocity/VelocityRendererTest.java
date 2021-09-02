@@ -26,10 +26,20 @@ import io.sundr.model.TypeDef;
 public class VelocityRendererTest {
 
   @Test
-  public void testVelocityrenderertest() throws Exception {
+  public void testVelocityRendererInline() throws Exception {
     VelocityRenderer<TypeDef> renderer = new VelocityRenderer<>("${model.getFullyQualifiedName()}");
     TypeDef string = TypeDef.forName(String.class.getName());
     String result = renderer.render(string);
     assertEquals(String.class.getName(), result);
+  }
+
+  @Test
+  public void testVelocityRendererFromResource() throws Exception {
+    VelocityRenderer.fromTemplateResource("/template.vm", TypeDef.class).ifPresent(r -> {
+      TypeDef string = TypeDef.forName(String.class.getName());
+      String result = r.render(string);
+      System.out.println(result);
+      assertEquals(String.class.getName(), result);
+    });
   }
 }

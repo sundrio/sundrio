@@ -116,7 +116,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   private String mavenVersion;
 
   @Parameter(defaultValue = "${bom.template.resource}")
-  private String bomTemplateResource = "templates/bom.xml.vm";
+  private String bomTemplateResource = "/templates/bom.xml.vm";
 
   @Parameter(defaultValue = "${bom.template.url}")
   private URL bomTemplateUrl;
@@ -205,7 +205,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
       FileOutput<Model> output = new FileOutput<>(generatedBom);
 
       VelocityRenderer renderer = VelocityRenderer.fromTemplateUrl(bomTemplateUrl)
-          .orElse(VelocityRenderer.fromTemplate(bomTemplateResource)
+          .orElse(VelocityRenderer.fromTemplateResource(bomTemplateResource)
               .orElseThrow(() -> new IllegalStateException("Neither bom template URL nor bom template resource was found.")));
       CodeGenerator.newGenerator(Model.class)
           .withOutput(output)
