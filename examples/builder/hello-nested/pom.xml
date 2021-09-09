@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.sundr</groupId>
     <artifactId>builder-hello-nested-example</artifactId>
-    <version>0.40-SNAPSHOT</version>
+    <version>0.50-SNAPSHOT</version>
     <name>Sundrio :: Examples :: Builder :: Hello Nested</name>
 
     <properties>
