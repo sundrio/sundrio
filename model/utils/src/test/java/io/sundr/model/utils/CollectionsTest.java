@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +38,15 @@ public class CollectionsTest {
   public static final TypeDef LIST = TypeDef.forName(List.class.getName());
   public static final TypeDef ARRAY_LIST = new TypeDefBuilder(TypeDef.forName(ArrayList.class.getName()))
       .withImplementsList(LIST.toInternalReference()).build();
+  public static final TypeDef LINKED_LIST = new TypeDefBuilder(TypeDef.forName(LinkedList.class.getName()))
+      .withImplementsList(LIST.toInternalReference()).build();
   public static final TypeDef MAP = TypeDef.forName(Map.class.getName());
 
   @Test
   public void testCollections() throws Exception {
     DefinitionRepository.getRepository().register(LIST);
     DefinitionRepository.getRepository().register(ARRAY_LIST);
+    DefinitionRepository.getRepository().register(LINKED_LIST);
     DefinitionRepository.getRepository().register(MAP);
 
     ClassRef list = new ClassRefBuilder()
@@ -67,6 +71,17 @@ public class CollectionsTest {
         .endClassRefArgument()
         .build();
 
+    ClassRef linkedList = new ClassRefBuilder()
+        .withFullyQualifiedName("java.util.LinkedList")
+        .build();
+
+    ClassRef linkedListOfString = new ClassRefBuilder()
+        .withFullyQualifiedName("java.util.LinkedList")
+        .addNewClassRefArgument()
+        .withFullyQualifiedName("java.lang.String")
+        .endClassRefArgument()
+        .build();
+
     ClassRef map = new ClassRefBuilder()
         .withFullyQualifiedName("java.util.Map")
         .build();
@@ -75,6 +90,8 @@ public class CollectionsTest {
     assertTrue(Collections.IS_LIST.apply(listOfString));
     assertTrue(Collections.IS_LIST.apply(arrayList));
     assertTrue(Collections.IS_LIST.apply(arrayListOfString));
+    assertTrue(Collections.IS_LIST.apply(linkedList));
+    assertTrue(Collections.IS_LIST.apply(linkedListOfString));
     assertFalse(Collections.IS_LIST.apply(map));
   }
 }
