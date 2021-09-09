@@ -39,6 +39,8 @@ import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.TypeDef;
+import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.utils.Collections;
@@ -78,6 +80,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
           : TypeAs.BUILDER.apply(GetDefinition.of(unwarppedClassRef)).toInternalReference();
     }
 
+    boolean isAbstract = Types.isAbstract(typeRef);
     boolean isArray = Types.isArray(typeRef);
     boolean isSet = Types.isSet(typeRef);
     boolean isList = Types.isList(typeRef);
@@ -88,31 +91,73 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
     boolean isOptionalLong = Types.isOptionalLong(typeRef);
 
     if (isArray || isList) {
-      ClassRef listRef = Collections.ARRAY_LIST.toReference(targetType);
+      ClassRef listRef = isArray || isAbstract
+          ? Collections.ARRAY_LIST.toReference(targetType)
+          : new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).withDimensions(0).build();
+
+      TypeDef listDef = new TypeDefBuilder(TypeDef.forName(listRef.getFullyQualifiedName()))
+          .addNewConstructor()
+          .endConstructor()
+          .addNewConstructor()
+          .addNewArgument()
+          .withTypeRef(Collections.LIST.toReference(arguments))
+          .withName("l")
+          .endArgument()
+          .endConstructor()
+          .build();
+
       builder.addToAttributes(LAZY_INIT, "new " + listRef + "()")
           .addToAttributes(INIT,
               builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED)
                   && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null
                       : builder.getAttributes().get(LAZY_INIT))
-          .addToAttributes(INIT_FUNCTION, new Construct(Collections.ARRAY_LIST, targetType))
+          .addToAttributes(INIT_FUNCTION, new Construct(listDef, targetType))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, listRef));
     } else if (isSet) {
-      ClassRef setRef = Collections.LINKED_HASH_SET.toReference(unwrapped);
+      ClassRef setRef = isArray || isAbstract
+          ? Collections.LINKED_HASH_SET.toReference(targetType)
+          : new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).build();
+
+      TypeDef setDef = new TypeDefBuilder(TypeDef.forName(setRef.getFullyQualifiedName()))
+          .addNewConstructor()
+          .endConstructor()
+          .addNewConstructor()
+          .addNewArgument()
+          .withTypeRef(Collections.SET.toReference(arguments))
+          .withName("s")
+          .endArgument()
+          .endConstructor()
+          .build();
+
       builder.addToAttributes(LAZY_INIT, "new " + setRef + "()")
           .addToAttributes(INIT,
               builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED)
                   && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null
                       : builder.getAttributes().get(LAZY_INIT))
-          .addToAttributes(INIT_FUNCTION, new Construct(Collections.LINKED_HASH_SET, unwrapped))
+          .addToAttributes(INIT_FUNCTION, new Construct(setDef, unwrapped))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, setRef));
     } else if (isMap) {
-      ClassRef mapRef = Collections.LINKED_HASH_MAP.toReference(arguments);
+      ClassRef mapRef = isArray || isAbstract
+          ? Collections.LINKED_HASH_MAP.toReference(arguments)
+          : new ClassRefBuilder((ClassRef) typeRef).withArguments(arguments).build();
+
+      TypeDef mapDef = new TypeDefBuilder(TypeDef.forName(mapRef.getFullyQualifiedName()))
+          .addNewConstructor()
+          .endConstructor()
+          .addNewConstructor()
+          .addNewArgument()
+          .withTypeRef(Collections.MAP.toReference(arguments))
+          .withName("m")
+          .endArgument()
+          .endConstructor()
+          .build();
+
       builder.addToAttributes(LAZY_INIT, "new " + mapRef + "()")
           .addToAttributes(INIT,
               builder.getAttributes().containsKey(LAZY_MAP_INIT_ENABLED)
                   && (Boolean) builder.getAttributes().get(LAZY_MAP_INIT_ENABLED) ? null
                       : builder.getAttributes().get(LAZY_INIT))
-          .addToAttributes(INIT_FUNCTION, new Construct(Collections.LINKED_HASH_MAP, arguments))
+          .addToAttributes(INIT_FUNCTION, new Construct(mapDef, arguments))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, mapRef));
     } else if (isOptional) {
       final ClassRef ref = new ClassRefBuilder(Optionals.OPTIONAL.toReference()).withArguments(java.util.Collections.EMPTY_LIST)
