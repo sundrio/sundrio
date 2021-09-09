@@ -42,6 +42,6 @@ jobs:
       - name: Build Project
         run: |
           if [ -f $JAVA_HOME/lib/tools.jar ]; then
-            mvn install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar -P${{ matrix.profile }};
+            ./mvnw install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar -P${{ matrix.profile }};
           fi
-          mvn ${MAVEN_ARGS} clean install -Pwith-examples
+          ./mvnw ${MAVEN_ARGS} clean install -Pwith-examples
