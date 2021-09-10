@@ -21,6 +21,7 @@ package io.sundr.builder;
  * 
  * @param <T> The type of objects this Builder builds.
  */
+@FunctionalInterface
 public interface Builder<T> {
 
   /**
