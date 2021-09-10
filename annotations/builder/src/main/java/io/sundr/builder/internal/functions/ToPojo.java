@@ -110,6 +110,33 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     }
   };
 
+  public static String getPojoName(TypeDef item) {
+    String pojoName = Strings.toPojoName(item.getName(), "Default", "");
+    for (AnnotationRef r : item.getAnnotations()) {
+      if (r.getClassRef() != null) {
+        if (r.getClassRef().getFullyQualifiedName().equals(Pojo.class.getTypeName())) {
+          Map<String, Object> params = r.getParameters();
+          if (params.containsKey("name")) {
+            pojoName = String.valueOf(r.getParameters().getOrDefault("name", pojoName));
+          } else if (params.containsKey("prefix") || params.containsKey("suffix")) {
+            String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
+            String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
+            pojoName = Strings.toPojoName(item.getName(), prefix, suffix);
+          }
+        }
+      }
+    }
+    return pojoName;
+  }
+
+  public static String getPojoFullyQualifiedName(TypeDef item) {
+    return new TypeDefBuilder(item).withName(getPojoName(item)).build().getFullyQualifiedName();
+  }
+
+  public static ClassRef getPojoRef(TypeDef item) {
+    return new TypeDefBuilder(item).withName(getPojoName(item)).build().toInternalReference();
+  }
+
   public TypeDef apply(RichTypeDef item) {
 
     List<Property> arguments = new CopyOnWriteArrayList<>();
@@ -248,6 +275,10 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       }
 
       for (Method method : t.getMethods()) {
+        //Ignore static methods and methods with arguments.
+        if (method.isStatic() || !method.getArguments().isEmpty()) {
+          continue;
+        }
         //We need all getters and all annotation methods.
         if (Getter.is(method) || t.equals(item)) {
           String name = Getter.propertyNameSafe(method);
