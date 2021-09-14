@@ -428,5 +428,4 @@ public class MyRect extends AbstractShape implements Rectangle {
 }
 ```
     
-    
 

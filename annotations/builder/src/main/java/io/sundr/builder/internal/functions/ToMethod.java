@@ -45,6 +45,7 @@ import static io.sundr.model.utils.Collections.IS_COLLECTION;
 import static io.sundr.model.utils.Collections.IS_LIST;
 import static io.sundr.model.utils.Collections.IS_MAP;
 import static io.sundr.model.utils.Collections.IS_SET;
+import static io.sundr.model.utils.Collections.LIST;
 import static io.sundr.model.utils.Types.BOOLEAN_REF;
 import static io.sundr.model.utils.Types.N_REF;
 import static io.sundr.model.utils.Types.Q;
@@ -263,17 +264,9 @@ class ToMethod {
         parameters.addAll(GetDefinition.of(baseType).getParameters());
       }
 
-      return new MethodBuilder()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .withParameters(parameters)
-          .withName(methodName)
-          .withReturnType(returnType)
-          .withArguments(property)
-          .withVarArgPreferred(true)
-          .withNewBlock()
-          .withStatements(getStatements(property, alsoImport))
-          .endBlock()
-          .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+      return new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
+          .withName(methodName).withReturnType(returnType).withArguments(property).withVarArgPreferred(true).withNewBlock()
+          .withStatements(getStatements(property, alsoImport)).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
           .build();
     }
 
@@ -484,7 +477,13 @@ class ToMethod {
       comments.add("This method has been deprecated, please use method " + builderName + " instead.");
       comments.add("@return The buildable object.");
       if (isList || isSet) {
-        statements.add(new StringStatement("return build(" + property.getName() + ");"));
+        if (isAbstractList || isAbstractSet) {
+          statements.add(
+              new StringStatement("return " + property.getName() + " != null ? build(" + property.getName() + ") : null;"));
+        } else {
+          statements.add(new StringStatement("return " + property.getName() + " != null ? new "
+              + ((ClassRef) property.getTypeRef()).getName() + "(build(" + property.getName() + ")) : null;"));
+        }
       } else if (isOptional) {
         statements.add(new StringStatement("return (" + property.getTypeRef() + ") (this." + property.getName()
             + "!=null && this." + property.getName() + ".isPresent() ? "
@@ -493,7 +492,7 @@ class ToMethod {
             + " : " + property.getAttribute(INIT) + ");"));
       } else {
         statements.add(
-            new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
+            new StringStatement("return this." + property.getName() + "!=null ?this." + property.getName() + ".build():null;"));
       }
     } else if (!descendants.isEmpty()) {
       isNested = true;
@@ -635,14 +634,9 @@ class ToMethod {
           final TypeRef unwrapped = BOXED_OF.apply(combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
           List<ClassRef> alsoImport = new ArrayList<>();
 
-          Property item = new PropertyBuilder(property)
-              .withName("items")
-              .withTypeRef(unwrapped.withDimensions(1))
-              .build();
+          Property item = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
 
-          Property unwrappedProperty = new PropertyBuilder(property)
-              .withName("item")
-              .withTypeRef(unwrapped).build();
+          Property unwrappedProperty = new PropertyBuilder(property).withName("item").withTypeRef(unwrapped).build();
 
           List<TypeParamDef> parameters = new ArrayList<>();
 
@@ -661,38 +655,24 @@ class ToMethod {
             }
           }
 
-          Method addSingleItemAtIndex = new MethodBuilder()
-              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-              .withParameters(parameters)
-              .withName(addVarargMethodName)
-              .withReturnType(returnType)
-              .addToArguments(INDEX)
-              .addToArguments(unwrappedProperty)
-              .withNewBlock()
+          Method addSingleItemAtIndex = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+              .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).addToArguments(INDEX)
+              .addToArguments(unwrappedProperty).withNewBlock()
               .withStatements(
                   new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                       + property.getAttribute(LAZY_INIT) + ";}"),
                   new StringStatement("this." + propertyName + ".add(index, item);"),
                   new StringStatement("return (" + returnType + ")this;"))
-              .endBlock()
-              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-              .build();
+              .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
-          Method setSingleItemAtIndex = new MethodBuilder()
-              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-              .withParameters(parameters)
-              .withName(setMethodName)
-              .withReturnType(returnType)
-              .addToArguments(INDEX)
-              .addToArguments(unwrappedProperty)
-              .withNewBlock()
+          Method setSingleItemAtIndex = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+              .withParameters(parameters).withName(setMethodName).withReturnType(returnType).addToArguments(INDEX)
+              .addToArguments(unwrappedProperty).withNewBlock()
               .withStatements(
                   new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                       + property.getAttribute(LAZY_INIT) + ";}"),
                   new StringStatement("this." + propertyName + ".set(index, item); return (" + returnType + ")this;"))
-              .endBlock()
-              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-              .build();
+              .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           List<Statement> statements = new ArrayList<>();
 
@@ -714,9 +694,7 @@ class ToMethod {
                 + builderClass + "(item);_visitables.get(\"" + propertyName + "\").add(builder);this." + propertyName
                 + ".add(builder);} return (" + returnType + ")this;"));
 
-            addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
-                .withParameters(parameters)
-                .editBlock()
+            addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
@@ -724,12 +702,9 @@ class ToMethod {
                         + propertyName + "\").add(index >= 0 ? index : _visitables.get(\"" + propertyName
                         + "\").size(), builder);this." + propertyName + ".add(index >= 0 ? index : " + propertyName
                         + ".size(), builder); return (" + returnType + ")this;"))
-                .endBlock()
-                .build();
+                .endBlock().build();
 
-            setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex)
-                .withParameters(parameters)
-                .editBlock()
+            setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
@@ -740,8 +715,7 @@ class ToMethod {
                     new StringStatement("if (index < 0 || index >= " + propertyName + ".size()) { " + propertyName
                         + ".add(builder); } else { " + propertyName + ".set(index, builder);}"),
                     new StringStatement(" return (" + returnType + ")this;"))
-                .endBlock()
-                .build();
+                .endBlock().build();
 
           } else if (!descendants.isEmpty()) {
             final ClassRef targetType = (ClassRef) unwrapped;
@@ -756,51 +730,33 @@ class ToMethod {
             statements.add(createAddToDescendantsFallback(targetType.getFullyQualifiedName(), propertyName));
             statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
-            addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex)
-                .withParameters(parameters)
-                .editBlock()
+            addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(createAddToDescendants("addTo", descendants, true),
                     new StringStatement("return (" + returnType + ")this;"))
-                .endBlock()
-                .build();
+                .endBlock().build();
 
-            setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex)
-                .withParameters(parameters)
-                .editBlock()
+            setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(createAddToDescendants("setTo", descendants, true),
                     new StringStatement("return (" + returnType + ")this;"))
-                .endBlock()
-                .build();
+                .endBlock().build();
 
-            methods.add(new MethodBuilder()
-                .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-                .withParameters(parameters)
-                .withName(addVarargMethodName)
-                .withReturnType(returnType)
-                .withArguments(builderProperty)
-                .withNewBlock()
+            methods.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
+                .withName(addVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
                 .addToStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
                     new StringStatement("_visitables.get(\"" + propertyName + "\").add(builder);this." + propertyName
                         + ".add(builder); return (" + returnType + ")this;"))
-                .endBlock()
-                .build());
+                .endBlock().build());
 
-            methods.add(new MethodBuilder()
-                .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-                .withParameters(parameters)
-                .withName(addVarargMethodName)
-                .withReturnType(returnType)
-                .withArguments(INDEX, builderProperty)
-                .withNewBlock()
+            methods.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
+                .withName(addVarargMethodName).withReturnType(returnType).withArguments(INDEX, builderProperty).withNewBlock()
                 .addToStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
                     new StringStatement("_visitables.get(\"" + propertyName + "\").add(index, builder);this." + propertyName
                         + ".add(index, builder); return (" + returnType + ")this;"))
-                .endBlock()
-                .build());
+                .endBlock().build());
 
           } else {
             statements.add(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
@@ -809,35 +765,21 @@ class ToMethod {
                 + ".add(item);} return (" + returnType + ")this;"));
           }
 
-          Method addVaragToCollection = new MethodBuilder()
-              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-              .withParameters(parameters)
-              .withName(addVarargMethodName)
-              .withReturnType(returnType)
-              .withArguments(item)
-              .withVarArgPreferred(true)
-              .withNewBlock()
-              .addAllToStatements(varArgInit)
-              .addAllToStatements(statements)
-              .endBlock()
-              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-              .build();
+          Method addVaragToCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+              .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).withArguments(item)
+              .withVarArgPreferred(true).withNewBlock().addAllToStatements(varArgInit).addAllToStatements(statements).endBlock()
+              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
-          Method addAllToCollection = new MethodBuilder()
-              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-              .withParameters(parameters)
-              .withName(addAllMethodName)
-              .withReturnType(returnType)
-              .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
-              .withNewBlock()
-              .addAllToStatements(collectionInit)
-              .addAllToStatements(statements)
-              .endBlock()
-              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-              .build();
+          Method addAllToCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+              .withParameters(parameters).withName(addAllMethodName).withReturnType(returnType)
+              .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
+              .addAllToStatements(collectionInit).addAllToStatements(statements).endBlock()
+              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
-          methods.add(addSingleItemAtIndex);
-          methods.add(setSingleItemAtIndex);
+          if (io.sundr.model.utils.Collections.IS_LIST.apply(property.getTypeRef())) {
+            methods.add(addSingleItemAtIndex);
+            methods.add(setSingleItemAtIndex);
+          }
           methods.add(addVaragToCollection);
           methods.add(addAllToCollection);
 
@@ -874,10 +816,7 @@ class ToMethod {
           TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
           final TypeRef unwrapped = BOXED_OF.apply(combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
           List<ClassRef> alsoImport = new ArrayList<>();
-          Property item = new PropertyBuilder(property)
-              .withName("items")
-              .withTypeRef(unwrapped.withDimensions(1))
-              .build();
+          Property item = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
 
           List<TypeParamDef> parameters = new ArrayList<>();
 
@@ -904,14 +843,15 @@ class ToMethod {
 
             //We need to do it more elegantly
             alsoImport.add(BUILDER.apply(GetDefinition.of(targetType)).toInternalReference());
+            alsoImport.add(LIST.toInternalReference());
             statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new "
                 + builderClass + "(item);_visitables.get(\"" + propertyName + "\").remove(builder);if (this." + propertyName
                 + " != null) {this." + propertyName + ".remove(builder);}} return (" + returnType + ")this;"));
           } else if (!descendants.isEmpty()) {
             final ClassRef targetType = (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
-            statements.add(new StringStatement(
-                "for (" + targetType.toString() + " item : items) {" + Strings.join(descendants, item1 -> {
+            statements.add(
+                new StringStatement("for (" + targetType.toString() + " item : items) {" + Strings.join(descendants, item1 -> {
                   TypeRef itemRef = combine(UNWRAP_COLLECTION_OF, ARRAY_OF).apply(item1.getTypeRef());
                   String className = ((ClassRef) itemRef).getFullyQualifiedName();
                   String removeFromMethodName = "removeFrom" + item1.getNameCapitalized();
@@ -921,48 +861,27 @@ class ToMethod {
             statements.add(createRemoveFromDescendantsFallback(targetType.getFullyQualifiedName(), property.getName()));
             statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
-            methods.add(new MethodBuilder()
-                .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-                .withParameters(parameters)
-                .withName(removeVarargMethodName)
-                .withReturnType(returnType)
-                .withArguments(builderProperty)
-                .withNewBlock()
+            methods.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
+                .withName(removeVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
                 .addToStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
                     new StringStatement("_visitables.get(\"" + propertyName + "\").remove(builder);this." + propertyName
                         + ".remove(builder); return (" + returnType + ")this;"))
-                .endBlock()
-                .build());
+                .endBlock().build());
           } else {
             statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {if (this." + property.getName()
                 + "!= null){ this." + property.getName() + ".remove(item);}} return (" + returnType + ")this;"));
           }
 
-          Method removeVarargFromCollection = new MethodBuilder()
-              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-              .withName(removeVarargMethodName)
-              .withParameters(parameters)
-              .withReturnType(returnType)
-              .withArguments(item)
-              .withVarArgPreferred(true)
-              .withNewBlock()
-              .withStatements(statements)
-              .endBlock()
-              .build();
+          Method removeVarargFromCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+              .withName(removeVarargMethodName).withParameters(parameters).withReturnType(returnType).withArguments(item)
+              .withVarArgPreferred(true).withNewBlock().withStatements(statements).endBlock().build();
 
-          Method removeAllFromCollection = new MethodBuilder()
-              .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-              .withParameters(parameters)
-              .withName(removeAllMethdoName)
-              .withReturnType(returnType)
-              .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build())
-              .withNewBlock()
-              .withStatements(statements)
-              .endBlock()
-              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-              .build();
+          Method removeAllFromCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+              .withParameters(parameters).withName(removeAllMethdoName).withReturnType(returnType)
+              .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
+              .withStatements(statements).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           methods.add(removeVarargFromCollection);
           methods.add(removeAllFromCollection);
@@ -972,17 +891,10 @@ class ToMethod {
               TypeRef builder = BUILDER.apply(GetDefinition.of((ClassRef) unwrapped)).toInternalReference();
               alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
               alsoImport.add((ClassRef) builderType);
-              methods.add(new MethodBuilder()
-                  .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-                  .withReturnType(returnType)
-                  .withParameters(parameters)
-                  .withName(removeMatchingMethodName)
-                  .addNewArgument()
-                  .withName("predicate")
-                  .withTypeRef(Constants.PREDICATE.toReference(builder))
-                  .endArgument()
-                  .withNewBlock()
+              methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType).withParameters(parameters)
+                  .withName(removeMatchingMethodName).addNewArgument().withName("predicate")
+                  .withTypeRef(Constants.PREDICATE.toReference(builder)).endArgument().withNewBlock()
                   .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
                   .addNewStringStatementStatement("final Iterator<" + builder + "> each = " + propertyName + ".iterator();")
                   .addNewStringStatementStatement("final List visitables = _visitables.get(\"" + propertyName + "\");")
@@ -990,12 +902,9 @@ class ToMethod {
                   .addNewStringStatementStatement("  " + builder + " builder = each.next();")
                   .addNewStringStatementStatement("  if (predicate.test(builder)) {")
                   .addNewStringStatementStatement("    visitables.remove(builder);")
-                  .addNewStringStatementStatement("    each.remove();")
-                  .addNewStringStatementStatement("  }")
-                  .addNewStringStatementStatement("}")
-                  .addNewStringStatementStatement("return (" + returnType + ")this;")
-                  .endBlock()
-                  .build());
+                  .addNewStringStatementStatement("    each.remove();").addNewStringStatementStatement("  }")
+                  .addNewStringStatementStatement("}").addNewStringStatementStatement("return (" + returnType + ")this;")
+                  .endBlock().build());
             } else {
               ClassRef fluentType = FLUENT_REF.apply(GetDefinition.of((ClassRef) unwrapped));
               if (property.hasAttribute(DESCENDANT_OF)) {
@@ -1004,17 +913,10 @@ class ToMethod {
 
               alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
               alsoImport.add((ClassRef) builderType);
-              methods.add(new MethodBuilder()
-                  .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-                  .withReturnType(returnType)
-                  .withParameters(parameters)
-                  .withName(removeMatchingMethodName)
-                  .addNewArgument()
-                  .withName("predicate")
-                  .withTypeRef(Constants.PREDICATE.toReference(builderType))
-                  .endArgument()
-                  .withNewBlock()
+              methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType).withParameters(parameters)
+                  .withName(removeMatchingMethodName).addNewArgument().withName("predicate")
+                  .withTypeRef(Constants.PREDICATE.toReference(builderType)).endArgument().withNewBlock()
                   .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
                   .addNewStringStatementStatement("final Iterator<" + builderType + "> each = " + propertyName + ".iterator();")
                   .addNewStringStatementStatement("final List visitables = _visitables.get(\"" + propertyName + "\");")
@@ -1022,12 +924,9 @@ class ToMethod {
                   .addNewStringStatementStatement("  " + builderType + " builder = each.next();")
                   .addNewStringStatementStatement("  if (predicate.test(builder)) {")
                   .addNewStringStatementStatement("    visitables.remove(builder);")
-                  .addNewStringStatementStatement("    each.remove();")
-                  .addNewStringStatementStatement("  }")
-                  .addNewStringStatementStatement("}")
-                  .addNewStringStatementStatement("return (" + returnType + ")this;")
-                  .endBlock()
-                  .build());
+                  .addNewStringStatementStatement("    each.remove();").addNewStringStatementStatement("  }")
+                  .addNewStringStatementStatement("}").addNewStringStatementStatement("return (" + returnType + ")this;")
+                  .endBlock().build());
             }
 
           }
@@ -1304,33 +1203,24 @@ class ToMethod {
       String ownPrefix = isCollection ? "addNew" : "withNew";
 
       ownPrefix += BuilderUtils.fullyQualifiedNameDiff(baseType.toInternalReference(), originTypeDef);
-      String ownName = ownPrefix + (isCollection
-          ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-          : property.getNameCapitalized());
+      String ownName = ownPrefix
+          + (isCollection ? Singularize.FUNCTION.apply(property.getNameCapitalized()) : property.getNameCapitalized());
 
       String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
       String delegateName = delegatePrefix + property.getNameCapitalized();
 
       String args = Strings.join(constructor.getArguments(), Property::getName, ", ");
 
-      result.add(new MethodBuilder()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .withReturnType(returnType)
-          .withArguments(constructor.getArguments())
-          .withName(ownName)
-          .withParameters(baseType.getParameters())
-          .withNewBlock()
+      result.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType)
+          .withArguments(constructor.getArguments()).withName(ownName).withParameters(baseType.getParameters()).withNewBlock()
           .addNewStringStatementStatement(
               "return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
-          .endBlock()
-          .accept(new TypedVisitor<MethodBuilder>() {
+          .endBlock().accept(new TypedVisitor<MethodBuilder>() {
             @Override
             public void visit(MethodBuilder method) {
               if (shouldDeprate) {
                 method.addToComments("Method is deprecated. use " + delegateName + " instead.");
-                method.addNewAnnotation()
-                    .withClassRef(ClassRef.forName(Deprecated.class.getName()))
-                    .endAnnotation();
+                method.addNewAnnotation().withClassRef(ClassRef.forName(Deprecated.class.getName())).endAnnotation();
               }
             }
 
@@ -1339,8 +1229,7 @@ class ToMethod {
               return MethodBuilder.class;
             }
 
-          })
-          .build());
+          }).build());
     }
 
     return result;
@@ -1476,6 +1365,7 @@ class ToMethod {
     ClassRef rewraped = nestedType.toReference(typeArguments);
     ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
+    boolean isList = IS_LIST.apply(property.getTypeRef());
     boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
 
     String prefix = isCollection ? "addNew" : "withNew";
@@ -1495,7 +1385,7 @@ class ToMethod {
         .endArgument()
         .withNewBlock()
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + (isCollection ? "-1, " : "") + "item);")
+            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + (isList ? "-1, " : "") + "item);")
         .endBlock()
         .build();
 
@@ -1662,15 +1552,10 @@ class ToMethod {
         }
       }
 
-      return new MethodBuilder()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-          .withReturnType(N_REF)
-          .withName("and")
+      return new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(N_REF).withName("and")
           .withNewBlock()
-          .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(" +
-              indexOrKey + "builder.build());")
-          .endBlock()
-          .build();
+          .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(" + indexOrKey + "builder.build());")
+          .endBlock().build();
 
     }
 
