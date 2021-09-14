@@ -75,23 +75,26 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
     TypeRef targetType = unwrapped;
     if (isBuildable || hasDescendants) {
       ClassRef unwarppedClassRef = (unwrapped instanceof ClassRef) ? (ClassRef) unwrapped : null;
+
       targetType = isAbstract(unwarppedClassRef) || GetDefinition.of(unwarppedClassRef).getKind() == Kind.INTERFACE
           ? TypeAs.VISITABLE_BUILDER.apply(unwarppedClassRef)
           : TypeAs.BUILDER.apply(GetDefinition.of(unwarppedClassRef)).toInternalReference();
     }
 
-    boolean isAbstract = Types.isAbstract(typeRef);
     boolean isArray = Types.isArray(typeRef);
     boolean isSet = Types.isSet(typeRef);
+    boolean isAbstractSet = isSet && Types.isAbstract(typeRef);
     boolean isList = Types.isList(typeRef);
+    boolean isAbstractList = isList && Types.isAbstract(typeRef);
     boolean isMap = Types.isMap(typeRef);
+    boolean isAbstractMap = isMap && Types.isAbstract(typeRef);
     boolean isOptional = Types.isOptional(typeRef);
     boolean isOptionalInt = Types.isOptionalInt(typeRef);
     boolean isOptionalDouble = Types.isOptionalDouble(typeRef);
     boolean isOptionalLong = Types.isOptionalLong(typeRef);
 
     if (isArray || isList) {
-      ClassRef listRef = isArray || isAbstract
+      ClassRef listRef = isArray || isAbstractList
           ? Collections.ARRAY_LIST.toReference(targetType)
           : new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).withDimensions(0).build();
 
@@ -100,7 +103,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
           .endConstructor()
           .addNewConstructor()
           .addNewArgument()
-          .withTypeRef(Collections.LIST.toReference(arguments))
+          .withTypeRef(Collections.LIST.toReference(targetType))
           .withName("l")
           .endArgument()
           .endConstructor()
@@ -114,7 +117,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
           .addToAttributes(INIT_FUNCTION, new Construct(listDef, targetType))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, listRef));
     } else if (isSet) {
-      ClassRef setRef = isArray || isAbstract
+      ClassRef setRef = isAbstractSet
           ? Collections.LINKED_HASH_SET.toReference(targetType)
           : new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).build();
 
@@ -123,7 +126,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
           .endConstructor()
           .addNewConstructor()
           .addNewArgument()
-          .withTypeRef(Collections.SET.toReference(arguments))
+          .withTypeRef(Collections.SET.toReference(targetType))
           .withName("s")
           .endArgument()
           .endConstructor()
@@ -137,7 +140,7 @@ public class InitEnricher extends TypedVisitor<PropertyBuilder> {
           .addToAttributes(INIT_FUNCTION, new Construct(setDef, unwrapped))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, setRef));
     } else if (isMap) {
-      ClassRef mapRef = isArray || isAbstract
+      ClassRef mapRef = isAbstractMap
           ? Collections.LINKED_HASH_MAP.toReference(arguments)
           : new ClassRefBuilder((ClassRef) typeRef).withArguments(arguments).build();
 

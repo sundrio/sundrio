@@ -22,6 +22,7 @@ import static io.sundr.builder.internal.functions.TypeAs.*;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
+import static io.sundr.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.model.Attributeable.LAZY_INIT;
 import static io.sundr.model.utils.Types.isAbstract;
 import static io.sundr.utils.Strings.capitalizeFirst;
@@ -50,6 +51,7 @@ import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.functions.Construct;
 import io.sundr.builder.internal.functions.Descendants;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.model.AnnotationRef;
@@ -521,57 +523,92 @@ public class BuilderUtils {
 
   public static Property buildableField(Property property) {
     TypeRef typeRef = property.getTypeRef();
-    ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
-    ClassRef classRef = (ClassRef) typeRef;
-    ClassRef builderType = !Types.isConcrete(unwrapped) ? TypeAs.VISITABLE_BUILDER.apply(unwrapped)
-        : TypeAs.BUILDER.apply(GetDefinition.of(unwrapped)).toInternalReference();
+    ClassRef targetType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
 
-    if (Types.isList(classRef)) {
-      ClassRef listRef = Collections.ARRAY_LIST.toReference(builderType);
-      return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(builderType))
+    boolean isArray = Types.isArray(typeRef);
+    boolean isSet = Types.isSet(typeRef);
+    boolean isAbstractSet = isSet && Types.isAbstract(typeRef);
+    boolean isList = Types.isList(typeRef);
+    boolean isAbstractList = isList && Types.isAbstract(typeRef);
+    boolean isMap = Types.isMap(typeRef);
+    boolean isAbstractMap = isMap && Types.isAbstract(typeRef);
+    boolean isOptional = Types.isOptional(typeRef);
+    boolean isOptionalDouble = Types.isOptionalDouble(typeRef);
+    boolean isOptionalLong = Types.isOptionalLong(typeRef);
+
+    // For fields that are concrete we can possibly create an instance of a VisitableBuilder.
+    // For everything else we can have a builder e.g. Builder<Foo> = () -> fooInstance but it won't be visitable
+    ClassRef builderType = Types.isConcrete(targetType)
+        ? TypeAs.BUILDER.apply(GetDefinition.of(targetType)).toInternalReference()
+        : TypeAs.VISITABLE_BUILDER.apply(targetType);
+
+    if (isArray || isList) {
+      ClassRef listRef = isArray || isAbstractList
+          ? Collections.ARRAY_LIST.toReference(builderType)
+          : new ClassRefBuilder((ClassRef) typeRef).withArguments(builderType).withDimensions(0).build();
+
+      TypeDef listDef = new TypeDefBuilder(TypeDef.forName(listRef.getFullyQualifiedName()))
+          .addNewConstructor()
+          .endConstructor()
+          .addNewConstructor()
+          .addNewArgument()
+          .withTypeRef(Collections.LIST.toReference(builderType))
+          .withName("l")
+          .endArgument()
+          .endConstructor()
+          .build();
+
+      return new PropertyBuilder(property).withTypeRef(listRef)
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
-          .addToAttributes(INIT,
-              property.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && property.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED)
-                  ? null
-                  : " new " + listRef + "()")
+          .addToAttributes(INIT_FUNCTION, new Construct(listDef, targetType))
           .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
           .build();
     }
+    if (isSet) {
+      ClassRef setRef = isAbstractSet
+          ? Collections.LINKED_HASH_SET.toReference(builderType)
+          : new ClassRefBuilder((ClassRef) typeRef).withArguments(builderType).build();
 
-    if (Types.isSet(classRef)) {
-      ClassRef setRef = Collections.LINKED_HASH_SET.toReference(builderType);
-      return new PropertyBuilder(property).withTypeRef(Collections.SET.toReference(builderType))
+      TypeDef setDef = new TypeDefBuilder(TypeDef.forName(setRef.getFullyQualifiedName()))
+          .addNewConstructor()
+          .endConstructor()
+          .addNewConstructor()
+          .addNewArgument()
+          .withTypeRef(Collections.SET.toReference(builderType))
+          .withName("s")
+          .endArgument()
+          .endConstructor()
+          .build();
+
+      return new PropertyBuilder(property).withTypeRef(setRef)
           .addToAttributes(LAZY_INIT, " new " + setRef + "()")
-          .addToAttributes(INIT,
-              property.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && property.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED)
-                  ? null
-                  : " new " + setRef + "()")
+          .addToAttributes(INIT_FUNCTION, new Construct(setDef, targetType))
           .addToAttributes(ALSO_IMPORT, alsoImport(property, setRef, builderType))
           .build();
     }
 
-    if (Types.isOptionalLong(classRef)) {
+    if (isOptionalLong) {
       ClassRef optionalRef = Optionals.OPTIONAL_LONG.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalLong.empty()")
           .build();
     }
 
-    if (Types.isOptionalDouble(classRef)) {
+    if (isOptionalDouble) {
       ClassRef optionalRef = Optionals.OPTIONAL_DOUBLE.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalDouble.empty()")
           .build();
     }
 
-    if (Types.isOptionalInt(classRef)) {
+    if (Types.isOptionalInt(targetType)) {
       ClassRef optionalRef = Optionals.OPTIONAL_INT.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalInt.empty()")
           .build();
     }
 
-    if (Types.isOptional(classRef)) {
+    if (isOptional) {
       ClassRef optionalRef = Optionals.OPTIONAL.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " Optional.empty()")
