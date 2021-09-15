@@ -61,13 +61,12 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
     // Populate constructor parameters
     for (VariableElement variableElement : executableElement.getParameters()) {
       methodBuilder = methodBuilder.addToArguments(propertyAdapterFunction.apply(variableElement));
-
-      List<ClassRef> exceptionRefs = new ArrayList<ClassRef>();
-      for (TypeMirror thrownType : executableElement.getThrownTypes()) {
-        TypeRef thrownRef = referenceAdapterFunction.apply(thrownType);
-        if (thrownRef instanceof ClassRef) {
-          exceptionRefs.add((ClassRef) thrownRef);
-        }
+    }
+    List<ClassRef> exceptionRefs = new ArrayList<ClassRef>();
+    for (TypeMirror thrownType : executableElement.getThrownTypes()) {
+      TypeRef thrownRef = referenceAdapterFunction.apply(thrownType);
+      if (thrownRef instanceof ClassRef) {
+        exceptionRefs.add((ClassRef) thrownRef);
       }
       methodBuilder = methodBuilder.withExceptions(exceptionRefs);
     }
