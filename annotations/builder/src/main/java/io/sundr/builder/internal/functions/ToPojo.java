@@ -259,6 +259,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     Set<TypeDef> additionalBuildables = new HashSet<>();
     Set<TypeDef> additionalTypes = new HashSet<>();
 
+    boolean shouldBeAbstract = false;
     for (TypeDef t : types) {
       if (superClass != null) {
         Method constructor = findBuildableConstructor(superClass);
@@ -280,8 +281,9 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           continue;
         }
         //We need all getters and all annotation methods.
-        if (Getter.is(method) || t.equals(item)) {
-          String name = Getter.propertyNameSafe(method);
+        boolean isAnnotation = t.isAnnotation() && t.equals(item);
+        if (Getter.is(method) || isAnnotation) {
+          String name = isAnnotation ? method.getName() : Getter.propertyName(method);
           TypeRef returnType = method.getReturnType();
           if (autobox) {
             returnType = Types.box(returnType);
@@ -361,6 +363,14 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
               getters.add(primitiveGetter);
             }
           }
+          //Let's try to identify methods that we can't possibly implement and mark the type as abstract if such method is found.
+        } else if (method.isDefaultMethod()) {
+          // nothing special
+        } else if (method.getBlock() != null && method.getBlock().getClass() != null
+            && !method.getBlock().getStatements().isEmpty()) {
+          // actual method, nothing special
+        } else if (method.getExceptions() != null && !method.getExceptions().isEmpty()) {
+          shouldBeAbstract = true;
         }
       }
     }
@@ -385,9 +395,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       for (Property p : fields) {
         statements.add(new StringStatement(fieldIntializer(p, initialize)));
       }
-    } else
-
-    {
+    } else {
       for (Property p : fields) {
         statements.add(new StringStatement(fieldIntializer(p, initialize)));
       }
@@ -432,9 +440,10 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     }
     constructors.add(buildableConstructor);
 
+    int modifiers = shouldBeAbstract ? modifiersToInt(Modifier.PUBLIC, Modifier.ABSTRACT) : modifiersToInt(Modifier.PUBLIC);
     TypeDef generatedPojo = new TypeDefBuilder()
         .withPackageName(relativePackage(item.getPackageName(), relativePath))
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withModifiers(modifiers)
         .withName(pojoName)
         .withAnnotations(annotationRefs)
         .withProperties(fields)
@@ -447,220 +456,220 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
     TypeDef pojoBuilder = BUILDER.apply(TypeArguments.apply(generatedPojo));
 
-    if (enableStaticBuilder) {
-      Method staticBuilder = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-          .withName(extendsList.isEmpty() ? "newBuilder" : "new" + pojoBuilder.getName()) //avoid clashes in case of inheritance
-          .withReturnType(pojoBuilder.toInternalReference())
-          .withNewBlock()
-          .addNewStringStatementStatement("return new " + pojoBuilder.getFullyQualifiedName() + "();")
-          .endBlock()
-          .build();
-
-      additionalMethods.add(staticBuilder);
-
-      StringBuilder sb = new StringBuilder().append("return new " + pojoBuilder.getFullyQualifiedName() + "()");
-
-      for (Method m : item.getMethods()) {
-        if (m.hasAttribute(DEFAULT_VALUE)) {
-          if (m.getReturnType().getDimensions() > 0) {
-            continue;
-          }
-
-          String defaultValue = getDefaultValue(m);
-          if (defaultValue == null || defaultValue.trim().isEmpty() || defaultValue.equals("\"\"")
-              || defaultValue.equals("null")) {
-            continue;
-          }
-
-          sb.append(
-              ".with" + Strings.capitalizeFirst(Strings.toFieldName(m.getName())) + "(" + defaultValue + ")");
-        }
-      }
-      sb.append(";");
-
-      Method staticBuilderFromDefaults = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-          .withName(extendsList.isEmpty() ? "newBuilderFromDefaults" : "new" + pojoBuilder.getName() + "FromDefaults") //avoid clashes in case of inheritance
-          .withReturnType(pojoBuilder.toInternalReference())
-          .withNewBlock()
-          .addNewStringStatementStatement(sb.toString())
-          .endBlock()
-          .build();
-
-      additionalMethods.add(staticBuilderFromDefaults);
-    }
-
-    Method staticAdapter = new MethodBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-        .withName("adapt")
-        .addNewArgument()
-        .withName("instance")
-        .withTypeRef(item.toInternalReference())
-        .endArgument()
-        .withReturnType(generatedPojo.toInternalReference())
-        .withNewBlock()
-        .addNewStringStatementStatement("return newBuilder(instance).build();")
-        .endBlock()
-        .build();
-
-    Method staticAdaptingBuilder = new MethodBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-        .withName("newBuilder")
-        .addNewArgument()
-        .withName("instance")
-        .withTypeRef(item.toInternalReference())
-        .endArgument()
-        .withReturnType(pojoBuilder.toInternalReference())
-        .withNewBlock()
-        .addToStatements(
-            new StringStatement(() -> "return " + convertReference("instance", item, generatedPojo, pojoBuilder) + ";"))
-        .endBlock()
-        .build();
-
-    Method staticMapAdapter = new MethodBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-        .withName("adapt")
-        .addNewArgument()
-        .withName("map")
-        .withTypeRef(Collections.MAP.toUnboundedReference())
-        .endArgument()
-        .withReturnType(generatedPojo.toInternalReference())
-        .withNewBlock()
-        .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo) + ";"))
-        .endBlock()
-        .build();
-
-    Method staticMapAdaptingBuilder = new MethodBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-        .withName("newBuilder")
-        .addNewArgument()
-        .withName("map")
-        .withTypeRef(Collections.MAP.toUnboundedReference())
-        .endArgument()
-        .withReturnType(pojoBuilder.toInternalReference())
-        .withNewBlock()
-        .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo, pojoBuilder) + ";"))
-        .endBlock()
-        .build();
-
-    Method staticToStringArray = new MethodBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-        .withName("toStringArray")
-        .addNewArgument()
-        .withName("o")
-        .withTypeRef(Types.OBJECT.toInternalReference())
-        .endArgument()
-        .withReturnType(Types.STRING_REF.withDimensions(1))
-        .withNewBlock()
-        .addToStatements(new StringStatement(TO_STRING_ARRAY_TEXT))
-        .endBlock()
-        .build();
-
-    if (enableStaticAdapter &&
-
-        hasArrayFields(item)) {
-      item.getMethods()
-          .stream()
-          .filter(m -> m.getReturnType() instanceof ClassRef && ((ClassRef) m.getReturnType()).getDimensions() > 0)
-          .findAny().ifPresent(m -> {
-            additionalImports.add(ARRAYS);
-            additionalImports.add(COLLECTORS);
-          });
-      additionalMethods.add(staticAdapter);
-      additionalMethods.add(staticAdaptingBuilder);
-      additionalMethods.add(staticMapAdapter);
-      if (enableStaticMapAdapter) {
-        additionalMethods.add(staticMapAdaptingBuilder);
-      }
-    }
-
-    Method equals = new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-        .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
-        .addNewArgument().withName("o").withTypeRef(Types.OBJECT.toReference()).endArgument()
-        .withName("equals")
-        .withNewBlock()
-        .withStatements(BuilderUtils.toEquals(generatedPojo, fields))
-        .endBlock()
-        .build();
-
-    Method hashCode = new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-        .withReturnType(Types.PRIMITIVE_INT_REF)
-        .withName("hashCode")
-        .withNewBlock()
-        .withStatements(BuilderUtils.toHashCode(fields))
-        .endBlock()
-        .build();
-
-    additionalMethods.add(equals);
-    additionalMethods.add(hashCode);
-
-    for (Object o : adapters) {
-      if (o instanceof AnnotationRef) {
-        AnnotationRef r = (AnnotationRef) o;
-        String name = String.valueOf(r.getParameters().getOrDefault("name", ""));
-        String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
-        String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
-        String mapperRelativePath = "";
-        boolean enableMapAdapter = !"false"
-            .equals(String.valueOf(r.getParameters().getOrDefault("withMapAdapterMethod", "false")));
-        List<Method> adapterMethods = new ArrayList<>();
-
-        if (Strings.isNullOrEmpty(name) && Strings.isNullOrEmpty(prefix) && Strings.isNullOrEmpty(suffix)) {
-          suffix = "Adapter";
-        }
-
-        if (r.getParameters().containsKey("relativePath")) {
-          mapperRelativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
-        }
-
-        String adapterPackage = relativePackage(item.getPackageName(), mapperRelativePath);
-
-        List<ClassRef> adapterImports = new ArrayList<>();
-        adapterImports.add(Collections.LIST.toInternalReference());
-
-        if (hasArrayFields(item)) {
-          adapterImports.add(ARRAYS);
-          adapterImports.add(COLLECTORS);
-        }
-        List<ClassRef> generatedRefs = new ArrayList<>();
-        Types.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef)
-            .forEach(i -> populateReferences((ClassRef) i, generatedRefs));
-        adapterImports.addAll(generatedRefs);
-        adapterImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
-
-        Types.allProperties(generatedPojo).stream()
-            .filter(p -> p.getTypeRef() instanceof ClassRef)
-            .map(p -> (ClassRef) p.getTypeRef())
-            .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
-            .collect(toList());
-
-        adapterImports.addAll(Types.allProperties(generatedPojo).stream()
-            .filter(p -> p.getTypeRef() instanceof ClassRef)
-            .map(p -> (ClassRef) p.getTypeRef())
-            .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
-            .collect(toList()));
-
-        adapterMethods.add(staticAdapter);
-        adapterMethods.add(staticAdaptingBuilder);
-        adapterMethods.add(staticMapAdapter);
-        if (enableMapAdapter) {
-          adapterMethods.add(staticMapAdaptingBuilder);
-        }
-        adapterMethods.add(staticToStringArray);
-
-        TypeDef mapper = new TypeDefBuilder()
-            .withComments("Generated")
-            .withModifiers(modifiersToInt(Modifier.PUBLIC))
-            .withPackageName(adapterPackage)
-            .withName(!Strings.isNullOrEmpty(name) ? name : Strings.toPojoName(generatedPojo.getName(), prefix, suffix))
-            .withMethods(adapterMethods)
-            .addToAttributes(ALSO_IMPORT, adapterImports)
+    if (!shouldBeAbstract) {
+      if (enableStaticBuilder) {
+        Method staticBuilder = new MethodBuilder()
+            .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+            .withName(extendsList.isEmpty() ? "newBuilder" : "new" + pojoBuilder.getName()) //avoid clashes in case of inheritance
+            .withReturnType(pojoBuilder.toInternalReference())
+            .withNewBlock()
+            .addNewStringStatementStatement("return new " + pojoBuilder.getFullyQualifiedName() + "();")
+            .endBlock()
             .build();
 
-        additionalTypes.add(mapper);
+        additionalMethods.add(staticBuilder);
+
+        StringBuilder sb = new StringBuilder().append("return new " + pojoBuilder.getFullyQualifiedName() + "()");
+
+        for (Method m : item.getMethods()) {
+          if (m.hasAttribute(DEFAULT_VALUE)) {
+            if (m.getReturnType().getDimensions() > 0) {
+              continue;
+            }
+
+            String defaultValue = getDefaultValue(m);
+            if (defaultValue == null || defaultValue.trim().isEmpty() || defaultValue.equals("\"\"")
+                || defaultValue.equals("null")) {
+              continue;
+            }
+
+            sb.append(
+                ".with" + Strings.capitalizeFirst(Strings.toFieldName(m.getName())) + "(" + defaultValue + ")");
+          }
+        }
+        sb.append(";");
+
+        Method staticBuilderFromDefaults = new MethodBuilder()
+            .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+            .withName(extendsList.isEmpty() ? "newBuilderFromDefaults" : "new" + pojoBuilder.getName() + "FromDefaults") //avoid clashes in case of inheritance
+            .withReturnType(pojoBuilder.toInternalReference())
+            .withNewBlock()
+            .addNewStringStatementStatement(sb.toString())
+            .endBlock()
+            .build();
+
+        additionalMethods.add(staticBuilderFromDefaults);
+      }
+
+      Method staticAdapter = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName("adapt")
+          .addNewArgument()
+          .withName("instance")
+          .withTypeRef(item.toInternalReference())
+          .endArgument()
+          .withReturnType(generatedPojo.toInternalReference())
+          .withNewBlock()
+          .addNewStringStatementStatement("return newBuilder(instance).build();")
+          .endBlock()
+          .build();
+
+      Method staticAdaptingBuilder = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName("newBuilder")
+          .addNewArgument()
+          .withName("instance")
+          .withTypeRef(item.toInternalReference())
+          .endArgument()
+          .withReturnType(pojoBuilder.toInternalReference())
+          .withNewBlock()
+          .addToStatements(
+              new StringStatement(() -> "return " + convertReference("instance", item, generatedPojo, pojoBuilder) + ";"))
+          .endBlock()
+          .build();
+
+      Method staticMapAdapter = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName("adapt")
+          .addNewArgument()
+          .withName("map")
+          .withTypeRef(Collections.MAP.toUnboundedReference())
+          .endArgument()
+          .withReturnType(generatedPojo.toInternalReference())
+          .withNewBlock()
+          .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo) + ";"))
+          .endBlock()
+          .build();
+
+      Method staticMapAdaptingBuilder = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName("newBuilder")
+          .addNewArgument()
+          .withName("map")
+          .withTypeRef(Collections.MAP.toUnboundedReference())
+          .endArgument()
+          .withReturnType(pojoBuilder.toInternalReference())
+          .withNewBlock()
+          .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo, pojoBuilder) + ";"))
+          .endBlock()
+          .build();
+
+      Method staticToStringArray = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName("toStringArray")
+          .addNewArgument()
+          .withName("o")
+          .withTypeRef(Types.OBJECT.toInternalReference())
+          .endArgument()
+          .withReturnType(Types.STRING_REF.withDimensions(1))
+          .withNewBlock()
+          .addToStatements(new StringStatement(TO_STRING_ARRAY_TEXT))
+          .endBlock()
+          .build();
+
+      if (enableStaticAdapter && hasArrayFields(item)) {
+        item.getMethods()
+            .stream()
+            .filter(m -> m.getReturnType() instanceof ClassRef && ((ClassRef) m.getReturnType()).getDimensions() > 0)
+            .findAny().ifPresent(m -> {
+              additionalImports.add(ARRAYS);
+              additionalImports.add(COLLECTORS);
+            });
+        additionalMethods.add(staticAdapter);
+        additionalMethods.add(staticAdaptingBuilder);
+        additionalMethods.add(staticMapAdapter);
+        if (enableStaticMapAdapter) {
+          additionalMethods.add(staticMapAdaptingBuilder);
+        }
+      }
+
+      Method equals = new MethodBuilder()
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
+          .addNewArgument().withName("o").withTypeRef(Types.OBJECT.toReference()).endArgument()
+          .withName("equals")
+          .withNewBlock()
+          .withStatements(BuilderUtils.toEquals(generatedPojo, fields))
+          .endBlock()
+          .build();
+
+      Method hashCode = new MethodBuilder()
+          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withReturnType(Types.PRIMITIVE_INT_REF)
+          .withName("hashCode")
+          .withNewBlock()
+          .withStatements(BuilderUtils.toHashCode(fields))
+          .endBlock()
+          .build();
+
+      additionalMethods.add(equals);
+      additionalMethods.add(hashCode);
+
+      for (Object o : adapters) {
+        if (o instanceof AnnotationRef) {
+          AnnotationRef r = (AnnotationRef) o;
+          String name = String.valueOf(r.getParameters().getOrDefault("name", ""));
+          String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
+          String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
+          String mapperRelativePath = "";
+          boolean enableMapAdapter = !"false"
+              .equals(String.valueOf(r.getParameters().getOrDefault("withMapAdapterMethod", "false")));
+          List<Method> adapterMethods = new ArrayList<>();
+
+          if (Strings.isNullOrEmpty(name) && Strings.isNullOrEmpty(prefix) && Strings.isNullOrEmpty(suffix)) {
+            suffix = "Adapter";
+          }
+
+          if (r.getParameters().containsKey("relativePath")) {
+            mapperRelativePath = String.valueOf(r.getParameters().getOrDefault("relativePath", "."));
+          }
+
+          String adapterPackage = relativePackage(item.getPackageName(), mapperRelativePath);
+
+          List<ClassRef> adapterImports = new ArrayList<>();
+          adapterImports.add(Collections.LIST.toInternalReference());
+
+          if (hasArrayFields(item)) {
+            adapterImports.add(ARRAYS);
+            adapterImports.add(COLLECTORS);
+          }
+          List<ClassRef> generatedRefs = new ArrayList<>();
+          Types.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef)
+              .forEach(i -> populateReferences((ClassRef) i, generatedRefs));
+          adapterImports.addAll(generatedRefs);
+          adapterImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
+
+          Types.allProperties(generatedPojo).stream()
+              .filter(p -> p.getTypeRef() instanceof ClassRef)
+              .map(p -> (ClassRef) p.getTypeRef())
+              .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
+              .collect(toList());
+
+          adapterImports.addAll(Types.allProperties(generatedPojo).stream()
+              .filter(p -> p.getTypeRef() instanceof ClassRef)
+              .map(p -> (ClassRef) p.getTypeRef())
+              .filter(c -> !adapterPackage.equals(GetDefinition.of(c).getPackageName()))
+              .collect(toList()));
+
+          adapterMethods.add(staticAdapter);
+          adapterMethods.add(staticAdaptingBuilder);
+          adapterMethods.add(staticMapAdapter);
+          if (enableMapAdapter) {
+            adapterMethods.add(staticMapAdaptingBuilder);
+          }
+          adapterMethods.add(staticToStringArray);
+
+          TypeDef mapper = new TypeDefBuilder()
+              .withComments("Generated")
+              .withModifiers(modifiersToInt(Modifier.PUBLIC))
+              .withPackageName(adapterPackage)
+              .withName(!Strings.isNullOrEmpty(name) ? name : Strings.toPojoName(generatedPojo.getName(), prefix, suffix))
+              .withMethods(adapterMethods)
+              .addToAttributes(ALSO_IMPORT, adapterImports)
+              .build();
+
+          additionalTypes.add(mapper);
+        }
       }
     }
 
