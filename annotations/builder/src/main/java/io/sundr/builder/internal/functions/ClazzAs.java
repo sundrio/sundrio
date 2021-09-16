@@ -23,6 +23,7 @@ import static io.sundr.model.utils.Types.isAbstract;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -34,6 +35,7 @@ import io.sundr.FunctionFactory;
 import io.sundr.SundrException;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
@@ -212,7 +214,7 @@ public class ClazzAs {
 
       Method instanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
           .withTypeRef(item.toInternalReference()).withName("instance").and().withNewBlock()
-          .withStatements(toInstanceConstructorBody(item, "")).endBlock().build();
+          .withStatements(toInstanceConstructorBody(item, item, "")).endBlock().build();
 
       constructors.add(emptyConstructor);
       constructors.add(instanceConstructor);
@@ -293,19 +295,20 @@ public class ClazzAs {
         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
         if (isMap) {
           properties.add(toAdd);
-        } else if (isBuildable && !isAbstract) {
-          methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
-          methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
-          if (isList || isArray) {
-            methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
-            methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
-          } else if (!isSet) {
-            methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
-            methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
-            methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
+        } else if (isBuildable) {
+          if (!isAbstract) {
+            methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
+            methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
+            if (isList || isArray) {
+              methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
+              methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
+            } else if (!isSet) {
+              methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
+              methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
+              methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
+            }
+            nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
           }
-
-          nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
           properties.add(buildableField(toAdd));
         } else if (descendants.isEmpty()) {
           properties.add(toAdd);
@@ -375,6 +378,11 @@ public class ClazzAs {
 
       ClassRef fluent = TypeAs.FLUENT_REF.apply(item);
 
+      Optional<TypeDef> buildableInterface = item.getImplementsList().stream().map(GetDefinition::of)
+          .filter(t -> t.getAnnotations().stream()
+              .anyMatch(a -> a.getClassRef().getFullyQualifiedName().equals(Buildable.class.getName())))
+          .findFirst();
+
       List<Method> constructors = new ArrayList<Method>();
       List<Method> methods = new ArrayList<Method>();
       final List<Property> fields = new ArrayList<Property>();
@@ -424,20 +432,22 @@ public class ClazzAs {
           .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
           .withTypeRef(Types.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock()
-          .addAllToStatements(toInstanceConstructorBody(item, "fluent"))
+          .addAllToStatements(toInstanceConstructorBody(item, item, "fluent"))
           .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
           .endBlock()
           .build();
 
       Method instanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
           .withTypeRef(instanceRef).withName("instance").and().withNewBlock()
-          .addNewStringStatementStatement("this(instance,false);").endBlock().build();
+          .addNewStringStatementStatement("this(instance,false);").endBlock()
+          .build();
+
       Method instanceAndValidationEnabledConstructor = new MethodBuilder()
           .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(instanceRef)
           .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
           .withName("validationEnabled").and()
           .withNewBlock()
-          .addAllToStatements(toInstanceConstructorBody(item, "this"))
+          .addAllToStatements(toInstanceConstructorBody(item, item, "this"))
           .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
           .endBlock()
           .build();
@@ -450,6 +460,52 @@ public class ClazzAs {
       constructors.add(instanceAndFluentAndValidationEnabledCosntructor);
       constructors.add(instanceConstructor);
       constructors.add(instanceAndValidationEnabledConstructor);
+
+      buildableInterface.ifPresent(i -> {
+        List<ClassRef> getterExceptions = i.getMethods().stream()
+            .filter(Getter::is)
+            .filter(m -> m != null && m.getExceptions() != null)
+            .flatMap(m -> m.getExceptions().stream()).collect(Collectors.toList());
+
+        ClassRef buildableInterfaceRef = i.toInternalReference();
+
+        Method sourceInstanceAndFluentCosntructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+            .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(buildableInterfaceRef)
+            .withName("instance").and().withNewBlock().addNewStringStatementStatement("this(fluent, instance, false);")
+            .endBlock()
+            .build();
+
+        Method sourceInstanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
+            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+            .and().addNewArgument().withTypeRef(buildableInterfaceRef).withName("instance").and().addNewArgument()
+            .withTypeRef(Types.BOOLEAN_REF).withName("validationEnabled").and()
+            .withNewBlock()
+            .addAllToStatements(toInstanceConstructorBody(item, i, "fluent"))
+            .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
+            .endBlock()
+            .build();
+
+        Method sourceInstanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+            .addNewArgument()
+            .withTypeRef(buildableInterfaceRef).withName("instance").and().withNewBlock()
+            .addNewStringStatementStatement("this(instance,false);").endBlock()
+            .build();
+
+        Method sourceInstanceAndValidationEnabledConstructor = new MethodBuilder()
+            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(buildableInterfaceRef)
+            .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
+            .withName("validationEnabled").and()
+            .withNewBlock()
+            .addAllToStatements(toInstanceConstructorBody(item, i, "this"))
+            .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
+            .endBlock()
+            .build();
+
+        constructors.add(sourceInstanceAndFluentCosntructor);
+        constructors.add(sourceInstanceAndFluentAndValidationEnabledCosntructor);
+        constructors.add(sourceInstanceAndValidationEnabledConstructor);
+        constructors.add(sourceInstanceConstructor);
+      });
 
       Method build = new MethodBuilder().withModifiers(Types.modifiersToInt(modifiers)).withReturnType(instanceRef)
           .withName("build")
@@ -498,7 +554,7 @@ public class ClazzAs {
             .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
             .withTypeRef(validatorRef).withName("validator").and()
             .withNewBlock()
-            .withStatements(toInstanceConstructorBody(item, "fluent"))
+            .withStatements(toInstanceConstructorBody(item, item, "fluent"))
             .addNewStringStatementStatement("this.validator = validator;")
             .addNewStringStatementStatement("this.validationEnabled = validator != null; ")
             .endBlock()
@@ -508,7 +564,7 @@ public class ClazzAs {
             .addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument().withTypeRef(validatorRef)
             .withName("validator").and()
             .withNewBlock()
-            .withStatements(toInstanceConstructorBody(item, "this"))
+            .withStatements(toInstanceConstructorBody(item, item, "this"))
             .addNewStringStatementStatement("this.validator = validator;")
             .addNewStringStatementStatement("this.validationEnabled = validator != null; ")
             .endBlock()
@@ -609,11 +665,9 @@ public class ClazzAs {
       //We need to treat the editable classes as buildables themselves.
       return AptContext.getContext().getDefinitionRepository()
           .register(BuilderContextManager.getContext().getBuildableRepository()
-              .register(new TypeDefBuilder(editableType)
-                  .withComments("Generated")
-                  .withAnnotations().withModifiers(Types.modifiersToInt(modifiers))
-                  .withConstructors(constructors).withMethods(methods).addToAttributes(BUILDABLE_ENABLED, true)
-                  .addToAttributes(GENERATED, true) // We want to know that its a generated type...
+              .register(new TypeDefBuilder(editableType).withComments("Generated").withAnnotations()
+                  .withModifiers(Types.modifiersToInt(modifiers)).withConstructors(constructors).withMethods(methods)
+                  .addToAttributes(BUILDABLE_ENABLED, true).addToAttributes(GENERATED, true) // We want to know that its a generated type...
                   .build()));
     }
   });
@@ -689,27 +743,27 @@ public class ClazzAs {
     return sb.toString();
   }
 
-  private static List<Statement> toInstanceConstructorBody(TypeDef clazz, String fluent) {
+  private static List<Statement> toInstanceConstructorBody(TypeDef clazz, TypeDef instance, String fluent) {
     Method constructor = findBuildableConstructor(clazz);
     List<Statement> statements = new ArrayList<Statement>();
-    String ref = fluent;
+    final String ref = fluent != null && !fluent.isEmpty() ? fluent : "this";
 
     //We may use a reference to fluent or we may use directly "this". So we need to check.
     if (fluent != null && !fluent.isEmpty()) {
       statements.add(new StringStatement("this.fluent = " + fluent + "; "));
-    } else {
-      ref = "this";
     }
 
     for (Property property : constructor.getArguments()) {
-      Method getter = Getter.find(clazz, property);
-      if (getter != null) {
+      Optional<Method> getter = Getter.findOptional(instance, property);
+      getter.ifPresent(g -> {
         String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() + ")" : "";
         statements.add(new StringStatement(new StringBuilder().append(ref).append(".with").append(property.getNameCapitalized())
-            .append("(").append(cast).append("instance.").append(getter.getName()).append("()); ").toString()));
-      } else {
-        throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
-      }
+            .append("(").append(cast).append("instance.").append(g.getName()).append("()); ").toString()));
+      });
+
+      // } else {
+      //   throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
+      // }
     }
 
     TypeDef target = clazz;
@@ -717,10 +771,11 @@ public class ClazzAs {
     while (target != null && !Types.OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
       for (Property property : target.getProperties()) {
         if (!hasBuildableConstructorWithArgument(target, property) && Setter.has(target, property)) {
-          String withName = "with" + property.getNameCapitalized();
-          String getterName = Getter.find(target, property).getName();
-          statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.")
-              .append(getterName).append("());\n").toString()));
+          Getter.findOptional(instance, property).map(Method::getName).ifPresent(getterName -> {
+            String withName = "with" + property.getNameCapitalized();
+            statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.")
+                .append(getterName).append("());\n").toString()));
+          });
         }
       }
 

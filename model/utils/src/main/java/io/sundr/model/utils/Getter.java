@@ -18,6 +18,7 @@ package io.sundr.model.utils;
 
 import static io.sundr.utils.Strings.capitalizeFirst;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.sundr.SundrException;
@@ -46,6 +47,14 @@ public class Getter {
    */
   public static Method find(TypeDef clazz, Property property) {
     return find(clazz, property, false);
+  }
+
+  public static Optional<Method> findOptional(TypeDef clazz, Property property) {
+    try {
+      return Optional.of(find(clazz, property, false));
+    } catch (SundrException e) {
+      return Optional.empty();
+    }
   }
 
   /**
