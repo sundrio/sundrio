@@ -531,7 +531,6 @@ public class BuilderUtils {
     boolean isList = Types.isList(typeRef);
     boolean isAbstractList = isList && Types.isAbstract(typeRef);
     boolean isMap = Types.isMap(typeRef);
-    boolean isAbstractMap = isMap && Types.isAbstract(typeRef);
     boolean isOptional = Types.isOptional(typeRef);
     boolean isOptionalDouble = Types.isOptionalDouble(typeRef);
     boolean isOptionalLong = Types.isOptionalLong(typeRef);

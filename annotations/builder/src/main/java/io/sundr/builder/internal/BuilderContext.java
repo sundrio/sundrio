@@ -599,7 +599,7 @@ public class BuilderContext {
         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
         .withName("build")
         .withParameters(T)
-        .withReturnType(Collections.ARRAY_LIST.toReference(T.toReference()))
+        .withReturnType(Collections.LIST.toReference(T.toReference()))
         .addNewArgument()
         .withTypeRef(Collections.LIST.toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS)
             .withBounds(builderInterface
@@ -611,13 +611,14 @@ public class BuilderContext {
         .addNewStringStatementStatement(
             "return list == null ? null : new ArrayList<T>(list.stream().map(Builder::build).collect(Collectors.toList()));")
         .endBlock()
+        .addToAttributes(ALSO_IMPORT, Collections.ARRAY_LIST.toInternalReference())
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
         .withName("build")
         .withParameters(T)
-        .withReturnType(Collections.ARRAY_LIST.toReference(T.toReference()))
+        .withReturnType(Collections.LIST.toReference(T.toReference()))
         .addNewArgument()
         .withTypeRef(Collections.SET.toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS)
             .withBounds(builderInterface
@@ -629,13 +630,14 @@ public class BuilderContext {
         .addNewStringStatementStatement(
             "return set == null ? null : new ArrayList<>(set.stream().map(Builder::build).collect(Collectors.toList()));")
         .endBlock()
+        .addToAttributes(ALSO_IMPORT, Collections.ARRAY_LIST.toInternalReference())
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
         .withName("aggregate")
         .withParameters(T)
-        .withReturnType(Collections.ARRAY_LIST.toReference(T.toReference()))
+        .withReturnType(Collections.LIST.toReference(T.toReference()))
         .addNewArgument()
         .withTypeRef(new ClassRefBuilder(Collections.LIST
             .toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS).withBounds(T.toReference()).build()))
@@ -647,13 +649,14 @@ public class BuilderContext {
         .addNewStringStatementStatement(
             "return new ArrayList(Arrays.stream(lists).filter(Objects::nonNull).collect(Collectors.toList()));")
         .endBlock()
+        .addToAttributes(ALSO_IMPORT, Collections.ARRAY_LIST.toInternalReference())
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
         .withName("aggregate")
         .withParameters(T)
-        .withReturnType(Collections.LINKED_HASH_SET.toReference(T.toReference()))
+        .withReturnType(Collections.SET.toReference(T.toReference()))
         .addNewArgument()
         .withTypeRef(new ClassRefBuilder(Collections.SET
             .toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS).withBounds(T.toReference()).build()))
@@ -664,6 +667,7 @@ public class BuilderContext {
         .addNewStringStatementStatement(
             "return new LinkedHashSet(Arrays.stream(sets).filter(Objects::nonNull).collect(Collectors.toSet()));")
         .endBlock()
+        .addToAttributes(ALSO_IMPORT, Collections.LINKED_HASH_SET.toInternalReference())
         .endMethod()
 
         .addNewMethod()

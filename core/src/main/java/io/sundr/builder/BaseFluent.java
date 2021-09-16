@@ -47,19 +47,19 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     }
   }
 
-  public static <T> ArrayList<T> build(List<? extends Builder<? extends T>> list) {
+  public static <T> List<T> build(List<? extends Builder<? extends T>> list) {
     return list == null ? null : new ArrayList<T>(list.stream().map(Builder::build).collect(Collectors.toList()));
   }
 
-  public static <T> ArrayList<T> build(Set<? extends Builder<? extends T>> set) {
+  public static <T> List<T> build(Set<? extends Builder<? extends T>> set) {
     return set == null ? null : new ArrayList<T>(set.stream().map(Builder::build).collect(Collectors.toList()));
   }
 
-  public static <T> ArrayList<T> aggregate(List<? extends T>... lists) {
+  public static <T> List<T> aggregate(List<? extends T>... lists) {
     return new ArrayList(Arrays.stream(lists).filter(Objects::nonNull).collect(Collectors.toList()));
   }
 
-  public static <T> LinkedHashSet<T> aggregate(Set<? extends T>... sets) {
+  public static <T> Set<T> aggregate(Set<? extends T>... sets) {
     return new LinkedHashSet(Arrays.stream(sets).filter(Objects::nonNull).collect(Collectors.toSet()));
   }
 
