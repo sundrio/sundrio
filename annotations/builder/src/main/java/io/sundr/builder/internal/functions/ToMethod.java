@@ -462,7 +462,9 @@ class ToMethod {
     boolean isNested = false;
     boolean isMap = isMap(property.getTypeRef());
     boolean isList = isList(property.getTypeRef());
+    boolean isAbstractList = isList && Types.isAbstract(property.getTypeRef());
     boolean isSet = isSet(property.getTypeRef());
+    boolean isAbstractSet = isSet && Types.isAbstract(property.getTypeRef());
     boolean isOptional = isOptional(property.getTypeRef()) || isOptionalDouble(property.getTypeRef())
         || isOptionalInt(property.getTypeRef()) || isOptionalLong(property.getTypeRef());
 
@@ -679,20 +681,25 @@ class ToMethod {
           List<Statement> varArgInit = new ArrayList<>();
           List<Statement> collectionInit = new ArrayList<>();
 
-          if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
-            final ClassRef targetType = (ClassRef) unwrapped;
-
-            String targetClass = targetType.getFullyQualifiedName();
+          if (isBuildable(unwrapped)) {
+            TypeDef originalDef = GetDefinition.of((ClassRef) unwrapped);
+            final ClassRef targetType = isAbstract(unwrapped)
+                ? ToPojo.getPojoRef(originalDef)
+                : (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
-            String builderClass = targetClass + "Builder";
+
+            String builderClass = targetType.getFullyQualifiedName() + "Builder";
 
             //We need to do it more
             alsoImport.add(BUILDER.apply(GetDefinition.of(targetType)).toInternalReference());
             statements.add(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                 + property.getAttribute(LAZY_INIT) + ";}"));
-            statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new "
-                + builderClass + "(item);_visitables.get(\"" + propertyName + "\").add(builder);this." + propertyName
-                + ".add(builder);} return (" + returnType + ")this;"));
+            statements
+                .add(new StringStatement(
+                    "for (" + ((ClassRef) unwrapped).getFullyQualifiedName() + " item : items) {" + builderClass
+                        + " builder = new "
+                        + builderClass + "(item);_visitables.get(\"" + propertyName + "\").add(builder);this." + propertyName
+                        + ".add(builder);} return (" + returnType + ")this;"));
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(
