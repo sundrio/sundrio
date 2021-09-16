@@ -76,6 +76,7 @@ import io.sundr.model.functions.Assignable;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.model.utils.Collections;
+import io.sundr.model.utils.Getter;
 import io.sundr.model.utils.Optionals;
 import io.sundr.model.utils.Types;
 
@@ -87,14 +88,47 @@ public class BuilderUtils {
   private BuilderUtils() {
   }
 
+  public static boolean canBeBuilt(TypeRef typeRef) {
+    if (!(typeRef instanceof ClassRef)) {
+      return false;
+    }
+
+    TypeDef typeDef = GetDefinition.of((ClassRef) typeRef);
+    if (typeDef.isEnum()) {
+      return true;
+    }
+    if (typeDef.isClass() && !typeDef.isAbstract()) {
+      return true;
+    }
+    if (typeDef.isInterface()) {
+      //We cannnot generate concrete classes for interfaces that define non getter methods.
+      return !typeDef.getMethods().stream().anyMatch(m -> !Getter.is(m) && !m.isDefaultMethod());
+    }
+    return true;
+  }
+
+  public static boolean canBeBuilt(TypeDef typeDef) {
+    if (typeDef.isEnum()) {
+      return true;
+    }
+    if (typeDef.isClass() && !typeDef.isAbstract()) {
+      return true;
+    }
+    if (typeDef.isInterface()) {
+      //We cannnot generate concrete classes for interfaces that define non getter methods.
+      return !typeDef.getMethods().stream().anyMatch(m -> !Getter.is(m) && !m.isDefaultMethod());
+    }
+    return true;
+  }
+
   public static boolean isBuildable(TypeRef typeRef) {
     BuildableRepository repository = BuilderContextManager.getContext().getBuildableRepository();
-    return repository.isBuildable(typeRef);
+    return repository.isBuildable(typeRef) && canBeBuilt(typeRef);
   }
 
   public static boolean isBuildable(TypeDef typeDef) {
     BuildableRepository repository = BuilderContextManager.getContext().getBuildableRepository();
-    return repository.isBuildable(typeDef);
+    return repository.isBuildable(typeDef) && canBeBuilt(typeDef);
   }
 
   /**
