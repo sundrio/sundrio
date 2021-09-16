@@ -128,6 +128,12 @@ public class Getter {
       return false;
     }
 
+    // Getters, should never ever throw exceptions. If they do their are not getters.
+    // If we relax, this limitation, `throws` will leak into areas that is undesirable (usability & maintainance wise).
+    if (method.getExceptions() != null && !method.getExceptions().isEmpty()) {
+      return false;
+    }
+
     if (acceptPrefixless) {
       return true;
     }
@@ -236,9 +242,9 @@ public class Getter {
     String name = method.getName();
 
     if (name.startsWith(GET_PREFIX)) {
-      return name.substring(GET_PREFIX.length());
+      name = name.substring(GET_PREFIX.length());
     } else if (name.startsWith(IS_PREFIX)) {
-      return name.substring(IS_PREFIX.length());
+      name = name.substring(IS_PREFIX.length());
     } else if (name.startsWith(SHOULD_PREFIX)) {
       name = name.substring(SHOULD_PREFIX.length());
     } else {
@@ -246,9 +252,9 @@ public class Getter {
     }
 
     if (name.length() == 1) {
-      return name.toUpperCase();
+      return name.toLowerCase();
     }
-    return name.substring(0, 1).toUpperCase() + name.substring(1);
+    return name.substring(0, 1).toLowerCase() + name.substring(1);
   }
 
   /**
@@ -259,23 +265,20 @@ public class Getter {
    * @return The name, or the method name if method is not a typical getter..
    */
   public static String propertyNameSafe(Method method) {
-    if (!is(method)) {
-      return method.getName();
-    }
     String name = method.getName();
 
     if (name.startsWith(GET_PREFIX)) {
-      return name.substring(GET_PREFIX.length());
+      name = name.substring(GET_PREFIX.length());
     } else if (name.startsWith(IS_PREFIX)) {
-      return name.substring(IS_PREFIX.length());
+      name = name.substring(IS_PREFIX.length());
     } else if (name.startsWith(SHOULD_PREFIX)) {
       name = name.substring(SHOULD_PREFIX.length());
     }
 
     if (name.length() == 1) {
-      return name.toUpperCase();
+      return name.toLowerCase();
     }
-    return name.substring(0, 1).toUpperCase() + name.substring(1);
+    return name.substring(0, 1).toLowerCase() + name.substring(1);
   }
 
   public static String prefix(Property property) {
