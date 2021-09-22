@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.lang.model.element.Modifier;
+import javax.lang.model.util.Elements;
 
 import io.sundr.builder.Constants;
 import io.sundr.builder.TypedVisitor;
@@ -86,13 +87,9 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     }
   }
 
-  static boolean classExists(String c) {
-    try {
-      Class.forName(c);
-      return true;
-    } catch (Exception e) {
-      return false;
-    }
+  boolean classExists(String c) {
+    Elements elements = processingEnv.getElementUtils();
+    return elements.getTypeElement(c) != null;
   }
 
   static TypeDef inlineableOf(BuilderContext ctx, TypeDef type, Inline inline) {
@@ -191,6 +188,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .addToProperties(builderProperty, functionProperty)
         .addToMethods(inlineMethod)
         .accept(new TypedVisitor<ClassRefBuilder>() {
+          @Override
           public void visit(ClassRefBuilder builder) {
             List<TypeRef> updatedArguments = new ArrayList<TypeRef>();
             for (TypeRef arg : builder.getArguments()) {
