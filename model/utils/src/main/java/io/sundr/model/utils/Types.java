@@ -16,46 +16,21 @@
 
 package io.sundr.model.utils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.lang.model.element.Modifier;
-
-import io.sundr.model.ClassRef;
-import io.sundr.model.Kind;
-import io.sundr.model.PrimitiveRef;
-import io.sundr.model.PrimitiveRefBuilder;
-import io.sundr.model.Property;
-import io.sundr.model.TypeDef;
-import io.sundr.model.TypeDefBuilder;
-import io.sundr.model.TypeParamDef;
-import io.sundr.model.TypeParamDefBuilder;
-import io.sundr.model.TypeParamRef;
-import io.sundr.model.TypeParamRefBuilder;
-import io.sundr.model.TypeRef;
-import io.sundr.model.VoidRef;
-import io.sundr.model.WildcardRef;
+import io.sundr.model.*;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.utils.Patterns;
 
+import javax.lang.model.element.Modifier;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 public final class Types {
 
   public static final String PACKAGE = ".*package\\s+(.*)\\s*\\;";
-  public static final String CLASS_NAME = ".*(enum|class|interface)\\s+(\\w+).*\\{";
+  public static final String CLASS_NAME = ".*(enum|class|interface)\\s+(\\w+).*\\W*\\{";
 
   private static final String JAVA_LANG_OBJECT = "java.lang.Object";
   private static final String JAVA_UTIL_OPTIONAL = "java.util.Optional";
@@ -679,8 +654,8 @@ public final class Types {
 
   public static String parseFullyQualifiedName(String content) {
     Optional<String> pkg = parsePackage(content);
-    final String name = Patterns.match(content, CLASS_NAME, 2)
-        .orElseThrow(() -> new IllegalStateException("Cannot extract fully qualified name from generated code."));
+    final String name = parseName(content)
+            .orElseThrow(() -> new IllegalStateException("Cannot extract fully qualified name from generated code."));
     return pkg.map(p -> p + "." + name).orElse(name);
   }
 }
