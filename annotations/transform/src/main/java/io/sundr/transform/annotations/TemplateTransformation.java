@@ -47,9 +47,4 @@ public @interface TemplateTransformation {
    *         representation of the class).
    */
   boolean gather() default false;
-
-  /**
-   * @return an external array of parameters, to pass to the transformation.
-   */
-  String[] paremters() default {};
 }
