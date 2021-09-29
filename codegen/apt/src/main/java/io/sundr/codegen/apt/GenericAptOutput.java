@@ -17,30 +17,41 @@
 
 package io.sundr.codegen.apt;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.annotation.processing.Filer;
+import javax.tools.FileObject;
 import javax.tools.JavaFileManager.Location;
 import javax.tools.StandardLocation;
 
 import io.sundr.SundrException;
 import io.sundr.codegen.api.Output;
+import io.sundr.codegen.api.Renderer;
+import io.sundr.model.utils.Types;
+import io.sundr.utils.Strings;
 
 public class GenericAptOutput<T> implements Output<T> {
 
   private final Filer filer;
+  private final Renderer<T> renderer;
   private final Location location;
   private final String moduleAndPackage;
   private final String relativePath;
+  private final static StringWriter DEV_NULL = new StringWriter();
 
-  public GenericAptOutput(Filer filer, String relativePath) {
-    this(filer, StandardLocation.CLASS_OUTPUT, "", relativePath);
+  public GenericAptOutput(Filer filer, Renderer<T> renderer, String relativePath) {
+    this(filer, renderer, StandardLocation.SOURCE_OUTPUT, "", relativePath);
   }
 
-  public GenericAptOutput(Filer filer, Location location, String moduleAndPackage, String relativePath) {
+  public GenericAptOutput(Filer filer, Renderer<T> renderer, Location location, String moduleAndPackage, String relativePath) {
     this.filer = filer;
+    this.renderer = renderer;
     this.location = location;
     this.moduleAndPackage = moduleAndPackage;
     this.relativePath = relativePath;
@@ -50,11 +61,21 @@ public class GenericAptOutput<T> implements Output<T> {
   public Function<T, Writer> getFunction() {
     return type -> {
       try {
-        return filer.createResource(location, moduleAndPackage, relativePath).openWriter();
+        String rendered = renderer.render(type);
+        Optional<String> name = Types.parseName(rendered);
+        if (name.isPresent()) {
+          String pkg = Types.parsePackage(rendered).orElse(moduleAndPackage);
+          String fqcn = Strings.isNullOrEmpty(pkg) ? name.get() : pkg + "." + name.get();
+          FileObject fileObject = filer.getResource(StandardLocation.SOURCE_OUTPUT, pkg, name.get() + ".java");
+          File file = Paths.get(fileObject.toUri()).toFile();
+          //If file exists just send output to /dev/null
+          return file.exists() ? DEV_NULL : filer.createSourceFile(fqcn).openWriter();
+        } else {
+          return filer.createResource(location, moduleAndPackage, relativePath).openWriter();
+        }
       } catch (IOException e) {
         throw SundrException.launderThrowable(e);
       }
     };
   }
-
 }
