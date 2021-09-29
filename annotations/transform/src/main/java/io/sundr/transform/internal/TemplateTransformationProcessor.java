@@ -144,7 +144,7 @@ public class TemplateTransformationProcessor extends AbstractCodeGeneratingProce
                 .orElseThrow(() -> new IllegalStateException("No template renderer found for:" + templateUrl));
             CodeGenerator.newGenerator(Map.class)
                 .withRenderer(renderer)
-                .withOutput(new GenericAptOutput<Map>(filer, transformation.outputPath()))
+                .withOutput(new GenericAptOutput<Map>(filer, renderer, transformation.outputPath()))
                 .skipping(i -> false)
                 .generate(annotated);
 

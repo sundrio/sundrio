@@ -16,16 +16,17 @@
 
 package io.sundr.model.utils;
 
-import io.sundr.model.*;
-import io.sundr.model.functions.GetDefinition;
-import io.sundr.model.repo.DefinitionRepository;
-import io.sundr.utils.Patterns;
-
-import javax.lang.model.element.Modifier;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.lang.model.element.Modifier;
+
+import io.sundr.model.*;
+import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.repo.DefinitionRepository;
+import io.sundr.utils.Patterns;
 
 public final class Types {
 
@@ -655,7 +656,7 @@ public final class Types {
   public static String parseFullyQualifiedName(String content) {
     Optional<String> pkg = parsePackage(content);
     final String name = parseName(content)
-            .orElseThrow(() -> new IllegalStateException("Cannot extract fully qualified name from generated code."));
+        .orElseThrow(() -> new IllegalStateException("Cannot extract fully qualified name from generated code."));
     return pkg.map(p -> p + "." + name).orElse(name);
   }
 }
