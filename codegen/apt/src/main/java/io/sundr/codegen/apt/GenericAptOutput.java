@@ -27,7 +27,6 @@ import java.util.function.Function;
 
 import javax.annotation.processing.Filer;
 import javax.tools.FileObject;
-import javax.tools.JavaFileManager.Location;
 import javax.tools.StandardLocation;
 
 import io.sundr.SundrException;
@@ -40,19 +39,17 @@ public class GenericAptOutput<T> implements Output<T> {
 
   private final Filer filer;
   private final Renderer<T> renderer;
-  private final Location location;
   private final String moduleAndPackage;
   private final String relativePath;
   private final static StringWriter DEV_NULL = new StringWriter();
 
   public GenericAptOutput(Filer filer, Renderer<T> renderer, String relativePath) {
-    this(filer, renderer, StandardLocation.SOURCE_OUTPUT, "", relativePath);
+    this(filer, renderer, "", relativePath);
   }
 
-  public GenericAptOutput(Filer filer, Renderer<T> renderer, Location location, String moduleAndPackage, String relativePath) {
+  public GenericAptOutput(Filer filer, Renderer<T> renderer, String moduleAndPackage, String relativePath) {
     this.filer = filer;
     this.renderer = renderer;
-    this.location = location;
     this.moduleAndPackage = moduleAndPackage;
     this.relativePath = relativePath;
   }
@@ -63,7 +60,11 @@ public class GenericAptOutput<T> implements Output<T> {
       try {
         String rendered = renderer.render(type);
         Optional<String> name = Types.parseName(rendered);
-        if (name.isPresent()) {
+        if (Strings.isNotNullOrEmpty(relativePath) && relativePath.endsWith(".java")) {
+          return filer.createResource(StandardLocation.SOURCE_OUTPUT, moduleAndPackage, relativePath).openWriter();
+        } else if (Strings.isNotNullOrEmpty(relativePath)) {
+          return filer.createResource(StandardLocation.CLASS_OUTPUT, moduleAndPackage, relativePath).openWriter();
+        } else if ((name.isPresent())) {
           String pkg = Types.parsePackage(rendered).orElse(moduleAndPackage);
           String fqcn = Strings.isNullOrEmpty(pkg) ? name.get() : pkg + "." + name.get();
           FileObject fileObject = filer.getResource(StandardLocation.SOURCE_OUTPUT, pkg, name.get() + ".java");
@@ -71,7 +72,8 @@ public class GenericAptOutput<T> implements Output<T> {
           //If file exists just send output to /dev/null
           return file.exists() ? DEV_NULL : filer.createSourceFile(fqcn).openWriter();
         } else {
-          return filer.createResource(location, moduleAndPackage, relativePath).openWriter();
+          throw new SundrException(
+              "Cannot generate resource. No output path specified and generated code does not correspond to a java class (so that output path can be inferred).");
         }
       } catch (IOException e) {
         throw SundrException.launderThrowable(e);
