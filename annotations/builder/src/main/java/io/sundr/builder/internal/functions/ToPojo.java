@@ -72,6 +72,7 @@ import io.sundr.model.MethodBuilder;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.PropertyFluent;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.Statement;
 import io.sundr.model.StringStatement;
@@ -323,12 +324,19 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                   getDefaultValue(new PropertyBuilder().withTypeRef(returnType).withAttributes(fieldAttributes).build()));
             }
           }
-          arguments.add(new PropertyBuilder()
+          //For arguments we need to retain all the original attributes as they affect adapters.
+          Property arg = new PropertyBuilder()
               .withName(name)
               .withTypeRef(returnType)
               .withModifiers(Types.modifiersToInt())
-              .withAttributes(fieldAttributes)
-              .build());
+              .withAttributes(method.getAttributes())
+              .build();
+
+          arguments.add(arg);
+          //Let's also update superClassFields, so that we reatins default values.
+          if (superClassFields.containsKey(name)) {
+            superClassFields.put(name, arg);
+          }
 
           if (!superClassFields.containsKey(Strings.toFieldName(name))) {
             Property field = new PropertyBuilder()
@@ -528,6 +536,20 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endBlock()
           .build();
 
+      Method staticMapAdapterWithDefaults = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName("adaptWithDefaults")
+          .addNewArgument()
+          .withName("map")
+          .withTypeRef(Collections.MAP.toUnboundedReference())
+          .endArgument()
+          .withReturnType(generatedPojo.toInternalReference())
+          .withNewBlock()
+          .addToStatements(new StringStatement(
+              () -> "return " + convertMap("map", item, generatedPojo) + ";"))
+          .endBlock()
+          .build();
+
       Method staticMapAdapter = new MethodBuilder()
           .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
           .withName("adapt")
@@ -537,7 +559,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endArgument()
           .withReturnType(generatedPojo.toInternalReference())
           .withNewBlock()
-          .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo) + ";"))
+          .addToStatements(new StringStatement(
+              () -> "return " + convertMap("map", item, withoutDefaults(generatedPojo)) + ";"))
           .endBlock()
           .build();
 
@@ -550,7 +573,25 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endArgument()
           .withReturnType(pojoBuilder.toInternalReference())
           .withNewBlock()
-          .addToStatements(new StringStatement(() -> "return " + convertMap("map", item, generatedPojo, pojoBuilder) + ";"))
+          .addToStatements(
+              new StringStatement(
+                  () -> "return " + convertMap("map", item, withoutDefaults(generatedPojo), withoutDefaults(pojoBuilder))
+                      + ";"))
+          .endBlock()
+          .build();
+
+      Method staticMapAdaptingBuilderWithDefaults = new MethodBuilder()
+          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withName("newBuilderWithDefaults")
+          .addNewArgument()
+          .withName("map")
+          .withTypeRef(Collections.MAP.toUnboundedReference())
+          .endArgument()
+          .withReturnType(pojoBuilder.toInternalReference())
+          .withNewBlock()
+          .addToStatements(
+              new StringStatement(
+                  () -> "return " + convertMap("map", item, generatedPojo, pojoBuilder) + ";"))
           .endBlock()
           .build();
 
@@ -578,6 +619,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
         additionalMethods.add(staticAdapter);
         additionalMethods.add(staticAdaptingBuilder);
         additionalMethods.add(staticMapAdapter);
+        additionalMethods.add(staticMapAdaptingBuilderWithDefaults);
+        additionalMethods.add(staticMapAdapterWithDefaults);
         if (enableStaticMapAdapter) {
           additionalMethods.add(staticMapAdaptingBuilder);
         }
@@ -1156,11 +1199,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
         sb.append("new ").append(((ClassRef) typeRef).getFullyQualifiedName());
       }
       for (int d = 0; d < typeRef.getDimensions(); d++) {
-        if (value == null || String.valueOf(value).isEmpty()) {
-          sb.append("[0]");
-        } else {
-          sb.append("[]");
-        }
+        sb.append("[0]");
       }
       return sb.toString();
     }
@@ -1210,5 +1249,14 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   private static String indent(String ref) {
     return Arrays.stream(ref.split("\\.")).map(s -> "    ").collect(Collectors.joining("", "           ", ""));
+  }
+
+  private static TypeDef withoutDefaults(TypeDef input) {
+    return new TypeDefBuilder(input).accept(new TypedVisitor<PropertyFluent<?>>() {
+      @Override
+      public void visit(PropertyFluent<?> property) {
+        property.removeFromAttributes(DEFAULT_VALUE);
+      }
+    }).build();
   }
 }
