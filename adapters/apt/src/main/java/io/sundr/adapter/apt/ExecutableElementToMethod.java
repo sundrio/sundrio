@@ -45,7 +45,7 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
   public Method apply(ExecutableElement executableElement) {
     Map<AttributeKey, Object> attributes = new HashMap<>();
     if (executableElement.getDefaultValue() != null) {
-      attributes.put(Attributeable.DEFAULT_VALUE, executableElement.getDefaultValue().getValue());
+      attributes.put(Attributeable.DEFAULT_VALUE, String.valueOf(executableElement.getDefaultValue()));
     }
     String comments = context.getElements().getDocComment(executableElement);
     List<String> commentList = Strings.isNullOrEmpty(comments) ? new ArrayList<>()

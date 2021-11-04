@@ -342,7 +342,7 @@ public class ClassTo {
 
       Map<AttributeKey, Object> attributes = new HashMap<>();
       if (method.getDefaultValue() != null) {
-        attributes.put(Attributeable.DEFAULT_VALUE, method.getDefaultValue());
+        attributes.put(Attributeable.DEFAULT_VALUE, String.valueOf(method.getDefaultValue()));
       }
 
       methods.add(new MethodBuilder()
