@@ -24,6 +24,7 @@ import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.model.Attributeable.LAZY_INIT;
+import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.isAbstract;
 import static io.sundr.utils.Strings.capitalizeFirst;
 
@@ -301,22 +302,22 @@ public class BuilderUtils {
 
   public static Set<Method> getInlineableConstructors(Property property) {
     Set<Method> result = new HashSet<Method>();
+    TypeRef typeRef = property.getTypeRef();
     TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF)
-        .apply(property.getTypeRef());
+        .apply(typeRef);
 
     if (unwrapped instanceof ClassRef) {
       ClassRef classRef = (ClassRef) unwrapped;
       //We need to handle `new String(String str)` as a special case of Inlineable constructor and deprecate Inlineables of it before we acutally remove it, so here goes...
-      if (classRef.getFullyQualifiedName().equals(String.class.getName())) {
-        return Stream
-            .of(GetDefinition.of(classRef).getConstructors().stream().filter(m -> m.getArguments().size() == 1).findFirst()
-                .orElse(new MethodBuilder()
-                    .withName("String")
-                    .addNewArgument()
-                    .withTypeRef(classRef)
-                    .endArgument()
-                    .build()))
-            .collect(Collectors.toSet());
+      if (STRING_REF.equals(typeRef)) {
+        result.add(new MethodBuilder()
+            .withName("String")
+            .addNewArgument()
+            .withName("s")
+            .withTypeRef(classRef)
+            .endArgument()
+            .build());
+        return result;
       }
       //We only want to inline non java types
       String pkg = Nameable.getPackageName(((ClassRef) unwrapped).getFullyQualifiedName());
