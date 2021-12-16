@@ -17,15 +17,6 @@
 
 package io.sundr.codegen.apt;
 
-import io.sundr.SundrException;
-import io.sundr.codegen.api.Output;
-import io.sundr.codegen.api.Renderer;
-import io.sundr.model.utils.Types;
-import io.sundr.utils.Strings;
-
-import javax.annotation.processing.Filer;
-import javax.tools.FileObject;
-import javax.tools.StandardLocation;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -33,6 +24,16 @@ import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Function;
+
+import javax.annotation.processing.Filer;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
+
+import io.sundr.SundrException;
+import io.sundr.codegen.api.Output;
+import io.sundr.codegen.api.Renderer;
+import io.sundr.model.utils.Types;
+import io.sundr.utils.Strings;
 
 public class GenericAptOutput<T> implements Output<T> {
 
@@ -70,7 +71,7 @@ public class GenericAptOutput<T> implements Output<T> {
           return filer.createResource(StandardLocation.CLASS_OUTPUT, moduleAndPackage, relativePath).openWriter();
         } else {
           throw new SundrException(
-                  "Cannot generate resource. No output path specified and generated code does not correspond to a java class (so that output path can be inferred).");
+              "Cannot generate resource. No output path specified and generated code does not correspond to a java class (so that output path can be inferred).");
         }
       } catch (IOException e) {
         throw SundrException.launderThrowable(e);
