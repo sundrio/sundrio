@@ -28,6 +28,8 @@ import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.isAbstract;
 import static io.sundr.utils.Strings.capitalizeFirst;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -85,6 +87,8 @@ public class BuilderUtils {
 
   private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
   private static final String[] NON_INLINABLE_PACKAGES = { "java", "javax", "sun", "com.sun" };
+  private static final List<String> ADDITIONALINLINABLE_ARGUMENTS = Arrays.asList(File.class.getCanonicalName(),
+      Path.class.getCanonicalName());
 
   private BuilderUtils() {
   }
@@ -350,7 +354,12 @@ public class BuilderUtils {
     for (Property argument : method.getArguments()) {
       if (!(argument.getTypeRef() instanceof ClassRef)) {
         continue;
-      } else if (((ClassRef) argument.getTypeRef()).getFullyQualifiedName().startsWith("java.lang")) {
+      }
+
+      String fqcn = ((ClassRef) argument.getTypeRef()).getFullyQualifiedName();
+      if (fqcn.startsWith("java.lang")) {
+        continue;
+      } else if (ADDITIONALINLINABLE_ARGUMENTS.contains(fqcn)) {
         continue;
       } else {
         return false;
