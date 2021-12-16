@@ -647,9 +647,10 @@ public class ClazzAs {
       List<Method> constructors = new ArrayList<Method>();
       List<Method> methods = new ArrayList<Method>();
 
-      for (Method constructor : item.getConstructors()) {
-        constructors.add(superConstructorOf(constructor, editableType));
-      }
+      constructors.addAll(item.getConstructors().stream()
+          .filter(c -> !c.isPrivate())
+          .map(c -> superConstructorOf(c, editableType))
+          .collect(Collectors.toList()));
 
       Method edit = new MethodBuilder().withModifiers(Types.modifiersToInt(modifiers))
           .withReturnType(builderType.toInternalReference()).withName("edit").withNewBlock()
