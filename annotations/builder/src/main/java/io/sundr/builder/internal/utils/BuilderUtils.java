@@ -87,8 +87,7 @@ public class BuilderUtils {
 
   private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
   private static final String[] NON_INLINABLE_PACKAGES = { "java", "javax", "sun", "com.sun" };
-  private static final List<String> ADDITIONALINLINABLE_ARGUMENTS = Arrays.asList(File.class.getCanonicalName(),
-      Path.class.getCanonicalName());
+  private static final List<String> ADDITIONALINLINABLE_ARGUMENTS = Arrays.asList(Class.class.getCanonicalName(), File.class.getCanonicalName(), Path.class.getCanonicalName());
 
   private BuilderUtils() {
   }
