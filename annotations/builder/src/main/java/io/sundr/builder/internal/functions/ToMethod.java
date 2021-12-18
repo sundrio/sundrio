@@ -77,7 +77,6 @@ import javax.lang.model.element.Modifier;
 
 import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
-import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.functions.Singularize;
@@ -1204,7 +1203,10 @@ class ToMethod {
     TypeDef baseType = DefinitionRepository.getRepository().getDefinition(unwrappedType);
 
     for (Method constructor : getInlineableConstructors(property)) {
-      boolean shouldDeprate = ((ClassRef) property.getTypeRef()).getFullyQualifiedName().equals(String.class.getName());
+      boolean shouldIgnore = ((ClassRef) property.getTypeRef()).getFullyQualifiedName().equals(String.class.getName());
+      if (shouldIgnore) {
+        continue;
+      }
 
       boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
       String ownPrefix = isCollection ? "addNew" : "withNew";
@@ -1222,21 +1224,7 @@ class ToMethod {
           .withArguments(constructor.getArguments()).withName(ownName).withParameters(baseType.getParameters()).withNewBlock()
           .addNewStringStatementStatement(
               "return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
-          .endBlock().accept(new TypedVisitor<MethodBuilder>() {
-            @Override
-            public void visit(MethodBuilder method) {
-              if (shouldDeprate) {
-                method.addToComments("Method is deprecated. use " + delegateName + " instead.");
-                method.addNewAnnotation().withClassRef(ClassRef.forName(Deprecated.class.getName())).endAnnotation();
-              }
-            }
-
-            @Override
-            public Class<MethodBuilder> getType() {
-              return MethodBuilder.class;
-            }
-
-          }).build());
+          .endBlock().build());
     }
 
     return result;
