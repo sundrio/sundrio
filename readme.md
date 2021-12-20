@@ -282,10 +282,11 @@ In our case:
                        .withExtendsList(Collections.emptyList())
                        .accept(new TypedVisitor<PropertyBuilder>() {
                              public void visit(PropertyBuilder property) {
-                                property.withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+                                property.withModifiers(Types.modifiersToInt(Modifier.PUBLIC));
                              }
-                        });
-  System.out.println(dto);
+                        })
+                        .build();
+  System.out.println(dto.render());
   ```
 
 The output should be something like:
