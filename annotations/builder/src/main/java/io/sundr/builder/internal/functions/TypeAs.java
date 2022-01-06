@@ -21,7 +21,9 @@ import static io.sundr.model.utils.Types.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
 
@@ -29,6 +31,7 @@ import io.sundr.FunctionFactory;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.model.*;
+import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.utils.Collections;
 import io.sundr.model.utils.Types;
 
@@ -216,13 +219,27 @@ public class TypeAs {
 
   public static final Function<TypeRef, TypeRef> UNWRAP_COLLECTION_OF = type -> {
     if (type instanceof ClassRef) {
-      ClassRef classRef = (ClassRef) type;
-      if (Collections.IS_COLLECTION.apply(classRef)) {
-        return classRef.getArguments().get(0);
-      }
+      return extractCollectionArgument((ClassRef) type).orElse(type);
     }
     return type;
   };
+
+  private static Optional<TypeRef> extractCollectionArgument(ClassRef classRef) {
+    if (Collections.IS_COLLECTION.apply(classRef)) {
+      if (!classRef.getArguments().isEmpty()) {
+        return Optional.of(classRef.getArguments().get(0));
+      } else {
+        // Fallback
+        TypeDef typeDef = GetDefinition.of(classRef);
+        return Stream
+            .concat(typeDef.getExtendsList().stream(), typeDef.getImplementsList().stream())
+            .map(TypeAs::extractCollectionArgument)
+            .reduce(Optional.empty(), (o, n) -> o.isPresent() ? o : n);
+      }
+    } else {
+      return Optional.empty();
+    }
+  }
 
   private static TypeRef unwrapMapOf(TypeRef type, int argumentIndex) {
     if (type instanceof ClassRef) {
