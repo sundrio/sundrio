@@ -219,21 +219,22 @@ public class TypeAs {
 
   public static final Function<TypeRef, TypeRef> UNWRAP_COLLECTION_OF = type -> {
     if (type instanceof ClassRef) {
-      return extractCollectionArgument((ClassRef) type).orElse(type);
+      return extractArgument((ClassRef) type, Collections.IS_COLLECTION, 0).orElse(type);
     }
     return type;
   };
 
-  private static Optional<TypeRef> extractCollectionArgument(ClassRef classRef) {
-    if (Collections.IS_COLLECTION.apply(classRef)) {
-      if (!classRef.getArguments().isEmpty()) {
-        return Optional.of(classRef.getArguments().get(0));
+  private static Optional<TypeRef> extractArgument(ClassRef classRef, Function<TypeRef, Boolean> typeCheckFn,
+      int argumentIndex) {
+    if (typeCheckFn.apply(classRef)) {
+      if (classRef.getArguments().size() > argumentIndex) {
+        return Optional.of(classRef.getArguments().get(argumentIndex));
       } else {
         // Fallback
         TypeDef typeDef = GetDefinition.of(classRef);
         return Stream
             .concat(typeDef.getExtendsList().stream(), typeDef.getImplementsList().stream())
-            .map(TypeAs::extractCollectionArgument)
+            .map((ref) -> extractArgument(ref, typeCheckFn, argumentIndex))
             .reduce(Optional.empty(), (o, n) -> o.isPresent() ? o : n);
       }
     } else {
@@ -243,10 +244,7 @@ public class TypeAs {
 
   private static TypeRef unwrapMapOf(TypeRef type, int argumentIndex) {
     if (type instanceof ClassRef) {
-      ClassRef classRef = (ClassRef) type;
-      if (Collections.IS_MAP.apply(classRef)) {
-        return classRef.getArguments().get(argumentIndex);
-      }
+      return extractArgument((ClassRef) type, Collections.IS_MAP, argumentIndex).orElse(type);
     }
     return type;
   }
@@ -258,8 +256,10 @@ public class TypeAs {
   public static final Function<TypeRef, TypeRef> UNWRAP_OPTIONAL_OF = type -> {
     if (type instanceof ClassRef) {
       ClassRef classRef = (ClassRef) type;
-      if (Types.isOptional(classRef)) {
-        return classRef.getArguments().get(0);
+
+      Optional<TypeRef> genericOptional = extractArgument(classRef, Types::isOptional, 0);
+      if (genericOptional.isPresent()) {
+        return genericOptional.get();
       }
 
       if (Types.isOptionalInt(classRef)) {
