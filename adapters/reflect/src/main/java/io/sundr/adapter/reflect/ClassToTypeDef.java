@@ -87,6 +87,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     List<Method> methods = new ArrayList<>();
     List<Method> constructors = new ArrayList<>();
     List<TypeParamDef> parameters = new ArrayList<>();
+    List<AnnotationRef> annotationRefs = new ArrayList<>();
 
     if (item.getSuperclass() != null) {
       extendsList.add((ClassRef) typeToTypeRef.apply(item.getGenericSuperclass()));
@@ -106,6 +107,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     constructors.addAll(getConstructors(item, references));
     methods.addAll(getMethods(item, references));
     properties.addAll(getProperties(item, references));
+    annotationRefs.addAll(getAnnotations(item));
 
     for (TypeVariable typeVariable : item.getTypeParameters()) {
       List<ClassRef> bounds = new ArrayList<>();
@@ -135,6 +137,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
         .withProperties(properties)
         .withExtendsList(extendsList)
         .withImplementsList(implementsList)
+        .withAnnotations(annotationRefs)
         .build());
 
     Set<Class> copy = new HashSet<>(references);
@@ -148,6 +151,12 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
         });
 
     return result;
+  }
+
+  private List<AnnotationRef> getAnnotations(Class item) {
+    List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
+    processAnnotatedElement(item, annotationRefs);
+    return annotationRefs;
   }
 
   private Set<Property> getProperties(Class item, Set<Class> references) {
@@ -227,8 +236,8 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     return methods;
   }
 
-  private void processAnnotatedElement(AnnotatedElement field, List<AnnotationRef> annotationRefs) {
-    for (Annotation annotation : field.getDeclaredAnnotations()) {
+  private void processAnnotatedElement(AnnotatedElement element, List<AnnotationRef> annotationRefs) {
+    for (Annotation annotation : element.getDeclaredAnnotations()) {
       final Class<? extends Annotation> annotationType = annotation.annotationType();
       AnnotationRef annotationRef = annotationTypeToAnnotationRef.apply(annotationType);
       Map<String, Object> parameters = new HashMap<>();
@@ -238,7 +247,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
           final Object value = method.invoke(annotation, (Object[]) null);
           parameters.put(name, value);
         } catch (IllegalAccessException | InvocationTargetException e) {
-          //Let's not pollute output with internal jdk stuff. 
+          //Let's not pollute output with internal jdk stuff.
           if (!annotationType.getName().startsWith("jdk.")) {
             System.out.printf("Couldn't retrieve '%s' parameter value for %s%n", name, annotationType.getName());
           }
