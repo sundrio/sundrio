@@ -33,6 +33,7 @@ import org.junit.Test;
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.testing.general.ClassWithAnnotation;
+import io.sundr.adapter.testing.general.ClassWithAnnotation2;
 import io.sundr.adapter.testing.general.ClassWithArray;
 import io.sundr.adapter.testing.general.ClassWithParam;
 import io.sundr.adapter.testing.general.ClassWithPrimitiveArray;
@@ -160,6 +161,17 @@ public abstract class AbstractAdapterTest<T> {
     assertEquals("bar", annotationRef.getParameters().get("name"));
     Object params = annotationRef.getParameters().get("values");
     assertArrayEquals(new int[] { 1, 2, 3, 5, 7 }, (int[]) annotationRef.getParameters().get("values"));
+  }
+
+  @Test
+  public void testClassWithClassAnnotations() {
+    T input = getInput(ClassWithAnnotation2.class);
+    TypeDef typeDef = Adapters.adaptType(input, getContext());
+    List<AnnotationRef> annotations = typeDef.getAnnotations();
+    assertEquals(1, annotations.size());
+    AnnotationRef annotationRef = annotations.get(0);
+    assertTrue(annotationRef.toString().contains("SimpleAnnotation2"));
+    assertEquals("baz", annotationRef.getParameters().get("name"));
   }
 
   //
