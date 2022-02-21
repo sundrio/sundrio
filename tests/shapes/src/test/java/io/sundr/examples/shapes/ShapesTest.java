@@ -191,7 +191,7 @@ public class ShapesTest {
         .withX(10)
         .withY(10)
         .withRadius(10.5)
-        .withNotes("circle1")
+        .withNotes("circle1") //Even though 'notes' is ignored on circle, this field is inherited.
         .and()
         .addNewSquareShape()
         .withY(10)
@@ -202,7 +202,7 @@ public class ShapesTest {
         .build();
 
     Circle circle = (Circle) canvas.getShapes().get(0);
-    Assert.assertEquals(Optional.of("circle1"), circle.getNotes());
+    Assert.assertNull(circle.getNotes()); //This field is added to ignore properties.
     Square square = (Square) canvas.getShapes().get(1);
     Assert.assertEquals(Optional.of("square1"), square.getNotes());
   }

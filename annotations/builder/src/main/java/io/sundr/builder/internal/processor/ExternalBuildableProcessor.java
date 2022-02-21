@@ -18,6 +18,7 @@ package io.sundr.builder.internal.processor;
 
 import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
+import static io.sundr.builder.Constants.IGNORE_PROPERTIES;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
@@ -166,6 +167,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                     builder.addToAttributes(EXTERNAL_BUILDABLE, generated);
                     builder.addToAttributes(EDITABLE_ENABLED, generated.editableEnabled());
                     builder.addToAttributes(VALIDATION_ENABLED, generated.validationEnabled());
+                    builder.addToAttributes(IGNORE_PROPERTIES, generated.ignore());
                     builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, isLazyCollectionInitEnabled);
                     builder.addToAttributes(LAZY_MAP_INIT_ENABLED, isLazyMapInitEnabled);
                   }

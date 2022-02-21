@@ -21,6 +21,8 @@ import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.model.utils.Types.isAbstract;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +75,10 @@ public class ClazzAs {
           TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
           TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
+          Set<String> propertiesToIgnore = item.hasAttribute(IGNORE_PROPERTIES)
+              ? new HashSet<>(Arrays.asList(item.getAttribute(IGNORE_PROPERTIES)))
+              : new HashSet<>();
+
           //The generic letter is always the last
           final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
 
@@ -85,6 +91,9 @@ public class ClazzAs {
                 .apply(property.getTypeRef());
 
             if (property.isStatic()) {
+              continue;
+            }
+            if (propertiesToIgnore.contains(property.getName())) {
               continue;
             }
             if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
@@ -208,6 +217,9 @@ public class ClazzAs {
       TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
       final TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
+      Set<String> propertiesToIgnore = item.hasAttribute(IGNORE_PROPERTIES)
+          ? new HashSet<>(Arrays.asList(item.getAttribute(IGNORE_PROPERTIES)))
+          : new HashSet<>();
       //The generic letter is always the last
       final TypeParamDef genericType = fluentImplType.getParameters().get(fluentImplType.getParameters().size() - 1);
 
@@ -228,6 +240,10 @@ public class ClazzAs {
         if (property.isStatic()) {
           continue;
         }
+        if (propertiesToIgnore.contains(property.getName())) {
+          continue;
+        }
+
         if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
           continue;
         }
@@ -773,10 +789,16 @@ public class ClazzAs {
     }
 
     TypeDef target = clazz;
+    Set<String> propertiesToIgnore = clazz.hasAttribute(IGNORE_PROPERTIES)
+        ? new HashSet<>(Arrays.asList(clazz.getAttribute(IGNORE_PROPERTIES)))
+        : new HashSet<>();
+
     //Iterate parent objects and check for properties with setters but not ctor arguments.
     while (target != null && !Types.OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
       for (Property property : target.getProperties()) {
-        if (!hasBuildableConstructorWithArgument(target, property) && Setter.has(target, property)) {
+        if (propertiesToIgnore.contains(property.getName())) {
+          continue;
+        } else if (!hasBuildableConstructorWithArgument(target, property) && Setter.has(target, property)) {
           Getter.findOptional(instance, property).map(Method::getName).ifPresent(getterName -> {
             String withName = "with" + property.getNameCapitalized();
             statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.")
@@ -798,6 +820,9 @@ public class ClazzAs {
   private static List<Statement> toBuild(final TypeDef clazz, final TypeDef instanceType) {
     Method constructor = findBuildableConstructor(clazz);
     List<Statement> statements = new ArrayList<Statement>();
+    Set<String> propertiesToIgnore = clazz.hasAttribute(IGNORE_PROPERTIES)
+        ? new HashSet<>(Arrays.asList(clazz.getAttribute(IGNORE_PROPERTIES)))
+        : new HashSet<>();
 
     statements.add(new StringStatement(new StringBuilder()
         .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
@@ -818,6 +843,9 @@ public class ClazzAs {
       }
 
       for (Property property : c.getProperties()) {
+        if (propertiesToIgnore.contains(property.getName())) {
+          continue;
+        }
         Method setter;
         try {
           setter = Setter.find(clazz, property);

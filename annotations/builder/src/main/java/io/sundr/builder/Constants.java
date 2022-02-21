@@ -75,6 +75,9 @@ public class Constants {
 
   public static final AttributeKey<Buildable> BUILDABLE = new AttributeKey<Buildable>("BUILDABLE_ANNOTATION", Buildable.class);
 
+  public static final AttributeKey<String[]> IGNORE_PROPERTIES = new AttributeKey<String[]>("IGNORE_PROPERTIES",
+      String[].class);
+
   public static final AttributeKey<ExternalBuildables> EXTERNAL_BUILDABLE = new AttributeKey<ExternalBuildables>(
       "EXTERNAL_BUILDABLE", ExternalBuildables.class);
 

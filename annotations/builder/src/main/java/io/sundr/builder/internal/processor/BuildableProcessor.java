@@ -18,6 +18,7 @@ package io.sundr.builder.internal.processor;
 
 import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.builder.Constants.EDITABLE_ENABLED;
+import static io.sundr.builder.Constants.IGNORE_PROPERTIES;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
@@ -76,6 +77,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             .addToAttributes(BUILDABLE, buildable)
             .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
+            .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
             .accept(new Visitor<PropertyBuilder>() {
               @Override
               public void visit(PropertyBuilder builder) {
@@ -93,6 +95,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
               .addToAttributes(BUILDABLE, buildable)
               .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
               .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
+              .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
               .accept(new Visitor<PropertyBuilder>() {
                 @Override
                 public void visit(PropertyBuilder builder) {
