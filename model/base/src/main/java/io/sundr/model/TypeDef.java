@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class TypeDef extends ModifierSupport implements Renderable, Nameable, Annotatable, Commentable, Mappable<TypeDef> {
@@ -422,16 +423,17 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
 
   @Override
   public String render() {
+    StringBuilder tb = new StringBuilder(); // Top StringBuffer: (package and imports).
     StringBuilder sb = new StringBuilder();
     String indent = outerTypeName == null ? "  " : "    ";
     String halfIndent = outerTypeName == null ? "" : "  ";
 
     // We only need to render those for the outermost type
     if (outerTypeName == null) {
-      sb.append("package ").append(getPackageName()).append(SEMICOLN).append(NEWLINE);
-      sb.append(NEWLINE);
+      tb.append("package ").append(getPackageName()).append(SEMICOLN).append(NEWLINE);
+      tb.append(NEWLINE);
       for (String i : getImports()) {
-        sb.append("import ").append(i).append(SEMICOLN).append(NEWLINE);
+        tb.append("import ").append(i).append(SEMICOLN).append(NEWLINE);
       }
     }
 
@@ -479,7 +481,14 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     }
 
     sb.append(NEWLINE).append(halfIndent).append(CB);
-    return sb.toString();
+    String top = tb.toString();
+    String content = sb.toString();
+    for (ClassRef ref : getReferences()) {
+      if (top.contains("import " + ref.getFullyQualifiedName() + ";") || ref.getPackageName().equals(getPackageName())) {
+        content = content.replaceFirst(Pattern.quote(ref.getFullyQualifiedName()), ref.getName());
+      }
+    }
+    return top + content;
   }
 
   @Override
