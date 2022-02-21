@@ -41,6 +41,7 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
@@ -362,7 +363,11 @@ public class ClazzAs {
 
       return BuilderContextManager.getContext().getDefinitionRepository()
           .register(
-              new TypeDefBuilder(fluentImplType).withComments("Generated").withAnnotations().withConstructors(constructors)
+              new TypeDefBuilder(fluentImplType).withComments("Generated")
+                  .withAnnotations(
+                      new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
+                          .addToParameters("value", "unchecked").build())
+                  .withConstructors(constructors)
                   .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(methods).build());
     }
   });
