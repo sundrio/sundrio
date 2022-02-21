@@ -64,7 +64,8 @@ context of the builder ([see below](#builder-inheritance)).
 
 On any POJO you can add the `@Buildable` annotation on a single
 constructor. On compile time a builder will get generated that will
-contain methods for all of the constructor arguments. For example:
+contain methods for all of the constructor arguments (or all properties that have a getter and a setter). 
+For example:
 
 ```java
 @Buildable
@@ -109,6 +110,10 @@ will now return the editable version of the object.
 EditableSquare mySquare = new SquareBuilder().withX(0).withY(0).withSize(10).build();
 EditableSquare newSquare = mySquare.edit().withSize(10).done();
 ```
+
+#### Ignoring fields
+
+To exclude properties (either or local to the class or inherited) from the resulting builder, you can use the `ignore()` method on the @Buildable annotation to specify the names of one or more properties to ignore.
 
 ### Builder Inheritance
 

@@ -25,7 +25,7 @@ import io.sundr.examples.shapes.Updateable;
 @Buildable(inline = {
     @Inline(type = Createable.class, value = "create", prefix = "Createable"),
     @Inline(type = Updateable.class, value = "update", prefix = "Updateable"),
-})
+}, ignore = { "notes" })
 public class Circle<T extends Number> extends AbstractShape {
 
   private final T radius;

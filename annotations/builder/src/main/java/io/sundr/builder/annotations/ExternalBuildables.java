@@ -52,4 +52,10 @@ public @interface ExternalBuildables {
   String[] excludes() default {};
 
   Inline[] inline() default {};
+
+  /**
+   * Ignore properties
+   * @return the names of the properties to ignore.
+   */
+  String[] ignore() default {};
 }

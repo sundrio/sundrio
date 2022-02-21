@@ -42,4 +42,11 @@ public @interface Buildable {
   BuildableReference[] refs() default {};
 
   Inline[] inline() default {};
+
+  /**
+   * Ignore properties
+   * 
+   * @return the names of the properties to ignore.
+   */
+  String[] ignore() default {};
 }
