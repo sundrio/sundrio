@@ -49,7 +49,7 @@ import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.Constants;
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.*;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
@@ -176,7 +176,7 @@ public class BuilderUtils {
   public static List<ClassRef> findBuildableReferences(ClassRef ref) {
     List<ClassRef> result = new ArrayList<>();
     TypeDef def = new TypeDefBuilder(GetDefinition.of(ref))
-        .accept(new TypedVisitor<ClassRefBuilder>() {
+        .accept(new Visitor<ClassRefBuilder>() {
           @Override
           public void visit(ClassRefBuilder builder) {
             ClassRef candidate = builder.build();

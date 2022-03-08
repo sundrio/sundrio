@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.MethodBuilder;
@@ -78,8 +78,8 @@ public class BindDefinition implements Function<ClassRef, TypeDef> {
    * @param mappings A map that maps class arguments names to types.
    * @return a visitors that performs the actual mapping.
    */
-  private static TypedVisitor<PropertyBuilder> mapGenericProperties(Map<String, TypeRef> mappings) {
-    return new TypedVisitor<PropertyBuilder>() {
+  private static Visitor<PropertyBuilder> mapGenericProperties(Map<String, TypeRef> mappings) {
+    return new Visitor<PropertyBuilder>() {
       @Override
       public void visit(PropertyBuilder property) {
         TypeRef typeRef = property.buildTypeRef();
@@ -103,8 +103,8 @@ public class BindDefinition implements Function<ClassRef, TypeDef> {
    * @param mappings A map that maps class arguments names to types.
    * @return a visitors that performs the actual mapping.
    */
-  private static TypedVisitor<MethodBuilder> mapGenericReturnTypes(Map<String, TypeRef> mappings) {
-    return new TypedVisitor<MethodBuilder>() {
+  private static Visitor<MethodBuilder> mapGenericReturnTypes(Map<String, TypeRef> mappings) {
+    return new Visitor<MethodBuilder>() {
       @Override
       public void visit(MethodBuilder method) {
         TypeRef typeRef = method.buildReturnType();
@@ -128,8 +128,8 @@ public class BindDefinition implements Function<ClassRef, TypeDef> {
    * @param mappings A map that maps class arguments names to types.
    * @return a visitors that performs the actual mapping.
    */
-  private static TypedVisitor<ClassRefBuilder> mapClassRefArguments(Map<String, TypeRef> mappings) {
-    return new TypedVisitor<ClassRefBuilder>() {
+  private static Visitor<ClassRefBuilder> mapClassRefArguments(Map<String, TypeRef> mappings) {
+    return new Visitor<ClassRefBuilder>() {
       @Override
       public void visit(ClassRefBuilder c) {
         List<TypeRef> arguments = new ArrayList<>();

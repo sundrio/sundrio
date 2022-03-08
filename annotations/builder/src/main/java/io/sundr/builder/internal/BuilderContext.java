@@ -19,6 +19,8 @@ package io.sundr.builder.internal;
 import static io.sundr.builder.Constants.INLINEABLE;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.utils.Types.CLASS;
+import static io.sundr.model.utils.Types.CLASS_REF_NO_ARG;
+import static io.sundr.model.utils.Types.OPTIONAL;
 import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.TYPE;
 import static io.sundr.model.utils.Types.modifiersToInt;
@@ -42,6 +44,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.apt.AptContext;
+import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.model.Attributeable;
@@ -60,6 +63,7 @@ import io.sundr.model.WildcardRefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.model.utils.Collections;
 import io.sundr.model.visitors.ReplacePackage;
+import io.sundr.utils.Strings;
 
 public class BuilderContext {
 
@@ -121,26 +125,6 @@ public class BuilderContext {
 
     TypeDef functionalInterfaceType = TypeDef.forName(FunctionalInterface.class.getName());
 
-    visitorInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
-        .addNewAnnotation()
-        .withClassRef(functionalInterfaceType.toInternalReference())
-        .endAnnotation()
-        .withKind(Kind.INTERFACE)
-        .withPackageName("io.sundr.builder")
-        .withName("Visitor")
-        .withParameters(T)
-        .addNewMethod()
-        .withName("visit")
-        .addNewArgument()
-        .withName("element")
-        .withTypeRef(T.toReference())
-        .endArgument()
-        .withReturnType(new VoidRef())
-        .endMethod()
-        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-        .build();
-
     builderInterface = new TypeDefBuilder()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withKind(Kind.INTERFACE)
@@ -154,7 +138,116 @@ public class BuilderContext {
         .withName("build")
         .withReturnType(T.toReference())
         .endMethod()
+
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .build();
+
+    visitorInterface = new TypeDefBuilder()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .addNewAnnotation()
+        .withClassRef(functionalInterfaceType.toInternalReference())
+        .endAnnotation()
+
+        .withKind(Kind.INTERFACE)
+        .withPackageName("io.sundr.builder")
+        .withName("Visitor")
+        .withParameters(T)
+        .addNewMethod()
+        .withName("visit")
+        .addNewArgument()
+        .withName("element")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .withReturnType(new VoidRef())
+        .endMethod()
+
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withName("getType")
+        .withReturnType(CLASS.toReference(T.toReference()))
+        .withNewBlock()
+        .addNewStringStatementStatement("return (Class<T>) getTypeArguments(Visitor.class, getClass()).get(0);")
+        .endBlock()
+        .endMethod()
+
+        // getRawName
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withName("getRawName")
+        .withReturnType(STRING_REF)
+        .addNewArgument()
+        .withName("type")
+        .withTypeRef(TYPE.toInternalReference())
+        .endArgument()
+        .withNewBlock()
+        .addNewStringStatementStatement(
+            "return type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType().getTypeName() : type.getTypeName();")
+        .endBlock()
+        .endMethod()
+
+        // getClass
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withName("getClass")
+        .withReturnType(CLASS.toReference(new WildcardRef()))
+        .addNewArgument()
+        .withName("type")
+        .withTypeRef(TYPE.toInternalReference())
+        .endArgument()
+        .withNewBlock()
+        .addNewStringStatementStatement(Strings.loadResourceQuietly(Constants.GET_CLASS_SNIPPET))
+        .endBlock()
+        .endMethod()
+
+        // getMatchingInterface
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withParameters(T)
+        .withName("getMatchingInterface")
+        .withReturnType(OPTIONAL.toReference(TYPE.toInternalReference()))
+        .addNewArgument()
+        .withName("targetInterface")
+        .withTypeRef(CLASS.toReference())
+        .endArgument()
+        .addNewArgument()
+        .withName("candidates")
+        .withTypeRef(new ClassRefBuilder(TYPE.toReference()).withDimensions(1).build())
+        .endArgument()
+        .withNewBlock()
+        .addNewStringStatementStatement(Strings.loadResourceQuietly(Constants.GET_MATCHING_INTERFACE_SNIPPET))
+        .endBlock()
+        .withVarArgPreferred(true)
+        .endMethod()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withParameters(T)
+        .withName("getTypeArguments")
+        .withReturnType(Collections.LIST.toReference(CLASS_REF_NO_ARG))
+        .addNewArgument()
+        .withTypeRef(CLASS.toReference(T.toReference()))
+        .withName("baseClass")
+        .endArgument()
+        .addNewArgument()
+        .withTypeRef(CLASS.toReference(new WildcardRefBuilder().withBounds(T.toReference()).build()))
+        .withName("childClass")
+        .endArgument()
+        .withNewBlock()
+        .addNewStringStatementStatement(Strings.loadResourceQuietly(Constants.GET_TYPE_ARGUMENTS_SNIPPET))
+        .endBlock()
+        .endMethod()
+
+        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .addToAttributes(ALSO_IMPORT,
+            new LinkedHashSet<>(Arrays.asList(ClassRef.forName(ParameterizedType.class.getName()),
+                ClassRef.forName(GenericArrayType.class.getName()),
+                ClassRef.forName(TypeVariable.class.getName()),
+                ClassRef.forName(Array.class.getName()),
+                ClassRef.forName(Arrays.class.getName()),
+                Collections.ARRAY_LIST.toReference(),
+                Collections.MAP.toReference(),
+                Collections.LINKED_HASH_MAP.toReference())))
         .build();
 
     typedVisitorInterface = new TypeDefBuilder()
@@ -170,75 +263,7 @@ public class BuilderContext {
         .withName("getType")
         .withReturnType(CLASS.toReference(V.toReference()))
         .withNewBlock()
-        .addNewStringStatementStatement("return (Class<V>) getTypeArguments(TypedVisitor.class, getClass()).get(0);")
-        .endBlock()
-        .endMethod()
-
-        .addNewMethod()
-        .withName("getClass")
-        .withReturnType(CLASS.toReference(new WildcardRef()))
-        .addNewArgument()
-        .withName("type")
-        .withTypeRef(TYPE.toInternalReference())
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "if (type instanceof Class) {return (Class) type;} else if (type instanceof ParameterizedType) {return getClass(((ParameterizedType) type).getRawType());} else if (type instanceof GenericArrayType) {Type componentType = ((GenericArrayType) type).getGenericComponentType(); Class<?> componentClass = getClass(componentType); if (componentClass != null) {return Array.newInstance(componentClass, 0).getClass();} else {return null;}} else {return null;}")
-        .endBlock()
-        .endMethod()
-
-        .addNewMethod()
-        .withParameters(T)
-        .withName("getTypeArguments")
-        .withReturnType(Collections.LIST.toReference(CLASS.toReference()))
-        .addNewArgument()
-        .withTypeRef(CLASS.toReference(T.toReference()))
-        .withName("baseClass")
-        .endArgument()
-        .addNewArgument()
-        .withTypeRef(CLASS.toReference(new WildcardRefBuilder().withBounds(T.toReference()).build()))
-        .withName("childClass")
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "    Map<Type, Type> resolvedTypes = new LinkedHashMap<>();" + "\n" +
-                "    Type type = childClass;" + "\n" +
-                "    // start walking up the inheritance hierarchy until we hit baseClass" + "\n" +
-                "    while (!getClass(type).equals(baseClass)) {" + "\n" +
-                "      if (type instanceof Class) {" + "\n" +
-                "        // there is no useful information for us in raw types, so just keep going." + "\n" +
-                "        type = ((Class) type).getGenericSuperclass();" + "\n" +
-                "      } else {" + "\n" +
-                "        ParameterizedType parameterizedType = (ParameterizedType) type;" + "\n" +
-                "        Class<?> rawType = (Class) parameterizedType.getRawType();" + "\n" +
-                "        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();" + "\n" +
-                "        TypeVariable<?>[] typeParameters = rawType.getTypeParameters();" + "\n" +
-                "        for (int i = 0; i < actualTypeArguments.length; i++) {" + "\n" +
-                "          resolvedTypes.put(typeParameters[i], actualTypeArguments[i]);" + "\n" +
-                "        }" + "\n" +
-                "        if (!rawType.equals(baseClass)) {" + "\n" +
-                "          type = rawType.getGenericSuperclass();" + "\n" +
-                "        }" + "\n" +
-                "      }" + "\n" +
-                "    }" + "\n" +
-                "    // finally, for each actual type argument provided to baseClass, determine (if possible)" + "\n" +
-                "    // the raw class for that type argument." + "\n" +
-                "    Type[] actualTypeArguments;" + "\n" +
-                "    if (type instanceof Class) {" + "\n" +
-                "      actualTypeArguments = ((Class) type).getTypeParameters();" + "\n" +
-                "    } else {" + "\n" +
-                "      actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();" + "\n" +
-                "    }" + "\n" +
-                "    List<Class<?>> typeArgumentsAsClasses = new ArrayList<>();" + "\n" +
-                "    // resolve types by chasing down type variables." + "\n" +
-                "    for (Type baseType : actualTypeArguments) {" + "\n" +
-                "      while (resolvedTypes.containsKey(baseType)) {" + "\n" +
-                "        baseType = resolvedTypes.get(baseType);" + "\n" +
-                "      }" + "\n" +
-                "      typeArgumentsAsClasses.add(getClass(baseType));" + "\n" +
-                "    }" + "\n" +
-                "    return typeArgumentsAsClasses;" + "\n" +
-                "")
+        .addNewStringStatementStatement("return (Class<V>) Visitor.getTypeArguments(TypedVisitor.class, getClass()).get(0);")
         .endBlock()
         .endMethod()
         .addToAttributes(ALSO_IMPORT,
@@ -285,7 +310,7 @@ public class BuilderContext {
         .addNewStringStatementStatement("this.path = path;")
         .addNewStringStatementStatement("this.delegate = this;")
         .addNewStringStatementStatement(
-            "this.parentType = (Class<P>) getTypeArguments(PathAwareTypedVisitor.class, getClass()).get(1);")
+            "this.parentType = (Class<P>) Visitor.getTypeArguments(PathAwareTypedVisitor.class, getClass()).get(1);")
         .endBlock()
         .endConstructor()
 
@@ -303,7 +328,7 @@ public class BuilderContext {
         .addNewStringStatementStatement("this.path = path;")
         .addNewStringStatementStatement("this.delegate = this;")
         .addNewStringStatementStatement(
-            "this.parentType = (Class<P>) getTypeArguments(PathAwareTypedVisitor.class, delegate.getClass()).get(1);")
+            "this.parentType = (Class<P>) Visitor.getTypeArguments(PathAwareTypedVisitor.class, delegate.getClass()).get(1);")
         .endBlock()
         .endConstructor()
 

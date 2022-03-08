@@ -55,7 +55,7 @@ import javax.lang.model.element.Modifier;
 
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.apt.AptContext;
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.Pojo;
 import io.sundr.builder.internal.BuilderContext;
@@ -427,7 +427,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     //The processor instead explicitly generates fluent and builder for the new pojo.
     Method buildableConstructor = new MethodBuilder().withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withArguments(constructorArgs).withNewBlock().withStatements(statements).endBlock()
-        .accept(new TypedVisitor<PropertyBuilder>() {
+        .accept(new Visitor<PropertyBuilder>() {
           @Override
           public void visit(PropertyBuilder b) {
             String name = b.getName();
@@ -1252,11 +1252,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
   }
 
   private static TypeDef withoutDefaults(TypeDef input) {
-    return new TypeDefBuilder(input).accept(new TypedVisitor<PropertyFluent<?>>() {
-      @Override
-      public void visit(PropertyFluent<?> property) {
-        property.removeFromAttributes(DEFAULT_VALUE);
-      }
+    return new TypeDefBuilder(input).accept(PropertyFluent.class, property -> {
+      property.removeFromAttributes(DEFAULT_VALUE);
     }).build();
   }
 }

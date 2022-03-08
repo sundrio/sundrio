@@ -40,7 +40,6 @@ import java.util.Set;
 import java.util.function.Function;
 
 import io.sundr.adapter.apt.AptContext;
-import io.sundr.builder.TypedVisitor;
 import io.sundr.dsl.internal.graph.Node;
 import io.sundr.dsl.internal.graph.NodeContext;
 import io.sundr.dsl.internal.processor.DslContextManager;
@@ -171,18 +170,16 @@ public class Nodes {
           final ClassRef reCombinedRef = reCombinedType.toInternalReference();
           DslContextManager.getContext().getDefinitionRepository().register(reCombinedType, IS_GENERATED);
 
-          reCombinedType = new TypeDefBuilder(reCombinedType).accept(new TypedVisitor<TypeDefBuilder>() {
-            public void visit(TypeDefBuilder builder) {
-              List<ClassRef> updatedInterfaces = new ArrayList<ClassRef>();
-              for (ClassRef interfaceRef : builder.getExtendsList()) {
-                if (interfaceRef.equals(selfRef)) {
-                  updatedInterfaces.add(GetDefinition.of(selfRef).toReference(reCombinedRef));
-                } else {
-                  updatedInterfaces.add(interfaceRef);
-                }
+          reCombinedType = new TypeDefBuilder(reCombinedType).accept(TypeDefBuilder.class, builder -> {
+            List<ClassRef> updatedInterfaces = new ArrayList<ClassRef>();
+            for (ClassRef interfaceRef : builder.getExtendsList()) {
+              if (interfaceRef.equals(selfRef)) {
+                updatedInterfaces.add(GetDefinition.of(selfRef).toReference(reCombinedRef));
+              } else {
+                updatedInterfaces.add(interfaceRef);
               }
-              builder.withExtendsList(updatedInterfaces);
             }
+            builder.withExtendsList(updatedInterfaces);
           }).build();
 
           ClassRef reCombined = reCombinedType.toInternalReference();
@@ -289,11 +286,9 @@ public class Nodes {
               .withPackageName(scopeInterface.getPackageName())
               .withName(scopeInterface.getName() + SCOPE_SUFFIX).withExtendsList(scopeInterface).withMethods()
               .addToAttributes(CARDINALITY_MULTIPLE, multiple).addToAttributes(KEYWORDS, scopeKeywords(scopeClasses))
-              .accept(new TypedVisitor<TypeDefBuilder>() {
-                public void visit(TypeDefBuilder builder) {
-                  builder.getAttributes().remove(BEGIN_SCOPE);
-                  builder.getAttributes().remove(END_SCOPE);
-                }
+              .accept(TypeDefBuilder.class, builder -> {
+                builder.getAttributes().remove(BEGIN_SCOPE);
+                builder.getAttributes().remove(END_SCOPE);
               }).build();
           DslContextManager.getContext().getDefinitionRepository().register(typeDef, IS_GENERATED);
           result.add(typeDef);

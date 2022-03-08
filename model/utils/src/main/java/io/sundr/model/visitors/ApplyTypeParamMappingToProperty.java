@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -31,7 +31,7 @@ import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 import io.sundr.utils.Maps;
 
-public class ApplyTypeParamMappingToProperty extends TypedVisitor<PropertyFluent<?>> {
+public class ApplyTypeParamMappingToProperty implements Visitor<PropertyFluent<?>> {
 
   private final Map<String, TypeRef> mappings;
   private final Optional<AttributeKey<TypeParamRef>> attributeKey;

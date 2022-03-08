@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.TypeDef;
@@ -70,7 +70,7 @@ public class Generics {
     }
   };
 
-  private static final TypedVisitor<ClassRefBuilder> UNWRAP_CLASSREF_VISITOR = new TypedVisitor<ClassRefBuilder>() {
+  private static final Visitor<ClassRefBuilder> UNWRAP_CLASSREF_VISITOR = new Visitor<ClassRefBuilder>() {
     public void visit(ClassRefBuilder builder) {
       List<TypeRef> unwrappedArguments = new ArrayList<TypeRef>();
       for (TypeRef argument : builder.getArguments()) {

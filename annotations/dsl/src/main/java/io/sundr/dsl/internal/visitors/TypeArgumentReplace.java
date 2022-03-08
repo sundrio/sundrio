@@ -19,11 +19,11 @@ package io.sundr.dsl.internal.visitors;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.TypeRef;
 
-public class TypeArgumentReplace extends TypedVisitor<ClassRefBuilder> {
+public class TypeArgumentReplace implements Visitor<ClassRefBuilder> {
 
   private final TypeRef target;
   private final TypeRef replacement;

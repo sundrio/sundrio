@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.sundr.builder.Builder;
-import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -37,12 +36,12 @@ public class ReplacePackage implements Visitor<Builder> {
 
   private final String target;
   private final String replacement;
-  private final TypedVisitor<ClassRefFluent<?>> visitor;
+  private final Visitor<ClassRefFluent<?>> visitor;
 
   public ReplacePackage(String target, String replacement) {
     this.target = target;
     this.replacement = replacement;
-    this.visitor = new TypedVisitor<ClassRefFluent<?>>() {
+    this.visitor = new Visitor<ClassRefFluent<?>>() {
       @Override
       public void visit(ClassRefFluent<?> ref) {
         ref.withFullyQualifiedName(ref.getFullyQualifiedName().replaceFirst(target, replacement));
@@ -108,5 +107,4 @@ public class ReplacePackage implements Visitor<Builder> {
       builder.getAttributes().put(TypeDef.ALSO_IMPORT, updatedImports);
     }
   }
-
 }

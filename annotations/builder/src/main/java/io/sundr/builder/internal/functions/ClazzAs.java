@@ -36,7 +36,7 @@ import javax.lang.model.element.Modifier;
 import io.sundr.FunctionFactory;
 import io.sundr.SundrException;
 import io.sundr.adapter.apt.AptContext;
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -645,7 +645,7 @@ public class ClazzAs {
 
           final TypeDef editable = EDITABLE.apply(item);
           return new TypeDefBuilder(BUILDER.apply(item)).withComments("Generated").withAnnotations()
-              .accept(new TypedVisitor<MethodBuilder>() {
+              .accept(new Visitor<MethodBuilder>() {
                 public void visit(MethodBuilder builder) {
                   if (builder.getName() != null && builder.getName().equals("build")) {
                     builder.withModifiers(Types.modifiersToInt(modifiers));

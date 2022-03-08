@@ -23,7 +23,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import io.sundr.builder.PathAwareTypedVisitor;
-import io.sundr.builder.TypedVisitor;
 import io.sundr.builder.Visitor;
 import io.sundr.examples.shapes.v1.Circle;
 import io.sundr.examples.shapes.v1.CircleBuilder;
@@ -128,7 +127,7 @@ public class ShapesTest {
             .build())
         .build();
 
-    canvas = new CanvasBuilder(canvas).accept(new TypedVisitor<CircleBuilder<Integer>>() {
+    canvas = new CanvasBuilder(canvas).accept(new Visitor<CircleBuilder<Integer>>() {
       @Override
       public void visit(CircleBuilder<Integer> builder) {
         builder.withRadius(100 + builder.getRadius());

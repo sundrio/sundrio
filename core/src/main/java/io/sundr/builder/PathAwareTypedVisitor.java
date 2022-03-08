@@ -29,19 +29,19 @@ public class PathAwareTypedVisitor<V, P> extends TypedVisitor<V> {
   public PathAwareTypedVisitor() {
     this.path = new ArrayList<Object>();
     this.delegate = this;
-    this.parentType = (Class<P>) getTypeArguments(PathAwareTypedVisitor.class, getClass()).get(1);
+    this.parentType = (Class<P>) Visitor.getTypeArguments(PathAwareTypedVisitor.class, getClass()).get(1);
   }
 
   public PathAwareTypedVisitor(List<Object> path) {
     this.path = path;
     this.delegate = this;
-    this.parentType = (Class<P>) getTypeArguments(PathAwareTypedVisitor.class, getClass()).get(1);
+    this.parentType = (Class<P>) Visitor.getTypeArguments(PathAwareTypedVisitor.class, getClass()).get(1);
   }
 
   public PathAwareTypedVisitor(List<Object> path, PathAwareTypedVisitor<V, P> delegate) {
     this.path = path;
     this.delegate = delegate;
-    this.parentType = (Class<P>) getTypeArguments(PathAwareTypedVisitor.class, delegate.getClass()).get(1);
+    this.parentType = (Class<P>) Visitor.getTypeArguments(PathAwareTypedVisitor.class, delegate.getClass()).get(1);
   }
 
   public PathAwareTypedVisitor<V, P> next(Object item) {
