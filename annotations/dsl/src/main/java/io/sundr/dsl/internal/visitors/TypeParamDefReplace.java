@@ -19,11 +19,11 @@ package io.sundr.dsl.internal.visitors;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 
-public class TypeParamDefReplace extends TypedVisitor<TypeDefBuilder> {
+public class TypeParamDefReplace implements Visitor<TypeDefBuilder> {
 
   private final TypeParamDef target;
   private final TypeParamDef replacement;

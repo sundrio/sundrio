@@ -33,7 +33,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
 
 import io.sundr.builder.Constants;
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.annotations.Inline;
@@ -187,7 +187,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .withConstructors(constructors)
         .addToProperties(builderProperty, functionProperty)
         .addToMethods(inlineMethod)
-        .accept(new TypedVisitor<ClassRefBuilder>() {
+        .accept(new Visitor<ClassRefBuilder>() {
           @Override
           public void visit(ClassRefBuilder builder) {
             List<TypeRef> updatedArguments = new ArrayList<TypeRef>();

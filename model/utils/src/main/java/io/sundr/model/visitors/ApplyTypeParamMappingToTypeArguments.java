@@ -21,13 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRefFluent;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 import io.sundr.utils.Maps;
 
-public class ApplyTypeParamMappingToTypeArguments extends TypedVisitor<ClassRefFluent<?>> {
+public class ApplyTypeParamMappingToTypeArguments implements Visitor<ClassRefFluent<?>> {
   private final Map<String, TypeRef> mappings;
 
   public ApplyTypeParamMappingToTypeArguments(String name, TypeRef typeRef) {

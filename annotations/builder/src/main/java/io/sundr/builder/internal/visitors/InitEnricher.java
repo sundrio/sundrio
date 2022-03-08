@@ -31,7 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.functions.Construct;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.model.ClassRef;
@@ -47,7 +47,7 @@ import io.sundr.model.utils.Collections;
 import io.sundr.model.utils.Optionals;
 import io.sundr.model.utils.Types;
 
-public class InitEnricher extends TypedVisitor<PropertyBuilder> {
+public class InitEnricher implements Visitor<PropertyBuilder> {
 
   @Override
   public void visit(PropertyBuilder builder) {

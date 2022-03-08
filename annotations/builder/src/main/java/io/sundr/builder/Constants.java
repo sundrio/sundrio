@@ -172,6 +172,7 @@ public class Constants {
   public static final String CAN_VISIT_SNIPPET = "snippets/can-visit.txt";
   public static final String GET_TYPE_SNIPPET = "snippets/get-type.txt";
   public static final String GET_CLASS_SNIPPET = "snippets/get-class.txt";
+  public static final String GET_MATCHING_INTERFACE_SNIPPET = "snippets/get-matching-interface.txt";
   public static final String GET_TYPE_ARGUMENTS_SNIPPET = "snippets/get-type-arguments.txt";
   public static final String AGGREGATE_SET_SNIPPET = "snippets/aggregate-set.txt";
   public static final String AGGREGATE_LIST_SNIPPET = "snippets/aggregate-list.txt";

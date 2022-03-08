@@ -280,12 +280,9 @@ In our case:
                        .withMethods(Collections.emptyList())
                        .withConstructors(Collections.emptyList())
                        .withExtendsList(Collections.emptyList())
-                       .accept(new TypedVisitor<PropertyBuilder>() {
-                             public void visit(PropertyBuilder property) {
+                       .accept(PropertyBuilder.class, property -> {
                                 property.withModifiers(Types.modifiersToInt(Modifier.PUBLIC));
-                             }
-                        })
-                        .build();
+                        }).build();
   System.out.println(dto.render());
   ```
 

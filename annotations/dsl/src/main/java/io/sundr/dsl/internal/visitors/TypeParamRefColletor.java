@@ -18,12 +18,12 @@ package io.sundr.dsl.internal.visitors;
 
 import java.util.Collection;
 
-import io.sundr.builder.TypedVisitor;
+import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 
-public class TypeParamRefColletor extends TypedVisitor<ClassRefBuilder> {
+public class TypeParamRefColletor implements Visitor<ClassRefBuilder> {
 
   private final Collection<TypeParamRef> collection;
 

@@ -265,7 +265,8 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
   public String render(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
     renderDefinition(sb, enclosingType);
-    boolean renderBody = isDefaultMethod() || (enclosingType != null && enclosingType.getKind() != Kind.INTERFACE);
+    boolean renderBody = isDefaultMethod() || isStatic()
+        || (enclosingType != null && enclosingType.getKind() != Kind.INTERFACE);
 
     if (renderBody) {
       String indent = enclosingType != null && enclosingType.getOuterTypeName() != null ? "    " : "  ";

@@ -60,6 +60,10 @@ public final class Types {
       .withExtendsList(TYPE.toInternalReference())
       .build();
 
+  public static final ClassRef CLASS_REF_NO_ARG = new ClassRefBuilder()
+      .withFullyQualifiedName(CLASS.getFullyQualifiedName())
+      .build();
+
   public static final TypeDef ARRAY = TypeDef.forName(Array.class.getName());
   public static final TypeDef TYPE_VARIABLE = TypeDef.forName(TypeVariable.class.getName());
   public static final TypeDef GENERIC_ARRAY_TYPE = TypeDef.forName(GenericArrayType.class.getName());
@@ -94,6 +98,12 @@ public final class Types {
 
   public static final TypeDef FLOAT = TypeDef.forName(Float.class.getName());
   public static final TypeRef FLOAT_REF = FLOAT.toInternalReference();
+
+  public static final TypeDef OPTIONAL = new TypeDefBuilder(TypeDef.forName(Optional.class.getName()))
+      .withKind(Kind.CLASS)
+      .withParameters(T)
+      .build();
+  public TypeRef OPTIONAL_REF = OPTIONAL.toInternalReference();
 
   public static final PrimitiveRef PRIMITIVE_BOOLEAN_REF = new PrimitiveRefBuilder().withName("boolean").build();
   public static final PrimitiveRef PRIMITIVE_BYTE_REF = new PrimitiveRefBuilder().withName("byte").build();

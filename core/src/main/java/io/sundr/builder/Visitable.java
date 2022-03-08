@@ -21,7 +21,7 @@ public interface Visitable<T> {
   T accept(Visitor... visitor);
 
   default <V> T accept(Class<V> type, Visitor<V> visitor) {
-    return accept(new TypedVisitor<V>() {
+    return accept(new Visitor<V>() {
       @Override
       public Class<V> getType() {
         return type;
