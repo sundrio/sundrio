@@ -814,13 +814,16 @@ public class BuilderContext {
         .withNewBlock()
         .addNewStringStatementStatement(
             "for (Visitor visitor : visitors) {" + "\n" +
-                "  for (Visitable visitable : _visitables) {" + "\n" +
-                "    visitable.accept(visitor);" + "\n" +
-                "  }" + "\n" +
-                "" + "\n" +
                 "  if (canVisit(visitor, this)) {" + "\n" +
                 "    visitor.visit(this);" + "\n" +
                 "  }" + "\n" +
+                "}" + "\n" +
+                "  for (Visitable visitable : _visitables) {" + "\n" +
+                "    Arrays.stream(visitors).filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass())).forEach(v -> visitable.accept(v));\n"
+                +
+                "    Arrays.stream(visitors).filter(v -> v.getType() == null || !v.getType().isAssignableFrom(visitable.getClass())).forEach(v -> visitable.accept(v));\n"
+                +
+                "" + "\n" +
                 "}" + "\n" +
                 "return (F) this;")
         .endBlock()

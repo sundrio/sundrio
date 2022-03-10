@@ -110,7 +110,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
   @Override
   public <V> F accept(final Class<V> type, final Visitor<V> visitor) {
-    return accept(new TypedVisitor<V>() {
+    return accept(new Visitor<V>() {
       @Override
       public Class<V> getType() {
         return type;
@@ -125,13 +125,16 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
   private F acceptInternal(Visitor... visitors) {
     for (Visitor visitor : visitors) {
-      for (Visitable visitable : _visitables) {
-        visitable.accept(visitor);
-      }
-
       if (canVisit(visitor, this)) {
         visitor.visit(this);
       }
+    }
+
+    for (Visitable visitable : _visitables) {
+      Arrays.stream(visitors).filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass()))
+          .forEach(v -> visitable.accept(v));
+      Arrays.stream(visitors).filter(v -> v.getType() == null || !v.getType().isAssignableFrom(visitable.getClass()))
+          .forEach(v -> visitable.accept(v));
     }
     return (F) this;
   }
