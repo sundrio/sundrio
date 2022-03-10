@@ -18,7 +18,11 @@ package io.sundr.builder.internal.utils;
 
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
-import static io.sundr.builder.internal.functions.TypeAs.*;
+import static io.sundr.builder.internal.functions.TypeAs.BOXED_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_MAP_VALUE_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
@@ -33,6 +37,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -50,7 +55,11 @@ import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
-import io.sundr.builder.annotations.*;
+import io.sundr.builder.annotations.Buildable;
+import io.sundr.builder.annotations.BuildableReference;
+import io.sundr.builder.annotations.ExternalBuildables;
+import io.sundr.builder.annotations.Inline;
+import io.sundr.builder.annotations.None;
 import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -673,6 +682,40 @@ public class BuilderUtils {
         .build();
   }
 
+  public static void populateEnclosedBuildables(TypeDef typeDef, Map<String, ClassRef> result) {
+    Map<String, ClassRef> buildables = new HashMap<>();
+
+    buildables.putAll(Types.allProperties(typeDef).stream()
+        .map(Property::getTypeRef)
+        .filter(t -> t instanceof ClassRef)
+        .map(t -> (ClassRef) t)
+        .map(TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF))
+        .filter(t -> t instanceof ClassRef)
+        .map(t -> (ClassRef) t)
+        .filter(BuilderUtils::isBuildable)
+        .distinct()
+        .collect(Collectors.toMap(c -> c.getFullyQualifiedName(), c -> c)));
+
+    buildables.entrySet().stream().forEach(e -> {
+      if (!result.containsKey(e.getKey())) {
+        TypeDef t = GetDefinition.of(e.getKey());
+        result.put(e.getKey(), e.getValue());
+        populateEnclosedBuildables(t, result);
+      }
+    });
+  }
+
+  /**
+   * Get all the enclosingTypes.
+   * 
+   * @return all the enclosingTypes.
+   */
+  public static Map<String, ClassRef> enclosedBuildables(TypeDef typeDef) {
+    Map<String, ClassRef> result = new HashMap<>();
+    populateEnclosedBuildables(typeDef, result);
+    return result;
+  }
+
   public static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
     List<ClassRef> result = new ArrayList<ClassRef>();
     if (attributeable.hasAttribute(ALSO_IMPORT)) {
@@ -736,4 +779,5 @@ public class BuilderUtils {
     statements.add(new StringStatement("return true;"));
     return statements;
   }
+
 }
