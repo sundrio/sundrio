@@ -4,6 +4,8 @@ target
 *.im
 *.ipr
 *.iws
+*.versionsBackup
+*.releaseBackup
 overlays
 .DS_Store
 .settings
