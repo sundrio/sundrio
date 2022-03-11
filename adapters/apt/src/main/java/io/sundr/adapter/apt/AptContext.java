@@ -47,6 +47,12 @@ public class AptContext extends AttributeSupport implements AdapterContextAware 
 
   private static Map<AttributeKey, Object> createAttributes(Elements elements, Types types) {
     Map<AttributeKey, Object> attributes = new HashMap<>();
+    if (elements == null) {
+      throw new NullPointerException("Elements cannot be null!");
+    }
+    if (types == null) {
+      throw new NullPointerException("Types cannot be null!");
+    }
     attributes.put(ELEMENTS_KEY, elements);
     attributes.put(TYPES_KEY, types);
     return attributes;
