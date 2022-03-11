@@ -30,6 +30,13 @@ public class BuilderContextManager {
   private static BuilderContext context = null;
 
   public synchronized static BuilderContext create(Elements elements, Types types) {
+    if (elements == null) {
+      throw new NullPointerException("Elements cannot be null!");
+    }
+    if (types == null) {
+      throw new NullPointerException("Types cannot be null!");
+    }
+
     context = new BuilderContext(elements, types, false, false, Builder.class.getPackage().getName());
     return context;
   }
