@@ -72,8 +72,8 @@ public final class PropertyAs {
         TypeDef baseType = GetDefinition.of((ClassRef) unwrapped);
         ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType).toReference();
 
-        TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
-        TypeRef nestedRef = nestedType.toReference();
+        final TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
+        final ClassRef nestedRef = nestedType.toReference();
 
         Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
         for (ClassRef n : nestedType.getImplementsList()) {
@@ -138,7 +138,14 @@ public final class PropertyAs {
             .endBlock()
             .build());
 
-        return new TypeDefBuilder(nestedType)
+        return new TypeDefBuilder()
+            .withKind(Kind.CLASS)
+            .withName(nestedType.getName())
+            .withPackageName(nestedType.getPackageName())
+            .withOuterTypeName(nestedType.getOuterTypeName())
+            .withParameters(nestedType.getParameters())
+            .withExtendsList(nestedType.getExtendsList())
+            .withImplementsList(nestedType.getImplementsList())
             .withAnnotations()
             .withProperties(properties)
             .withMethods(nestedMethods)
@@ -157,11 +164,7 @@ public final class PropertyAs {
       //TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
 
       if (unwrapped instanceof ClassRef) {
-        TypeDef baseType = GetDefinition.of((ClassRef) unwrapped);
-        TypeDef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType);
-
         TypeDef nestedType = NESTED_INTERFACE_TYPE.apply(item);
-        TypeRef nestedRef = nestedType.toReference();
 
         Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
         for (ClassRef n : nestedType.getImplementsList()) {
@@ -172,39 +175,18 @@ public final class PropertyAs {
         nestedMethods.add(ToMethod.AND.apply(item));
         nestedMethods.add(ToMethod.END.apply(item));
 
-        List<Property> properties = new ArrayList<Property>();
-        List<Method> constructors = new ArrayList<Method>();
-
-        properties.add(new PropertyBuilder()
-            .withName("builder")
-            .withTypeRef(builderType.toReference()).build());
-
-        constructors.add(new MethodBuilder()
-            .withName("")
-            .withReturnType(nestedRef)
-            .addNewArgument()
-            .withName("item")
-            .withTypeRef(baseType.toReference())
-            .endArgument()
-            .withNewBlock()
-            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this, item);")
-            .endBlock()
-            .build());
-
-        constructors.add(new MethodBuilder()
-            .withName("")
-            .withReturnType(nestedRef)
-            .withNewBlock()
-            .addNewStringStatementStatement("this.builder = new " + builderType.getName() + "(this);")
-            .endBlock()
-            .build());
-
-        return new TypeDefBuilder(nestedType)
+        return new TypeDefBuilder()
             .withAnnotations()
             .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
-            .withProperties(properties)
+            .withKind(Kind.INTERFACE)
+            .withName(nestedType.getName())
+            .withPackageName(nestedType.getPackageName())
+            .withOuterTypeName(nestedType.getOuterTypeName())
+            .withParameters(nestedType.getParameters())
+            .withExtendsList(nestedType.getExtendsList())
             .withMethods(nestedMethods)
-            .withConstructors(constructors)
+            .withProperties()
+            .withConstructors()
             .build();
       }
       throw new IllegalStateException();
@@ -218,9 +200,13 @@ public final class PropertyAs {
       TypeDef outerClass = item.getAttribute(OUTER_CLASS);
 
       TypeDef nested = new TypeDefBuilder(shallowNestedType)
+          .withKind(Kind.CLASS)
           .withPackageName(outerClass.getPackageName())
           .withName(shallowNestedType.getName() + "Impl")
           .withOuterTypeName(outerClass.getFullyQualifiedName())
+          .withConstructors()
+          .withMethods()
+          .withProperties()
           .build();
 
       //Not a typical fluent
@@ -251,13 +237,14 @@ public final class PropertyAs {
       ClassRef nestedInterfaceRef = nestedInterfaceType.toReference(pivotParameters);
       superClassParameters.add(nestedInterfaceRef);
 
-      ClassRef superClassFluent = new ClassRefBuilder()
-          .withFullyQualifiedName(typeDef.getFullyQualifiedName() + "FluentImpl")
-          .withArguments(superClassParameters)
-          .build();
+      ClassRef superClassFluent = new ClassRefBuilder().withFullyQualifiedName(typeDef.getFullyQualifiedName() + "FluentImpl")
+          .withArguments(superClassParameters).build();
 
-      return new TypeDefBuilder(nested)
+      return new TypeDefBuilder()
           .withKind(Kind.CLASS)
+          .withPackageName(outerClass.getPackageName())
+          .withName(shallowNestedType.getName() + "Impl")
+          .withOuterTypeName(outerClass.getFullyQualifiedName())
           .withParameters(parameters)
           .withExtendsList(superClassFluent)
           .withImplementsList(nestedInterfaceRef,
@@ -272,8 +259,7 @@ public final class PropertyAs {
     public TypeDef apply(Property item) {
       TypeDef outerInterface = item.getAttribute(OUTER_INTERFACE);
       TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item))
-          .withOuterTypeName(outerInterface != null ? outerInterface.getFullyQualifiedName() : null)
-          .build();
+          .withOuterTypeName(outerInterface != null ? outerInterface.getFullyQualifiedName() : null).build();
 
       //Not a typical fluent
       TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF)
@@ -303,22 +289,15 @@ public final class PropertyAs {
       superClassParameters.add(nested.toReference(pivotParameters));
 
       //CircleFluent<T, CircleShapesNested<T, N>>
-      ClassRef superClassFluent = new ClassRefBuilder()
-          .withFullyQualifiedName(typeDef.getFullyQualifiedName() + "Fluent")
-          .withArguments(superClassParameters)
-          .build();
+      ClassRef superClassFluent = new ClassRefBuilder().withFullyQualifiedName(typeDef.getFullyQualifiedName() + "Fluent")
+          .withArguments(superClassParameters).build();
 
-      return new TypeDefBuilder(nested)
-          .withKind(Kind.INTERFACE)
-          .withPackageName(outerInterface.getPackageName())
-          .withParameters(parameters)
-          .withOuterTypeName(outerInterface.getFullyQualifiedName())
-          .withImplementsList()
+      return new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName(outerInterface.getPackageName())
+          .withName(nested.getName()).withOuterTypeName(nested.getOuterTypeName()).withParameters(parameters)
+          .withOuterTypeName(outerInterface.getFullyQualifiedName()).withImplementsList()
           .withExtendsList(BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()),
               superClassFluent)
-
-          .withInnerTypes()
-          .build();
+          .withInnerTypes().build();
     }
   };
 
@@ -339,19 +318,21 @@ public final class PropertyAs {
         }
       }
 
-      TypeDef outerInterface = property.getAttribute(OUTER_INTERFACE);
-
+      TypeDef outerClass = property.getAttribute(OUTER_CLASS);
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
       for (TypeParamDef generic : typeDef.getParameters()) {
         parameters.add(generic);
       }
       parameters.add(N);
 
-      return new TypeDefBuilder(typeDef)
-          .withPackageName(outerInterface.getPackageName())
+      return new TypeDefBuilder()
+          .withKind(Kind.INTERFACE)
+          .withPackageName(outerClass.getPackageName())
           .withName(BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + property.getNameCapitalized()
               + "Nested")
+          .withOuterTypeName(outerClass.getFullyQualifiedName())
           .withParameters(parameters)
+          .withExtendsList(typeDef.getExtendsList())
           .build();
     }
   };
