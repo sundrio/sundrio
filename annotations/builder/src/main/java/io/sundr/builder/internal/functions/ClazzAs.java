@@ -355,27 +355,21 @@ public class ClazzAs {
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
           .withTypeRef(Types.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
           .withStatements(BuilderUtils.toEquals(fluentImplType, properties)).endBlock()
-          // .withBlock(new Block(new Provider<List<Statement>>() {
-          //   @Override
-          //   public List<Statement> get() {
-          //     return BuilderUtils.toEquals(fluentImplType, properties);
-          //   }
-          // }))
           .build();
 
       Method hashCode = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
           .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_INT_REF).withName("hashCode").withNewBlock()
           .withStatements(BuilderUtils.toHashCode(properties)).endBlock()
-          // .withBlock(new Block(new Provider<List<Statement>>() {
-          //   @Override
-          //   public List<Statement> get() {
-          //     return BuilderUtils.toHashCode(properties);
-          //   }
-          // }))
+          .build();
+
+      Method toString = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withReturnType(io.sundr.model.utils.Types.STRING_REF).withName("toString").withNewBlock()
+          .withStatements(BuilderUtils.toString(fluentImplType.getName(), properties)).endBlock()
           .build();
 
       methods.add(equals);
       methods.add(hashCode);
+      methods.add(toString);
 
       return BuilderContextManager.getContext().getDefinitionRepository()
           .register(

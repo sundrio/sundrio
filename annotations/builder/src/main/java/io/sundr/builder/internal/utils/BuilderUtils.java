@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,7 @@ import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Nameable;
+import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Statement;
@@ -728,6 +730,33 @@ public class BuilderUtils {
     List<ClassRef> result = alsoImportAsList(attributeable);
     result.addAll(Arrays.asList(refs));
     return result;
+  }
+
+  public static List<Statement> toString(String name, Collection<Property> properties) {
+    List<Statement> statements = new ArrayList<>();
+    statements.add(new StringStatement("StringBuilder sb = new StringBuilder();"));
+    statements.add(new StringStatement("sb.append(\"{\");"));
+    Iterator<Property> iter = properties.iterator();
+    while (iter.hasNext()) {
+      statements.add(new StringStatement(ifNotNullToString(iter.next(), iter.hasNext())));
+    }
+    statements.add(new StringStatement("sb.append(\"}\");"));
+    statements.add(new StringStatement("return sb.toString();"));
+    return statements;
+  }
+
+  public static String ifNotNullToString(Property property, boolean hasNext) {
+    String suffix = hasNext ? " + \",\"" : "";
+    // Primitives should be displayed no matter what.
+    if (property.getTypeRef() instanceof PrimitiveRef) {
+      return String.format("sb.append(\"%s:\"); sb.append(%s%s);", property.getName(), property.getName(), suffix);
+    }
+    if (Collections.isCollection(property.getTypeRef()) || Types.isMap(property.getTypeRef())) {
+      return String.format("if (%s != null && !%s.isEmpty()) { sb.append(\"%s:\"); sb.append(%s%s); }", property.getName(),
+          property.getName(), property.getName(), property.getName(), suffix);
+    }
+    return String.format("if (%s != null) { sb.append(\"%s:\"); sb.append(%s%s); }", property.getName(),
+        property.getName(), property.getName(), suffix);
   }
 
   public static List<Statement> toHashCode(Collection<Property> properties) {

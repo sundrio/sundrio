@@ -16,6 +16,8 @@
 
 package io.sundr.builder;
 
+import java.util.List;
+
 public interface Visitable<T> {
 
   T accept(Visitor... visitor);
@@ -33,4 +35,6 @@ public interface Visitable<T> {
       }
     });
   }
+
+  T accept(List<Object> path, Visitor... visitor);
 }

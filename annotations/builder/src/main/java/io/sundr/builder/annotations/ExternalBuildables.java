@@ -55,6 +55,7 @@ public @interface ExternalBuildables {
 
   /**
    * Ignore properties
+   * 
    * @return the names of the properties to ignore.
    */
   String[] ignore() default {};
