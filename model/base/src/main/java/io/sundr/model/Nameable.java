@@ -19,6 +19,7 @@ package io.sundr.model;
 
 import java.util.Arrays;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public interface Nameable extends Node {
@@ -52,6 +53,16 @@ public interface Nameable extends Node {
    */
   default String getPackageName() {
     return getPackageName(getFullyQualifiedName());
+  }
+
+  static String getOuterTypeName(String fullyQualifiedName) {
+    String packageName = getPackageName(fullyQualifiedName);
+    String className = getClassName(fullyQualifiedName);
+    if (!className.contains(DOT)) {
+      return null;
+    }
+    return Arrays.stream(className.split(Pattern.quote(DOT)))
+        .map(n -> packageName != null && !packageName.isEmpty() ? packageName + DOT + n : n).findFirst().orElse(null);
   }
 
   static String getClassName(String fullyQualifiedName) {

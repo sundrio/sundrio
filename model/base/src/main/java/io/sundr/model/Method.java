@@ -231,7 +231,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     } else {
       //This is a constructor
       String fqcn = ((ClassRef) returnType).getFullyQualifiedName();
-      String className = fqcn.substring(fqcn.lastIndexOf(".") + 1);
+      String className = Nameable.getClassName(fqcn);
       sb.append(className);
     }
 

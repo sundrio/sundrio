@@ -17,15 +17,10 @@
 
 package io.sundr.model.functions;
 
-import static io.sundr.utils.Predicates.after;
-import static io.sundr.utils.Predicates.until;
-
-import java.util.Arrays;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import io.sundr.model.ClassRef;
+import io.sundr.model.Nameable;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
@@ -49,27 +44,16 @@ public class GetDefinition implements Function<ClassRef, TypeDef> {
     if (def != null) {
       return def;
     }
-    Predicate<String> isLowerCase = w -> Character.isUpperCase(w.charAt(0));
-    Predicate<String> inPackage = until(isLowerCase);
-    Predicate<String> outOfPackage = after(isLowerCase);
 
-    String packageName = Arrays.stream(fullyQualifiedName.split("\\.")).filter(inPackage).collect(Collectors.joining("."));
-    String className = Arrays.stream(fullyQualifiedName.split("\\.")).filter(outOfPackage).collect(Collectors.joining("."));
-
-    String ownerClassName = className.contains(".") ? className.substring(0, className.indexOf(".")) : null;
-
-    if (ownerClassName != null) {
-      className = className.substring(ownerClassName.length() + 1);
-      return new TypeDefBuilder()
-          .withName(className)
-          .withPackageName(packageName)
-          .withOuterTypeName(packageName + "." + ownerClassName)
-          .build();
-    }
+    String packageName = Nameable.getPackageName(fullyQualifiedName);
+    String className = Nameable.getClassName(fullyQualifiedName);
+    String outerTypeName = Nameable.getOuterTypeName(fullyQualifiedName);
 
     return new TypeDefBuilder()
         .withName(className)
         .withPackageName(packageName)
+        .withOuterTypeName(outerTypeName)
         .build();
   }
+
 }
