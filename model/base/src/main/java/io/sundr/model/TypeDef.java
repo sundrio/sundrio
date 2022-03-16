@@ -88,7 +88,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     this.constructors = Collections.emptyList();
     this.methods = Collections.emptyList();
     this.innerTypes = Collections.emptyList();
-    this.outerTypeName = null;
+    this.outerTypeName = Nameable.getOuterTypeName(fullyQualifiedName);
   }
 
   public static TypeDef forName(String fullyQualifiedName) {
