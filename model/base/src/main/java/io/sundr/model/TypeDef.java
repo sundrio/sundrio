@@ -302,12 +302,17 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   }
 
   public Set<String> getImports() {
+    return getImports(getReferenceMap().values());
+  }
+
+  private Set<String> getImports(Collection<ClassRef> references) {
     final Set<String> imports = new LinkedHashSet<String>();
-    for (ClassRef ref : getReferenceMap().values()) {
+    for (ClassRef ref : references) {
       if (ref.getPackageName() == null ||
           ref.getPackageName().isEmpty() ||
           ref.getPackageName().equals(packageName) ||
-          ref.getName().equals(name)) {
+          ref.getName().equals(name) ||
+          ref.getFullyQualifiedName().equals(getFullyQualifiedName())) {
         continue;
       } else if (ref.getFullyQualifiedName().startsWith("com.ibm.jit.JITHelpers")
           || ref.getFullyQualifiedName().equals("java.lang.StringCompressionFlag")) {
@@ -428,12 +433,13 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     StringBuilder sb = new StringBuilder();
     String indent = outerTypeName == null ? "  " : "    ";
     String halfIndent = outerTypeName == null ? "" : "  ";
+    Collection<ClassRef> references = getReferenceMap().values();
 
     // We only need to render those for the outermost type
     if (outerTypeName == null) {
       tb.append("package ").append(getPackageName()).append(SEMICOLN).append(NEWLINE);
       tb.append(NEWLINE);
-      for (String i : getImports()) {
+      for (String i : getImports(references)) {
         tb.append("import ").append(i).append(SEMICOLN).append(NEWLINE);
       }
     }
@@ -484,7 +490,8 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     sb.append(NEWLINE).append(halfIndent).append(CB);
     String top = tb.toString();
     String content = sb.toString();
-    for (ClassRef ref : getReferences()) {
+    for (ClassRef ref : references) {
+      //If class is imported
       if (top.contains("import " + ref.getFullyQualifiedName() + ";") || ref.getPackageName().equals(getPackageName())) {
         content = content.replaceFirst(Pattern.quote(ref.getFullyQualifiedName()), ref.getName());
       }
