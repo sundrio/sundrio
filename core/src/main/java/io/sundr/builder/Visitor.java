@@ -18,6 +18,7 @@ package io.sundr.builder;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -33,8 +34,51 @@ public interface Visitor<T> {
 
   void visit(T element);
 
+  default void visit(List<Object> path, T element) {
+    visit(element);
+  }
+
   default Class<T> getType() {
-    return (Class<T>) getTypeArguments(Visitor.class, getClass()).get(0);
+    List<Class> args = getTypeArguments(Visitor.class, getClass());
+    if (args == null || args.isEmpty()) {
+      return null;
+    }
+    return (Class<T>) args.get(0);
+  }
+
+  default <F> Boolean canVisit(F target) {
+    if (target == null) {
+      return false;
+    }
+
+    if (getType() == null) {
+      return hasVisitMethodMatching(target);
+    } else if (!getType().isAssignableFrom(target.getClass())) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the specified visitor has a visit method compatible with the specified fluent.
+   * 
+   * @param target
+   * @param <F>
+   * @return
+   */
+  default <F> Boolean hasVisitMethodMatching(F target) {
+    for (Method method : getClass().getMethods()) {
+      if (!method.getName().equals("visit") || method.getParameterTypes().length != 1) {
+        continue;
+      }
+      Class<?> visitorType = method.getParameterTypes()[0];
+      if (visitorType.isAssignableFrom(target.getClass())) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
   }
 
   /**
@@ -98,7 +142,8 @@ public interface Visitor<T> {
     Map<Type, Type> resolvedTypes = new LinkedHashMap<Type, Type>();
     Type type = childClass;
     // start walking up the inheritance hierarchy until we hit baseClass
-    while (!getClass(type).equals(baseClass)) {
+    for (Class cl = getClass(type); cl != null && cl != Object.class
+        && !baseClass.getName().equals(cl.getName()); cl = getClass(type)) {
       if (type instanceof Class) {
         Class c = (Class) type;
         Optional<Type> nextInterface = baseClass.isInterface() ? getMatchingInterface(baseClass, c.getGenericInterfaces())
@@ -109,18 +154,23 @@ public interface Visitor<T> {
           // there is no useful information for us in raw types, so just keep going.
           type = ((Class) type).getGenericSuperclass();
         }
-      } else {
+      } else if (type instanceof ParameterizedType) {
         ParameterizedType parameterizedType = (ParameterizedType) type;
-        Class<?> rawType = (Class) parameterizedType.getRawType();
+        Type t = parameterizedType.getRawType();
+        if (t instanceof Class) {
+          Class<?> rawType = (Class) parameterizedType.getRawType();
 
-        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-        TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
-        for (int i = 0; i < actualTypeArguments.length; i++) {
-          resolvedTypes.put(typeParameters[i], actualTypeArguments[i]);
-        }
+          Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+          TypeVariable<?>[] typeParameters = rawType.getTypeParameters();
+          for (int i = 0; i < actualTypeArguments.length; i++) {
+            resolvedTypes.put(typeParameters[i], actualTypeArguments[i]);
+          }
 
-        if (!rawType.equals(baseClass)) {
-          type = rawType.getGenericSuperclass();
+          if (!baseClass.equals(rawType)) {
+            type = rawType.getGenericSuperclass();
+          }
+        } else {
+          break;
         }
       }
     }

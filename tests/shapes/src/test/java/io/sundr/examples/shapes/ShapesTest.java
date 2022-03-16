@@ -17,6 +17,7 @@
 package io.sundr.examples.shapes;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Assert;
@@ -85,7 +86,8 @@ public class ShapesTest {
 
     canvas = new CanvasBuilder(canvas).accept(new PathAwareTypedVisitor<CircleBuilder<Integer>, CanvasBuilder>() {
       @Override
-      public void visit(CircleBuilder<Integer> builder) {
+      public void visit(List<Object> path, CircleBuilder<Integer> builder) {
+        System.out.println("path:" + path);
         builder.withRadius(100 + builder.getRadius());
       }
     }).build();

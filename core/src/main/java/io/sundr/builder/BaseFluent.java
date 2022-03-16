@@ -16,9 +16,9 @@
 
 package io.sundr.builder;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -63,57 +63,21 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     return new LinkedHashSet(Arrays.stream(sets).filter(Objects::nonNull).collect(Collectors.toSet()));
   }
 
-  private static <V extends Visitor, F> Boolean canVisit(V visitor, F fluent) {
-    if (!visitor.getType().isAssignableFrom(fluent.getClass())) {
-      return false;
-    }
-
-    if (visitor instanceof PathAwareTypedVisitor) {
-      PathAwareTypedVisitor pathAwareTypedVisitor = (PathAwareTypedVisitor) visitor;
-      Class parentType = pathAwareTypedVisitor.getParentType();
-      Class actaulParentType = pathAwareTypedVisitor.getActualParentType();
-      if (!parentType.isAssignableFrom(actaulParentType)) {
-        return false;
-      }
-    }
-
-    return hasCompatibleVisitMethod(visitor, fluent);
-  }
-
-  /**
-   * Checks if the specified visitor has a visit method compatible with the specified fluent.
-   * 
-   * @param visitor
-   * @param fluent
-   * @param <V>
-   * @param <F>
-   * @return
-   */
-  private static <V, F> Boolean hasCompatibleVisitMethod(V visitor, F fluent) {
-    for (Method method : visitor.getClass().getMethods()) {
-      if (!method.getName().equals(VISIT) || method.getParameterTypes().length != 1) {
-        continue;
-      }
-      Class visitorType = method.getParameterTypes()[0];
-      if (visitorType.isAssignableFrom(fluent.getClass())) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-    return false;
-  }
-
   public F accept(Visitor... visitors) {
-    return isPathAwareVisitorArray(visitors) ? acceptPathAware(asPathAwareVisitorArray(visitors)) : acceptInternal(visitors);
+    return accept(Collections.emptyList(), visitors);
   }
 
   @Override
   public <V> F accept(final Class<V> type, final Visitor<V> visitor) {
-    return accept(new Visitor<V>() {
+    return accept(Collections.emptyList(), new Visitor<V>() {
       @Override
       public Class<V> getType() {
         return type;
+      }
+
+      @Override
+      public void visit(List<Object> path, V element) {
+        visitor.visit(path, element);
       }
 
       @Override
@@ -123,34 +87,24 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     });
   }
 
-  private F acceptInternal(Visitor... visitors) {
+  @Override
+  public F accept(List<Object> path, Visitor... visitors) {
     for (Visitor visitor : visitors) {
-      if (canVisit(visitor, this)) {
-        visitor.visit(this);
+      if (visitor.canVisit(this)) {
+        visitor.visit(path, this);
       }
     }
 
+    List<Object> copyOfPath = path != null ? new ArrayList(path) : new ArrayList<>();
+    copyOfPath.add(this);
+    List<Object> newPath = Collections.unmodifiableList(copyOfPath);
+
     for (Visitable visitable : _visitables) {
       Arrays.stream(visitors).filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass()))
-          .forEach(v -> visitable.accept(v));
+          .forEach(v -> visitable.accept(newPath, v));
       Arrays.stream(visitors).filter(v -> v.getType() == null || !v.getType().isAssignableFrom(visitable.getClass()))
-          .forEach(v -> visitable.accept(v));
+          .forEach(v -> visitable.accept(newPath, v));
     }
     return (F) this;
-  }
-
-  private F acceptPathAware(PathAwareTypedVisitor... pathAwareTypedVisitors) {
-    return acceptInternal(
-        Arrays.stream(pathAwareTypedVisitors).map(p -> p.next(this)).toArray(size -> new PathAwareTypedVisitor[size]));
-  }
-
-  private static boolean isPathAwareVisitorArray(Visitor... visitors) {
-    return !Arrays.stream(visitors).filter(v -> !(v instanceof PathAwareTypedVisitor)).findAny().isPresent();
-  }
-
-  private static PathAwareTypedVisitor[] asPathAwareVisitorArray(Visitor... visitors) {
-    return Arrays.stream(visitors).filter(v -> v instanceof PathAwareTypedVisitor)
-        .map(v -> (PathAwareTypedVisitor) v)
-        .toArray(size -> new PathAwareTypedVisitor[size]);
   }
 }
