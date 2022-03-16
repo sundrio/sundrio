@@ -38,4 +38,8 @@ public final class AttributeKey<T> {
     return type;
   }
 
+  @Override
+  public String toString() {
+    return "AttributeKey [name=" + name + "]";
+  }
 }
