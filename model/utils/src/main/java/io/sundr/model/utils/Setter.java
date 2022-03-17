@@ -21,6 +21,7 @@ import static io.sundr.utils.Strings.capitalizeFirst;
 import io.sundr.SundrException;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
+import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
 
@@ -92,6 +93,15 @@ public class Setter {
 
     if (!strict && method.getName().endsWith("set" + property.getNameCapitalized())) {
       return true;
+    }
+    return false;
+  }
+
+  public static boolean hasOrInherits(RichTypeDef clazz, Property property) {
+    for (Method method : clazz.getAllMethods()) {
+      if (isApplicable(method, property)) {
+        return true;
+      }
     }
     return false;
   }

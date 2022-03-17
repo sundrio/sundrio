@@ -31,6 +31,7 @@
 
     <modules>
         <module>arrays</module>
+        <module>buildable-fields</module>
         <module>shapes</module>
         <module>shapes-extension</module>
     </modules>

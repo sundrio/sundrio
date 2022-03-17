@@ -102,7 +102,11 @@ public class ClazzAs {
 
             boolean isInherited = !itemProperties.containsKey(property.getName());
             boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
-            if (isInherited && !isGeneric) {
+            boolean hasBuildableSuperClass = item.getExtendsList().stream().anyMatch(s -> isBuildable(s));
+
+            // We should skip fields that originate from buildable superclasses, unless they are generic.
+            // Generic fields need to be processed at the level they can be resolved to an actual type.
+            if (isInherited && hasBuildableSuperClass && !isGeneric) {
               continue;
             }
 
@@ -249,7 +253,11 @@ public class ClazzAs {
         }
         boolean isInherited = !itemProperties.containsKey(property.getName());
         boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
-        if (isInherited && !isGeneric) {
+        boolean hasBuildableSuperClass = item.getExtendsList().stream().anyMatch(s -> isBuildable(s));
+
+        // We should skip fields that originate from buildable superclasses, unless they are generic.
+        // Generic fields need to be processed at the level they can be resolved to an actual type.
+        if (isInherited && hasBuildableSuperClass && !isGeneric) {
           continue;
         }
 
