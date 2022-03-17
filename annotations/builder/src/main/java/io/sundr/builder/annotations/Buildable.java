@@ -23,6 +23,21 @@ import java.lang.annotation.Target;
 
 import io.sundr.builder.Constants;
 
+/**
+ * An annotation that triggers the generation of a {@link Builder}.
+ * The annotation may be added to either the type or constructor.
+ *
+ * When added to a constructor all fields of the constructor will be exposed to the builder.
+ * Additionally, fields (both declared and inherited) that are writeable via setter will be taken into account.
+ * To exclude fields from the builder you can use the `ignore` property.
+ *
+ * When the annotation is added to interfaces or abstract classes, fluent interfaces and implementation will be
+ * generated but no builder. Buildable classes that extend, implement buildable abstract classes or interfaces respectively
+ * will reuse the generated fluent types.
+ *
+ * Generic fields are meant to be processed at the level they are resolved.
+ *
+ */
 @Target({ ElementType.CONSTRUCTOR, ElementType.TYPE })
 @Retention(RetentionPolicy.SOURCE)
 public @interface Buildable {
@@ -44,7 +59,15 @@ public @interface Buildable {
   Inline[] inline() default {};
 
   /**
-   * Ignore properties
+   * Properties to ignore
+   *
+   * In most cases the sturcture of the class will designate the properties to expose to the builder.
+   *
+   * However, there might be cases that we need to explicitly request a field not to be exposed.
+   * Example: Extending a 3rd party class that exposes setters, or requiring setter for a field that the builder should not
+   * expose).
+   *
+   * In such cases `ignore` can be used.
    * 
    * @return the names of the properties to ignore.
    */
