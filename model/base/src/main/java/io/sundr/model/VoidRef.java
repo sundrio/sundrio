@@ -29,6 +29,11 @@ public class VoidRef extends TypeRef {
     super(attributes);
   }
 
+  @Override
+  public String getName() {
+    return "void";
+  }
+
   public int getDimensions() {
     return 0;
   }
@@ -39,11 +44,10 @@ public class VoidRef extends TypeRef {
 
   @Override
   public String toString() {
-    return "void";
+    return getName();
   }
 
   public boolean isAssignableFrom(TypeRef ref) {
     return false;
   }
-
 }

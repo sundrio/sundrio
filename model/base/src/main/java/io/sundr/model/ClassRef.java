@@ -74,6 +74,11 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
   }
 
   @Override
+  public String getName() {
+    return Nameable.getClassName(fullyQualifiedName);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o)
       return true;
@@ -128,4 +133,5 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
     }
     return sb.toString();
   }
+
 }

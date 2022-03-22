@@ -50,6 +50,10 @@ public class WildcardRef extends TypeRef {
     this.bounds = bounds;
   }
 
+  public String getName() {
+    return "?";
+  }
+
   public List<TypeRef> getBounds() {
     return bounds;
   }
