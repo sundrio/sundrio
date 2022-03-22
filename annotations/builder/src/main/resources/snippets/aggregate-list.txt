@@ -1,6 +1,0 @@
-ArrayList<T> result = new ArrayList<>();
-
-for (List<? extends T> list : lists) {
-    result.addAll(list);
-}
-return result;

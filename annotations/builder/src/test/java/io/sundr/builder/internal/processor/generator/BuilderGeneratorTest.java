@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import io.sundr.builder.Constants;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.utils.Types;
@@ -48,22 +47,15 @@ public class BuilderGeneratorTest {
         .build();
 
     File tmp = new File(System.getProperty("java.io.tmpdir"));
-    generate(type, tmp, "CircleFluent.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-    generate(type, tmp, "CircleBuilder.java", Constants.DEFAULT_SOURCEFILE_TEMPLATE_LOCATION);
-
+    generate(type, tmp, "CircleFluent.java");
+    generate(type, tmp, "CircleBuilder.java");
   }
 
-  private static void generate(TypeDef model, File dir, String name, String templateResource) throws IOException {
+  private static void generate(TypeDef model, File dir, String name) throws IOException {
     FileWriter fluentWriter = null;
     try {
       fluentWriter = new FileWriter(new File(dir, name));
-      /*
-       * new CodeGeneratorBuilder<TypeDef>()
-       * .withModel(model)
-       * .withWriter(fluentWriter)
-       * .withTemplateResource(templateResource)
-       * .build().generate();
-       */
+      fluentWriter.write(model.render());
     } catch (IOException e) {
       throw new RuntimeException(e);
     } finally {

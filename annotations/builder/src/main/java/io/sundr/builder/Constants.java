@@ -165,21 +165,8 @@ public class Constants {
   public static List<ClassRef> VALIDATION_REFS = Arrays.<ClassRef> asList(VALIDATION, VALIDATOR, VALIDATOR_FACTORY,
       VALIDATION_EXCEPTION, CONSTRAIN_VIOLATION, CONSTRAIN_VIOLATION_EXCEPTION, Collections.SET.toInternalReference());
 
-  public static final String DEFAULT_SOURCEFILE_TEMPLATE_LOCATION = "templates/builder/sourcefile.vm";
-
-  public static final String ACCEPT_VISITOR_SNIPPET = "snippets/accept-visitor.txt";
-  public static final String BUILD_LIST_SNIPPET = "snippets/build-list.txt";
-  public static final String CAN_VISIT_SNIPPET = "snippets/can-visit.txt";
-  public static final String GET_TYPE_SNIPPET = "snippets/get-type.txt";
-  public static final String GET_CLASS_SNIPPET = "snippets/get-class.txt";
-  public static final String GET_MATCHING_INTERFACE_SNIPPET = "snippets/get-matching-interface.txt";
-  public static final String GET_TYPE_ARGUMENTS_SNIPPET = "snippets/get-type-arguments.txt";
-  public static final String AGGREGATE_SET_SNIPPET = "snippets/aggregate-set.txt";
-  public static final String AGGREGATE_LIST_SNIPPET = "snippets/aggregate-list.txt";
-  public static final String BUILD_SET_SNIPPET = "snippets/build-set.txt";
   public static final String SIMPLE_ARRAY_GETTER_SNIPPET = "snippets/simple-array-getter.txt";
   public static final String BUILDABLE_ARRAY_GETTER_SNIPPET = "snippets/buildable-array-getter.txt";
-  public static final String VALIDATE_SNIPPET = "snippets/validate.txt";
   public static final String EMPTY_FUNCTION_SNIPPET = "snippets/empty-function.txt";
   public static final String TO_STRING_ARRAY_SNIPPET = "snippets/to-string-array.txt";
 
