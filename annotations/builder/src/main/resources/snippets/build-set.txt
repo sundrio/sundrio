@@ -1,5 +1,0 @@
-LinkedHashSet<T> r = new LinkedHashSet<>();
-for (Builder<T> b : set) {
-    r.add(b.build());
-}
-return r;

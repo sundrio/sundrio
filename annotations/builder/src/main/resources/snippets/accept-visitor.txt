@@ -1,9 +1,0 @@
-for (Visitable v : _visitables) {
-    v.accept(visitor);
-}
-
-if (canVisit(visitor,this)) {
-    visitor.visit(this);
-}
-
-return (T) this;

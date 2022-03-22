@@ -18,7 +18,6 @@
 package io.sundr.model.visitors;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.sundr.builder.Visitor;
 import io.sundr.model.Attributeable;
