@@ -219,8 +219,6 @@ public class BuilderContext {
         .withName("type")
         .withTypeRef(TYPE.toInternalReference())
         .endArgument()
-        .withNewBlock()
-        .endBlock()
         .endMethod()
 
         // getMatchingInterface
@@ -344,19 +342,12 @@ public class BuilderContext {
         .withName("path")
         .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement("return path.size() - 2 >= 0 ? (P) path.get(path.size() - 2) : null;")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("getParentType")
         .withReturnType(CLASS.toReference(P.toReference()))
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return parentType != null ? parentType : delegate.getParentType();")
-        .endBlock()
         .endMethod()
 
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
@@ -387,10 +378,11 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
+        .withDefaultMethod(true)
         .withName("accept")
         .withReturnType(T.toReference())
         .addNewArgument()
-        .withName("visitor")
+        .withName("visitors")
         .withNewClassRefType().withNewFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1)
         .endClassRefType()
         .endArgument()
@@ -398,6 +390,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
+        .withDefaultMethod(true)
         .withName("accept")
         .withReturnType(T.toReference())
         .addNewArgument()
@@ -407,9 +400,20 @@ public class BuilderContext {
         .addNewArgument()
         .withTypeRef(
             new ClassRefBuilder().withNewFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1).build())
-        .withName("visitor")
+        .withName("visitors")
         .endArgument()
         .withVarArgPreferred(true)
+        .endMethod()
+
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withName("getTarget")
+        .withReturnType(T.toReference())
+        .addNewArgument()
+        .withTypeRef(
+            new ClassRefBuilder().withFullyQualifiedName(builderPackage + ".Visitable").withArguments(T.toReference()).build())
+        .withName("visitable")
+        .endArgument()
         .endMethod()
 
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
