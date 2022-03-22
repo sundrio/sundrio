@@ -17,6 +17,8 @@
 package io.sundr.model;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,10 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     this.typeRef = typeRef;
     this.name = name;
     this.comments = comments;
+  }
+
+  public static Property newProperty(TypeRef typeRef, String name) {
+    return new Property(Collections.emptyList(), typeRef, name, Collections.emptyList(), 0, new HashMap<>());
   }
 
   public List<AnnotationRef> getAnnotations() {

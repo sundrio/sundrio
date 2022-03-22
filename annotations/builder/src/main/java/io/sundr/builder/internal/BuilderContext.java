@@ -17,7 +17,7 @@
 package io.sundr.builder.internal;
 
 import static io.sundr.builder.Constants.INLINEABLE;
-import static io.sundr.model.Attributeable.ALSO_IMPORT;
+import static io.sundr.model.utils.Types.BOOLEAN_REF;
 import static io.sundr.model.utils.Types.CLASS;
 import static io.sundr.model.utils.Types.CLASS_REF_NO_ARG;
 import static io.sundr.model.utils.Types.OPTIONAL;
@@ -26,32 +26,22 @@ import static io.sundr.model.utils.Types.TYPE;
 import static io.sundr.model.utils.Types.modifiersToInt;
 import static io.sundr.model.utils.Types.newTypeParamRef;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.apt.AptContext;
-import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
-import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -62,8 +52,9 @@ import io.sundr.model.WildcardRef.BoundKind;
 import io.sundr.model.WildcardRefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.model.utils.Collections;
+import io.sundr.model.visitors.ApplyImportsFromResources;
+import io.sundr.model.visitors.ApplyMethodBlockFromResources;
 import io.sundr.model.visitors.ReplacePackage;
-import io.sundr.utils.Strings;
 
 public class BuilderContext {
 
@@ -138,7 +129,6 @@ public class BuilderContext {
         .withName("build")
         .withReturnType(T.toReference())
         .endMethod()
-
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
@@ -152,8 +142,25 @@ public class BuilderContext {
         .withPackageName("io.sundr.builder")
         .withName("Visitor")
         .withParameters(T)
+
+        //visit
         .addNewMethod()
         .withName("visit")
+        .addNewArgument()
+        .withName("element")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .withReturnType(new VoidRef())
+        .endMethod()
+
+        //default void visit(List<Object> path, T element) {
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withName("visit")
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
         .addNewArgument()
         .withName("element")
         .withTypeRef(T.toReference())
@@ -164,11 +171,32 @@ public class BuilderContext {
         .addNewMethod()
         .withDefaultMethod(true)
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withParameters(F)
+        .withName("canVisit")
+        .withReturnType(BOOLEAN_REF)
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(F.toReference())
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withParameters(F)
+        .withName("hasVisitMethodMatching")
+        .withReturnType(BOOLEAN_REF)
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(F.toReference())
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("getType")
         .withReturnType(CLASS.toReference(T.toReference()))
-        .withNewBlock()
-        .addNewStringStatementStatement("return (Class<T>) getTypeArguments(Visitor.class, getClass()).get(0);")
-        .endBlock()
         .endMethod()
 
         // getRawName
@@ -180,10 +208,6 @@ public class BuilderContext {
         .withName("type")
         .withTypeRef(TYPE.toInternalReference())
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return type instanceof ParameterizedType ? ((ParameterizedType) type).getRawType().getTypeName() : type.getTypeName();")
-        .endBlock()
         .endMethod()
 
         // getClass
@@ -196,7 +220,6 @@ public class BuilderContext {
         .withTypeRef(TYPE.toInternalReference())
         .endArgument()
         .withNewBlock()
-        .addNewStringStatementStatement(Strings.loadResourceQuietly(Constants.GET_CLASS_SNIPPET))
         .endBlock()
         .endMethod()
 
@@ -214,9 +237,6 @@ public class BuilderContext {
         .withName("candidates")
         .withTypeRef(new ClassRefBuilder(TYPE.toReference()).withDimensions(1).build())
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(Strings.loadResourceQuietly(Constants.GET_MATCHING_INTERFACE_SNIPPET))
-        .endBlock()
         .withVarArgPreferred(true)
         .endMethod()
 
@@ -233,21 +253,11 @@ public class BuilderContext {
         .withTypeRef(CLASS.toReference(new WildcardRefBuilder().withBounds(T.toReference()).build()))
         .withName("childClass")
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(Strings.loadResourceQuietly(Constants.GET_TYPE_ARGUMENTS_SNIPPET))
-        .endBlock()
         .endMethod()
 
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-        .addToAttributes(ALSO_IMPORT,
-            new LinkedHashSet<>(Arrays.asList(ClassRef.forName(ParameterizedType.class.getName()),
-                ClassRef.forName(GenericArrayType.class.getName()),
-                ClassRef.forName(TypeVariable.class.getName()),
-                ClassRef.forName(Array.class.getName()),
-                ClassRef.forName(Arrays.class.getName()),
-                Collections.ARRAY_LIST.toReference(),
-                Collections.MAP.toReference(),
-                Collections.LINKED_HASH_MAP.toReference())))
+        .accept(new ApplyMethodBlockFromResources("Visitor", "io/sundr/builder/Visitor.java", true))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/Visitor.java"))
         .build();
 
     typedVisitorInterface = new TypeDefBuilder()
@@ -262,19 +272,10 @@ public class BuilderContext {
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("getType")
         .withReturnType(CLASS.toReference(V.toReference()))
-        .withNewBlock()
-        .addNewStringStatementStatement("return (Class<V>) Visitor.getTypeArguments(TypedVisitor.class, getClass()).get(0);")
-        .endBlock()
         .endMethod()
-        .addToAttributes(ALSO_IMPORT,
-            new LinkedHashSet<>(Arrays.asList(ClassRef.forName(ParameterizedType.class.getName()),
-                ClassRef.forName(GenericArrayType.class.getName()),
-                ClassRef.forName(TypeVariable.class.getName()),
-                ClassRef.forName(Array.class.getName()),
-                Collections.ARRAY_LIST.toReference(),
-                Collections.MAP.toReference(),
-                Collections.LINKED_HASH_MAP.toReference())))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("TypedVisitor", "io/sundr/builder/TypedVisitor.java"))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/TypedVisitor.java"))
         .build();
 
     pathAwareVisitorClass = new TypeDefBuilder()
@@ -286,50 +287,18 @@ public class BuilderContext {
         .withExtendsList(typedVisitorInterface.toReference(V.toReference()))
 
         .addNewProperty()
-        .withName("path")
-        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withName("type")
+        .withTypeRef(CLASS.toReference(V.toReference()))
         .endProperty()
 
         .addNewProperty()
-        .withName("delegate")
-        .withTypeRef(new ClassRefBuilder().withNewFullyQualifiedName("io.sundr.builder.PathAwareTypedVisitor")
-            .withArguments(V.toReference(), P.toReference()).build())
-        .endProperty()
-
-        .addNewProperty()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
         .withName("parentType")
         .withTypeRef(CLASS.toReference(P.toReference()))
         .endProperty()
 
-        .addNewConstructor()
-        .addNewArgument()
-        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
-        .withName("path")
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement("this.path = path;")
-        .addNewStringStatementStatement("this.delegate = this;")
-        .addNewStringStatementStatement(
-            "this.parentType = (Class<P>) Visitor.getTypeArguments(PathAwareTypedVisitor.class, getClass()).get(1);")
-        .endBlock()
-        .endConstructor()
-
-        .addNewConstructor()
-        .addNewArgument()
-        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
-        .withName("path")
-        .endArgument()
-        .addNewArgument()
-        .withName("delegate")
-        .withTypeRef(new ClassRefBuilder().withNewFullyQualifiedName("io.sundr.builder.PathAwareTypedVisitor")
-            .withArguments(V.toReference(), P.toReference()).build())
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement("this.path = path;")
-        .addNewStringStatementStatement("this.delegate = this;")
-        .addNewStringStatementStatement(
-            "this.parentType = (Class<P>) Visitor.getTypeArguments(PathAwareTypedVisitor.class, delegate.getClass()).get(1);")
-        .endBlock()
+        .addNewConstructor() // default constructor
         .endConstructor()
 
         .addNewMethod()
@@ -340,36 +309,48 @@ public class BuilderContext {
         .withTypeRef(V.toReference())
         .endArgument()
         .withReturnType(new VoidRef())
-        .withNewBlock()
-        .addNewStringStatementStatement("delegate.path = path;")
-        .addNewStringStatementStatement("delegate.visit(element);")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
-        .withName("next")
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withName("visit")
         .addNewArgument()
-        .withName("item")
-        .withTypeRef(TypeDef.OBJECT_REF)
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
         .endArgument()
-        .withReturnType(new ClassRefBuilder().withNewFullyQualifiedName("io.sundr.builder.PathAwareTypedVisitor")
-            .withArguments(V.toReference(), P.toReference()).build())
-        .withNewBlock()
-        .addNewStringStatementStatement("List<Object> path = new ArrayList<Object>(this.path);")
-        .addNewStringStatementStatement("path.add(item);")
-        .addNewStringStatementStatement("return new PathAwareTypedVisitor<V, P>(path, this);")
-        .endBlock()
+        .addNewArgument()
+        .withName("element")
+        .withTypeRef(V.toReference())
+        .endArgument()
+        .withReturnType(new VoidRef())
         .endMethod()
 
         .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withParameters(F)
+        .withName("canVisit")
+        .withReturnType(BOOLEAN_REF)
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(F.toReference())
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("getParent")
         .withReturnType(P.toReference())
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
         .withNewBlock()
         .addNewStringStatementStatement("return path.size() - 2 >= 0 ? (P) path.get(path.size() - 2) : null;")
         .endBlock()
         .endMethod()
 
         .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("getParentType")
         .withReturnType(CLASS.toReference(P.toReference()))
         .withNewBlock()
@@ -378,37 +359,18 @@ public class BuilderContext {
         .endBlock()
         .endMethod()
 
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PROTECTED))
-        .withName("getActualParentType")
-        .withReturnType(CLASS.toReference())
-        .withNewBlock()
-        .addNewStringStatementStatement("return path.size() - 2 >= 0 ? path.get(path.size() - 2).getClass() : Void.class;")
-        .endBlock()
-        .endMethod()
-        .addToAttributes(ALSO_IMPORT, new LinkedHashSet<>(Arrays.asList(Collections.ARRAY_LIST.toReference())))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("PathAwareTypedVisitor", "io/sundr/builder/PathAwareTypedVisitor.java"))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/PathAwareTypedVisitor.java"))
         .build();
 
     visitableInterface = new TypeDefBuilder()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
-        .addNewAnnotation()
-        .withClassRef(functionalInterfaceType.toInternalReference())
-        .endAnnotation()
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
         .withName("Visitable")
         .withParameters(T)
-        .addNewMethod()
-        .withName("accept")
-        .withReturnType(T.toReference())
-        .addNewArgument()
-        .withName("visitor")
-        .withNewClassRefType().withNewFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1)
-        .endClassRefType()
-        .endArgument()
-        .withVarArgPreferred(true)
-        .endMethod()
+
         .addNewMethod()
         .withName("accept")
         .withParameters(V)
@@ -422,12 +384,37 @@ public class BuilderContext {
         .withTypeRef(visitorInterface.toReference(V.toReference()))
         .withName("visitor")
         .endArgument()
-        .withNewBlock()
-        .withStatements(new StringStatement(
-            "return accept(new TypedVisitor<V>() {@Override public Class<V> getType() {return type;} @Override public void visit(V element) {visitor.visit(element);}});"))
-        .endBlock()
         .endMethod()
+
+        .addNewMethod()
+        .withName("accept")
+        .withReturnType(T.toReference())
+        .addNewArgument()
+        .withName("visitor")
+        .withNewClassRefType().withNewFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1)
+        .endClassRefType()
+        .endArgument()
+        .withVarArgPreferred(true)
+        .endMethod()
+
+        .addNewMethod()
+        .withName("accept")
+        .withReturnType(T.toReference())
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
+        .addNewArgument()
+        .withTypeRef(
+            new ClassRefBuilder().withNewFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1).build())
+        .withName("visitor")
+        .endArgument()
+        .withVarArgPreferred(true)
+        .endMethod()
+
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("Visitable", "io/sundr/builder/Visitable.java", true))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/Visitable.java"))
         .build();
 
     visitableBuilderInterface = new TypeDefBuilder()
@@ -515,28 +502,18 @@ public class BuilderContext {
         .withTypeRef(TypeDef.OBJECT_REF)
         .withName("key")
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement("if (!containsKey(key)) {put(String.valueOf(key), new ArrayList());}")
-        .addNewStringStatementStatement("return super.get(key);")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("aggregate")
         .withReturnType(Collections.LIST.toReference(visitableInterface.toReference()))
-        .withNewBlock()
-        .addNewStringStatementStatement("return values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("iterator")
         .withReturnType(Collections.ITERATOR.toReference(visitableInterface.toReference()))
-        .withNewBlock()
-        .addNewStringStatementStatement("return aggregate().iterator();")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
@@ -548,24 +525,17 @@ public class BuilderContext {
         .withTypeRef(consumerInterface.toReference(
             new WildcardRefBuilder().withBoundKind(BoundKind.SUPER).withBounds(visitableInterface.toReference()).build()))
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement("aggregate().forEach(action);")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .withName("spliterator")
         .withReturnType(TypeDef.forName(Spliterator.class.getName()).toReference(visitableInterface.toReference()))
-        .withNewBlock()
-        .addNewStringStatementStatement("return aggregate().spliterator();")
-        .endBlock()
         .endMethod()
 
-        .addToAttributes(ALSO_IMPORT,
-            new LinkedHashSet<>(
-                Arrays.asList(Collections.ARRAY_LIST.toReference(), ClassRef.forName(Collectors.class.getName()))))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("VisitableMap", "io/sundr/builder/VisitableMap.java"))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/VisitableMap.java"))
         .build();
 
     baseFluentClass = new TypeDefBuilder()
@@ -602,22 +572,6 @@ public class BuilderContext {
         .withTypeRef(T.toReference())
         .withName("item")
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "if (item instanceof Editable) { " + "\n" +
-                "  Object editor = ((Editable) item).edit(); " + "\n" +
-                "  if (editor instanceof VisitableBuilder) { " + "\n" +
-                "    return (VisitableBuilder<T, ?>) editor; " + "\n" +
-                "  } " + "\n" +
-                "} " + "\n" +
-                "try { " + "\n" +
-                "  return (VisitableBuilder<T, ?>) Class.forName(item.getClass().getName() + \"Builder\").getConstructor(item.getClass()) "
-                + "\n" +
-                "      .newInstance(item); " + "\n" +
-                "} catch (Exception e) { " + "\n" +
-                "  throw new IllegalStateException(\"Failed to create builder for: \" + item.getClass(), e); " + "\n" +
-                "} " + "\n")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
@@ -632,11 +586,6 @@ public class BuilderContext {
             .build()))
         .withName("list")
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return list == null ? null : new ArrayList<T>(list.stream().map(Builder::build).collect(Collectors.toList()));")
-        .endBlock()
-        .addToAttributes(ALSO_IMPORT, Collections.ARRAY_LIST.toInternalReference())
         .endMethod()
 
         .addNewMethod()
@@ -651,11 +600,6 @@ public class BuilderContext {
             .build()))
         .withName("set")
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return set == null ? null : new ArrayList<>(set.stream().map(Builder::build).collect(Collectors.toList()));")
-        .endBlock()
-        .addToAttributes(ALSO_IMPORT, Collections.ARRAY_LIST.toInternalReference())
         .endMethod()
 
         .addNewMethod()
@@ -670,11 +614,6 @@ public class BuilderContext {
         .withName("lists")
         .endArgument()
         .withVarArgPreferred(true)
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return new ArrayList(Arrays.stream(lists).filter(Objects::nonNull).collect(Collectors.toList()));")
-        .endBlock()
-        .addToAttributes(ALSO_IMPORT, Collections.ARRAY_LIST.toInternalReference())
         .endMethod()
 
         .addNewMethod()
@@ -688,73 +627,7 @@ public class BuilderContext {
                 .withDimensions(1).build())
         .withName("sets")
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return new LinkedHashSet(Arrays.stream(sets).filter(Objects::nonNull).collect(Collectors.toSet()));")
-        .endBlock()
-        .addToAttributes(ALSO_IMPORT, Collections.LINKED_HASH_SET.toInternalReference())
-        .endMethod()
-
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-        .withName("canVisit")
-        .withParameters(new TypeParamDefBuilder().withName("V").withBounds(visitorInterface.toReference()).build(), F)
-        .withReturnType(io.sundr.model.utils.Types.BOOLEAN_REF)
-        .addNewArgument()
-        .withTypeRef(V.toReference())
-        .withName("visitor")
-        .endArgument()
-        .addNewArgument()
-        .withName("fluent")
-        .withTypeRef(F.toReference())
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "if (visitor instanceof TypedVisitor) { " + "\n" +
-                "  if (!((TypedVisitor) visitor).getType().isAssignableFrom(fluent.getClass())) { " + "\n" +
-                "    return false; " + "\n" +
-                "  } " + "\n" +
-                "} " + "\n" +
-                "if (visitor instanceof PathAwareTypedVisitor) { " + "\n" +
-                "  PathAwareTypedVisitor pathAwareTypedVisitor = (PathAwareTypedVisitor) visitor; " + "\n" +
-                "  Class parentType = pathAwareTypedVisitor.getParentType(); " + "\n" +
-                "  Class actaulParentType = pathAwareTypedVisitor.getActualParentType(); " + "\n" +
-                "  if (!parentType.isAssignableFrom(actaulParentType)) { " + "\n" +
-                "    return false; " + "\n" +
-                "  } " + "\n" +
-                "} " + "\n" +
-                "return hasCompatibleVisitMethod(visitor, fluent); " + "\n")
-        .endBlock()
-        .endMethod()
-
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
-        .withName("hasCompatibleVisitMethod")
-        .withParameters(V, F)
-        .withReturnType(io.sundr.model.utils.Types.BOOLEAN_REF)
-        .addNewArgument()
-        .withTypeRef(V.toReference())
-        .withName("visitor")
-        .endArgument()
-        .addNewArgument()
-        .withName("fluent")
-        .withTypeRef(F.toReference())
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "for (java.lang.reflect.Method method : visitor.getClass().getMethods()) {" + "\n" +
-                "  if (!method.getName().equals(VISIT) || method.getParameterTypes().length != 1) {" + "\n" +
-                "    continue;" + "\n" +
-                "  }" + "\n" +
-                "  Class visitorType = method.getParameterTypes()[0];" + "\n" +
-                "  if (visitorType.isAssignableFrom(fluent.getClass())) {" + "\n" +
-                "    return true;" + "\n" +
-                "  } else {" + "\n" +
-                "    return false;" + "\n" +
-                "  }" + "\n" +
-                "}" + "\n" +
-                "return false;")
-        .endBlock()
+        .withVarArgPreferred(true)
         .endMethod()
 
         .addNewMethod()
@@ -766,10 +639,6 @@ public class BuilderContext {
         .withTypeRef(new ClassRefBuilder().withFullyQualifiedName(Visitor.class.getName()).withDimensions(1).build())
         .endArgument()
         .withVarArgPreferred(true)
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return isPathAwareVisitorArray(visitors) ? acceptPathAware(asPathAwareVisitorArray(visitors)) : acceptInternal(visitors);")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
@@ -787,105 +656,30 @@ public class BuilderContext {
         .withName("visitor")
         .endArgument()
         .withVarArgPreferred(true)
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return accept(new TypedVisitor<V>() {" + "\n" +
-                "  @Override" + "\n" +
-                "  public Class<V> getType() {" + "\n" +
-                "    return type;" + "\n" +
-                "  }" + "\n" +
-                "  @Override" + "\n" +
-                "  public void visit(V element) {" + "\n" +
-                "    visitor.visit(element);" + "\n" +
-                "  }" + "\n" +
-                "});")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
-        .withName("acceptInternal")
+        .withName("accept")
         .withReturnType(F.toReference())
         .addNewArgument()
-        .withTypeRef(new ClassRefBuilder(visitorInterface.toReference()).withDimensions(1).build())
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
+        .addNewArgument()
+        .withTypeRef(
+            new ClassRefBuilder().withFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1).build())
         .withName("visitors")
         .endArgument()
         .withVarArgPreferred(true)
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "for (Visitor visitor : visitors) {" + "\n" +
-                "  if (canVisit(visitor, this)) {" + "\n" +
-                "    visitor.visit(this);" + "\n" +
-                "  }" + "\n" +
-                "}" + "\n" +
-                "  for (Visitable visitable : _visitables) {" + "\n" +
-                "    Arrays.stream(visitors).filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass())).forEach(v -> visitable.accept(v));\n"
-                +
-                "    Arrays.stream(visitors).filter(v -> v.getType() == null || !v.getType().isAssignableFrom(visitable.getClass())).forEach(v -> visitable.accept(v));\n"
-                +
-                "" + "\n" +
-                "}" + "\n" +
-                "return (F) this;")
-        .endBlock()
         .endMethod()
 
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE))
-        .withName("acceptPathAware")
-        .withReturnType(F.toReference())
-        .addNewArgument()
-        .withTypeRef(new ClassRefBuilder(pathAwareVisitorClass.toReference()).withDimensions(1).build())
-        .withName("pathAwareTypedVisitors")
-        .endArgument()
-        .withVarArgPreferred(true)
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return acceptInternal(Arrays.stream(pathAwareTypedVisitors).map(p -> p.next(this)).toArray(size -> new PathAwareTypedVisitor[size]));")
-        .endBlock()
-        .endMethod()
-
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
-        .withName("isPathAwareVisitorArray")
-        .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF)
-        .addNewArgument()
-        .withTypeRef(new ClassRefBuilder(visitorInterface.toReference()).withDimensions(1).build())
-        .withName("visitors")
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return !Arrays.stream(visitors).filter(v -> !(v instanceof PathAwareTypedVisitor)).findAny().isPresent();")
-        .endBlock()
-        .endMethod()
-
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
-        .withName("asPathAwareVisitorArray")
-        .withReturnType(new ClassRefBuilder(pathAwareVisitorClass.toReference()).withDimensions(1).build())
-        .addNewArgument()
-        .withTypeRef(new ClassRefBuilder(visitorInterface.toReference()).withDimensions(1).build())
-        .withName("visitors")
-        .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "return Arrays.stream(visitors).filter(v -> v instanceof PathAwareTypedVisitor).map(v -> (PathAwareTypedVisitor) v).toArray(size -> new PathAwareTypedVisitor[size]);")
-        .endBlock()
-        .endMethod()
-        .addToAttributes(ALSO_IMPORT, new LinkedHashSet<>(Arrays.asList(
-            ClassRef.forName(Collectors.class.getName()),
-            ClassRef.forName(Objects.class.getName()),
-            ClassRef.forName(Arrays.class.getName()))))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("BaseFluent", "io/sundr/builder/BaseFluent.java"))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/BaseFluent.java"))
         .build();
 
     ClassRef validatorRef = ClassRef.forName("javax.validation.Validator");
-    ClassRef validationRef = ClassRef.forName("javax.validation.Validation");
-    ClassRef validationExceptionRef = ClassRef.forName("javax.validation.ValidationException");
-    ClassRef validatorFactoryRef = ClassRef.forName("javax.validation.ValidatorFactory");
-
-    ClassRef constraintViolationRef = ClassRef.forName("javax.validation.ConstraintViolation");
-    ClassRef constraintViolationExceptionRef = ClassRef.forName("javax.validation.ConstraintViolationException");
-
     validationUtils = new TypeDefBuilder()
         .withPackageName("io.sundr.builder.internal.resources")
         .withName("ValidationUtils")
@@ -909,35 +703,12 @@ public class BuilderContext {
         .withName("createValidator")
         .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
         .withReturnType(validatorRef)
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "try {" + "\n" +
-                "  ValidatorFactory factory = Validation.buildDefaultValidatorFactory();" + "\n" +
-                "  return factory.getValidator();" + "\n" +
-                "} catch (ValidationException e) {" + "\n" +
-                "  return null;" + "\n" +
-                "}")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
         .withName("getValidator")
         .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
         .withReturnType(validatorRef)
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "Validator v = validator;" + "\n" +
-                "if (v == null) {" + "\n" +
-                "  synchronized (LOCK) {" + "\n" +
-                "    v = validator;" + "\n" +
-                "    if (validator == null) {" + "\n" +
-                "      v = createValidator();" + "\n" +
-                "      validator = v;" + "\n" +
-                "    }" + "\n" +
-                "  }" + "\n" +
-                "}" + "\n" +
-                "return v;")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
@@ -949,9 +720,6 @@ public class BuilderContext {
         .withTypeRef(T.toReference())
         .withName("item")
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement("validate(item, getValidator());")
-        .endBlock()
         .endMethod()
 
         .addNewMethod()
@@ -967,38 +735,13 @@ public class BuilderContext {
         .withName("v")
         .withTypeRef(validatorRef)
         .endArgument()
-        .withNewBlock()
-        .addNewStringStatementStatement(
-            "if (v == null) {" + "\n" +
-                "  v = getValidator();" + "\n" +
-                "}" + "\n" +
-                "if (v == null) {" + "\n" +
-                "  return;" + "\n" +
-                "}" + "\n" +
-                "Set<ConstraintViolation<T>> violations = v.validate(item);" + "\n" +
-                "if (!violations.isEmpty()) {" + "\n" +
-                "  StringBuilder sb = new StringBuilder(\"Constraint Validations: \");" + "\n" +
-                "  boolean first = true;" + "\n" +
-                "  for (ConstraintViolation violation : violations) {" + "\n" +
-                "    if (first) {" + "\n" +
-                "      first = false;" + "\n" +
-                "    } else {" + "\n" +
-                "      sb.append(\", \");" + "\n" +
-                "    }" + "\n" +
-                "    Object leafBean = violation.getLeafBean();" + "\n" +
-                "    sb.append(violation.getPropertyPath() + \" \" + violation.getMessage() + \" on bean: \" + leafBean);"
-                + "\n" +
-                "  }" + "\n" +
-                "  throw new ConstraintViolationException(sb.toString(), violations);" + "\n" +
-                "}")
-        .endBlock()
         .endMethod()
 
         .accept(new ReplacePackage("io.sundr.builder.internal.resources", builderPackage))
-        .addToAttributes(ALSO_IMPORT,
-            new LinkedHashSet<>(
-                Arrays.asList(Collections.SET.toReference(), validatorFactoryRef, validationRef, validationExceptionRef,
-                    constraintViolationRef, constraintViolationExceptionRef)))
+        .accept(
+            new ApplyMethodBlockFromResources("ValidationUtils", "io/sundr/builder/internal/resources/ValidationUtils.java"))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/internal/resources/ValidationUtils.java"))
+
         .withAnnotations(new ArrayList<>())
         .build();
 
