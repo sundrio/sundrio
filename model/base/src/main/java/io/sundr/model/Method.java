@@ -16,8 +16,10 @@
 
 package io.sundr.model;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,16 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     this.exceptions = exceptions;
     this.defaultMethod = defaultMethod;
     this.block = block;
+  }
+
+  // For testing 
+  public static Method newMethod(String name, TypeRef returnType, boolean varArgPrefered, Property... arguments) {
+    return new Method(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), name, returnType,
+        Arrays.asList(arguments), varArgPrefered, Collections.emptyList(), false, null, 0, new HashMap<>());
+  }
+
+  public static Method newMethod(String name, TypeRef returnType, Property... arguments) {
+    return newMethod(name, returnType, false, arguments);
   }
 
   public List<String> getComments() {

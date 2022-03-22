@@ -149,8 +149,8 @@ public final class Strings {
   public static final String loadResourceQuietly(String resourceName) {
     try {
       return loadResource(resourceName);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to load resource:" + resourceName, e);
     }
   }
 
@@ -179,8 +179,8 @@ public final class Strings {
   public static final String loadResourceQuietly(URL resourceUrl) {
     try {
       return loadResource(resourceUrl);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to load resource:" + resourceUrl, e);
     }
   }
 

@@ -20,8 +20,6 @@ import java.util.List;
 
 public interface Visitable<T> {
 
-  T accept(Visitor... visitor);
-
   default <V> T accept(Class<V> type, Visitor<V> visitor) {
     return accept(new Visitor<V>() {
       @Override
@@ -35,6 +33,8 @@ public interface Visitable<T> {
       }
     });
   }
+
+  T accept(Visitor... visitor);
 
   T accept(List<Object> path, Visitor... visitor);
 }

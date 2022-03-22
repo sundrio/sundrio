@@ -68,7 +68,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
   }
 
   @Override
-  public <V> F accept(final Class<V> type, final Visitor<V> visitor) {
+  public <V> F accept(Class<V> type, Visitor<V> visitor) {
     return accept(Collections.emptyList(), new Visitor<V>() {
       @Override
       public Class<V> getType() {
