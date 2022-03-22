@@ -1,4 +1,5 @@
 /*
+ *
  * Copyright 2015 The original authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +35,25 @@ public interface Visitable<T> {
     });
   }
 
-  T accept(Visitor... visitor);
+  default T accept(Visitor... visitors) {
+    for (Visitor visitor : visitors) {
+      if (visitor.canVisit(this)) {
+        visitor.visit(this);
+      }
+    }
+    return getTarget(this);
+  }
 
-  T accept(List<Object> path, Visitor... visitor);
+  default T accept(List<Object> path, Visitor... visitors) {
+    for (Visitor visitor : visitors) {
+      if (visitor.canVisit(this)) {
+        visitor.visit(path, this);
+      }
+    }
+    return getTarget(this);
+  }
+
+  default T getTarget(Visitable<T> visitable) {
+    return (T) visitable;
+  }
 }
