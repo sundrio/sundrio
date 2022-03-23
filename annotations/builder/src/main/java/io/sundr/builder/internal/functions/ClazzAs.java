@@ -207,7 +207,9 @@ public class ClazzAs {
           }
 
           return new TypeDefBuilder(fluentType).withComments("Generated").withAnnotations().withInnerTypes(nestedClazzes)
-              .withMethods(methods).build();
+              .withProperties()
+              .withMethods(methods)
+              .build();
 
         }
       });

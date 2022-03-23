@@ -70,6 +70,8 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         generate(context.getVisitorInterface());
         generate(context.getTypedVisitorInterface());
         generate(context.getPathAwareVisitorClass());
+        generate(context.getVisitorWiretapClass());
+        generate(context.getVisitorListenerInterface());
 
         generate(context.getVisitableBuilderInterface());
         generate(context.getVisitableMapClass());
