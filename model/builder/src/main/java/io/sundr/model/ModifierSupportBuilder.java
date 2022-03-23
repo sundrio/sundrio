@@ -6,13 +6,9 @@ import java.lang.Object;
 import io.sundr.builder.VisitableBuilder;
 
 public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSupportBuilder>
-    implements VisitableBuilder<ModifierSupport, ModifierSupportBuilder> {
-
-  ModifierSupportFluent<?> fluent;
-  Boolean validationEnabled;
-
+    implements VisitableBuilder<ModifierSupport, io.sundr.model.ModifierSupportBuilder> {
   public ModifierSupportBuilder() {
-    this(true);
+    this(false);
   }
 
   public ModifierSupportBuilder(Boolean validationEnabled) {
@@ -20,38 +16,42 @@ public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSu
     this.validationEnabled = validationEnabled;
   }
 
-  public ModifierSupportBuilder(ModifierSupportFluent<?> fluent) {
-    this(fluent, true);
+  public ModifierSupportBuilder(io.sundr.model.ModifierSupportFluent<?> fluent) {
+    this(fluent, false);
   }
 
-  public ModifierSupportBuilder(ModifierSupportFluent<?> fluent, Boolean validationEnabled) {
+  public ModifierSupportBuilder(io.sundr.model.ModifierSupportFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public ModifierSupportBuilder(ModifierSupportFluent<?> fluent, ModifierSupport instance) {
-    this(fluent, instance, true);
+  public ModifierSupportBuilder(io.sundr.model.ModifierSupportFluent<?> fluent, io.sundr.model.ModifierSupport instance) {
+    this(fluent, instance, false);
   }
 
-  public ModifierSupportBuilder(ModifierSupportFluent<?> fluent, ModifierSupport instance, Boolean validationEnabled) {
+  public ModifierSupportBuilder(io.sundr.model.ModifierSupportFluent<?> fluent, io.sundr.model.ModifierSupport instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withModifiers(instance.getModifiers());
     fluent.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
   }
 
-  public ModifierSupportBuilder(ModifierSupport instance) {
-    this(instance, true);
+  public ModifierSupportBuilder(io.sundr.model.ModifierSupport instance) {
+    this(instance, false);
   }
 
-  public ModifierSupportBuilder(ModifierSupport instance, Boolean validationEnabled) {
+  public ModifierSupportBuilder(io.sundr.model.ModifierSupport instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withModifiers(instance.getModifiers());
     this.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
   }
 
-  public ModifierSupport build() {
+  io.sundr.model.ModifierSupportFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.ModifierSupport build() {
     ModifierSupport buildable = new ModifierSupport(fluent.getModifiers(), fluent.getAttributes());
     return buildable;
   }

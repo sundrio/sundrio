@@ -5,48 +5,49 @@ import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class SourceBuilder extends SourceFluentImpl<SourceBuilder> implements VisitableBuilder<Source, SourceBuilder> {
-
-  SourceFluent<?> fluent;
-  Boolean validationEnabled;
-
+public class SourceBuilder extends SourceFluentImpl<SourceBuilder>
+    implements VisitableBuilder<Source, io.sundr.model.SourceBuilder> {
   public SourceBuilder() {
-    this(true);
+    this(false);
   }
 
   public SourceBuilder(Boolean validationEnabled) {
     this(new Source(), validationEnabled);
   }
 
-  public SourceBuilder(SourceFluent<?> fluent) {
-    this(fluent, true);
+  public SourceBuilder(io.sundr.model.SourceFluent<?> fluent) {
+    this(fluent, false);
   }
 
-  public SourceBuilder(SourceFluent<?> fluent, Boolean validationEnabled) {
+  public SourceBuilder(io.sundr.model.SourceFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this(fluent, new Source(), validationEnabled);
   }
 
-  public SourceBuilder(SourceFluent<?> fluent, Source instance) {
-    this(fluent, instance, true);
+  public SourceBuilder(io.sundr.model.SourceFluent<?> fluent, io.sundr.model.Source instance) {
+    this(fluent, instance, false);
   }
 
-  public SourceBuilder(SourceFluent<?> fluent, Source instance, Boolean validationEnabled) {
+  public SourceBuilder(io.sundr.model.SourceFluent<?> fluent, io.sundr.model.Source instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withTypes(instance.getTypes());
     this.validationEnabled = validationEnabled;
   }
 
-  public SourceBuilder(Source instance) {
-    this(instance, true);
+  public SourceBuilder(io.sundr.model.Source instance) {
+    this(instance, false);
   }
 
-  public SourceBuilder(Source instance, Boolean validationEnabled) {
+  public SourceBuilder(io.sundr.model.Source instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withTypes(instance.getTypes());
     this.validationEnabled = validationEnabled;
   }
 
-  public Source build() {
+  io.sundr.model.SourceFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.Source build() {
     Source buildable = new Source(fluent.getTypes());
     return buildable;
   }

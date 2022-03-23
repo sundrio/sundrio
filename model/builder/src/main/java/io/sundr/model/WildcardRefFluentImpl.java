@@ -2,7 +2,10 @@ package io.sundr.model;
 
 import java.lang.Boolean;
 import java.lang.Deprecated;
+import java.lang.Integer;
 import java.lang.Object;
+import java.lang.String;
+import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,20 +15,23 @@ import java.util.function.Predicate;
 import io.sundr.builder.Nested;
 import io.sundr.builder.VisitableBuilder;
 
+/**
+ * Generated
+ */
+@SuppressWarnings(value = "unchecked")
 public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeRefFluentImpl<A>
     implements WildcardRefFluent<A> {
-
-  private io.sundr.model.WildcardRef.BoundKind boundKind;
-  private List<VisitableBuilder<? extends TypeRef, ?>> bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
-
   public WildcardRefFluentImpl() {
   }
 
-  public WildcardRefFluentImpl(WildcardRef instance) {
+  public WildcardRefFluentImpl(io.sundr.model.WildcardRef instance) {
     this.withBoundKind(instance.getBoundKind());
     this.withBounds(instance.getBounds());
     this.withAttributes(instance.getAttributes());
   }
+
+  private WildcardRef.BoundKind boundKind;
+  private ArrayList<VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
 
   public io.sundr.model.WildcardRef.BoundKind getBoundKind() {
     return this.boundKind;
@@ -40,75 +46,75 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return this.boundKind != null;
   }
 
-  public A addToBounds(VisitableBuilder<? extends TypeRef, ?> builder) {
+  public A addToBounds(io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
     _visitables.get("bounds").add(builder);
     this.bounds.add(builder);
     return (A) this;
   }
 
-  public A addToBounds(int index, VisitableBuilder<? extends TypeRef, ?> builder) {
+  public A addToBounds(Integer index, io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
     _visitables.get("bounds").add(index, builder);
     this.bounds.add(index, builder);
     return (A) this;
   }
 
-  public A addToBounds(int index, TypeRef item) {
+  public A addToBounds(java.lang.Integer index, io.sundr.model.TypeRef item) {
     if (item instanceof TypeParamRef) {
-      addToTypeParamRefBounds(index, (TypeParamRef) item);
-    } else if (item instanceof WildcardRef) {
-      addToWildcardRefBounds(index, (WildcardRef) item);
+      addToTypeParamRefBounds(index, (io.sundr.model.TypeParamRef) item);
+    } else if (item instanceof io.sundr.model.WildcardRef) {
+      addToWildcardRefBounds(index, (io.sundr.model.WildcardRef) item);
     } else if (item instanceof ClassRef) {
-      addToClassRefBounds(index, (ClassRef) item);
+      addToClassRefBounds(index, (io.sundr.model.ClassRef) item);
     } else if (item instanceof PrimitiveRef) {
-      addToPrimitiveRefBounds(index, (PrimitiveRef) item);
+      addToPrimitiveRefBounds(index, (io.sundr.model.PrimitiveRef) item);
     } else if (item instanceof VoidRef) {
-      addToVoidRefBounds(index, (VoidRef) item);
+      addToVoidRefBounds(index, (io.sundr.model.VoidRef) item);
     }
 
     return (A) this;
   }
 
-  public A setToBounds(int index, TypeRef item) {
-    if (item instanceof TypeParamRef) {
-      setToTypeParamRefBounds(index, (TypeParamRef) item);
-    } else if (item instanceof WildcardRef) {
-      setToWildcardRefBounds(index, (WildcardRef) item);
-    } else if (item instanceof ClassRef) {
-      setToClassRefBounds(index, (ClassRef) item);
-    } else if (item instanceof PrimitiveRef) {
-      setToPrimitiveRefBounds(index, (PrimitiveRef) item);
-    } else if (item instanceof VoidRef) {
-      setToVoidRefBounds(index, (VoidRef) item);
+  public A setToBounds(java.lang.Integer index, io.sundr.model.TypeRef item) {
+    if (item instanceof io.sundr.model.TypeParamRef) {
+      setToTypeParamRefBounds(index, (io.sundr.model.TypeParamRef) item);
+    } else if (item instanceof io.sundr.model.WildcardRef) {
+      setToWildcardRefBounds(index, (io.sundr.model.WildcardRef) item);
+    } else if (item instanceof io.sundr.model.ClassRef) {
+      setToClassRefBounds(index, (io.sundr.model.ClassRef) item);
+    } else if (item instanceof io.sundr.model.PrimitiveRef) {
+      setToPrimitiveRefBounds(index, (io.sundr.model.PrimitiveRef) item);
+    } else if (item instanceof io.sundr.model.VoidRef) {
+      setToVoidRefBounds(index, (io.sundr.model.VoidRef) item);
     }
 
     return (A) this;
   }
 
-  public A addToBounds(TypeRef... items) {
+  public A addToBounds(io.sundr.model.TypeRef... items) {
     if (items != null && items.length > 0 && this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new ArrayList<VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (TypeRef item : items) {
-      if (item instanceof TypeParamRef) {
-        addToTypeParamRefBounds((TypeParamRef) item);
-      } else if (item instanceof WildcardRef) {
-        addToWildcardRefBounds((WildcardRef) item);
-      } else if (item instanceof ClassRef) {
-        addToClassRefBounds((ClassRef) item);
-      } else if (item instanceof PrimitiveRef) {
-        addToPrimitiveRefBounds((PrimitiveRef) item);
-      } else if (item instanceof VoidRef) {
-        addToVoidRefBounds((VoidRef) item);
+    for (io.sundr.model.TypeRef item : items) {
+      if (item instanceof io.sundr.model.TypeParamRef) {
+        addToTypeParamRefBounds((io.sundr.model.TypeParamRef) item);
+      } else if (item instanceof io.sundr.model.WildcardRef) {
+        addToWildcardRefBounds((io.sundr.model.WildcardRef) item);
+      } else if (item instanceof io.sundr.model.ClassRef) {
+        addToClassRefBounds((io.sundr.model.ClassRef) item);
+      } else if (item instanceof io.sundr.model.PrimitiveRef) {
+        addToPrimitiveRefBounds((io.sundr.model.PrimitiveRef) item);
+      } else if (item instanceof io.sundr.model.VoidRef) {
+        addToVoidRefBounds((io.sundr.model.VoidRef) item);
       }
 
       else {
-        VisitableBuilder<? extends TypeRef, ?> builder = builderOf(item);
+        VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = builderOf(item);
         _visitables.get("bounds").add(builder);
         this.bounds.add(builder);
       }
@@ -116,25 +122,25 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A addAllToBounds(Collection<TypeRef> items) {
+  public A addAllToBounds(Collection<io.sundr.model.TypeRef> items) {
     if (items != null && items.size() > 0 && this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new ArrayList<VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (TypeRef item : items) {
-      if (item instanceof TypeParamRef) {
-        addToTypeParamRefBounds((TypeParamRef) item);
-      } else if (item instanceof WildcardRef) {
-        addToWildcardRefBounds((WildcardRef) item);
-      } else if (item instanceof ClassRef) {
-        addToClassRefBounds((ClassRef) item);
-      } else if (item instanceof PrimitiveRef) {
-        addToPrimitiveRefBounds((PrimitiveRef) item);
-      } else if (item instanceof VoidRef) {
-        addToVoidRefBounds((VoidRef) item);
+    for (io.sundr.model.TypeRef item : items) {
+      if (item instanceof io.sundr.model.TypeParamRef) {
+        addToTypeParamRefBounds((io.sundr.model.TypeParamRef) item);
+      } else if (item instanceof io.sundr.model.WildcardRef) {
+        addToWildcardRefBounds((io.sundr.model.WildcardRef) item);
+      } else if (item instanceof io.sundr.model.ClassRef) {
+        addToClassRefBounds((io.sundr.model.ClassRef) item);
+      } else if (item instanceof io.sundr.model.PrimitiveRef) {
+        addToPrimitiveRefBounds((io.sundr.model.PrimitiveRef) item);
+      } else if (item instanceof io.sundr.model.VoidRef) {
+        addToVoidRefBounds((io.sundr.model.VoidRef) item);
       }
 
       else {
-        VisitableBuilder<? extends TypeRef, ?> builder = builderOf(item);
+        VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = builderOf(item);
         _visitables.get("bounds").add(builder);
         this.bounds.add(builder);
       }
@@ -142,31 +148,31 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeFromBounds(VisitableBuilder<? extends TypeRef, ?> builder) {
+  public A removeFromBounds(io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
     _visitables.get("bounds").remove(builder);
     this.bounds.remove(builder);
     return (A) this;
   }
 
-  public A removeFromBounds(TypeRef... items) {
-    for (TypeRef item : items) {
-      if (item instanceof TypeParamRef) {
-        removeFromTypeParamRefBounds((TypeParamRef) item);
-      } else if (item instanceof WildcardRef) {
-        removeFromWildcardRefBounds((WildcardRef) item);
-      } else if (item instanceof ClassRef) {
-        removeFromClassRefBounds((ClassRef) item);
-      } else if (item instanceof PrimitiveRef) {
-        removeFromPrimitiveRefBounds((PrimitiveRef) item);
-      } else if (item instanceof VoidRef) {
-        removeFromVoidRefBounds((VoidRef) item);
+  public A removeFromBounds(io.sundr.model.TypeRef... items) {
+    for (io.sundr.model.TypeRef item : items) {
+      if (item instanceof io.sundr.model.TypeParamRef) {
+        removeFromTypeParamRefBounds((io.sundr.model.TypeParamRef) item);
+      } else if (item instanceof io.sundr.model.WildcardRef) {
+        removeFromWildcardRefBounds((io.sundr.model.WildcardRef) item);
+      } else if (item instanceof io.sundr.model.ClassRef) {
+        removeFromClassRefBounds((io.sundr.model.ClassRef) item);
+      } else if (item instanceof io.sundr.model.PrimitiveRef) {
+        removeFromPrimitiveRefBounds((io.sundr.model.PrimitiveRef) item);
+      } else if (item instanceof io.sundr.model.VoidRef) {
+        removeFromVoidRefBounds((io.sundr.model.VoidRef) item);
       }
 
       else {
-        VisitableBuilder<? extends TypeRef, ?> builder = builderOf(item);
+        VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = builderOf(item);
         _visitables.get("bounds").remove(builder);
         this.bounds.remove(builder);
       }
@@ -174,39 +180,24 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeAllFromBounds(Collection<TypeRef> items) {
-    for (TypeRef item : items) {
-      if (item instanceof TypeParamRef) {
-        removeFromTypeParamRefBounds((TypeParamRef) item);
-      } else if (item instanceof WildcardRef) {
-        removeFromWildcardRefBounds((WildcardRef) item);
-      } else if (item instanceof ClassRef) {
-        removeFromClassRefBounds((ClassRef) item);
-      } else if (item instanceof PrimitiveRef) {
-        removeFromPrimitiveRefBounds((PrimitiveRef) item);
-      } else if (item instanceof VoidRef) {
-        removeFromVoidRefBounds((VoidRef) item);
+  public A removeAllFromBounds(java.util.Collection<io.sundr.model.TypeRef> items) {
+    for (io.sundr.model.TypeRef item : items) {
+      if (item instanceof io.sundr.model.TypeParamRef) {
+        removeFromTypeParamRefBounds((io.sundr.model.TypeParamRef) item);
+      } else if (item instanceof io.sundr.model.WildcardRef) {
+        removeFromWildcardRefBounds((io.sundr.model.WildcardRef) item);
+      } else if (item instanceof io.sundr.model.ClassRef) {
+        removeFromClassRefBounds((io.sundr.model.ClassRef) item);
+      } else if (item instanceof io.sundr.model.PrimitiveRef) {
+        removeFromPrimitiveRefBounds((io.sundr.model.PrimitiveRef) item);
+      } else if (item instanceof io.sundr.model.VoidRef) {
+        removeFromVoidRefBounds((io.sundr.model.VoidRef) item);
       }
 
       else {
-        VisitableBuilder<? extends TypeRef, ?> builder = builderOf(item);
+        VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = builderOf(item);
         _visitables.get("bounds").remove(builder);
         this.bounds.remove(builder);
-      }
-    }
-    return (A) this;
-  }
-
-  public A removeMatchingFromBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
-    if (bounds == null)
-      return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = bounds.iterator();
-    final List visitables = _visitables.get("bounds");
-    while (each.hasNext()) {
-      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
-      if (predicate.test(builder)) {
-        visitables.remove(builder);
-        each.remove();
       }
     }
     return (A) this;
@@ -218,28 +209,29 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
    * @return The buildable object.
    */
   @Deprecated
-  public List<TypeRef> getBounds() {
+  public List<io.sundr.model.TypeRef> getBounds() {
     return build(bounds);
   }
 
-  public List<TypeRef> buildBounds() {
+  public java.util.List<io.sundr.model.TypeRef> buildBounds() {
     return build(bounds);
   }
 
-  public TypeRef buildBound(int index) {
+  public io.sundr.model.TypeRef buildBound(java.lang.Integer index) {
     return this.bounds.get(index).build();
   }
 
-  public TypeRef buildFirstBound() {
+  public io.sundr.model.TypeRef buildFirstBound() {
     return this.bounds.get(0).build();
   }
 
-  public TypeRef buildLastBound() {
+  public io.sundr.model.TypeRef buildLastBound() {
     return this.bounds.get(bounds.size() - 1).build();
   }
 
-  public TypeRef buildMatchingBound(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
-    for (VisitableBuilder<? extends TypeRef, ?> item : bounds) {
+  public io.sundr.model.TypeRef buildMatchingBound(
+      Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> predicate) {
+    for (io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> item : bounds) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -247,8 +239,9 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return null;
   }
 
-  public Boolean hasMatchingBound(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
-    for (VisitableBuilder<? extends TypeRef, ?> item : bounds) {
+  public java.lang.Boolean hasMatchingBound(
+      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> predicate) {
+    for (io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> item : bounds) {
       if (predicate.test(item)) {
         return true;
       }
@@ -256,13 +249,10 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return false;
   }
 
-  public A withBounds(List<TypeRef> bounds) {
-    if (this.bounds != null) {
-      _visitables.get("bounds").removeAll(this.bounds);
-    }
+  public A withBounds(java.util.List<io.sundr.model.TypeRef> bounds) {
     if (bounds != null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
-      for (TypeRef item : bounds) {
+      this.bounds = new java.util.ArrayList();
+      for (io.sundr.model.TypeRef item : bounds) {
         this.addToBounds(item);
       }
     } else {
@@ -271,37 +261,37 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A withBounds(TypeRef... bounds) {
+  public A withBounds(io.sundr.model.TypeRef... bounds) {
     if (this.bounds != null) {
       this.bounds.clear();
     }
     if (bounds != null) {
-      for (TypeRef item : bounds) {
+      for (io.sundr.model.TypeRef item : bounds) {
         this.addToBounds(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasBounds() {
+  public java.lang.Boolean hasBounds() {
     return bounds != null && !bounds.isEmpty();
   }
 
-  public A addToTypeParamRefBounds(int index, TypeParamRef item) {
+  public A addToTypeParamRefBounds(java.lang.Integer index, io.sundr.model.TypeParamRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
+    TypeParamRefBuilder builder = new io.sundr.model.TypeParamRefBuilder(item);
     _visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);
     this.bounds.add(index >= 0 ? index : bounds.size(), builder);
     return (A) this;
   }
 
-  public A setToTypeParamRefBounds(int index, TypeParamRef item) {
+  public A setToTypeParamRefBounds(java.lang.Integer index, io.sundr.model.TypeParamRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
+    io.sundr.model.TypeParamRefBuilder builder = new io.sundr.model.TypeParamRefBuilder(item);
     if (index < 0 || index >= _visitables.get("bounds").size()) {
       _visitables.get("bounds").add(builder);
     } else {
@@ -315,33 +305,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A addToTypeParamRefBounds(TypeParamRef... items) {
+  public A addToTypeParamRefBounds(io.sundr.model.TypeParamRef... items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (TypeParamRef item : items) {
-      TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
+    for (io.sundr.model.TypeParamRef item : items) {
+      io.sundr.model.TypeParamRefBuilder builder = new io.sundr.model.TypeParamRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToTypeParamRefBounds(Collection<TypeParamRef> items) {
+  public A addAllToTypeParamRefBounds(java.util.Collection<io.sundr.model.TypeParamRef> items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (TypeParamRef item : items) {
-      TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
+    for (io.sundr.model.TypeParamRef item : items) {
+      io.sundr.model.TypeParamRefBuilder builder = new io.sundr.model.TypeParamRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromTypeParamRefBounds(TypeParamRef... items) {
-    for (TypeParamRef item : items) {
-      TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
+  public A removeFromTypeParamRefBounds(io.sundr.model.TypeParamRef... items) {
+    for (io.sundr.model.TypeParamRef item : items) {
+      io.sundr.model.TypeParamRefBuilder builder = new io.sundr.model.TypeParamRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -350,9 +340,9 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeAllFromTypeParamRefBounds(Collection<TypeParamRef> items) {
-    for (TypeParamRef item : items) {
-      TypeParamRefBuilder builder = new TypeParamRefBuilder(item);
+  public A removeAllFromTypeParamRefBounds(java.util.Collection<io.sundr.model.TypeParamRef> items) {
+    for (io.sundr.model.TypeParamRef item : items) {
+      io.sundr.model.TypeParamRefBuilder builder = new io.sundr.model.TypeParamRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -361,13 +351,14 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeMatchingFromTypeParamRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromTypeParamRefBounds(
+      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> predicate) {
     if (bounds == null)
       return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = bounds.iterator();
+    final Iterator<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> each = bounds.iterator();
     final List visitables = _visitables.get("bounds");
     while (each.hasNext()) {
-      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -376,34 +367,35 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBound() {
-    return new TypeParamRefBoundsNestedImpl();
+  public WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBound() {
+    return new WildcardRefFluentImpl.TypeParamRefBoundsNestedImpl();
   }
 
-  public io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBoundLike(TypeParamRef item) {
-    return new TypeParamRefBoundsNestedImpl(-1, item);
+  public io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<A> addNewTypeParamRefBoundLike(
+      io.sundr.model.TypeParamRef item) {
+    return new WildcardRefFluentImpl.TypeParamRefBoundsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<A> setNewTypeParamRefBoundLike(int index,
-      TypeParamRef item) {
-    return new TypeParamRefBoundsNestedImpl(index, item);
+  public io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<A> setNewTypeParamRefBoundLike(java.lang.Integer index,
+      io.sundr.model.TypeParamRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.TypeParamRefBoundsNestedImpl(index, item);
   }
 
-  public A addToWildcardRefBounds(int index, WildcardRef item) {
+  public A addToWildcardRefBounds(java.lang.Integer index, io.sundr.model.WildcardRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    WildcardRefBuilder builder = new WildcardRefBuilder(item);
+    WildcardRefBuilder builder = new io.sundr.model.WildcardRefBuilder(item);
     _visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);
     this.bounds.add(index >= 0 ? index : bounds.size(), builder);
     return (A) this;
   }
 
-  public A setToWildcardRefBounds(int index, WildcardRef item) {
+  public A setToWildcardRefBounds(java.lang.Integer index, io.sundr.model.WildcardRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    WildcardRefBuilder builder = new WildcardRefBuilder(item);
+    io.sundr.model.WildcardRefBuilder builder = new io.sundr.model.WildcardRefBuilder(item);
     if (index < 0 || index >= _visitables.get("bounds").size()) {
       _visitables.get("bounds").add(builder);
     } else {
@@ -417,33 +409,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A addToWildcardRefBounds(WildcardRef... items) {
+  public A addToWildcardRefBounds(io.sundr.model.WildcardRef... items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (WildcardRef item : items) {
-      WildcardRefBuilder builder = new WildcardRefBuilder(item);
+    for (io.sundr.model.WildcardRef item : items) {
+      io.sundr.model.WildcardRefBuilder builder = new io.sundr.model.WildcardRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToWildcardRefBounds(Collection<WildcardRef> items) {
+  public A addAllToWildcardRefBounds(java.util.Collection<io.sundr.model.WildcardRef> items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (WildcardRef item : items) {
-      WildcardRefBuilder builder = new WildcardRefBuilder(item);
+    for (io.sundr.model.WildcardRef item : items) {
+      io.sundr.model.WildcardRefBuilder builder = new io.sundr.model.WildcardRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromWildcardRefBounds(WildcardRef... items) {
-    for (WildcardRef item : items) {
-      WildcardRefBuilder builder = new WildcardRefBuilder(item);
+  public A removeFromWildcardRefBounds(io.sundr.model.WildcardRef... items) {
+    for (io.sundr.model.WildcardRef item : items) {
+      io.sundr.model.WildcardRefBuilder builder = new io.sundr.model.WildcardRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -452,9 +444,9 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeAllFromWildcardRefBounds(Collection<WildcardRef> items) {
-    for (WildcardRef item : items) {
-      WildcardRefBuilder builder = new WildcardRefBuilder(item);
+  public A removeAllFromWildcardRefBounds(java.util.Collection<io.sundr.model.WildcardRef> items) {
+    for (io.sundr.model.WildcardRef item : items) {
+      io.sundr.model.WildcardRefBuilder builder = new io.sundr.model.WildcardRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -463,13 +455,14 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeMatchingFromWildcardRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromWildcardRefBounds(
+      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> predicate) {
     if (bounds == null)
       return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = bounds.iterator();
+    final Iterator<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> each = bounds.iterator();
     final List visitables = _visitables.get("bounds");
     while (each.hasNext()) {
-      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -478,33 +471,35 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBound() {
-    return new WildcardRefBoundsNestedImpl();
+  public WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBound() {
+    return new WildcardRefFluentImpl.WildcardRefBoundsNestedImpl();
   }
 
-  public io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBoundLike(WildcardRef item) {
-    return new WildcardRefBoundsNestedImpl(-1, item);
+  public io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<A> addNewWildcardRefBoundLike(
+      io.sundr.model.WildcardRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.WildcardRefBoundsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<A> setNewWildcardRefBoundLike(int index, WildcardRef item) {
-    return new WildcardRefBoundsNestedImpl(index, item);
+  public io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<A> setNewWildcardRefBoundLike(java.lang.Integer index,
+      io.sundr.model.WildcardRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.WildcardRefBoundsNestedImpl(index, item);
   }
 
-  public A addToClassRefBounds(int index, ClassRef item) {
+  public A addToClassRefBounds(java.lang.Integer index, io.sundr.model.ClassRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    ClassRefBuilder builder = new ClassRefBuilder(item);
+    ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
     _visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);
     this.bounds.add(index >= 0 ? index : bounds.size(), builder);
     return (A) this;
   }
 
-  public A setToClassRefBounds(int index, ClassRef item) {
+  public A setToClassRefBounds(java.lang.Integer index, io.sundr.model.ClassRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    ClassRefBuilder builder = new ClassRefBuilder(item);
+    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
     if (index < 0 || index >= _visitables.get("bounds").size()) {
       _visitables.get("bounds").add(builder);
     } else {
@@ -518,33 +513,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A addToClassRefBounds(ClassRef... items) {
+  public A addToClassRefBounds(io.sundr.model.ClassRef... items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToClassRefBounds(Collection<ClassRef> items) {
+  public A addAllToClassRefBounds(java.util.Collection<io.sundr.model.ClassRef> items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromClassRefBounds(ClassRef... items) {
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+  public A removeFromClassRefBounds(io.sundr.model.ClassRef... items) {
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -553,9 +548,9 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeAllFromClassRefBounds(Collection<ClassRef> items) {
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+  public A removeAllFromClassRefBounds(java.util.Collection<io.sundr.model.ClassRef> items) {
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -564,13 +559,14 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeMatchingFromClassRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromClassRefBounds(
+      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> predicate) {
     if (bounds == null)
       return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = bounds.iterator();
+    final Iterator<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> each = bounds.iterator();
     final List visitables = _visitables.get("bounds");
     while (each.hasNext()) {
-      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -579,33 +575,34 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBound() {
-    return new ClassRefBoundsNestedImpl();
+  public WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBound() {
+    return new WildcardRefFluentImpl.ClassRefBoundsNestedImpl();
   }
 
-  public io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBoundLike(ClassRef item) {
-    return new ClassRefBoundsNestedImpl(-1, item);
+  public io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<A> addNewClassRefBoundLike(io.sundr.model.ClassRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.ClassRefBoundsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<A> setNewClassRefBoundLike(int index, ClassRef item) {
-    return new ClassRefBoundsNestedImpl(index, item);
+  public io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<A> setNewClassRefBoundLike(java.lang.Integer index,
+      io.sundr.model.ClassRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.ClassRefBoundsNestedImpl(index, item);
   }
 
-  public A addToPrimitiveRefBounds(int index, PrimitiveRef item) {
+  public A addToPrimitiveRefBounds(java.lang.Integer index, io.sundr.model.PrimitiveRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
+    PrimitiveRefBuilder builder = new io.sundr.model.PrimitiveRefBuilder(item);
     _visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);
     this.bounds.add(index >= 0 ? index : bounds.size(), builder);
     return (A) this;
   }
 
-  public A setToPrimitiveRefBounds(int index, PrimitiveRef item) {
+  public A setToPrimitiveRefBounds(java.lang.Integer index, io.sundr.model.PrimitiveRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
+    io.sundr.model.PrimitiveRefBuilder builder = new io.sundr.model.PrimitiveRefBuilder(item);
     if (index < 0 || index >= _visitables.get("bounds").size()) {
       _visitables.get("bounds").add(builder);
     } else {
@@ -619,33 +616,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A addToPrimitiveRefBounds(PrimitiveRef... items) {
+  public A addToPrimitiveRefBounds(io.sundr.model.PrimitiveRef... items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (PrimitiveRef item : items) {
-      PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
+    for (io.sundr.model.PrimitiveRef item : items) {
+      io.sundr.model.PrimitiveRefBuilder builder = new io.sundr.model.PrimitiveRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToPrimitiveRefBounds(Collection<PrimitiveRef> items) {
+  public A addAllToPrimitiveRefBounds(java.util.Collection<io.sundr.model.PrimitiveRef> items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (PrimitiveRef item : items) {
-      PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
+    for (io.sundr.model.PrimitiveRef item : items) {
+      io.sundr.model.PrimitiveRefBuilder builder = new io.sundr.model.PrimitiveRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromPrimitiveRefBounds(PrimitiveRef... items) {
-    for (PrimitiveRef item : items) {
-      PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
+  public A removeFromPrimitiveRefBounds(io.sundr.model.PrimitiveRef... items) {
+    for (io.sundr.model.PrimitiveRef item : items) {
+      io.sundr.model.PrimitiveRefBuilder builder = new io.sundr.model.PrimitiveRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -654,9 +651,9 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeAllFromPrimitiveRefBounds(Collection<PrimitiveRef> items) {
-    for (PrimitiveRef item : items) {
-      PrimitiveRefBuilder builder = new PrimitiveRefBuilder(item);
+  public A removeAllFromPrimitiveRefBounds(java.util.Collection<io.sundr.model.PrimitiveRef> items) {
+    for (io.sundr.model.PrimitiveRef item : items) {
+      io.sundr.model.PrimitiveRefBuilder builder = new io.sundr.model.PrimitiveRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -665,13 +662,14 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeMatchingFromPrimitiveRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromPrimitiveRefBounds(
+      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> predicate) {
     if (bounds == null)
       return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = bounds.iterator();
+    final Iterator<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> each = bounds.iterator();
     final List visitables = _visitables.get("bounds");
     while (each.hasNext()) {
-      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -680,34 +678,35 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound() {
-    return new PrimitiveRefBoundsNestedImpl();
+  public WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBound() {
+    return new WildcardRefFluentImpl.PrimitiveRefBoundsNestedImpl();
   }
 
-  public io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBoundLike(PrimitiveRef item) {
-    return new PrimitiveRefBoundsNestedImpl(-1, item);
+  public io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<A> addNewPrimitiveRefBoundLike(
+      io.sundr.model.PrimitiveRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.PrimitiveRefBoundsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<A> setNewPrimitiveRefBoundLike(int index,
-      PrimitiveRef item) {
-    return new PrimitiveRefBoundsNestedImpl(index, item);
+  public io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<A> setNewPrimitiveRefBoundLike(java.lang.Integer index,
+      io.sundr.model.PrimitiveRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.PrimitiveRefBoundsNestedImpl(index, item);
   }
 
-  public A addToVoidRefBounds(int index, VoidRef item) {
+  public A addToVoidRefBounds(java.lang.Integer index, io.sundr.model.VoidRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    VoidRefBuilder builder = new VoidRefBuilder(item);
+    VoidRefBuilder builder = new io.sundr.model.VoidRefBuilder(item);
     _visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);
     this.bounds.add(index >= 0 ? index : bounds.size(), builder);
     return (A) this;
   }
 
-  public A setToVoidRefBounds(int index, VoidRef item) {
+  public A setToVoidRefBounds(java.lang.Integer index, io.sundr.model.VoidRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    VoidRefBuilder builder = new VoidRefBuilder(item);
+    io.sundr.model.VoidRefBuilder builder = new io.sundr.model.VoidRefBuilder(item);
     if (index < 0 || index >= _visitables.get("bounds").size()) {
       _visitables.get("bounds").add(builder);
     } else {
@@ -721,33 +720,33 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A addToVoidRefBounds(VoidRef... items) {
+  public A addToVoidRefBounds(io.sundr.model.VoidRef... items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (VoidRef item : items) {
-      VoidRefBuilder builder = new VoidRefBuilder(item);
+    for (io.sundr.model.VoidRef item : items) {
+      io.sundr.model.VoidRefBuilder builder = new io.sundr.model.VoidRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToVoidRefBounds(Collection<VoidRef> items) {
+  public A addAllToVoidRefBounds(java.util.Collection<io.sundr.model.VoidRef> items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.bounds = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>>();
     }
-    for (VoidRef item : items) {
-      VoidRefBuilder builder = new VoidRefBuilder(item);
+    for (io.sundr.model.VoidRef item : items) {
+      io.sundr.model.VoidRefBuilder builder = new io.sundr.model.VoidRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromVoidRefBounds(VoidRef... items) {
-    for (VoidRef item : items) {
-      VoidRefBuilder builder = new VoidRefBuilder(item);
+  public A removeFromVoidRefBounds(io.sundr.model.VoidRef... items) {
+    for (io.sundr.model.VoidRef item : items) {
+      io.sundr.model.VoidRefBuilder builder = new io.sundr.model.VoidRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -756,9 +755,9 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeAllFromVoidRefBounds(Collection<VoidRef> items) {
-    for (VoidRef item : items) {
-      VoidRefBuilder builder = new VoidRefBuilder(item);
+  public A removeAllFromVoidRefBounds(java.util.Collection<io.sundr.model.VoidRef> items) {
+    for (io.sundr.model.VoidRef item : items) {
+      io.sundr.model.VoidRefBuilder builder = new io.sundr.model.VoidRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -767,13 +766,14 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public A removeMatchingFromVoidRefBounds(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
+  public A removeMatchingFromVoidRefBounds(
+      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> predicate) {
     if (bounds == null)
       return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = bounds.iterator();
+    final Iterator<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?>> each = bounds.iterator();
     final List visitables = _visitables.get("bounds");
     while (each.hasNext()) {
-      VisitableBuilder<? extends TypeRef, ?> builder = each.next();
+      io.sundr.builder.VisitableBuilder<? extends io.sundr.model.TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -782,16 +782,17 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return (A) this;
   }
 
-  public io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBound() {
-    return new VoidRefBoundsNestedImpl();
+  public WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBound() {
+    return new WildcardRefFluentImpl.VoidRefBoundsNestedImpl();
   }
 
-  public io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBoundLike(VoidRef item) {
-    return new VoidRefBoundsNestedImpl(-1, item);
+  public io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<A> addNewVoidRefBoundLike(io.sundr.model.VoidRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.VoidRefBoundsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<A> setNewVoidRefBoundLike(int index, VoidRef item) {
-    return new VoidRefBoundsNestedImpl(index, item);
+  public io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<A> setNewVoidRefBoundLike(java.lang.Integer index,
+      io.sundr.model.VoidRef item) {
+    return new io.sundr.model.WildcardRefFluentImpl.VoidRefBoundsNestedImpl(index, item);
   }
 
   public boolean equals(Object o) {
@@ -813,23 +814,35 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     return java.util.Objects.hash(boundKind, bounds, super.hashCode());
   }
 
-  public class TypeParamRefBoundsNestedImpl<N>
-      extends TypeParamRefFluentImpl<io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<N>>
-      implements io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<N>, Nested<N> {
-    private final TypeParamRefBuilder builder;
-    private final int index;
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (boundKind != null) {
+      sb.append("boundKind:");
+      sb.append(boundKind + ",");
+    }
+    if (bounds != null && !bounds.isEmpty()) {
+      sb.append("bounds:");
+      sb.append(bounds);
+    }
+    sb.append("}");
+    return sb.toString();
+  }
 
-    TypeParamRefBoundsNestedImpl(int index, TypeParamRef item) {
+  class TypeParamRefBoundsNestedImpl<N> extends TypeParamRefFluentImpl<WildcardRefFluent.TypeParamRefBoundsNested<N>>
+      implements io.sundr.model.WildcardRefFluent.TypeParamRefBoundsNested<N>, Nested<N> {
+    TypeParamRefBoundsNestedImpl(java.lang.Integer index, io.sundr.model.TypeParamRef item) {
       this.index = index;
       this.builder = new TypeParamRefBuilder(this, item);
-
     }
 
     TypeParamRefBoundsNestedImpl() {
       this.index = -1;
-      this.builder = new TypeParamRefBuilder(this);
-
+      this.builder = new io.sundr.model.TypeParamRefBuilder(this);
     }
+
+    io.sundr.model.TypeParamRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) WildcardRefFluentImpl.this.setToBounds(index, builder.build());
@@ -838,25 +851,23 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     public N endTypeParamRefBound() {
       return and();
     }
+
   }
 
-  public class WildcardRefBoundsNestedImpl<N>
-      extends WildcardRefFluentImpl<io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<N>>
-      implements io.sundr.model.WildcardRefFluent.WildcardRefBoundsNested<N>, Nested<N> {
-    private final WildcardRefBuilder builder;
-    private final int index;
-
-    WildcardRefBoundsNestedImpl(int index, WildcardRef item) {
+  class WildcardRefBoundsNestedImpl<N> extends WildcardRefFluentImpl<WildcardRefFluent.WildcardRefBoundsNested<N>>
+      implements WildcardRefFluent.WildcardRefBoundsNested<N>, io.sundr.builder.Nested<N> {
+    WildcardRefBoundsNestedImpl(java.lang.Integer index, io.sundr.model.WildcardRef item) {
       this.index = index;
       this.builder = new WildcardRefBuilder(this, item);
-
     }
 
     WildcardRefBoundsNestedImpl() {
       this.index = -1;
-      this.builder = new WildcardRefBuilder(this);
-
+      this.builder = new io.sundr.model.WildcardRefBuilder(this);
     }
+
+    io.sundr.model.WildcardRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) WildcardRefFluentImpl.this.setToBounds(index, builder.build());
@@ -865,24 +876,23 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     public N endWildcardRefBound() {
       return and();
     }
+
   }
 
-  public class ClassRefBoundsNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<N>>
-      implements io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<N>, Nested<N> {
-    private final ClassRefBuilder builder;
-    private final int index;
-
-    ClassRefBoundsNestedImpl(int index, ClassRef item) {
+  class ClassRefBoundsNestedImpl<N> extends ClassRefFluentImpl<WildcardRefFluent.ClassRefBoundsNested<N>>
+      implements io.sundr.model.WildcardRefFluent.ClassRefBoundsNested<N>, io.sundr.builder.Nested<N> {
+    ClassRefBoundsNestedImpl(java.lang.Integer index, io.sundr.model.ClassRef item) {
       this.index = index;
       this.builder = new ClassRefBuilder(this, item);
-
     }
 
     ClassRefBoundsNestedImpl() {
       this.index = -1;
-      this.builder = new ClassRefBuilder(this);
-
+      this.builder = new io.sundr.model.ClassRefBuilder(this);
     }
+
+    io.sundr.model.ClassRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) WildcardRefFluentImpl.this.setToBounds(index, builder.build());
@@ -891,25 +901,23 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     public N endClassRefBound() {
       return and();
     }
+
   }
 
-  public class PrimitiveRefBoundsNestedImpl<N>
-      extends PrimitiveRefFluentImpl<io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<N>>
-      implements io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<N>, Nested<N> {
-    private final PrimitiveRefBuilder builder;
-    private final int index;
-
-    PrimitiveRefBoundsNestedImpl(int index, PrimitiveRef item) {
+  class PrimitiveRefBoundsNestedImpl<N> extends PrimitiveRefFluentImpl<WildcardRefFluent.PrimitiveRefBoundsNested<N>>
+      implements io.sundr.model.WildcardRefFluent.PrimitiveRefBoundsNested<N>, io.sundr.builder.Nested<N> {
+    PrimitiveRefBoundsNestedImpl(java.lang.Integer index, io.sundr.model.PrimitiveRef item) {
       this.index = index;
       this.builder = new PrimitiveRefBuilder(this, item);
-
     }
 
     PrimitiveRefBoundsNestedImpl() {
       this.index = -1;
-      this.builder = new PrimitiveRefBuilder(this);
-
+      this.builder = new io.sundr.model.PrimitiveRefBuilder(this);
     }
+
+    io.sundr.model.PrimitiveRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) WildcardRefFluentImpl.this.setToBounds(index, builder.build());
@@ -918,24 +926,23 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     public N endPrimitiveRefBound() {
       return and();
     }
+
   }
 
-  public class VoidRefBoundsNestedImpl<N> extends VoidRefFluentImpl<io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<N>>
-      implements io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<N>, Nested<N> {
-    private final VoidRefBuilder builder;
-    private final int index;
-
-    VoidRefBoundsNestedImpl(int index, VoidRef item) {
+  class VoidRefBoundsNestedImpl<N> extends VoidRefFluentImpl<WildcardRefFluent.VoidRefBoundsNested<N>>
+      implements io.sundr.model.WildcardRefFluent.VoidRefBoundsNested<N>, io.sundr.builder.Nested<N> {
+    VoidRefBoundsNestedImpl(java.lang.Integer index, VoidRef item) {
       this.index = index;
       this.builder = new VoidRefBuilder(this, item);
-
     }
 
     VoidRefBoundsNestedImpl() {
       this.index = -1;
-      this.builder = new VoidRefBuilder(this);
-
+      this.builder = new io.sundr.model.VoidRefBuilder(this);
     }
+
+    io.sundr.model.VoidRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) WildcardRefFluentImpl.this.setToBounds(index, builder.build());
@@ -944,6 +951,7 @@ public class WildcardRefFluentImpl<A extends WildcardRefFluent<A>> extends TypeR
     public N endVoidRefBound() {
       return and();
     }
+
   }
 
 }

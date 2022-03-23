@@ -8,6 +8,9 @@ import java.util.Map;
 
 import io.sundr.builder.Nested;
 
+/**
+ * Generated
+ */
 public interface AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends AttributeSupportFluent<A> {
 
   /**
@@ -18,41 +21,41 @@ public interface AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends A
   @Deprecated
   public ClassRef getClassRef();
 
-  public ClassRef buildClassRef();
+  public io.sundr.model.ClassRef buildClassRef();
 
-  public A withClassRef(ClassRef classRef);
+  public A withClassRef(io.sundr.model.ClassRef classRef);
 
   public Boolean hasClassRef();
 
-  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> withNewClassRef();
+  public AnnotationRefFluent.ClassRefNested<A> withNewClassRef();
 
-  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> withNewClassRefLike(ClassRef item);
+  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> withNewClassRefLike(io.sundr.model.ClassRef item);
 
   public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> editClassRef();
 
   public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> editOrNewClassRef();
 
-  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> editOrNewClassRefLike(ClassRef item);
+  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> editOrNewClassRefLike(io.sundr.model.ClassRef item);
 
   public A addToParameters(String key, Object value);
 
-  public A addToParameters(Map<String, Object> map);
+  public A addToParameters(Map<java.lang.String, java.lang.Object> map);
 
-  public A removeFromParameters(String key);
+  public A removeFromParameters(java.lang.String key);
 
-  public A removeFromParameters(Map<String, Object> map);
+  public A removeFromParameters(java.util.Map<java.lang.String, java.lang.Object> map);
 
-  public Map<String, Object> getParameters();
+  public java.util.Map<java.lang.String, java.lang.Object> getParameters();
 
-  public <K extends Object, V extends Object> A withParameters(Map<String, Object> parameters);
+  public <K, V> A withParameters(java.util.Map<java.lang.String, java.lang.Object> parameters);
 
-  public Boolean hasParameters();
+  public java.lang.Boolean hasParameters();
 
-  public interface ClassRefNested<N> extends Nested<N>, ClassRefFluent<io.sundr.model.AnnotationRefFluent.ClassRefNested<N>> {
-
+  public interface ClassRefNested<N> extends Nested<N>, ClassRefFluent<AnnotationRefFluent.ClassRefNested<N>> {
     public N and();
 
     public N endClassRef();
+
   }
 
 }

@@ -2,10 +2,10 @@ package io.sundr.model;
 
 import java.lang.Boolean;
 import java.lang.Deprecated;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
-import java.lang.StringBuffer;
-import java.lang.StringBuilder;
+import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -14,26 +14,15 @@ import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
 
+/**
+ * Generated
+ */
+@SuppressWarnings(value = "unchecked")
 public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSupportFluentImpl<A> implements TypeDefFluent<A> {
-
-  private Kind kind;
-  private String packageName;
-  private String name;
-  private List<String> comments = new ArrayList<String>();
-  private List<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
-  private List<ClassRefBuilder> extendsList = new ArrayList<ClassRefBuilder>();
-  private List<ClassRefBuilder> implementsList = new ArrayList<ClassRefBuilder>();
-  private List<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
-  private List<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
-  private List<MethodBuilder> constructors = new ArrayList<MethodBuilder>();
-  private List<MethodBuilder> methods = new ArrayList<MethodBuilder>();
-  private String outerTypeName;
-  private List<TypeDefBuilder> innerTypes = new ArrayList<TypeDefBuilder>();
-
   public TypeDefFluentImpl() {
   }
 
-  public TypeDefFluentImpl(TypeDef instance) {
+  public TypeDefFluentImpl(io.sundr.model.TypeDef instance) {
     this.withKind(instance.getKind());
     this.withPackageName(instance.getPackageName());
     this.withName(instance.getName());
@@ -51,11 +40,25 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     this.withAttributes(instance.getAttributes());
   }
 
-  public Kind getKind() {
+  private Kind kind;
+  private String packageName;
+  private java.lang.String name;
+  private List<java.lang.String> comments = new ArrayList<java.lang.String>();
+  private java.util.ArrayList<AnnotationRefBuilder> annotations = new java.util.ArrayList<AnnotationRefBuilder>();
+  private java.util.ArrayList<ClassRefBuilder> extendsList = new java.util.ArrayList<ClassRefBuilder>();
+  private java.util.ArrayList<io.sundr.model.ClassRefBuilder> implementsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+  private java.util.ArrayList<TypeParamDefBuilder> parameters = new java.util.ArrayList<TypeParamDefBuilder>();
+  private java.util.ArrayList<PropertyBuilder> properties = new java.util.ArrayList<PropertyBuilder>();
+  private java.util.ArrayList<MethodBuilder> constructors = new java.util.ArrayList<MethodBuilder>();
+  private java.util.ArrayList<io.sundr.model.MethodBuilder> methods = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
+  private java.lang.String outerTypeName;
+  private java.util.ArrayList<TypeDefBuilder> innerTypes = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
+
+  public io.sundr.model.Kind getKind() {
     return this.kind;
   }
 
-  public A withKind(Kind kind) {
+  public A withKind(io.sundr.model.Kind kind) {
     this.kind = kind;
     return (A) this;
   }
@@ -64,150 +67,70 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return this.kind != null;
   }
 
-  public String getPackageName() {
+  public java.lang.String getPackageName() {
     return this.packageName;
   }
 
-  public A withPackageName(String packageName) {
+  public A withPackageName(java.lang.String packageName) {
     this.packageName = packageName;
     return (A) this;
   }
 
-  public Boolean hasPackageName() {
+  public java.lang.Boolean hasPackageName() {
     return this.packageName != null;
   }
 
-  public A withNewPackageName(StringBuilder arg1) {
-    return (A) withPackageName(new String(arg1));
-  }
-
-  public A withNewPackageName(int[] arg1, int arg2, int arg3) {
-    return (A) withPackageName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewPackageName(char[] arg1) {
-    return (A) withPackageName(new String(arg1));
-  }
-
-  public A withNewPackageName(StringBuffer arg1) {
-    return (A) withPackageName(new String(arg1));
-  }
-
-  public A withNewPackageName(byte[] arg1, int arg2) {
-    return (A) withPackageName(new String(arg1, arg2));
-  }
-
-  public A withNewPackageName(byte[] arg1) {
-    return (A) withPackageName(new String(arg1));
-  }
-
-  public A withNewPackageName(char[] arg1, int arg2, int arg3) {
-    return (A) withPackageName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewPackageName(byte[] arg1, int arg2, int arg3) {
-    return (A) withPackageName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewPackageName(byte[] arg1, int arg2, int arg3, int arg4) {
-    return (A) withPackageName(new String(arg1, arg2, arg3, arg4));
-  }
-
-  public A withNewPackageName(String arg1) {
-    return (A) withPackageName(new String(arg1));
-  }
-
-  public String getName() {
+  public java.lang.String getName() {
     return this.name;
   }
 
-  public A withName(String name) {
+  public A withName(java.lang.String name) {
     this.name = name;
     return (A) this;
   }
 
-  public Boolean hasName() {
+  public java.lang.Boolean hasName() {
     return this.name != null;
   }
 
-  public A withNewName(StringBuilder arg1) {
-    return (A) withName(new String(arg1));
-  }
-
-  public A withNewName(int[] arg1, int arg2, int arg3) {
-    return (A) withName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewName(char[] arg1) {
-    return (A) withName(new String(arg1));
-  }
-
-  public A withNewName(StringBuffer arg1) {
-    return (A) withName(new String(arg1));
-  }
-
-  public A withNewName(byte[] arg1, int arg2) {
-    return (A) withName(new String(arg1, arg2));
-  }
-
-  public A withNewName(byte[] arg1) {
-    return (A) withName(new String(arg1));
-  }
-
-  public A withNewName(char[] arg1, int arg2, int arg3) {
-    return (A) withName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewName(byte[] arg1, int arg2, int arg3) {
-    return (A) withName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewName(byte[] arg1, int arg2, int arg3, int arg4) {
-    return (A) withName(new String(arg1, arg2, arg3, arg4));
-  }
-
-  public A withNewName(String arg1) {
-    return (A) withName(new String(arg1));
-  }
-
-  public A addToComments(int index, String item) {
+  public A addToComments(Integer index, java.lang.String item) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new java.util.ArrayList<java.lang.String>();
     }
     this.comments.add(index, item);
     return (A) this;
   }
 
-  public A setToComments(int index, String item) {
+  public A setToComments(java.lang.Integer index, java.lang.String item) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new java.util.ArrayList<java.lang.String>();
     }
     this.comments.set(index, item);
     return (A) this;
   }
 
-  public A addToComments(String... items) {
+  public A addToComments(java.lang.String... items) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new java.util.ArrayList<java.lang.String>();
     }
-    for (String item : items) {
+    for (java.lang.String item : items) {
       this.comments.add(item);
     }
     return (A) this;
   }
 
-  public A addAllToComments(Collection<String> items) {
+  public A addAllToComments(Collection<java.lang.String> items) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new java.util.ArrayList<java.lang.String>();
     }
-    for (String item : items) {
+    for (java.lang.String item : items) {
       this.comments.add(item);
     }
     return (A) this;
   }
 
-  public A removeFromComments(String... items) {
-    for (String item : items) {
+  public A removeFromComments(java.lang.String... items) {
+    for (java.lang.String item : items) {
       if (this.comments != null) {
         this.comments.remove(item);
       }
@@ -215,8 +138,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromComments(Collection<String> items) {
-    for (String item : items) {
+  public A removeAllFromComments(java.util.Collection<java.lang.String> items) {
+    for (java.lang.String item : items) {
       if (this.comments != null) {
         this.comments.remove(item);
       }
@@ -224,24 +147,24 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public List<String> getComments() {
+  public java.util.List<java.lang.String> getComments() {
     return this.comments;
   }
 
-  public String getComment(int index) {
+  public java.lang.String getComment(java.lang.Integer index) {
     return this.comments.get(index);
   }
 
-  public String getFirstComment() {
+  public java.lang.String getFirstComment() {
     return this.comments.get(0);
   }
 
-  public String getLastComment() {
+  public java.lang.String getLastComment() {
     return this.comments.get(comments.size() - 1);
   }
 
-  public String getMatchingComment(Predicate<String> predicate) {
-    for (String item : comments) {
+  public java.lang.String getMatchingComment(Predicate<java.lang.String> predicate) {
+    for (java.lang.String item : comments) {
       if (predicate.test(item)) {
         return item;
       }
@@ -249,8 +172,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingComment(Predicate<String> predicate) {
-    for (String item : comments) {
+  public java.lang.Boolean hasMatchingComment(java.util.function.Predicate<java.lang.String> predicate) {
+    for (java.lang.String item : comments) {
       if (predicate.test(item)) {
         return true;
       }
@@ -258,13 +181,10 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withComments(List<String> comments) {
-    if (this.comments != null) {
-      _visitables.get("comments").removeAll(this.comments);
-    }
+  public A withComments(java.util.List<java.lang.String> comments) {
     if (comments != null) {
-      this.comments = new ArrayList<String>();
-      for (String item : comments) {
+      this.comments = new java.util.ArrayList();
+      for (java.lang.String item : comments) {
         this.addToComments(item);
       }
     } else {
@@ -273,77 +193,37 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withComments(String... comments) {
+  public A withComments(java.lang.String... comments) {
     if (this.comments != null) {
       this.comments.clear();
     }
     if (comments != null) {
-      for (String item : comments) {
+      for (java.lang.String item : comments) {
         this.addToComments(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasComments() {
+  public java.lang.Boolean hasComments() {
     return comments != null && !comments.isEmpty();
   }
 
-  public A addNewComment(StringBuilder arg1) {
-    return (A) addToComments(new String(arg1));
-  }
-
-  public A addNewComment(int[] arg1, int arg2, int arg3) {
-    return (A) addToComments(new String(arg1, arg2, arg3));
-  }
-
-  public A addNewComment(char[] arg1) {
-    return (A) addToComments(new String(arg1));
-  }
-
-  public A addNewComment(StringBuffer arg1) {
-    return (A) addToComments(new String(arg1));
-  }
-
-  public A addNewComment(byte[] arg1, int arg2) {
-    return (A) addToComments(new String(arg1, arg2));
-  }
-
-  public A addNewComment(byte[] arg1) {
-    return (A) addToComments(new String(arg1));
-  }
-
-  public A addNewComment(char[] arg1, int arg2, int arg3) {
-    return (A) addToComments(new String(arg1, arg2, arg3));
-  }
-
-  public A addNewComment(byte[] arg1, int arg2, int arg3) {
-    return (A) addToComments(new String(arg1, arg2, arg3));
-  }
-
-  public A addNewComment(byte[] arg1, int arg2, int arg3, int arg4) {
-    return (A) addToComments(new String(arg1, arg2, arg3, arg4));
-  }
-
-  public A addNewComment(String arg1) {
-    return (A) addToComments(new String(arg1));
-  }
-
-  public A addToAnnotations(int index, AnnotationRef item) {
+  public A addToAnnotations(java.lang.Integer index, io.sundr.model.AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
     }
-    AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
+    io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
     _visitables.get("annotations").add(index >= 0 ? index : _visitables.get("annotations").size(), builder);
     this.annotations.add(index >= 0 ? index : annotations.size(), builder);
     return (A) this;
   }
 
-  public A setToAnnotations(int index, AnnotationRef item) {
+  public A setToAnnotations(java.lang.Integer index, io.sundr.model.AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
     }
-    AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
+    io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
     if (index < 0 || index >= _visitables.get("annotations").size()) {
       _visitables.get("annotations").add(builder);
     } else {
@@ -357,33 +237,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToAnnotations(AnnotationRef... items) {
+  public A addToAnnotations(io.sundr.model.AnnotationRef... items) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
     }
-    for (AnnotationRef item : items) {
-      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
+    for (io.sundr.model.AnnotationRef item : items) {
+      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
       _visitables.get("annotations").add(builder);
       this.annotations.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToAnnotations(Collection<AnnotationRef> items) {
+  public A addAllToAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
     }
-    for (AnnotationRef item : items) {
-      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
+    for (io.sundr.model.AnnotationRef item : items) {
+      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
       _visitables.get("annotations").add(builder);
       this.annotations.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromAnnotations(AnnotationRef... items) {
-    for (AnnotationRef item : items) {
-      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
+  public A removeFromAnnotations(io.sundr.model.AnnotationRef... items) {
+    for (io.sundr.model.AnnotationRef item : items) {
+      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
       if (this.annotations != null) {
         this.annotations.remove(builder);
@@ -392,9 +272,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromAnnotations(Collection<AnnotationRef> items) {
-    for (AnnotationRef item : items) {
-      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
+  public A removeAllFromAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items) {
+    for (io.sundr.model.AnnotationRef item : items) {
+      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
       if (this.annotations != null) {
         this.annotations.remove(builder);
@@ -403,13 +283,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate) {
+  public A removeMatchingFromAnnotations(java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
     if (annotations == null)
       return (A) this;
-    final Iterator<AnnotationRefBuilder> each = annotations.iterator();
+    final Iterator<io.sundr.model.AnnotationRefBuilder> each = annotations.iterator();
     final List visitables = _visitables.get("annotations");
     while (each.hasNext()) {
-      AnnotationRefBuilder builder = each.next();
+      io.sundr.model.AnnotationRefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -424,28 +304,29 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * @return The buildable object.
    */
   @Deprecated
-  public List<AnnotationRef> getAnnotations() {
-    return build(annotations);
+  public java.util.List<io.sundr.model.AnnotationRef> getAnnotations() {
+    return annotations != null ? build(annotations) : null;
   }
 
-  public List<AnnotationRef> buildAnnotations() {
-    return build(annotations);
+  public java.util.List<io.sundr.model.AnnotationRef> buildAnnotations() {
+    return annotations != null ? build(annotations) : null;
   }
 
-  public AnnotationRef buildAnnotation(int index) {
+  public io.sundr.model.AnnotationRef buildAnnotation(java.lang.Integer index) {
     return this.annotations.get(index).build();
   }
 
-  public AnnotationRef buildFirstAnnotation() {
+  public io.sundr.model.AnnotationRef buildFirstAnnotation() {
     return this.annotations.get(0).build();
   }
 
-  public AnnotationRef buildLastAnnotation() {
+  public io.sundr.model.AnnotationRef buildLastAnnotation() {
     return this.annotations.get(annotations.size() - 1).build();
   }
 
-  public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
-    for (AnnotationRefBuilder item : annotations) {
+  public io.sundr.model.AnnotationRef buildMatchingAnnotation(
+      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
+    for (io.sundr.model.AnnotationRefBuilder item : annotations) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -453,8 +334,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
-    for (AnnotationRefBuilder item : annotations) {
+  public java.lang.Boolean hasMatchingAnnotation(java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
+    for (io.sundr.model.AnnotationRefBuilder item : annotations) {
       if (predicate.test(item)) {
         return true;
       }
@@ -462,13 +343,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withAnnotations(List<AnnotationRef> annotations) {
+  public A withAnnotations(java.util.List<io.sundr.model.AnnotationRef> annotations) {
     if (this.annotations != null) {
       _visitables.get("annotations").removeAll(this.annotations);
     }
     if (annotations != null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
-      for (AnnotationRef item : annotations) {
+      this.annotations = new java.util.ArrayList();
+      for (io.sundr.model.AnnotationRef item : annotations) {
         this.addToAnnotations(item);
       }
     } else {
@@ -477,35 +358,36 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withAnnotations(AnnotationRef... annotations) {
+  public A withAnnotations(io.sundr.model.AnnotationRef... annotations) {
     if (this.annotations != null) {
       this.annotations.clear();
     }
     if (annotations != null) {
-      for (AnnotationRef item : annotations) {
+      for (io.sundr.model.AnnotationRef item : annotations) {
         this.addToAnnotations(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasAnnotations() {
+  public java.lang.Boolean hasAnnotations() {
     return annotations != null && !annotations.isEmpty();
   }
 
-  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> addNewAnnotation() {
-    return new AnnotationsNestedImpl();
+  public TypeDefFluent.AnnotationsNested<A> addNewAnnotation() {
+    return new TypeDefFluentImpl.AnnotationsNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item) {
-    return new AnnotationsNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> addNewAnnotationLike(io.sundr.model.AnnotationRef item) {
+    return new TypeDefFluentImpl.AnnotationsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> setNewAnnotationLike(int index, AnnotationRef item) {
-    return new AnnotationsNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> setNewAnnotationLike(java.lang.Integer index,
+      io.sundr.model.AnnotationRef item) {
+    return new io.sundr.model.TypeDefFluentImpl.AnnotationsNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> editAnnotation(int index) {
+  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> editAnnotation(java.lang.Integer index) {
     if (annotations.size() <= index)
       throw new RuntimeException("Can't edit annotations. Index exceeds size.");
     return setNewAnnotationLike(index, buildAnnotation(index));
@@ -524,7 +406,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewAnnotationLike(index, buildAnnotation(index));
   }
 
-  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.AnnotationsNested<A> editMatchingAnnotation(
+      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < annotations.size(); i++) {
       if (predicate.test(annotations.get(i))) {
@@ -537,21 +420,21 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewAnnotationLike(index, buildAnnotation(index));
   }
 
-  public A addToExtendsList(int index, ClassRef item) {
+  public A addToExtendsList(java.lang.Integer index, io.sundr.model.ClassRef item) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    ClassRefBuilder builder = new ClassRefBuilder(item);
+    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
     _visitables.get("extendsList").add(index >= 0 ? index : _visitables.get("extendsList").size(), builder);
     this.extendsList.add(index >= 0 ? index : extendsList.size(), builder);
     return (A) this;
   }
 
-  public A setToExtendsList(int index, ClassRef item) {
+  public A setToExtendsList(java.lang.Integer index, io.sundr.model.ClassRef item) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    ClassRefBuilder builder = new ClassRefBuilder(item);
+    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
     if (index < 0 || index >= _visitables.get("extendsList").size()) {
       _visitables.get("extendsList").add(builder);
     } else {
@@ -565,33 +448,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToExtendsList(ClassRef... items) {
+  public A addToExtendsList(io.sundr.model.ClassRef... items) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("extendsList").add(builder);
       this.extendsList.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToExtendsList(Collection<ClassRef> items) {
+  public A addAllToExtendsList(java.util.Collection<io.sundr.model.ClassRef> items) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("extendsList").add(builder);
       this.extendsList.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromExtendsList(ClassRef... items) {
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+  public A removeFromExtendsList(io.sundr.model.ClassRef... items) {
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("extendsList").remove(builder);
       if (this.extendsList != null) {
         this.extendsList.remove(builder);
@@ -600,9 +483,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromExtendsList(Collection<ClassRef> items) {
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+  public A removeAllFromExtendsList(java.util.Collection<io.sundr.model.ClassRef> items) {
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("extendsList").remove(builder);
       if (this.extendsList != null) {
         this.extendsList.remove(builder);
@@ -611,13 +494,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromExtendsList(Predicate<ClassRefBuilder> predicate) {
+  public A removeMatchingFromExtendsList(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
     if (extendsList == null)
       return (A) this;
-    final Iterator<ClassRefBuilder> each = extendsList.iterator();
+    final Iterator<io.sundr.model.ClassRefBuilder> each = extendsList.iterator();
     final List visitables = _visitables.get("extendsList");
     while (each.hasNext()) {
-      ClassRefBuilder builder = each.next();
+      io.sundr.model.ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -631,29 +514,30 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<ClassRef> getExtendsList() {
-    return build(extendsList);
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.ClassRef> getExtendsList() {
+    return extendsList != null ? build(extendsList) : null;
   }
 
-  public List<ClassRef> buildExtendsList() {
-    return build(extendsList);
+  public java.util.List<io.sundr.model.ClassRef> buildExtendsList() {
+    return extendsList != null ? build(extendsList) : null;
   }
 
-  public ClassRef buildExtendsList(int index) {
+  public io.sundr.model.ClassRef buildExtendsList(java.lang.Integer index) {
     return this.extendsList.get(index).build();
   }
 
-  public ClassRef buildFirstExtendsList() {
+  public io.sundr.model.ClassRef buildFirstExtendsList() {
     return this.extendsList.get(0).build();
   }
 
-  public ClassRef buildLastExtendsList() {
+  public io.sundr.model.ClassRef buildLastExtendsList() {
     return this.extendsList.get(extendsList.size() - 1).build();
   }
 
-  public ClassRef buildMatchingExtendsList(Predicate<ClassRefBuilder> predicate) {
-    for (ClassRefBuilder item : extendsList) {
+  public io.sundr.model.ClassRef buildMatchingExtendsList(
+      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+    for (io.sundr.model.ClassRefBuilder item : extendsList) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -661,8 +545,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingExtendsList(Predicate<ClassRefBuilder> predicate) {
-    for (ClassRefBuilder item : extendsList) {
+  public java.lang.Boolean hasMatchingExtendsList(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+    for (io.sundr.model.ClassRefBuilder item : extendsList) {
       if (predicate.test(item)) {
         return true;
       }
@@ -670,13 +554,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withExtendsList(List<ClassRef> extendsList) {
+  public A withExtendsList(java.util.List<io.sundr.model.ClassRef> extendsList) {
     if (this.extendsList != null) {
       _visitables.get("extendsList").removeAll(this.extendsList);
     }
     if (extendsList != null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
-      for (ClassRef item : extendsList) {
+      this.extendsList = new java.util.ArrayList();
+      for (io.sundr.model.ClassRef item : extendsList) {
         this.addToExtendsList(item);
       }
     } else {
@@ -685,35 +569,36 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withExtendsList(ClassRef... extendsList) {
+  public A withExtendsList(io.sundr.model.ClassRef... extendsList) {
     if (this.extendsList != null) {
       this.extendsList.clear();
     }
     if (extendsList != null) {
-      for (ClassRef item : extendsList) {
+      for (io.sundr.model.ClassRef item : extendsList) {
         this.addToExtendsList(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasExtendsList() {
+  public java.lang.Boolean hasExtendsList() {
     return extendsList != null && !extendsList.isEmpty();
   }
 
-  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> addNewExtendsList() {
-    return new ExtendsListNestedImpl();
+  public TypeDefFluent.ExtendsListNested<A> addNewExtendsList() {
+    return new TypeDefFluentImpl.ExtendsListNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> addNewExtendsListLike(ClassRef item) {
-    return new ExtendsListNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> addNewExtendsListLike(io.sundr.model.ClassRef item) {
+    return new io.sundr.model.TypeDefFluentImpl.ExtendsListNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> setNewExtendsListLike(int index, ClassRef item) {
-    return new ExtendsListNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> setNewExtendsListLike(java.lang.Integer index,
+      io.sundr.model.ClassRef item) {
+    return new io.sundr.model.TypeDefFluentImpl.ExtendsListNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> editExtendsList(int index) {
+  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> editExtendsList(java.lang.Integer index) {
     if (extendsList.size() <= index)
       throw new RuntimeException("Can't edit extendsList. Index exceeds size.");
     return setNewExtendsListLike(index, buildExtendsList(index));
@@ -732,7 +617,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewExtendsListLike(index, buildExtendsList(index));
   }
 
-  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> editMatchingExtendsList(Predicate<ClassRefBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.ExtendsListNested<A> editMatchingExtendsList(
+      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < extendsList.size(); i++) {
       if (predicate.test(extendsList.get(i))) {
@@ -745,21 +631,21 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewExtendsListLike(index, buildExtendsList(index));
   }
 
-  public A addToImplementsList(int index, ClassRef item) {
+  public A addToImplementsList(java.lang.Integer index, io.sundr.model.ClassRef item) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    ClassRefBuilder builder = new ClassRefBuilder(item);
+    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
     _visitables.get("implementsList").add(index >= 0 ? index : _visitables.get("implementsList").size(), builder);
     this.implementsList.add(index >= 0 ? index : implementsList.size(), builder);
     return (A) this;
   }
 
-  public A setToImplementsList(int index, ClassRef item) {
+  public A setToImplementsList(java.lang.Integer index, io.sundr.model.ClassRef item) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    ClassRefBuilder builder = new ClassRefBuilder(item);
+    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
     if (index < 0 || index >= _visitables.get("implementsList").size()) {
       _visitables.get("implementsList").add(builder);
     } else {
@@ -773,33 +659,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToImplementsList(ClassRef... items) {
+  public A addToImplementsList(io.sundr.model.ClassRef... items) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("implementsList").add(builder);
       this.implementsList.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToImplementsList(Collection<ClassRef> items) {
+  public A addAllToImplementsList(java.util.Collection<io.sundr.model.ClassRef> items) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
     }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("implementsList").add(builder);
       this.implementsList.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromImplementsList(ClassRef... items) {
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+  public A removeFromImplementsList(io.sundr.model.ClassRef... items) {
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("implementsList").remove(builder);
       if (this.implementsList != null) {
         this.implementsList.remove(builder);
@@ -808,9 +694,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromImplementsList(Collection<ClassRef> items) {
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
+  public A removeAllFromImplementsList(java.util.Collection<io.sundr.model.ClassRef> items) {
+    for (io.sundr.model.ClassRef item : items) {
+      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
       _visitables.get("implementsList").remove(builder);
       if (this.implementsList != null) {
         this.implementsList.remove(builder);
@@ -819,13 +705,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromImplementsList(Predicate<ClassRefBuilder> predicate) {
+  public A removeMatchingFromImplementsList(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
     if (implementsList == null)
       return (A) this;
-    final Iterator<ClassRefBuilder> each = implementsList.iterator();
+    final Iterator<io.sundr.model.ClassRefBuilder> each = implementsList.iterator();
     final List visitables = _visitables.get("implementsList");
     while (each.hasNext()) {
-      ClassRefBuilder builder = each.next();
+      io.sundr.model.ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -839,29 +725,30 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<ClassRef> getImplementsList() {
-    return build(implementsList);
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.ClassRef> getImplementsList() {
+    return implementsList != null ? build(implementsList) : null;
   }
 
-  public List<ClassRef> buildImplementsList() {
-    return build(implementsList);
+  public java.util.List<io.sundr.model.ClassRef> buildImplementsList() {
+    return implementsList != null ? build(implementsList) : null;
   }
 
-  public ClassRef buildImplementsList(int index) {
+  public io.sundr.model.ClassRef buildImplementsList(java.lang.Integer index) {
     return this.implementsList.get(index).build();
   }
 
-  public ClassRef buildFirstImplementsList() {
+  public io.sundr.model.ClassRef buildFirstImplementsList() {
     return this.implementsList.get(0).build();
   }
 
-  public ClassRef buildLastImplementsList() {
+  public io.sundr.model.ClassRef buildLastImplementsList() {
     return this.implementsList.get(implementsList.size() - 1).build();
   }
 
-  public ClassRef buildMatchingImplementsList(Predicate<ClassRefBuilder> predicate) {
-    for (ClassRefBuilder item : implementsList) {
+  public io.sundr.model.ClassRef buildMatchingImplementsList(
+      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+    for (io.sundr.model.ClassRefBuilder item : implementsList) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -869,8 +756,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingImplementsList(Predicate<ClassRefBuilder> predicate) {
-    for (ClassRefBuilder item : implementsList) {
+  public java.lang.Boolean hasMatchingImplementsList(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+    for (io.sundr.model.ClassRefBuilder item : implementsList) {
       if (predicate.test(item)) {
         return true;
       }
@@ -878,13 +765,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withImplementsList(List<ClassRef> implementsList) {
+  public A withImplementsList(java.util.List<io.sundr.model.ClassRef> implementsList) {
     if (this.implementsList != null) {
       _visitables.get("implementsList").removeAll(this.implementsList);
     }
     if (implementsList != null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
-      for (ClassRef item : implementsList) {
+      this.implementsList = new java.util.ArrayList();
+      for (io.sundr.model.ClassRef item : implementsList) {
         this.addToImplementsList(item);
       }
     } else {
@@ -893,35 +780,36 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withImplementsList(ClassRef... implementsList) {
+  public A withImplementsList(io.sundr.model.ClassRef... implementsList) {
     if (this.implementsList != null) {
       this.implementsList.clear();
     }
     if (implementsList != null) {
-      for (ClassRef item : implementsList) {
+      for (io.sundr.model.ClassRef item : implementsList) {
         this.addToImplementsList(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasImplementsList() {
+  public java.lang.Boolean hasImplementsList() {
     return implementsList != null && !implementsList.isEmpty();
   }
 
-  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> addNewImplementsList() {
-    return new ImplementsListNestedImpl();
+  public TypeDefFluent.ImplementsListNested<A> addNewImplementsList() {
+    return new TypeDefFluentImpl.ImplementsListNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> addNewImplementsListLike(ClassRef item) {
-    return new ImplementsListNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> addNewImplementsListLike(io.sundr.model.ClassRef item) {
+    return new io.sundr.model.TypeDefFluentImpl.ImplementsListNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> setNewImplementsListLike(int index, ClassRef item) {
-    return new ImplementsListNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> setNewImplementsListLike(java.lang.Integer index,
+      io.sundr.model.ClassRef item) {
+    return new io.sundr.model.TypeDefFluentImpl.ImplementsListNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> editImplementsList(int index) {
+  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> editImplementsList(java.lang.Integer index) {
     if (implementsList.size() <= index)
       throw new RuntimeException("Can't edit implementsList. Index exceeds size.");
     return setNewImplementsListLike(index, buildImplementsList(index));
@@ -940,7 +828,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewImplementsListLike(index, buildImplementsList(index));
   }
 
-  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> editMatchingImplementsList(Predicate<ClassRefBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.ImplementsListNested<A> editMatchingImplementsList(
+      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < implementsList.size(); i++) {
       if (predicate.test(implementsList.get(i))) {
@@ -953,21 +842,21 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewImplementsListLike(index, buildImplementsList(index));
   }
 
-  public A addToParameters(int index, TypeParamDef item) {
+  public A addToParameters(java.lang.Integer index, io.sundr.model.TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
     }
-    TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
+    io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
     _visitables.get("parameters").add(index >= 0 ? index : _visitables.get("parameters").size(), builder);
     this.parameters.add(index >= 0 ? index : parameters.size(), builder);
     return (A) this;
   }
 
-  public A setToParameters(int index, TypeParamDef item) {
+  public A setToParameters(java.lang.Integer index, io.sundr.model.TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
     }
-    TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
+    io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
     if (index < 0 || index >= _visitables.get("parameters").size()) {
       _visitables.get("parameters").add(builder);
     } else {
@@ -981,33 +870,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToParameters(TypeParamDef... items) {
+  public A addToParameters(io.sundr.model.TypeParamDef... items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
     }
-    for (TypeParamDef item : items) {
-      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
+    for (io.sundr.model.TypeParamDef item : items) {
+      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
       _visitables.get("parameters").add(builder);
       this.parameters.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToParameters(Collection<TypeParamDef> items) {
+  public A addAllToParameters(java.util.Collection<io.sundr.model.TypeParamDef> items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
     }
-    for (TypeParamDef item : items) {
-      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
+    for (io.sundr.model.TypeParamDef item : items) {
+      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
       _visitables.get("parameters").add(builder);
       this.parameters.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromParameters(TypeParamDef... items) {
-    for (TypeParamDef item : items) {
-      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
+  public A removeFromParameters(io.sundr.model.TypeParamDef... items) {
+    for (io.sundr.model.TypeParamDef item : items) {
+      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
       if (this.parameters != null) {
         this.parameters.remove(builder);
@@ -1016,9 +905,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromParameters(Collection<TypeParamDef> items) {
-    for (TypeParamDef item : items) {
-      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
+  public A removeAllFromParameters(java.util.Collection<io.sundr.model.TypeParamDef> items) {
+    for (io.sundr.model.TypeParamDef item : items) {
+      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
       if (this.parameters != null) {
         this.parameters.remove(builder);
@@ -1027,13 +916,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromParameters(Predicate<TypeParamDefBuilder> predicate) {
+  public A removeMatchingFromParameters(java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
     if (parameters == null)
       return (A) this;
-    final Iterator<TypeParamDefBuilder> each = parameters.iterator();
+    final Iterator<io.sundr.model.TypeParamDefBuilder> each = parameters.iterator();
     final List visitables = _visitables.get("parameters");
     while (each.hasNext()) {
-      TypeParamDefBuilder builder = each.next();
+      io.sundr.model.TypeParamDefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -1047,29 +936,30 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<TypeParamDef> getParameters() {
-    return build(parameters);
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.TypeParamDef> getParameters() {
+    return parameters != null ? build(parameters) : null;
   }
 
-  public List<TypeParamDef> buildParameters() {
-    return build(parameters);
+  public java.util.List<io.sundr.model.TypeParamDef> buildParameters() {
+    return parameters != null ? build(parameters) : null;
   }
 
-  public TypeParamDef buildParameter(int index) {
+  public io.sundr.model.TypeParamDef buildParameter(java.lang.Integer index) {
     return this.parameters.get(index).build();
   }
 
-  public TypeParamDef buildFirstParameter() {
+  public io.sundr.model.TypeParamDef buildFirstParameter() {
     return this.parameters.get(0).build();
   }
 
-  public TypeParamDef buildLastParameter() {
+  public io.sundr.model.TypeParamDef buildLastParameter() {
     return this.parameters.get(parameters.size() - 1).build();
   }
 
-  public TypeParamDef buildMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
-    for (TypeParamDefBuilder item : parameters) {
+  public io.sundr.model.TypeParamDef buildMatchingParameter(
+      java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
+    for (io.sundr.model.TypeParamDefBuilder item : parameters) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -1077,8 +967,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
-    for (TypeParamDefBuilder item : parameters) {
+  public java.lang.Boolean hasMatchingParameter(java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
+    for (io.sundr.model.TypeParamDefBuilder item : parameters) {
       if (predicate.test(item)) {
         return true;
       }
@@ -1086,13 +976,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withParameters(List<TypeParamDef> parameters) {
+  public A withParameters(java.util.List<io.sundr.model.TypeParamDef> parameters) {
     if (this.parameters != null) {
       _visitables.get("parameters").removeAll(this.parameters);
     }
     if (parameters != null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
-      for (TypeParamDef item : parameters) {
+      this.parameters = new java.util.ArrayList();
+      for (io.sundr.model.TypeParamDef item : parameters) {
         this.addToParameters(item);
       }
     } else {
@@ -1101,35 +991,36 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withParameters(TypeParamDef... parameters) {
+  public A withParameters(io.sundr.model.TypeParamDef... parameters) {
     if (this.parameters != null) {
       this.parameters.clear();
     }
     if (parameters != null) {
-      for (TypeParamDef item : parameters) {
+      for (io.sundr.model.TypeParamDef item : parameters) {
         this.addToParameters(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasParameters() {
+  public java.lang.Boolean hasParameters() {
     return parameters != null && !parameters.isEmpty();
   }
 
-  public io.sundr.model.TypeDefFluent.ParametersNested<A> addNewParameter() {
-    return new ParametersNestedImpl();
+  public TypeDefFluent.ParametersNested<A> addNewParameter() {
+    return new TypeDefFluentImpl.ParametersNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.ParametersNested<A> addNewParameterLike(TypeParamDef item) {
-    return new ParametersNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.ParametersNested<A> addNewParameterLike(io.sundr.model.TypeParamDef item) {
+    return new io.sundr.model.TypeDefFluentImpl.ParametersNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ParametersNested<A> setNewParameterLike(int index, TypeParamDef item) {
-    return new ParametersNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.ParametersNested<A> setNewParameterLike(java.lang.Integer index,
+      io.sundr.model.TypeParamDef item) {
+    return new io.sundr.model.TypeDefFluentImpl.ParametersNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ParametersNested<A> editParameter(int index) {
+  public io.sundr.model.TypeDefFluent.ParametersNested<A> editParameter(java.lang.Integer index) {
     if (parameters.size() <= index)
       throw new RuntimeException("Can't edit parameters. Index exceeds size.");
     return setNewParameterLike(index, buildParameter(index));
@@ -1148,7 +1039,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewParameterLike(index, buildParameter(index));
   }
 
-  public io.sundr.model.TypeDefFluent.ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.ParametersNested<A> editMatchingParameter(
+      java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < parameters.size(); i++) {
       if (predicate.test(parameters.get(i))) {
@@ -1161,21 +1053,21 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewParameterLike(index, buildParameter(index));
   }
 
-  public A addToProperties(int index, Property item) {
+  public A addToProperties(java.lang.Integer index, io.sundr.model.Property item) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
     }
-    PropertyBuilder builder = new PropertyBuilder(item);
+    io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
     _visitables.get("properties").add(index >= 0 ? index : _visitables.get("properties").size(), builder);
     this.properties.add(index >= 0 ? index : properties.size(), builder);
     return (A) this;
   }
 
-  public A setToProperties(int index, Property item) {
+  public A setToProperties(java.lang.Integer index, io.sundr.model.Property item) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
     }
-    PropertyBuilder builder = new PropertyBuilder(item);
+    io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
     if (index < 0 || index >= _visitables.get("properties").size()) {
       _visitables.get("properties").add(builder);
     } else {
@@ -1189,33 +1081,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToProperties(Property... items) {
+  public A addToProperties(io.sundr.model.Property... items) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+    for (io.sundr.model.Property item : items) {
+      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
       _visitables.get("properties").add(builder);
       this.properties.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToProperties(Collection<Property> items) {
+  public A addAllToProperties(java.util.Collection<io.sundr.model.Property> items) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+    for (io.sundr.model.Property item : items) {
+      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
       _visitables.get("properties").add(builder);
       this.properties.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromProperties(Property... items) {
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+  public A removeFromProperties(io.sundr.model.Property... items) {
+    for (io.sundr.model.Property item : items) {
+      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
       _visitables.get("properties").remove(builder);
       if (this.properties != null) {
         this.properties.remove(builder);
@@ -1224,9 +1116,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromProperties(Collection<Property> items) {
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+  public A removeAllFromProperties(java.util.Collection<io.sundr.model.Property> items) {
+    for (io.sundr.model.Property item : items) {
+      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
       _visitables.get("properties").remove(builder);
       if (this.properties != null) {
         this.properties.remove(builder);
@@ -1235,13 +1127,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromProperties(Predicate<PropertyBuilder> predicate) {
+  public A removeMatchingFromProperties(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
     if (properties == null)
       return (A) this;
-    final Iterator<PropertyBuilder> each = properties.iterator();
+    final Iterator<io.sundr.model.PropertyBuilder> each = properties.iterator();
     final List visitables = _visitables.get("properties");
     while (each.hasNext()) {
-      PropertyBuilder builder = each.next();
+      io.sundr.model.PropertyBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -1255,29 +1147,29 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<Property> getProperties() {
-    return build(properties);
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.Property> getProperties() {
+    return properties != null ? build(properties) : null;
   }
 
-  public List<Property> buildProperties() {
-    return build(properties);
+  public java.util.List<io.sundr.model.Property> buildProperties() {
+    return properties != null ? build(properties) : null;
   }
 
-  public Property buildProperty(int index) {
+  public io.sundr.model.Property buildProperty(java.lang.Integer index) {
     return this.properties.get(index).build();
   }
 
-  public Property buildFirstProperty() {
+  public io.sundr.model.Property buildFirstProperty() {
     return this.properties.get(0).build();
   }
 
-  public Property buildLastProperty() {
+  public io.sundr.model.Property buildLastProperty() {
     return this.properties.get(properties.size() - 1).build();
   }
 
-  public Property buildMatchingProperty(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : properties) {
+  public io.sundr.model.Property buildMatchingProperty(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
+    for (io.sundr.model.PropertyBuilder item : properties) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -1285,8 +1177,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingProperty(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : properties) {
+  public java.lang.Boolean hasMatchingProperty(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
+    for (io.sundr.model.PropertyBuilder item : properties) {
       if (predicate.test(item)) {
         return true;
       }
@@ -1294,13 +1186,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withProperties(List<Property> properties) {
+  public A withProperties(java.util.List<io.sundr.model.Property> properties) {
     if (this.properties != null) {
       _visitables.get("properties").removeAll(this.properties);
     }
     if (properties != null) {
-      this.properties = new ArrayList<PropertyBuilder>();
-      for (Property item : properties) {
+      this.properties = new java.util.ArrayList();
+      for (io.sundr.model.Property item : properties) {
         this.addToProperties(item);
       }
     } else {
@@ -1309,35 +1201,36 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withProperties(Property... properties) {
+  public A withProperties(io.sundr.model.Property... properties) {
     if (this.properties != null) {
       this.properties.clear();
     }
     if (properties != null) {
-      for (Property item : properties) {
+      for (io.sundr.model.Property item : properties) {
         this.addToProperties(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasProperties() {
+  public java.lang.Boolean hasProperties() {
     return properties != null && !properties.isEmpty();
   }
 
-  public io.sundr.model.TypeDefFluent.PropertiesNested<A> addNewProperty() {
-    return new PropertiesNestedImpl();
+  public TypeDefFluent.PropertiesNested<A> addNewProperty() {
+    return new TypeDefFluentImpl.PropertiesNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.PropertiesNested<A> addNewPropertyLike(Property item) {
-    return new PropertiesNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.PropertiesNested<A> addNewPropertyLike(io.sundr.model.Property item) {
+    return new io.sundr.model.TypeDefFluentImpl.PropertiesNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.PropertiesNested<A> setNewPropertyLike(int index, Property item) {
-    return new PropertiesNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.PropertiesNested<A> setNewPropertyLike(java.lang.Integer index,
+      io.sundr.model.Property item) {
+    return new io.sundr.model.TypeDefFluentImpl.PropertiesNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.PropertiesNested<A> editProperty(int index) {
+  public io.sundr.model.TypeDefFluent.PropertiesNested<A> editProperty(java.lang.Integer index) {
     if (properties.size() <= index)
       throw new RuntimeException("Can't edit properties. Index exceeds size.");
     return setNewPropertyLike(index, buildProperty(index));
@@ -1356,7 +1249,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewPropertyLike(index, buildProperty(index));
   }
 
-  public io.sundr.model.TypeDefFluent.PropertiesNested<A> editMatchingProperty(Predicate<PropertyBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.PropertiesNested<A> editMatchingProperty(
+      java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < properties.size(); i++) {
       if (predicate.test(properties.get(i))) {
@@ -1369,21 +1263,21 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewPropertyLike(index, buildProperty(index));
   }
 
-  public A addToConstructors(int index, Method item) {
+  public A addToConstructors(java.lang.Integer index, io.sundr.model.Method item) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    MethodBuilder builder = new MethodBuilder(item);
+    io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
     _visitables.get("constructors").add(index >= 0 ? index : _visitables.get("constructors").size(), builder);
     this.constructors.add(index >= 0 ? index : constructors.size(), builder);
     return (A) this;
   }
 
-  public A setToConstructors(int index, Method item) {
+  public A setToConstructors(java.lang.Integer index, io.sundr.model.Method item) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    MethodBuilder builder = new MethodBuilder(item);
+    io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
     if (index < 0 || index >= _visitables.get("constructors").size()) {
       _visitables.get("constructors").add(builder);
     } else {
@@ -1397,33 +1291,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToConstructors(Method... items) {
+  public A addToConstructors(io.sundr.model.Method... items) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("constructors").add(builder);
       this.constructors.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToConstructors(Collection<Method> items) {
+  public A addAllToConstructors(java.util.Collection<io.sundr.model.Method> items) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("constructors").add(builder);
       this.constructors.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromConstructors(Method... items) {
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+  public A removeFromConstructors(io.sundr.model.Method... items) {
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("constructors").remove(builder);
       if (this.constructors != null) {
         this.constructors.remove(builder);
@@ -1432,9 +1326,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromConstructors(Collection<Method> items) {
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+  public A removeAllFromConstructors(java.util.Collection<io.sundr.model.Method> items) {
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("constructors").remove(builder);
       if (this.constructors != null) {
         this.constructors.remove(builder);
@@ -1443,13 +1337,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromConstructors(Predicate<MethodBuilder> predicate) {
+  public A removeMatchingFromConstructors(java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
     if (constructors == null)
       return (A) this;
-    final Iterator<MethodBuilder> each = constructors.iterator();
+    final Iterator<io.sundr.model.MethodBuilder> each = constructors.iterator();
     final List visitables = _visitables.get("constructors");
     while (each.hasNext()) {
-      MethodBuilder builder = each.next();
+      io.sundr.model.MethodBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -1463,29 +1357,29 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<Method> getConstructors() {
-    return build(constructors);
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.Method> getConstructors() {
+    return constructors != null ? build(constructors) : null;
   }
 
-  public List<Method> buildConstructors() {
-    return build(constructors);
+  public java.util.List<io.sundr.model.Method> buildConstructors() {
+    return constructors != null ? build(constructors) : null;
   }
 
-  public Method buildConstructor(int index) {
+  public io.sundr.model.Method buildConstructor(java.lang.Integer index) {
     return this.constructors.get(index).build();
   }
 
-  public Method buildFirstConstructor() {
+  public io.sundr.model.Method buildFirstConstructor() {
     return this.constructors.get(0).build();
   }
 
-  public Method buildLastConstructor() {
+  public io.sundr.model.Method buildLastConstructor() {
     return this.constructors.get(constructors.size() - 1).build();
   }
 
-  public Method buildMatchingConstructor(Predicate<MethodBuilder> predicate) {
-    for (MethodBuilder item : constructors) {
+  public io.sundr.model.Method buildMatchingConstructor(java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
+    for (io.sundr.model.MethodBuilder item : constructors) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -1493,8 +1387,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingConstructor(Predicate<MethodBuilder> predicate) {
-    for (MethodBuilder item : constructors) {
+  public java.lang.Boolean hasMatchingConstructor(java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
+    for (io.sundr.model.MethodBuilder item : constructors) {
       if (predicate.test(item)) {
         return true;
       }
@@ -1502,13 +1396,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withConstructors(List<Method> constructors) {
+  public A withConstructors(java.util.List<io.sundr.model.Method> constructors) {
     if (this.constructors != null) {
       _visitables.get("constructors").removeAll(this.constructors);
     }
     if (constructors != null) {
-      this.constructors = new ArrayList<MethodBuilder>();
-      for (Method item : constructors) {
+      this.constructors = new java.util.ArrayList();
+      for (io.sundr.model.Method item : constructors) {
         this.addToConstructors(item);
       }
     } else {
@@ -1517,35 +1411,36 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withConstructors(Method... constructors) {
+  public A withConstructors(io.sundr.model.Method... constructors) {
     if (this.constructors != null) {
       this.constructors.clear();
     }
     if (constructors != null) {
-      for (Method item : constructors) {
+      for (io.sundr.model.Method item : constructors) {
         this.addToConstructors(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasConstructors() {
+  public java.lang.Boolean hasConstructors() {
     return constructors != null && !constructors.isEmpty();
   }
 
-  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> addNewConstructor() {
-    return new ConstructorsNestedImpl();
+  public TypeDefFluent.ConstructorsNested<A> addNewConstructor() {
+    return new TypeDefFluentImpl.ConstructorsNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> addNewConstructorLike(Method item) {
-    return new ConstructorsNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> addNewConstructorLike(io.sundr.model.Method item) {
+    return new io.sundr.model.TypeDefFluentImpl.ConstructorsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> setNewConstructorLike(int index, Method item) {
-    return new ConstructorsNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> setNewConstructorLike(java.lang.Integer index,
+      io.sundr.model.Method item) {
+    return new io.sundr.model.TypeDefFluentImpl.ConstructorsNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> editConstructor(int index) {
+  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> editConstructor(java.lang.Integer index) {
     if (constructors.size() <= index)
       throw new RuntimeException("Can't edit constructors. Index exceeds size.");
     return setNewConstructorLike(index, buildConstructor(index));
@@ -1564,7 +1459,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewConstructorLike(index, buildConstructor(index));
   }
 
-  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> editMatchingConstructor(Predicate<MethodBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.ConstructorsNested<A> editMatchingConstructor(
+      java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < constructors.size(); i++) {
       if (predicate.test(constructors.get(i))) {
@@ -1577,21 +1473,21 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewConstructorLike(index, buildConstructor(index));
   }
 
-  public A addToMethods(int index, Method item) {
+  public A addToMethods(java.lang.Integer index, io.sundr.model.Method item) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    MethodBuilder builder = new MethodBuilder(item);
+    io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
     _visitables.get("methods").add(index >= 0 ? index : _visitables.get("methods").size(), builder);
     this.methods.add(index >= 0 ? index : methods.size(), builder);
     return (A) this;
   }
 
-  public A setToMethods(int index, Method item) {
+  public A setToMethods(java.lang.Integer index, io.sundr.model.Method item) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    MethodBuilder builder = new MethodBuilder(item);
+    io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
     if (index < 0 || index >= _visitables.get("methods").size()) {
       _visitables.get("methods").add(builder);
     } else {
@@ -1605,33 +1501,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToMethods(Method... items) {
+  public A addToMethods(io.sundr.model.Method... items) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("methods").add(builder);
       this.methods.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToMethods(Collection<Method> items) {
+  public A addAllToMethods(java.util.Collection<io.sundr.model.Method> items) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new java.util.ArrayList<io.sundr.model.MethodBuilder>();
     }
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("methods").add(builder);
       this.methods.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromMethods(Method... items) {
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+  public A removeFromMethods(io.sundr.model.Method... items) {
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("methods").remove(builder);
       if (this.methods != null) {
         this.methods.remove(builder);
@@ -1640,9 +1536,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromMethods(Collection<Method> items) {
-    for (Method item : items) {
-      MethodBuilder builder = new MethodBuilder(item);
+  public A removeAllFromMethods(java.util.Collection<io.sundr.model.Method> items) {
+    for (io.sundr.model.Method item : items) {
+      io.sundr.model.MethodBuilder builder = new io.sundr.model.MethodBuilder(item);
       _visitables.get("methods").remove(builder);
       if (this.methods != null) {
         this.methods.remove(builder);
@@ -1651,13 +1547,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromMethods(Predicate<MethodBuilder> predicate) {
+  public A removeMatchingFromMethods(java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
     if (methods == null)
       return (A) this;
-    final Iterator<MethodBuilder> each = methods.iterator();
+    final Iterator<io.sundr.model.MethodBuilder> each = methods.iterator();
     final List visitables = _visitables.get("methods");
     while (each.hasNext()) {
-      MethodBuilder builder = each.next();
+      io.sundr.model.MethodBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -1671,29 +1567,29 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<Method> getMethods() {
-    return build(methods);
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.Method> getMethods() {
+    return methods != null ? build(methods) : null;
   }
 
-  public List<Method> buildMethods() {
-    return build(methods);
+  public java.util.List<io.sundr.model.Method> buildMethods() {
+    return methods != null ? build(methods) : null;
   }
 
-  public Method buildMethod(int index) {
+  public io.sundr.model.Method buildMethod(java.lang.Integer index) {
     return this.methods.get(index).build();
   }
 
-  public Method buildFirstMethod() {
+  public io.sundr.model.Method buildFirstMethod() {
     return this.methods.get(0).build();
   }
 
-  public Method buildLastMethod() {
+  public io.sundr.model.Method buildLastMethod() {
     return this.methods.get(methods.size() - 1).build();
   }
 
-  public Method buildMatchingMethod(Predicate<MethodBuilder> predicate) {
-    for (MethodBuilder item : methods) {
+  public io.sundr.model.Method buildMatchingMethod(java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
+    for (io.sundr.model.MethodBuilder item : methods) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -1701,8 +1597,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingMethod(Predicate<MethodBuilder> predicate) {
-    for (MethodBuilder item : methods) {
+  public java.lang.Boolean hasMatchingMethod(java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
+    for (io.sundr.model.MethodBuilder item : methods) {
       if (predicate.test(item)) {
         return true;
       }
@@ -1710,13 +1606,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withMethods(List<Method> methods) {
+  public A withMethods(java.util.List<io.sundr.model.Method> methods) {
     if (this.methods != null) {
       _visitables.get("methods").removeAll(this.methods);
     }
     if (methods != null) {
-      this.methods = new ArrayList<MethodBuilder>();
-      for (Method item : methods) {
+      this.methods = new java.util.ArrayList();
+      for (io.sundr.model.Method item : methods) {
         this.addToMethods(item);
       }
     } else {
@@ -1725,35 +1621,35 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withMethods(Method... methods) {
+  public A withMethods(io.sundr.model.Method... methods) {
     if (this.methods != null) {
       this.methods.clear();
     }
     if (methods != null) {
-      for (Method item : methods) {
+      for (io.sundr.model.Method item : methods) {
         this.addToMethods(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasMethods() {
+  public java.lang.Boolean hasMethods() {
     return methods != null && !methods.isEmpty();
   }
 
-  public io.sundr.model.TypeDefFluent.MethodsNested<A> addNewMethod() {
-    return new MethodsNestedImpl();
+  public TypeDefFluent.MethodsNested<A> addNewMethod() {
+    return new TypeDefFluentImpl.MethodsNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.MethodsNested<A> addNewMethodLike(Method item) {
-    return new MethodsNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.MethodsNested<A> addNewMethodLike(io.sundr.model.Method item) {
+    return new io.sundr.model.TypeDefFluentImpl.MethodsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.MethodsNested<A> setNewMethodLike(int index, Method item) {
-    return new MethodsNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.MethodsNested<A> setNewMethodLike(java.lang.Integer index, io.sundr.model.Method item) {
+    return new io.sundr.model.TypeDefFluentImpl.MethodsNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.MethodsNested<A> editMethod(int index) {
+  public io.sundr.model.TypeDefFluent.MethodsNested<A> editMethod(java.lang.Integer index) {
     if (methods.size() <= index)
       throw new RuntimeException("Can't edit methods. Index exceeds size.");
     return setNewMethodLike(index, buildMethod(index));
@@ -1772,7 +1668,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewMethodLike(index, buildMethod(index));
   }
 
-  public io.sundr.model.TypeDefFluent.MethodsNested<A> editMatchingMethod(Predicate<MethodBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.MethodsNested<A> editMatchingMethod(
+      java.util.function.Predicate<io.sundr.model.MethodBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < methods.size(); i++) {
       if (predicate.test(methods.get(i))) {
@@ -1785,74 +1682,34 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewMethodLike(index, buildMethod(index));
   }
 
-  public String getOuterTypeName() {
+  public java.lang.String getOuterTypeName() {
     return this.outerTypeName;
   }
 
-  public A withOuterTypeName(String outerTypeName) {
+  public A withOuterTypeName(java.lang.String outerTypeName) {
     this.outerTypeName = outerTypeName;
     return (A) this;
   }
 
-  public Boolean hasOuterTypeName() {
+  public java.lang.Boolean hasOuterTypeName() {
     return this.outerTypeName != null;
   }
 
-  public A withNewOuterTypeName(StringBuilder arg1) {
-    return (A) withOuterTypeName(new String(arg1));
-  }
-
-  public A withNewOuterTypeName(int[] arg1, int arg2, int arg3) {
-    return (A) withOuterTypeName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewOuterTypeName(char[] arg1) {
-    return (A) withOuterTypeName(new String(arg1));
-  }
-
-  public A withNewOuterTypeName(StringBuffer arg1) {
-    return (A) withOuterTypeName(new String(arg1));
-  }
-
-  public A withNewOuterTypeName(byte[] arg1, int arg2) {
-    return (A) withOuterTypeName(new String(arg1, arg2));
-  }
-
-  public A withNewOuterTypeName(byte[] arg1) {
-    return (A) withOuterTypeName(new String(arg1));
-  }
-
-  public A withNewOuterTypeName(char[] arg1, int arg2, int arg3) {
-    return (A) withOuterTypeName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewOuterTypeName(byte[] arg1, int arg2, int arg3) {
-    return (A) withOuterTypeName(new String(arg1, arg2, arg3));
-  }
-
-  public A withNewOuterTypeName(byte[] arg1, int arg2, int arg3, int arg4) {
-    return (A) withOuterTypeName(new String(arg1, arg2, arg3, arg4));
-  }
-
-  public A withNewOuterTypeName(String arg1) {
-    return (A) withOuterTypeName(new String(arg1));
-  }
-
-  public A addToInnerTypes(int index, TypeDef item) {
+  public A addToInnerTypes(java.lang.Integer index, io.sundr.model.TypeDef item) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
     }
-    TypeDefBuilder builder = new TypeDefBuilder(item);
+    io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
     _visitables.get("innerTypes").add(index >= 0 ? index : _visitables.get("innerTypes").size(), builder);
     this.innerTypes.add(index >= 0 ? index : innerTypes.size(), builder);
     return (A) this;
   }
 
-  public A setToInnerTypes(int index, TypeDef item) {
+  public A setToInnerTypes(java.lang.Integer index, io.sundr.model.TypeDef item) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
     }
-    TypeDefBuilder builder = new TypeDefBuilder(item);
+    io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
     if (index < 0 || index >= _visitables.get("innerTypes").size()) {
       _visitables.get("innerTypes").add(builder);
     } else {
@@ -1866,33 +1723,33 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A addToInnerTypes(TypeDef... items) {
+  public A addToInnerTypes(io.sundr.model.TypeDef... items) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
     }
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
+    for (io.sundr.model.TypeDef item : items) {
+      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
       _visitables.get("innerTypes").add(builder);
       this.innerTypes.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToInnerTypes(Collection<TypeDef> items) {
+  public A addAllToInnerTypes(java.util.Collection<io.sundr.model.TypeDef> items) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
     }
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
+    for (io.sundr.model.TypeDef item : items) {
+      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
       _visitables.get("innerTypes").add(builder);
       this.innerTypes.add(builder);
     }
     return (A) this;
   }
 
-  public A removeFromInnerTypes(TypeDef... items) {
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
+  public A removeFromInnerTypes(io.sundr.model.TypeDef... items) {
+    for (io.sundr.model.TypeDef item : items) {
+      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
       _visitables.get("innerTypes").remove(builder);
       if (this.innerTypes != null) {
         this.innerTypes.remove(builder);
@@ -1901,9 +1758,9 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeAllFromInnerTypes(Collection<TypeDef> items) {
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
+  public A removeAllFromInnerTypes(java.util.Collection<io.sundr.model.TypeDef> items) {
+    for (io.sundr.model.TypeDef item : items) {
+      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
       _visitables.get("innerTypes").remove(builder);
       if (this.innerTypes != null) {
         this.innerTypes.remove(builder);
@@ -1912,13 +1769,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A removeMatchingFromInnerTypes(Predicate<TypeDefBuilder> predicate) {
+  public A removeMatchingFromInnerTypes(java.util.function.Predicate<io.sundr.model.TypeDefBuilder> predicate) {
     if (innerTypes == null)
       return (A) this;
-    final Iterator<TypeDefBuilder> each = innerTypes.iterator();
+    final Iterator<io.sundr.model.TypeDefBuilder> each = innerTypes.iterator();
     final List visitables = _visitables.get("innerTypes");
     while (each.hasNext()) {
-      TypeDefBuilder builder = each.next();
+      io.sundr.model.TypeDefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -1932,29 +1789,29 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<TypeDef> getInnerTypes() {
-    return build(innerTypes);
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.TypeDef> getInnerTypes() {
+    return innerTypes != null ? build(innerTypes) : null;
   }
 
-  public List<TypeDef> buildInnerTypes() {
-    return build(innerTypes);
+  public java.util.List<io.sundr.model.TypeDef> buildInnerTypes() {
+    return innerTypes != null ? build(innerTypes) : null;
   }
 
-  public TypeDef buildInnerType(int index) {
+  public io.sundr.model.TypeDef buildInnerType(java.lang.Integer index) {
     return this.innerTypes.get(index).build();
   }
 
-  public TypeDef buildFirstInnerType() {
+  public io.sundr.model.TypeDef buildFirstInnerType() {
     return this.innerTypes.get(0).build();
   }
 
-  public TypeDef buildLastInnerType() {
+  public io.sundr.model.TypeDef buildLastInnerType() {
     return this.innerTypes.get(innerTypes.size() - 1).build();
   }
 
-  public TypeDef buildMatchingInnerType(Predicate<TypeDefBuilder> predicate) {
-    for (TypeDefBuilder item : innerTypes) {
+  public io.sundr.model.TypeDef buildMatchingInnerType(java.util.function.Predicate<io.sundr.model.TypeDefBuilder> predicate) {
+    for (io.sundr.model.TypeDefBuilder item : innerTypes) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -1962,8 +1819,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return null;
   }
 
-  public Boolean hasMatchingInnerType(Predicate<TypeDefBuilder> predicate) {
-    for (TypeDefBuilder item : innerTypes) {
+  public java.lang.Boolean hasMatchingInnerType(java.util.function.Predicate<io.sundr.model.TypeDefBuilder> predicate) {
+    for (io.sundr.model.TypeDefBuilder item : innerTypes) {
       if (predicate.test(item)) {
         return true;
       }
@@ -1971,13 +1828,13 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return false;
   }
 
-  public A withInnerTypes(List<TypeDef> innerTypes) {
+  public A withInnerTypes(java.util.List<io.sundr.model.TypeDef> innerTypes) {
     if (this.innerTypes != null) {
       _visitables.get("innerTypes").removeAll(this.innerTypes);
     }
     if (innerTypes != null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
-      for (TypeDef item : innerTypes) {
+      this.innerTypes = new java.util.ArrayList();
+      for (io.sundr.model.TypeDef item : innerTypes) {
         this.addToInnerTypes(item);
       }
     } else {
@@ -1986,39 +1843,40 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return (A) this;
   }
 
-  public A withInnerTypes(TypeDef... innerTypes) {
+  public A withInnerTypes(io.sundr.model.TypeDef... innerTypes) {
     if (this.innerTypes != null) {
       this.innerTypes.clear();
     }
     if (innerTypes != null) {
-      for (TypeDef item : innerTypes) {
+      for (io.sundr.model.TypeDef item : innerTypes) {
         this.addToInnerTypes(item);
       }
     }
     return (A) this;
   }
 
-  public Boolean hasInnerTypes() {
+  public java.lang.Boolean hasInnerTypes() {
     return innerTypes != null && !innerTypes.isEmpty();
   }
 
-  public A addNewInnerType(String fullyQualifiedName) {
+  public A addNewInnerType(java.lang.String fullyQualifiedName) {
     return (A) addToInnerTypes(new TypeDef(fullyQualifiedName));
   }
 
-  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> addNewInnerType() {
-    return new InnerTypesNestedImpl();
+  public TypeDefFluent.InnerTypesNested<A> addNewInnerType() {
+    return new TypeDefFluentImpl.InnerTypesNestedImpl();
   }
 
-  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> addNewInnerTypeLike(TypeDef item) {
-    return new InnerTypesNestedImpl(-1, item);
+  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> addNewInnerTypeLike(io.sundr.model.TypeDef item) {
+    return new io.sundr.model.TypeDefFluentImpl.InnerTypesNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> setNewInnerTypeLike(int index, TypeDef item) {
-    return new InnerTypesNestedImpl(index, item);
+  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> setNewInnerTypeLike(java.lang.Integer index,
+      io.sundr.model.TypeDef item) {
+    return new io.sundr.model.TypeDefFluentImpl.InnerTypesNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> editInnerType(int index) {
+  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> editInnerType(java.lang.Integer index) {
     if (innerTypes.size() <= index)
       throw new RuntimeException("Can't edit innerTypes. Index exceeds size.");
     return setNewInnerTypeLike(index, buildInnerType(index));
@@ -2037,7 +1895,8 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     return setNewInnerTypeLike(index, buildInnerType(index));
   }
 
-  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> editMatchingInnerType(Predicate<TypeDefBuilder> predicate) {
+  public io.sundr.model.TypeDefFluent.InnerTypesNested<A> editMatchingInnerType(
+      java.util.function.Predicate<io.sundr.model.TypeDefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < innerTypes.size(); i++) {
       if (predicate.test(innerTypes.get(i))) {
@@ -2092,22 +1951,79 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
         properties, constructors, methods, outerTypeName, innerTypes, super.hashCode());
   }
 
-  public class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<io.sundr.model.TypeDefFluent.AnnotationsNested<N>>
-      implements io.sundr.model.TypeDefFluent.AnnotationsNested<N>, Nested<N> {
-    private final AnnotationRefBuilder builder;
-    private final int index;
+  public java.lang.String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (kind != null) {
+      sb.append("kind:");
+      sb.append(kind + ",");
+    }
+    if (packageName != null) {
+      sb.append("packageName:");
+      sb.append(packageName + ",");
+    }
+    if (name != null) {
+      sb.append("name:");
+      sb.append(name + ",");
+    }
+    if (comments != null && !comments.isEmpty()) {
+      sb.append("comments:");
+      sb.append(comments + ",");
+    }
+    if (annotations != null && !annotations.isEmpty()) {
+      sb.append("annotations:");
+      sb.append(annotations + ",");
+    }
+    if (extendsList != null && !extendsList.isEmpty()) {
+      sb.append("extendsList:");
+      sb.append(extendsList + ",");
+    }
+    if (implementsList != null && !implementsList.isEmpty()) {
+      sb.append("implementsList:");
+      sb.append(implementsList + ",");
+    }
+    if (parameters != null && !parameters.isEmpty()) {
+      sb.append("parameters:");
+      sb.append(parameters + ",");
+    }
+    if (properties != null && !properties.isEmpty()) {
+      sb.append("properties:");
+      sb.append(properties + ",");
+    }
+    if (constructors != null && !constructors.isEmpty()) {
+      sb.append("constructors:");
+      sb.append(constructors + ",");
+    }
+    if (methods != null && !methods.isEmpty()) {
+      sb.append("methods:");
+      sb.append(methods + ",");
+    }
+    if (outerTypeName != null) {
+      sb.append("outerTypeName:");
+      sb.append(outerTypeName + ",");
+    }
+    if (innerTypes != null && !innerTypes.isEmpty()) {
+      sb.append("innerTypes:");
+      sb.append(innerTypes);
+    }
+    sb.append("}");
+    return sb.toString();
+  }
 
-    AnnotationsNestedImpl(int index, AnnotationRef item) {
+  class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<TypeDefFluent.AnnotationsNested<N>>
+      implements io.sundr.model.TypeDefFluent.AnnotationsNested<N>, Nested<N> {
+    AnnotationsNestedImpl(java.lang.Integer index, AnnotationRef item) {
       this.index = index;
       this.builder = new AnnotationRefBuilder(this, item);
-
     }
 
     AnnotationsNestedImpl() {
       this.index = -1;
-      this.builder = new AnnotationRefBuilder(this);
-
+      this.builder = new io.sundr.model.AnnotationRefBuilder(this);
     }
+
+    io.sundr.model.AnnotationRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToAnnotations(index, builder.build());
@@ -2116,24 +2032,23 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endAnnotation() {
       return and();
     }
+
   }
 
-  public class ExtendsListNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.TypeDefFluent.ExtendsListNested<N>>
-      implements io.sundr.model.TypeDefFluent.ExtendsListNested<N>, Nested<N> {
-    private final ClassRefBuilder builder;
-    private final int index;
-
-    ExtendsListNestedImpl(int index, ClassRef item) {
+  class ExtendsListNestedImpl<N> extends ClassRefFluentImpl<TypeDefFluent.ExtendsListNested<N>>
+      implements io.sundr.model.TypeDefFluent.ExtendsListNested<N>, io.sundr.builder.Nested<N> {
+    ExtendsListNestedImpl(java.lang.Integer index, io.sundr.model.ClassRef item) {
       this.index = index;
       this.builder = new ClassRefBuilder(this, item);
-
     }
 
     ExtendsListNestedImpl() {
       this.index = -1;
-      this.builder = new ClassRefBuilder(this);
-
+      this.builder = new io.sundr.model.ClassRefBuilder(this);
     }
+
+    io.sundr.model.ClassRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToExtendsList(index, builder.build());
@@ -2142,24 +2057,23 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endExtendsList() {
       return and();
     }
+
   }
 
-  public class ImplementsListNestedImpl<N> extends ClassRefFluentImpl<io.sundr.model.TypeDefFluent.ImplementsListNested<N>>
-      implements io.sundr.model.TypeDefFluent.ImplementsListNested<N>, Nested<N> {
-    private final ClassRefBuilder builder;
-    private final int index;
-
-    ImplementsListNestedImpl(int index, ClassRef item) {
+  class ImplementsListNestedImpl<N> extends ClassRefFluentImpl<TypeDefFluent.ImplementsListNested<N>>
+      implements io.sundr.model.TypeDefFluent.ImplementsListNested<N>, io.sundr.builder.Nested<N> {
+    ImplementsListNestedImpl(java.lang.Integer index, io.sundr.model.ClassRef item) {
       this.index = index;
       this.builder = new ClassRefBuilder(this, item);
-
     }
 
     ImplementsListNestedImpl() {
       this.index = -1;
-      this.builder = new ClassRefBuilder(this);
-
+      this.builder = new io.sundr.model.ClassRefBuilder(this);
     }
+
+    io.sundr.model.ClassRefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToImplementsList(index, builder.build());
@@ -2168,24 +2082,23 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endImplementsList() {
       return and();
     }
+
   }
 
-  public class ParametersNestedImpl<N> extends TypeParamDefFluentImpl<io.sundr.model.TypeDefFluent.ParametersNested<N>>
-      implements io.sundr.model.TypeDefFluent.ParametersNested<N>, Nested<N> {
-    private final TypeParamDefBuilder builder;
-    private final int index;
-
-    ParametersNestedImpl(int index, TypeParamDef item) {
+  class ParametersNestedImpl<N> extends TypeParamDefFluentImpl<TypeDefFluent.ParametersNested<N>>
+      implements io.sundr.model.TypeDefFluent.ParametersNested<N>, io.sundr.builder.Nested<N> {
+    ParametersNestedImpl(java.lang.Integer index, TypeParamDef item) {
       this.index = index;
       this.builder = new TypeParamDefBuilder(this, item);
-
     }
 
     ParametersNestedImpl() {
       this.index = -1;
-      this.builder = new TypeParamDefBuilder(this);
-
+      this.builder = new io.sundr.model.TypeParamDefBuilder(this);
     }
+
+    io.sundr.model.TypeParamDefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToParameters(index, builder.build());
@@ -2194,24 +2107,23 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endParameter() {
       return and();
     }
+
   }
 
-  public class PropertiesNestedImpl<N> extends PropertyFluentImpl<io.sundr.model.TypeDefFluent.PropertiesNested<N>>
-      implements io.sundr.model.TypeDefFluent.PropertiesNested<N>, Nested<N> {
-    private final PropertyBuilder builder;
-    private final int index;
-
-    PropertiesNestedImpl(int index, Property item) {
+  class PropertiesNestedImpl<N> extends PropertyFluentImpl<TypeDefFluent.PropertiesNested<N>>
+      implements io.sundr.model.TypeDefFluent.PropertiesNested<N>, io.sundr.builder.Nested<N> {
+    PropertiesNestedImpl(java.lang.Integer index, Property item) {
       this.index = index;
       this.builder = new PropertyBuilder(this, item);
-
     }
 
     PropertiesNestedImpl() {
       this.index = -1;
-      this.builder = new PropertyBuilder(this);
-
+      this.builder = new io.sundr.model.PropertyBuilder(this);
     }
+
+    io.sundr.model.PropertyBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToProperties(index, builder.build());
@@ -2220,24 +2132,23 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endProperty() {
       return and();
     }
+
   }
 
-  public class ConstructorsNestedImpl<N> extends MethodFluentImpl<io.sundr.model.TypeDefFluent.ConstructorsNested<N>>
-      implements io.sundr.model.TypeDefFluent.ConstructorsNested<N>, Nested<N> {
-    private final MethodBuilder builder;
-    private final int index;
-
-    ConstructorsNestedImpl(int index, Method item) {
+  class ConstructorsNestedImpl<N> extends MethodFluentImpl<TypeDefFluent.ConstructorsNested<N>>
+      implements io.sundr.model.TypeDefFluent.ConstructorsNested<N>, io.sundr.builder.Nested<N> {
+    ConstructorsNestedImpl(java.lang.Integer index, Method item) {
       this.index = index;
       this.builder = new MethodBuilder(this, item);
-
     }
 
     ConstructorsNestedImpl() {
       this.index = -1;
-      this.builder = new MethodBuilder(this);
-
+      this.builder = new io.sundr.model.MethodBuilder(this);
     }
+
+    io.sundr.model.MethodBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToConstructors(index, builder.build());
@@ -2246,24 +2157,23 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endConstructor() {
       return and();
     }
+
   }
 
-  public class MethodsNestedImpl<N> extends MethodFluentImpl<io.sundr.model.TypeDefFluent.MethodsNested<N>>
-      implements io.sundr.model.TypeDefFluent.MethodsNested<N>, Nested<N> {
-    private final MethodBuilder builder;
-    private final int index;
-
-    MethodsNestedImpl(int index, Method item) {
+  class MethodsNestedImpl<N> extends MethodFluentImpl<TypeDefFluent.MethodsNested<N>>
+      implements io.sundr.model.TypeDefFluent.MethodsNested<N>, io.sundr.builder.Nested<N> {
+    MethodsNestedImpl(java.lang.Integer index, Method item) {
       this.index = index;
       this.builder = new MethodBuilder(this, item);
-
     }
 
     MethodsNestedImpl() {
       this.index = -1;
-      this.builder = new MethodBuilder(this);
-
+      this.builder = new io.sundr.model.MethodBuilder(this);
     }
+
+    io.sundr.model.MethodBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToMethods(index, builder.build());
@@ -2272,24 +2182,23 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endMethod() {
       return and();
     }
+
   }
 
-  public class InnerTypesNestedImpl<N> extends TypeDefFluentImpl<io.sundr.model.TypeDefFluent.InnerTypesNested<N>>
-      implements io.sundr.model.TypeDefFluent.InnerTypesNested<N>, Nested<N> {
-    private final TypeDefBuilder builder;
-    private final int index;
-
-    InnerTypesNestedImpl(int index, TypeDef item) {
+  class InnerTypesNestedImpl<N> extends TypeDefFluentImpl<TypeDefFluent.InnerTypesNested<N>>
+      implements io.sundr.model.TypeDefFluent.InnerTypesNested<N>, io.sundr.builder.Nested<N> {
+    InnerTypesNestedImpl(java.lang.Integer index, io.sundr.model.TypeDef item) {
       this.index = index;
       this.builder = new TypeDefBuilder(this, item);
-
     }
 
     InnerTypesNestedImpl() {
       this.index = -1;
-      this.builder = new TypeDefBuilder(this);
-
+      this.builder = new io.sundr.model.TypeDefBuilder(this);
     }
+
+    io.sundr.model.TypeDefBuilder builder;
+    java.lang.Integer index;
 
     public N and() {
       return (N) TypeDefFluentImpl.this.setToInnerTypes(index, builder.build());
@@ -2298,6 +2207,7 @@ public class TypeDefFluentImpl<A extends TypeDefFluent<A>> extends ModifierSuppo
     public N endInnerType() {
       return and();
     }
+
   }
 
 }

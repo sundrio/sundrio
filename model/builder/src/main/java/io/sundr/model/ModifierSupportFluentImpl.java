@@ -2,19 +2,24 @@ package io.sundr.model;
 
 import java.lang.Boolean;
 import java.lang.Object;
+import java.lang.String;
+import java.lang.SuppressWarnings;
 
+/**
+ * Generated
+ */
+@SuppressWarnings(value = "unchecked")
 public class ModifierSupportFluentImpl<A extends ModifierSupportFluent<A>> extends AttributeSupportFluentImpl<A>
     implements ModifierSupportFluent<A> {
-
-  private int modifiers;
-
   public ModifierSupportFluentImpl() {
   }
 
-  public ModifierSupportFluentImpl(ModifierSupport instance) {
+  public ModifierSupportFluentImpl(io.sundr.model.ModifierSupport instance) {
     this.withModifiers(instance.getModifiers());
     this.withAttributes(instance.getAttributes());
   }
+
+  private int modifiers;
 
   public int getModifiers() {
     return this.modifiers;
@@ -44,6 +49,15 @@ public class ModifierSupportFluentImpl<A extends ModifierSupportFluent<A>> exten
 
   public int hashCode() {
     return java.util.Objects.hash(modifiers, super.hashCode());
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    sb.append("modifiers:");
+    sb.append(modifiers);
+    sb.append("}");
+    return sb.toString();
   }
 
 }

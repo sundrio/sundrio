@@ -2,80 +2,61 @@ package io.sundr.model;
 
 import java.lang.Boolean;
 import java.lang.Deprecated;
+import java.lang.Integer;
 import java.lang.String;
-import java.lang.StringBuffer;
-import java.lang.StringBuilder;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
 
+/**
+ * Generated
+ */
 public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFluent<A> {
+  public A addToComments(Integer index, String item);
 
-  public A addToComments(int index, String item);
+  public A setToComments(java.lang.Integer index, java.lang.String item);
 
-  public A setToComments(int index, String item);
+  public A addToComments(java.lang.String... items);
 
-  public A addToComments(String... items);
+  public A addAllToComments(Collection<java.lang.String> items);
 
-  public A addAllToComments(Collection<String> items);
+  public A removeFromComments(java.lang.String... items);
 
-  public A removeFromComments(String... items);
+  public A removeAllFromComments(java.util.Collection<java.lang.String> items);
 
-  public A removeAllFromComments(Collection<String> items);
+  public List<java.lang.String> getComments();
 
-  public List<String> getComments();
+  public java.lang.String getComment(java.lang.Integer index);
 
-  public String getComment(int index);
+  public java.lang.String getFirstComment();
 
-  public String getFirstComment();
+  public java.lang.String getLastComment();
 
-  public String getLastComment();
+  public java.lang.String getMatchingComment(Predicate<java.lang.String> predicate);
 
-  public String getMatchingComment(Predicate<String> predicate);
+  public Boolean hasMatchingComment(java.util.function.Predicate<java.lang.String> predicate);
 
-  public Boolean hasMatchingComment(Predicate<String> predicate);
+  public A withComments(java.util.List<java.lang.String> comments);
 
-  public A withComments(List<String> comments);
+  public A withComments(java.lang.String... comments);
 
-  public A withComments(String... comments);
+  public java.lang.Boolean hasComments();
 
-  public Boolean hasComments();
+  public A addToAnnotations(java.lang.Integer index, AnnotationRef item);
 
-  public A addNewComment(StringBuilder arg1);
+  public A setToAnnotations(java.lang.Integer index, io.sundr.model.AnnotationRef item);
 
-  public A addNewComment(int[] arg1, int arg2, int arg3);
+  public A addToAnnotations(io.sundr.model.AnnotationRef... items);
 
-  public A addNewComment(char[] arg1);
+  public A addAllToAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items);
 
-  public A addNewComment(StringBuffer arg1);
+  public A removeFromAnnotations(io.sundr.model.AnnotationRef... items);
 
-  public A addNewComment(byte[] arg1, int arg2);
+  public A removeAllFromAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items);
 
-  public A addNewComment(byte[] arg1);
-
-  public A addNewComment(char[] arg1, int arg2, int arg3);
-
-  public A addNewComment(byte[] arg1, int arg2, int arg3);
-
-  public A addNewComment(byte[] arg1, int arg2, int arg3, int arg4);
-
-  public A addNewComment(String arg1);
-
-  public A addToAnnotations(int index, AnnotationRef item);
-
-  public A setToAnnotations(int index, AnnotationRef item);
-
-  public A addToAnnotations(AnnotationRef... items);
-
-  public A addAllToAnnotations(Collection<AnnotationRef> items);
-
-  public A removeFromAnnotations(AnnotationRef... items);
-
-  public A removeAllFromAnnotations(Collection<AnnotationRef> items);
-
-  public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate);
+  public A removeMatchingFromAnnotations(java.util.function.Predicate<AnnotationRefBuilder> predicate);
 
   /**
    * This method has been deprecated, please use method buildAnnotations instead.
@@ -83,382 +64,375 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
    * @return The buildable object.
    */
   @Deprecated
-  public List<AnnotationRef> getAnnotations();
+  public java.util.List<io.sundr.model.AnnotationRef> getAnnotations();
 
-  public List<AnnotationRef> buildAnnotations();
+  public java.util.List<io.sundr.model.AnnotationRef> buildAnnotations();
 
-  public AnnotationRef buildAnnotation(int index);
+  public io.sundr.model.AnnotationRef buildAnnotation(java.lang.Integer index);
 
-  public AnnotationRef buildFirstAnnotation();
+  public io.sundr.model.AnnotationRef buildFirstAnnotation();
 
-  public AnnotationRef buildLastAnnotation();
+  public io.sundr.model.AnnotationRef buildLastAnnotation();
 
-  public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+  public io.sundr.model.AnnotationRef buildMatchingAnnotation(
+      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate);
 
-  public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+  public java.lang.Boolean hasMatchingAnnotation(java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate);
 
-  public A withAnnotations(List<AnnotationRef> annotations);
+  public A withAnnotations(java.util.List<io.sundr.model.AnnotationRef> annotations);
 
-  public A withAnnotations(AnnotationRef... annotations);
+  public A withAnnotations(io.sundr.model.AnnotationRef... annotations);
 
-  public Boolean hasAnnotations();
+  public java.lang.Boolean hasAnnotations();
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> addNewAnnotation();
+  public MethodFluent.AnnotationsNested<A> addNewAnnotation();
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item);
+  public io.sundr.model.MethodFluent.AnnotationsNested<A> addNewAnnotationLike(io.sundr.model.AnnotationRef item);
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> setNewAnnotationLike(int index, AnnotationRef item);
+  public io.sundr.model.MethodFluent.AnnotationsNested<A> setNewAnnotationLike(java.lang.Integer index,
+      io.sundr.model.AnnotationRef item);
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> editAnnotation(int index);
+  public io.sundr.model.MethodFluent.AnnotationsNested<A> editAnnotation(java.lang.Integer index);
 
   public io.sundr.model.MethodFluent.AnnotationsNested<A> editFirstAnnotation();
 
   public io.sundr.model.MethodFluent.AnnotationsNested<A> editLastAnnotation();
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+  public io.sundr.model.MethodFluent.AnnotationsNested<A> editMatchingAnnotation(
+      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate);
 
-  public A addToParameters(int index, TypeParamDef item);
+  public A addToParameters(java.lang.Integer index, TypeParamDef item);
 
-  public A setToParameters(int index, TypeParamDef item);
+  public A setToParameters(java.lang.Integer index, io.sundr.model.TypeParamDef item);
 
-  public A addToParameters(TypeParamDef... items);
+  public A addToParameters(io.sundr.model.TypeParamDef... items);
 
-  public A addAllToParameters(Collection<TypeParamDef> items);
+  public A addAllToParameters(java.util.Collection<io.sundr.model.TypeParamDef> items);
 
-  public A removeFromParameters(TypeParamDef... items);
+  public A removeFromParameters(io.sundr.model.TypeParamDef... items);
 
-  public A removeAllFromParameters(Collection<TypeParamDef> items);
+  public A removeAllFromParameters(java.util.Collection<io.sundr.model.TypeParamDef> items);
 
-  public A removeMatchingFromParameters(Predicate<TypeParamDefBuilder> predicate);
+  public A removeMatchingFromParameters(java.util.function.Predicate<TypeParamDefBuilder> predicate);
 
   /**
    * This method has been deprecated, please use method buildParameters instead.
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<TypeParamDef> getParameters();
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.TypeParamDef> getParameters();
 
-  public List<TypeParamDef> buildParameters();
+  public java.util.List<io.sundr.model.TypeParamDef> buildParameters();
 
-  public TypeParamDef buildParameter(int index);
+  public io.sundr.model.TypeParamDef buildParameter(java.lang.Integer index);
 
-  public TypeParamDef buildFirstParameter();
+  public io.sundr.model.TypeParamDef buildFirstParameter();
 
-  public TypeParamDef buildLastParameter();
+  public io.sundr.model.TypeParamDef buildLastParameter();
 
-  public TypeParamDef buildMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
+  public io.sundr.model.TypeParamDef buildMatchingParameter(
+      java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate);
 
-  public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
+  public java.lang.Boolean hasMatchingParameter(java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate);
 
-  public A withParameters(List<TypeParamDef> parameters);
+  public A withParameters(java.util.List<io.sundr.model.TypeParamDef> parameters);
 
-  public A withParameters(TypeParamDef... parameters);
+  public A withParameters(io.sundr.model.TypeParamDef... parameters);
 
-  public Boolean hasParameters();
+  public java.lang.Boolean hasParameters();
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> addNewParameter();
+  public MethodFluent.ParametersNested<A> addNewParameter();
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> addNewParameterLike(TypeParamDef item);
+  public io.sundr.model.MethodFluent.ParametersNested<A> addNewParameterLike(io.sundr.model.TypeParamDef item);
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> setNewParameterLike(int index, TypeParamDef item);
+  public io.sundr.model.MethodFluent.ParametersNested<A> setNewParameterLike(java.lang.Integer index,
+      io.sundr.model.TypeParamDef item);
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> editParameter(int index);
+  public io.sundr.model.MethodFluent.ParametersNested<A> editParameter(java.lang.Integer index);
 
   public io.sundr.model.MethodFluent.ParametersNested<A> editFirstParameter();
 
   public io.sundr.model.MethodFluent.ParametersNested<A> editLastParameter();
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate);
+  public io.sundr.model.MethodFluent.ParametersNested<A> editMatchingParameter(
+      java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate);
 
-  public String getName();
+  public java.lang.String getName();
 
-  public A withName(String name);
+  public A withName(java.lang.String name);
 
-  public Boolean hasName();
-
-  public A withNewName(StringBuilder arg1);
-
-  public A withNewName(int[] arg1, int arg2, int arg3);
-
-  public A withNewName(char[] arg1);
-
-  public A withNewName(StringBuffer arg1);
-
-  public A withNewName(byte[] arg1, int arg2);
-
-  public A withNewName(byte[] arg1);
-
-  public A withNewName(char[] arg1, int arg2, int arg3);
-
-  public A withNewName(byte[] arg1, int arg2, int arg3);
-
-  public A withNewName(byte[] arg1, int arg2, int arg3, int arg4);
-
-  public A withNewName(String arg1);
+  public java.lang.Boolean hasName();
 
   /**
    * This method has been deprecated, please use method buildReturnType instead.
    * 
    * @return The buildable object.
    */
-  @Deprecated
+  @java.lang.Deprecated
   public TypeRef getReturnType();
 
-  public TypeRef buildReturnType();
+  public io.sundr.model.TypeRef buildReturnType();
 
-  public A withReturnType(TypeRef returnType);
+  public A withReturnType(io.sundr.model.TypeRef returnType);
 
-  public Boolean hasReturnType();
+  public java.lang.Boolean hasReturnType();
 
   public A withTypeParamRefReturnType(TypeParamRef typeParamRefReturnType);
 
-  public io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnType();
+  public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnType();
 
-  public io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(TypeParamRef item);
+  public io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(
+      io.sundr.model.TypeParamRef item);
 
   public A withWildcardRefReturnType(WildcardRef wildcardRefReturnType);
 
-  public io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnType();
+  public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnType();
 
-  public io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(WildcardRef item);
+  public io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(
+      io.sundr.model.WildcardRef item);
 
   public A withClassRefReturnType(ClassRef classRefReturnType);
 
-  public io.sundr.model.MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnType();
+  public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnType();
 
-  public io.sundr.model.MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(ClassRef item);
+  public io.sundr.model.MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(io.sundr.model.ClassRef item);
 
   public A withPrimitiveRefReturnType(PrimitiveRef primitiveRefReturnType);
 
-  public io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnType();
+  public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnType();
 
-  public io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(PrimitiveRef item);
+  public io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(
+      io.sundr.model.PrimitiveRef item);
 
   public A withVoidRefReturnType(VoidRef voidRefReturnType);
 
-  public io.sundr.model.MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnType();
+  public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnType();
 
-  public io.sundr.model.MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(VoidRef item);
+  public io.sundr.model.MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(io.sundr.model.VoidRef item);
 
-  public A addToArguments(int index, Property item);
+  public A addToArguments(java.lang.Integer index, Property item);
 
-  public A setToArguments(int index, Property item);
+  public A setToArguments(java.lang.Integer index, io.sundr.model.Property item);
 
-  public A addToArguments(Property... items);
+  public A addToArguments(io.sundr.model.Property... items);
 
-  public A addAllToArguments(Collection<Property> items);
+  public A addAllToArguments(java.util.Collection<io.sundr.model.Property> items);
 
-  public A removeFromArguments(Property... items);
+  public A removeFromArguments(io.sundr.model.Property... items);
 
-  public A removeAllFromArguments(Collection<Property> items);
+  public A removeAllFromArguments(java.util.Collection<io.sundr.model.Property> items);
 
-  public A removeMatchingFromArguments(Predicate<PropertyBuilder> predicate);
+  public A removeMatchingFromArguments(java.util.function.Predicate<PropertyBuilder> predicate);
 
   /**
    * This method has been deprecated, please use method buildArguments instead.
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<Property> getArguments();
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.Property> getArguments();
 
-  public List<Property> buildArguments();
+  public java.util.List<io.sundr.model.Property> buildArguments();
 
-  public Property buildArgument(int index);
+  public io.sundr.model.Property buildArgument(java.lang.Integer index);
 
-  public Property buildFirstArgument();
+  public io.sundr.model.Property buildFirstArgument();
 
-  public Property buildLastArgument();
+  public io.sundr.model.Property buildLastArgument();
 
-  public Property buildMatchingArgument(Predicate<PropertyBuilder> predicate);
+  public io.sundr.model.Property buildMatchingArgument(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate);
 
-  public Boolean hasMatchingArgument(Predicate<PropertyBuilder> predicate);
+  public java.lang.Boolean hasMatchingArgument(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate);
 
-  public A withArguments(List<Property> arguments);
+  public A withArguments(java.util.List<io.sundr.model.Property> arguments);
 
-  public A withArguments(Property... arguments);
+  public A withArguments(io.sundr.model.Property... arguments);
 
-  public Boolean hasArguments();
+  public java.lang.Boolean hasArguments();
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> addNewArgument();
+  public MethodFluent.ArgumentsNested<A> addNewArgument();
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> addNewArgumentLike(Property item);
+  public io.sundr.model.MethodFluent.ArgumentsNested<A> addNewArgumentLike(io.sundr.model.Property item);
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> setNewArgumentLike(int index, Property item);
+  public io.sundr.model.MethodFluent.ArgumentsNested<A> setNewArgumentLike(java.lang.Integer index,
+      io.sundr.model.Property item);
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> editArgument(int index);
+  public io.sundr.model.MethodFluent.ArgumentsNested<A> editArgument(java.lang.Integer index);
 
   public io.sundr.model.MethodFluent.ArgumentsNested<A> editFirstArgument();
 
   public io.sundr.model.MethodFluent.ArgumentsNested<A> editLastArgument();
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> editMatchingArgument(Predicate<PropertyBuilder> predicate);
+  public io.sundr.model.MethodFluent.ArgumentsNested<A> editMatchingArgument(
+      java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate);
 
   public boolean isVarArgPreferred();
 
   public A withVarArgPreferred(boolean varArgPreferred);
 
-  public Boolean hasVarArgPreferred();
+  public java.lang.Boolean hasVarArgPreferred();
 
-  public A addToExceptions(int index, ClassRef item);
+  public A addToExceptions(java.lang.Integer index, io.sundr.model.ClassRef item);
 
-  public A setToExceptions(int index, ClassRef item);
+  public A setToExceptions(java.lang.Integer index, io.sundr.model.ClassRef item);
 
-  public A addToExceptions(ClassRef... items);
+  public A addToExceptions(io.sundr.model.ClassRef... items);
 
-  public A addAllToExceptions(Collection<ClassRef> items);
+  public A addAllToExceptions(java.util.Collection<io.sundr.model.ClassRef> items);
 
-  public A removeFromExceptions(ClassRef... items);
+  public A removeFromExceptions(io.sundr.model.ClassRef... items);
 
-  public A removeAllFromExceptions(Collection<ClassRef> items);
+  public A removeAllFromExceptions(java.util.Collection<io.sundr.model.ClassRef> items);
 
-  public A removeMatchingFromExceptions(Predicate<ClassRefBuilder> predicate);
+  public A removeMatchingFromExceptions(java.util.function.Predicate<ClassRefBuilder> predicate);
 
   /**
    * This method has been deprecated, please use method buildExceptions instead.
    * 
    * @return The buildable object.
    */
-  @Deprecated
-  public List<ClassRef> getExceptions();
+  @java.lang.Deprecated
+  public java.util.List<io.sundr.model.ClassRef> getExceptions();
 
-  public List<ClassRef> buildExceptions();
+  public java.util.List<io.sundr.model.ClassRef> buildExceptions();
 
-  public ClassRef buildException(int index);
+  public io.sundr.model.ClassRef buildException(java.lang.Integer index);
 
-  public ClassRef buildFirstException();
+  public io.sundr.model.ClassRef buildFirstException();
 
-  public ClassRef buildLastException();
+  public io.sundr.model.ClassRef buildLastException();
 
-  public ClassRef buildMatchingException(Predicate<ClassRefBuilder> predicate);
+  public io.sundr.model.ClassRef buildMatchingException(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate);
 
-  public Boolean hasMatchingException(Predicate<ClassRefBuilder> predicate);
+  public java.lang.Boolean hasMatchingException(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate);
 
-  public A withExceptions(List<ClassRef> exceptions);
+  public A withExceptions(java.util.List<io.sundr.model.ClassRef> exceptions);
 
-  public A withExceptions(ClassRef... exceptions);
+  public A withExceptions(io.sundr.model.ClassRef... exceptions);
 
-  public Boolean hasExceptions();
+  public java.lang.Boolean hasExceptions();
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> addNewException();
+  public MethodFluent.ExceptionsNested<A> addNewException();
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> addNewExceptionLike(ClassRef item);
+  public io.sundr.model.MethodFluent.ExceptionsNested<A> addNewExceptionLike(io.sundr.model.ClassRef item);
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> setNewExceptionLike(int index, ClassRef item);
+  public io.sundr.model.MethodFluent.ExceptionsNested<A> setNewExceptionLike(java.lang.Integer index,
+      io.sundr.model.ClassRef item);
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> editException(int index);
+  public io.sundr.model.MethodFluent.ExceptionsNested<A> editException(java.lang.Integer index);
 
   public io.sundr.model.MethodFluent.ExceptionsNested<A> editFirstException();
 
   public io.sundr.model.MethodFluent.ExceptionsNested<A> editLastException();
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> editMatchingException(Predicate<ClassRefBuilder> predicate);
+  public io.sundr.model.MethodFluent.ExceptionsNested<A> editMatchingException(
+      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate);
 
   public boolean isDefaultMethod();
 
   public A withDefaultMethod(boolean defaultMethod);
 
-  public Boolean hasDefaultMethod();
+  public java.lang.Boolean hasDefaultMethod();
 
   /**
    * This method has been deprecated, please use method buildBlock instead.
    * 
    * @return The buildable object.
    */
-  @Deprecated
+  @java.lang.Deprecated
   public Block getBlock();
 
-  public Block buildBlock();
+  public io.sundr.model.Block buildBlock();
 
-  public A withBlock(Block block);
+  public A withBlock(io.sundr.model.Block block);
 
-  public Boolean hasBlock();
+  public java.lang.Boolean hasBlock();
 
-  public io.sundr.model.MethodFluent.BlockNested<A> withNewBlock();
+  public MethodFluent.BlockNested<A> withNewBlock();
 
-  public io.sundr.model.MethodFluent.BlockNested<A> withNewBlockLike(Block item);
+  public io.sundr.model.MethodFluent.BlockNested<A> withNewBlockLike(io.sundr.model.Block item);
 
   public io.sundr.model.MethodFluent.BlockNested<A> editBlock();
 
   public io.sundr.model.MethodFluent.BlockNested<A> editOrNewBlock();
 
-  public io.sundr.model.MethodFluent.BlockNested<A> editOrNewBlockLike(Block item);
+  public io.sundr.model.MethodFluent.BlockNested<A> editOrNewBlockLike(io.sundr.model.Block item);
 
-  public interface AnnotationsNested<N>
-      extends Nested<N>, AnnotationRefFluent<io.sundr.model.MethodFluent.AnnotationsNested<N>> {
-
+  public interface AnnotationsNested<N> extends Nested<N>, AnnotationRefFluent<MethodFluent.AnnotationsNested<N>> {
     public N and();
 
     public N endAnnotation();
+
   }
 
-  public interface ParametersNested<N> extends Nested<N>, TypeParamDefFluent<io.sundr.model.MethodFluent.ParametersNested<N>> {
-
+  public interface ParametersNested<N>
+      extends io.sundr.builder.Nested<N>, TypeParamDefFluent<MethodFluent.ParametersNested<N>> {
     public N and();
 
     public N endParameter();
+
   }
 
   public interface TypeParamRefReturnTypeNested<N>
-      extends Nested<N>, TypeParamRefFluent<io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, TypeParamRefFluent<MethodFluent.TypeParamRefReturnTypeNested<N>> {
     public N and();
 
     public N endTypeParamRefReturnType();
+
   }
 
   public interface WildcardRefReturnTypeNested<N>
-      extends Nested<N>, WildcardRefFluent<io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, WildcardRefFluent<MethodFluent.WildcardRefReturnTypeNested<N>> {
     public N and();
 
     public N endWildcardRefReturnType();
+
   }
 
   public interface ClassRefReturnTypeNested<N>
-      extends Nested<N>, ClassRefFluent<io.sundr.model.MethodFluent.ClassRefReturnTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, ClassRefFluent<MethodFluent.ClassRefReturnTypeNested<N>> {
     public N and();
 
     public N endClassRefReturnType();
+
   }
 
   public interface PrimitiveRefReturnTypeNested<N>
-      extends Nested<N>, PrimitiveRefFluent<io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, PrimitiveRefFluent<MethodFluent.PrimitiveRefReturnTypeNested<N>> {
     public N and();
 
     public N endPrimitiveRefReturnType();
+
   }
 
   public interface VoidRefReturnTypeNested<N>
-      extends Nested<N>, VoidRefFluent<io.sundr.model.MethodFluent.VoidRefReturnTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, VoidRefFluent<MethodFluent.VoidRefReturnTypeNested<N>> {
     public N and();
 
     public N endVoidRefReturnType();
+
   }
 
-  public interface ArgumentsNested<N> extends Nested<N>, PropertyFluent<io.sundr.model.MethodFluent.ArgumentsNested<N>> {
-
+  public interface ArgumentsNested<N> extends io.sundr.builder.Nested<N>, PropertyFluent<MethodFluent.ArgumentsNested<N>> {
     public N and();
 
     public N endArgument();
+
   }
 
-  public interface ExceptionsNested<N> extends Nested<N>, ClassRefFluent<io.sundr.model.MethodFluent.ExceptionsNested<N>> {
-
+  public interface ExceptionsNested<N> extends io.sundr.builder.Nested<N>, ClassRefFluent<MethodFluent.ExceptionsNested<N>> {
     public N and();
 
     public N endException();
+
   }
 
-  public interface BlockNested<N> extends Nested<N>, BlockFluent<io.sundr.model.MethodFluent.BlockNested<N>> {
-
+  public interface BlockNested<N> extends io.sundr.builder.Nested<N>, BlockFluent<MethodFluent.BlockNested<N>> {
     public N and();
 
     public N endBlock();
+
   }
 
 }

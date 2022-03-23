@@ -1,13 +1,18 @@
 package io.sundr.model;
 
 import java.lang.Object;
+import java.lang.String;
+import java.lang.SuppressWarnings;
 
+/**
+ * Generated
+ */
+@SuppressWarnings(value = "unchecked")
 public class VoidRefFluentImpl<A extends VoidRefFluent<A>> extends TypeRefFluentImpl<A> implements VoidRefFluent<A> {
-
   public VoidRefFluentImpl() {
   }
 
-  public VoidRefFluentImpl(VoidRef instance) {
+  public VoidRefFluentImpl(io.sundr.model.VoidRef instance) {
     this.withAttributes(instance.getAttributes());
   }
 
@@ -24,6 +29,13 @@ public class VoidRefFluentImpl<A extends VoidRefFluent<A>> extends TypeRefFluent
 
   public int hashCode() {
     return java.util.Objects.hash(super.hashCode());
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    sb.append("}");
+    return sb.toString();
   }
 
 }

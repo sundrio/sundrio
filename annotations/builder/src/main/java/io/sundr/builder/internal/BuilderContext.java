@@ -642,7 +642,7 @@ public class BuilderContext {
         .withReturnType(T.toReference())
         .addNewArgument()
         .withName("visitors")
-        .withNewClassRefType().withNewFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1)
+        .withNewClassRefType().withFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1)
         .endClassRefType()
         .endArgument()
         .withVarArgPreferred(true)
@@ -658,7 +658,7 @@ public class BuilderContext {
         .endArgument()
         .addNewArgument()
         .withTypeRef(
-            new ClassRefBuilder().withNewFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1).build())
+            new ClassRefBuilder().withFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1).build())
         .withName("visitors")
         .endArgument()
         .withVarArgPreferred(true)
@@ -687,7 +687,7 @@ public class BuilderContext {
         .withName("VisitableBuilder")
         .withParameters(T,
             new TypeParamDefBuilder(V).addNewBound().withArguments(V.toReference())
-                .withNewFullyQualifiedName("VisitableBuilder").withArguments(T.toReference(), V.toReference())
+                .withFullyQualifiedName("VisitableBuilder").withArguments(T.toReference(), V.toReference())
                 .endBound().build())
         .withExtendsList(builderInterface.toReference(T.toReference()), visitableInterface.toReference(V.toReference()))
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))

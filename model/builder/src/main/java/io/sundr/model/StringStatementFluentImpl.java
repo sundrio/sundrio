@@ -3,27 +3,31 @@ package io.sundr.model;
 import java.lang.Boolean;
 import java.lang.Object;
 import java.lang.String;
+import java.lang.SuppressWarnings;
 import java.util.function.Supplier;
 
 import io.sundr.builder.BaseFluent;
 
+/**
+ * Generated
+ */
+@SuppressWarnings(value = "unchecked")
 public class StringStatementFluentImpl<A extends StringStatementFluent<A>> extends BaseFluent<A>
     implements StringStatementFluent<A> {
-
-  private Supplier<String> supplier;
-
   public StringStatementFluentImpl() {
   }
 
-  public StringStatementFluentImpl(StringStatement instance) {
+  public StringStatementFluentImpl(io.sundr.model.StringStatement instance) {
     this.withSupplier(instance.getSupplier());
   }
 
-  public Supplier<String> getSupplier() {
+  private Supplier<String> supplier;
+
+  public java.util.function.Supplier<java.lang.String> getSupplier() {
     return this.supplier;
   }
 
-  public <T extends Object> A withSupplier(Supplier<String> supplier) {
+  public <T> A withSupplier(java.util.function.Supplier<java.lang.String> supplier) {
     this.supplier = supplier;
     return (A) this;
   }
@@ -45,6 +49,17 @@ public class StringStatementFluentImpl<A extends StringStatementFluent<A>> exten
 
   public int hashCode() {
     return java.util.Objects.hash(supplier, super.hashCode());
+  }
+
+  public java.lang.String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (supplier != null) {
+      sb.append("supplier:");
+      sb.append(supplier);
+    }
+    sb.append("}");
+    return sb.toString();
   }
 
 }

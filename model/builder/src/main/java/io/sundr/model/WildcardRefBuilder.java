@@ -6,13 +6,9 @@ import java.lang.Object;
 import io.sundr.builder.VisitableBuilder;
 
 public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder>
-    implements VisitableBuilder<WildcardRef, WildcardRefBuilder> {
-
-  WildcardRefFluent<?> fluent;
-  Boolean validationEnabled;
-
+    implements VisitableBuilder<WildcardRef, io.sundr.model.WildcardRefBuilder> {
   public WildcardRefBuilder() {
-    this(true);
+    this(false);
   }
 
   public WildcardRefBuilder(Boolean validationEnabled) {
@@ -20,18 +16,19 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
   }
 
   public WildcardRefBuilder(WildcardRefFluent<?> fluent) {
-    this(fluent, true);
+    this(fluent, false);
   }
 
-  public WildcardRefBuilder(WildcardRefFluent<?> fluent, Boolean validationEnabled) {
+  public WildcardRefBuilder(io.sundr.model.WildcardRefFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this(fluent, new WildcardRef(), validationEnabled);
   }
 
-  public WildcardRefBuilder(WildcardRefFluent<?> fluent, WildcardRef instance) {
-    this(fluent, instance, true);
+  public WildcardRefBuilder(io.sundr.model.WildcardRefFluent<?> fluent, io.sundr.model.WildcardRef instance) {
+    this(fluent, instance, false);
   }
 
-  public WildcardRefBuilder(WildcardRefFluent<?> fluent, WildcardRef instance, Boolean validationEnabled) {
+  public WildcardRefBuilder(io.sundr.model.WildcardRefFluent<?> fluent, io.sundr.model.WildcardRef instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withBoundKind(instance.getBoundKind());
     fluent.withBounds(instance.getBounds());
@@ -39,11 +36,11 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
     this.validationEnabled = validationEnabled;
   }
 
-  public WildcardRefBuilder(WildcardRef instance) {
-    this(instance, true);
+  public WildcardRefBuilder(io.sundr.model.WildcardRef instance) {
+    this(instance, false);
   }
 
-  public WildcardRefBuilder(WildcardRef instance, Boolean validationEnabled) {
+  public WildcardRefBuilder(io.sundr.model.WildcardRef instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withBoundKind(instance.getBoundKind());
     this.withBounds(instance.getBounds());
@@ -51,7 +48,10 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
     this.validationEnabled = validationEnabled;
   }
 
-  public WildcardRef build() {
+  io.sundr.model.WildcardRefFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.WildcardRef build() {
     WildcardRef buildable = new WildcardRef(fluent.getBoundKind(), fluent.getBounds(), fluent.getAttributes());
     return buildable;
   }

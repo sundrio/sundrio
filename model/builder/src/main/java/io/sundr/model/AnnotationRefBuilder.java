@@ -6,13 +6,9 @@ import java.lang.Object;
 import io.sundr.builder.VisitableBuilder;
 
 public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefBuilder>
-    implements VisitableBuilder<AnnotationRef, AnnotationRefBuilder> {
-
-  AnnotationRefFluent<?> fluent;
-  Boolean validationEnabled;
-
+    implements VisitableBuilder<AnnotationRef, io.sundr.model.AnnotationRefBuilder> {
   public AnnotationRefBuilder() {
-    this(true);
+    this(false);
   }
 
   public AnnotationRefBuilder(Boolean validationEnabled) {
@@ -20,20 +16,21 @@ public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefB
     this.validationEnabled = validationEnabled;
   }
 
-  public AnnotationRefBuilder(AnnotationRefFluent<?> fluent) {
-    this(fluent, true);
+  public AnnotationRefBuilder(io.sundr.model.AnnotationRefFluent<?> fluent) {
+    this(fluent, false);
   }
 
-  public AnnotationRefBuilder(AnnotationRefFluent<?> fluent, Boolean validationEnabled) {
+  public AnnotationRefBuilder(io.sundr.model.AnnotationRefFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public AnnotationRefBuilder(AnnotationRefFluent<?> fluent, AnnotationRef instance) {
-    this(fluent, instance, true);
+  public AnnotationRefBuilder(io.sundr.model.AnnotationRefFluent<?> fluent, io.sundr.model.AnnotationRef instance) {
+    this(fluent, instance, false);
   }
 
-  public AnnotationRefBuilder(AnnotationRefFluent<?> fluent, AnnotationRef instance, Boolean validationEnabled) {
+  public AnnotationRefBuilder(io.sundr.model.AnnotationRefFluent<?> fluent, io.sundr.model.AnnotationRef instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withClassRef(instance.getClassRef());
     fluent.withParameters(instance.getParameters());
@@ -41,11 +38,11 @@ public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefB
     this.validationEnabled = validationEnabled;
   }
 
-  public AnnotationRefBuilder(AnnotationRef instance) {
-    this(instance, true);
+  public AnnotationRefBuilder(io.sundr.model.AnnotationRef instance) {
+    this(instance, false);
   }
 
-  public AnnotationRefBuilder(AnnotationRef instance, Boolean validationEnabled) {
+  public AnnotationRefBuilder(io.sundr.model.AnnotationRef instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withClassRef(instance.getClassRef());
     this.withParameters(instance.getParameters());
@@ -53,7 +50,10 @@ public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefB
     this.validationEnabled = validationEnabled;
   }
 
-  public AnnotationRef build() {
+  io.sundr.model.AnnotationRefFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.AnnotationRef build() {
     AnnotationRef buildable = new AnnotationRef(fluent.getClassRef(), fluent.getParameters(), fluent.getAttributes());
     return buildable;
   }

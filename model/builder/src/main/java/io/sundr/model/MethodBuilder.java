@@ -5,13 +5,10 @@ import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class MethodBuilder extends MethodFluentImpl<MethodBuilder> implements VisitableBuilder<Method, MethodBuilder> {
-
-  MethodFluent<?> fluent;
-  Boolean validationEnabled;
-
+public class MethodBuilder extends MethodFluentImpl<MethodBuilder>
+    implements VisitableBuilder<io.sundr.model.Method, MethodBuilder> {
   public MethodBuilder() {
-    this(true);
+    this(false);
   }
 
   public MethodBuilder(Boolean validationEnabled) {
@@ -19,20 +16,21 @@ public class MethodBuilder extends MethodFluentImpl<MethodBuilder> implements Vi
     this.validationEnabled = validationEnabled;
   }
 
-  public MethodBuilder(MethodFluent<?> fluent) {
-    this(fluent, true);
+  public MethodBuilder(io.sundr.model.MethodFluent<?> fluent) {
+    this(fluent, false);
   }
 
-  public MethodBuilder(MethodFluent<?> fluent, Boolean validationEnabled) {
+  public MethodBuilder(io.sundr.model.MethodFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public MethodBuilder(MethodFluent<?> fluent, Method instance) {
-    this(fluent, instance, true);
+  public MethodBuilder(io.sundr.model.MethodFluent<?> fluent, io.sundr.model.Method instance) {
+    this(fluent, instance, false);
   }
 
-  public MethodBuilder(MethodFluent<?> fluent, Method instance, Boolean validationEnabled) {
+  public MethodBuilder(io.sundr.model.MethodFluent<?> fluent, io.sundr.model.Method instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withComments(instance.getComments());
     fluent.withAnnotations(instance.getAnnotations());
@@ -49,11 +47,11 @@ public class MethodBuilder extends MethodFluentImpl<MethodBuilder> implements Vi
     this.validationEnabled = validationEnabled;
   }
 
-  public MethodBuilder(Method instance) {
-    this(instance, true);
+  public MethodBuilder(io.sundr.model.Method instance) {
+    this(instance, false);
   }
 
-  public MethodBuilder(Method instance, Boolean validationEnabled) {
+  public MethodBuilder(io.sundr.model.Method instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withComments(instance.getComments());
     this.withAnnotations(instance.getAnnotations());
@@ -70,7 +68,10 @@ public class MethodBuilder extends MethodFluentImpl<MethodBuilder> implements Vi
     this.validationEnabled = validationEnabled;
   }
 
-  public Method build() {
+  io.sundr.model.MethodFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.Method build() {
     Method buildable = new Method(fluent.getComments(), fluent.getAnnotations(), fluent.getParameters(), fluent.getName(),
         fluent.getReturnType(), fluent.getArguments(), fluent.isVarArgPreferred(), fluent.getExceptions(),
         fluent.isDefaultMethod(), fluent.getBlock(), fluent.getModifiers(), fluent.getAttributes());
