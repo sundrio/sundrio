@@ -17,6 +17,7 @@
 
 package io.sundr.utils;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,4 +36,16 @@ public final class Patterns {
     Matcher matcher = Pattern.compile(pattern).matcher(content);
     return matcher.find() ? Optional.of(matcher.group(index)) : Optional.empty();
   }
+
+  public static boolean isIncluded(String target, String... includes) {
+    return includes.length == 0 || Arrays.stream(includes).map(Pattern::compile).map(p -> p.matcher(target))
+        .filter(Matcher::matches).findAny().isPresent();
+  }
+
+  public static boolean isExcluded(String target, String... excludes) {
+    return excludes.length != 0 &&
+        Arrays.stream(excludes).map(Pattern::compile).map(p -> p.matcher(target)).filter(Matcher::matches).findAny()
+            .isPresent();
+  }
+
 }
