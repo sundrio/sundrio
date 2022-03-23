@@ -1,6 +1,6 @@
 /*
  * Copyright 2015 The original authors.
- *
+*
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -63,6 +63,7 @@ public class BuilderContext {
   private final Types types;
   private final AptContext aptContext;
 
+  private final TypeDef visitorsClass;
   private final TypeDef visitorInterface;
   private final TypeDef typedVisitorInterface;
   private final TypeDef pathAwareVisitorClass;
@@ -133,6 +134,74 @@ public class BuilderContext {
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
+    visitorsClass = new TypeDefBuilder()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
+
+        .withKind(Kind.CLASS)
+        .withPackageName("io.sundr.builder")
+        .withName("Visitors")
+        .addNewConstructor()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE))
+        .endConstructor()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PROTECTED, Modifier.STATIC))
+        .withParameters(T)
+        .withName("getTypeArguments")
+        .withReturnType(Collections.LIST.toReference(CLASS_REF_NO_ARG))
+        .addNewArgument()
+        .withTypeRef(CLASS.toReference(T.toReference()))
+        .withName("baseClass")
+        .endArgument()
+        .addNewArgument()
+        .withTypeRef(CLASS.toReference(new WildcardRefBuilder().withBounds(T.toReference()).build()))
+        .withName("childClass")
+        .endArgument()
+        .endMethod()
+
+        // getRawName
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withName("getRawName")
+        .withReturnType(STRING_REF)
+        .addNewArgument()
+        .withName("type")
+        .withTypeRef(TYPE.toInternalReference())
+        .endArgument()
+        .endMethod()
+
+        // getClass
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withName("getClass")
+        .withReturnType(CLASS.toReference(new WildcardRef()))
+        .addNewArgument()
+        .withName("type")
+        .withTypeRef(TYPE.toInternalReference())
+        .endArgument()
+        .endMethod()
+
+        // getMatchingInterface
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withParameters(T)
+        .withName("getMatchingInterface")
+        .withReturnType(OPTIONAL.toReference(TYPE.toInternalReference()))
+        .addNewArgument()
+        .withName("targetInterface")
+        .withTypeRef(CLASS.toReference())
+        .endArgument()
+        .addNewArgument()
+        .withName("candidates")
+        .withTypeRef(new ClassRefBuilder(TYPE.toReference()).withDimensions(1).build())
+        .endArgument()
+        .withVarArgPreferred(true)
+        .endMethod()
+        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("Visitors", "io/sundr/builder/Visitors.java", true))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/Visitors.java"))
+        .build();
+
     visitorInterface = new TypeDefBuilder()
         .withModifiers(modifiersToInt(Modifier.PUBLIC))
         .addNewAnnotation()
@@ -143,6 +212,13 @@ public class BuilderContext {
         .withPackageName("io.sundr.builder")
         .withName("Visitor")
         .withParameters(T)
+
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withName("getType")
+        .withReturnType(CLASS.toReference(T.toReference()))
+        .endMethod()
 
         //visit
         .addNewMethod()
@@ -196,67 +272,6 @@ public class BuilderContext {
         .addNewArgument()
         .withName("target")
         .withTypeRef(F.toReference())
-        .endArgument()
-        .endMethod()
-
-        .addNewMethod()
-        .withDefaultMethod(true)
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
-        .withName("getType")
-        .withReturnType(CLASS.toReference(T.toReference()))
-        .endMethod()
-
-        // getRawName
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.STATIC))
-        .withName("getRawName")
-        .withReturnType(STRING_REF)
-        .addNewArgument()
-        .withName("type")
-        .withTypeRef(TYPE.toInternalReference())
-        .endArgument()
-        .endMethod()
-
-        // getClass
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.STATIC))
-        .withName("getClass")
-        .withReturnType(CLASS.toReference(new WildcardRef()))
-        .addNewArgument()
-        .withName("type")
-        .withTypeRef(TYPE.toInternalReference())
-        .endArgument()
-        .endMethod()
-
-        // getMatchingInterface
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.STATIC))
-        .withParameters(T)
-        .withName("getMatchingInterface")
-        .withReturnType(OPTIONAL.toReference(TYPE.toInternalReference()))
-        .addNewArgument()
-        .withName("targetInterface")
-        .withTypeRef(CLASS.toReference())
-        .endArgument()
-        .addNewArgument()
-        .withName("candidates")
-        .withTypeRef(new ClassRefBuilder(TYPE.toReference()).withDimensions(1).build())
-        .endArgument()
-        .withVarArgPreferred(true)
-        .endMethod()
-
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.STATIC))
-        .withParameters(T)
-        .withName("getTypeArguments")
-        .withReturnType(Collections.LIST.toReference(CLASS_REF_NO_ARG))
-        .addNewArgument()
-        .withTypeRef(CLASS.toReference(T.toReference()))
-        .withName("baseClass")
-        .endArgument()
-        .addNewArgument()
-        .withTypeRef(CLASS.toReference(new WildcardRefBuilder().withBounds(T.toReference()).build()))
-        .withName("childClass")
         .endArgument()
         .endMethod()
 
@@ -830,6 +845,10 @@ public class BuilderContext {
 
   public TypeDef getVisitableMapClass() {
     return visitableMapClass;
+  }
+
+  public TypeDef getVisitorsClass() {
+    return visitorsClass;
   }
 
   public TypeDef getVisitorInterface() {

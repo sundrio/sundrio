@@ -25,7 +25,7 @@ public class PathAwareTypedVisitor<V, P> implements Visitor<V> {
   private final Class<P> parentType;
 
   public PathAwareTypedVisitor() {
-    List<Class> args = Visitor.getTypeArguments(PathAwareTypedVisitor.class, getClass());
+    List<Class> args = Visitors.getTypeArguments(PathAwareTypedVisitor.class, getClass());
     if (args == null || args.isEmpty()) {
       throw new IllegalStateException("Could not determine type arguments for path aware typed visitor.");
     }
