@@ -798,7 +798,7 @@ public class ClazzAs {
         : new HashSet<>();
 
     //Iterate parent objects and check for properties with setters but not ctor arguments.
-    while (target != null && !Types.OBJECT.equals(target) && BuilderUtils.isBuildable(target)) {
+    while (target != null && !Types.OBJECT.equals(target) && BuilderUtils.isRegisteredAsBuildable(target)) { // We want to allow abstract parents marked as buildable
       for (Property property : target.getProperties()) {
         if (propertiesToIgnore.contains(property.getName())) {
           continue;
@@ -842,7 +842,7 @@ public class ClazzAs {
     List<TypeDef> parents = new ArrayList<TypeDef>();
     Types.visitParents(target, parents);
     for (TypeDef c : parents) {
-      if (!isBuildable(c)) {
+      if (!isRegisteredAsBuildable(c)) {
         continue;
       }
 
