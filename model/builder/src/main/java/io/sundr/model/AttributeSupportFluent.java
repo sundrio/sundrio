@@ -6,19 +6,22 @@ import java.util.Map;
 
 import io.sundr.builder.Fluent;
 
+/**
+ * Generated
+ */
 public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A> {
-
   public A addToAttributes(AttributeKey key, Object value);
 
-  public A addToAttributes(Map<AttributeKey, Object> map);
+  public A addToAttributes(Map<io.sundr.model.AttributeKey, java.lang.Object> map);
 
-  public A removeFromAttributes(AttributeKey key);
+  public A removeFromAttributes(io.sundr.model.AttributeKey key);
 
-  public A removeFromAttributes(Map<AttributeKey, Object> map);
+  public A removeFromAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> map);
 
-  public Map<AttributeKey, Object> getAttributes();
+  public java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> getAttributes();
 
-  public <K extends Object, V extends Object> A withAttributes(Map<AttributeKey, Object> attributes);
+  public <K, V> A withAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> attributes);
 
   public Boolean hasAttributes();
+
 }

@@ -6,13 +6,9 @@ import java.lang.Object;
 import io.sundr.builder.VisitableBuilder;
 
 public class StringStatementBuilder extends StringStatementFluentImpl<StringStatementBuilder>
-    implements VisitableBuilder<StringStatement, StringStatementBuilder> {
-
-  StringStatementFluent<?> fluent;
-  Boolean validationEnabled;
-
+    implements VisitableBuilder<StringStatement, io.sundr.model.StringStatementBuilder> {
   public StringStatementBuilder() {
-    this(true);
+    this(false);
   }
 
   public StringStatementBuilder(Boolean validationEnabled) {
@@ -20,36 +16,40 @@ public class StringStatementBuilder extends StringStatementFluentImpl<StringStat
     this.validationEnabled = validationEnabled;
   }
 
-  public StringStatementBuilder(StringStatementFluent<?> fluent) {
-    this(fluent, true);
+  public StringStatementBuilder(io.sundr.model.StringStatementFluent<?> fluent) {
+    this(fluent, false);
   }
 
-  public StringStatementBuilder(StringStatementFluent<?> fluent, Boolean validationEnabled) {
+  public StringStatementBuilder(io.sundr.model.StringStatementFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance) {
-    this(fluent, instance, true);
+  public StringStatementBuilder(io.sundr.model.StringStatementFluent<?> fluent, io.sundr.model.StringStatement instance) {
+    this(fluent, instance, false);
   }
 
-  public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance, Boolean validationEnabled) {
+  public StringStatementBuilder(io.sundr.model.StringStatementFluent<?> fluent, io.sundr.model.StringStatement instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withSupplier(instance.getSupplier());
     this.validationEnabled = validationEnabled;
   }
 
-  public StringStatementBuilder(StringStatement instance) {
-    this(instance, true);
+  public StringStatementBuilder(io.sundr.model.StringStatement instance) {
+    this(instance, false);
   }
 
-  public StringStatementBuilder(StringStatement instance, Boolean validationEnabled) {
+  public StringStatementBuilder(io.sundr.model.StringStatement instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withSupplier(instance.getSupplier());
     this.validationEnabled = validationEnabled;
   }
 
-  public StringStatement build() {
+  io.sundr.model.StringStatementFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.StringStatement build() {
     StringStatement buildable = new StringStatement(fluent.getSupplier());
     return buildable;
   }

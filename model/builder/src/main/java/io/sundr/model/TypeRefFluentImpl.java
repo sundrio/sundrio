@@ -1,13 +1,18 @@
 package io.sundr.model;
 
 import java.lang.Object;
+import java.lang.String;
+import java.lang.SuppressWarnings;
 
+/**
+ * Generated
+ */
+@SuppressWarnings(value = "unchecked")
 public class TypeRefFluentImpl<A extends TypeRefFluent<A>> extends AttributeSupportFluentImpl<A> implements TypeRefFluent<A> {
-
   public TypeRefFluentImpl() {
   }
 
-  public TypeRefFluentImpl(TypeRef instance) {
+  public TypeRefFluentImpl(io.sundr.model.TypeRef instance) {
     this.withAttributes(instance.getAttributes());
   }
 
@@ -24,6 +29,13 @@ public class TypeRefFluentImpl<A extends TypeRefFluent<A>> extends AttributeSupp
 
   public int hashCode() {
     return java.util.Objects.hash(super.hashCode());
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    sb.append("}");
+    return sb.toString();
   }
 
 }

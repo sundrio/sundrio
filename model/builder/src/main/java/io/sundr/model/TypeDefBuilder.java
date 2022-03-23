@@ -5,13 +5,10 @@ import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements VisitableBuilder<TypeDef, TypeDefBuilder> {
-
-  TypeDefFluent<?> fluent;
-  Boolean validationEnabled;
-
+public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder>
+    implements VisitableBuilder<io.sundr.model.TypeDef, io.sundr.model.TypeDefBuilder> {
   public TypeDefBuilder() {
-    this(true);
+    this(false);
   }
 
   public TypeDefBuilder(Boolean validationEnabled) {
@@ -20,19 +17,20 @@ public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements
   }
 
   public TypeDefBuilder(TypeDefFluent<?> fluent) {
-    this(fluent, true);
+    this(fluent, false);
   }
 
-  public TypeDefBuilder(TypeDefFluent<?> fluent, Boolean validationEnabled) {
+  public TypeDefBuilder(io.sundr.model.TypeDefFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public TypeDefBuilder(TypeDefFluent<?> fluent, TypeDef instance) {
-    this(fluent, instance, true);
+  public TypeDefBuilder(io.sundr.model.TypeDefFluent<?> fluent, io.sundr.model.TypeDef instance) {
+    this(fluent, instance, false);
   }
 
-  public TypeDefBuilder(TypeDefFluent<?> fluent, TypeDef instance, Boolean validationEnabled) {
+  public TypeDefBuilder(io.sundr.model.TypeDefFluent<?> fluent, io.sundr.model.TypeDef instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withKind(instance.getKind());
     fluent.withPackageName(instance.getPackageName());
@@ -52,11 +50,11 @@ public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements
     this.validationEnabled = validationEnabled;
   }
 
-  public TypeDefBuilder(TypeDef instance) {
-    this(instance, true);
+  public TypeDefBuilder(io.sundr.model.TypeDef instance) {
+    this(instance, false);
   }
 
-  public TypeDefBuilder(TypeDef instance, Boolean validationEnabled) {
+  public TypeDefBuilder(io.sundr.model.TypeDef instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withKind(instance.getKind());
     this.withPackageName(instance.getPackageName());
@@ -76,7 +74,10 @@ public class TypeDefBuilder extends TypeDefFluentImpl<TypeDefBuilder> implements
     this.validationEnabled = validationEnabled;
   }
 
-  public TypeDef build() {
+  io.sundr.model.TypeDefFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.TypeDef build() {
     TypeDef buildable = new TypeDef(fluent.getKind(), fluent.getPackageName(), fluent.getName(), fluent.getComments(),
         fluent.getAnnotations(), fluent.getExtendsList(), fluent.getImplementsList(), fluent.getParameters(),
         fluent.getProperties(), fluent.getConstructors(), fluent.getMethods(), fluent.getOuterTypeName(),

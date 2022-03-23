@@ -5,13 +5,10 @@ import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements VisitableBuilder<VoidRef, VoidRefBuilder> {
-
-  VoidRefFluent<?> fluent;
-  Boolean validationEnabled;
-
+public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder>
+    implements VisitableBuilder<VoidRef, io.sundr.model.VoidRefBuilder> {
   public VoidRefBuilder() {
-    this(true);
+    this(false);
   }
 
   public VoidRefBuilder(Boolean validationEnabled) {
@@ -19,34 +16,38 @@ public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements
   }
 
   public VoidRefBuilder(VoidRefFluent<?> fluent) {
-    this(fluent, true);
+    this(fluent, false);
   }
 
-  public VoidRefBuilder(VoidRefFluent<?> fluent, Boolean validationEnabled) {
+  public VoidRefBuilder(io.sundr.model.VoidRefFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this(fluent, new VoidRef(), validationEnabled);
   }
 
-  public VoidRefBuilder(VoidRefFluent<?> fluent, VoidRef instance) {
-    this(fluent, instance, true);
+  public VoidRefBuilder(io.sundr.model.VoidRefFluent<?> fluent, io.sundr.model.VoidRef instance) {
+    this(fluent, instance, false);
   }
 
-  public VoidRefBuilder(VoidRefFluent<?> fluent, VoidRef instance, Boolean validationEnabled) {
+  public VoidRefBuilder(io.sundr.model.VoidRefFluent<?> fluent, io.sundr.model.VoidRef instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
   }
 
-  public VoidRefBuilder(VoidRef instance) {
-    this(instance, true);
+  public VoidRefBuilder(io.sundr.model.VoidRef instance) {
+    this(instance, false);
   }
 
-  public VoidRefBuilder(VoidRef instance, Boolean validationEnabled) {
+  public VoidRefBuilder(io.sundr.model.VoidRef instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
   }
 
-  public VoidRef build() {
+  io.sundr.model.VoidRefFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.VoidRef build() {
     VoidRef buildable = new VoidRef(fluent.getAttributes());
     return buildable;
   }

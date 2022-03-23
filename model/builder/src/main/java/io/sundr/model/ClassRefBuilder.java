@@ -6,13 +6,9 @@ import java.lang.Object;
 import io.sundr.builder.VisitableBuilder;
 
 public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
-    implements VisitableBuilder<ClassRef, ClassRefBuilder> {
-
-  ClassRefFluent<?> fluent;
-  Boolean validationEnabled;
-
+    implements VisitableBuilder<io.sundr.model.ClassRef, ClassRefBuilder> {
   public ClassRefBuilder() {
-    this(true);
+    this(false);
   }
 
   public ClassRefBuilder(Boolean validationEnabled) {
@@ -20,20 +16,21 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
     this.validationEnabled = validationEnabled;
   }
 
-  public ClassRefBuilder(ClassRefFluent<?> fluent) {
-    this(fluent, true);
+  public ClassRefBuilder(io.sundr.model.ClassRefFluent<?> fluent) {
+    this(fluent, false);
   }
 
-  public ClassRefBuilder(ClassRefFluent<?> fluent, Boolean validationEnabled) {
+  public ClassRefBuilder(io.sundr.model.ClassRefFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public ClassRefBuilder(ClassRefFluent<?> fluent, ClassRef instance) {
-    this(fluent, instance, true);
+  public ClassRefBuilder(io.sundr.model.ClassRefFluent<?> fluent, io.sundr.model.ClassRef instance) {
+    this(fluent, instance, false);
   }
 
-  public ClassRefBuilder(ClassRefFluent<?> fluent, ClassRef instance, Boolean validationEnabled) {
+  public ClassRefBuilder(io.sundr.model.ClassRefFluent<?> fluent, io.sundr.model.ClassRef instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withFullyQualifiedName(instance.getFullyQualifiedName());
     fluent.withDimensions(instance.getDimensions());
@@ -42,11 +39,11 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
     this.validationEnabled = validationEnabled;
   }
 
-  public ClassRefBuilder(ClassRef instance) {
-    this(instance, true);
+  public ClassRefBuilder(io.sundr.model.ClassRef instance) {
+    this(instance, false);
   }
 
-  public ClassRefBuilder(ClassRef instance, Boolean validationEnabled) {
+  public ClassRefBuilder(io.sundr.model.ClassRef instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withFullyQualifiedName(instance.getFullyQualifiedName());
     this.withDimensions(instance.getDimensions());
@@ -55,7 +52,10 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
     this.validationEnabled = validationEnabled;
   }
 
-  public ClassRef build() {
+  io.sundr.model.ClassRefFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.ClassRef build() {
     ClassRef buildable = new ClassRef(fluent.getFullyQualifiedName(), fluent.getDimensions(), fluent.getArguments(),
         fluent.getAttributes());
     return buildable;

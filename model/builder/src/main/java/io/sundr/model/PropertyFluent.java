@@ -2,28 +2,29 @@ package io.sundr.model;
 
 import java.lang.Boolean;
 import java.lang.Deprecated;
+import java.lang.Integer;
 import java.lang.String;
-import java.lang.StringBuffer;
-import java.lang.StringBuilder;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
 
+/**
+ * Generated
+ */
 public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupportFluent<A> {
+  public A addToAnnotations(Integer index, AnnotationRef item);
 
-  public A addToAnnotations(int index, AnnotationRef item);
+  public A setToAnnotations(java.lang.Integer index, io.sundr.model.AnnotationRef item);
 
-  public A setToAnnotations(int index, AnnotationRef item);
+  public A addToAnnotations(io.sundr.model.AnnotationRef... items);
 
-  public A addToAnnotations(AnnotationRef... items);
+  public A addAllToAnnotations(Collection<io.sundr.model.AnnotationRef> items);
 
-  public A addAllToAnnotations(Collection<AnnotationRef> items);
+  public A removeFromAnnotations(io.sundr.model.AnnotationRef... items);
 
-  public A removeFromAnnotations(AnnotationRef... items);
-
-  public A removeAllFromAnnotations(Collection<AnnotationRef> items);
+  public A removeAllFromAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items);
 
   public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate);
 
@@ -33,205 +34,167 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
    * @return The buildable object.
    */
   @Deprecated
-  public List<AnnotationRef> getAnnotations();
+  public List<io.sundr.model.AnnotationRef> getAnnotations();
 
-  public List<AnnotationRef> buildAnnotations();
+  public java.util.List<io.sundr.model.AnnotationRef> buildAnnotations();
 
-  public AnnotationRef buildAnnotation(int index);
+  public io.sundr.model.AnnotationRef buildAnnotation(java.lang.Integer index);
 
-  public AnnotationRef buildFirstAnnotation();
+  public io.sundr.model.AnnotationRef buildFirstAnnotation();
 
-  public AnnotationRef buildLastAnnotation();
+  public io.sundr.model.AnnotationRef buildLastAnnotation();
 
-  public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+  public io.sundr.model.AnnotationRef buildMatchingAnnotation(
+      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate);
 
-  public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+  public Boolean hasMatchingAnnotation(java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate);
 
-  public A withAnnotations(List<AnnotationRef> annotations);
+  public A withAnnotations(java.util.List<io.sundr.model.AnnotationRef> annotations);
 
-  public A withAnnotations(AnnotationRef... annotations);
+  public A withAnnotations(io.sundr.model.AnnotationRef... annotations);
 
-  public Boolean hasAnnotations();
+  public java.lang.Boolean hasAnnotations();
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> addNewAnnotation();
+  public PropertyFluent.AnnotationsNested<A> addNewAnnotation();
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item);
+  public io.sundr.model.PropertyFluent.AnnotationsNested<A> addNewAnnotationLike(io.sundr.model.AnnotationRef item);
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> setNewAnnotationLike(int index, AnnotationRef item);
+  public io.sundr.model.PropertyFluent.AnnotationsNested<A> setNewAnnotationLike(java.lang.Integer index,
+      io.sundr.model.AnnotationRef item);
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editAnnotation(int index);
+  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editAnnotation(java.lang.Integer index);
 
   public io.sundr.model.PropertyFluent.AnnotationsNested<A> editFirstAnnotation();
 
   public io.sundr.model.PropertyFluent.AnnotationsNested<A> editLastAnnotation();
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate);
+  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editMatchingAnnotation(
+      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate);
 
   /**
    * This method has been deprecated, please use method buildTypeRef instead.
    * 
    * @return The buildable object.
    */
-  @Deprecated
+  @java.lang.Deprecated
   public TypeRef getTypeRef();
 
-  public TypeRef buildTypeRef();
+  public io.sundr.model.TypeRef buildTypeRef();
 
-  public A withTypeRef(TypeRef typeRef);
+  public A withTypeRef(io.sundr.model.TypeRef typeRef);
 
-  public Boolean hasTypeRef();
+  public java.lang.Boolean hasTypeRef();
 
   public A withTypeParamRefType(TypeParamRef typeParamRefType);
 
-  public io.sundr.model.PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefType();
+  public PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefType();
 
-  public io.sundr.model.PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefTypeLike(TypeParamRef item);
+  public io.sundr.model.PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefTypeLike(io.sundr.model.TypeParamRef item);
 
   public A withWildcardRefType(WildcardRef wildcardRefType);
 
-  public io.sundr.model.PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefType();
+  public PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefType();
 
-  public io.sundr.model.PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefTypeLike(WildcardRef item);
+  public io.sundr.model.PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefTypeLike(io.sundr.model.WildcardRef item);
 
   public A withClassRefType(ClassRef classRefType);
 
-  public io.sundr.model.PropertyFluent.ClassRefTypeNested<A> withNewClassRefType();
+  public PropertyFluent.ClassRefTypeNested<A> withNewClassRefType();
 
-  public io.sundr.model.PropertyFluent.ClassRefTypeNested<A> withNewClassRefTypeLike(ClassRef item);
+  public io.sundr.model.PropertyFluent.ClassRefTypeNested<A> withNewClassRefTypeLike(io.sundr.model.ClassRef item);
 
   public A withPrimitiveRefType(PrimitiveRef primitiveRefType);
 
-  public io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefType();
+  public PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefType();
 
-  public io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefTypeLike(PrimitiveRef item);
+  public io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefTypeLike(io.sundr.model.PrimitiveRef item);
 
   public A withVoidRefType(VoidRef voidRefType);
 
-  public io.sundr.model.PropertyFluent.VoidRefTypeNested<A> withNewVoidRefType();
+  public PropertyFluent.VoidRefTypeNested<A> withNewVoidRefType();
 
-  public io.sundr.model.PropertyFluent.VoidRefTypeNested<A> withNewVoidRefTypeLike(VoidRef item);
+  public io.sundr.model.PropertyFluent.VoidRefTypeNested<A> withNewVoidRefTypeLike(io.sundr.model.VoidRef item);
 
   public String getName();
 
-  public A withName(String name);
+  public A withName(java.lang.String name);
 
-  public Boolean hasName();
+  public java.lang.Boolean hasName();
 
-  public A withNewName(StringBuilder arg1);
+  public A addToComments(java.lang.Integer index, java.lang.String item);
 
-  public A withNewName(int[] arg1, int arg2, int arg3);
+  public A setToComments(java.lang.Integer index, java.lang.String item);
 
-  public A withNewName(char[] arg1);
+  public A addToComments(java.lang.String... items);
 
-  public A withNewName(StringBuffer arg1);
+  public A addAllToComments(java.util.Collection<java.lang.String> items);
 
-  public A withNewName(byte[] arg1, int arg2);
+  public A removeFromComments(java.lang.String... items);
 
-  public A withNewName(byte[] arg1);
+  public A removeAllFromComments(java.util.Collection<java.lang.String> items);
 
-  public A withNewName(char[] arg1, int arg2, int arg3);
+  public java.util.List<java.lang.String> getComments();
 
-  public A withNewName(byte[] arg1, int arg2, int arg3);
+  public java.lang.String getComment(java.lang.Integer index);
 
-  public A withNewName(byte[] arg1, int arg2, int arg3, int arg4);
+  public java.lang.String getFirstComment();
 
-  public A withNewName(String arg1);
+  public java.lang.String getLastComment();
 
-  public A addToComments(int index, String item);
+  public java.lang.String getMatchingComment(java.util.function.Predicate<java.lang.String> predicate);
 
-  public A setToComments(int index, String item);
+  public java.lang.Boolean hasMatchingComment(java.util.function.Predicate<java.lang.String> predicate);
 
-  public A addToComments(String... items);
+  public A withComments(java.util.List<java.lang.String> comments);
 
-  public A addAllToComments(Collection<String> items);
+  public A withComments(java.lang.String... comments);
 
-  public A removeFromComments(String... items);
+  public java.lang.Boolean hasComments();
 
-  public A removeAllFromComments(Collection<String> items);
-
-  public List<String> getComments();
-
-  public String getComment(int index);
-
-  public String getFirstComment();
-
-  public String getLastComment();
-
-  public String getMatchingComment(Predicate<String> predicate);
-
-  public Boolean hasMatchingComment(Predicate<String> predicate);
-
-  public A withComments(List<String> comments);
-
-  public A withComments(String... comments);
-
-  public Boolean hasComments();
-
-  public A addNewComment(StringBuilder arg1);
-
-  public A addNewComment(int[] arg1, int arg2, int arg3);
-
-  public A addNewComment(char[] arg1);
-
-  public A addNewComment(StringBuffer arg1);
-
-  public A addNewComment(byte[] arg1, int arg2);
-
-  public A addNewComment(byte[] arg1);
-
-  public A addNewComment(char[] arg1, int arg2, int arg3);
-
-  public A addNewComment(byte[] arg1, int arg2, int arg3);
-
-  public A addNewComment(byte[] arg1, int arg2, int arg3, int arg4);
-
-  public A addNewComment(String arg1);
-
-  public interface AnnotationsNested<N>
-      extends Nested<N>, AnnotationRefFluent<io.sundr.model.PropertyFluent.AnnotationsNested<N>> {
-
+  public interface AnnotationsNested<N> extends Nested<N>, AnnotationRefFluent<PropertyFluent.AnnotationsNested<N>> {
     public N and();
 
     public N endAnnotation();
+
   }
 
   public interface TypeParamRefTypeNested<N>
-      extends Nested<N>, TypeParamRefFluent<io.sundr.model.PropertyFluent.TypeParamRefTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, TypeParamRefFluent<PropertyFluent.TypeParamRefTypeNested<N>> {
     public N and();
 
     public N endTypeParamRefType();
+
   }
 
   public interface WildcardRefTypeNested<N>
-      extends Nested<N>, WildcardRefFluent<io.sundr.model.PropertyFluent.WildcardRefTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, WildcardRefFluent<PropertyFluent.WildcardRefTypeNested<N>> {
     public N and();
 
     public N endWildcardRefType();
+
   }
 
   public interface ClassRefTypeNested<N>
-      extends Nested<N>, ClassRefFluent<io.sundr.model.PropertyFluent.ClassRefTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, ClassRefFluent<PropertyFluent.ClassRefTypeNested<N>> {
     public N and();
 
     public N endClassRefType();
+
   }
 
   public interface PrimitiveRefTypeNested<N>
-      extends Nested<N>, PrimitiveRefFluent<io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<N>> {
-
+      extends io.sundr.builder.Nested<N>, PrimitiveRefFluent<PropertyFluent.PrimitiveRefTypeNested<N>> {
     public N and();
 
     public N endPrimitiveRefType();
+
   }
 
-  public interface VoidRefTypeNested<N> extends Nested<N>, VoidRefFluent<io.sundr.model.PropertyFluent.VoidRefTypeNested<N>> {
-
+  public interface VoidRefTypeNested<N> extends io.sundr.builder.Nested<N>, VoidRefFluent<PropertyFluent.VoidRefTypeNested<N>> {
     public N and();
 
     public N endVoidRefType();
+
   }
 
 }

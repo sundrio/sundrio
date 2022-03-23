@@ -2,26 +2,31 @@ package io.sundr.model;
 
 import java.lang.Boolean;
 import java.lang.Object;
+import java.lang.String;
+import java.lang.SuppressWarnings;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.sundr.builder.BaseFluent;
 
+/**
+ * Generated
+ */
+@SuppressWarnings(value = "unchecked")
 public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> extends BaseFluent<A>
     implements AttributeSupportFluent<A> {
-
-  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
-
   public AttributeSupportFluentImpl() {
   }
 
-  public AttributeSupportFluentImpl(AttributeSupport instance) {
+  public AttributeSupportFluentImpl(io.sundr.model.AttributeSupport instance) {
     this.withAttributes(instance.getAttributes());
   }
 
-  public A addToAttributes(AttributeKey key, Object value) {
+  private Map<AttributeKey, Object> attributes = new LinkedHashMap<io.sundr.model.AttributeKey, java.lang.Object>();
+
+  public A addToAttributes(io.sundr.model.AttributeKey key, java.lang.Object value) {
     if (this.attributes == null && key != null && value != null) {
-      this.attributes = new LinkedHashMap<AttributeKey, Object>();
+      this.attributes = new java.util.LinkedHashMap();
     }
     if (key != null && value != null) {
       this.attributes.put(key, value);
@@ -29,9 +34,9 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public A addToAttributes(Map<AttributeKey, Object> map) {
+  public A addToAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> map) {
     if (this.attributes == null && map != null) {
-      this.attributes = new LinkedHashMap<AttributeKey, Object>();
+      this.attributes = new java.util.LinkedHashMap();
     }
     if (map != null) {
       this.attributes.putAll(map);
@@ -39,7 +44,7 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public A removeFromAttributes(AttributeKey key) {
+  public A removeFromAttributes(io.sundr.model.AttributeKey key) {
     if (this.attributes == null) {
       return (A) this;
     }
@@ -49,7 +54,7 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public A removeFromAttributes(Map<AttributeKey, Object> map) {
+  public A removeFromAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> map) {
     if (this.attributes == null) {
       return (A) this;
     }
@@ -63,15 +68,15 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public Map<AttributeKey, Object> getAttributes() {
+  public java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> getAttributes() {
     return this.attributes;
   }
 
-  public <K extends Object, V extends Object> A withAttributes(Map<AttributeKey, Object> attributes) {
+  public <K, V> A withAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> attributes) {
     if (attributes == null) {
       this.attributes = null;
     } else {
-      this.attributes = new LinkedHashMap<AttributeKey, Object>(attributes);
+      this.attributes = new java.util.LinkedHashMap(attributes);
     }
     return (A) this;
   }
@@ -80,7 +85,7 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return this.attributes != null;
   }
 
-  public boolean equals(Object o) {
+  public boolean equals(java.lang.Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
@@ -93,6 +98,17 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
 
   public int hashCode() {
     return java.util.Objects.hash(attributes, super.hashCode());
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (attributes != null && !attributes.isEmpty()) {
+      sb.append("attributes:");
+      sb.append(attributes);
+    }
+    sb.append("}");
+    return sb.toString();
   }
 
 }

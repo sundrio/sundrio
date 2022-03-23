@@ -5,13 +5,10 @@ import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class BlockBuilder extends BlockFluentImpl<BlockBuilder> implements VisitableBuilder<Block, BlockBuilder> {
-
-  BlockFluent<?> fluent;
-  Boolean validationEnabled;
-
+public class BlockBuilder extends BlockFluentImpl<BlockBuilder>
+    implements VisitableBuilder<io.sundr.model.Block, BlockBuilder> {
   public BlockBuilder() {
-    this(true);
+    this(false);
   }
 
   public BlockBuilder(Boolean validationEnabled) {
@@ -20,35 +17,39 @@ public class BlockBuilder extends BlockFluentImpl<BlockBuilder> implements Visit
   }
 
   public BlockBuilder(BlockFluent<?> fluent) {
-    this(fluent, true);
+    this(fluent, false);
   }
 
-  public BlockBuilder(BlockFluent<?> fluent, Boolean validationEnabled) {
+  public BlockBuilder(io.sundr.model.BlockFluent<?> fluent, java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public BlockBuilder(BlockFluent<?> fluent, Block instance) {
-    this(fluent, instance, true);
+  public BlockBuilder(io.sundr.model.BlockFluent<?> fluent, io.sundr.model.Block instance) {
+    this(fluent, instance, false);
   }
 
-  public BlockBuilder(BlockFluent<?> fluent, Block instance, Boolean validationEnabled) {
+  public BlockBuilder(io.sundr.model.BlockFluent<?> fluent, io.sundr.model.Block instance,
+      java.lang.Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withStatements(instance.getStatements());
     this.validationEnabled = validationEnabled;
   }
 
-  public BlockBuilder(Block instance) {
-    this(instance, true);
+  public BlockBuilder(io.sundr.model.Block instance) {
+    this(instance, false);
   }
 
-  public BlockBuilder(Block instance, Boolean validationEnabled) {
+  public BlockBuilder(io.sundr.model.Block instance, java.lang.Boolean validationEnabled) {
     this.fluent = this;
     this.withStatements(instance.getStatements());
     this.validationEnabled = validationEnabled;
   }
 
-  public Block build() {
+  io.sundr.model.BlockFluent<?> fluent;
+  java.lang.Boolean validationEnabled;
+
+  public io.sundr.model.Block build() {
     Block buildable = new Block(fluent.getStatements());
     return buildable;
   }

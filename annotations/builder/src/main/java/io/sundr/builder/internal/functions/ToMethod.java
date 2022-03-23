@@ -895,7 +895,7 @@ class ToMethod {
           if (isBuildable(unwrapped)) {
             if (Types.isConcrete(unwrapped) && !property.hasAttribute(DESCENDANT_OF)) {
               TypeRef builder = BUILDER.apply(GetDefinition.of((ClassRef) unwrapped)).toInternalReference();
-              alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
+              alsoImport.add(new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").build());
               alsoImport.add((ClassRef) builderType);
               methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                   .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType).withParameters(parameters)
@@ -917,7 +917,7 @@ class ToMethod {
                 builderType = VISITABLE_BUILDER.apply(property.getAttribute(DESCENDANT_OF).getTypeRef());
               }
 
-              alsoImport.add(new ClassRefBuilder().withNewFullyQualifiedName("java.util.Iterator").build());
+              alsoImport.add(new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").build());
               alsoImport.add((ClassRef) builderType);
               methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
                   .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType).withParameters(parameters)

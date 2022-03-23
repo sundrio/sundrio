@@ -2,54 +2,35 @@ package io.sundr.model;
 
 import java.lang.Boolean;
 import java.lang.Deprecated;
+import java.lang.Integer;
 import java.lang.String;
-import java.lang.StringBuffer;
-import java.lang.StringBuilder;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
 
+/**
+ * Generated
+ */
 public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends AttributeSupportFluent<A> {
-
   public String getName();
 
-  public A withName(String name);
+  public A withName(java.lang.String name);
 
   public Boolean hasName();
 
-  public A withNewName(StringBuilder arg1);
+  public A addToBounds(Integer index, ClassRef item);
 
-  public A withNewName(int[] arg1, int arg2, int arg3);
+  public A setToBounds(java.lang.Integer index, io.sundr.model.ClassRef item);
 
-  public A withNewName(char[] arg1);
+  public A addToBounds(io.sundr.model.ClassRef... items);
 
-  public A withNewName(StringBuffer arg1);
+  public A addAllToBounds(Collection<io.sundr.model.ClassRef> items);
 
-  public A withNewName(byte[] arg1, int arg2);
+  public A removeFromBounds(io.sundr.model.ClassRef... items);
 
-  public A withNewName(byte[] arg1);
-
-  public A withNewName(char[] arg1, int arg2, int arg3);
-
-  public A withNewName(byte[] arg1, int arg2, int arg3);
-
-  public A withNewName(byte[] arg1, int arg2, int arg3, int arg4);
-
-  public A withNewName(String arg1);
-
-  public A addToBounds(int index, ClassRef item);
-
-  public A setToBounds(int index, ClassRef item);
-
-  public A addToBounds(ClassRef... items);
-
-  public A addAllToBounds(Collection<ClassRef> items);
-
-  public A removeFromBounds(ClassRef... items);
-
-  public A removeAllFromBounds(Collection<ClassRef> items);
+  public A removeAllFromBounds(java.util.Collection<io.sundr.model.ClassRef> items);
 
   public A removeMatchingFromBounds(Predicate<ClassRefBuilder> predicate);
 
@@ -59,45 +40,47 @@ public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Att
    * @return The buildable object.
    */
   @Deprecated
-  public List<ClassRef> getBounds();
+  public List<io.sundr.model.ClassRef> getBounds();
 
-  public List<ClassRef> buildBounds();
+  public java.util.List<io.sundr.model.ClassRef> buildBounds();
 
-  public ClassRef buildBound(int index);
+  public io.sundr.model.ClassRef buildBound(java.lang.Integer index);
 
-  public ClassRef buildFirstBound();
+  public io.sundr.model.ClassRef buildFirstBound();
 
-  public ClassRef buildLastBound();
+  public io.sundr.model.ClassRef buildLastBound();
 
-  public ClassRef buildMatchingBound(Predicate<ClassRefBuilder> predicate);
+  public io.sundr.model.ClassRef buildMatchingBound(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate);
 
-  public Boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate);
+  public java.lang.Boolean hasMatchingBound(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate);
 
-  public A withBounds(List<ClassRef> bounds);
+  public A withBounds(java.util.List<io.sundr.model.ClassRef> bounds);
 
-  public A withBounds(ClassRef... bounds);
+  public A withBounds(io.sundr.model.ClassRef... bounds);
 
-  public Boolean hasBounds();
+  public java.lang.Boolean hasBounds();
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> addNewBound();
+  public TypeParamDefFluent.BoundsNested<A> addNewBound();
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> addNewBoundLike(ClassRef item);
+  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> addNewBoundLike(io.sundr.model.ClassRef item);
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> setNewBoundLike(int index, ClassRef item);
+  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> setNewBoundLike(java.lang.Integer index,
+      io.sundr.model.ClassRef item);
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editBound(int index);
+  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editBound(java.lang.Integer index);
 
   public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editFirstBound();
 
   public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editLastBound();
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate);
+  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editMatchingBound(
+      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate);
 
-  public interface BoundsNested<N> extends Nested<N>, ClassRefFluent<io.sundr.model.TypeParamDefFluent.BoundsNested<N>> {
-
+  public interface BoundsNested<N> extends Nested<N>, ClassRefFluent<TypeParamDefFluent.BoundsNested<N>> {
     public N and();
 
     public N endBound();
+
   }
 
 }
