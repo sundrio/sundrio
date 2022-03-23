@@ -21,6 +21,7 @@ import static io.sundr.model.utils.Types.BOOLEAN_REF;
 import static io.sundr.model.utils.Types.CLASS;
 import static io.sundr.model.utils.Types.CLASS_REF_NO_ARG;
 import static io.sundr.model.utils.Types.OPTIONAL;
+import static io.sundr.model.utils.Types.PRIMITIVE_INT_REF;
 import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.TYPE;
 import static io.sundr.model.utils.Types.modifiersToInt;
@@ -151,6 +152,12 @@ public class BuilderContext {
         .withTypeRef(T.toReference())
         .endArgument()
         .withReturnType(new VoidRef())
+        .endMethod()
+
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withName("order")
+        .withReturnType(PRIMITIVE_INT_REF)
         .endMethod()
 
         //default void visit(List<Object> path, T element) {
