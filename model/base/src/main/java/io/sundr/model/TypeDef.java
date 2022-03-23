@@ -462,18 +462,18 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
         sb.append(constructors.render(this));
         sb.append(NEWLINE).append(indent);
       }
-
-      for (Property field : getProperties()) {
-        sb.append(field.renderComments(indent));
-        sb.append(field.renderAnnotations(indent));
-        sb.append(field.render(this));
-        if (field.getAttribute(INIT) != null) {
-          sb.append(" = ").append(field.getDefaultValue());
-        }
-
-        sb.append(SEMICOLN).append(NEWLINE).append(indent);
-      }
     }
+
+    getProperties().stream().filter(p -> kind != Kind.INTERFACE || p.isStatic()).forEach(field -> {
+      sb.append(field.renderComments(indent));
+      sb.append(field.renderAnnotations(indent));
+      sb.append(field.render(this));
+      if (field.getAttribute(INIT) != null) {
+        sb.append(" = ").append(field.getDefaultValue());
+      }
+
+      sb.append(SEMICOLN).append(NEWLINE).append(indent);
+    });
 
     for (Method method : getMethods()) {
       sb.append(method.renderComments(indent));
