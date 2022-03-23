@@ -91,9 +91,9 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
   public F accept(List<Object> path, Visitor... visitors) {
     Arrays.stream(visitors)
         .map(v -> VisitorListener.wrap(v))
-        .filter(v -> v.canVisit(this)).sorted((l, r) -> r.order() - l.order())
+        .filter(v -> ((Visitor) v).canVisit(this)).sorted((l, r) -> ((Visitor) r).order() - ((Visitor) l).order())
         .forEach(v -> {
-          v.visit(path, this);
+          ((Visitor) v).visit(path, this);
         });
 
     List<Object> copyOfPath = path != null ? new ArrayList(path) : new ArrayList<>();
