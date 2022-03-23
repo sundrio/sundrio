@@ -120,7 +120,7 @@ public class BuilderUtils {
       //We cannnot generate concrete classes for interfaces that define non getter methods.
       return !typeDef.getMethods().stream().anyMatch(m -> !Getter.is(m) && !m.isDefaultMethod());
     }
-    return true;
+    return false;
   }
 
   public static boolean canBeBuilt(TypeDef typeDef) {
@@ -134,17 +134,23 @@ public class BuilderUtils {
       //We cannnot generate concrete classes for interfaces that define non getter methods.
       return !typeDef.getMethods().stream().anyMatch(m -> !Getter.is(m) && !m.isDefaultMethod());
     }
-    return true;
+    return false;
+  }
+
+  public static boolean isRegisteredAsBuildable(TypeRef typeRef) {
+    return BuilderContextManager.getContext().getBuildableRepository().isBuildable(typeRef);
   }
 
   public static boolean isBuildable(TypeRef typeRef) {
-    BuildableRepository repository = BuilderContextManager.getContext().getBuildableRepository();
-    return repository.isBuildable(typeRef) && canBeBuilt(typeRef);
+    return isRegisteredAsBuildable(typeRef) && canBeBuilt(typeRef);
+  }
+
+  public static boolean isRegisteredAsBuildable(TypeDef typeDef) {
+    return BuilderContextManager.getContext().getBuildableRepository().isBuildable(typeDef);
   }
 
   public static boolean isBuildable(TypeDef typeDef) {
-    BuildableRepository repository = BuilderContextManager.getContext().getBuildableRepository();
-    return repository.isBuildable(typeDef) && canBeBuilt(typeDef);
+    return isRegisteredAsBuildable(typeDef) && canBeBuilt(typeDef);
   }
 
   /**
