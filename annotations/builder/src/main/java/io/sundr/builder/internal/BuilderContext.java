@@ -17,10 +17,13 @@
 package io.sundr.builder.internal;
 
 import static io.sundr.builder.Constants.INLINEABLE;
+import static io.sundr.model.utils.Collections.COLLECTION;
+import static io.sundr.model.utils.Collections.SET;
 import static io.sundr.model.utils.Types.BOOLEAN_REF;
 import static io.sundr.model.utils.Types.CLASS;
 import static io.sundr.model.utils.Types.CLASS_REF_NO_ARG;
 import static io.sundr.model.utils.Types.OPTIONAL;
+import static io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF;
 import static io.sundr.model.utils.Types.PRIMITIVE_INT_REF;
 import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.TYPE;
@@ -30,6 +33,7 @@ import static io.sundr.model.utils.Types.newTypeParamRef;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Spliterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import javax.lang.model.element.Modifier;
@@ -67,6 +71,8 @@ public class BuilderContext {
   private final TypeDef visitorInterface;
   private final TypeDef typedVisitorInterface;
   private final TypeDef pathAwareVisitorClass;
+  private final TypeDef visitorListenerInterface;
+  private final TypeDef visitorWiretapClass;
   private final TypeDef fluentInterface;
   private final TypeDef builderInterface;
   private final TypeDef nestedInterface;
@@ -375,6 +381,237 @@ public class BuilderContext {
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .accept(new ApplyMethodBlockFromResources("PathAwareTypedVisitor", "io/sundr/builder/PathAwareTypedVisitor.java"))
         .accept(new ApplyImportsFromResources("io/sundr/builder/PathAwareTypedVisitor.java"))
+        .build();
+
+    ClassRef visitorListenerSelfRef = ClassRef.forName(builderPackage + ".VisitorListener");
+    visitorListenerInterface = new TypeDefBuilder()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+
+        .withKind(Kind.INTERFACE)
+        .withPackageName("io.sundr.builder")
+        .withName("VisitorListener")
+
+        .addNewProperty()
+        .withName("loaded")
+        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withTypeRef(ClassRef.forName(AtomicBoolean.class.getCanonicalName()))
+        .addToAttributes(Attributeable.INIT, "new AtomicBoolean()")
+        .endProperty()
+
+        .addNewProperty()
+        .withName("listeners")
+        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withTypeRef(SET.toReference(visitorListenerSelfRef))
+        .addToAttributes(Attributeable.INIT, "new HashSet<>()")
+        .endProperty()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withName("getListeners")
+        .withReturnType(SET.toReference(visitorListenerSelfRef))
+        .endMethod()
+
+        //wrap
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withParameters(T)
+        .withName("wrap")
+        .withReturnType(visitorInterface.toReference(T.toReference()))
+        .addNewArgument()
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("visitor")
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withName("register")
+        .withReturnType(new VoidRef())
+        .addNewArgument()
+        .withTypeRef(visitorListenerSelfRef)
+        .withName("listener")
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withName("unregister")
+        .withReturnType(new VoidRef())
+        .addNewArgument()
+        .withTypeRef(visitorListenerSelfRef)
+        .withName("listener")
+        .endArgument()
+        .endMethod()
+
+        //beforeVisit
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withParameters(T)
+        .withName("beforeVisit")
+        .withReturnType(new VoidRef())
+        .addNewArgument()
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("v")
+        .endArgument()
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .endMethod()
+
+        //afterVisit
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withParameters(T)
+        .withName("afterVisit")
+        .withReturnType(new VoidRef())
+        .addNewArgument()
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("v")
+        .endArgument()
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .endMethod()
+
+        //onCheck
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withParameters(V, T)
+        .withName("onCheck")
+        .withReturnType(new VoidRef())
+        .addNewArgument()
+        .withTypeRef(visitorInterface.toReference(V.toReference()))
+        .withName("v")
+        .endArgument()
+        .addNewArgument()
+        .withName("canVisit")
+        .withTypeRef(PRIMITIVE_BOOLEAN_REF)
+        .endArgument()
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .endMethod()
+
+        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("VisitorListener", "io/sundr/builder/VisitorListener.java", true))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/VisitorListener.java"))
+        .build();
+
+    visitorWiretapClass = new TypeDefBuilder()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
+
+        .withKind(Kind.CLASS)
+        .withPackageName("io.sundr.builder")
+        .withName("VisitorWiretap")
+        .withParameters(T)
+        .addToImplementsList(visitorInterface.toReference(T.toReference()))
+
+        .addNewProperty()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withTypeRef(COLLECTION.toReference(visitorListenerInterface.toReference()))
+        .withName("listeners")
+        .endProperty()
+
+        .addNewProperty()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("delegate")
+        .endProperty()
+
+        .addNewConstructor()
+        .withModifiers(modifiersToInt(Modifier.PRIVATE))
+
+        .addNewArgument()
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("delegate")
+        .endArgument()
+
+        .addNewArgument()
+        .withTypeRef(COLLECTION.toReference(visitorListenerInterface.toReference()))
+        .withName("listeners")
+        .endArgument()
+
+        .endConstructor()
+
+        .addNewMethod()
+        .withParameters(T)
+        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withName("create")
+        .withReturnType(new ClassRefBuilder().withFullyQualifiedName(builderPackage + ".VisitorWiretap")
+            .withArguments(T.toReference()).build())
+        .addNewArgument()
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("visitor")
+        .endArgument()
+        .addNewArgument()
+        .withTypeRef(COLLECTION.toReference(visitorListenerInterface.toReference()))
+        .withName("listeners")
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withName("getType")
+        .withReturnType(CLASS.toReference(T.toReference()))
+        .endMethod()
+
+        //visit
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withName("visit")
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .withReturnType(new VoidRef())
+        .endMethod()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withName("order")
+        .withReturnType(PRIMITIVE_INT_REF)
+        .endMethod()
+
+        //default void visit(List<Object> path, T element) {
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withName("visit")
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .withReturnType(new VoidRef())
+        .endMethod()
+
+        .addNewMethod()
+        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withParameters(F)
+        .withName("canVisit")
+        .withReturnType(BOOLEAN_REF)
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(F.toReference())
+        .endArgument()
+        .endMethod()
+
+        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("VisitorWiretap", "io/sundr/builder/VisitorWiretap.java", true))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/VisitorWiretap.java"))
         .build();
 
     visitableInterface = new TypeDefBuilder()
@@ -861,6 +1098,14 @@ public class BuilderContext {
 
   public TypeDef getPathAwareVisitorClass() {
     return pathAwareVisitorClass;
+  }
+
+  public TypeDef getVisitorListenerInterface() {
+    return visitorListenerInterface;
+  }
+
+  public TypeDef getVisitorWiretapClass() {
+    return visitorWiretapClass;
   }
 
   public TypeDef getInlineableBase() {
