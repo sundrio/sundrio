@@ -21,9 +21,6 @@ import static io.sundr.model.Node.CP;
 import static io.sundr.model.Node.OB;
 import static io.sundr.model.Node.OP;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -38,14 +35,6 @@ import io.sundr.utils.Strings;
 
 public class Parsers {
 
-  public static List<ClassRef> parseImports(Path path) {
-    try {
-      return parseImports(Files.readString(path));
-    } catch (IOException e) {
-      throw SundrException.launderThrowable(e);
-    }
-  }
-
   public static List<ClassRef> parseImports(String content) {
     return Arrays.stream(content.trim().split("(\\r\\n)|(\\n)"))
         .filter(l -> l.matches("^\\s*import .*;\\s*$"))
@@ -54,14 +43,6 @@ public class Parsers {
         .map(String::trim)
         .map(ClassRef::forName)
         .collect(Collectors.toList());
-  }
-
-  public static String parseMethodBody(Path path, Method method) {
-    try {
-      return parseMethodBody(Files.readString(path), method);
-    } catch (Exception e) {
-      throw SundrException.launderThrowable(e);
-    }
   }
 
   public static String parseMethodBody(String content, Method method) {
