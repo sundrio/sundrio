@@ -19,6 +19,6 @@ package io.sundr.builder;
 public abstract class TypedVisitor<V> implements Visitor<V> {
 
   public Class<V> getType() {
-    return (Class<V>) Visitor.getTypeArguments(TypedVisitor.class, getClass()).get(0);
+    return (Class<V>) Visitors.getTypeArguments(TypedVisitor.class, getClass()).get(0);
   }
 }
