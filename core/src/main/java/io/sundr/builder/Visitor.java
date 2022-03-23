@@ -81,6 +81,10 @@ public interface Visitor<T> {
     return false;
   }
 
+  default int order() {
+    return 0;
+  }
+
   /**
    * Get the underlying class for a type, or null if the type is a variable type.
    * 
