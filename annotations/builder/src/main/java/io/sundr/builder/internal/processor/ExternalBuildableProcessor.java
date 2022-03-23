@@ -22,14 +22,13 @@ import static io.sundr.builder.Constants.IGNORE_PROPERTIES;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.Constants.VALIDATION_ENABLED;
+import static io.sundr.utils.Patterns.isExcluded;
+import static io.sundr.utils.Patterns.isIncluded;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
@@ -51,6 +50,8 @@ import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.codegen.api.CodeGenerator;
+import io.sundr.codegen.apt.TypeDefAptOutput;
 import io.sundr.model.Kind;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
@@ -65,6 +66,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
     Types types = processingEnv.getTypeUtils();
     Filer filer = processingEnv.getFiler();
 
+    boolean skipExistingTypes = true;
     BuilderContext ctx = null;
     Set<TypeDef> buildables = new HashSet<>();
     //First pass register all externals
@@ -77,12 +79,20 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         ctx = BuilderContextManager.create(elements, types, generated.validationEnabled(), generated.generateBuilderPackage(),
             generated.builderPackage());
 
+        skipExistingTypes = skipExistingTypes && generated.skipExistingTypes();
         for (String name : generated.value()) {
           PackageElement packageElement = elements.getPackageElement(name);
           List<TypeElement> typeElements = new ArrayList<>();
 
           if (packageElement != null) {
             for (Element e : packageElement.getEnclosedElements()) {
+              if (!isIncluded(e.toString(), generated.includes())) {
+                continue;
+              }
+              if (isExcluded(e.toString(), generated.excludes())) {
+                continue;
+              }
+
               if (e instanceof TypeElement) {
                 typeElements.add((TypeElement) e);
               }
@@ -207,6 +217,13 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
       return true;
     }
 
+    if (!skipExistingTypes) {
+      generator = CodeGenerator.newGenerator(TypeDef.class)
+          .withOutput(new TypeDefAptOutput(processingEnv.getFiler()))
+          .skipping(s -> false)
+          .build();
+    }
+
     generateLocalDependenciesIfNeeded();
     ctx.getDefinitionRepository().updateReferenceMap();
     generateBuildables(ctx, buildables);
@@ -215,15 +232,4 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
         String.format("%-120s", "100%: Builder generation complete."));
     return true;
   }
-
-  private boolean isIncluded(String fqcn, String[] includes) {
-    return includes.length == 0 || Arrays.stream(includes).map(Pattern::compile).map(p -> p.matcher(fqcn))
-        .filter(Matcher::matches).findAny().isPresent();
-  }
-
-  private boolean isExcluded(String fqcn, String[] excludes) {
-    return excludes.length != 0 &&
-        Arrays.stream(excludes).map(Pattern::compile).map(p -> p.matcher(fqcn)).filter(Matcher::matches).findAny().isPresent();
-  }
-
 }
