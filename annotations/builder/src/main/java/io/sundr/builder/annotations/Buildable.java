@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
 import io.sundr.builder.Constants;
 
 /**
- * An annotation that triggers the generation of a {@link Builder}.
+ * An annotation that triggers the generation of a {@link io.sundr.builder.Builder}.
  * The annotation may be added to either the type or constructor.
  *
  * When added to a constructor all fields of the constructor will be exposed to the builder.

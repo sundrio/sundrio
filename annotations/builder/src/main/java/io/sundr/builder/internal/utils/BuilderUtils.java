@@ -716,6 +716,7 @@ public class BuilderUtils {
   /**
    * Get all the enclosingTypes.
    * 
+   * @param typeDef the typeDef that we check for enclosed buildables.
    * @return all the enclosingTypes.
    */
   public static Map<String, ClassRef> enclosedBuildables(TypeDef typeDef) {
