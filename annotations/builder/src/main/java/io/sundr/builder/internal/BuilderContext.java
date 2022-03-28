@@ -1,6 +1,6 @@
 /*
  * Copyright 2015 The original authors.
-*
+ *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -27,7 +27,6 @@ import static io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF;
 import static io.sundr.model.utils.Types.PRIMITIVE_INT_REF;
 import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.TYPE;
-import static io.sundr.model.utils.Types.modifiersToInt;
 import static io.sundr.model.utils.Types.newTypeParamRef;
 
 import java.lang.reflect.Method;
@@ -36,7 +35,6 @@ import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -125,7 +123,7 @@ public class BuilderContext {
     TypeDef functionalInterfaceType = TypeDef.forName(FunctionalInterface.class.getName());
 
     builderInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
         .withName("Builder")
@@ -141,17 +139,17 @@ public class BuilderContext {
         .build();
 
     visitorsClass = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
+        .withNewModifiers().withPublic().withFinal().endModifiers()
 
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("Visitors")
         .addNewConstructor()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE))
+        .withNewModifiers().withPrivate().endModifiers()
         .endConstructor()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PROTECTED, Modifier.STATIC))
+        .withNewModifiers().withProtected().withStatic().endModifiers()
         .withParameters(T)
         .withName("getTypeArguments")
         .withReturnType(Collections.LIST.toReference(CLASS_REF_NO_ARG))
@@ -167,7 +165,7 @@ public class BuilderContext {
 
         // getRawName
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withNewModifiers().withPrivate().withStatic().endModifiers()
         .withName("getRawName")
         .withReturnType(STRING_REF)
         .addNewArgument()
@@ -178,7 +176,7 @@ public class BuilderContext {
 
         // getClass
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withNewModifiers().withPrivate().withStatic().endModifiers()
         .withName("getClass")
         .withReturnType(CLASS.toReference(new WildcardRef()))
         .addNewArgument()
@@ -189,7 +187,7 @@ public class BuilderContext {
 
         // getMatchingInterface
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withNewModifiers().withPrivate().withStatic().endModifiers()
         .withParameters(T)
         .withName("getMatchingInterface")
         .withReturnType(OPTIONAL.toReference(TYPE.toInternalReference()))
@@ -209,7 +207,7 @@ public class BuilderContext {
         .build();
 
     visitorInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .addNewAnnotation()
         .withClassRef(functionalInterfaceType.toInternalReference())
         .endAnnotation()
@@ -221,7 +219,7 @@ public class BuilderContext {
 
         .addNewMethod()
         .withDefaultMethod(true)
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("getType")
         .withReturnType(CLASS.toReference(T.toReference()))
         .endMethod()
@@ -259,7 +257,7 @@ public class BuilderContext {
 
         .addNewMethod()
         .withDefaultMethod(true)
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(F)
         .withName("canVisit")
         .withReturnType(BOOLEAN_REF)
@@ -271,7 +269,7 @@ public class BuilderContext {
 
         .addNewMethod()
         .withDefaultMethod(true)
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(F)
         .withName("hasVisitMethodMatching")
         .withReturnType(BOOLEAN_REF)
@@ -287,7 +285,7 @@ public class BuilderContext {
         .build();
 
     typedVisitorInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.ABSTRACT))
+        .withNewModifiers().withPublic().withAbstract().endModifiers()
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("TypedVisitor")
@@ -295,7 +293,7 @@ public class BuilderContext {
         .withImplementsList(visitorInterface.toReference(V.toReference()))
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("getType")
         .withReturnType(CLASS.toReference(V.toReference()))
         .endMethod()
@@ -305,7 +303,7 @@ public class BuilderContext {
         .build();
 
     pathAwareVisitorClass = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("PathAwareTypedVisitor")
@@ -313,13 +311,13 @@ public class BuilderContext {
         .withExtendsList(typedVisitorInterface.toReference(V.toReference()))
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
         .withName("type")
         .withTypeRef(CLASS.toReference(V.toReference()))
         .endProperty()
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
         .withName("parentType")
         .withTypeRef(CLASS.toReference(P.toReference()))
         .endProperty()
@@ -328,7 +326,7 @@ public class BuilderContext {
         .endConstructor()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("visit")
         .addNewArgument()
         .withName("element")
@@ -338,7 +336,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("visit")
         .addNewArgument()
         .withName("path")
@@ -352,7 +350,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(F)
         .withName("canVisit")
         .withReturnType(BOOLEAN_REF)
@@ -363,7 +361,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("getParent")
         .withReturnType(P.toReference())
         .addNewArgument()
@@ -373,7 +371,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("getParentType")
         .withReturnType(CLASS.toReference(P.toReference()))
         .endMethod()
@@ -385,7 +383,7 @@ public class BuilderContext {
 
     ClassRef visitorListenerSelfRef = ClassRef.forName(builderPackage + ".VisitorListener");
     visitorListenerInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
 
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
@@ -393,27 +391,28 @@ public class BuilderContext {
 
         .addNewProperty()
         .withName("loaded")
-        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withNewModifiers().withStatic().endModifiers()
         .withTypeRef(ClassRef.forName(AtomicBoolean.class.getCanonicalName()))
         .addToAttributes(Attributeable.INIT, "new AtomicBoolean()")
         .endProperty()
 
         .addNewProperty()
         .withName("listeners")
-        .withModifiers(modifiersToInt(Modifier.STATIC))
+        .withNewModifiers().withStatic().endModifiers()
         .withTypeRef(SET.toReference(visitorListenerSelfRef))
         .addToAttributes(Attributeable.INIT, "new HashSet<>()")
         .endProperty()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("getListeners")
         .withReturnType(SET.toReference(visitorListenerSelfRef))
         .endMethod()
 
         //wrap
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withParameters(T)
         .withName("wrap")
         .withReturnType(visitorInterface.toReference(T.toReference()))
@@ -424,7 +423,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("register")
         .withReturnType(new VoidRef())
         .addNewArgument()
@@ -433,8 +432,8 @@ public class BuilderContext {
         .endArgument()
         .endMethod()
 
-        .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .addNewMethod().withNewModifiers().withPublic().withStatic().endModifiers()
+
         .withName("unregister")
         .withReturnType(new VoidRef())
         .addNewArgument()
@@ -509,7 +508,8 @@ public class BuilderContext {
         .build();
 
     visitorWiretapClass = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
+
+        .withNewModifiers().withPublic().withFinal().endModifiers()
 
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
@@ -518,19 +518,19 @@ public class BuilderContext {
         .addToImplementsList(visitorInterface.toReference(T.toReference()))
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
         .withTypeRef(COLLECTION.toReference(visitorListenerInterface.toReference()))
         .withName("listeners")
         .endProperty()
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
         .withTypeRef(visitorInterface.toReference(T.toReference()))
         .withName("delegate")
         .endProperty()
 
         .addNewConstructor()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE))
+        .withNewModifiers().withPrivate().endModifiers()
 
         .addNewArgument()
         .withTypeRef(visitorInterface.toReference(T.toReference()))
@@ -546,7 +546,8 @@ public class BuilderContext {
 
         .addNewMethod()
         .withParameters(T)
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("create")
         .withReturnType(new ClassRefBuilder().withFullyQualifiedName(builderPackage + ".VisitorWiretap")
             .withArguments(T.toReference()).build())
@@ -561,14 +562,14 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("getType")
         .withReturnType(CLASS.toReference(T.toReference()))
         .endMethod()
 
         //visit
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("visit")
         .addNewArgument()
         .withName("target")
@@ -578,14 +579,14 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("order")
         .withReturnType(PRIMITIVE_INT_REF)
         .endMethod()
 
         //default void visit(List<Object> path, T element) {
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("visit")
         .addNewArgument()
         .withName("path")
@@ -599,7 +600,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(F)
         .withName("canVisit")
         .withReturnType(BOOLEAN_REF)
@@ -615,7 +616,8 @@ public class BuilderContext {
         .build();
 
     visitableInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
         .withName("Visitable")
@@ -681,7 +683,7 @@ public class BuilderContext {
         .build();
 
     visitableBuilderInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
         .withName("VisitableBuilder")
@@ -694,7 +696,7 @@ public class BuilderContext {
         .build();
 
     fluentInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
         .withName("Fluent")
@@ -707,7 +709,7 @@ public class BuilderContext {
         .build();
 
     nestedInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
         .withName("Nested")
@@ -720,7 +722,7 @@ public class BuilderContext {
         .build();
 
     editableInterface = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.INTERFACE)
         .withPackageName("io.sundr.builder")
         .withName("Editable")
@@ -733,7 +735,7 @@ public class BuilderContext {
         .build();
 
     inlineableBase = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .addNewAnnotation()
         .withClassRef(functionalInterfaceType.toInternalReference())
         .endAnnotation()
@@ -749,7 +751,7 @@ public class BuilderContext {
         .build();
 
     visitableMapClass = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("VisitableMap")
@@ -758,7 +760,7 @@ public class BuilderContext {
         .withImplementsList(Collections.ITERABLE.toReference(visitableInterface.toReference()))
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("get")
         .withReturnType(Collections.LIST.toReference(visitableInterface.toReference()))
         .addNewArgument()
@@ -768,19 +770,19 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("aggregate")
         .withReturnType(Collections.LIST.toReference(visitableInterface.toReference()))
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("iterator")
         .withReturnType(Collections.ITERATOR.toReference(visitableInterface.toReference()))
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("forEach")
         .withReturnType(new VoidRef())
         .addNewArgument()
@@ -791,7 +793,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("spliterator")
         .withReturnType(TypeDef.forName(Spliterator.class.getName()).toReference(visitableInterface.toReference()))
         .endMethod()
@@ -802,7 +804,7 @@ public class BuilderContext {
         .build();
 
     baseFluentClass = new TypeDefBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.CLASS)
         .withPackageName("io.sundr.builder")
         .withName("BaseFluent")
@@ -813,21 +815,21 @@ public class BuilderContext {
         .withImplementsList(fluentInterface.toReference(F.toReference()), visitableInterface.toReference(F.toReference()))
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL))
+        .withNewModifiers().withPublic().withStatic().withFinal().endModifiers()
         .withTypeRef(STRING_REF)
         .withName("VISIT")
         .addToAttributes(Attributeable.INIT, "visit")
         .endProperty()
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
+        .withNewModifiers().withPublic().withFinal().endModifiers()
         .withTypeRef(visitableMapClass.toReference())
         .withName("_visitables")
         .addToAttributes(Attributeable.INIT, "new VisitableMap()")
         .endProperty()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("builderOf")
         .withParameters(T)
         .withReturnType(visitableBuilderInterface.toReference(T.toReference(), new WildcardRef()))
@@ -838,7 +840,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("build")
         .withParameters(T)
         .withReturnType(Collections.LIST.toReference(T.toReference()))
@@ -852,7 +854,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("build")
         .withParameters(T)
         .withReturnType(Collections.LIST.toReference(T.toReference()))
@@ -866,7 +868,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("aggregate")
         .withParameters(T)
         .withReturnType(Collections.LIST.toReference(T.toReference()))
@@ -880,7 +882,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("aggregate")
         .withParameters(T)
         .withReturnType(Collections.SET.toReference(T.toReference()))
@@ -894,7 +896,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("accept")
         .withReturnType(F.toReference())
         .addNewArgument()
@@ -905,7 +907,7 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("accept")
         .withParameters(V)
         .withReturnType(F.toReference())
@@ -915,14 +917,14 @@ public class BuilderContext {
         .endArgument()
         .addNewArgument()
         .withTypeRef(visitorInterface.toReference(V.toReference()))
-        .withModifiers(modifiersToInt(Modifier.FINAL))
+        .withNewModifiers().withFinal().endModifiers()
         .withName("visitor")
         .endArgument()
         .withVarArgPreferred(true)
         .endMethod()
 
         .addNewMethod()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("accept")
         .withReturnType(F.toReference())
         .addNewArgument()
@@ -947,36 +949,36 @@ public class BuilderContext {
         .withPackageName("io.sundr.builder.internal.resources")
         .withName("ValidationUtils")
         .withKind(Kind.CLASS)
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.FINAL))
+        .withNewModifiers().withPublic().withFinal().endModifiers()
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL))
+        .withNewModifiers().withPrivate().withStatic().withFinal().endModifiers()
         .withName("LOCK")
         .withTypeRef(TypeDef.OBJECT_REF)
         .addToAttributes(Attributeable.INIT, "new Object()")
         .endProperty()
 
         .addNewProperty()
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withNewModifiers().withPrivate().withStatic().endModifiers()
         .withName("validator")
         .withTypeRef(validatorRef)
         .endProperty()
 
         .addNewMethod()
         .withName("createValidator")
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withNewModifiers().withPrivate().withStatic().endModifiers()
         .withReturnType(validatorRef)
         .endMethod()
 
         .addNewMethod()
         .withName("getValidator")
-        .withModifiers(modifiersToInt(Modifier.PRIVATE, Modifier.STATIC))
+        .withNewModifiers().withPrivate().withStatic().endModifiers()
         .withReturnType(validatorRef)
         .endMethod()
 
         .addNewMethod()
         .withName("validate")
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withParameters(T)
         .withReturnType(new VoidRef())
         .addNewArgument()
@@ -987,7 +989,7 @@ public class BuilderContext {
 
         .addNewMethod()
         .withName("validate")
-        .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+        .withNewModifiers().withPublic().withStatic().endModifiers()
         .withParameters(T)
         .withReturnType(new VoidRef())
         .addNewArgument()

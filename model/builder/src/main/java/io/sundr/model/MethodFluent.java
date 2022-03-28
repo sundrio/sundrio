@@ -359,6 +359,10 @@ public interface MethodFluent<A extends MethodFluent<A>> extends ModifierSupport
 
   public io.sundr.model.MethodFluent.BlockNested<A> editOrNewBlockLike(io.sundr.model.Block item);
 
+  public A withVarArgPreferred();
+
+  public A withDefaultMethod();
+
   public interface AnnotationsNested<N> extends Nested<N>, AnnotationRefFluent<MethodFluent.AnnotationsNested<N>> {
     public N and();
 

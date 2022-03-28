@@ -19,9 +19,9 @@ import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.TypeRef;
-import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
 public class ExecutableElementToMethod implements Function<ExecutableElement, Method> {
@@ -53,7 +53,7 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
             .collect(Collectors.toList());
     MethodBuilder methodBuilder = new MethodBuilder().withComments(commentList)
         .withDefaultMethod(executableElement.isDefault())
-        .withModifiers(Types.modifiersToInt(executableElement.getModifiers()))
+        .withModifiers(Modifiers.from(executableElement.getModifiers()))
         .withName(executableElement.getSimpleName().toString())
         .withReturnType(referenceAdapterFunction.apply(executableElement.getReturnType()))
         .withVarArgPreferred(executableElement.isVarArgs()).withAttributes(attributes);

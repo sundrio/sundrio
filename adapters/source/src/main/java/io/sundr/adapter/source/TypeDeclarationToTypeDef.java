@@ -52,6 +52,7 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
@@ -117,7 +118,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
             TypeRef fieldDeclRef = typeToTypeRef.apply(fieldDeclaration.getType());
             TypeRef typeRef = checkAgainstTypeParamRef(fieldDeclRef, parameters);
             properties.add(new PropertyBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
-                .withModifiers(fieldDeclaration.getModifiers())
+                .withModifiers(Modifiers.from(fieldDeclaration.getModifiers()))
                 .addToAttributes(Attributeable.INIT, var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
                 .build());
           }
@@ -151,7 +152,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
             }
 
             arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
-                .withModifiers(parameter.getModifiers()).withAnnotations(paramAnnotations).build());
+                .withModifiers(Modifiers.from(parameter.getModifiers())).withAnnotations(paramAnnotations).build());
           }
 
           List<TypeParamDef> typeParamDefs = new ArrayList<TypeParamDef>();
@@ -161,7 +162,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
 
           TypeRef returnType = checkAgainstTypeParamRef(typeToTypeRef.apply(methodDeclaration.getType()), parameters);
           methods.add(new MethodBuilder().withName(methodDeclaration.getName())
-              .withDefaultMethod(methodDeclaration.isDefault()).withModifiers(methodDeclaration.getModifiers())
+              .withDefaultMethod(methodDeclaration.isDefault()).withModifiers(Modifiers.from(methodDeclaration.getModifiers()))
               .withParameters(typeParamDefs).withVarArgPreferred(preferVarArg).withReturnType(returnType)
               .withExceptions(exceptions).withArguments(arguments).withAnnotations(methodAnnotations)
               .withBlock(BLOCK.apply(methodDeclaration.getBody())).build());
@@ -186,9 +187,10 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
             }
             TypeRef typeRef = checkAgainstTypeParamRef(typeToTypeRef.apply(parameter.getType()), parameters);
             arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
-                .withModifiers(parameter.getModifiers()).withAnnotations(ctorParamAnnotations).build());
+                .withModifiers(Modifiers.from(parameter.getModifiers())).withAnnotations(ctorParamAnnotations).build());
           }
-          constructors.add(new MethodBuilder().withModifiers(constructorDeclaration.getModifiers()).withExceptions(exceptions)
+          constructors.add(new MethodBuilder().withModifiers(Modifiers.from(constructorDeclaration.getModifiers()))
+              .withExceptions(exceptions)
               .withArguments(arguments).withAnnotations(ctorAnnotations)
               .withBlock(BLOCK.apply(constructorDeclaration.getBlock())).build());
         }
@@ -196,7 +198,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
 
       return context.getDefinitionRepository()
           .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
-              .withModifiers(type.getModifiers()).withParameters(parameters).withExtendsList(extendsList)
+              .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters).withExtendsList(extendsList)
               .withImplementsList(implementsList).withProperties(properties).withMethods(methods)
               .withConstructors(constructors).withAnnotations(annotations)
               .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
@@ -216,7 +218,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           }
           TypeRef returnType = typeToTypeRef.apply(annotationMemberDeclaration.getType());
           methods.add(new MethodBuilder().withName(annotationMemberDeclaration.getName())
-              .withModifiers(annotationMemberDeclaration.getModifiers()).withReturnType(returnType).withAttributes(attributes)
+              .withModifiers(Modifiers.from(annotationMemberDeclaration.getModifiers())).withReturnType(returnType)
+              .withAttributes(attributes)
               .build());
         }
       }
@@ -228,7 +231,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
 
       return context.getDefinitionRepository()
           .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
-              .withModifiers(type.getModifiers()).withMethods(methods).withAnnotations(annotations)
+              .withModifiers(Modifiers.from(type.getModifiers())).withMethods(methods).withAnnotations(annotations)
               .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
     }
     throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");

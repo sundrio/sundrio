@@ -281,7 +281,7 @@ In our case:
                        .withConstructors(Collections.emptyList())
                        .withExtendsList(Collections.emptyList())
                        .accept(PropertyBuilder.class, property -> {
-                                property.withModifiers(Types.modifiersToInt(Modifier.PUBLIC));
+                                property.withNewModifiers().withPublic().endModifiers()
                         }).build();
   System.out.println(dto.render());
   ```

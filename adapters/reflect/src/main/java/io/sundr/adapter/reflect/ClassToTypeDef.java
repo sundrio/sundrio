@@ -44,6 +44,7 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
@@ -130,7 +131,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
         .withOuterTypeName(outerFQCN)
         .withName(item.getSimpleName())
         .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
-        .withModifiers(item.getModifiers())
+        .withModifiers(Modifiers.from(item.getModifiers()))
         .withParameters(parameters)
         .withConstructors(constructors)
         .withMethods(methods)
@@ -178,7 +179,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
       }
       properties.add(new PropertyBuilder()
           .withName(field.getName())
-          .withModifiers(field.getModifiers())
+          .withModifiers(Modifiers.from(field.getModifiers()))
           .withAnnotations(annotationRefs)
           .withTypeRef(typeToTypeRef.apply(field.getGenericType()))
           .build());
@@ -197,7 +198,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
 
       constructors.add(new MethodBuilder()
           .withName(constructor.getName())
-          .withModifiers(constructor.getModifiers())
+          .withModifiers(Modifiers.from(constructor.getModifiers()))
           .withArguments(arguments)
           .withParameters(parameters)
           .withAnnotations(annotationRefs)
@@ -224,7 +225,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
       methods.add(new MethodBuilder()
           .withName(method.getName())
           .withDefaultMethod(method.isDefault())
-          .withModifiers(method.getModifiers())
+          .withModifiers(Modifiers.from(method.getModifiers()))
           .withReturnType(typeToTypeRef.apply(method.getGenericReturnType()))
           .withArguments(arguments)
           .withParameters(parameters)

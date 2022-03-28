@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.apt.utils.Apt;
@@ -76,7 +75,6 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.functions.GetDefinition;
-import io.sundr.model.utils.Types;
 
 public final class TypeDefUtils {
 
@@ -158,7 +156,7 @@ public final class TypeDefUtils {
     }
     Method targetMethod = new MethodBuilder(sourceMethod)
         .withAnnotations(annotations)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withReturnType(paremeterType.toReference())
         .withName(methodName)
         .build();
@@ -170,7 +168,7 @@ public final class TypeDefUtils {
         .withName(interfaceName)
         .withParameters(paremeterType)
         .withKind(Kind.INTERFACE)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .addToAttributes(ORIGINAL_RETURN_TYPE, returnType)
         .addToAttributes(IS_ENTRYPOINT, isEntryPoint)
         .addToAttributes(IS_TERMINAL, isTerminal)

@@ -1303,6 +1303,14 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return sb.toString();
   }
 
+  public A withVarArgPreferred() {
+    return withVarArgPreferred(true);
+  }
+
+  public A withDefaultMethod() {
+    return withDefaultMethod(true);
+  }
+
   class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<MethodFluent.AnnotationsNested<N>>
       implements io.sundr.model.MethodFluent.AnnotationsNested<N>, Nested<N> {
     AnnotationsNestedImpl(java.lang.Integer index, AnnotationRef item) {

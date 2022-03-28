@@ -16,7 +16,6 @@
 
 package io.sundr.model;
 
-import java.lang.reflect.Modifier;
 import java.util.Map;
 
 public class ModifierSupport extends AttributeSupport {
@@ -29,46 +28,50 @@ public class ModifierSupport extends AttributeSupport {
   public static final String FINAL = "final";
   public static final String SYNCHRONIZED = "synchronized";
 
-  protected final int modifiers;
+  protected final Modifiers modifiers;
 
-  public ModifierSupport(int modifiers, Map<AttributeKey, Object> attributes) {
+  public ModifierSupport(Modifiers modifiers, Map<AttributeKey, Object> attributes) {
     super(attributes);
-    this.modifiers = modifiers;
+    this.modifiers = modifiers != null ? modifiers : Modifiers.create();
   }
 
   public boolean isPrivate() {
-    return Modifier.isPrivate(modifiers);
+    return modifiers.isPrivate();
   }
 
   public boolean isProtected() {
-    return Modifier.isProtected(modifiers);
+    return modifiers.isProtected();
   }
 
   public boolean isPublic() {
-    return Modifier.isPublic(modifiers);
+    return modifiers.isPublic();
   }
 
   public boolean isFinal() {
-    return Modifier.isFinal(modifiers);
+    return modifiers.isFinal();
   }
 
   public boolean isStatic() {
-    return Modifier.isStatic(modifiers);
+    return modifiers.isStatic();
   }
 
   public boolean isAbstract() {
-    return Modifier.isAbstract(modifiers);
+    return modifiers.isAbstract();
   }
 
   public boolean isSynchronized() {
-    return Modifier.isSynchronized(modifiers);
+    return modifiers.isSynchronized();
   }
 
   public boolean isTransient() {
-    return Modifier.isTransient(modifiers);
+    return modifiers.isTransient();
   }
 
-  public int getModifiers() {
+  public boolean isNative() {
+    return modifiers.isTransient();
+  }
+
+  public Modifiers getModifiers() {
     return modifiers;
   }
 

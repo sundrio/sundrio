@@ -19,7 +19,6 @@ package io.sundr.dsl.internal.processor;
 import static io.sundr.dsl.internal.Constants.IS_GENERATED;
 import static io.sundr.dsl.internal.Constants.ORIGINAL_REF;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.executablesToInterfaces;
-import static io.sundr.model.utils.Types.modifiersToInt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +30,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
@@ -124,7 +122,7 @@ public class DslProcessor extends AbstractCodeGeneratingProcessor {
               .withPackageName(Apt.getPackageElement(element).toString())
               .withName(targetInterface)
               .withKind(Kind.INTERFACE)
-              .withModifiers(modifiersToInt(Modifier.PUBLIC))
+              .withNewModifiers().withPublic().endModifiers()
               .withMethods(methods)
               .build());
 

@@ -27,7 +27,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstruc
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
-import static io.sundr.model.utils.Types.modifiersToInt;
 import static io.sundr.utils.Strings.loadResourceQuietly;
 import static java.util.stream.Collectors.*;
 
@@ -51,7 +50,6 @@ import java.util.stream.Collectors;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
 
 import io.sundr.adapter.api.Adapters;
 import io.sundr.adapter.apt.AptContext;
@@ -328,7 +326,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           Property arg = new PropertyBuilder()
               .withName(name)
               .withTypeRef(returnType)
-              .withModifiers(Types.modifiersToInt())
+              .withNewModifiers().endModifiers()
               .withAttributes(method.getAttributes())
               .build();
 
@@ -342,15 +340,14 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
             Property field = new PropertyBuilder()
                 .withName(Strings.toFieldName(name))
                 .withTypeRef(returnType)
-                .withModifiers(mutable ? Types.modifiersToInt(Modifier.PRIVATE)
-                    : Types.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+                .withNewModifiers().withPrivate().withFinal(!mutable).endModifiers()
                 .withAttributes(fieldAttributes)
                 .build();
 
             Method getter = new MethodBuilder(Getter.forProperty(field))
                 .withAnnotations(method.getAnnotations())
                 .withComments(method.getComments())
-                .withModifiers(modifiersToInt(Modifier.PUBLIC))
+                .withNewModifiers().withPublic().endModifiers()
                 .withNewBlock()
                 .withStatements(new StringStatement("return this." + Strings.toFieldName(name) + ";"))
                 .endBlock()
@@ -412,7 +409,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     List<Method> constructors = new ArrayList();
 
     Method emptyConstructor = new MethodBuilder()
-        .withModifiers(modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .build();
 
     //We can't just rely on what getters are present in the superclass.
@@ -425,7 +422,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
     //We don't want to annotate the POJO as @Buildable, as this is likely to re-trigger the processor multiple times.
     //The processor instead explicitly generates fluent and builder for the new pojo.
-    Method buildableConstructor = new MethodBuilder().withModifiers(modifiersToInt(Modifier.PUBLIC))
+    Method buildableConstructor = new MethodBuilder()
+        .withNewModifiers().withPublic().endModifiers()
         .withArguments(constructorArgs).withNewBlock().withStatements(statements).endBlock()
         .accept(new Visitor<PropertyBuilder>() {
           @Override
@@ -448,10 +446,9 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     }
     constructors.add(buildableConstructor);
 
-    int modifiers = shouldBeAbstract ? modifiersToInt(Modifier.PUBLIC, Modifier.ABSTRACT) : modifiersToInt(Modifier.PUBLIC);
     TypeDef generatedPojo = new TypeDefBuilder()
         .withPackageName(relativePackage(item.getPackageName(), relativePath))
-        .withModifiers(modifiers)
+        .withNewModifiers().withPublic().withAbstract(shouldBeAbstract).endModifiers()
         .withName(pojoName)
         .withAnnotations(annotationRefs)
         .withProperties(fields)
@@ -467,7 +464,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     if (!shouldBeAbstract) {
       if (enableStaticBuilder) {
         Method staticBuilder = new MethodBuilder()
-            .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+            .withNewModifiers().withPublic().withStatic().endModifiers()
             .withName(extendsList.isEmpty() ? "newBuilder" : "new" + pojoBuilder.getName()) //avoid clashes in case of inheritance
             .withReturnType(pojoBuilder.toInternalReference())
             .withNewBlock()
@@ -498,7 +495,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
         sb.append(";");
 
         Method staticBuilderFromDefaults = new MethodBuilder()
-            .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+            .withNewModifiers().withPublic().withStatic().endModifiers()
             .withName(extendsList.isEmpty() ? "newBuilderFromDefaults" : "new" + pojoBuilder.getName() + "FromDefaults") //avoid clashes in case of inheritance
             .withReturnType(pojoBuilder.toInternalReference())
             .withNewBlock()
@@ -510,7 +507,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       }
 
       Method staticAdapter = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("adapt")
           .addNewArgument()
           .withName("instance")
@@ -523,7 +520,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .build();
 
       Method staticAdaptingBuilder = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("newBuilder")
           .addNewArgument()
           .withName("instance")
@@ -537,7 +534,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .build();
 
       Method staticMapAdapterWithDefaults = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("adaptWithDefaults")
           .addNewArgument()
           .withName("map")
@@ -551,7 +548,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .build();
 
       Method staticMapAdapter = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("adapt")
           .addNewArgument()
           .withName("map")
@@ -565,7 +562,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .build();
 
       Method staticMapAdaptingBuilder = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("newBuilder")
           .addNewArgument()
           .withName("map")
@@ -581,7 +578,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .build();
 
       Method staticMapAdaptingBuilderWithDefaults = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("newBuilderWithDefaults")
           .addNewArgument()
           .withName("map")
@@ -596,7 +593,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .build();
 
       Method staticToStringArray = new MethodBuilder()
-          .withModifiers(modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+          .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("toStringArray")
           .addNewArgument()
           .withName("o")
@@ -627,7 +624,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       }
 
       Method equals = new MethodBuilder()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withNewModifiers().withPublic().endModifiers()
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
           .addNewArgument().withName("o").withTypeRef(Types.OBJECT.toReference()).endArgument()
           .withName("equals")
@@ -637,7 +634,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .build();
 
       Method hashCode = new MethodBuilder()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withNewModifiers().withPublic().endModifiers()
           .withReturnType(Types.PRIMITIVE_INT_REF)
           .withName("hashCode")
           .withNewBlock()
@@ -704,7 +701,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
           TypeDef mapper = new TypeDefBuilder()
               .withComments("Generated")
-              .withModifiers(modifiersToInt(Modifier.PUBLIC))
+              .withNewModifiers().withPublic().endModifiers()
               .withPackageName(adapterPackage)
               .withName(!Strings.isNullOrEmpty(name) ? name : Strings.toPojoName(generatedPojo.getName(), prefix, suffix))
               .withMethods(adapterMethods)

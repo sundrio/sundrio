@@ -34,7 +34,7 @@ public class RichTypeDef extends TypeDef {
       List<Method> allConstructors,
       List<Method> methods,
       List<Method> allMethods,
-      String outerTypeName, List<TypeDef> innerTypes, int modifiers, Map<AttributeKey, Object> attributes) {
+      String outerTypeName, List<TypeDef> innerTypes, Modifiers modifiers, Map<AttributeKey, Object> attributes) {
 
     super(kind, packageName, name, comments, annotations, extendsList, implementsList, parameters, properties, constructors,
         methods, outerTypeName, innerTypes, modifiers, attributes);

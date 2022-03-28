@@ -43,7 +43,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
 
   public Method(List<String> comments, List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name,
       TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, boolean defaultMethod,
-      Block block, int modifiers, Map<AttributeKey, Object> attributes) {
+      Block block, Modifiers modifiers, Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
     this.comments = comments != null ? comments : Collections.<String> emptyList();
     this.annotations = annotations;
@@ -60,7 +60,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
   // For testing 
   public static Method newMethod(String name, TypeRef returnType, boolean varArgPrefered, Property... arguments) {
     return new Method(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), name, returnType,
-        Arrays.asList(arguments), varArgPrefered, Collections.emptyList(), false, null, 0, new HashMap<>());
+        Arrays.asList(arguments), varArgPrefered, Collections.emptyList(), false, null, Modifiers.create(), new HashMap<>());
   }
 
   public static Method newMethod(String name, TypeRef returnType, Property... arguments) {
@@ -172,7 +172,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
         return false;
     } else if (!exceptions.equals(other.exceptions))
       return false;
-    if (modifiers != other.modifiers)
+    if (!modifiers.equals(other.modifiers))
       return false;
     if (name == null) {
       if (other.name != null)
@@ -198,7 +198,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     int result = 1;
     result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
     result = prime * result + ((exceptions == null) ? 0 : exceptions.hashCode());
-    result = prime * result + modifiers;
+    result = prime * result + modifiers.hashCode();
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
     result = prime * result + ((returnType == null) ? 0 : returnType.hashCode());
