@@ -73,8 +73,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-import javax.lang.model.element.Modifier;
-
 import io.sundr.FunctionFactory;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -175,7 +173,7 @@ class ToMethod {
       final MethodBuilder methodBuilder = new MethodBuilder()
           .withComments()
           .withAnnotations()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withNewModifiers().withPublic().endModifiers()
           .withName(customizer.methodPrefix(property) + type.name + Singularize.FUNCTION.apply(property.getNameCapitalized()))
           .withReturnType(unwrapped);
       type.addIndexIfNeeded(methodBuilder);
@@ -210,7 +208,7 @@ class ToMethod {
       return new MethodBuilder()
           .withComments(comments)
           .withAnnotations(annotations)
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withNewModifiers().withPublic().endModifiers()
           .withName(operationName() + Singularize.FUNCTION.apply(property.getNameCapitalized()))
           .addNewArgument()
           .withName("predicate")
@@ -263,8 +261,8 @@ class ToMethod {
         parameters.addAll(GetDefinition.of(baseType).getParameters());
       }
 
-      return new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
-          .withName(methodName).withReturnType(returnType).withArguments(property).withVarArgPreferred(true).withNewBlock()
+      return new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters).withName(methodName)
+          .withReturnType(returnType).withArguments(property).withVarArgPreferred(true).withNewBlock()
           .withStatements(getStatements(property, alsoImport)).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
           .build();
     }
@@ -352,7 +350,7 @@ class ToMethod {
     Property arrayProperty = new PropertyBuilder(property).withTypeRef(arrayType).build();
 
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(arrayProperty)
@@ -390,7 +388,7 @@ class ToMethod {
 
     methods.add(
         new MethodBuilder()
-            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+            .withNewModifiers().withPublic().endModifiers()
             .withName(methodName)
             .withReturnType(returnType)
             .withArguments(property)
@@ -404,7 +402,7 @@ class ToMethod {
     Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped).build();
     methods.add(
         new MethodBuilder()
-            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+            .withNewModifiers().withPublic().endModifiers()
             .withName(methodName)
             .withReturnType(returnType)
             .withArguments(genericProperty)
@@ -438,7 +436,7 @@ class ToMethod {
     }
 
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
         .withReturnType(BOOLEAN_REF)
         .withArguments()
@@ -513,7 +511,7 @@ class ToMethod {
     Method getter = new MethodBuilder()
         .withComments(comments)
         .withAnnotations(annotations)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(getterName)
         .withReturnType(property.getTypeRef())
         .withArguments(new Property[] {})
@@ -582,7 +580,7 @@ class ToMethod {
     Method getter = new MethodBuilder()
         .withAnnotations(annotations)
         .withComments(comments)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(getterName)
         .withReturnType(property.getTypeRef())
         .withArguments()
@@ -656,7 +654,7 @@ class ToMethod {
             }
           }
 
-          Method addSingleItemAtIndex = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          Method addSingleItemAtIndex = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).addToArguments(INDEX)
               .addToArguments(unwrappedProperty).withNewBlock()
               .withStatements(
@@ -666,7 +664,7 @@ class ToMethod {
                   new StringStatement("return (" + returnType + ")this;"))
               .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
-          Method setSingleItemAtIndex = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          Method setSingleItemAtIndex = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(setMethodName).withReturnType(returnType).addToArguments(INDEX)
               .addToArguments(unwrappedProperty).withNewBlock()
               .withStatements(
@@ -682,9 +680,7 @@ class ToMethod {
 
           if (isBuildable(unwrapped)) {
             TypeDef originalDef = GetDefinition.of((ClassRef) unwrapped);
-            final ClassRef targetType = isAbstract(unwrapped)
-                ? ToPojo.getPojoRef(originalDef)
-                : (ClassRef) unwrapped;
+            final ClassRef targetType = isAbstract(unwrapped) ? ToPojo.getPojoRef(originalDef) : (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
 
             String builderClass = targetType.getFullyQualifiedName() + "Builder";
@@ -693,12 +689,9 @@ class ToMethod {
             alsoImport.add(BUILDER.apply(GetDefinition.of(targetType)).toInternalReference());
             statements.add(new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                 + property.getAttribute(LAZY_INIT) + ";}"));
-            statements
-                .add(new StringStatement(
-                    "for (" + ((ClassRef) unwrapped).getFullyQualifiedName() + " item : items) {" + builderClass
-                        + " builder = new "
-                        + builderClass + "(item);_visitables.get(\"" + propertyName + "\").add(builder);this." + propertyName
-                        + ".add(builder);} return (" + returnType + ")this;"));
+            statements.add(new StringStatement("for (" + ((ClassRef) unwrapped).getFullyQualifiedName() + " item : items) {"
+                + builderClass + " builder = new " + builderClass + "(item);_visitables.get(\"" + propertyName
+                + "\").add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(
@@ -746,7 +739,7 @@ class ToMethod {
                     new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build();
 
-            methods.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
+            methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
                 .withName(addVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
                 .addToStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
@@ -755,7 +748,7 @@ class ToMethod {
                         + ".add(builder); return (" + returnType + ")this;"))
                 .endBlock().build());
 
-            methods.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
+            methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
                 .withName(addVarargMethodName).withReturnType(returnType).withArguments(INDEX, builderProperty).withNewBlock()
                 .addToStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
@@ -771,12 +764,12 @@ class ToMethod {
                 + ".add(item);} return (" + returnType + ")this;"));
           }
 
-          Method addVaragToCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          Method addVaragToCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).withArguments(item)
               .withVarArgPreferred(true).withNewBlock().addAllToStatements(varArgInit).addAllToStatements(statements).endBlock()
               .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
-          Method addAllToCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          Method addAllToCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addAllMethodName).withReturnType(returnType)
               .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
               .addAllToStatements(collectionInit).addAllToStatements(statements).endBlock()
@@ -867,7 +860,7 @@ class ToMethod {
             statements.add(createRemoveFromDescendantsFallback(targetType.getFullyQualifiedName(), property.getName()));
             statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
-            methods.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withParameters(parameters)
+            methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
                 .withName(removeVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
                 .addToStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
@@ -880,11 +873,11 @@ class ToMethod {
                 + "!= null){ this." + property.getName() + ".remove(item);}} return (" + returnType + ")this;"));
           }
 
-          Method removeVarargFromCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          Method removeVarargFromCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withName(removeVarargMethodName).withParameters(parameters).withReturnType(returnType).withArguments(item)
               .withVarArgPreferred(true).withNewBlock().withStatements(statements).endBlock().build();
 
-          Method removeAllFromCollection = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          Method removeAllFromCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(removeAllMethdoName).withReturnType(returnType)
               .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
               .withStatements(statements).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
@@ -897,8 +890,8 @@ class ToMethod {
               TypeRef builder = BUILDER.apply(GetDefinition.of((ClassRef) unwrapped)).toInternalReference();
               alsoImport.add(new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").build());
               alsoImport.add((ClassRef) builderType);
-              methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType).withParameters(parameters)
+              methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).withNewModifiers()
+                  .withPublic().endModifiers().withReturnType(returnType).withParameters(parameters)
                   .withName(removeMatchingMethodName).addNewArgument().withName("predicate")
                   .withTypeRef(Constants.PREDICATE.toReference(builder)).endArgument().withNewBlock()
                   .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
@@ -919,8 +912,8 @@ class ToMethod {
 
               alsoImport.add(new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").build());
               alsoImport.add((ClassRef) builderType);
-              methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
-                  .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType).withParameters(parameters)
+              methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).withNewModifiers()
+                  .withPublic().endModifiers().withReturnType(returnType).withParameters(parameters)
                   .withName(removeMatchingMethodName).addNewArgument().withName("predicate")
                   .withTypeRef(Constants.PREDICATE.toReference(builderType)).endArgument().withNewBlock()
                   .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
@@ -952,7 +945,7 @@ class ToMethod {
     Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
     String methodName = "addTo" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(mapProperty)
@@ -1005,7 +998,7 @@ class ToMethod {
 
     Method addNewValueTo = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("addNewValueTo" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty)
@@ -1018,7 +1011,7 @@ class ToMethod {
 
     Method addNewValueLikeTo = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("addNewValueLikeTo" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty, valueProperty)
@@ -1032,7 +1025,7 @@ class ToMethod {
 
     Method editValueIn = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("editValueIn" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty)
@@ -1054,7 +1047,7 @@ class ToMethod {
 
     Method editOrAddValueIn = new MethodBuilder()
         .withParameters(parameters)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("editOrAddValueIn" + methodSuffix)
         .withReturnType(rewraped)
         .withArguments(keyProperty)
@@ -1092,7 +1085,7 @@ class ToMethod {
     Property valueProperty = new PropertyBuilder().withName("value").withTypeRef(valueType).build();
     String methodName = "addTo" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(new Property[] { keyProperty, valueProperty })
@@ -1111,7 +1104,7 @@ class ToMethod {
     Property mapProperty = new PropertyBuilder().withName("map").withTypeRef(mapType).build();
     String methodName = "removeFrom" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(mapProperty)
@@ -1131,7 +1124,7 @@ class ToMethod {
     Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
     String methodName = "removeFrom" + property.getNameCapitalized();
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
         .withReturnType(returnType)
         .withArguments(keyProperty)
@@ -1179,7 +1172,7 @@ class ToMethod {
         : property.getNameCapitalized()));
 
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1220,7 +1213,9 @@ class ToMethod {
 
       String args = Strings.join(constructor.getArguments(), Property::getName, ", ");
 
-      result.add(new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(returnType)
+      result.add(new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
+          .withReturnType(returnType)
           .withArguments(constructor.getArguments()).withName(ownName).withParameters(baseType.getParameters()).withNewBlock()
           .addNewStringStatementStatement(
               "return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
@@ -1269,7 +1264,7 @@ class ToMethod {
         : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): new "
             + builderType.getFullyQualifiedName() + "().build());";
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1319,7 +1314,7 @@ class ToMethod {
         : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): item);";
 
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1370,7 +1365,7 @@ class ToMethod {
         : property.getNameCapitalized()) + suffix);
 
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
@@ -1452,7 +1447,7 @@ class ToMethod {
         : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "());";
 
     Method base = new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
@@ -1547,7 +1542,7 @@ class ToMethod {
         }
       }
 
-      return new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withReturnType(N_REF).withName("and")
+      return new MethodBuilder().withNewModifiers().withPublic().endModifiers().withReturnType(N_REF).withName("and")
           .withNewBlock()
           .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(" + indexOrKey + "builder.build());")
           .endBlock().build();
@@ -1573,7 +1568,7 @@ class ToMethod {
             : property.getNameCapitalized());
 
     return new MethodBuilder()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withReturnType(N_REF)
         .withName(methodName)
         .withNewBlock()

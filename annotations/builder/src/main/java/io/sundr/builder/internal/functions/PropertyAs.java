@@ -42,6 +42,7 @@ import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Statement;
@@ -177,7 +178,7 @@ public final class PropertyAs {
 
         return new TypeDefBuilder()
             .withAnnotations()
-            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+            .withModifiers(Modifiers.from(Modifier.PUBLIC))
             .withKind(Kind.INTERFACE)
             .withName(nestedType.getName())
             .withPackageName(nestedType.getPackageName())

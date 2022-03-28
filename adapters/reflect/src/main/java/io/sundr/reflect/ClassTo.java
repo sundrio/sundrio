@@ -47,6 +47,7 @@ import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.Modifiers;
 import io.sundr.model.PrimitiveRefBuilder;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
@@ -213,7 +214,7 @@ public class ClassTo {
           .withOuterTypeName(outerFQCN)
           .withName(item.getSimpleName())
           .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
-          .withModifiers(item.getModifiers())
+          .withModifiers(Modifiers.from(item.getModifiers()))
           .withParameters(parameters)
           .withConstructors(constructors)
           .withMethods(methods)
@@ -279,7 +280,7 @@ public class ClassTo {
       }
       properties.add(new PropertyBuilder()
           .withName(field.getName())
-          .withModifiers(field.getModifiers())
+          .withModifiers(Modifiers.from(field.getModifiers()))
           .withAnnotations(annotationRefs)
           .withTypeRef(TYPEREF.apply(field.getGenericType()))
           .build());
@@ -321,7 +322,7 @@ public class ClassTo {
 
       constructors.add(new MethodBuilder()
           .withName(constructor.getName())
-          .withModifiers(constructor.getModifiers())
+          .withModifiers(Modifiers.from(constructor.getModifiers()))
           .withArguments(arguments)
           .withParameters(parameters)
           .withAnnotations(annotationRefs)
@@ -348,7 +349,7 @@ public class ClassTo {
       methods.add(new MethodBuilder()
           .withName(method.getName())
           .withDefaultMethod(method.isDefault())
-          .withModifiers(method.getModifiers())
+          .withModifiers(Modifiers.from(method.getModifiers()))
           .withReturnType(TYPEREF.apply(method.getReturnType()))
           .withArguments(arguments)
           .withParameters(parameters)

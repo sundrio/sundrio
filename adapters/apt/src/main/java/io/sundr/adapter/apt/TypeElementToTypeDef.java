@@ -46,12 +46,12 @@ import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
+import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
-import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
 public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
@@ -143,7 +143,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
 
     TypeDef baseType = new TypeDefBuilder()
         .withComments(commentList).withKind(kind)
-        .withModifiers(Types.modifiersToInt(classElement.getModifiers()))
+        .withModifiers(Modifiers.from(classElement.getModifiers()))
         .withPackageName(getPackageName(classElement))
         .withName(getClassName(classElement))
         .withParameters(genericTypes)

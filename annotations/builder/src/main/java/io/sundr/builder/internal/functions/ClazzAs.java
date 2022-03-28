@@ -41,6 +41,7 @@ import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.builder.internal.visitors.AddNoArgWithMethod;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
@@ -48,6 +49,7 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.RichTypeDef;
@@ -110,7 +112,8 @@ public class ClazzAs {
               continue;
             }
 
-            Property toAdd = new PropertyBuilder(property).withModifiers(0).addToAttributes(ORIGIN_TYPEDEF, item)
+            Property toAdd = new PropertyBuilder(property).withNewModifiers().endModifiers()
+                .addToAttributes(ORIGIN_TYPEDEF, item)
                 .addToAttributes(OUTER_INTERFACE, fluentType).addToAttributes(OUTER_CLASS, fluentImplType)
                 .addToAttributes(GENERIC_TYPE_REF, genericType.toReference()).withComments().withAnnotations().build();
 
@@ -209,6 +212,7 @@ public class ClazzAs {
           return new TypeDefBuilder(fluentType).withComments("Generated").withAnnotations().withInnerTypes(nestedClazzes)
               .withProperties()
               .withMethods(methods)
+              .accept(new AddNoArgWithMethod())
               .build();
 
         }
@@ -229,9 +233,11 @@ public class ClazzAs {
       //The generic letter is always the last
       final TypeParamDef genericType = fluentImplType.getParameters().get(fluentImplType.getParameters().size() - 1);
 
-      Method emptyConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).build();
+      Method emptyConstructor = new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
+          .build();
 
-      Method instanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
+      Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(item.toInternalReference()).withName("instance").and().withNewBlock()
           .withStatements(toInstanceConstructorBody(item, item, "")).endBlock().build();
 
@@ -273,7 +279,8 @@ public class ClazzAs {
         boolean isOptional = Types.isOptional(property.getTypeRef()) || Types.isOptionalInt(property.getTypeRef())
             || Types.isOptionalDouble(property.getTypeRef()) || Types.isOptionalLong(property.getTypeRef());
 
-        Property toAdd = new PropertyBuilder(property).withModifiers(Types.modifiersToInt(Modifier.PRIVATE))
+        Property toAdd = new PropertyBuilder(property)
+            .withNewModifiers().withPrivate().endModifiers()
             .addToAttributes(ORIGIN_TYPEDEF, item).addToAttributes(OUTER_INTERFACE, fluentType)
             .addToAttributes(OUTER_CLASS, fluentImplType).addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
             .withComments().withAnnotations().build();
@@ -361,18 +368,21 @@ public class ClazzAs {
         }
       }
 
-      Method equals = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method equals = new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
           .withTypeRef(Types.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
           .withStatements(BuilderUtils.toEquals(fluentImplType, properties)).endBlock()
           .build();
 
-      Method hashCode = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method hashCode = new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
           .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_INT_REF).withName("hashCode").withNewBlock()
           .withStatements(BuilderUtils.toHashCode(properties)).endBlock()
           .build();
 
-      Method toString = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method toString = new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
           .withReturnType(io.sundr.model.utils.Types.STRING_REF).withName("toString").withNewBlock()
           .withStatements(BuilderUtils.toString(fluentImplType.getName(), properties)).endBlock()
           .build();
@@ -388,7 +398,9 @@ public class ClazzAs {
                       new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
                           .addToParameters("value", "unchecked").build())
                   .withConstructors(constructors)
-                  .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(methods).build());
+                  .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(methods)
+                  .accept(new AddNoArgWithMethod())
+                  .build());
     }
   });
 
@@ -419,10 +431,12 @@ public class ClazzAs {
       fields.add(fluentProperty);
       fields.add(validationEnabledProperty);
 
-      Method emptyConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).withNewBlock()
+      Method emptyConstructor = new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
+          .withNewBlock()
           .addNewStringStatementStatement("this(false);").endBlock().build();
 
-      Method validationEnabledConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method validationEnabledConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
           .addNewArgument().withTypeRef(io.sundr.model.utils.Types.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock().addToStatements(new StringStatement(new Supplier<String>() {
             @Override
@@ -432,11 +446,12 @@ public class ClazzAs {
             }
           })).endBlock().build();
 
-      Method fluentConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
+      Method fluentConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock().addNewStringStatementStatement("this(fluent, false);")
           .endBlock().build();
 
-      Method fluentAndValidationConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method fluentAndValidationConstructor = new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument()
           .withTypeRef(io.sundr.model.utils.Types.BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
           .addToStatements(new StringStatement(new Supplier<String>() {
@@ -447,13 +462,14 @@ public class ClazzAs {
             }
           })).endBlock().build();
 
-      Method instanceAndFluentCosntructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method instanceAndFluentCosntructor = new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(instanceRef)
           .withName("instance").and().withNewBlock().addNewStringStatementStatement("this(fluent, instance, false);").endBlock()
           .build();
 
       Method instanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+          .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
           .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
           .withTypeRef(Types.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock()
@@ -462,13 +478,13 @@ public class ClazzAs {
           .endBlock()
           .build();
 
-      Method instanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument()
+      Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(instanceRef).withName("instance").and().withNewBlock()
           .addNewStringStatementStatement("this(instance,false);").endBlock()
           .build();
 
       Method instanceAndValidationEnabledConstructor = new MethodBuilder()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(instanceRef)
+          .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(instanceRef)
           .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
           .withName("validationEnabled").and()
           .withNewBlock()
@@ -494,14 +510,14 @@ public class ClazzAs {
 
         ClassRef buildableInterfaceRef = i.toInternalReference();
 
-        Method sourceInstanceAndFluentCosntructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        Method sourceInstanceAndFluentCosntructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(buildableInterfaceRef)
             .withName("instance").and().withNewBlock().addNewStringStatementStatement("this(fluent, instance, false);")
             .endBlock()
             .build();
 
         Method sourceInstanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
-            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+            .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
             .and().addNewArgument().withTypeRef(buildableInterfaceRef).withName("instance").and().addNewArgument()
             .withTypeRef(Types.BOOLEAN_REF).withName("validationEnabled").and()
             .withNewBlock()
@@ -510,14 +526,14 @@ public class ClazzAs {
             .endBlock()
             .build();
 
-        Method sourceInstanceConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        Method sourceInstanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .addNewArgument()
             .withTypeRef(buildableInterfaceRef).withName("instance").and().withNewBlock()
             .addNewStringStatementStatement("this(instance,false);").endBlock()
             .build();
 
         Method sourceInstanceAndValidationEnabledConstructor = new MethodBuilder()
-            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(buildableInterfaceRef)
+            .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(buildableInterfaceRef)
             .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
             .withName("validationEnabled").and()
             .withNewBlock()
@@ -532,7 +548,7 @@ public class ClazzAs {
         constructors.add(sourceInstanceConstructor);
       });
 
-      Method build = new MethodBuilder().withModifiers(Types.modifiersToInt(modifiers)).withReturnType(instanceRef)
+      Method build = new MethodBuilder().withModifiers(Modifiers.from(modifiers)).withReturnType(instanceRef)
           .withName("build")
           .withNewBlock()
           .withStatements(toBuild(item, item))
@@ -540,7 +556,7 @@ public class ClazzAs {
           .build();
       methods.add(build);
 
-      Method equals = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method equals = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
           .withTypeRef(Types.OBJECT_REF).endArgument().withName("equals")
           .withNewBlock()
@@ -548,7 +564,7 @@ public class ClazzAs {
           .endBlock()
           .build();
 
-      Method hashCode = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      Method hashCode = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
           .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_INT_REF).withName("hashCode")
           .withNewBlock()
           .withStatements(BuilderUtils.toHashCode(fields))
@@ -564,7 +580,7 @@ public class ClazzAs {
         Property validatorProperty = new PropertyBuilder().withName("validator").withTypeRef(validatorRef).build();
 
         fields.add(validatorProperty);
-        Method validatorConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        Method validatorConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .addNewArgument().withTypeRef(validatorRef).withName("validator").and().withNewBlock()
             .addToStatements(new StringStatement(new Supplier<String>() {
               @Override
@@ -575,7 +591,7 @@ public class ClazzAs {
             })).endBlock().build();
 
         Method instanceAndFluentAndValidatorConstructor = new MethodBuilder()
-            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+            .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
             .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
             .withTypeRef(validatorRef).withName("validator").and()
             .withNewBlock()
@@ -585,7 +601,7 @@ public class ClazzAs {
             .endBlock()
             .build();
 
-        Method instanceAndValidatorConstructor = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        Method instanceAndValidatorConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument().withTypeRef(validatorRef)
             .withName("validator").and()
             .withNewBlock()
@@ -596,7 +612,7 @@ public class ClazzAs {
             .build();
 
         Method fluentAndValidatorConstructor = new MethodBuilder()
-            .withModifiers(Types.modifiersToInt(Modifier.PUBLIC)).addNewArgument().withTypeRef(fluent).withName("fluent")
+            .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
             .and().addNewArgument()
             .withTypeRef(validatorRef).withName("validator").and()
             .withNewBlock()
@@ -606,7 +622,7 @@ public class ClazzAs {
             .endBlock()
             .build();
 
-        Method usingValidation = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        Method usingValidation = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .withReturnType(builderType.toInternalReference())
             .withName("usingValidation")
             .withNewBlock()
@@ -614,7 +630,7 @@ public class ClazzAs {
             .endBlock()
             .build();
 
-        Method usingValidator = new MethodBuilder().withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        Method usingValidator = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .withReturnType(builderType.toInternalReference())
             .withName("usingValidator")
             .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
@@ -635,7 +651,7 @@ public class ClazzAs {
       }
 
       return BuilderContextManager.getContext().getDefinitionRepository()
-          .register(new TypeDefBuilder(builderType).withAnnotations().withModifiers(Types.modifiersToInt(modifiers))
+          .register(new TypeDefBuilder(builderType).withAnnotations().withModifiers(Modifiers.from(modifiers))
               .withProperties(fields).withConstructors(constructors).withMethods(methods).build());
     }
 
@@ -652,7 +668,7 @@ public class ClazzAs {
               .accept(new Visitor<MethodBuilder>() {
                 public void visit(MethodBuilder builder) {
                   if (builder.getName() != null && builder.getName().equals("build")) {
-                    builder.withModifiers(Types.modifiersToInt(modifiers));
+                    builder.withModifiers(Modifiers.from(modifiers));
                     builder.withReturnType(editable.toInternalReference());
                     builder.withNewBlock().withStatements(toBuild(editable, editable)).endBlock();
                   }
@@ -677,7 +693,7 @@ public class ClazzAs {
           .map(c -> superConstructorOf(c, editableType))
           .collect(Collectors.toList()));
 
-      Method edit = new MethodBuilder().withModifiers(Types.modifiersToInt(modifiers))
+      Method edit = new MethodBuilder().withModifiers(Modifiers.from(modifiers))
           .withReturnType(builderType.toInternalReference()).withName("edit").withNewBlock()
           .addToStatements(new StringStatement(new Supplier<String>() {
             @Override
@@ -692,7 +708,7 @@ public class ClazzAs {
       return AptContext.getContext().getDefinitionRepository()
           .register(BuilderContextManager.getContext().getBuildableRepository()
               .register(new TypeDefBuilder(editableType).withComments("Generated").withAnnotations()
-                  .withModifiers(Types.modifiersToInt(modifiers)).withConstructors(constructors).withMethods(methods)
+                  .withModifiers(Modifiers.from(modifiers)).withConstructors(constructors).withMethods(methods)
                   .addToAttributes(BUILDABLE_ENABLED, true).addToAttributes(GENERATED, true) // We want to know that its a generated type...
                   .build()));
     }

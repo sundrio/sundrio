@@ -28,10 +28,10 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeRef;
-import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
 public class VariableElementToProperty implements Function<VariableElement, Property> {
@@ -63,7 +63,7 @@ public class VariableElementToProperty implements Function<VariableElement, Prop
         : Arrays.stream(comments.split(NEWLINE_PATTERN)).map(String::trim).filter(s -> !s.isEmpty())
             .collect(Collectors.toList());
     return new PropertyBuilder().withComments(commentList).withName(name).withTypeRef(type).withAnnotations(annotations)
-        .withModifiers(Types.modifiersToInt(variableElement.getModifiers())).build();
+        .withModifiers(Modifiers.from(variableElement.getModifiers())).build();
   }
 
 }

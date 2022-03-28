@@ -21,8 +21,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.lang.model.element.Modifier;
-
 import io.sundr.model.*;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
@@ -286,48 +284,6 @@ public final class Types {
     return new TypeDefBuilder(base)
         .withImplementsList(superClass)
         .build();
-  }
-
-  public static int modifiersToInt(Modifier... modifiers) {
-    return modifiersToInt(Arrays.asList(modifiers));
-  }
-
-  public static int modifiersToInt(Collection<Modifier> modifiers) {
-    int result = 0;
-
-    for (Modifier m : modifiers) {
-      switch (m) {
-        case ABSTRACT:
-          result = result | java.lang.reflect.Modifier.ABSTRACT;
-          break;
-        case FINAL:
-          result = result | java.lang.reflect.Modifier.FINAL;
-          break;
-        case NATIVE:
-          result = result | java.lang.reflect.Modifier.NATIVE;
-          break;
-        case PRIVATE:
-          result = result | java.lang.reflect.Modifier.PRIVATE;
-          break;
-        case PROTECTED:
-          result = result | java.lang.reflect.Modifier.PROTECTED;
-          break;
-        case PUBLIC:
-          result = result | java.lang.reflect.Modifier.PUBLIC;
-          break;
-        case STATIC:
-          result = result | java.lang.reflect.Modifier.STATIC;
-          break;
-        case SYNCHRONIZED:
-          result = result | java.lang.reflect.Modifier.SYNCHRONIZED;
-          break;
-        case TRANSIENT:
-          result = result | java.lang.reflect.Modifier.TRANSIENT;
-          break;
-      }
-    }
-
-    return result;
   }
 
   public static String fullyQualifiedNameDiff(String left, String right) {

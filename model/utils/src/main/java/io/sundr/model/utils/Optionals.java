@@ -22,8 +22,6 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.function.Function;
 
-import javax.lang.model.element.Modifier;
-
 import io.sundr.FunctionFactory;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -38,7 +36,7 @@ public class Optionals {
   public static final TypeDef OPTIONAL = new TypeDefBuilder(TypeDef.forName(Optional.class.getName()))
       .withParameters(E)
       .addNewMethod()
-      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withNewModifiers().withPublic().withStatic().endModifiers()
       .withName("of")
       .addNewArgument()
       .withName("value")
@@ -49,7 +47,7 @@ public class Optionals {
 
   public static final TypeDef OPTIONAL_INT = new TypeDefBuilder(TypeDef.forName(OptionalInt.class.getName()))
       .addNewMethod()
-      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withNewModifiers().withPublic().withStatic().endModifiers()
       .withName("of")
       .addNewArgument()
       .withName("value")
@@ -60,7 +58,7 @@ public class Optionals {
 
   public static final TypeDef OPTIONAL_DOUBLE = new TypeDefBuilder(TypeDef.forName(OptionalDouble.class.getName()))
       .addNewMethod()
-      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withNewModifiers().withPublic().withStatic().endModifiers()
       .withName("of")
       .addNewArgument()
       .withName("value")
@@ -71,7 +69,7 @@ public class Optionals {
 
   public static final TypeDef OPTIONAL_LONG = new TypeDefBuilder(TypeDef.forName(OptionalLong.class.getName()))
       .addNewMethod()
-      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC, Modifier.STATIC))
+      .withNewModifiers().withPublic().withStatic().endModifiers()
       .withName("of")
       .addNewArgument()
       .withName("value")

@@ -25,8 +25,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import javax.lang.model.element.Modifier;
-
 import io.sundr.FunctionFactory;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
@@ -48,7 +46,7 @@ public class TypeAs {
   }
 
   static final Function<TypeDef, TypeDef> SHALLOW_BUILDER = item -> new TypeDefBuilder(item)
-      .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+      .withNewModifiers().withPublic().endModifiers()
       .withName(item.getName() + "Builder")
       .withInnerTypes()
       .build();
@@ -59,7 +57,7 @@ public class TypeAs {
 
     return new TypeDefBuilder(item)
         .withKind(Kind.INTERFACE)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(item.getName() + "Fluent")
         .withParameters(parameters)
         .withInnerTypes()
@@ -92,7 +90,7 @@ public class TypeAs {
 
     return new TypeDefBuilder(item)
         .withKind(Kind.INTERFACE)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(item.getName() + "Fluent")
         .withPackageName(item.getPackageName())
         .withParameters(parameters)
@@ -128,7 +126,7 @@ public class TypeAs {
 
       return new TypeDefBuilder(item)
           .withKind(Kind.CLASS)
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withNewModifiers().withPublic().endModifiers()
           .withName(item.getName() + "FluentImpl")
           .withPackageName(item.getPackageName())
           .withParameters(parameters)
@@ -160,7 +158,7 @@ public class TypeAs {
     parameters.add(builder.toInternalReference());
     return new TypeDefBuilder(item)
         .withKind(Kind.CLASS)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName(item.getName() + "Builder")
         .withParameters(item.getParameters())
         .withInnerTypes()
@@ -174,7 +172,7 @@ public class TypeAs {
     List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
     return new TypeDefBuilder(item)
         .withKind(Kind.CLASS)
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withName("Editable" + item.getName())
         .withParameters(parameters)
         .withExtendsList(item.toInternalReference())

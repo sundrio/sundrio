@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
 
 import io.sundr.builder.Constants;
@@ -54,7 +53,6 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
 import io.sundr.model.utils.TypeArguments;
-import io.sundr.model.utils.Types;
 
 public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingProcessor {
 
@@ -119,13 +117,13 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     Property builderProperty = new PropertyBuilder()
         .withTypeRef(TypeAs.BUILDER.apply(type).toInternalReference())
         .withName(BUILDER)
-        .withModifiers(Types.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
         .build();
 
     Property functionProperty = new PropertyBuilder()
         .withTypeRef(functionType)
         .withName(FUNCTION)
-        .withModifiers(Types.modifiersToInt(Modifier.PRIVATE, Modifier.FINAL))
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
         .build();
 
     Method inlineMethod = new MethodBuilder()
@@ -134,7 +132,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .withNewBlock()
         .addNewStringStatementStatement(BUILD_AND_APPLY_FUNCTION)
         .endBlock()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .build();
 
     constructors.add(new MethodBuilder()
@@ -144,7 +142,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .withName(FUNCTION)
         .withTypeRef(functionType)
         .and()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withNewBlock()
         .addNewStringStatementStatement(String.format(NEW_BULDER_AND_SET_FUNCTION_FORMAT, builderType.getName()))
         .endBlock()
@@ -161,7 +159,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .withName(FUNCTION)
         .withTypeRef(functionType)
         .and()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withNewBlock()
         .addNewStringStatementStatement(String.format(NEW_BULDER_WITH_ITEM_AND_SET_FUNCTION_FORMAT, builderType.getName()))
         .endBlock()
@@ -175,7 +173,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
           .withName(ITEM)
           .withTypeRef(type.toInternalReference())
           .and()
-          .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+          .withNewModifiers().withPublic().endModifiers()
           .withNewBlock()
           .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(),
               String.format(EMPTY_FUNCTION_TEXT, type.toInternalReference(), returnType.toInternalReference(),
@@ -186,7 +184,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
 
     return new TypeDefBuilder(shallowInlineType)
         .withAnnotations()
-        .withModifiers(Types.modifiersToInt(Modifier.PUBLIC))
+        .withNewModifiers().withPublic().endModifiers()
         .withConstructors(constructors)
         .addToProperties(builderProperty, functionProperty)
         .addToMethods(inlineMethod)

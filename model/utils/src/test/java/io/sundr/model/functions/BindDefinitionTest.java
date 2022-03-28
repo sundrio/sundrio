@@ -17,14 +17,11 @@
 
 package io.sundr.model.functions;
 
-import static io.sundr.model.utils.Types.modifiersToInt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
-
-import javax.lang.model.element.Modifier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,13 +47,12 @@ public class BindDefinitionTest {
       .withParameters(T)
       // private T type;
       .addNewProperty()
-      .withModifiers(modifiersToInt(Modifier.PRIVATE))
       .withName("type")
       .withTypeRef(T.toReference())
       .endProperty()
       // public T getType();
       .addNewMethod()
-      .withModifiers(modifiersToInt(Modifier.PUBLIC))
+      .withNewModifiers().withPublic().endModifiers()
       .withName("getType")
       .withReturnType(T.toReference())
       .endMethod()

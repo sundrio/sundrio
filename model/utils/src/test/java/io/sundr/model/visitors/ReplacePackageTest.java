@@ -16,6 +16,8 @@
 
 package io.sundr.model.visitors;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.Test;
 
 import io.sundr.model.TypeDef;
@@ -27,6 +29,7 @@ public class ReplacePackageTest {
   public void testMoveToPackage() {
     TypeDef original = new TypeDefBuilder().withPackageName("io.sundr.codegen").withName("SomeClass").build();
     TypeDef refactored = new TypeDefBuilder(original).accept(new ReplacePackage("io.sundr.codegen", "my.pkg")).build();
+    assertNotNull(refactored);
     System.out.println(refactored);
   }
 }

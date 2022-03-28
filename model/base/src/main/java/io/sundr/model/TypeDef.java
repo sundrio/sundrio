@@ -56,7 +56,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
 
   public TypeDef(Kind kind, String packageName, String name, List<String> comments, List<AnnotationRef> annotations,
       List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties,
-      List<Method> constructors, List<Method> methods, String outerTypeName, List<TypeDef> innerTypes, int modifiers,
+      List<Method> constructors, List<Method> methods, String outerTypeName, List<TypeDef> innerTypes, Modifiers modifiers,
       Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
     this.kind = kind != null ? kind : Kind.CLASS;
@@ -76,7 +76,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   }
 
   protected TypeDef(String fullyQualifiedName) {
-    super(Modifier.PUBLIC, Collections.emptyMap());
+    super(Modifiers.from(Modifier.PUBLIC), Collections.emptyMap());
     this.kind = Kind.CLASS;
     this.name = Nameable.getClassName(fullyQualifiedName);
     this.packageName = Nameable.getPackageName(fullyQualifiedName);

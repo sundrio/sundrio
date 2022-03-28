@@ -33,7 +33,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   private final String name;
   private final List<String> comments;
 
-  public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, int modifiers,
+  public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, Modifiers modifiers,
       Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
     this.annotations = annotations;
@@ -43,7 +43,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   }
 
   public static Property newProperty(TypeRef typeRef, String name) {
-    return new Property(Collections.emptyList(), typeRef, name, Collections.emptyList(), 0, new HashMap<>());
+    return new Property(Collections.emptyList(), typeRef, name, Collections.emptyList(), Modifiers.create(), new HashMap<>());
   }
 
   public List<AnnotationRef> getAnnotations() {
@@ -101,7 +101,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
    * @return the property without any modifiers
    */
   protected Property withoutModiers() {
-    return new Property(annotations, typeRef, name, comments, 0, getAttributes());
+    return new Property(annotations, typeRef, name, comments, Modifiers.create(), getAttributes());
   }
 
   /**
@@ -112,7 +112,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
    */
   public Property withErasure() {
     return new Property(annotations, typeRef instanceof TypeParamRef ? ((TypeParamRef) typeRef).withErasure() : typeRef, name,
-        comments, 0, getAttributes());
+        comments, Modifiers.create(), getAttributes());
   }
 
   protected String getDefaultValue() {
@@ -134,7 +134,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     if (getClass() != obj.getClass())
       return false;
     Property other = (Property) obj;
-    if (modifiers != other.modifiers)
+    if (!modifiers.equals(other.modifiers))
       return false;
     if (name == null) {
       if (other.name != null)
@@ -153,7 +153,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + modifiers;
+    result = prime * result + modifiers.hashCode();
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + ((typeRef == null) ? 0 : typeRef.hashCode());
     return result;
