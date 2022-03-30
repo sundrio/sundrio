@@ -17,26 +17,17 @@
 
 package io.sundr.builder;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class VisitorWiretap<T> implements Visitor<T> {
+public class DelegatingVisitor<T> implements Visitor<T> {
 
-  private final Collection<VisitorListener> listeners;
+  private final Class<T> type;
   private final Visitor<T> delegate;
 
-  private VisitorWiretap(Visitor<T> delegate, Collection<VisitorListener> listeners) {
+  DelegatingVisitor(Class<T> type, Visitor<T> delegate) {
+    this.type = type;
     this.delegate = delegate;
-    this.listeners = listeners;
-  }
-
-  public static <T> VisitorWiretap<T> create(Visitor<T> visitor, Collection<VisitorListener> listeners) {
-    if (visitor instanceof VisitorWiretap) {
-      return (VisitorWiretap<T>) visitor;
-    }
-    return new VisitorWiretap<T>(visitor, listeners);
   }
 
   @Override
@@ -46,9 +37,15 @@ public class VisitorWiretap<T> implements Visitor<T> {
 
   @Override
   public <F> Boolean canVisit(F target) {
-    boolean canVisit = delegate.canVisit(target);
-    listeners.forEach(l -> l.onCheck(delegate, canVisit, target));
-    return canVisit;
+    if (target == null) {
+      return false;
+    }
+    if (type == null) {
+      return hasVisitMethodMatching(target);
+    } else if (!type.isAssignableFrom(target.getClass())) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -58,26 +55,21 @@ public class VisitorWiretap<T> implements Visitor<T> {
 
   @Override
   public void visit(T target) {
-    listeners.forEach(l -> l.beforeVisit(delegate, Collections.emptyList(), target));
     delegate.visit(target);
-    listeners.forEach(l -> l.afterVisit(delegate, Collections.emptyList(), target));
   }
 
   @Override
   public void visit(List<Object> path, T target) {
-    listeners.forEach(l -> l.beforeVisit(delegate, path, target));
     delegate.visit(path, target);
-    listeners.forEach(l -> l.afterVisit(delegate, path, target));
   }
 
   @Override
   public Class<T> getType() {
-    return delegate.getType();
+    return type;
   }
 
   @Override
   public String toString() {
     return delegate.toString();
   }
-
 }

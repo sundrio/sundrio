@@ -39,6 +39,7 @@ public class PathAwareTypedVisitor<V, P> implements Visitor<V> {
 
   @Override
   public void visit(List<Object> path, V element) {
+    visit(element);
   }
 
   @Override

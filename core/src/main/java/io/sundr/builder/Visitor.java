@@ -17,7 +17,10 @@
 package io.sundr.builder;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @FunctionalInterface
 public interface Visitor<T> {
@@ -49,8 +52,13 @@ public interface Visitor<T> {
     return true;
   }
 
+  default Predicate[] getRequirements() {
+    return new Predicate[0];
+  }
+
   /**
-   * Checks if the specified visitor has a visit method compatible with the specified fluent.
+   * Checks if the specified visitor has a visit method compatible with the
+   * specified fluent.
    * 
    * @param target
    * @param <F>
@@ -73,5 +81,19 @@ public interface Visitor<T> {
 
   default int order() {
     return 0;
+  }
+
+  default <P> Visitor<T> addRequirement(Class<P> type, Predicate<P> predicate) {
+    return addRequirement(predicate);
+  }
+
+  default Visitor<T> addRequirement(Predicate predicate) {
+    return new DelegatingVisitor(getType(), this) {
+      @Override
+      public Predicate[] getRequirements() {
+        return Stream.concat(Arrays.stream(Visitor.this.getRequirements()), Stream.of(predicate))
+            .toArray(size -> new Predicate[size]);
+      }
+    };
   }
 }

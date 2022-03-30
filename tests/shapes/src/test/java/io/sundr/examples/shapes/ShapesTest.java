@@ -19,6 +19,7 @@ package io.sundr.examples.shapes;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -93,6 +94,49 @@ public class ShapesTest {
     }).build();
 
     Assert.assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
+  }
+
+  @Test
+  public void testVisitorFilter() {
+    Canvas canvas = new CanvasBuilder()
+        .addNewCircleShape(0, 0, 10)
+        .addNewSquareShape()
+        .withY(10)
+        .withY(20)
+        .withHeight(30)
+        .and()
+        .build();
+
+    //Add a visitor that is going to be filtered out.
+    canvas = new CanvasBuilder(canvas).accept(new PathAwareTypedVisitor<CircleBuilder<Integer>, CanvasBuilder>() {
+      @Override
+      public void visit(CircleBuilder<Integer> builder) {
+        builder.withRadius(100 + builder.getRadius());
+      }
+
+      @Override
+      public Predicate[] getRequirements() {
+        return new Predicate[] { (Predicate<CanvasBuilder>) c -> !c.hasShapes() };
+      }
+    }).build();
+
+    Assert.assertEquals(10, ((Circle) canvas.getShapes().get(0)).getRadius());
+
+    //Add a visitor that is not going to be filtered out.
+    canvas = new CanvasBuilder(canvas).accept(new PathAwareTypedVisitor<CircleBuilder<Integer>, CanvasBuilder>() {
+      @Override
+      public void visit(CircleBuilder<Integer> builder) {
+        builder.withRadius(200 + builder.getRadius());
+      }
+
+      @Override
+      public Predicate[] getRequirements() {
+        return new Predicate[] { (Predicate<CanvasBuilder>) c -> c.hasShapes() };
+      }
+    }).build();
+
+    Assert.assertEquals(210, ((Circle) canvas.getShapes().get(0)).getRadius());
+
   }
 
   @Test

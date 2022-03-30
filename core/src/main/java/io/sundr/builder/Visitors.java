@@ -35,6 +35,10 @@ public final class Visitors {
     //Utility Class
   }
 
+  public static <T> Visitor<T> newVisitor(Class<T> type, Visitor<T> visitor) {
+    return new DelegatingVisitor<T>(type, visitor);
+  }
+
   /**
    * Get the actual type arguments a child class has used to extend a generic base class.
    *
