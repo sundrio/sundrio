@@ -34,5 +34,6 @@
         <module>buildable-fields</module>
         <module>shapes</module>
         <module>shapes-extension</module>
+        <module>visitor-filtering</module>
     </modules>
 </project>

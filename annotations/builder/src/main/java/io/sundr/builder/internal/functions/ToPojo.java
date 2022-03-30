@@ -450,6 +450,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
         .withPackageName(relativePackage(item.getPackageName(), relativePath))
         .withNewModifiers().withPublic().withAbstract(shouldBeAbstract).endModifiers()
         .withName(pojoName)
+        .withParameters(item.getParameters())
         .withAnnotations(annotationRefs)
         .withProperties(fields)
         .withConstructors(constructors)
@@ -465,6 +466,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       if (enableStaticBuilder) {
         Method staticBuilder = new MethodBuilder()
             .withNewModifiers().withPublic().withStatic().endModifiers()
+            .withParameters(item.getParameters())
             .withName(extendsList.isEmpty() ? "newBuilder" : "new" + pojoBuilder.getName()) //avoid clashes in case of inheritance
             .withReturnType(pojoBuilder.toInternalReference())
             .withNewBlock()
@@ -496,6 +498,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
         Method staticBuilderFromDefaults = new MethodBuilder()
             .withNewModifiers().withPublic().withStatic().endModifiers()
+            .withParameters(item.getParameters())
             .withName(extendsList.isEmpty() ? "newBuilderFromDefaults" : "new" + pojoBuilder.getName() + "FromDefaults") //avoid clashes in case of inheritance
             .withReturnType(pojoBuilder.toInternalReference())
             .withNewBlock()

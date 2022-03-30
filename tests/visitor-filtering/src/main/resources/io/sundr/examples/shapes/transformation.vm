@@ -1,0 +1,16 @@
+package ${model.packageName};
+
+import java.util.Optional;
+
+public class Optional${model.name} {
+
+    private final Optional<${model.name}> field;
+
+    public Optional${model.name}(${model.name} field) {
+        this.field = Optional.of(field);
+    }
+
+    public ${model.name} getValue() {
+       return field.get();
+    }
+}

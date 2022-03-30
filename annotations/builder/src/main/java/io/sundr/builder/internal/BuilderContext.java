@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -71,6 +72,7 @@ public class BuilderContext {
   private final TypeDef pathAwareVisitorClass;
   private final TypeDef visitorListenerInterface;
   private final TypeDef visitorWiretapClass;
+  private final TypeDef delegatingVisitorClass;
   private final TypeDef fluentInterface;
   private final TypeDef builderInterface;
   private final TypeDef nestedInterface;
@@ -147,6 +149,22 @@ public class BuilderContext {
         .addNewConstructor()
         .withNewModifiers().withPrivate().endModifiers()
         .endConstructor()
+
+        .addNewMethod()
+        .withName("newVisitor")
+        .withParameters(T)
+        .withNewModifiers().withPublic().withStatic().endModifiers()
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Visitor.class.getName())).withArguments(T.toReference())
+        .endClassRefReturnType()
+        .addNewArgument()
+        .withName("type")
+        .withTypeRef(CLASS.toReference(T.toReference()))
+        .endArgument()
+        .addNewArgument()
+        .withName("visitor")
+        .withNewClassRefTypeLike(ClassRef.forName(Visitor.class.getName())).withArguments(T.toReference()).endClassRefType()
+        .endArgument()
+        .endMethod()
 
         .addNewMethod()
         .withNewModifiers().withProtected().withStatic().endModifiers()
@@ -276,6 +294,43 @@ public class BuilderContext {
         .addNewArgument()
         .withName("target")
         .withTypeRef(F.toReference())
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withParameters(F)
+        .withDefaultMethod(true)
+        .withNewModifiers().withPublic().endModifiers()
+        .withParameters(F)
+        .withName("getRequirements")
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Predicate.class.getName())).withArguments(F.toReference())
+        .withDimensions(1).endClassRefReturnType()
+        .endMethod()
+
+        .addNewMethod()
+        .withParameters(P)
+        .withDefaultMethod(true)
+        .withName("addRequirement")
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Visitor.class.getName())).withArguments(T.toReference())
+        .endClassRefReturnType()
+        .addNewArgument()
+        .withName("type")
+        .withTypeRef(CLASS.toReference(P.toReference()))
+        .endArgument()
+        .addNewArgument()
+        .withName("predicate")
+        .withNewClassRefTypeLike(ClassRef.forName(Predicate.class.getName())).withArguments(P.toReference()).endClassRefType()
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withName("addRequirement")
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Visitor.class.getName())).withArguments(T.toReference())
+        .endClassRefReturnType()
+        .addNewArgument()
+        .withName("predicate")
+        .withNewClassRefTypeLike(ClassRef.forName(Predicate.class.getName())).withArguments().endClassRefType()
         .endArgument()
         .endMethod()
 
@@ -615,6 +670,102 @@ public class BuilderContext {
         .accept(new ApplyImportsFromResources("io/sundr/builder/VisitorWiretap.java"))
         .build();
 
+    delegatingVisitorClass = new TypeDefBuilder()
+
+        .withNewModifiers().withPublic().endModifiers()
+
+        .withKind(Kind.CLASS)
+        .withPackageName("io.sundr.builder")
+        .withName("DelegatingVisitor")
+        .withParameters(T)
+        .addToImplementsList(visitorInterface.toReference(T.toReference()))
+
+        .addNewProperty()
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
+        .withTypeRef(CLASS.toReference(T.toReference()))
+        .withName("type")
+        .endProperty()
+
+        .addNewProperty()
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("delegate")
+        .endProperty()
+
+        .addNewConstructor()
+        .addNewArgument()
+        .withTypeRef(CLASS.toReference(T.toReference()))
+        .withName("type")
+        .endArgument()
+        .addNewArgument()
+        .withTypeRef(visitorInterface.toReference(T.toReference()))
+        .withName("delegate")
+        .endArgument()
+        .endConstructor()
+
+        .addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withName("getType")
+        .withReturnType(CLASS.toReference(T.toReference()))
+        .endMethod()
+
+        //visit
+        .addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withName("visit")
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .withReturnType(new VoidRef())
+        .endMethod()
+
+        .addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withName("order")
+        .withReturnType(PRIMITIVE_INT_REF)
+        .endMethod()
+
+        //default void visit(List<Object> path, T element) {
+        .addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withName("visit")
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(T.toReference())
+        .endArgument()
+        .withReturnType(new VoidRef())
+        .endMethod()
+
+        .addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withParameters(F)
+        .withName("canVisit")
+        .withReturnType(BOOLEAN_REF)
+        .addNewArgument()
+        .withName("target")
+        .withTypeRef(F.toReference())
+        .endArgument()
+        .endMethod()
+
+        .addNewMethod()
+        .withParameters(F)
+        .withNewModifiers().withPublic().endModifiers()
+        .withParameters(F)
+        .withName("getRequirements")
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Predicate.class.getName())).withArguments(F.toReference())
+        .withDimensions(1).endClassRefReturnType()
+        .endMethod()
+
+        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("DelegatingVisitor", "io/sundr/builder/DelegatingVisitor.java", true))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/DelegatingVisitor.java"))
+        .build();
+
     visitableInterface = new TypeDefBuilder()
 
         .withNewModifiers().withPublic().endModifiers()
@@ -939,6 +1090,20 @@ public class BuilderContext {
         .withVarArgPreferred(true)
         .endMethod()
 
+        .addNewMethod()
+        .withNewModifiers().withPrivate().endModifiers()
+        .withReturnType(BOOLEAN_REF)
+        .withName("isSatisfied")
+        .addNewArgument()
+        .withName("path")
+        .withTypeRef(Collections.LIST.toReference(TypeDef.OBJECT_REF))
+        .endArgument()
+        .addNewArgument()
+        .withName("visitor")
+        .withTypeRef(visitorInterface.toReference(new WildcardRef()))
+        .endArgument()
+        .endMethod()
+
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .accept(new ApplyMethodBlockFromResources("BaseFluent", "io/sundr/builder/BaseFluent.java"))
         .accept(new ApplyImportsFromResources("io/sundr/builder/BaseFluent.java"))
@@ -1108,6 +1273,10 @@ public class BuilderContext {
 
   public TypeDef getVisitorWiretapClass() {
     return visitorWiretapClass;
+  }
+
+  public TypeDef getDelegatingVisitorClass() {
+    return delegatingVisitorClass;
   }
 
   public TypeDef getInlineableBase() {

@@ -508,7 +508,10 @@ public class ClazzAs {
             .filter(m -> m != null && m.getExceptions() != null)
             .flatMap(m -> m.getExceptions().stream()).collect(Collectors.toList());
 
-        ClassRef buildableInterfaceRef = i.toInternalReference();
+        ClassRef buildableInterfaceRef = item.getImplementsList().stream()
+            .filter(candidate -> candidate.getFullyQualifiedName().equals(i.getFullyQualifiedName())).findFirst()
+            .orElseThrow(() -> new IllegalStateException(
+                "Could not find reference for implemented interface:" + i.getFullyQualifiedName()));
 
         Method sourceInstanceAndFluentCosntructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(buildableInterfaceRef)
