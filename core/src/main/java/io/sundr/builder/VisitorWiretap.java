@@ -45,8 +45,8 @@ public class VisitorWiretap<T> implements Visitor<T> {
   }
 
   @Override
-  public <F> Boolean canVisit(F target) {
-    boolean canVisit = delegate.canVisit(target);
+  public <F> Boolean canVisit(List<Object> path, F target) {
+    boolean canVisit = delegate.canVisit(path, target);
     listeners.forEach(l -> l.onCheck(delegate, canVisit, target));
     return canVisit;
   }

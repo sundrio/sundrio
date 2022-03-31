@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> {
 
@@ -88,25 +87,11 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     });
   }
 
-  private boolean isSatisfied(List<Object> path, Visitor<?> visitor) {
-    return visitor.getRequirements().length == 0 || Arrays.stream(visitor.getRequirements()).allMatch(r -> {
-      return Stream.concat(Stream.of(this), path.stream()).anyMatch(o -> {
-        try {
-          boolean result = r.test(o);
-          return result;
-        } catch (Exception e) {
-          return false;
-        }
-      });
-    });
-  }
-
   @Override
   public F accept(List<Object> path, Visitor... visitors) {
     Arrays.stream(visitors)
         .map(v -> VisitorListener.wrap(v))
-        .filter(v -> ((Visitor) v).canVisit(this))
-        .filter(v -> isSatisfied(path, (Visitor) v)) // We need to ensure that requirements are met.
+        .filter(v -> ((Visitor) v).canVisit(path, this))
         .sorted((l, r) -> ((Visitor) r).order() - ((Visitor) l).order())
         .forEach(v -> {
           ((Visitor) v).visit(path, this);

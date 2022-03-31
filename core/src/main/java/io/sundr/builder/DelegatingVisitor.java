@@ -36,19 +36,6 @@ public class DelegatingVisitor<T> implements Visitor<T> {
   }
 
   @Override
-  public <F> Boolean canVisit(F target) {
-    if (target == null) {
-      return false;
-    }
-    if (type == null) {
-      return hasVisitMethodMatching(target);
-    } else if (!type.isAssignableFrom(target.getClass())) {
-      return false;
-    }
-    return true;
-  }
-
-  @Override
   public int order() {
     return delegate.order();
   }

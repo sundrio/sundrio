@@ -17,6 +17,7 @@
 
 package io.sundr.builder;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface Visitable<T> {
@@ -37,7 +38,7 @@ public interface Visitable<T> {
 
   default T accept(Visitor... visitors) {
     for (Visitor visitor : visitors) {
-      if (visitor.canVisit(this)) {
+      if (visitor.canVisit(Collections.emptyList(), this)) {
         visitor.visit(this);
       }
     }
@@ -46,7 +47,7 @@ public interface Visitable<T> {
 
   default T accept(List<Object> path, Visitor... visitors) {
     for (Visitor visitor : visitors) {
-      if (visitor.canVisit(this)) {
+      if (visitor.canVisit(path, this)) {
         visitor.visit(path, this);
       }
     }
