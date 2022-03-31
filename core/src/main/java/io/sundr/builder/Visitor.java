@@ -39,7 +39,7 @@ public interface Visitor<T> {
     return (Class<T>) args.get(0);
   }
 
-  default <F> Boolean canVisit(F target) {
+  default <F> Boolean canVisit(List<Object> path, F target) {
     if (target == null) {
       return false;
     }
@@ -49,7 +49,18 @@ public interface Visitor<T> {
     } else if (!getType().isAssignableFrom(target.getClass())) {
       return false;
     }
-    return true;
+
+    return getRequirements().length == 0 || Arrays.stream(getRequirements()).allMatch(r -> {
+      return Stream.concat(Stream.of(this), path.stream()).anyMatch(o -> {
+        try {
+          return r.test(o);
+        } catch (ClassCastException e) {
+          // This will happen if predicte does not match the Object.
+          // So, instead of using reflection to determine that, let's just catch the error
+          return false;
+        }
+      });
+    });
   }
 
   default Predicate[] getRequirements() {

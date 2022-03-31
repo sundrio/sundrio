@@ -42,19 +42,6 @@ public class PathAwareTypedVisitor<V, P> implements Visitor<V> {
     visit(element);
   }
 
-  @Override
-  public <F> Boolean canVisit(F target) {
-    if (target == null) {
-      return false;
-    }
-    if (getType() == null) {
-      return false;
-    } else if (!getType().isAssignableFrom(target.getClass())) {
-      return false;
-    }
-    return true;
-  }
-
   /**
    * Checks if the specified visitor has a visit method compatible with the specified fluent.
    * 
