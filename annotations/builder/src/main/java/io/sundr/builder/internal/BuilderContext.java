@@ -1014,7 +1014,7 @@ public class BuilderContext {
         .withNewModifiers().withPublic().withStatic().endModifiers()
         .withName("build")
         .withParameters(T)
-        .withReturnType(Collections.LIST.toReference(T.toReference()))
+        .withReturnType(Collections.SET.toReference(T.toReference()))
         .addNewArgument()
         .withTypeRef(Collections.SET.toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS)
             .withBounds(builderInterface
