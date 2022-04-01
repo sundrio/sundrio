@@ -31,8 +31,8 @@ public class DelegatingVisitor<T> implements Visitor<T> {
   }
 
   @Override
-  public Predicate[] getRequirements() {
-    return delegate.getRequirements();
+  public Predicate<List<Object>> getRequirement() {
+    return delegate.getRequirement();
   }
 
   @Override

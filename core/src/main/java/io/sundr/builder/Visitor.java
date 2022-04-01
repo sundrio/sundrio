@@ -17,10 +17,8 @@
 package io.sundr.builder;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 @FunctionalInterface
 public interface Visitor<T> {
@@ -50,21 +48,22 @@ public interface Visitor<T> {
       return false;
     }
 
-    return getRequirements().length == 0 || Arrays.stream(getRequirements()).allMatch(r -> {
-      return Stream.concat(Stream.of(this), path.stream()).anyMatch(o -> {
-        try {
-          return r.test(o);
-        } catch (ClassCastException e) {
-          // This will happen if predicte does not match the Object.
-          // So, instead of using reflection to determine that, let's just catch the error
-          return false;
-        }
-      });
-    });
+    try {
+      return getRequirement().test(path);
+    } catch (ClassCastException e) {
+      // This will happen if predicte does not match the Object.
+      // So, instead of using reflection to determine that, let's just catch the error
+      return false;
+    }
   }
 
-  default Predicate[] getRequirements() {
-    return new Predicate[0];
+  default Predicate<List<Object>> getRequirement() {
+    return p -> true;
+  }
+
+  default <I> Predicate<List<Object>> hasItem(Class<I> type, Predicate<I> predicate) {
+    Predicate<List<Object>> result = l -> l.stream().filter(i -> type.isInstance(i)).map(i -> type.cast(i)).anyMatch(predicate);
+    return result;
   }
 
   /**
@@ -101,9 +100,8 @@ public interface Visitor<T> {
   default Visitor<T> addRequirement(Predicate predicate) {
     return new DelegatingVisitor(getType(), this) {
       @Override
-      public Predicate[] getRequirements() {
-        return Stream.concat(Arrays.stream(Visitor.this.getRequirements()), Stream.of(predicate))
-            .toArray(size -> new Predicate[size]);
+      public Predicate<List<Object>> getRequirement() {
+        return Visitor.this.getRequirement().and(predicate);
       }
     };
   }

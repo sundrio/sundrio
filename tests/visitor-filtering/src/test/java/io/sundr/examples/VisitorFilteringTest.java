@@ -21,17 +21,30 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+import java.util.function.Predicate;
+
 import org.junit.Test;
 
 import io.sundr.builder.Visitor;
-import io.sundr.builder.Visitors;
 
 public class VisitorFilteringTest {
 
   @Test
   public void testFiltering() {
-    Visitor<SelectorBuilder> visitor = Visitors.newVisitor(SelectorBuilder.class, s -> s.addToLabels("foo", "bar"))
-        .addRequirement(DeploymentBuilder.class, d -> d.getName().equals("my-deployment"));
+    Visitor<SelectorBuilder> visitor = new Visitor<SelectorBuilder>() {
+
+      @Override
+      public void visit(SelectorBuilder s) {
+        s.addToLabels("foo", "bar");
+      }
+
+      public Predicate<List<Object>> getRequirement() {
+        return hasItem(DeploymentBuilder.class, d -> d.getName().equals("my-deployment"));
+      }
+
+    };
+    //      Visitors.newVisitor(SelectorBuilder.class, s -> s.addToLabels("foo", "bar")) .addRequirement(DeploymentBuilder.class, d -> d.getName().equals("my-deployment"));
 
     Deployment myDeployment = new DeploymentBuilder()
         .withName("my-deployment")
