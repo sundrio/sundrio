@@ -559,23 +559,9 @@ public class ClazzAs {
           .build();
       methods.add(build);
 
-      Method equals = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-          .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
-          .withTypeRef(Types.OBJECT_REF).endArgument().withName("equals")
-          .withNewBlock()
-          .withStatements(BuilderUtils.toEquals(builderType, fields))
-          .endBlock()
-          .build();
-
-      Method hashCode = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-          .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_INT_REF).withName("hashCode")
-          .withNewBlock()
-          .withStatements(BuilderUtils.toHashCode(fields))
-          .endBlock()
-          .build();
-
-      methods.add(equals);
-      methods.add(hashCode);
+      //
+      // We don't want to generate equals and hashCode for the builder as in most cases contains self references, leading to stack overflow errors
+      //
 
       if (validationEnabled) {
         ClassRef validatorRef = new ClassRefBuilder().withFullyQualifiedName("javax.validation.Validator").build();
