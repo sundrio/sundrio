@@ -1096,6 +1096,22 @@ public class BuilderContext {
         .withVarArgPreferred(true)
         .endMethod()
 
+        .addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withReturnType(PRIMITIVE_INT_REF)
+        .withName("hashCode")
+        .endMethod()
+
+        .addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withReturnType(PRIMITIVE_BOOLEAN_REF)
+        .withName("equals")
+        .addNewArgument()
+        .withName("obj")
+        .withTypeRef(TypeDef.OBJECT_REF)
+        .endArgument()
+        .endMethod()
+
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .accept(new ApplyMethodBlockFromResources("BaseFluent", "io/sundr/builder/BaseFluent.java"))
         .accept(new ApplyImportsFromResources("io/sundr/builder/BaseFluent.java"))
