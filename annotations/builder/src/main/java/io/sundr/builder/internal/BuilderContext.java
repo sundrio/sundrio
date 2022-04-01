@@ -118,6 +118,10 @@ public class BuilderContext {
         .withName("P")
         .build();
 
+    TypeParamDef I = new TypeParamDefBuilder()
+        .withName("I")
+        .build();
+
     TypeDef consumerInterface = new TypeDefBuilder(TypeDef.forName(Consumer.class.getName()))
         .withParameters(T)
         .build();
@@ -302,13 +306,29 @@ public class BuilderContext {
         .endMethod()
 
         .addNewMethod()
-        .withParameters(F)
+        .withParameters(T)
         .withDefaultMethod(true)
         .withNewModifiers().withPublic().endModifiers()
-        .withParameters(F)
-        .withName("getRequirements")
-        .withNewClassRefReturnTypeLike(ClassRef.forName(Predicate.class.getName())).withArguments(F.toReference())
-        .withDimensions(1).endClassRefReturnType()
+        .withName("getRequirement")
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Predicate.class.getName()))
+        .withArguments(Collections.LIST.toReference(TypeDef.OBJECT_REF)).endClassRefReturnType()
+        .endMethod()
+
+        .addNewMethod()
+        .withDefaultMethod()
+        .withParameters(I)
+        .withNewModifiers().withPublic().endModifiers()
+        .withName("hasItem")
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Predicate.class.getName()))
+        .withArguments(Collections.LIST.toReference(TypeDef.OBJECT_REF)).endClassRefReturnType()
+        .addNewArgument()
+        .withName("type")
+        .withTypeRef(CLASS.toReference(I.toReference()))
+        .endArgument()
+        .addNewArgument()
+        .withName("predicate")
+        .withNewClassRefTypeLike(ClassRef.forName(Predicate.class.getName())).withArguments(I.toReference()).endClassRefType()
+        .endArgument()
         .endMethod()
 
         .addNewMethod()
@@ -742,9 +762,9 @@ public class BuilderContext {
         .withParameters(F)
         .withNewModifiers().withPublic().endModifiers()
         .withParameters(F)
-        .withName("getRequirements")
-        .withNewClassRefReturnTypeLike(ClassRef.forName(Predicate.class.getName())).withArguments(F.toReference())
-        .withDimensions(1).endClassRefReturnType()
+        .withName("getRequirement")
+        .withNewClassRefReturnTypeLike(ClassRef.forName(Predicate.class.getName()))
+        .withArguments(Collections.LIST.toReference(TypeDef.OBJECT_REF)).endClassRefReturnType()
         .endMethod()
 
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))

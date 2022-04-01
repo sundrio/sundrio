@@ -40,8 +40,8 @@ public class VisitorWiretap<T> implements Visitor<T> {
   }
 
   @Override
-  public Predicate[] getRequirements() {
-    return delegate.getRequirements();
+  public Predicate<List<Object>> getRequirement() {
+    return delegate.getRequirement();
   }
 
   @Override

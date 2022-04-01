@@ -115,8 +115,8 @@ public class ShapesTest {
       }
 
       @Override
-      public Predicate[] getRequirements() {
-        return new Predicate[] { (Predicate<CanvasBuilder>) c -> !c.hasShapes() };
+      public Predicate<List<Object>> getRequirement() {
+        return hasItem(CanvasBuilder.class, c -> !c.hasShapes());
       }
     }).build();
 
@@ -130,8 +130,8 @@ public class ShapesTest {
       }
 
       @Override
-      public Predicate[] getRequirements() {
-        return new Predicate[] { (Predicate<CanvasBuilder>) c -> c.hasShapes() };
+      public Predicate<List<Object>> getRequirement() {
+        return hasItem(CanvasBuilder.class, c -> c.hasShapes());
       }
     }).build();
 
