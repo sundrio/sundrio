@@ -51,8 +51,8 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     return list == null ? null : new ArrayList<T>(list.stream().map(Builder::build).collect(Collectors.toList()));
   }
 
-  public static <T> List<T> build(Set<? extends Builder<? extends T>> set) {
-    return set == null ? null : new ArrayList<T>(set.stream().map(Builder::build).collect(Collectors.toList()));
+  public static <T> Set<T> build(Set<? extends Builder<? extends T>> set) {
+    return set == null ? null : new LinkedHashSet<T>(set.stream().map(Builder::build).collect(Collectors.toSet()));
   }
 
   public static <T> List<T> aggregate(List<? extends T>... lists) {
