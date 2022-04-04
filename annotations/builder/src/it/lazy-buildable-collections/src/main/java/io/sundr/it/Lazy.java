@@ -16,19 +16,26 @@
 
 package io.sundr.it;
 
-import io.sundr.builder.annotations.Buildable;
 import java.util.List;
+import java.util.Set;
+import io.sundr.builder.annotations.Buildable;
 
-@Buildable(lazyCollectionInitEnabled=true)
+@Buildable(lazyCollectionInitEnabled = true)
 public class Lazy {
 
-    private final List<Thing> list;
+  private final List<Thing> list;
+    private final Set<Thing> set;
 
-    public Lazy(List<Thing> list) {
+  public Lazy(List<Thing> list, Set<Thing> set) {
         this.list = list;
+                this.set = set;
     }
 
     public List<Thing> getList() {
         return this.list;
+    }
+
+    public Set<Thing> getSet() {
+      return set;
     }
 }

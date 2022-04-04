@@ -18,6 +18,8 @@ package io.sundr.it;
 import org.junit.Test;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 import static org.junit.Assert.*;
 
@@ -27,26 +29,32 @@ public class LazyTest {
     public void shouldReturnNull() {
         Lazy item = new LazyBuilder().build();
         assertNull(item.getList());
+        assertNull(item.getSet());
     }
 
     @Test
     public void shouldRespectWithNull() {
-        Lazy item = new LazyBuilder().withList((List<String>)null).build();
+        Lazy item = new LazyBuilder().withList((List<String>)null).withSet((Set<String>)null).build();
         assertNull(item.getList());
+        assertNull(item.getSet());
     }
 
     @Test
-    public void shouldRespectWithList() {
-        Lazy item = new LazyBuilder().withList(new ArrayList<String>()).build();
+    public void shouldRespectWith() {
+        Lazy item = new LazyBuilder().withList(new ArrayList<>()).withSet(new LinkedHashSet<>()).build();
         assertNotNull(item.getList());
         assertEquals(0, item.getList().size());
+        assertEquals(0, item.getSet().size());
     }
 
     @Test
-    public void shouldRespecAddToList() {
-        Lazy item = new LazyBuilder().addToList("foo").build();
+    public void shouldRespecAddTo() {
+        Lazy item = new LazyBuilder().addToList(new String("foo")).addToSet(new String("bar")).build();
         assertNotNull(item.getList());
         assertEquals(1, item.getList().size());
         assertEquals("foo", item.getList().get(0));
+
+        assertEquals(1, item.getSet().size());
+        assertEquals("bar", item.getSet().iterator().next());
     }
 }

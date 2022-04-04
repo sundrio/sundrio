@@ -17,18 +17,25 @@
 package io.sundr.it;
 
 import java.util.List;
+import java.util.Set;
 import io.sundr.builder.annotations.Buildable;
 
 @Buildable
 public class Default {
 
-    private final List<Thing> list;
+  private final List<Thing> list;
+    private final Set<Thing> set;
 
-    public Default(List<Thing> list) {
+  public Default(List<Thing> list, Set<Thing> set) {
         this.list = list;
+                this.set = set;
     }
 
     public List<Thing> getList() {
         return this.list;
+    }
+
+    public Set<Thing> getSet() {
+      return set;
     }
 }

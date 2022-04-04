@@ -18,6 +18,8 @@ package io.sundr.it;
 import org.junit.Test;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 import static org.junit.Assert.*;
 
@@ -27,26 +29,32 @@ public class DefaultTest {
     public void shouldReturnNull() {
         Default item = new DefaultBuilder().build();
         assertNull(item.getList());
+        assertNull(item.getSet());
     }
 
     @Test
     public void shouldRespectWithNull() {
-        Default item = new DefaultBuilder().withList((List<String>)null).build();
+        Default item = new DefaultBuilder().withList((List<String>)null).withSet((Set<String>)null).build();
         assertNull(item.getList());
+        assertNull(item.getSet());
     }
 
     @Test
-    public void shouldRespectWithList() {
-        Default item = new DefaultBuilder().withList(new ArrayList<String>()).build();
+    public void shouldRespectWith() {
+        Default item = new DefaultBuilder().withList(new ArrayList<>()).withSet(new LinkedHashSet<>()).build();
         assertNotNull(item.getList());
         assertEquals(0, item.getList().size());
+        assertEquals(0, item.getSet().size());
     }
 
     @Test
-    public void shouldRespecAddToList() {
-        Default item = new DefaultBuilder().addToList("foo").build();
+    public void shouldRespecAddTo() {
+        Default item = new DefaultBuilder().addToList(new String("foo")).addToSet(new String("bar")).build();
         assertNotNull(item.getList());
         assertEquals(1, item.getList().size());
         assertEquals("foo", item.getList().get(0));
+
+        assertEquals(1, item.getSet().size());
+        assertEquals("bar", item.getSet().iterator().next());
     }
 }
