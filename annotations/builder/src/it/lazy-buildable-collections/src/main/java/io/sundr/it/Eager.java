@@ -17,18 +17,26 @@
 package io.sundr.it;
 
 import java.util.List;
+import java.util.Set;
 import io.sundr.builder.annotations.Buildable;
 
-@Buildable(lazyCollectionInitEnabled=false)
+@Buildable(lazyCollectionInitEnabled = false)
 public class Eager {
 
-    private final List<Thing> list;
+  private final List<Thing> list;
+    private final Set<Thing> set;
 
-    public Eager(List<Thing> list) {
+  public Eager(List<Thing> list, Set<Thing> set) {
         this.list = list;
+                this.set = set;
+
     }
 
     public List<Thing> getList() {
         return this.list;
+    }
+
+    public Set<Thing> getSet() {
+      return set;
     }
 }

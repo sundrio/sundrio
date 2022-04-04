@@ -1,3 +1,4 @@
+
 /*
  *      Copyright 2019 The original authors.
  *
@@ -17,18 +18,25 @@
 package io.sundr.it;
 
 import java.util.List;
+import java.util.Set;
 import io.sundr.builder.annotations.Buildable;
 
 @Buildable(lazyCollectionInitEnabled=false)
 public class Eager {
 
     private final List<String> list;
+    private final Set<String> set;
 
-    public Eager(List<String> list) {
+  public Eager(List<String> list, Set<String> set) {
         this.list = list;
+        this.set = set;
     }
 
     public List<String> getList() {
         return this.list;
+    }
+
+    public Set<String> getSet() {
+      return set;
     }
 }

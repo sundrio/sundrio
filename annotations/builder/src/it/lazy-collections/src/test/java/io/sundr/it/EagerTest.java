@@ -18,36 +18,45 @@ package io.sundr.it;
 import org.junit.Test;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 import static org.junit.Assert.*;
 
 public class EagerTest {
 
     @Test
-    public void shouldReturnEmpty() {
+    public void shouldReturnNull() {
         Eager item = new EagerBuilder().build();
         assertNotNull(item.getList());
-        assertEquals(0, item.getList().size());
+        assertTrue(item.getList().isEmpty());
+        assertNotNull(item.getSet());
+        assertTrue(item.getSet().isEmpty());
     }
 
     @Test
     public void shouldRespectWithNull() {
-        Eager item = new EagerBuilder().withList((List<String>)null).build();
+        Eager item = new EagerBuilder().withList((List<String>)null).withSet((Set<String>)null).build();
         assertNull(item.getList());
+        assertNull(item.getSet());
     }
 
     @Test
-    public void shouldRespectWithList() {
-        Eager item = new EagerBuilder().withList(new ArrayList<String>()).build();
+    public void shouldRespectWith() {
+        Eager item = new EagerBuilder().withList(new ArrayList<>()).withSet(new LinkedHashSet<>()).build();
         assertNotNull(item.getList());
         assertEquals(0, item.getList().size());
+        assertEquals(0, item.getSet().size());
     }
 
     @Test
-    public void shouldRespecAddToList() {
-        Eager item = new EagerBuilder().addToList("foo").build();
+    public void shouldRespecAddTo() {
+        Eager item = new EagerBuilder().addToList(new String("foo")).addToSet(new String("bar")).build();
         assertNotNull(item.getList());
         assertEquals(1, item.getList().size());
         assertEquals("foo", item.getList().get(0));
+
+        assertEquals(1, item.getSet().size());
+        assertEquals("bar", item.getSet().iterator().next());
     }
 }
