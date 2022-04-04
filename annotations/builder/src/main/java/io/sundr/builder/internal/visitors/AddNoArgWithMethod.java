@@ -30,7 +30,8 @@ public class AddNoArgWithMethod implements Visitor<TypeDefFluent<?>> {
   @Override
   public void visit(TypeDefFluent<?> type) {
     List<Method> withBooleanMethods = type.buildMethods().stream()
-        .filter(m -> m.getName().startsWith("with"))
+        //Only focus on methods that start `with` but not `withNew` as it can cause conflicts with nested buildables that are inlinable using a single boolean argument
+        .filter(m -> m.getName().startsWith("with") && !m.getName().startsWith("withNew"))
         .filter(m -> m.getArguments().size() == 1)
         .filter(m -> m.getArguments().get(0).getTypeRef().equals(Types.BOOLEAN_REF)
             || m.getArguments().get(0).getTypeRef().equals(Types.PRIMITIVE_BOOLEAN_REF))
