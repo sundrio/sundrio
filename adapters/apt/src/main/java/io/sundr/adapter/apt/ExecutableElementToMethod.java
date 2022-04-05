@@ -9,6 +9,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.AnnotationValueVisitor;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
@@ -44,8 +46,92 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
 
   public Method apply(ExecutableElement executableElement) {
     Map<AttributeKey, Object> attributes = new HashMap<>();
-    if (executableElement.getDefaultValue() != null) {
-      attributes.put(Attributeable.DEFAULT_VALUE, String.valueOf(executableElement.getDefaultValue()));
+    if (executableElement.getDefaultValue() != null && executableElement.getDefaultValue().getValue() != null) {
+      Object defaultValue = executableElement.getDefaultValue().accept(new AnnotationValueVisitor() {
+        public Object visit(AnnotationValue av) {
+          return String.valueOf(av);
+        }
+
+        @Override
+        public Object visit(AnnotationValue av, Object p) {
+          return String.valueOf(av);
+        }
+
+        @Override
+        public Object visitBoolean(boolean b, Object p) {
+          return String.valueOf(b);
+        }
+
+        @Override
+        public Object visitByte(byte b, Object p) {
+          return String.valueOf(b);
+        }
+
+        @Override
+        public Object visitChar(char c, Object p) {
+          return String.valueOf(c);
+        }
+
+        @Override
+        public Object visitDouble(double d, Object p) {
+          return String.valueOf(d);
+        }
+
+        @Override
+        public Object visitFloat(float f, Object p) {
+          return String.valueOf(f);
+        }
+
+        @Override
+        public Object visitInt(int i, Object p) {
+          return String.valueOf(i);
+        }
+
+        @Override
+        public Object visitLong(long i, Object p) {
+          return String.valueOf(i) + "L";
+        }
+
+        @Override
+        public Object visitShort(short s, Object p) {
+          return String.valueOf(s);
+        }
+
+        @Override
+        public Object visitString(String s, Object p) {
+          return s;
+        }
+
+        @Override
+        public Object visitType(TypeMirror t, Object p) {
+          return t.toString();
+        }
+
+        @Override
+        public Object visitEnumConstant(VariableElement c, Object p) {
+          if (c.getSimpleName().toString().contains(c.getEnclosingElement().toString())) {
+            return c.getSimpleName().toString();
+          }
+          return c.getEnclosingElement() + "." + c.getSimpleName();
+        }
+
+        @Override
+        public Object visitAnnotation(AnnotationMirror a, Object p) {
+          return a;
+        }
+
+        @Override
+        public Object visitArray(List vals, Object p) {
+          return vals;
+        }
+
+        @Override
+        public Object visitUnknown(AnnotationValue av, Object p) {
+          return av;
+        }
+      }, null);
+
+      attributes.put(Attributeable.DEFAULT_VALUE, String.valueOf(defaultValue));
     }
     String comments = context.getElements().getDocComment(executableElement);
     List<String> commentList = Strings.isNullOrEmpty(comments) ? new ArrayList<>()
@@ -76,5 +162,4 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
     }
     return methodBuilder.build();
   }
-
 }
