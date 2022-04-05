@@ -28,6 +28,7 @@ public class ReactorContextFactory {
 
   private static MavenVersion VERSION_3_0_0 = new MavenVersion(3, 0, 0);
   private static MavenVersion VERSION_3_3_0 = new MavenVersion(3, 3, 0);
+  private static MavenVersion VERSION_3_8_5 = new MavenVersion(3, 8, 5);
 
   private final MavenVersion version;
 
@@ -40,7 +41,7 @@ public class ReactorContextFactory {
     ReactorContext context;
     if (VERSION_3_0_0.compareTo(version) < 0) {
       throw new UnsupportedOperationException("ReactorContext is not supported in maven version:" + version);
-    } else if (VERSION_3_3_0.compareTo(version) < 0) {
+    } else if (VERSION_3_3_0.compareTo(version) < 0 || VERSION_3_8_5.compareTo(version) >= 0) {
       context = create_3_2_x(result, index, classLoader, status);
     } else {
       context = create_3_3_x(result, index, classLoader, status, builder);
