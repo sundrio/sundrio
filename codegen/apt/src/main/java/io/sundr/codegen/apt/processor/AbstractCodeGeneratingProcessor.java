@@ -13,13 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 package io.sundr.codegen.apt.processor;
 
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.SourceVersion;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.apt.AptContext;
@@ -43,6 +43,11 @@ public abstract class AbstractCodeGeneratingProcessor extends AbstractProcessor 
         .withOutput(new TypeDefAptOutput(processingEnv.getFiler()))
         .skipping(AbstractCodeGeneratingProcessor::classExists)
         .build();
+  }
+
+  @Override
+  public SourceVersion getSupportedSourceVersion() {
+    return SourceVersion.latest();
   }
 
   public void generate(TypeDef type) {
