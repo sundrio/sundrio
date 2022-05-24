@@ -312,7 +312,10 @@ class ToMethod {
         String builderClass = builder.toReference().getFullyQualifiedName();
         statements.add(new StringStatement(
             "if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "(" + argumentName
-                + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");} return (" + returnType + ") this;"));
+                + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");}"
+                + " else { this." + fieldName + " = null; _visitables.get(\"" + fieldName + "\").remove(this." + fieldName
+                + "); }"
+                + " return (" + returnType + ") this;"));
         return statements;
       }
 
