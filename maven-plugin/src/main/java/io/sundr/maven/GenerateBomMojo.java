@@ -394,7 +394,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     ProjectIndex projectIndex = new ProjectIndex(session.getProjects());
     try {
       ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus(new BomDependencyGraph(session.getProjects()));
-      ReactorContext reactorContext = new ReactorContextFactory(new MavenVersion(mavenVersion)).create(session.getResult(),
+      ReactorContext reactorContext = new ReactorContextFactory(mavenVersion).create(session.getResult(),
           projectIndex, Thread.currentThread().getContextClassLoader(),
           reactorBuildStatus, builder);
       List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);

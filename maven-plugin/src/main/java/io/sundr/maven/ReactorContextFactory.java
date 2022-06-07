@@ -17,7 +17,9 @@
 package io.sundr.maven;
 
 import java.lang.reflect.Constructor;
+import java.util.Objects;
 
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.ProjectIndex;
@@ -26,22 +28,22 @@ import org.apache.maven.lifecycle.internal.ReactorContext;
 
 public class ReactorContextFactory {
 
-  private static MavenVersion VERSION_3_0_0 = new MavenVersion(3, 0, 0);
-  private static MavenVersion VERSION_3_3_0 = new MavenVersion(3, 3, 0);
-  private static MavenVersion VERSION_3_8_5 = new MavenVersion(3, 8, 5);
+  private static ComparableVersion VERSION_3_0_0 = new ComparableVersion("3.0.0");
+  private static ComparableVersion VERSION_3_3_0 = new ComparableVersion("3.3.0");
+  private static ComparableVersion VERSION_3_8_5 = new ComparableVersion("3.8.5");
 
-  private final MavenVersion version;
+  private final ComparableVersion version;
 
-  public ReactorContextFactory(MavenVersion version) {
-    this.version = version;
+  public ReactorContextFactory(String version) {
+    this.version = new ComparableVersion(Objects.requireNonNull(version, "Maven version must not be null"));
   }
 
   public ReactorContext create(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader,
       ReactorBuildStatus status, LifecycleModuleBuilder builder) {
-    ReactorContext context;
-    if (VERSION_3_0_0.compareTo(version) < 0) {
-      throw new UnsupportedOperationException("ReactorContext is not supported in maven version:" + version);
-    } else if (VERSION_3_3_0.compareTo(version) < 0 || VERSION_3_8_5.compareTo(version) >= 0) {
+    final ReactorContext context;
+    if (version.compareTo(VERSION_3_0_0) < 0) {
+      throw new UnsupportedOperationException("ReactorContext is not supported in maven version: " + version);
+    } else if (version.compareTo(VERSION_3_3_0) < 0 || version.compareTo(VERSION_3_8_5) == 0) {
       context = create_3_2_x(result, index, classLoader, status);
     } else {
       context = create_3_3_x(result, index, classLoader, status, builder);
