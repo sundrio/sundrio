@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -87,31 +88,10 @@ public class ClazzAs {
           Map<String, Property> itemProperties = item.getProperties().stream()
               .collect(Collectors.toMap(Property::getName, p -> p));
 
-          for (Property property : item.getAllProperties()) {
+          item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
             final TypeRef unwrapped = TypeAs
                 .combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
                 .apply(property.getTypeRef());
-
-            if (property.isStatic()) {
-              continue;
-            }
-            if (propertiesToIgnore.contains(property.getName())) {
-              continue;
-            }
-            if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
-              continue;
-            }
-
-            boolean isInherited = !itemProperties.containsKey(property.getName());
-            boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
-            boolean hasBuildableSuperClass = item.getExtendsList().stream().anyMatch(s -> isBuildable(s));
-
-            // We should skip fields that originate from buildable superclasses, unless they are generic.
-            // Generic fields need to be processed at the level they can be resolved to an actual type.
-            if (isInherited && hasBuildableSuperClass && !isGeneric) {
-              continue;
-            }
-
             Property toAdd = new PropertyBuilder(property).withNewModifiers().endModifiers()
                 .addToAttributes(ORIGIN_TYPEDEF, item)
                 .addToAttributes(OUTER_INTERFACE, fluentType).addToAttributes(OUTER_CLASS, fluentImplType)
@@ -207,7 +187,7 @@ public class ClazzAs {
                 nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
               }
             }
-          }
+          });
 
           return new TypeDefBuilder(fluentType).withComments("Generated").withAnnotations().withInnerTypes(nestedClazzes)
               .withProperties()
@@ -245,29 +225,9 @@ public class ClazzAs {
       constructors.add(instanceConstructor);
 
       Map<String, Property> itemProperties = item.getProperties().stream().collect(Collectors.toMap(Property::getName, p -> p));
-      for (final Property property : item.getAllProperties()) {
+      item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
         final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
             .apply(property.getTypeRef());
-
-        if (property.isStatic()) {
-          continue;
-        }
-        if (propertiesToIgnore.contains(property.getName())) {
-          continue;
-        }
-
-        if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
-          continue;
-        }
-        boolean isInherited = !itemProperties.containsKey(property.getName());
-        boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
-        boolean hasBuildableSuperClass = item.getExtendsList().stream().anyMatch(s -> isBuildable(s));
-
-        // We should skip fields that originate from buildable superclasses, unless they are generic.
-        // Generic fields need to be processed at the level they can be resolved to an actual type.
-        if (isInherited && hasBuildableSuperClass && !isGeneric) {
-          continue;
-        }
 
         final boolean isBuildable = isBuildable(unwrapped);
         final boolean isArray = Types.isArray(property.getTypeRef());
@@ -366,7 +326,7 @@ public class ClazzAs {
         } else {
           properties.add(buildableField(toAdd));
         }
-      }
+      });
 
       Method equals = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
@@ -903,5 +863,36 @@ public class ClazzAs {
             }, ", ") + ");")
         .endBlock()
         .build();
+  }
+
+  private static Predicate<Property> isPropertyApplicable(RichTypeDef item) {
+    final Set<String> propertiesToIgnore = item.hasAttribute(IGNORE_PROPERTIES)
+        ? new HashSet<>(Arrays.asList(item.getAttribute(IGNORE_PROPERTIES)))
+        : new HashSet<>();
+
+    final Map<String, Property> itemProperties = item.getProperties().stream()
+        .collect(Collectors.toMap(Property::getName, p -> p));
+    return property -> {
+      if (property.isStatic()) {
+        return false;
+      }
+      if (propertiesToIgnore.contains(property.getName())) {
+        return false;
+      }
+      if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
+        return false;
+      }
+
+      boolean isInherited = !itemProperties.containsKey(property.getName());
+      boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
+      boolean hasBuildableSuperClass = item.getExtendsList().stream().anyMatch(s -> isBuildable(s));
+
+      // We should skip fields that originate from buildable superclasses, unless they are generic.
+      // Generic fields need to be processed at the level they can be resolved to an actual type.
+      if (isInherited && hasBuildableSuperClass && !isGeneric) {
+        return false;
+      }
+      return true;
+    };
   }
 }
