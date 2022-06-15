@@ -33,7 +33,7 @@ public class DogTest {
   }
 
   @Test
-  public void shoudNotHaveWithKid() {
+  public void shoudNotHaveWithKind() {
     DogBuilder builder = new DogBuilder();
     assertFalse(Arrays.stream(builder.getClass().getMethods()).anyMatch(m -> m.getName().equals("withKind")));
   }

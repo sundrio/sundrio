@@ -30,12 +30,12 @@ public class Setter {
   /**
    * Find the setter of the specified property in the type.
    * 
-   * @param clazz The class.
+   * @param type The class.
    * @param property The property.
    * @return The setter method if found. Throws exception if no setter is matched.
    */
-  public static Method find(TypeDef clazz, Property property) {
-    TypeDef current = clazz;
+  public static Method find(TypeDef type, Property property) {
+    TypeDef current = type;
     while (current != null && !current.equals(TypeDef.OBJECT)) {
       //1st pass strict
       for (Method method : current.getMethods()) {
@@ -57,7 +57,31 @@ public class Setter {
       current = DefinitionRepository.getRepository().getDefinition(fqn);
     }
     throw new SundrException(
-        "No setter found for property: " + property.getName() + " on class: " + clazz.getFullyQualifiedName());
+        "No setter found for property: " + property.getName() + " on class: " + type.getFullyQualifiedName());
+  }
+
+  /**
+   * Find the setter of the specified property in the rich type.
+   * 
+   * @param richType The class.
+   * @param property The property.
+   * @return The setter method if found. Throws exception if no setter is matched.
+   */
+  public static Method find(RichTypeDef richType, Property property) {
+    //1st pass strict
+    for (Method method : richType.getAllMethods()) {
+      if (isApplicable(method, property, true)) {
+        return method;
+      }
+    }
+    //2nd pass relaxed
+    for (Method method : richType.getAllMethods()) {
+      if (isApplicable(method, property, false)) {
+        return method;
+      }
+    }
+    throw new SundrException(
+        "No setter found for property: " + property.getName() + " on class: " + richType.getFullyQualifiedName());
   }
 
   public static boolean has(TypeDef clazz, Property property) {
