@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import javax.lang.model.element.Modifier;
 
 import io.sundr.FunctionFactory;
-import io.sundr.SundrException;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
@@ -78,15 +77,8 @@ public class ClazzAs {
           TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
           TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
-          Set<String> propertiesToIgnore = item.hasAttribute(IGNORE_PROPERTIES)
-              ? new HashSet<>(Arrays.asList(item.getAttribute(IGNORE_PROPERTIES)))
-              : new HashSet<>();
-
           //The generic letter is always the last
           final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
-
-          Map<String, Property> itemProperties = item.getProperties().stream()
-              .collect(Collectors.toMap(Property::getName, p -> p));
 
           item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
             final TypeRef unwrapped = TypeAs
@@ -207,9 +199,6 @@ public class ClazzAs {
       TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
       final TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
-      Set<String> propertiesToIgnore = item.hasAttribute(IGNORE_PROPERTIES)
-          ? new HashSet<>(Arrays.asList(item.getAttribute(IGNORE_PROPERTIES)))
-          : new HashSet<>();
       //The generic letter is always the last
       final TypeParamDef genericType = fluentImplType.getParameters().get(fluentImplType.getParameters().size() - 1);
 
@@ -224,7 +213,6 @@ public class ClazzAs {
       constructors.add(emptyConstructor);
       constructors.add(instanceConstructor);
 
-      Map<String, Property> itemProperties = item.getProperties().stream().collect(Collectors.toMap(Property::getName, p -> p));
       item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
         final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
             .apply(property.getTypeRef());
@@ -619,7 +607,7 @@ public class ClazzAs {
                   if (builder.getName() != null && builder.getName().equals("build")) {
                     builder.withModifiers(Modifiers.from(modifiers));
                     builder.withReturnType(editable.toInternalReference());
-                    builder.withNewBlock().withStatements(toBuild(editable, editable)).endBlock();
+                    builder.withNewBlock().withStatements(toBuild(TypeArguments.apply(editable), editable)).endBlock();
                   }
                 }
               }).build();
@@ -658,7 +646,9 @@ public class ClazzAs {
           .register(BuilderContextManager.getContext().getBuildableRepository()
               .register(new TypeDefBuilder(editableType).withComments("Generated").withAnnotations()
                   .withModifiers(Modifiers.from(modifiers)).withConstructors(constructors).withMethods(methods)
-                  .addToAttributes(BUILDABLE_ENABLED, true).addToAttributes(GENERATED, true) // We want to know that its a generated type...
+                  .addToAttributes(BUILDABLE_ENABLED, true)
+                  .addToAttributes(GENERATED, true) // We want to know that its a generated type...
+                  .addToAttributes(IGNORE_PROPERTIES, item.getAttribute(IGNORE_PROPERTIES)) // We want to know that its a generated type...
                   .build()));
     }
   });
@@ -786,12 +776,9 @@ public class ClazzAs {
     return statements;
   }
 
-  private static List<Statement> toBuild(final TypeDef clazz, final TypeDef instanceType) {
-    Method constructor = findBuildableConstructor(clazz);
+  private static List<Statement> toBuild(final RichTypeDef item, final TypeDef instanceType) {
+    Method constructor = findBuildableConstructor(item);
     List<Statement> statements = new ArrayList<Statement>();
-    Set<String> propertiesToIgnore = clazz.hasAttribute(IGNORE_PROPERTIES)
-        ? new HashSet<>(Arrays.asList(clazz.getAttribute(IGNORE_PROPERTIES)))
-        : new HashSet<>();
 
     statements.add(new StringStatement(new StringBuilder()
         .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
@@ -803,33 +790,16 @@ public class ClazzAs {
         .append(");")
         .toString()));
 
-    TypeDef target = clazz;
-    List<TypeDef> parents = new ArrayList<TypeDef>();
-    Types.visitParents(target, parents);
-    for (TypeDef c : parents) {
-      if (!isRegisteredAsBuildable(c)) {
-        continue;
-      }
-
-      for (Property property : c.getProperties()) {
-        if (propertiesToIgnore.contains(property.getName())) {
-          continue;
-        }
-        Method setter;
-        try {
-          setter = Setter.find(clazz, property);
-        } catch (SundrException e) {
-          continue; // no setter found nothing to set
-        }
-        if (!hasBuildableConstructorWithArgument(c, property)) {
+    Predicate<Property> propertyFilter = isPropertyApplicable(item, false);
+    item.getAllProperties().stream()
+        .filter(propertyFilter)
+        .filter(p -> Setter.hasOrInherits(item, p))
+        .forEach(property -> {
+          Method setter = Setter.find(item, property);
           String getterName = Getter.name(property);
-          statements.add(new StringStatement(new StringBuilder()
-              .append("buildable.").append(setter.getName()).append("(fluent.").append(getterName).append("());")
-              .toString()));
-
-        }
-      }
-    }
+          statements.add(new StringStatement(new StringBuilder().append("buildable.").append(setter.getName())
+              .append("(fluent.").append(getterName).append("());").toString()));
+        });
 
     BuilderContext context = BuilderContextManager.getContext();
     if (context.isExternalvalidatorSupported()) {
@@ -866,6 +836,10 @@ public class ClazzAs {
   }
 
   private static Predicate<Property> isPropertyApplicable(RichTypeDef item) {
+    return isPropertyApplicable(item, true);
+  }
+
+  private static Predicate<Property> isPropertyApplicable(RichTypeDef item, boolean excludeBuildableSuperClassFields) {
     final Set<String> propertiesToIgnore = item.hasAttribute(IGNORE_PROPERTIES)
         ? new HashSet<>(Arrays.asList(item.getAttribute(IGNORE_PROPERTIES)))
         : new HashSet<>();
@@ -889,7 +863,7 @@ public class ClazzAs {
 
       // We should skip fields that originate from buildable superclasses, unless they are generic.
       // Generic fields need to be processed at the level they can be resolved to an actual type.
-      if (isInherited && hasBuildableSuperClass && !isGeneric) {
+      if (excludeBuildableSuperClassFields && (isInherited && hasBuildableSuperClass && !isGeneric)) {
         return false;
       }
       return true;

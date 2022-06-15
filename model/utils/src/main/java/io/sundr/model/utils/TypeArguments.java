@@ -17,6 +17,7 @@
 
 package io.sundr.model.utils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,10 +56,29 @@ public class TypeArguments {
         .flatMap(s -> Stream.concat(Stream.of(s), apply(s).getExtendsList().stream()))
         .collect(Collectors.toList());
 
+    final List<TypeDef> typeDefs = classRefs.stream().map(TypeArguments::apply).collect(Collectors.toList());
+
     // resolve properties
     final List<Property> allProperties = applyToProperties(definition);
     final List<Method> allMethods = applyToMethods(definition);
     final List<Method> allConstructors = applyToConstructors(definition);
+
+    // handle attributes
+    // final Map<AttributeKey, Object> allAttributes = typeDefs.stream().map(t -> t.getAttributes()).reduce(new HashMap(),
+    //     (subtotal, element) -> {
+    //       Map<AttributeKey, Object> result = new HashMap<>();
+    //       result.putAll(subtotal);
+    //       Stream.concat(subtotal.keySet().stream(), element.keySet().stream()).distinct().forEach(key -> {
+    //         if (!result.containsKey(key)) {
+    //           result.put(key, element.getOrDefault(key, subtotal.get(key)));
+    //         } else if (key.getType().isArray() && String.class.equals(key.getType().getComponentType())) {
+    //           result.putAll(mergeStringArrays(key, subtotal, element));
+    //         } else {
+    //           result.put(key, element.getOrDefault(key, subtotal.get(key)));
+    //         }
+    //       });
+    //       return result;
+    //     });
 
     // re-create TypeDef with all the needed information
     return new RichTypeDef(definition.getKind(), definition.getPackageName(),
@@ -112,5 +132,13 @@ public class TypeArguments {
             .filter(INTERNAL_JDK.negate())
             .flatMap(e -> applyToConstructors(apply(e)).stream()))
         .collect(Collectors.toList());
+  }
+
+  private static Map<AttributeKey, Object> mergeStringArrays(AttributeKey<String[]> key, Map<AttributeKey, Object> subtotal,
+      Map<AttributeKey, Object> element) {
+    Map<AttributeKey, Object> result = new HashMap<>();
+    result.put(key, Stream.concat(Arrays.stream((String[]) subtotal.getOrDefault(key, new String[0])),
+        Arrays.stream((String[]) element.getOrDefault(key, new String[0]))).toArray(size -> new String[size]));
+    return result;
   }
 }
