@@ -794,6 +794,7 @@ public class ClazzAs {
     item.getAllProperties().stream()
         .filter(propertyFilter)
         .filter(p -> Setter.hasOrInherits(item, p))
+        .filter(p -> !constructor.getArguments().stream().anyMatch(a -> a.getName().equals(p.getName()))) //Exclude fields that are set via constructor!
         .forEach(property -> {
           Method setter = Setter.find(item, property);
           String getterName = Getter.name(property);
