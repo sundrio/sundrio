@@ -25,6 +25,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -89,6 +90,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     List<Method> constructors = new ArrayList<>();
     List<TypeParamDef> parameters = new ArrayList<>();
     List<AnnotationRef> annotationRefs = new ArrayList<>();
+    List<ClassRef> innerRefs = new ArrayList<>();
 
     if (item.getSuperclass() != null) {
       extendsList.add((ClassRef) typeToTypeRef.apply(item.getGenericSuperclass()));
@@ -127,6 +129,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     String outerFQCN = item.getDeclaringClass() != null ? item.getDeclaringClass().getName() : null;
     TypeDef result = context.getDefinitionRepository().register(new TypeDefBuilder()
         .withKind(kind)
+        .withInnerTypes(Arrays.stream(item.getDeclaredClasses()).map(i -> apply(i)).collect(Collectors.toList()))
         .withOuterTypeName(outerFQCN)
         .withName(item.getSimpleName())
         .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
