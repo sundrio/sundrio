@@ -498,7 +498,14 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     String content = sb.toString();
     for (ClassRef ref : references) {
       //If class is imported
-      if (top.contains("import " + ref.getFullyQualifiedName() + ";") || ref.getPackageName().equals(getPackageName())) {
+
+      //If under the same package then just replace the fully qualified name with the name.
+      //Nested classes under the same package will retain the outer class.
+      if (ref.getPackageName().equals(getPackageName())) {
+        content = content.replaceAll(Pattern.quote(ref.getFullyQualifiedName()) + "(?![a-zA-Z0-9\\.])", ref.getName());
+      }
+      // Since we import the fully qualified name, no need to retain outer class (if any).
+      else if (top.contains("import " + ref.getFullyQualifiedName() + ";")) {
         String name = ref.getName().substring(ref.getName().lastIndexOf(DOT) + 1);
         content = content.replaceAll(Pattern.quote(ref.getFullyQualifiedName()) + "(?![a-zA-Z0-9\\.])", name);
       }
