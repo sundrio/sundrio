@@ -26,15 +26,27 @@ import org.junit.Test;
 public class ClassRefTest {
 
   ClassRef SOME_CLASS = new ClassRef("my.pkg.SomeClass", 0, Collections.emptyList(), Collections.emptyMap());
+  ClassRef SOME_INNER_CLASS = new ClassRef("my.pkg.SomeClass.Inner", 0, Collections.emptyList(), Collections.emptyMap());
+  ClassRef FROM_TYPEDEF_CLASS = TypeDef.forName("my.pkg.SomeClass.Inner").toInternalReference();
 
   @Test
   public void shouldGetClassName() throws Exception {
     assertEquals("SomeClass", SOME_CLASS.getName());
+    assertEquals("SomeClass.Inner", SOME_INNER_CLASS.getName());
+    assertEquals("SomeClass.Inner", FROM_TYPEDEF_CLASS.getName());
   }
 
   @Test
   public void shouldGetPackageName() throws Exception {
     assertEquals("my.pkg", SOME_CLASS.getPackageName());
+    assertEquals("my.pkg", SOME_INNER_CLASS.getPackageName());
+    assertEquals("my.pkg", FROM_TYPEDEF_CLASS.getPackageName());
   }
 
+  @Test
+  public void shouldGetFullyQualifiedName() throws Exception {
+    assertEquals("my.pkg.SomeClass", SOME_CLASS.getFullyQualifiedName());
+    assertEquals("my.pkg.SomeClass.Inner", SOME_INNER_CLASS.getFullyQualifiedName());
+    assertEquals("my.pkg.SomeClass.Inner", FROM_TYPEDEF_CLASS.getFullyQualifiedName());
+  }
 }

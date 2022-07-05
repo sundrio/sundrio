@@ -18,6 +18,7 @@ package io.sundr.examples.shapes;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -87,7 +88,7 @@ public class ShapesTest {
 
     canvas = new CanvasBuilder(canvas).accept(new PathAwareTypedVisitor<CircleBuilder<Integer>, CanvasBuilder>() {
       @Override
-      public void visit(List<Object> path, CircleBuilder<Integer> builder) {
+      public void visit(List<Entry<String, Object>> path, CircleBuilder<Integer> builder) {
         System.out.println("path:" + path);
         builder.withRadius(100 + builder.getRadius());
       }
@@ -115,7 +116,7 @@ public class ShapesTest {
       }
 
       @Override
-      public Predicate<List<Object>> getRequirement() {
+      public Predicate<List<Entry<String, Object>>> getRequirement() {
         return hasItem(CanvasBuilder.class, c -> !c.hasShapes());
       }
     }).build();
@@ -130,7 +131,7 @@ public class ShapesTest {
       }
 
       @Override
-      public Predicate<List<Object>> getRequirement() {
+      public Predicate<List<Entry<String, Object>>> getRequirement() {
         return hasItem(CanvasBuilder.class, c -> c.hasShapes());
       }
     }).build();

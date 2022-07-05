@@ -18,6 +18,7 @@
 package io.sundr.builder;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 public class DelegatingVisitor<T> implements Visitor<T> {
@@ -31,7 +32,7 @@ public class DelegatingVisitor<T> implements Visitor<T> {
   }
 
   @Override
-  public Predicate<List<Object>> getRequirement() {
+  public Predicate<List<Entry<String, Object>>> getRequirement() {
     return delegate.getRequirement();
   }
 
@@ -46,7 +47,7 @@ public class DelegatingVisitor<T> implements Visitor<T> {
   }
 
   @Override
-  public void visit(List<Object> path, T target) {
+  public void visit(List<Entry<String, Object>> path, T target) {
     delegate.visit(path, target);
   }
 

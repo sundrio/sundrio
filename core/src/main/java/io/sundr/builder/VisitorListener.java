@@ -19,6 +19,7 @@ package io.sundr.builder;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -62,12 +63,12 @@ public interface VisitorListener {
     listeners.add(listener);
   }
 
-  default <T> void beforeVisit(Visitor<T> v, List<Object> path, T target) {
+  default <T> void beforeVisit(Visitor<T> v, List<Entry<String, Object>> path, T target) {
   }
 
   default <V, T> void onCheck(Visitor<V> v, boolean canVisit, T target) {
   }
 
-  default <T> void afterVisit(Visitor<T> v, List<Object> path, T target) {
+  default <T> void afterVisit(Visitor<T> v, List<Entry<String, Object>> path, T target) {
   }
 }

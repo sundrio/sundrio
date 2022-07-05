@@ -16,18 +16,18 @@
 
 package io.sundr.builder;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> {
-
-  private static final String VISIT = "visit";
 
   public final VisitableMap _visitables = new VisitableMap();
 
@@ -76,7 +76,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
       }
 
       @Override
-      public void visit(List<Object> path, V element) {
+      public void visit(List<Entry<String, Object>> path, V element) {
         visitor.visit(path, element);
       }
 
@@ -87,8 +87,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     });
   }
 
-  @Override
-  public F accept(List<Object> path, Visitor... visitors) {
+  public F accept(List<Entry<String, Object>> path, String currentKey, Visitor... visitors) {
     Arrays.stream(visitors)
         .map(v -> VisitorListener.wrap(v))
         .filter(v -> ((Visitor) v).canVisit(path, this))
@@ -97,19 +96,27 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
           ((Visitor) v).visit(path, this);
         });
 
-    List<Object> copyOfPath = path != null ? new ArrayList(path) : new ArrayList<>();
-    copyOfPath.add(this);
-    List<Object> newPath = Collections.unmodifiableList(copyOfPath);
+    List<Entry<String, Object>> copyOfPath = path != null ? new ArrayList(path) : new ArrayList<>();
+    copyOfPath.add(new AbstractMap.SimpleEntry<String, Object>(currentKey, this));
 
-    for (Visitable visitable : _visitables) {
-      Arrays.stream(visitors)
-          .filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass()))
-          .forEach(v -> visitable.accept(newPath, v));
-      Arrays.stream(visitors)
-          .filter(v -> v.getType() == null || !v.getType().isAssignableFrom(visitable.getClass()))
-          .forEach(v -> visitable.accept(newPath, v));
-    }
+    _visitables.forEach((key, visitables) -> {
+      List<Entry<String, Object>> newPath = Collections.unmodifiableList(copyOfPath);
+      visitables.forEach(visitable -> {
+        Arrays.stream(visitors)
+            .filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass()))
+            .forEach(v -> visitable.accept(newPath, key, v));
+
+        Arrays.stream(visitors)
+            .filter(v -> v.getType() == null || !v.getType().isAssignableFrom(visitable.getClass()))
+            .forEach(v -> visitable.accept(newPath, key, v));
+      });
+    });
     return (F) this;
+  }
+
+  @Override
+  public F accept(List<Entry<String, Object>> path, Visitor... visitors) {
+    return accept(path, "", visitors);
   }
 
   @Override

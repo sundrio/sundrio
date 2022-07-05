@@ -18,6 +18,7 @@ package io.sundr.builder;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map.Entry;
 
 public class PathAwareTypedVisitor<V, P> implements Visitor<V> {
 
@@ -38,7 +39,7 @@ public class PathAwareTypedVisitor<V, P> implements Visitor<V> {
   }
 
   @Override
-  public void visit(List<Object> path, V element) {
+  public void visit(List<Entry<String, Object>> path, V element) {
     visit(element);
   }
 

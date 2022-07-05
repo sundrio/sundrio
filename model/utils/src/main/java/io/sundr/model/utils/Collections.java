@@ -77,6 +77,11 @@ public class Collections {
       .withParameters(K, V)
       .build();
 
+  public static final TypeDef MAP_ENTRY = new TypeDefBuilder(TypeDef.forName(Map.Entry.class.getName()))
+      .withKind(Kind.INTERFACE)
+      .withParameters(K, V)
+      .withExtendsList(COLLECTION.toReference(K.toReference(), V.toReference())).build();
+
   public static final TypeDef HASH_MAP = new TypeDefBuilder(TypeDef.forName(HashMap.class.getName()))
       .withKind(Kind.CLASS)
       .withParameters(K, V)

@@ -122,7 +122,6 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
           .withName(typeVariable.getName())
           .withBounds(bounds)
           .build());
-
     }
 
     String outerFQCN = item.getDeclaringClass() != null ? item.getDeclaringClass().getName() : null;
