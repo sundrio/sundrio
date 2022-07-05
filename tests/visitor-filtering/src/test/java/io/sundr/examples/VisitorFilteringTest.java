@@ -22,6 +22,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class VisitorFilteringTest {
         s.addToLabels("foo", "bar");
       }
 
-      public Predicate<List<Object>> getRequirement() {
+      public Predicate<List<Entry<String, Object>>> getRequirement() {
         return hasItem(DeploymentBuilder.class, d -> d.getName().equals("my-deployment"));
       }
 

@@ -20,6 +20,7 @@ package io.sundr.builder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 public class VisitorWiretap<T> implements Visitor<T> {
@@ -40,12 +41,12 @@ public class VisitorWiretap<T> implements Visitor<T> {
   }
 
   @Override
-  public Predicate<List<Object>> getRequirement() {
+  public Predicate<List<Entry<String, Object>>> getRequirement() {
     return delegate.getRequirement();
   }
 
   @Override
-  public <F> Boolean canVisit(List<Object> path, F target) {
+  public <F> Boolean canVisit(List<Entry<String, Object>> path, F target) {
     boolean canVisit = delegate.canVisit(path, target);
     listeners.forEach(l -> l.onCheck(delegate, canVisit, target));
     return canVisit;
@@ -64,7 +65,7 @@ public class VisitorWiretap<T> implements Visitor<T> {
   }
 
   @Override
-  public void visit(List<Object> path, T target) {
+  public void visit(List<Entry<String, Object>> path, T target) {
     listeners.forEach(l -> l.beforeVisit(delegate, path, target));
     delegate.visit(path, target);
     listeners.forEach(l -> l.afterVisit(delegate, path, target));

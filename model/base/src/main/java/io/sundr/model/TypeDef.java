@@ -93,7 +93,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   }
 
   public static TypeDef forName(String fullyQualifiedName) {
-    return new TypeDef(fullyQualifiedName);
+    return new TypeDef(fullyQualifiedName.replaceAll(Pattern.quote("$"), "."));
   }
 
   /**
@@ -141,7 +141,13 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     if (outerTypeName != null) {
       sb.append(outerTypeName).append(".");
     }
-    sb.append(getName());
+
+    String outerClassName = outerTypeName != null ? outerTypeName.substring(getPackageName().length() + 1) : null;
+    if (getName().contains(DOT) && outerClassName != null && getName().startsWith(outerClassName)) {
+      sb.append(getName().substring(outerClassName.length() + 1));
+    } else {
+      sb.append(getName());
+    }
 
     return sb.toString();
   }
@@ -493,7 +499,8 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     for (ClassRef ref : references) {
       //If class is imported
       if (top.contains("import " + ref.getFullyQualifiedName() + ";") || ref.getPackageName().equals(getPackageName())) {
-        content = content.replaceFirst(Pattern.quote(ref.getFullyQualifiedName()), ref.getName());
+        String name = ref.getName().substring(ref.getName().lastIndexOf(DOT) + 1);
+        content = content.replaceAll(Pattern.quote(ref.getFullyQualifiedName()) + "(?![a-zA-Z0-9\\.])", name);
       }
     }
     return top + content;

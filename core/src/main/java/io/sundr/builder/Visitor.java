@@ -18,6 +18,7 @@ package io.sundr.builder;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 @FunctionalInterface
@@ -25,7 +26,7 @@ public interface Visitor<T> {
 
   void visit(T element);
 
-  default void visit(List<Object> path, T element) {
+  default void visit(List<Entry<String, Object>> path, T element) {
     visit(element);
   }
 
@@ -37,7 +38,7 @@ public interface Visitor<T> {
     return (Class<T>) args.get(0);
   }
 
-  default <F> Boolean canVisit(List<Object> path, F target) {
+  default <F> Boolean canVisit(List<Entry<String, Object>> path, F target) {
     if (target == null) {
       return false;
     }
@@ -57,12 +58,13 @@ public interface Visitor<T> {
     }
   }
 
-  default Predicate<List<Object>> getRequirement() {
+  default Predicate<List<Entry<String, Object>>> getRequirement() {
     return p -> true;
   }
 
-  default <I> Predicate<List<Object>> hasItem(Class<I> type, Predicate<I> predicate) {
-    Predicate<List<Object>> result = l -> l.stream().filter(i -> type.isInstance(i)).map(i -> type.cast(i)).anyMatch(predicate);
+  default <I> Predicate<List<Entry<String, Object>>> hasItem(Class<I> type, Predicate<I> predicate) {
+    Predicate<List<Entry<String, Object>>> result = l -> l.stream().map(Entry::getValue).filter(i -> type.isInstance(i))
+        .map(i -> type.cast(i)).anyMatch(predicate);
     return result;
   }
 

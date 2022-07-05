@@ -24,6 +24,12 @@ import org.junit.Test;
 public class NameableTest {
 
   @Test
+  public void shouldGetPackageName() {
+    assertEquals("java.util", Nameable.getPackageName("java.util.List"));
+    assertEquals("java.lang", Nameable.getPackageName("java.lang.System.Logger"));
+  }
+
+  @Test
   public void shouldGetClassName() {
     assertEquals("Void", Nameable.getClassName("Void"));
     assertEquals("List", Nameable.getClassName("java.util.List"));

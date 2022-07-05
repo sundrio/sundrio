@@ -19,6 +19,7 @@ package io.sundr.builder;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 
 public interface Visitable<T> {
 
@@ -45,13 +46,17 @@ public interface Visitable<T> {
     return getTarget(this);
   }
 
-  default T accept(List<Object> path, Visitor... visitors) {
+  default T accept(List<Entry<String, Object>> path, String currentKey, Visitor... visitors) {
     for (Visitor visitor : visitors) {
       if (visitor.canVisit(path, this)) {
         visitor.visit(path, this);
       }
     }
     return getTarget(this);
+  }
+
+  default T accept(List<Entry<String, Object>> path, Visitor... visitors) {
+    return accept(path, "", visitors);
   }
 
   default T getTarget(Visitable<T> visitable) {
