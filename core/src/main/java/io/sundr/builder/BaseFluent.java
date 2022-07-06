@@ -101,7 +101,8 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
 
     _visitables.forEach((key, visitables) -> {
       List<Entry<String, Object>> newPath = Collections.unmodifiableList(copyOfPath);
-      visitables.forEach(visitable -> {
+      // Copy visitables to avoid ConcurrrentModificationException when Visitors add/remove Visitables
+      new ArrayList<>(visitables).forEach(visitable -> {
         Arrays.stream(visitors)
             .filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass()))
             .forEach(v -> visitable.accept(newPath, key, v));
