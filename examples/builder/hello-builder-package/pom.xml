@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.sundr</groupId>
     <artifactId>builder-hello-builder-package-example</artifactId>
-    <version>0.90-SNAPSHOT</version>
+    <version>0.92-SNAPSHOT</version>
     <name>Sundrio :: Examples :: Builder :: Hello World with Builder Package</name>
 
     <properties>
