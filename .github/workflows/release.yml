@@ -60,6 +60,7 @@ jobs:
           # update examples and tests
           ./mvnw versions:set -DnewVersion=${{steps.metadata.outputs.next-version}} -Pwith-examples,with-tests -DgenerateBackupPoms=false -DoldVersion=* -DgroupId=* -DartifactId=*
           # commit changes
+          git add --all
           git commit -m "chore: Set examples and tests version to ${{steps.metadata.outputs.current-version}}"
         env:
           OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
