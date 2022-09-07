@@ -15,6 +15,8 @@ jobs:
     name: release
     if: ${{github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true}}
     steps:
+      - uses: actions/checkout@v2
+        name: Checkout
       - uses: radcortez/project-metadata-action@main
         name: Retrieve project metadata
         id: metadata
@@ -22,8 +24,6 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           metadata-file-path: '.github/project.yml'
           local-file: true
-      - uses: actions/checkout@v2
-
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
