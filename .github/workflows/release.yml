@@ -4,17 +4,16 @@ env:
   MAVEN_ARGS: -B -e
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [closed]
     paths:
       - '.github/project.yml'
-
 jobs:
   release:
     runs-on: ubuntu-latest
     name: release
-    if: ${{github.event.pull_request.merged == true}}
-
+    if: ${{github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true}}
     steps:
       - uses: radcortez/project-metadata-action@master
         name: Retrieve project metadata
