@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
 import io.sundr.model.RichTypeDef;
@@ -35,6 +36,7 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.WildcardRef;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.visitors.ApplyTypeParamMappingToMethod;
 import io.sundr.model.visitors.ApplyTypeParamMappingToProperty;
@@ -101,7 +103,12 @@ public class TypeArguments {
     for (int i = 0; i < arguments.size(); i++) {
       String name = parameters.get(i).getName();
       TypeRef typeRef = arguments.get(i);
-      mappings.put(name, typeRef);
+      if (typeRef instanceof ClassRef) {
+        ClassRef classRef = (ClassRef) typeRef;
+        mappings.put(name, unwrapCyclicMappings(name, classRef));
+      } else {
+        mappings.put(name, typeRef);
+      }
     }
 
     return new TypeDefBuilder(definition)
@@ -140,5 +147,13 @@ public class TypeArguments {
     result.put(key, Stream.concat(Arrays.stream((String[]) subtotal.getOrDefault(key, new String[0])),
         Arrays.stream((String[]) element.getOrDefault(key, new String[0]))).toArray(size -> new String[size]));
     return result;
+  }
+
+  private static ClassRef unwrapCyclicMappings(String name, ClassRef classRef) {
+    List<TypeRef> arguments = classRef.getArguments().stream()
+        .map(a -> a instanceof TypeParamRef && name.equals(a.getName()) ? new WildcardRef() : a)
+        .map(a -> a instanceof ClassRef ? unwrapCyclicMappings(name, (ClassRef) a) : a)
+        .collect(Collectors.toList());
+    return new ClassRefBuilder(classRef).withArguments(arguments).build();
   }
 }
