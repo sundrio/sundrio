@@ -34,7 +34,11 @@ jobs:
           server-password: OSS_SONATYPE_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-
+      - name: Install prerequisites
+        run: |
+          if [ -f $JAVA_HOME/lib/tools.jar ]; then
+            ./mvnw install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar -P${{ matrix.profile }};
+          fi
       - name: Configure Git author
         run: |
           git config --local user.email "action@github.com"
