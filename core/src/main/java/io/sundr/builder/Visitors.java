@@ -42,6 +42,7 @@ public final class Visitors {
   /**
    * Get the actual type arguments a child class has used to extend a generic base class.
    *
+   * @param <T>  the type of the baseClass
    * @param baseClass the base class
    * @param childClass the child class
    * @return a list of the raw classes for the actual type arguments.
