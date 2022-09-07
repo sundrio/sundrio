@@ -1,12 +1,11 @@
 package io.sundr.model;
 
 import java.lang.Boolean;
-import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
 public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
-    implements VisitableBuilder<io.sundr.model.Property, PropertyBuilder> {
+    implements VisitableBuilder<Property, PropertyBuilder> {
   public PropertyBuilder() {
     this(false);
   }
@@ -20,17 +19,16 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
     this(fluent, false);
   }
 
-  public PropertyBuilder(io.sundr.model.PropertyFluent<?> fluent, java.lang.Boolean validationEnabled) {
+  public PropertyBuilder(PropertyFluent<?> fluent, Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public PropertyBuilder(io.sundr.model.PropertyFluent<?> fluent, io.sundr.model.Property instance) {
+  public PropertyBuilder(PropertyFluent<?> fluent, Property instance) {
     this(fluent, instance, false);
   }
 
-  public PropertyBuilder(io.sundr.model.PropertyFluent<?> fluent, io.sundr.model.Property instance,
-      java.lang.Boolean validationEnabled) {
+  public PropertyBuilder(PropertyFluent<?> fluent, Property instance, Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withAnnotations(instance.getAnnotations());
     fluent.withTypeRef(instance.getTypeRef());
@@ -41,11 +39,11 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
     this.validationEnabled = validationEnabled;
   }
 
-  public PropertyBuilder(io.sundr.model.Property instance) {
+  public PropertyBuilder(Property instance) {
     this(instance, false);
   }
 
-  public PropertyBuilder(io.sundr.model.Property instance, java.lang.Boolean validationEnabled) {
+  public PropertyBuilder(Property instance, Boolean validationEnabled) {
     this.fluent = this;
     this.withAnnotations(instance.getAnnotations());
     this.withTypeRef(instance.getTypeRef());
@@ -56,33 +54,13 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
     this.validationEnabled = validationEnabled;
   }
 
-  io.sundr.model.PropertyFluent<?> fluent;
-  java.lang.Boolean validationEnabled;
+  PropertyFluent<?> fluent;
+  Boolean validationEnabled;
 
-  public io.sundr.model.Property build() {
+  public Property build() {
     Property buildable = new Property(fluent.getAnnotations(), fluent.getTypeRef(), fluent.getName(), fluent.getComments(),
         fluent.getModifiers(), fluent.getAttributes());
     return buildable;
-  }
-
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    if (!super.equals(o))
-      return false;
-    PropertyBuilder that = (PropertyBuilder) o;
-    if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-      return false;
-
-    if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) : that.validationEnabled != null)
-      return false;
-    return true;
-  }
-
-  public int hashCode() {
-    return java.util.Objects.hash(fluent, validationEnabled, super.hashCode());
   }
 
 }

@@ -18,21 +18,21 @@ public interface ModifierSupportFluent<A extends ModifierSupportFluent<A>> exten
   @Deprecated
   public Modifiers getModifiers();
 
-  public io.sundr.model.Modifiers buildModifiers();
+  public Modifiers buildModifiers();
 
-  public A withModifiers(io.sundr.model.Modifiers modifiers);
+  public A withModifiers(Modifiers modifiers);
 
   public Boolean hasModifiers();
 
   public ModifierSupportFluent.ModifiersNested<A> withNewModifiers();
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> withNewModifiersLike(io.sundr.model.Modifiers item);
+  public ModifierSupportFluent.ModifiersNested<A> withNewModifiersLike(Modifiers item);
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> editModifiers();
+  public ModifierSupportFluent.ModifiersNested<A> editModifiers();
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> editOrNewModifiers();
+  public ModifierSupportFluent.ModifiersNested<A> editOrNewModifiers();
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> editOrNewModifiersLike(io.sundr.model.Modifiers item);
+  public ModifierSupportFluent.ModifiersNested<A> editOrNewModifiersLike(Modifiers item);
 
   public interface ModifiersNested<N> extends Nested<N>, ModifiersFluent<ModifierSupportFluent.ModifiersNested<N>> {
     public N and();

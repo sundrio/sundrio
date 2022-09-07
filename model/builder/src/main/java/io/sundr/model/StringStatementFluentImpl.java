@@ -17,17 +17,17 @@ public class StringStatementFluentImpl<A extends StringStatementFluent<A>> exten
   public StringStatementFluentImpl() {
   }
 
-  public StringStatementFluentImpl(io.sundr.model.StringStatement instance) {
+  public StringStatementFluentImpl(StringStatement instance) {
     this.withSupplier(instance.getSupplier());
   }
 
   private Supplier<String> supplier;
 
-  public java.util.function.Supplier<java.lang.String> getSupplier() {
+  public Supplier<String> getSupplier() {
     return this.supplier;
   }
 
-  public <T> A withSupplier(java.util.function.Supplier<java.lang.String> supplier) {
+  public <T> A withSupplier(Supplier<String> supplier) {
     this.supplier = supplier;
     return (A) this;
   }
@@ -51,7 +51,7 @@ public class StringStatementFluentImpl<A extends StringStatementFluent<A>> exten
     return java.util.Objects.hash(supplier, super.hashCode());
   }
 
-  public java.lang.String toString() {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (supplier != null) {

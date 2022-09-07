@@ -21,35 +21,35 @@ public interface AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends A
   @Deprecated
   public ClassRef getClassRef();
 
-  public io.sundr.model.ClassRef buildClassRef();
+  public ClassRef buildClassRef();
 
-  public A withClassRef(io.sundr.model.ClassRef classRef);
+  public A withClassRef(ClassRef classRef);
 
   public Boolean hasClassRef();
 
   public AnnotationRefFluent.ClassRefNested<A> withNewClassRef();
 
-  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> withNewClassRefLike(io.sundr.model.ClassRef item);
+  public AnnotationRefFluent.ClassRefNested<A> withNewClassRefLike(ClassRef item);
 
-  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> editClassRef();
+  public AnnotationRefFluent.ClassRefNested<A> editClassRef();
 
-  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> editOrNewClassRef();
+  public AnnotationRefFluent.ClassRefNested<A> editOrNewClassRef();
 
-  public io.sundr.model.AnnotationRefFluent.ClassRefNested<A> editOrNewClassRefLike(io.sundr.model.ClassRef item);
+  public AnnotationRefFluent.ClassRefNested<A> editOrNewClassRefLike(ClassRef item);
 
   public A addToParameters(String key, Object value);
 
-  public A addToParameters(Map<java.lang.String, java.lang.Object> map);
+  public A addToParameters(Map<String, Object> map);
 
-  public A removeFromParameters(java.lang.String key);
+  public A removeFromParameters(String key);
 
-  public A removeFromParameters(java.util.Map<java.lang.String, java.lang.Object> map);
+  public A removeFromParameters(Map<String, Object> map);
 
-  public java.util.Map<java.lang.String, java.lang.Object> getParameters();
+  public Map<String, Object> getParameters();
 
-  public <K, V> A withParameters(java.util.Map<java.lang.String, java.lang.Object> parameters);
+  public <K, V> A withParameters(Map<String, Object> parameters);
 
-  public java.lang.Boolean hasParameters();
+  public Boolean hasParameters();
 
   public interface ClassRefNested<N> extends Nested<N>, ClassRefFluent<AnnotationRefFluent.ClassRefNested<N>> {
     public N and();

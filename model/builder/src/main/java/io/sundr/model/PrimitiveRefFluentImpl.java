@@ -14,7 +14,7 @@ public class PrimitiveRefFluentImpl<A extends PrimitiveRefFluent<A>> extends Typ
   public PrimitiveRefFluentImpl() {
   }
 
-  public PrimitiveRefFluentImpl(io.sundr.model.PrimitiveRef instance) {
+  public PrimitiveRefFluentImpl(PrimitiveRef instance) {
     this.withName(instance.getName());
     this.withDimensions(instance.getDimensions());
     this.withAttributes(instance.getAttributes());
@@ -23,11 +23,11 @@ public class PrimitiveRefFluentImpl<A extends PrimitiveRefFluent<A>> extends Typ
   private String name;
   private int dimensions;
 
-  public java.lang.String getName() {
+  public String getName() {
     return this.name;
   }
 
-  public A withName(java.lang.String name) {
+  public A withName(String name) {
     this.name = name;
     return (A) this;
   }
@@ -45,7 +45,7 @@ public class PrimitiveRefFluentImpl<A extends PrimitiveRefFluent<A>> extends Typ
     return (A) this;
   }
 
-  public java.lang.Boolean hasDimensions() {
+  public Boolean hasDimensions() {
     return true;
   }
 
@@ -68,7 +68,7 @@ public class PrimitiveRefFluentImpl<A extends PrimitiveRefFluent<A>> extends Typ
     return java.util.Objects.hash(name, dimensions, super.hashCode());
   }
 
-  public java.lang.String toString() {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (name != null) {

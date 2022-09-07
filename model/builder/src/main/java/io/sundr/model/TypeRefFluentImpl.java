@@ -12,7 +12,7 @@ public class TypeRefFluentImpl<A extends TypeRefFluent<A>> extends AttributeSupp
   public TypeRefFluentImpl() {
   }
 
-  public TypeRefFluentImpl(io.sundr.model.TypeRef instance) {
+  public TypeRefFluentImpl(TypeRef instance) {
     this.withAttributes(instance.getAttributes());
   }
 

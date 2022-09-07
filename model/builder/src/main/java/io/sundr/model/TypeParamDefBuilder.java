@@ -1,12 +1,11 @@
 package io.sundr.model;
 
 import java.lang.Boolean;
-import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
 public class TypeParamDefBuilder extends TypeParamDefFluentImpl<TypeParamDefBuilder>
-    implements VisitableBuilder<io.sundr.model.TypeParamDef, TypeParamDefBuilder> {
+    implements VisitableBuilder<TypeParamDef, TypeParamDefBuilder> {
   public TypeParamDefBuilder() {
     this(false);
   }
@@ -20,17 +19,16 @@ public class TypeParamDefBuilder extends TypeParamDefFluentImpl<TypeParamDefBuil
     this(fluent, false);
   }
 
-  public TypeParamDefBuilder(io.sundr.model.TypeParamDefFluent<?> fluent, java.lang.Boolean validationEnabled) {
+  public TypeParamDefBuilder(TypeParamDefFluent<?> fluent, Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public TypeParamDefBuilder(io.sundr.model.TypeParamDefFluent<?> fluent, io.sundr.model.TypeParamDef instance) {
+  public TypeParamDefBuilder(TypeParamDefFluent<?> fluent, TypeParamDef instance) {
     this(fluent, instance, false);
   }
 
-  public TypeParamDefBuilder(io.sundr.model.TypeParamDefFluent<?> fluent, io.sundr.model.TypeParamDef instance,
-      java.lang.Boolean validationEnabled) {
+  public TypeParamDefBuilder(TypeParamDefFluent<?> fluent, TypeParamDef instance, Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withName(instance.getName());
     fluent.withBounds(instance.getBounds());
@@ -38,11 +36,11 @@ public class TypeParamDefBuilder extends TypeParamDefFluentImpl<TypeParamDefBuil
     this.validationEnabled = validationEnabled;
   }
 
-  public TypeParamDefBuilder(io.sundr.model.TypeParamDef instance) {
+  public TypeParamDefBuilder(TypeParamDef instance) {
     this(instance, false);
   }
 
-  public TypeParamDefBuilder(io.sundr.model.TypeParamDef instance, java.lang.Boolean validationEnabled) {
+  public TypeParamDefBuilder(TypeParamDef instance, Boolean validationEnabled) {
     this.fluent = this;
     this.withName(instance.getName());
     this.withBounds(instance.getBounds());
@@ -50,32 +48,12 @@ public class TypeParamDefBuilder extends TypeParamDefFluentImpl<TypeParamDefBuil
     this.validationEnabled = validationEnabled;
   }
 
-  io.sundr.model.TypeParamDefFluent<?> fluent;
-  java.lang.Boolean validationEnabled;
+  TypeParamDefFluent<?> fluent;
+  Boolean validationEnabled;
 
-  public io.sundr.model.TypeParamDef build() {
+  public TypeParamDef build() {
     TypeParamDef buildable = new TypeParamDef(fluent.getName(), fluent.getBounds(), fluent.getAttributes());
     return buildable;
-  }
-
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    if (!super.equals(o))
-      return false;
-    TypeParamDefBuilder that = (TypeParamDefBuilder) o;
-    if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-      return false;
-
-    if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) : that.validationEnabled != null)
-      return false;
-    return true;
-  }
-
-  public int hashCode() {
-    return java.util.Objects.hash(fluent, validationEnabled, super.hashCode());
   }
 
 }
