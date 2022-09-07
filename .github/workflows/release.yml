@@ -51,12 +51,12 @@ jobs:
         run: curl -Ls https://sh.jbang.dev | bash -s - app setup
       - name: Maven release ${{steps.metadata.outputs.current-version}}
         run: |
-          ./mvnw clean install -DskipTests
+          ./mvnw clean install -DskipTests -Prelease
           git checkout -b release
-          ./mvnw -X -Prelease -B release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
+          ./mvnw -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}}
           git checkout ${{github.base_ref}}
           git rebase release
-          ./mvnw -X -Prelease -B release:perform -DskipTests
+          ./mvnw -Prelease release:perform -DskipTests
           # update examples and tests
           ./mvnw versions:set -DnewVersion=${{steps.metadata.outputs.next-version}} -Pwith-examples,with-tests -DgenerateBackupPoms=false -DoldVersion=* -DgroupId=* -DartifactId=*
           # commit changes
