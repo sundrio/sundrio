@@ -23,7 +23,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   public PropertyFluentImpl() {
   }
 
-  public PropertyFluentImpl(io.sundr.model.Property instance) {
+  public PropertyFluentImpl(Property instance) {
     this.withAnnotations(instance.getAnnotations());
     this.withTypeRef(instance.getTypeRef());
     this.withName(instance.getName());
@@ -32,26 +32,26 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     this.withAttributes(instance.getAttributes());
   }
 
-  private ArrayList<AnnotationRefBuilder> annotations = new java.util.ArrayList<AnnotationRefBuilder>();
+  private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
   private VisitableBuilder<? extends TypeRef, ?> typeRef;
   private String name;
-  private List<java.lang.String> comments = new java.util.ArrayList<java.lang.String>();
+  private List<String> comments = new ArrayList<String>();
 
-  public A addToAnnotations(Integer index, io.sundr.model.AnnotationRef item) {
+  public A addToAnnotations(Integer index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     _visitables.get("annotations").add(index >= 0 ? index : _visitables.get("annotations").size(), builder);
     this.annotations.add(index >= 0 ? index : annotations.size(), builder);
     return (A) this;
   }
 
-  public A setToAnnotations(java.lang.Integer index, io.sundr.model.AnnotationRef item) {
+  public A setToAnnotations(Integer index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     if (index < 0 || index >= _visitables.get("annotations").size()) {
       _visitables.get("annotations").add(builder);
     } else {
@@ -67,22 +67,22 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
 
   public A addToAnnotations(io.sundr.model.AnnotationRef... items) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").add(builder);
       this.annotations.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToAnnotations(Collection<io.sundr.model.AnnotationRef> items) {
+  public A addAllToAnnotations(Collection<AnnotationRef> items) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").add(builder);
       this.annotations.add(builder);
     }
@@ -90,8 +90,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   public A removeFromAnnotations(io.sundr.model.AnnotationRef... items) {
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
       if (this.annotations != null) {
         this.annotations.remove(builder);
@@ -100,9 +100,9 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return (A) this;
   }
 
-  public A removeAllFromAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items) {
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+  public A removeAllFromAnnotations(Collection<AnnotationRef> items) {
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
       if (this.annotations != null) {
         this.annotations.remove(builder);
@@ -111,13 +111,13 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return (A) this;
   }
 
-  public A removeMatchingFromAnnotations(Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
+  public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate) {
     if (annotations == null)
       return (A) this;
-    final Iterator<io.sundr.model.AnnotationRefBuilder> each = annotations.iterator();
+    final Iterator<AnnotationRefBuilder> each = annotations.iterator();
     final List visitables = _visitables.get("annotations");
     while (each.hasNext()) {
-      io.sundr.model.AnnotationRefBuilder builder = each.next();
+      AnnotationRefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -132,29 +132,28 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
    * @return The buildable object.
    */
   @Deprecated
-  public java.util.List<io.sundr.model.AnnotationRef> getAnnotations() {
+  public List<AnnotationRef> getAnnotations() {
     return annotations != null ? build(annotations) : null;
   }
 
-  public java.util.List<io.sundr.model.AnnotationRef> buildAnnotations() {
+  public List<AnnotationRef> buildAnnotations() {
     return annotations != null ? build(annotations) : null;
   }
 
-  public io.sundr.model.AnnotationRef buildAnnotation(java.lang.Integer index) {
+  public AnnotationRef buildAnnotation(Integer index) {
     return this.annotations.get(index).build();
   }
 
-  public io.sundr.model.AnnotationRef buildFirstAnnotation() {
+  public AnnotationRef buildFirstAnnotation() {
     return this.annotations.get(0).build();
   }
 
-  public io.sundr.model.AnnotationRef buildLastAnnotation() {
+  public AnnotationRef buildLastAnnotation() {
     return this.annotations.get(annotations.size() - 1).build();
   }
 
-  public io.sundr.model.AnnotationRef buildMatchingAnnotation(
-      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
-    for (io.sundr.model.AnnotationRefBuilder item : annotations) {
+  public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
+    for (AnnotationRefBuilder item : annotations) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -162,8 +161,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return null;
   }
 
-  public Boolean hasMatchingAnnotation(java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
-    for (io.sundr.model.AnnotationRefBuilder item : annotations) {
+  public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
+    for (AnnotationRefBuilder item : annotations) {
       if (predicate.test(item)) {
         return true;
       }
@@ -171,13 +170,13 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return false;
   }
 
-  public A withAnnotations(java.util.List<io.sundr.model.AnnotationRef> annotations) {
+  public A withAnnotations(List<AnnotationRef> annotations) {
     if (this.annotations != null) {
       _visitables.get("annotations").removeAll(this.annotations);
     }
     if (annotations != null) {
-      this.annotations = new java.util.ArrayList();
-      for (io.sundr.model.AnnotationRef item : annotations) {
+      this.annotations = new ArrayList();
+      for (AnnotationRef item : annotations) {
         this.addToAnnotations(item);
       }
     } else {
@@ -191,14 +190,14 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
       this.annotations.clear();
     }
     if (annotations != null) {
-      for (io.sundr.model.AnnotationRef item : annotations) {
+      for (AnnotationRef item : annotations) {
         this.addToAnnotations(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasAnnotations() {
+  public Boolean hasAnnotations() {
     return annotations != null && !annotations.isEmpty();
   }
 
@@ -206,36 +205,34 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return new PropertyFluentImpl.AnnotationsNestedImpl();
   }
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> addNewAnnotationLike(io.sundr.model.AnnotationRef item) {
+  public PropertyFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item) {
     return new PropertyFluentImpl.AnnotationsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> setNewAnnotationLike(java.lang.Integer index,
-      io.sundr.model.AnnotationRef item) {
-    return new io.sundr.model.PropertyFluentImpl.AnnotationsNestedImpl(index, item);
+  public PropertyFluent.AnnotationsNested<A> setNewAnnotationLike(Integer index, AnnotationRef item) {
+    return new PropertyFluentImpl.AnnotationsNestedImpl(index, item);
   }
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editAnnotation(java.lang.Integer index) {
+  public PropertyFluent.AnnotationsNested<A> editAnnotation(Integer index) {
     if (annotations.size() <= index)
       throw new RuntimeException("Can't edit annotations. Index exceeds size.");
     return setNewAnnotationLike(index, buildAnnotation(index));
   }
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editFirstAnnotation() {
+  public PropertyFluent.AnnotationsNested<A> editFirstAnnotation() {
     if (annotations.size() == 0)
       throw new RuntimeException("Can't edit first annotations. The list is empty.");
     return setNewAnnotationLike(0, buildAnnotation(0));
   }
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editLastAnnotation() {
+  public PropertyFluent.AnnotationsNested<A> editLastAnnotation() {
     int index = annotations.size() - 1;
     if (index < 0)
       throw new RuntimeException("Can't edit last annotations. The list is empty.");
     return setNewAnnotationLike(index, buildAnnotation(index));
   }
 
-  public io.sundr.model.PropertyFluent.AnnotationsNested<A> editMatchingAnnotation(
-      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
+  public PropertyFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < annotations.size(); i++) {
       if (predicate.test(annotations.get(i))) {
@@ -253,48 +250,51 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
    * 
    * @return The buildable object.
    */
-  @java.lang.Deprecated
-  public io.sundr.model.TypeRef getTypeRef() {
+  @Deprecated
+  public TypeRef getTypeRef() {
     return this.typeRef != null ? this.typeRef.build() : null;
   }
 
-  public io.sundr.model.TypeRef buildTypeRef() {
+  public TypeRef buildTypeRef() {
     return this.typeRef != null ? this.typeRef.build() : null;
   }
 
-  public A withTypeRef(io.sundr.model.TypeRef typeRef) {
+  public A withTypeRef(TypeRef typeRef) {
     if (typeRef instanceof TypeParamRef) {
-      this.typeRef = new TypeParamRefBuilder((io.sundr.model.TypeParamRef) typeRef);
+      this.typeRef = new TypeParamRefBuilder((TypeParamRef) typeRef);
       _visitables.get("typeRef").add(this.typeRef);
     }
     if (typeRef instanceof WildcardRef) {
-      this.typeRef = new WildcardRefBuilder((io.sundr.model.WildcardRef) typeRef);
+      this.typeRef = new WildcardRefBuilder((WildcardRef) typeRef);
       _visitables.get("typeRef").add(this.typeRef);
     }
     if (typeRef instanceof ClassRef) {
-      this.typeRef = new ClassRefBuilder((io.sundr.model.ClassRef) typeRef);
+      this.typeRef = new ClassRefBuilder((ClassRef) typeRef);
       _visitables.get("typeRef").add(this.typeRef);
     }
     if (typeRef instanceof PrimitiveRef) {
-      this.typeRef = new PrimitiveRefBuilder((io.sundr.model.PrimitiveRef) typeRef);
+      this.typeRef = new PrimitiveRefBuilder((PrimitiveRef) typeRef);
       _visitables.get("typeRef").add(this.typeRef);
     }
     if (typeRef instanceof VoidRef) {
-      this.typeRef = new VoidRefBuilder((io.sundr.model.VoidRef) typeRef);
+      this.typeRef = new VoidRefBuilder((VoidRef) typeRef);
       _visitables.get("typeRef").add(this.typeRef);
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasTypeRef() {
+  public Boolean hasTypeRef() {
     return this.typeRef != null;
   }
 
-  public A withTypeParamRefType(io.sundr.model.TypeParamRef typeParamRefType) {
+  public A withTypeParamRefType(TypeParamRef typeParamRefType) {
     _visitables.get("typeRef").remove(this.typeRef);
     if (typeParamRefType != null) {
-      this.typeRef = new io.sundr.model.TypeParamRefBuilder(typeParamRefType);
+      this.typeRef = new TypeParamRefBuilder(typeParamRefType);
       _visitables.get("typeRef").add(this.typeRef);
+    } else {
+      this.typeRef = null;
+      _visitables.get("typeRef").remove(this.typeRef);
     }
     return (A) this;
   }
@@ -303,15 +303,18 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return new PropertyFluentImpl.TypeParamRefTypeNestedImpl();
   }
 
-  public io.sundr.model.PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefTypeLike(io.sundr.model.TypeParamRef item) {
-    return new io.sundr.model.PropertyFluentImpl.TypeParamRefTypeNestedImpl(item);
+  public PropertyFluent.TypeParamRefTypeNested<A> withNewTypeParamRefTypeLike(TypeParamRef item) {
+    return new PropertyFluentImpl.TypeParamRefTypeNestedImpl(item);
   }
 
-  public A withWildcardRefType(io.sundr.model.WildcardRef wildcardRefType) {
+  public A withWildcardRefType(WildcardRef wildcardRefType) {
     _visitables.get("typeRef").remove(this.typeRef);
     if (wildcardRefType != null) {
-      this.typeRef = new io.sundr.model.WildcardRefBuilder(wildcardRefType);
+      this.typeRef = new WildcardRefBuilder(wildcardRefType);
       _visitables.get("typeRef").add(this.typeRef);
+    } else {
+      this.typeRef = null;
+      _visitables.get("typeRef").remove(this.typeRef);
     }
     return (A) this;
   }
@@ -320,15 +323,18 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return new PropertyFluentImpl.WildcardRefTypeNestedImpl();
   }
 
-  public io.sundr.model.PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefTypeLike(io.sundr.model.WildcardRef item) {
-    return new io.sundr.model.PropertyFluentImpl.WildcardRefTypeNestedImpl(item);
+  public PropertyFluent.WildcardRefTypeNested<A> withNewWildcardRefTypeLike(WildcardRef item) {
+    return new PropertyFluentImpl.WildcardRefTypeNestedImpl(item);
   }
 
-  public A withClassRefType(io.sundr.model.ClassRef classRefType) {
+  public A withClassRefType(ClassRef classRefType) {
     _visitables.get("typeRef").remove(this.typeRef);
     if (classRefType != null) {
-      this.typeRef = new io.sundr.model.ClassRefBuilder(classRefType);
+      this.typeRef = new ClassRefBuilder(classRefType);
       _visitables.get("typeRef").add(this.typeRef);
+    } else {
+      this.typeRef = null;
+      _visitables.get("typeRef").remove(this.typeRef);
     }
     return (A) this;
   }
@@ -337,15 +343,18 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return new PropertyFluentImpl.ClassRefTypeNestedImpl();
   }
 
-  public io.sundr.model.PropertyFluent.ClassRefTypeNested<A> withNewClassRefTypeLike(io.sundr.model.ClassRef item) {
-    return new io.sundr.model.PropertyFluentImpl.ClassRefTypeNestedImpl(item);
+  public PropertyFluent.ClassRefTypeNested<A> withNewClassRefTypeLike(ClassRef item) {
+    return new PropertyFluentImpl.ClassRefTypeNestedImpl(item);
   }
 
-  public A withPrimitiveRefType(io.sundr.model.PrimitiveRef primitiveRefType) {
+  public A withPrimitiveRefType(PrimitiveRef primitiveRefType) {
     _visitables.get("typeRef").remove(this.typeRef);
     if (primitiveRefType != null) {
-      this.typeRef = new io.sundr.model.PrimitiveRefBuilder(primitiveRefType);
+      this.typeRef = new PrimitiveRefBuilder(primitiveRefType);
       _visitables.get("typeRef").add(this.typeRef);
+    } else {
+      this.typeRef = null;
+      _visitables.get("typeRef").remove(this.typeRef);
     }
     return (A) this;
   }
@@ -354,15 +363,18 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return new PropertyFluentImpl.PrimitiveRefTypeNestedImpl();
   }
 
-  public io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefTypeLike(io.sundr.model.PrimitiveRef item) {
-    return new io.sundr.model.PropertyFluentImpl.PrimitiveRefTypeNestedImpl(item);
+  public PropertyFluent.PrimitiveRefTypeNested<A> withNewPrimitiveRefTypeLike(PrimitiveRef item) {
+    return new PropertyFluentImpl.PrimitiveRefTypeNestedImpl(item);
   }
 
-  public A withVoidRefType(io.sundr.model.VoidRef voidRefType) {
+  public A withVoidRefType(VoidRef voidRefType) {
     _visitables.get("typeRef").remove(this.typeRef);
     if (voidRefType != null) {
-      this.typeRef = new io.sundr.model.VoidRefBuilder(voidRefType);
+      this.typeRef = new VoidRefBuilder(voidRefType);
       _visitables.get("typeRef").add(this.typeRef);
+    } else {
+      this.typeRef = null;
+      _visitables.get("typeRef").remove(this.typeRef);
     }
     return (A) this;
   }
@@ -371,34 +383,34 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return new PropertyFluentImpl.VoidRefTypeNestedImpl();
   }
 
-  public io.sundr.model.PropertyFluent.VoidRefTypeNested<A> withNewVoidRefTypeLike(io.sundr.model.VoidRef item) {
-    return new io.sundr.model.PropertyFluentImpl.VoidRefTypeNestedImpl(item);
+  public PropertyFluent.VoidRefTypeNested<A> withNewVoidRefTypeLike(VoidRef item) {
+    return new PropertyFluentImpl.VoidRefTypeNestedImpl(item);
   }
 
-  public java.lang.String getName() {
+  public String getName() {
     return this.name;
   }
 
-  public A withName(java.lang.String name) {
+  public A withName(String name) {
     this.name = name;
     return (A) this;
   }
 
-  public java.lang.Boolean hasName() {
+  public Boolean hasName() {
     return this.name != null;
   }
 
-  public A addToComments(java.lang.Integer index, java.lang.String item) {
+  public A addToComments(Integer index, String item) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
     this.comments.add(index, item);
     return (A) this;
   }
 
-  public A setToComments(java.lang.Integer index, java.lang.String item) {
+  public A setToComments(Integer index, String item) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
     this.comments.set(index, item);
     return (A) this;
@@ -406,26 +418,26 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
 
   public A addToComments(java.lang.String... items) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
-    for (java.lang.String item : items) {
+    for (String item : items) {
       this.comments.add(item);
     }
     return (A) this;
   }
 
-  public A addAllToComments(java.util.Collection<java.lang.String> items) {
+  public A addAllToComments(Collection<String> items) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
-    for (java.lang.String item : items) {
+    for (String item : items) {
       this.comments.add(item);
     }
     return (A) this;
   }
 
   public A removeFromComments(java.lang.String... items) {
-    for (java.lang.String item : items) {
+    for (String item : items) {
       if (this.comments != null) {
         this.comments.remove(item);
       }
@@ -433,8 +445,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return (A) this;
   }
 
-  public A removeAllFromComments(java.util.Collection<java.lang.String> items) {
-    for (java.lang.String item : items) {
+  public A removeAllFromComments(Collection<String> items) {
+    for (String item : items) {
       if (this.comments != null) {
         this.comments.remove(item);
       }
@@ -442,24 +454,24 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return (A) this;
   }
 
-  public java.util.List<java.lang.String> getComments() {
+  public List<String> getComments() {
     return this.comments;
   }
 
-  public java.lang.String getComment(java.lang.Integer index) {
+  public String getComment(Integer index) {
     return this.comments.get(index);
   }
 
-  public java.lang.String getFirstComment() {
+  public String getFirstComment() {
     return this.comments.get(0);
   }
 
-  public java.lang.String getLastComment() {
+  public String getLastComment() {
     return this.comments.get(comments.size() - 1);
   }
 
-  public java.lang.String getMatchingComment(java.util.function.Predicate<java.lang.String> predicate) {
-    for (java.lang.String item : comments) {
+  public String getMatchingComment(Predicate<String> predicate) {
+    for (String item : comments) {
       if (predicate.test(item)) {
         return item;
       }
@@ -467,8 +479,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return null;
   }
 
-  public java.lang.Boolean hasMatchingComment(java.util.function.Predicate<java.lang.String> predicate) {
-    for (java.lang.String item : comments) {
+  public Boolean hasMatchingComment(Predicate<String> predicate) {
+    for (String item : comments) {
       if (predicate.test(item)) {
         return true;
       }
@@ -476,10 +488,10 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return false;
   }
 
-  public A withComments(java.util.List<java.lang.String> comments) {
+  public A withComments(List<String> comments) {
     if (comments != null) {
-      this.comments = new java.util.ArrayList();
-      for (java.lang.String item : comments) {
+      this.comments = new ArrayList();
+      for (String item : comments) {
         this.addToComments(item);
       }
     } else {
@@ -493,14 +505,14 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
       this.comments.clear();
     }
     if (comments != null) {
-      for (java.lang.String item : comments) {
+      for (String item : comments) {
         this.addToComments(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasComments() {
+  public Boolean hasComments() {
     return comments != null && !comments.isEmpty();
   }
 
@@ -527,7 +539,7 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return java.util.Objects.hash(annotations, typeRef, name, comments, super.hashCode());
   }
 
-  public java.lang.String toString() {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (annotations != null && !annotations.isEmpty()) {
@@ -551,19 +563,19 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<PropertyFluent.AnnotationsNested<N>>
-      implements io.sundr.model.PropertyFluent.AnnotationsNested<N>, Nested<N> {
-    AnnotationsNestedImpl(java.lang.Integer index, AnnotationRef item) {
+      implements PropertyFluent.AnnotationsNested<N>, Nested<N> {
+    AnnotationsNestedImpl(Integer index, AnnotationRef item) {
       this.index = index;
       this.builder = new AnnotationRefBuilder(this, item);
     }
 
     AnnotationsNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.AnnotationRefBuilder(this);
+      this.builder = new AnnotationRefBuilder(this);
     }
 
-    io.sundr.model.AnnotationRefBuilder builder;
-    java.lang.Integer index;
+    AnnotationRefBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) PropertyFluentImpl.this.setToAnnotations(index, builder.build());
@@ -576,16 +588,16 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   class TypeParamRefTypeNestedImpl<N> extends TypeParamRefFluentImpl<PropertyFluent.TypeParamRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.TypeParamRefTypeNested<N>, io.sundr.builder.Nested<N> {
-    TypeParamRefTypeNestedImpl(io.sundr.model.TypeParamRef item) {
+      implements PropertyFluent.TypeParamRefTypeNested<N>, Nested<N> {
+    TypeParamRefTypeNestedImpl(TypeParamRef item) {
       this.builder = new TypeParamRefBuilder(this, item);
     }
 
     TypeParamRefTypeNestedImpl() {
-      this.builder = new io.sundr.model.TypeParamRefBuilder(this);
+      this.builder = new TypeParamRefBuilder(this);
     }
 
-    io.sundr.model.TypeParamRefBuilder builder;
+    TypeParamRefBuilder builder;
 
     public N and() {
       return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
@@ -598,16 +610,16 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   class WildcardRefTypeNestedImpl<N> extends WildcardRefFluentImpl<PropertyFluent.WildcardRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.WildcardRefTypeNested<N>, io.sundr.builder.Nested<N> {
+      implements PropertyFluent.WildcardRefTypeNested<N>, Nested<N> {
     WildcardRefTypeNestedImpl(WildcardRef item) {
       this.builder = new WildcardRefBuilder(this, item);
     }
 
     WildcardRefTypeNestedImpl() {
-      this.builder = new io.sundr.model.WildcardRefBuilder(this);
+      this.builder = new WildcardRefBuilder(this);
     }
 
-    io.sundr.model.WildcardRefBuilder builder;
+    WildcardRefBuilder builder;
 
     public N and() {
       return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
@@ -620,16 +632,16 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   class ClassRefTypeNestedImpl<N> extends ClassRefFluentImpl<PropertyFluent.ClassRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.ClassRefTypeNested<N>, io.sundr.builder.Nested<N> {
-    ClassRefTypeNestedImpl(io.sundr.model.ClassRef item) {
+      implements PropertyFluent.ClassRefTypeNested<N>, Nested<N> {
+    ClassRefTypeNestedImpl(ClassRef item) {
       this.builder = new ClassRefBuilder(this, item);
     }
 
     ClassRefTypeNestedImpl() {
-      this.builder = new io.sundr.model.ClassRefBuilder(this);
+      this.builder = new ClassRefBuilder(this);
     }
 
-    io.sundr.model.ClassRefBuilder builder;
+    ClassRefBuilder builder;
 
     public N and() {
       return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
@@ -642,16 +654,16 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   class PrimitiveRefTypeNestedImpl<N> extends PrimitiveRefFluentImpl<PropertyFluent.PrimitiveRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.PrimitiveRefTypeNested<N>, io.sundr.builder.Nested<N> {
-    PrimitiveRefTypeNestedImpl(io.sundr.model.PrimitiveRef item) {
+      implements PropertyFluent.PrimitiveRefTypeNested<N>, Nested<N> {
+    PrimitiveRefTypeNestedImpl(PrimitiveRef item) {
       this.builder = new PrimitiveRefBuilder(this, item);
     }
 
     PrimitiveRefTypeNestedImpl() {
-      this.builder = new io.sundr.model.PrimitiveRefBuilder(this);
+      this.builder = new PrimitiveRefBuilder(this);
     }
 
-    io.sundr.model.PrimitiveRefBuilder builder;
+    PrimitiveRefBuilder builder;
 
     public N and() {
       return (N) PropertyFluentImpl.this.withTypeRef(builder.build());
@@ -664,16 +676,16 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   }
 
   class VoidRefTypeNestedImpl<N> extends VoidRefFluentImpl<PropertyFluent.VoidRefTypeNested<N>>
-      implements io.sundr.model.PropertyFluent.VoidRefTypeNested<N>, io.sundr.builder.Nested<N> {
+      implements PropertyFluent.VoidRefTypeNested<N>, Nested<N> {
     VoidRefTypeNestedImpl(VoidRef item) {
       this.builder = new VoidRefBuilder(this, item);
     }
 
     VoidRefTypeNestedImpl() {
-      this.builder = new io.sundr.model.VoidRefBuilder(this);
+      this.builder = new VoidRefBuilder(this);
     }
 
-    io.sundr.model.VoidRefBuilder builder;
+    VoidRefBuilder builder;
 
     public N and() {
       return (N) PropertyFluentImpl.this.withTypeRef(builder.build());

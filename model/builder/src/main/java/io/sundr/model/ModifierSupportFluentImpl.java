@@ -17,7 +17,7 @@ public class ModifierSupportFluentImpl<A extends ModifierSupportFluent<A>> exten
   public ModifierSupportFluentImpl() {
   }
 
-  public ModifierSupportFluentImpl(io.sundr.model.ModifierSupport instance) {
+  public ModifierSupportFluentImpl(ModifierSupport instance) {
     this.withModifiers(instance.getModifiers());
     this.withAttributes(instance.getAttributes());
   }
@@ -34,15 +34,18 @@ public class ModifierSupportFluentImpl<A extends ModifierSupportFluent<A>> exten
     return this.modifiers != null ? this.modifiers.build() : null;
   }
 
-  public io.sundr.model.Modifiers buildModifiers() {
+  public Modifiers buildModifiers() {
     return this.modifiers != null ? this.modifiers.build() : null;
   }
 
-  public A withModifiers(io.sundr.model.Modifiers modifiers) {
+  public A withModifiers(Modifiers modifiers) {
     _visitables.get("modifiers").remove(this.modifiers);
     if (modifiers != null) {
-      this.modifiers = new io.sundr.model.ModifiersBuilder(modifiers);
+      this.modifiers = new ModifiersBuilder(modifiers);
       _visitables.get("modifiers").add(this.modifiers);
+    } else {
+      this.modifiers = null;
+      _visitables.get("modifiers").remove(this.modifiers);
     }
     return (A) this;
   }
@@ -55,19 +58,19 @@ public class ModifierSupportFluentImpl<A extends ModifierSupportFluent<A>> exten
     return new ModifierSupportFluentImpl.ModifiersNestedImpl();
   }
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> withNewModifiersLike(io.sundr.model.Modifiers item) {
+  public ModifierSupportFluent.ModifiersNested<A> withNewModifiersLike(Modifiers item) {
     return new ModifierSupportFluentImpl.ModifiersNestedImpl(item);
   }
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> editModifiers() {
+  public ModifierSupportFluent.ModifiersNested<A> editModifiers() {
     return withNewModifiersLike(getModifiers());
   }
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> editOrNewModifiers() {
-    return withNewModifiersLike(getModifiers() != null ? getModifiers() : new io.sundr.model.ModifiersBuilder().build());
+  public ModifierSupportFluent.ModifiersNested<A> editOrNewModifiers() {
+    return withNewModifiersLike(getModifiers() != null ? getModifiers() : new ModifiersBuilder().build());
   }
 
-  public io.sundr.model.ModifierSupportFluent.ModifiersNested<A> editOrNewModifiersLike(io.sundr.model.Modifiers item) {
+  public ModifierSupportFluent.ModifiersNested<A> editOrNewModifiersLike(Modifiers item) {
     return withNewModifiersLike(getModifiers() != null ? getModifiers() : item);
   }
 
@@ -100,16 +103,16 @@ public class ModifierSupportFluentImpl<A extends ModifierSupportFluent<A>> exten
   }
 
   class ModifiersNestedImpl<N> extends ModifiersFluentImpl<ModifierSupportFluent.ModifiersNested<N>>
-      implements io.sundr.model.ModifierSupportFluent.ModifiersNested<N>, Nested<N> {
+      implements ModifierSupportFluent.ModifiersNested<N>, Nested<N> {
     ModifiersNestedImpl(Modifiers item) {
       this.builder = new ModifiersBuilder(this, item);
     }
 
     ModifiersNestedImpl() {
-      this.builder = new io.sundr.model.ModifiersBuilder(this);
+      this.builder = new ModifiersBuilder(this);
     }
 
-    io.sundr.model.ModifiersBuilder builder;
+    ModifiersBuilder builder;
 
     public N and() {
       return (N) ModifierSupportFluentImpl.this.withModifiers(builder.build());

@@ -23,20 +23,20 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
   public TypeParamDefFluentImpl() {
   }
 
-  public TypeParamDefFluentImpl(io.sundr.model.TypeParamDef instance) {
+  public TypeParamDefFluentImpl(TypeParamDef instance) {
     this.withName(instance.getName());
     this.withBounds(instance.getBounds());
     this.withAttributes(instance.getAttributes());
   }
 
   private String name;
-  private ArrayList<ClassRefBuilder> bounds = new java.util.ArrayList<ClassRefBuilder>();
+  private ArrayList<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
 
-  public java.lang.String getName() {
+  public String getName() {
     return this.name;
   }
 
-  public A withName(java.lang.String name) {
+  public A withName(String name) {
     this.name = name;
     return (A) this;
   }
@@ -45,21 +45,21 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     return this.name != null;
   }
 
-  public A addToBounds(Integer index, io.sundr.model.ClassRef item) {
+  public A addToBounds(Integer index, ClassRef item) {
     if (this.bounds == null) {
-      this.bounds = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.bounds = new ArrayList<ClassRefBuilder>();
     }
-    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    ClassRefBuilder builder = new ClassRefBuilder(item);
     _visitables.get("bounds").add(index >= 0 ? index : _visitables.get("bounds").size(), builder);
     this.bounds.add(index >= 0 ? index : bounds.size(), builder);
     return (A) this;
   }
 
-  public A setToBounds(java.lang.Integer index, io.sundr.model.ClassRef item) {
+  public A setToBounds(Integer index, ClassRef item) {
     if (this.bounds == null) {
-      this.bounds = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.bounds = new ArrayList<ClassRefBuilder>();
     }
-    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= _visitables.get("bounds").size()) {
       _visitables.get("bounds").add(builder);
     } else {
@@ -75,22 +75,22 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
 
   public A addToBounds(io.sundr.model.ClassRef... items) {
     if (this.bounds == null) {
-      this.bounds = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.bounds = new ArrayList<ClassRefBuilder>();
     }
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToBounds(Collection<io.sundr.model.ClassRef> items) {
+  public A addAllToBounds(Collection<ClassRef> items) {
     if (this.bounds == null) {
-      this.bounds = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.bounds = new ArrayList<ClassRefBuilder>();
     }
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("bounds").add(builder);
       this.bounds.add(builder);
     }
@@ -98,8 +98,8 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
   }
 
   public A removeFromBounds(io.sundr.model.ClassRef... items) {
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -108,9 +108,9 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     return (A) this;
   }
 
-  public A removeAllFromBounds(java.util.Collection<io.sundr.model.ClassRef> items) {
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+  public A removeAllFromBounds(Collection<ClassRef> items) {
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("bounds").remove(builder);
       if (this.bounds != null) {
         this.bounds.remove(builder);
@@ -119,13 +119,13 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     return (A) this;
   }
 
-  public A removeMatchingFromBounds(Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+  public A removeMatchingFromBounds(Predicate<ClassRefBuilder> predicate) {
     if (bounds == null)
       return (A) this;
-    final Iterator<io.sundr.model.ClassRefBuilder> each = bounds.iterator();
+    final Iterator<ClassRefBuilder> each = bounds.iterator();
     final List visitables = _visitables.get("bounds");
     while (each.hasNext()) {
-      io.sundr.model.ClassRefBuilder builder = each.next();
+      ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -140,28 +140,28 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
    * @return The buildable object.
    */
   @Deprecated
-  public List<io.sundr.model.ClassRef> getBounds() {
+  public List<ClassRef> getBounds() {
     return bounds != null ? build(bounds) : null;
   }
 
-  public java.util.List<io.sundr.model.ClassRef> buildBounds() {
+  public List<ClassRef> buildBounds() {
     return bounds != null ? build(bounds) : null;
   }
 
-  public io.sundr.model.ClassRef buildBound(java.lang.Integer index) {
+  public ClassRef buildBound(Integer index) {
     return this.bounds.get(index).build();
   }
 
-  public io.sundr.model.ClassRef buildFirstBound() {
+  public ClassRef buildFirstBound() {
     return this.bounds.get(0).build();
   }
 
-  public io.sundr.model.ClassRef buildLastBound() {
+  public ClassRef buildLastBound() {
     return this.bounds.get(bounds.size() - 1).build();
   }
 
-  public io.sundr.model.ClassRef buildMatchingBound(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
-    for (io.sundr.model.ClassRefBuilder item : bounds) {
+  public ClassRef buildMatchingBound(Predicate<ClassRefBuilder> predicate) {
+    for (ClassRefBuilder item : bounds) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -169,8 +169,8 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     return null;
   }
 
-  public java.lang.Boolean hasMatchingBound(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
-    for (io.sundr.model.ClassRefBuilder item : bounds) {
+  public Boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate) {
+    for (ClassRefBuilder item : bounds) {
       if (predicate.test(item)) {
         return true;
       }
@@ -178,13 +178,13 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     return false;
   }
 
-  public A withBounds(java.util.List<io.sundr.model.ClassRef> bounds) {
+  public A withBounds(List<ClassRef> bounds) {
     if (this.bounds != null) {
       _visitables.get("bounds").removeAll(this.bounds);
     }
     if (bounds != null) {
-      this.bounds = new java.util.ArrayList();
-      for (io.sundr.model.ClassRef item : bounds) {
+      this.bounds = new ArrayList();
+      for (ClassRef item : bounds) {
         this.addToBounds(item);
       }
     } else {
@@ -198,14 +198,14 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
       this.bounds.clear();
     }
     if (bounds != null) {
-      for (io.sundr.model.ClassRef item : bounds) {
+      for (ClassRef item : bounds) {
         this.addToBounds(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasBounds() {
+  public Boolean hasBounds() {
     return bounds != null && !bounds.isEmpty();
   }
 
@@ -213,36 +213,34 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     return new TypeParamDefFluentImpl.BoundsNestedImpl();
   }
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> addNewBoundLike(io.sundr.model.ClassRef item) {
+  public TypeParamDefFluent.BoundsNested<A> addNewBoundLike(ClassRef item) {
     return new TypeParamDefFluentImpl.BoundsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> setNewBoundLike(java.lang.Integer index,
-      io.sundr.model.ClassRef item) {
-    return new io.sundr.model.TypeParamDefFluentImpl.BoundsNestedImpl(index, item);
+  public TypeParamDefFluent.BoundsNested<A> setNewBoundLike(Integer index, ClassRef item) {
+    return new TypeParamDefFluentImpl.BoundsNestedImpl(index, item);
   }
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editBound(java.lang.Integer index) {
+  public TypeParamDefFluent.BoundsNested<A> editBound(Integer index) {
     if (bounds.size() <= index)
       throw new RuntimeException("Can't edit bounds. Index exceeds size.");
     return setNewBoundLike(index, buildBound(index));
   }
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editFirstBound() {
+  public TypeParamDefFluent.BoundsNested<A> editFirstBound() {
     if (bounds.size() == 0)
       throw new RuntimeException("Can't edit first bounds. The list is empty.");
     return setNewBoundLike(0, buildBound(0));
   }
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editLastBound() {
+  public TypeParamDefFluent.BoundsNested<A> editLastBound() {
     int index = bounds.size() - 1;
     if (index < 0)
       throw new RuntimeException("Can't edit last bounds. The list is empty.");
     return setNewBoundLike(index, buildBound(index));
   }
 
-  public io.sundr.model.TypeParamDefFluent.BoundsNested<A> editMatchingBound(
-      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+  public TypeParamDefFluent.BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < bounds.size(); i++) {
       if (predicate.test(bounds.get(i))) {
@@ -274,7 +272,7 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
     return java.util.Objects.hash(name, bounds, super.hashCode());
   }
 
-  public java.lang.String toString() {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (name != null) {
@@ -290,19 +288,19 @@ public class TypeParamDefFluentImpl<A extends TypeParamDefFluent<A>> extends Att
   }
 
   class BoundsNestedImpl<N> extends ClassRefFluentImpl<TypeParamDefFluent.BoundsNested<N>>
-      implements io.sundr.model.TypeParamDefFluent.BoundsNested<N>, Nested<N> {
-    BoundsNestedImpl(java.lang.Integer index, io.sundr.model.ClassRef item) {
+      implements TypeParamDefFluent.BoundsNested<N>, Nested<N> {
+    BoundsNestedImpl(Integer index, ClassRef item) {
       this.index = index;
       this.builder = new ClassRefBuilder(this, item);
     }
 
     BoundsNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.ClassRefBuilder(this);
+      this.builder = new ClassRefBuilder(this);
     }
 
-    io.sundr.model.ClassRefBuilder builder;
-    java.lang.Integer index;
+    ClassRefBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) TypeParamDefFluentImpl.this.setToBounds(index, builder.build());

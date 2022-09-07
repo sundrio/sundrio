@@ -24,41 +24,41 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
   public BlockFluentImpl() {
   }
 
-  public BlockFluentImpl(io.sundr.model.Block instance) {
+  public BlockFluentImpl(Block instance) {
     this.withStatements(instance.getStatements());
   }
 
-  private ArrayList<VisitableBuilder<? extends Statement, ?>> statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+  private ArrayList<VisitableBuilder<? extends Statement, ?>> statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
 
-  public A addToStatements(io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?> builder) {
+  public A addToStatements(VisitableBuilder<? extends Statement, ?> builder) {
     if (this.statements == null) {
-      this.statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
     _visitables.get("statements").add(builder);
     this.statements.add(builder);
     return (A) this;
   }
 
-  public A addToStatements(Integer index, io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?> builder) {
+  public A addToStatements(Integer index, VisitableBuilder<? extends Statement, ?> builder) {
     if (this.statements == null) {
-      this.statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
     _visitables.get("statements").add(index, builder);
     this.statements.add(index, builder);
     return (A) this;
   }
 
-  public A addToStatements(java.lang.Integer index, io.sundr.model.Statement item) {
+  public A addToStatements(Integer index, Statement item) {
     if (item instanceof StringStatement) {
-      addToStringStatementStatements(index, (io.sundr.model.StringStatement) item);
+      addToStringStatementStatements(index, (StringStatement) item);
     }
 
     return (A) this;
   }
 
-  public A setToStatements(java.lang.Integer index, io.sundr.model.Statement item) {
-    if (item instanceof io.sundr.model.StringStatement) {
-      setToStringStatementStatements(index, (io.sundr.model.StringStatement) item);
+  public A setToStatements(Integer index, Statement item) {
+    if (item instanceof StringStatement) {
+      setToStringStatementStatements(index, (StringStatement) item);
     }
 
     return (A) this;
@@ -66,15 +66,15 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
 
   public A addToStatements(io.sundr.model.Statement... items) {
     if (items != null && items.length > 0 && this.statements == null) {
-      this.statements = new ArrayList<VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
-    for (io.sundr.model.Statement item : items) {
-      if (item instanceof io.sundr.model.StringStatement) {
-        addToStringStatementStatements((io.sundr.model.StringStatement) item);
+    for (Statement item : items) {
+      if (item instanceof StringStatement) {
+        addToStringStatementStatements((StringStatement) item);
       }
 
       else {
-        VisitableBuilder<? extends io.sundr.model.Statement, ?> builder = builderOf(item);
+        VisitableBuilder<? extends Statement, ?> builder = builderOf(item);
         _visitables.get("statements").add(builder);
         this.statements.add(builder);
       }
@@ -82,17 +82,17 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return (A) this;
   }
 
-  public A addAllToStatements(Collection<io.sundr.model.Statement> items) {
+  public A addAllToStatements(Collection<Statement> items) {
     if (items != null && items.size() > 0 && this.statements == null) {
-      this.statements = new ArrayList<VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
-    for (io.sundr.model.Statement item : items) {
-      if (item instanceof io.sundr.model.StringStatement) {
-        addToStringStatementStatements((io.sundr.model.StringStatement) item);
+    for (Statement item : items) {
+      if (item instanceof StringStatement) {
+        addToStringStatementStatements((StringStatement) item);
       }
 
       else {
-        VisitableBuilder<? extends io.sundr.model.Statement, ?> builder = builderOf(item);
+        VisitableBuilder<? extends Statement, ?> builder = builderOf(item);
         _visitables.get("statements").add(builder);
         this.statements.add(builder);
       }
@@ -100,9 +100,9 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return (A) this;
   }
 
-  public A removeFromStatements(io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?> builder) {
+  public A removeFromStatements(VisitableBuilder<? extends Statement, ?> builder) {
     if (this.statements == null) {
-      this.statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
     _visitables.get("statements").remove(builder);
     this.statements.remove(builder);
@@ -110,13 +110,13 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
   }
 
   public A removeFromStatements(io.sundr.model.Statement... items) {
-    for (io.sundr.model.Statement item : items) {
-      if (item instanceof io.sundr.model.StringStatement) {
-        removeFromStringStatementStatements((io.sundr.model.StringStatement) item);
+    for (Statement item : items) {
+      if (item instanceof StringStatement) {
+        removeFromStringStatementStatements((StringStatement) item);
       }
 
       else {
-        VisitableBuilder<? extends io.sundr.model.Statement, ?> builder = builderOf(item);
+        VisitableBuilder<? extends Statement, ?> builder = builderOf(item);
         _visitables.get("statements").remove(builder);
         this.statements.remove(builder);
       }
@@ -124,14 +124,14 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return (A) this;
   }
 
-  public A removeAllFromStatements(java.util.Collection<io.sundr.model.Statement> items) {
-    for (io.sundr.model.Statement item : items) {
-      if (item instanceof io.sundr.model.StringStatement) {
-        removeFromStringStatementStatements((io.sundr.model.StringStatement) item);
+  public A removeAllFromStatements(Collection<Statement> items) {
+    for (Statement item : items) {
+      if (item instanceof StringStatement) {
+        removeFromStringStatementStatements((StringStatement) item);
       }
 
       else {
-        VisitableBuilder<? extends io.sundr.model.Statement, ?> builder = builderOf(item);
+        VisitableBuilder<? extends Statement, ?> builder = builderOf(item);
         _visitables.get("statements").remove(builder);
         this.statements.remove(builder);
       }
@@ -145,29 +145,28 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
    * @return The buildable object.
    */
   @Deprecated
-  public List<io.sundr.model.Statement> getStatements() {
+  public List<Statement> getStatements() {
     return build(statements);
   }
 
-  public java.util.List<io.sundr.model.Statement> buildStatements() {
+  public List<Statement> buildStatements() {
     return build(statements);
   }
 
-  public io.sundr.model.Statement buildStatement(java.lang.Integer index) {
+  public Statement buildStatement(Integer index) {
     return this.statements.get(index).build();
   }
 
-  public io.sundr.model.Statement buildFirstStatement() {
+  public Statement buildFirstStatement() {
     return this.statements.get(0).build();
   }
 
-  public io.sundr.model.Statement buildLastStatement() {
+  public Statement buildLastStatement() {
     return this.statements.get(statements.size() - 1).build();
   }
 
-  public io.sundr.model.Statement buildMatchingStatement(
-      Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>> predicate) {
-    for (io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?> item : statements) {
+  public Statement buildMatchingStatement(Predicate<VisitableBuilder<? extends Statement, ?>> predicate) {
+    for (VisitableBuilder<? extends Statement, ?> item : statements) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -175,9 +174,8 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return null;
   }
 
-  public Boolean hasMatchingStatement(
-      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>> predicate) {
-    for (io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?> item : statements) {
+  public Boolean hasMatchingStatement(Predicate<VisitableBuilder<? extends Statement, ?>> predicate) {
+    for (VisitableBuilder<? extends Statement, ?> item : statements) {
       if (predicate.test(item)) {
         return true;
       }
@@ -185,10 +183,10 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return false;
   }
 
-  public A withStatements(java.util.List<io.sundr.model.Statement> statements) {
+  public A withStatements(List<Statement> statements) {
     if (statements != null) {
-      this.statements = new java.util.ArrayList();
-      for (io.sundr.model.Statement item : statements) {
+      this.statements = new ArrayList();
+      for (Statement item : statements) {
         this.addToStatements(item);
       }
     } else {
@@ -202,32 +200,32 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
       this.statements.clear();
     }
     if (statements != null) {
-      for (io.sundr.model.Statement item : statements) {
+      for (Statement item : statements) {
         this.addToStatements(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasStatements() {
+  public Boolean hasStatements() {
     return statements != null && !statements.isEmpty();
   }
 
-  public A addToStringStatementStatements(java.lang.Integer index, io.sundr.model.StringStatement item) {
+  public A addToStringStatementStatements(Integer index, StringStatement item) {
     if (this.statements == null) {
-      this.statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
-    StringStatementBuilder builder = new io.sundr.model.StringStatementBuilder(item);
+    StringStatementBuilder builder = new StringStatementBuilder(item);
     _visitables.get("statements").add(index >= 0 ? index : _visitables.get("statements").size(), builder);
     this.statements.add(index >= 0 ? index : statements.size(), builder);
     return (A) this;
   }
 
-  public A setToStringStatementStatements(java.lang.Integer index, io.sundr.model.StringStatement item) {
+  public A setToStringStatementStatements(Integer index, StringStatement item) {
     if (this.statements == null) {
-      this.statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
-    io.sundr.model.StringStatementBuilder builder = new io.sundr.model.StringStatementBuilder(item);
+    StringStatementBuilder builder = new StringStatementBuilder(item);
     if (index < 0 || index >= _visitables.get("statements").size()) {
       _visitables.get("statements").add(builder);
     } else {
@@ -243,22 +241,22 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
 
   public A addToStringStatementStatements(io.sundr.model.StringStatement... items) {
     if (this.statements == null) {
-      this.statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
-    for (io.sundr.model.StringStatement item : items) {
-      io.sundr.model.StringStatementBuilder builder = new io.sundr.model.StringStatementBuilder(item);
+    for (StringStatement item : items) {
+      StringStatementBuilder builder = new StringStatementBuilder(item);
       _visitables.get("statements").add(builder);
       this.statements.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToStringStatementStatements(java.util.Collection<io.sundr.model.StringStatement> items) {
+  public A addAllToStringStatementStatements(Collection<StringStatement> items) {
     if (this.statements == null) {
-      this.statements = new java.util.ArrayList<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>>();
+      this.statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
     }
-    for (io.sundr.model.StringStatement item : items) {
-      io.sundr.model.StringStatementBuilder builder = new io.sundr.model.StringStatementBuilder(item);
+    for (StringStatement item : items) {
+      StringStatementBuilder builder = new StringStatementBuilder(item);
       _visitables.get("statements").add(builder);
       this.statements.add(builder);
     }
@@ -266,8 +264,8 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
   }
 
   public A removeFromStringStatementStatements(io.sundr.model.StringStatement... items) {
-    for (io.sundr.model.StringStatement item : items) {
-      io.sundr.model.StringStatementBuilder builder = new io.sundr.model.StringStatementBuilder(item);
+    for (StringStatement item : items) {
+      StringStatementBuilder builder = new StringStatementBuilder(item);
       _visitables.get("statements").remove(builder);
       if (this.statements != null) {
         this.statements.remove(builder);
@@ -276,9 +274,9 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return (A) this;
   }
 
-  public A removeAllFromStringStatementStatements(java.util.Collection<io.sundr.model.StringStatement> items) {
-    for (io.sundr.model.StringStatement item : items) {
-      io.sundr.model.StringStatementBuilder builder = new io.sundr.model.StringStatementBuilder(item);
+  public A removeAllFromStringStatementStatements(Collection<StringStatement> items) {
+    for (StringStatement item : items) {
+      StringStatementBuilder builder = new StringStatementBuilder(item);
       _visitables.get("statements").remove(builder);
       if (this.statements != null) {
         this.statements.remove(builder);
@@ -287,14 +285,13 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return (A) this;
   }
 
-  public A removeMatchingFromStringStatementStatements(
-      java.util.function.Predicate<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>> predicate) {
+  public A removeMatchingFromStringStatementStatements(Predicate<VisitableBuilder<? extends Statement, ?>> predicate) {
     if (statements == null)
       return (A) this;
-    final Iterator<io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?>> each = statements.iterator();
+    final Iterator<VisitableBuilder<? extends Statement, ?>> each = statements.iterator();
     final List visitables = _visitables.get("statements");
     while (each.hasNext()) {
-      io.sundr.builder.VisitableBuilder<? extends io.sundr.model.Statement, ?> builder = each.next();
+      VisitableBuilder<? extends Statement, ?> builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -307,8 +304,7 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return new BlockFluentImpl.StringStatementStatementsNestedImpl();
   }
 
-  public io.sundr.model.BlockFluent.StringStatementStatementsNested<A> addNewStringStatementStatementLike(
-      io.sundr.model.StringStatement item) {
+  public BlockFluent.StringStatementStatementsNested<A> addNewStringStatementStatementLike(StringStatement item) {
     return new BlockFluentImpl.StringStatementStatementsNestedImpl(-1, item);
   }
 
@@ -316,16 +312,16 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return (A) addToStringStatementStatements(new StringStatement(data));
   }
 
-  public A addNewStringStatementStatement(java.lang.String data, Object[] parameters) {
+  public A addNewStringStatementStatement(String data, Object[] parameters) {
     return (A) addToStringStatementStatements(new StringStatement(data, parameters));
   }
 
-  public io.sundr.model.BlockFluent.StringStatementStatementsNested<A> setNewStringStatementStatementLike(
-      java.lang.Integer index, io.sundr.model.StringStatement item) {
-    return new io.sundr.model.BlockFluentImpl.StringStatementStatementsNestedImpl(index, item);
+  public BlockFluent.StringStatementStatementsNested<A> setNewStringStatementStatementLike(Integer index,
+      StringStatement item) {
+    return new BlockFluentImpl.StringStatementStatementsNestedImpl(index, item);
   }
 
-  public boolean equals(java.lang.Object o) {
+  public boolean equals(Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())
@@ -340,7 +336,7 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
     return java.util.Objects.hash(statements, super.hashCode());
   }
 
-  public java.lang.String toString() {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (statements != null && !statements.isEmpty()) {
@@ -352,19 +348,19 @@ public class BlockFluentImpl<A extends BlockFluent<A>> extends BaseFluent<A> imp
   }
 
   class StringStatementStatementsNestedImpl<N> extends StringStatementFluentImpl<BlockFluent.StringStatementStatementsNested<N>>
-      implements io.sundr.model.BlockFluent.StringStatementStatementsNested<N>, Nested<N> {
-    StringStatementStatementsNestedImpl(java.lang.Integer index, StringStatement item) {
+      implements BlockFluent.StringStatementStatementsNested<N>, Nested<N> {
+    StringStatementStatementsNestedImpl(Integer index, StringStatement item) {
       this.index = index;
       this.builder = new StringStatementBuilder(this, item);
     }
 
     StringStatementStatementsNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.StringStatementBuilder(this);
+      this.builder = new StringStatementBuilder(this);
     }
 
-    io.sundr.model.StringStatementBuilder builder;
-    java.lang.Integer index;
+    StringStatementBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) BlockFluentImpl.this.setToStatements(index, builder.build());

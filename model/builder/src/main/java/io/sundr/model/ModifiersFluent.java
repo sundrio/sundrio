@@ -18,49 +18,49 @@ public interface ModifiersFluent<A extends ModifiersFluent<A>> extends Fluent<A>
 
   public A withProtected(boolean _protected);
 
-  public java.lang.Boolean hasProtected();
+  public Boolean hasProtected();
 
   public boolean isPublic();
 
   public A withPublic(boolean _public);
 
-  public java.lang.Boolean hasPublic();
+  public Boolean hasPublic();
 
   public boolean isAbstract();
 
   public A withAbstract(boolean _abstract);
 
-  public java.lang.Boolean hasAbstract();
+  public Boolean hasAbstract();
 
   public boolean isFinal();
 
   public A withFinal(boolean _final);
 
-  public java.lang.Boolean hasFinal();
+  public Boolean hasFinal();
 
   public boolean isNative();
 
   public A withNative(boolean _native);
 
-  public java.lang.Boolean hasNative();
+  public Boolean hasNative();
 
   public boolean isStatic();
 
   public A withStatic(boolean _static);
 
-  public java.lang.Boolean hasStatic();
+  public Boolean hasStatic();
 
   public boolean isSynchronized();
 
   public A withSynchronized(boolean _synchronized);
 
-  public java.lang.Boolean hasSynchronized();
+  public Boolean hasSynchronized();
 
   public boolean isTransient();
 
   public A withTransient(boolean _transient);
 
-  public java.lang.Boolean hasTransient();
+  public Boolean hasTransient();
 
   public A withPrivate();
 

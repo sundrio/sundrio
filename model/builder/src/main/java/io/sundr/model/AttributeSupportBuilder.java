@@ -1,12 +1,11 @@
 package io.sundr.model;
 
 import java.lang.Boolean;
-import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
 public class AttributeSupportBuilder extends AttributeSupportFluentImpl<AttributeSupportBuilder>
-    implements VisitableBuilder<AttributeSupport, io.sundr.model.AttributeSupportBuilder> {
+    implements VisitableBuilder<AttributeSupport, AttributeSupportBuilder> {
   public AttributeSupportBuilder() {
     this(false);
   }
@@ -20,58 +19,37 @@ public class AttributeSupportBuilder extends AttributeSupportFluentImpl<Attribut
     this(fluent, false);
   }
 
-  public AttributeSupportBuilder(io.sundr.model.AttributeSupportFluent<?> fluent, java.lang.Boolean validationEnabled) {
+  public AttributeSupportBuilder(AttributeSupportFluent<?> fluent, Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public AttributeSupportBuilder(io.sundr.model.AttributeSupportFluent<?> fluent, io.sundr.model.AttributeSupport instance) {
+  public AttributeSupportBuilder(AttributeSupportFluent<?> fluent, AttributeSupport instance) {
     this(fluent, instance, false);
   }
 
-  public AttributeSupportBuilder(io.sundr.model.AttributeSupportFluent<?> fluent, io.sundr.model.AttributeSupport instance,
-      java.lang.Boolean validationEnabled) {
+  public AttributeSupportBuilder(AttributeSupportFluent<?> fluent, AttributeSupport instance, Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
   }
 
-  public AttributeSupportBuilder(io.sundr.model.AttributeSupport instance) {
+  public AttributeSupportBuilder(AttributeSupport instance) {
     this(instance, false);
   }
 
-  public AttributeSupportBuilder(io.sundr.model.AttributeSupport instance, java.lang.Boolean validationEnabled) {
+  public AttributeSupportBuilder(AttributeSupport instance, Boolean validationEnabled) {
     this.fluent = this;
     this.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
   }
 
-  io.sundr.model.AttributeSupportFluent<?> fluent;
-  java.lang.Boolean validationEnabled;
+  AttributeSupportFluent<?> fluent;
+  Boolean validationEnabled;
 
-  public io.sundr.model.AttributeSupport build() {
+  public AttributeSupport build() {
     AttributeSupport buildable = new AttributeSupport(fluent.getAttributes());
     return buildable;
-  }
-
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    if (!super.equals(o))
-      return false;
-    AttributeSupportBuilder that = (AttributeSupportBuilder) o;
-    if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-      return false;
-
-    if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) : that.validationEnabled != null)
-      return false;
-    return true;
-  }
-
-  public int hashCode() {
-    return java.util.Objects.hash(fluent, validationEnabled, super.hashCode());
   }
 
 }

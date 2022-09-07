@@ -9,7 +9,7 @@ import java.lang.String;
 public interface PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRefFluent<A> {
   public String getName();
 
-  public A withName(java.lang.String name);
+  public A withName(String name);
 
   public Boolean hasName();
 
@@ -17,6 +17,6 @@ public interface PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends Typ
 
   public A withDimensions(int dimensions);
 
-  public java.lang.Boolean hasDimensions();
+  public Boolean hasDimensions();
 
 }

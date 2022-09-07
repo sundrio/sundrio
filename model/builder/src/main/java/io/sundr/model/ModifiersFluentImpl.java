@@ -15,7 +15,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
   public ModifiersFluentImpl() {
   }
 
-  public ModifiersFluentImpl(io.sundr.model.Modifiers instance) {
+  public ModifiersFluentImpl(Modifiers instance) {
     this.withPrivate(instance.isPrivate());
     this.withProtected(instance.isProtected());
     this.withPublic(instance.isPublic());
@@ -59,7 +59,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasProtected() {
+  public Boolean hasProtected() {
     return true;
   }
 
@@ -72,7 +72,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasPublic() {
+  public Boolean hasPublic() {
     return true;
   }
 
@@ -85,7 +85,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasAbstract() {
+  public Boolean hasAbstract() {
     return true;
   }
 
@@ -98,7 +98,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasFinal() {
+  public Boolean hasFinal() {
     return true;
   }
 
@@ -111,7 +111,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasNative() {
+  public Boolean hasNative() {
     return true;
   }
 
@@ -124,7 +124,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasStatic() {
+  public Boolean hasStatic() {
     return true;
   }
 
@@ -137,7 +137,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasSynchronized() {
+  public Boolean hasSynchronized() {
     return true;
   }
 
@@ -150,7 +150,7 @@ public class ModifiersFluentImpl<A extends ModifiersFluent<A>> extends BaseFluen
     return (A) this;
   }
 
-  public java.lang.Boolean hasTransient() {
+  public Boolean hasTransient() {
     return true;
   }
 

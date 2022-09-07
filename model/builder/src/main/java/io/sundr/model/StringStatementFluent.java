@@ -12,7 +12,7 @@ import io.sundr.builder.Fluent;
 public interface StringStatementFluent<A extends StringStatementFluent<A>> extends Fluent<A> {
   public Supplier<String> getSupplier();
 
-  public <T> A withSupplier(java.util.function.Supplier<java.lang.String> supplier);
+  public <T> A withSupplier(Supplier<String> supplier);
 
   public Boolean hasSupplier();
 

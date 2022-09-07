@@ -12,7 +12,7 @@ public class VoidRefFluentImpl<A extends VoidRefFluent<A>> extends TypeRefFluent
   public VoidRefFluentImpl() {
   }
 
-  public VoidRefFluentImpl(io.sundr.model.VoidRef instance) {
+  public VoidRefFluentImpl(VoidRef instance) {
     this.withAttributes(instance.getAttributes());
   }
 

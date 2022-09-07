@@ -18,15 +18,15 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
   public AttributeSupportFluentImpl() {
   }
 
-  public AttributeSupportFluentImpl(io.sundr.model.AttributeSupport instance) {
+  public AttributeSupportFluentImpl(AttributeSupport instance) {
     this.withAttributes(instance.getAttributes());
   }
 
-  private Map<AttributeKey, Object> attributes = new LinkedHashMap<io.sundr.model.AttributeKey, java.lang.Object>();
+  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
 
-  public A addToAttributes(io.sundr.model.AttributeKey key, java.lang.Object value) {
+  public A addToAttributes(AttributeKey key, Object value) {
     if (this.attributes == null && key != null && value != null) {
-      this.attributes = new java.util.LinkedHashMap();
+      this.attributes = new LinkedHashMap();
     }
     if (key != null && value != null) {
       this.attributes.put(key, value);
@@ -34,9 +34,9 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public A addToAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> map) {
+  public A addToAttributes(Map<AttributeKey, Object> map) {
     if (this.attributes == null && map != null) {
-      this.attributes = new java.util.LinkedHashMap();
+      this.attributes = new LinkedHashMap();
     }
     if (map != null) {
       this.attributes.putAll(map);
@@ -44,7 +44,7 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public A removeFromAttributes(io.sundr.model.AttributeKey key) {
+  public A removeFromAttributes(AttributeKey key) {
     if (this.attributes == null) {
       return (A) this;
     }
@@ -54,7 +54,7 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public A removeFromAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> map) {
+  public A removeFromAttributes(Map<AttributeKey, Object> map) {
     if (this.attributes == null) {
       return (A) this;
     }
@@ -68,15 +68,15 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return (A) this;
   }
 
-  public java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> getAttributes() {
+  public Map<AttributeKey, Object> getAttributes() {
     return this.attributes;
   }
 
-  public <K, V> A withAttributes(java.util.Map<io.sundr.model.AttributeKey, java.lang.Object> attributes) {
+  public <K, V> A withAttributes(Map<AttributeKey, Object> attributes) {
     if (attributes == null) {
       this.attributes = null;
     } else {
-      this.attributes = new java.util.LinkedHashMap(attributes);
+      this.attributes = new LinkedHashMap(attributes);
     }
     return (A) this;
   }
@@ -85,7 +85,7 @@ public class AttributeSupportFluentImpl<A extends AttributeSupportFluent<A>> ext
     return this.attributes != null;
   }
 
-  public boolean equals(java.lang.Object o) {
+  public boolean equals(Object o) {
     if (this == o)
       return true;
     if (o == null || getClass() != o.getClass())

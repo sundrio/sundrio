@@ -23,27 +23,27 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
   public SourceFluentImpl() {
   }
 
-  public SourceFluentImpl(io.sundr.model.Source instance) {
+  public SourceFluentImpl(Source instance) {
     this.withTypes(instance.getTypes());
   }
 
-  private ArrayList<TypeDefBuilder> types = new java.util.ArrayList<TypeDefBuilder>();
+  private ArrayList<TypeDefBuilder> types = new ArrayList<TypeDefBuilder>();
 
-  public A addToTypes(Integer index, io.sundr.model.TypeDef item) {
+  public A addToTypes(Integer index, TypeDef item) {
     if (this.types == null) {
-      this.types = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
+      this.types = new ArrayList<TypeDefBuilder>();
     }
-    io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
+    TypeDefBuilder builder = new TypeDefBuilder(item);
     _visitables.get("types").add(index >= 0 ? index : _visitables.get("types").size(), builder);
     this.types.add(index >= 0 ? index : types.size(), builder);
     return (A) this;
   }
 
-  public A setToTypes(java.lang.Integer index, io.sundr.model.TypeDef item) {
+  public A setToTypes(Integer index, TypeDef item) {
     if (this.types == null) {
-      this.types = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
+      this.types = new ArrayList<TypeDefBuilder>();
     }
-    io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
+    TypeDefBuilder builder = new TypeDefBuilder(item);
     if (index < 0 || index >= _visitables.get("types").size()) {
       _visitables.get("types").add(builder);
     } else {
@@ -59,22 +59,22 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
 
   public A addToTypes(io.sundr.model.TypeDef... items) {
     if (this.types == null) {
-      this.types = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
+      this.types = new ArrayList<TypeDefBuilder>();
     }
-    for (io.sundr.model.TypeDef item : items) {
-      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
       _visitables.get("types").add(builder);
       this.types.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToTypes(Collection<io.sundr.model.TypeDef> items) {
+  public A addAllToTypes(Collection<TypeDef> items) {
     if (this.types == null) {
-      this.types = new java.util.ArrayList<io.sundr.model.TypeDefBuilder>();
+      this.types = new ArrayList<TypeDefBuilder>();
     }
-    for (io.sundr.model.TypeDef item : items) {
-      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
       _visitables.get("types").add(builder);
       this.types.add(builder);
     }
@@ -82,8 +82,8 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
   }
 
   public A removeFromTypes(io.sundr.model.TypeDef... items) {
-    for (io.sundr.model.TypeDef item : items) {
-      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
       _visitables.get("types").remove(builder);
       if (this.types != null) {
         this.types.remove(builder);
@@ -92,9 +92,9 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     return (A) this;
   }
 
-  public A removeAllFromTypes(java.util.Collection<io.sundr.model.TypeDef> items) {
-    for (io.sundr.model.TypeDef item : items) {
-      io.sundr.model.TypeDefBuilder builder = new io.sundr.model.TypeDefBuilder(item);
+  public A removeAllFromTypes(Collection<TypeDef> items) {
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
       _visitables.get("types").remove(builder);
       if (this.types != null) {
         this.types.remove(builder);
@@ -103,13 +103,13 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     return (A) this;
   }
 
-  public A removeMatchingFromTypes(Predicate<io.sundr.model.TypeDefBuilder> predicate) {
+  public A removeMatchingFromTypes(Predicate<TypeDefBuilder> predicate) {
     if (types == null)
       return (A) this;
-    final Iterator<io.sundr.model.TypeDefBuilder> each = types.iterator();
+    final Iterator<TypeDefBuilder> each = types.iterator();
     final List visitables = _visitables.get("types");
     while (each.hasNext()) {
-      io.sundr.model.TypeDefBuilder builder = each.next();
+      TypeDefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -124,28 +124,28 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
    * @return The buildable object.
    */
   @Deprecated
-  public List<io.sundr.model.TypeDef> getTypes() {
+  public List<TypeDef> getTypes() {
     return types != null ? build(types) : null;
   }
 
-  public java.util.List<io.sundr.model.TypeDef> buildTypes() {
+  public List<TypeDef> buildTypes() {
     return types != null ? build(types) : null;
   }
 
-  public io.sundr.model.TypeDef buildType(java.lang.Integer index) {
+  public TypeDef buildType(Integer index) {
     return this.types.get(index).build();
   }
 
-  public io.sundr.model.TypeDef buildFirstType() {
+  public TypeDef buildFirstType() {
     return this.types.get(0).build();
   }
 
-  public io.sundr.model.TypeDef buildLastType() {
+  public TypeDef buildLastType() {
     return this.types.get(types.size() - 1).build();
   }
 
-  public io.sundr.model.TypeDef buildMatchingType(java.util.function.Predicate<io.sundr.model.TypeDefBuilder> predicate) {
-    for (io.sundr.model.TypeDefBuilder item : types) {
+  public TypeDef buildMatchingType(Predicate<TypeDefBuilder> predicate) {
+    for (TypeDefBuilder item : types) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -153,8 +153,8 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     return null;
   }
 
-  public Boolean hasMatchingType(java.util.function.Predicate<io.sundr.model.TypeDefBuilder> predicate) {
-    for (io.sundr.model.TypeDefBuilder item : types) {
+  public Boolean hasMatchingType(Predicate<TypeDefBuilder> predicate) {
+    for (TypeDefBuilder item : types) {
       if (predicate.test(item)) {
         return true;
       }
@@ -162,13 +162,13 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     return false;
   }
 
-  public A withTypes(java.util.List<io.sundr.model.TypeDef> types) {
+  public A withTypes(List<TypeDef> types) {
     if (this.types != null) {
       _visitables.get("types").removeAll(this.types);
     }
     if (types != null) {
-      this.types = new java.util.ArrayList();
-      for (io.sundr.model.TypeDef item : types) {
+      this.types = new ArrayList();
+      for (TypeDef item : types) {
         this.addToTypes(item);
       }
     } else {
@@ -182,14 +182,14 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
       this.types.clear();
     }
     if (types != null) {
-      for (io.sundr.model.TypeDef item : types) {
+      for (TypeDef item : types) {
         this.addToTypes(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasTypes() {
+  public Boolean hasTypes() {
     return types != null && !types.isEmpty();
   }
 
@@ -201,35 +201,34 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     return new SourceFluentImpl.TypesNestedImpl();
   }
 
-  public io.sundr.model.SourceFluent.TypesNested<A> addNewTypeLike(io.sundr.model.TypeDef item) {
+  public SourceFluent.TypesNested<A> addNewTypeLike(TypeDef item) {
     return new SourceFluentImpl.TypesNestedImpl(-1, item);
   }
 
-  public io.sundr.model.SourceFluent.TypesNested<A> setNewTypeLike(java.lang.Integer index, io.sundr.model.TypeDef item) {
-    return new io.sundr.model.SourceFluentImpl.TypesNestedImpl(index, item);
+  public SourceFluent.TypesNested<A> setNewTypeLike(Integer index, TypeDef item) {
+    return new SourceFluentImpl.TypesNestedImpl(index, item);
   }
 
-  public io.sundr.model.SourceFluent.TypesNested<A> editType(java.lang.Integer index) {
+  public SourceFluent.TypesNested<A> editType(Integer index) {
     if (types.size() <= index)
       throw new RuntimeException("Can't edit types. Index exceeds size.");
     return setNewTypeLike(index, buildType(index));
   }
 
-  public io.sundr.model.SourceFluent.TypesNested<A> editFirstType() {
+  public SourceFluent.TypesNested<A> editFirstType() {
     if (types.size() == 0)
       throw new RuntimeException("Can't edit first types. The list is empty.");
     return setNewTypeLike(0, buildType(0));
   }
 
-  public io.sundr.model.SourceFluent.TypesNested<A> editLastType() {
+  public SourceFluent.TypesNested<A> editLastType() {
     int index = types.size() - 1;
     if (index < 0)
       throw new RuntimeException("Can't edit last types. The list is empty.");
     return setNewTypeLike(index, buildType(index));
   }
 
-  public io.sundr.model.SourceFluent.TypesNested<A> editMatchingType(
-      java.util.function.Predicate<io.sundr.model.TypeDefBuilder> predicate) {
+  public SourceFluent.TypesNested<A> editMatchingType(Predicate<TypeDefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < types.size(); i++) {
       if (predicate.test(types.get(i))) {
@@ -257,7 +256,7 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
     return java.util.Objects.hash(types, super.hashCode());
   }
 
-  public java.lang.String toString() {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (types != null && !types.isEmpty()) {
@@ -269,19 +268,19 @@ public class SourceFluentImpl<A extends SourceFluent<A>> extends BaseFluent<A> i
   }
 
   class TypesNestedImpl<N> extends TypeDefFluentImpl<SourceFluent.TypesNested<N>>
-      implements io.sundr.model.SourceFluent.TypesNested<N>, Nested<N> {
-    TypesNestedImpl(java.lang.Integer index, io.sundr.model.TypeDef item) {
+      implements SourceFluent.TypesNested<N>, Nested<N> {
+    TypesNestedImpl(Integer index, TypeDef item) {
       this.index = index;
       this.builder = new TypeDefBuilder(this, item);
     }
 
     TypesNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.TypeDefBuilder(this);
+      this.builder = new TypeDefBuilder(this);
     }
 
-    io.sundr.model.TypeDefBuilder builder;
-    java.lang.Integer index;
+    TypeDefBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) SourceFluentImpl.this.setToTypes(index, builder.build());

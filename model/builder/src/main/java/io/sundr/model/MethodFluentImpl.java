@@ -23,7 +23,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   public MethodFluentImpl() {
   }
 
-  public MethodFluentImpl(io.sundr.model.Method instance) {
+  public MethodFluentImpl(Method instance) {
     this.withComments(instance.getComments());
     this.withAnnotations(instance.getAnnotations());
     this.withParameters(instance.getParameters());
@@ -38,28 +38,28 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     this.withAttributes(instance.getAttributes());
   }
 
-  private List<String> comments = new ArrayList<java.lang.String>();
-  private java.util.ArrayList<AnnotationRefBuilder> annotations = new java.util.ArrayList<AnnotationRefBuilder>();
-  private java.util.ArrayList<TypeParamDefBuilder> parameters = new java.util.ArrayList<TypeParamDefBuilder>();
-  private java.lang.String name;
+  private List<String> comments = new ArrayList<String>();
+  private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
+  private ArrayList<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
+  private String name;
   private VisitableBuilder<? extends TypeRef, ?> returnType;
-  private java.util.ArrayList<PropertyBuilder> arguments = new java.util.ArrayList<PropertyBuilder>();
+  private ArrayList<PropertyBuilder> arguments = new ArrayList<PropertyBuilder>();
   private boolean varArgPreferred;
-  private java.util.ArrayList<ClassRefBuilder> exceptions = new java.util.ArrayList<ClassRefBuilder>();
+  private ArrayList<ClassRefBuilder> exceptions = new ArrayList<ClassRefBuilder>();
   private boolean defaultMethod;
   private BlockBuilder block;
 
-  public A addToComments(Integer index, java.lang.String item) {
+  public A addToComments(Integer index, String item) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
     this.comments.add(index, item);
     return (A) this;
   }
 
-  public A setToComments(java.lang.Integer index, java.lang.String item) {
+  public A setToComments(Integer index, String item) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
     this.comments.set(index, item);
     return (A) this;
@@ -67,26 +67,26 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public A addToComments(java.lang.String... items) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
-    for (java.lang.String item : items) {
+    for (String item : items) {
       this.comments.add(item);
     }
     return (A) this;
   }
 
-  public A addAllToComments(Collection<java.lang.String> items) {
+  public A addAllToComments(Collection<String> items) {
     if (this.comments == null) {
-      this.comments = new java.util.ArrayList<java.lang.String>();
+      this.comments = new ArrayList<String>();
     }
-    for (java.lang.String item : items) {
+    for (String item : items) {
       this.comments.add(item);
     }
     return (A) this;
   }
 
   public A removeFromComments(java.lang.String... items) {
-    for (java.lang.String item : items) {
+    for (String item : items) {
       if (this.comments != null) {
         this.comments.remove(item);
       }
@@ -94,8 +94,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeAllFromComments(java.util.Collection<java.lang.String> items) {
-    for (java.lang.String item : items) {
+  public A removeAllFromComments(Collection<String> items) {
+    for (String item : items) {
       if (this.comments != null) {
         this.comments.remove(item);
       }
@@ -103,24 +103,24 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public java.util.List<java.lang.String> getComments() {
+  public List<String> getComments() {
     return this.comments;
   }
 
-  public java.lang.String getComment(java.lang.Integer index) {
+  public String getComment(Integer index) {
     return this.comments.get(index);
   }
 
-  public java.lang.String getFirstComment() {
+  public String getFirstComment() {
     return this.comments.get(0);
   }
 
-  public java.lang.String getLastComment() {
+  public String getLastComment() {
     return this.comments.get(comments.size() - 1);
   }
 
-  public java.lang.String getMatchingComment(Predicate<java.lang.String> predicate) {
-    for (java.lang.String item : comments) {
+  public String getMatchingComment(Predicate<String> predicate) {
+    for (String item : comments) {
       if (predicate.test(item)) {
         return item;
       }
@@ -128,8 +128,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return null;
   }
 
-  public Boolean hasMatchingComment(java.util.function.Predicate<java.lang.String> predicate) {
-    for (java.lang.String item : comments) {
+  public Boolean hasMatchingComment(Predicate<String> predicate) {
+    for (String item : comments) {
       if (predicate.test(item)) {
         return true;
       }
@@ -137,10 +137,10 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return false;
   }
 
-  public A withComments(java.util.List<java.lang.String> comments) {
+  public A withComments(List<String> comments) {
     if (comments != null) {
-      this.comments = new java.util.ArrayList();
-      for (java.lang.String item : comments) {
+      this.comments = new ArrayList();
+      for (String item : comments) {
         this.addToComments(item);
       }
     } else {
@@ -154,32 +154,32 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
       this.comments.clear();
     }
     if (comments != null) {
-      for (java.lang.String item : comments) {
+      for (String item : comments) {
         this.addToComments(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasComments() {
+  public Boolean hasComments() {
     return comments != null && !comments.isEmpty();
   }
 
-  public A addToAnnotations(java.lang.Integer index, io.sundr.model.AnnotationRef item) {
+  public A addToAnnotations(Integer index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     _visitables.get("annotations").add(index >= 0 ? index : _visitables.get("annotations").size(), builder);
     this.annotations.add(index >= 0 ? index : annotations.size(), builder);
     return (A) this;
   }
 
-  public A setToAnnotations(java.lang.Integer index, io.sundr.model.AnnotationRef item) {
+  public A setToAnnotations(Integer index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     if (index < 0 || index >= _visitables.get("annotations").size()) {
       _visitables.get("annotations").add(builder);
     } else {
@@ -195,22 +195,22 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public A addToAnnotations(io.sundr.model.AnnotationRef... items) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").add(builder);
       this.annotations.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items) {
+  public A addAllToAnnotations(Collection<AnnotationRef> items) {
     if (this.annotations == null) {
-      this.annotations = new java.util.ArrayList<io.sundr.model.AnnotationRefBuilder>();
+      this.annotations = new ArrayList<AnnotationRefBuilder>();
     }
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").add(builder);
       this.annotations.add(builder);
     }
@@ -218,8 +218,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public A removeFromAnnotations(io.sundr.model.AnnotationRef... items) {
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
       if (this.annotations != null) {
         this.annotations.remove(builder);
@@ -228,9 +228,9 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeAllFromAnnotations(java.util.Collection<io.sundr.model.AnnotationRef> items) {
-    for (io.sundr.model.AnnotationRef item : items) {
-      io.sundr.model.AnnotationRefBuilder builder = new io.sundr.model.AnnotationRefBuilder(item);
+  public A removeAllFromAnnotations(Collection<AnnotationRef> items) {
+    for (AnnotationRef item : items) {
+      AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
       if (this.annotations != null) {
         this.annotations.remove(builder);
@@ -239,13 +239,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeMatchingFromAnnotations(java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
+  public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate) {
     if (annotations == null)
       return (A) this;
-    final Iterator<io.sundr.model.AnnotationRefBuilder> each = annotations.iterator();
+    final Iterator<AnnotationRefBuilder> each = annotations.iterator();
     final List visitables = _visitables.get("annotations");
     while (each.hasNext()) {
-      io.sundr.model.AnnotationRefBuilder builder = each.next();
+      AnnotationRefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -260,29 +260,28 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
    * @return The buildable object.
    */
   @Deprecated
-  public java.util.List<io.sundr.model.AnnotationRef> getAnnotations() {
+  public List<AnnotationRef> getAnnotations() {
     return annotations != null ? build(annotations) : null;
   }
 
-  public java.util.List<io.sundr.model.AnnotationRef> buildAnnotations() {
+  public List<AnnotationRef> buildAnnotations() {
     return annotations != null ? build(annotations) : null;
   }
 
-  public io.sundr.model.AnnotationRef buildAnnotation(java.lang.Integer index) {
+  public AnnotationRef buildAnnotation(Integer index) {
     return this.annotations.get(index).build();
   }
 
-  public io.sundr.model.AnnotationRef buildFirstAnnotation() {
+  public AnnotationRef buildFirstAnnotation() {
     return this.annotations.get(0).build();
   }
 
-  public io.sundr.model.AnnotationRef buildLastAnnotation() {
+  public AnnotationRef buildLastAnnotation() {
     return this.annotations.get(annotations.size() - 1).build();
   }
 
-  public io.sundr.model.AnnotationRef buildMatchingAnnotation(
-      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
-    for (io.sundr.model.AnnotationRefBuilder item : annotations) {
+  public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
+    for (AnnotationRefBuilder item : annotations) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -290,8 +289,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return null;
   }
 
-  public java.lang.Boolean hasMatchingAnnotation(java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
-    for (io.sundr.model.AnnotationRefBuilder item : annotations) {
+  public Boolean hasMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
+    for (AnnotationRefBuilder item : annotations) {
       if (predicate.test(item)) {
         return true;
       }
@@ -299,13 +298,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return false;
   }
 
-  public A withAnnotations(java.util.List<io.sundr.model.AnnotationRef> annotations) {
+  public A withAnnotations(List<AnnotationRef> annotations) {
     if (this.annotations != null) {
       _visitables.get("annotations").removeAll(this.annotations);
     }
     if (annotations != null) {
-      this.annotations = new java.util.ArrayList();
-      for (io.sundr.model.AnnotationRef item : annotations) {
+      this.annotations = new ArrayList();
+      for (AnnotationRef item : annotations) {
         this.addToAnnotations(item);
       }
     } else {
@@ -319,14 +318,14 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
       this.annotations.clear();
     }
     if (annotations != null) {
-      for (io.sundr.model.AnnotationRef item : annotations) {
+      for (AnnotationRef item : annotations) {
         this.addToAnnotations(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasAnnotations() {
+  public Boolean hasAnnotations() {
     return annotations != null && !annotations.isEmpty();
   }
 
@@ -334,36 +333,34 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.AnnotationsNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> addNewAnnotationLike(io.sundr.model.AnnotationRef item) {
+  public MethodFluent.AnnotationsNested<A> addNewAnnotationLike(AnnotationRef item) {
     return new MethodFluentImpl.AnnotationsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> setNewAnnotationLike(java.lang.Integer index,
-      io.sundr.model.AnnotationRef item) {
-    return new io.sundr.model.MethodFluentImpl.AnnotationsNestedImpl(index, item);
+  public MethodFluent.AnnotationsNested<A> setNewAnnotationLike(Integer index, AnnotationRef item) {
+    return new MethodFluentImpl.AnnotationsNestedImpl(index, item);
   }
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> editAnnotation(java.lang.Integer index) {
+  public MethodFluent.AnnotationsNested<A> editAnnotation(Integer index) {
     if (annotations.size() <= index)
       throw new RuntimeException("Can't edit annotations. Index exceeds size.");
     return setNewAnnotationLike(index, buildAnnotation(index));
   }
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> editFirstAnnotation() {
+  public MethodFluent.AnnotationsNested<A> editFirstAnnotation() {
     if (annotations.size() == 0)
       throw new RuntimeException("Can't edit first annotations. The list is empty.");
     return setNewAnnotationLike(0, buildAnnotation(0));
   }
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> editLastAnnotation() {
+  public MethodFluent.AnnotationsNested<A> editLastAnnotation() {
     int index = annotations.size() - 1;
     if (index < 0)
       throw new RuntimeException("Can't edit last annotations. The list is empty.");
     return setNewAnnotationLike(index, buildAnnotation(index));
   }
 
-  public io.sundr.model.MethodFluent.AnnotationsNested<A> editMatchingAnnotation(
-      java.util.function.Predicate<io.sundr.model.AnnotationRefBuilder> predicate) {
+  public MethodFluent.AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < annotations.size(); i++) {
       if (predicate.test(annotations.get(i))) {
@@ -376,21 +373,21 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return setNewAnnotationLike(index, buildAnnotation(index));
   }
 
-  public A addToParameters(java.lang.Integer index, io.sundr.model.TypeParamDef item) {
+  public A addToParameters(Integer index, TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
+      this.parameters = new ArrayList<TypeParamDefBuilder>();
     }
-    io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
+    TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
     _visitables.get("parameters").add(index >= 0 ? index : _visitables.get("parameters").size(), builder);
     this.parameters.add(index >= 0 ? index : parameters.size(), builder);
     return (A) this;
   }
 
-  public A setToParameters(java.lang.Integer index, io.sundr.model.TypeParamDef item) {
+  public A setToParameters(Integer index, TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
+      this.parameters = new ArrayList<TypeParamDefBuilder>();
     }
-    io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
+    TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
     if (index < 0 || index >= _visitables.get("parameters").size()) {
       _visitables.get("parameters").add(builder);
     } else {
@@ -406,22 +403,22 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public A addToParameters(io.sundr.model.TypeParamDef... items) {
     if (this.parameters == null) {
-      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
+      this.parameters = new ArrayList<TypeParamDefBuilder>();
     }
-    for (io.sundr.model.TypeParamDef item : items) {
-      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
+    for (TypeParamDef item : items) {
+      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").add(builder);
       this.parameters.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToParameters(java.util.Collection<io.sundr.model.TypeParamDef> items) {
+  public A addAllToParameters(Collection<TypeParamDef> items) {
     if (this.parameters == null) {
-      this.parameters = new java.util.ArrayList<io.sundr.model.TypeParamDefBuilder>();
+      this.parameters = new ArrayList<TypeParamDefBuilder>();
     }
-    for (io.sundr.model.TypeParamDef item : items) {
-      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
+    for (TypeParamDef item : items) {
+      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").add(builder);
       this.parameters.add(builder);
     }
@@ -429,8 +426,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public A removeFromParameters(io.sundr.model.TypeParamDef... items) {
-    for (io.sundr.model.TypeParamDef item : items) {
-      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
+    for (TypeParamDef item : items) {
+      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
       if (this.parameters != null) {
         this.parameters.remove(builder);
@@ -439,9 +436,9 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeAllFromParameters(java.util.Collection<io.sundr.model.TypeParamDef> items) {
-    for (io.sundr.model.TypeParamDef item : items) {
-      io.sundr.model.TypeParamDefBuilder builder = new io.sundr.model.TypeParamDefBuilder(item);
+  public A removeAllFromParameters(Collection<TypeParamDef> items) {
+    for (TypeParamDef item : items) {
+      TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
       if (this.parameters != null) {
         this.parameters.remove(builder);
@@ -450,13 +447,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeMatchingFromParameters(java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
+  public A removeMatchingFromParameters(Predicate<TypeParamDefBuilder> predicate) {
     if (parameters == null)
       return (A) this;
-    final Iterator<io.sundr.model.TypeParamDefBuilder> each = parameters.iterator();
+    final Iterator<TypeParamDefBuilder> each = parameters.iterator();
     final List visitables = _visitables.get("parameters");
     while (each.hasNext()) {
-      io.sundr.model.TypeParamDefBuilder builder = each.next();
+      TypeParamDefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -470,30 +467,29 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
    * 
    * @return The buildable object.
    */
-  @java.lang.Deprecated
-  public java.util.List<io.sundr.model.TypeParamDef> getParameters() {
+  @Deprecated
+  public List<TypeParamDef> getParameters() {
     return parameters != null ? build(parameters) : null;
   }
 
-  public java.util.List<io.sundr.model.TypeParamDef> buildParameters() {
+  public List<TypeParamDef> buildParameters() {
     return parameters != null ? build(parameters) : null;
   }
 
-  public io.sundr.model.TypeParamDef buildParameter(java.lang.Integer index) {
+  public TypeParamDef buildParameter(Integer index) {
     return this.parameters.get(index).build();
   }
 
-  public io.sundr.model.TypeParamDef buildFirstParameter() {
+  public TypeParamDef buildFirstParameter() {
     return this.parameters.get(0).build();
   }
 
-  public io.sundr.model.TypeParamDef buildLastParameter() {
+  public TypeParamDef buildLastParameter() {
     return this.parameters.get(parameters.size() - 1).build();
   }
 
-  public io.sundr.model.TypeParamDef buildMatchingParameter(
-      java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
-    for (io.sundr.model.TypeParamDefBuilder item : parameters) {
+  public TypeParamDef buildMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
+    for (TypeParamDefBuilder item : parameters) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -501,8 +497,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return null;
   }
 
-  public java.lang.Boolean hasMatchingParameter(java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
-    for (io.sundr.model.TypeParamDefBuilder item : parameters) {
+  public Boolean hasMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
+    for (TypeParamDefBuilder item : parameters) {
       if (predicate.test(item)) {
         return true;
       }
@@ -510,13 +506,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return false;
   }
 
-  public A withParameters(java.util.List<io.sundr.model.TypeParamDef> parameters) {
+  public A withParameters(List<TypeParamDef> parameters) {
     if (this.parameters != null) {
       _visitables.get("parameters").removeAll(this.parameters);
     }
     if (parameters != null) {
-      this.parameters = new java.util.ArrayList();
-      for (io.sundr.model.TypeParamDef item : parameters) {
+      this.parameters = new ArrayList();
+      for (TypeParamDef item : parameters) {
         this.addToParameters(item);
       }
     } else {
@@ -530,14 +526,14 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
       this.parameters.clear();
     }
     if (parameters != null) {
-      for (io.sundr.model.TypeParamDef item : parameters) {
+      for (TypeParamDef item : parameters) {
         this.addToParameters(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasParameters() {
+  public Boolean hasParameters() {
     return parameters != null && !parameters.isEmpty();
   }
 
@@ -545,36 +541,34 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.ParametersNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> addNewParameterLike(io.sundr.model.TypeParamDef item) {
-    return new io.sundr.model.MethodFluentImpl.ParametersNestedImpl(-1, item);
+  public MethodFluent.ParametersNested<A> addNewParameterLike(TypeParamDef item) {
+    return new MethodFluentImpl.ParametersNestedImpl(-1, item);
   }
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> setNewParameterLike(java.lang.Integer index,
-      io.sundr.model.TypeParamDef item) {
-    return new io.sundr.model.MethodFluentImpl.ParametersNestedImpl(index, item);
+  public MethodFluent.ParametersNested<A> setNewParameterLike(Integer index, TypeParamDef item) {
+    return new MethodFluentImpl.ParametersNestedImpl(index, item);
   }
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> editParameter(java.lang.Integer index) {
+  public MethodFluent.ParametersNested<A> editParameter(Integer index) {
     if (parameters.size() <= index)
       throw new RuntimeException("Can't edit parameters. Index exceeds size.");
     return setNewParameterLike(index, buildParameter(index));
   }
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> editFirstParameter() {
+  public MethodFluent.ParametersNested<A> editFirstParameter() {
     if (parameters.size() == 0)
       throw new RuntimeException("Can't edit first parameters. The list is empty.");
     return setNewParameterLike(0, buildParameter(0));
   }
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> editLastParameter() {
+  public MethodFluent.ParametersNested<A> editLastParameter() {
     int index = parameters.size() - 1;
     if (index < 0)
       throw new RuntimeException("Can't edit last parameters. The list is empty.");
     return setNewParameterLike(index, buildParameter(index));
   }
 
-  public io.sundr.model.MethodFluent.ParametersNested<A> editMatchingParameter(
-      java.util.function.Predicate<io.sundr.model.TypeParamDefBuilder> predicate) {
+  public MethodFluent.ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < parameters.size(); i++) {
       if (predicate.test(parameters.get(i))) {
@@ -587,16 +581,16 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return setNewParameterLike(index, buildParameter(index));
   }
 
-  public java.lang.String getName() {
+  public String getName() {
     return this.name;
   }
 
-  public A withName(java.lang.String name) {
+  public A withName(String name) {
     this.name = name;
     return (A) this;
   }
 
-  public java.lang.Boolean hasName() {
+  public Boolean hasName() {
     return this.name != null;
   }
 
@@ -605,48 +599,51 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
    * 
    * @return The buildable object.
    */
-  @java.lang.Deprecated
-  public io.sundr.model.TypeRef getReturnType() {
+  @Deprecated
+  public TypeRef getReturnType() {
     return this.returnType != null ? this.returnType.build() : null;
   }
 
-  public io.sundr.model.TypeRef buildReturnType() {
+  public TypeRef buildReturnType() {
     return this.returnType != null ? this.returnType.build() : null;
   }
 
-  public A withReturnType(io.sundr.model.TypeRef returnType) {
+  public A withReturnType(TypeRef returnType) {
     if (returnType instanceof TypeParamRef) {
-      this.returnType = new TypeParamRefBuilder((io.sundr.model.TypeParamRef) returnType);
+      this.returnType = new TypeParamRefBuilder((TypeParamRef) returnType);
       _visitables.get("returnType").add(this.returnType);
     }
     if (returnType instanceof WildcardRef) {
-      this.returnType = new WildcardRefBuilder((io.sundr.model.WildcardRef) returnType);
+      this.returnType = new WildcardRefBuilder((WildcardRef) returnType);
       _visitables.get("returnType").add(this.returnType);
     }
-    if (returnType instanceof io.sundr.model.ClassRef) {
-      this.returnType = new io.sundr.model.ClassRefBuilder((io.sundr.model.ClassRef) returnType);
+    if (returnType instanceof ClassRef) {
+      this.returnType = new ClassRefBuilder((ClassRef) returnType);
       _visitables.get("returnType").add(this.returnType);
     }
     if (returnType instanceof PrimitiveRef) {
-      this.returnType = new PrimitiveRefBuilder((io.sundr.model.PrimitiveRef) returnType);
+      this.returnType = new PrimitiveRefBuilder((PrimitiveRef) returnType);
       _visitables.get("returnType").add(this.returnType);
     }
     if (returnType instanceof VoidRef) {
-      this.returnType = new VoidRefBuilder((io.sundr.model.VoidRef) returnType);
+      this.returnType = new VoidRefBuilder((VoidRef) returnType);
       _visitables.get("returnType").add(this.returnType);
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasReturnType() {
+  public Boolean hasReturnType() {
     return this.returnType != null;
   }
 
-  public A withTypeParamRefReturnType(io.sundr.model.TypeParamRef typeParamRefReturnType) {
+  public A withTypeParamRefReturnType(TypeParamRef typeParamRefReturnType) {
     _visitables.get("returnType").remove(this.returnType);
     if (typeParamRefReturnType != null) {
-      this.returnType = new io.sundr.model.TypeParamRefBuilder(typeParamRefReturnType);
+      this.returnType = new TypeParamRefBuilder(typeParamRefReturnType);
       _visitables.get("returnType").add(this.returnType);
+    } else {
+      this.returnType = null;
+      _visitables.get("returnType").remove(this.returnType);
     }
     return (A) this;
   }
@@ -655,16 +652,18 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.TypeParamRefReturnTypeNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(
-      io.sundr.model.TypeParamRef item) {
-    return new io.sundr.model.MethodFluentImpl.TypeParamRefReturnTypeNestedImpl(item);
+  public MethodFluent.TypeParamRefReturnTypeNested<A> withNewTypeParamRefReturnTypeLike(TypeParamRef item) {
+    return new MethodFluentImpl.TypeParamRefReturnTypeNestedImpl(item);
   }
 
-  public A withWildcardRefReturnType(io.sundr.model.WildcardRef wildcardRefReturnType) {
+  public A withWildcardRefReturnType(WildcardRef wildcardRefReturnType) {
     _visitables.get("returnType").remove(this.returnType);
     if (wildcardRefReturnType != null) {
-      this.returnType = new io.sundr.model.WildcardRefBuilder(wildcardRefReturnType);
+      this.returnType = new WildcardRefBuilder(wildcardRefReturnType);
       _visitables.get("returnType").add(this.returnType);
+    } else {
+      this.returnType = null;
+      _visitables.get("returnType").remove(this.returnType);
     }
     return (A) this;
   }
@@ -673,16 +672,18 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.WildcardRefReturnTypeNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(
-      io.sundr.model.WildcardRef item) {
-    return new io.sundr.model.MethodFluentImpl.WildcardRefReturnTypeNestedImpl(item);
+  public MethodFluent.WildcardRefReturnTypeNested<A> withNewWildcardRefReturnTypeLike(WildcardRef item) {
+    return new MethodFluentImpl.WildcardRefReturnTypeNestedImpl(item);
   }
 
-  public A withClassRefReturnType(io.sundr.model.ClassRef classRefReturnType) {
+  public A withClassRefReturnType(ClassRef classRefReturnType) {
     _visitables.get("returnType").remove(this.returnType);
     if (classRefReturnType != null) {
-      this.returnType = new io.sundr.model.ClassRefBuilder(classRefReturnType);
+      this.returnType = new ClassRefBuilder(classRefReturnType);
       _visitables.get("returnType").add(this.returnType);
+    } else {
+      this.returnType = null;
+      _visitables.get("returnType").remove(this.returnType);
     }
     return (A) this;
   }
@@ -691,15 +692,18 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.ClassRefReturnTypeNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(io.sundr.model.ClassRef item) {
-    return new io.sundr.model.MethodFluentImpl.ClassRefReturnTypeNestedImpl(item);
+  public MethodFluent.ClassRefReturnTypeNested<A> withNewClassRefReturnTypeLike(ClassRef item) {
+    return new MethodFluentImpl.ClassRefReturnTypeNestedImpl(item);
   }
 
-  public A withPrimitiveRefReturnType(io.sundr.model.PrimitiveRef primitiveRefReturnType) {
+  public A withPrimitiveRefReturnType(PrimitiveRef primitiveRefReturnType) {
     _visitables.get("returnType").remove(this.returnType);
     if (primitiveRefReturnType != null) {
-      this.returnType = new io.sundr.model.PrimitiveRefBuilder(primitiveRefReturnType);
+      this.returnType = new PrimitiveRefBuilder(primitiveRefReturnType);
       _visitables.get("returnType").add(this.returnType);
+    } else {
+      this.returnType = null;
+      _visitables.get("returnType").remove(this.returnType);
     }
     return (A) this;
   }
@@ -708,16 +712,18 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.PrimitiveRefReturnTypeNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(
-      io.sundr.model.PrimitiveRef item) {
-    return new io.sundr.model.MethodFluentImpl.PrimitiveRefReturnTypeNestedImpl(item);
+  public MethodFluent.PrimitiveRefReturnTypeNested<A> withNewPrimitiveRefReturnTypeLike(PrimitiveRef item) {
+    return new MethodFluentImpl.PrimitiveRefReturnTypeNestedImpl(item);
   }
 
-  public A withVoidRefReturnType(io.sundr.model.VoidRef voidRefReturnType) {
+  public A withVoidRefReturnType(VoidRef voidRefReturnType) {
     _visitables.get("returnType").remove(this.returnType);
     if (voidRefReturnType != null) {
-      this.returnType = new io.sundr.model.VoidRefBuilder(voidRefReturnType);
+      this.returnType = new VoidRefBuilder(voidRefReturnType);
       _visitables.get("returnType").add(this.returnType);
+    } else {
+      this.returnType = null;
+      _visitables.get("returnType").remove(this.returnType);
     }
     return (A) this;
   }
@@ -726,25 +732,25 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.VoidRefReturnTypeNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(io.sundr.model.VoidRef item) {
-    return new io.sundr.model.MethodFluentImpl.VoidRefReturnTypeNestedImpl(item);
+  public MethodFluent.VoidRefReturnTypeNested<A> withNewVoidRefReturnTypeLike(VoidRef item) {
+    return new MethodFluentImpl.VoidRefReturnTypeNestedImpl(item);
   }
 
-  public A addToArguments(java.lang.Integer index, io.sundr.model.Property item) {
+  public A addToArguments(Integer index, Property item) {
     if (this.arguments == null) {
-      this.arguments = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
+      this.arguments = new ArrayList<PropertyBuilder>();
     }
-    io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
+    PropertyBuilder builder = new PropertyBuilder(item);
     _visitables.get("arguments").add(index >= 0 ? index : _visitables.get("arguments").size(), builder);
     this.arguments.add(index >= 0 ? index : arguments.size(), builder);
     return (A) this;
   }
 
-  public A setToArguments(java.lang.Integer index, io.sundr.model.Property item) {
+  public A setToArguments(Integer index, Property item) {
     if (this.arguments == null) {
-      this.arguments = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
+      this.arguments = new ArrayList<PropertyBuilder>();
     }
-    io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
+    PropertyBuilder builder = new PropertyBuilder(item);
     if (index < 0 || index >= _visitables.get("arguments").size()) {
       _visitables.get("arguments").add(builder);
     } else {
@@ -760,22 +766,22 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public A addToArguments(io.sundr.model.Property... items) {
     if (this.arguments == null) {
-      this.arguments = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
+      this.arguments = new ArrayList<PropertyBuilder>();
     }
-    for (io.sundr.model.Property item : items) {
-      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
+    for (Property item : items) {
+      PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("arguments").add(builder);
       this.arguments.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToArguments(java.util.Collection<io.sundr.model.Property> items) {
+  public A addAllToArguments(Collection<Property> items) {
     if (this.arguments == null) {
-      this.arguments = new java.util.ArrayList<io.sundr.model.PropertyBuilder>();
+      this.arguments = new ArrayList<PropertyBuilder>();
     }
-    for (io.sundr.model.Property item : items) {
-      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
+    for (Property item : items) {
+      PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("arguments").add(builder);
       this.arguments.add(builder);
     }
@@ -783,8 +789,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public A removeFromArguments(io.sundr.model.Property... items) {
-    for (io.sundr.model.Property item : items) {
-      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
+    for (Property item : items) {
+      PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("arguments").remove(builder);
       if (this.arguments != null) {
         this.arguments.remove(builder);
@@ -793,9 +799,9 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeAllFromArguments(java.util.Collection<io.sundr.model.Property> items) {
-    for (io.sundr.model.Property item : items) {
-      io.sundr.model.PropertyBuilder builder = new io.sundr.model.PropertyBuilder(item);
+  public A removeAllFromArguments(Collection<Property> items) {
+    for (Property item : items) {
+      PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("arguments").remove(builder);
       if (this.arguments != null) {
         this.arguments.remove(builder);
@@ -804,13 +810,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeMatchingFromArguments(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
+  public A removeMatchingFromArguments(Predicate<PropertyBuilder> predicate) {
     if (arguments == null)
       return (A) this;
-    final Iterator<io.sundr.model.PropertyBuilder> each = arguments.iterator();
+    final Iterator<PropertyBuilder> each = arguments.iterator();
     final List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      io.sundr.model.PropertyBuilder builder = each.next();
+      PropertyBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -824,29 +830,29 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
    * 
    * @return The buildable object.
    */
-  @java.lang.Deprecated
-  public java.util.List<io.sundr.model.Property> getArguments() {
+  @Deprecated
+  public List<Property> getArguments() {
     return arguments != null ? build(arguments) : null;
   }
 
-  public java.util.List<io.sundr.model.Property> buildArguments() {
+  public List<Property> buildArguments() {
     return arguments != null ? build(arguments) : null;
   }
 
-  public io.sundr.model.Property buildArgument(java.lang.Integer index) {
+  public Property buildArgument(Integer index) {
     return this.arguments.get(index).build();
   }
 
-  public io.sundr.model.Property buildFirstArgument() {
+  public Property buildFirstArgument() {
     return this.arguments.get(0).build();
   }
 
-  public io.sundr.model.Property buildLastArgument() {
+  public Property buildLastArgument() {
     return this.arguments.get(arguments.size() - 1).build();
   }
 
-  public io.sundr.model.Property buildMatchingArgument(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
-    for (io.sundr.model.PropertyBuilder item : arguments) {
+  public Property buildMatchingArgument(Predicate<PropertyBuilder> predicate) {
+    for (PropertyBuilder item : arguments) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -854,8 +860,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return null;
   }
 
-  public java.lang.Boolean hasMatchingArgument(java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
-    for (io.sundr.model.PropertyBuilder item : arguments) {
+  public Boolean hasMatchingArgument(Predicate<PropertyBuilder> predicate) {
+    for (PropertyBuilder item : arguments) {
       if (predicate.test(item)) {
         return true;
       }
@@ -863,13 +869,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return false;
   }
 
-  public A withArguments(java.util.List<io.sundr.model.Property> arguments) {
+  public A withArguments(List<Property> arguments) {
     if (this.arguments != null) {
       _visitables.get("arguments").removeAll(this.arguments);
     }
     if (arguments != null) {
-      this.arguments = new java.util.ArrayList();
-      for (io.sundr.model.Property item : arguments) {
+      this.arguments = new ArrayList();
+      for (Property item : arguments) {
         this.addToArguments(item);
       }
     } else {
@@ -883,14 +889,14 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
       this.arguments.clear();
     }
     if (arguments != null) {
-      for (io.sundr.model.Property item : arguments) {
+      for (Property item : arguments) {
         this.addToArguments(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasArguments() {
+  public Boolean hasArguments() {
     return arguments != null && !arguments.isEmpty();
   }
 
@@ -898,36 +904,34 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.ArgumentsNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> addNewArgumentLike(io.sundr.model.Property item) {
-    return new io.sundr.model.MethodFluentImpl.ArgumentsNestedImpl(-1, item);
+  public MethodFluent.ArgumentsNested<A> addNewArgumentLike(Property item) {
+    return new MethodFluentImpl.ArgumentsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> setNewArgumentLike(java.lang.Integer index,
-      io.sundr.model.Property item) {
-    return new io.sundr.model.MethodFluentImpl.ArgumentsNestedImpl(index, item);
+  public MethodFluent.ArgumentsNested<A> setNewArgumentLike(Integer index, Property item) {
+    return new MethodFluentImpl.ArgumentsNestedImpl(index, item);
   }
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> editArgument(java.lang.Integer index) {
+  public MethodFluent.ArgumentsNested<A> editArgument(Integer index) {
     if (arguments.size() <= index)
       throw new RuntimeException("Can't edit arguments. Index exceeds size.");
     return setNewArgumentLike(index, buildArgument(index));
   }
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> editFirstArgument() {
+  public MethodFluent.ArgumentsNested<A> editFirstArgument() {
     if (arguments.size() == 0)
       throw new RuntimeException("Can't edit first arguments. The list is empty.");
     return setNewArgumentLike(0, buildArgument(0));
   }
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> editLastArgument() {
+  public MethodFluent.ArgumentsNested<A> editLastArgument() {
     int index = arguments.size() - 1;
     if (index < 0)
       throw new RuntimeException("Can't edit last arguments. The list is empty.");
     return setNewArgumentLike(index, buildArgument(index));
   }
 
-  public io.sundr.model.MethodFluent.ArgumentsNested<A> editMatchingArgument(
-      java.util.function.Predicate<io.sundr.model.PropertyBuilder> predicate) {
+  public MethodFluent.ArgumentsNested<A> editMatchingArgument(Predicate<PropertyBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < arguments.size(); i++) {
       if (predicate.test(arguments.get(i))) {
@@ -949,25 +953,25 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public java.lang.Boolean hasVarArgPreferred() {
+  public Boolean hasVarArgPreferred() {
     return true;
   }
 
-  public A addToExceptions(java.lang.Integer index, io.sundr.model.ClassRef item) {
+  public A addToExceptions(Integer index, ClassRef item) {
     if (this.exceptions == null) {
-      this.exceptions = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.exceptions = new ArrayList<ClassRefBuilder>();
     }
-    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    ClassRefBuilder builder = new ClassRefBuilder(item);
     _visitables.get("exceptions").add(index >= 0 ? index : _visitables.get("exceptions").size(), builder);
     this.exceptions.add(index >= 0 ? index : exceptions.size(), builder);
     return (A) this;
   }
 
-  public A setToExceptions(java.lang.Integer index, io.sundr.model.ClassRef item) {
+  public A setToExceptions(Integer index, ClassRef item) {
     if (this.exceptions == null) {
-      this.exceptions = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.exceptions = new ArrayList<ClassRefBuilder>();
     }
-    io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= _visitables.get("exceptions").size()) {
       _visitables.get("exceptions").add(builder);
     } else {
@@ -983,22 +987,22 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
 
   public A addToExceptions(io.sundr.model.ClassRef... items) {
     if (this.exceptions == null) {
-      this.exceptions = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.exceptions = new ArrayList<ClassRefBuilder>();
     }
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("exceptions").add(builder);
       this.exceptions.add(builder);
     }
     return (A) this;
   }
 
-  public A addAllToExceptions(java.util.Collection<io.sundr.model.ClassRef> items) {
+  public A addAllToExceptions(Collection<ClassRef> items) {
     if (this.exceptions == null) {
-      this.exceptions = new java.util.ArrayList<io.sundr.model.ClassRefBuilder>();
+      this.exceptions = new ArrayList<ClassRefBuilder>();
     }
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("exceptions").add(builder);
       this.exceptions.add(builder);
     }
@@ -1006,8 +1010,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   public A removeFromExceptions(io.sundr.model.ClassRef... items) {
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("exceptions").remove(builder);
       if (this.exceptions != null) {
         this.exceptions.remove(builder);
@@ -1016,9 +1020,9 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeAllFromExceptions(java.util.Collection<io.sundr.model.ClassRef> items) {
-    for (io.sundr.model.ClassRef item : items) {
-      io.sundr.model.ClassRefBuilder builder = new io.sundr.model.ClassRefBuilder(item);
+  public A removeAllFromExceptions(Collection<ClassRef> items) {
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("exceptions").remove(builder);
       if (this.exceptions != null) {
         this.exceptions.remove(builder);
@@ -1027,13 +1031,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public A removeMatchingFromExceptions(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+  public A removeMatchingFromExceptions(Predicate<ClassRefBuilder> predicate) {
     if (exceptions == null)
       return (A) this;
-    final Iterator<io.sundr.model.ClassRefBuilder> each = exceptions.iterator();
+    final Iterator<ClassRefBuilder> each = exceptions.iterator();
     final List visitables = _visitables.get("exceptions");
     while (each.hasNext()) {
-      io.sundr.model.ClassRefBuilder builder = each.next();
+      ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -1047,30 +1051,29 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
    * 
    * @return The buildable object.
    */
-  @java.lang.Deprecated
-  public java.util.List<io.sundr.model.ClassRef> getExceptions() {
+  @Deprecated
+  public List<ClassRef> getExceptions() {
     return exceptions != null ? build(exceptions) : null;
   }
 
-  public java.util.List<io.sundr.model.ClassRef> buildExceptions() {
+  public List<ClassRef> buildExceptions() {
     return exceptions != null ? build(exceptions) : null;
   }
 
-  public io.sundr.model.ClassRef buildException(java.lang.Integer index) {
+  public ClassRef buildException(Integer index) {
     return this.exceptions.get(index).build();
   }
 
-  public io.sundr.model.ClassRef buildFirstException() {
+  public ClassRef buildFirstException() {
     return this.exceptions.get(0).build();
   }
 
-  public io.sundr.model.ClassRef buildLastException() {
+  public ClassRef buildLastException() {
     return this.exceptions.get(exceptions.size() - 1).build();
   }
 
-  public io.sundr.model.ClassRef buildMatchingException(
-      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
-    for (io.sundr.model.ClassRefBuilder item : exceptions) {
+  public ClassRef buildMatchingException(Predicate<ClassRefBuilder> predicate) {
+    for (ClassRefBuilder item : exceptions) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -1078,8 +1081,8 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return null;
   }
 
-  public java.lang.Boolean hasMatchingException(java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
-    for (io.sundr.model.ClassRefBuilder item : exceptions) {
+  public Boolean hasMatchingException(Predicate<ClassRefBuilder> predicate) {
+    for (ClassRefBuilder item : exceptions) {
       if (predicate.test(item)) {
         return true;
       }
@@ -1087,13 +1090,13 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return false;
   }
 
-  public A withExceptions(java.util.List<io.sundr.model.ClassRef> exceptions) {
+  public A withExceptions(List<ClassRef> exceptions) {
     if (this.exceptions != null) {
       _visitables.get("exceptions").removeAll(this.exceptions);
     }
     if (exceptions != null) {
-      this.exceptions = new java.util.ArrayList();
-      for (io.sundr.model.ClassRef item : exceptions) {
+      this.exceptions = new ArrayList();
+      for (ClassRef item : exceptions) {
         this.addToExceptions(item);
       }
     } else {
@@ -1107,14 +1110,14 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
       this.exceptions.clear();
     }
     if (exceptions != null) {
-      for (io.sundr.model.ClassRef item : exceptions) {
+      for (ClassRef item : exceptions) {
         this.addToExceptions(item);
       }
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasExceptions() {
+  public Boolean hasExceptions() {
     return exceptions != null && !exceptions.isEmpty();
   }
 
@@ -1122,36 +1125,34 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.ExceptionsNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> addNewExceptionLike(io.sundr.model.ClassRef item) {
-    return new io.sundr.model.MethodFluentImpl.ExceptionsNestedImpl(-1, item);
+  public MethodFluent.ExceptionsNested<A> addNewExceptionLike(ClassRef item) {
+    return new MethodFluentImpl.ExceptionsNestedImpl(-1, item);
   }
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> setNewExceptionLike(java.lang.Integer index,
-      io.sundr.model.ClassRef item) {
-    return new io.sundr.model.MethodFluentImpl.ExceptionsNestedImpl(index, item);
+  public MethodFluent.ExceptionsNested<A> setNewExceptionLike(Integer index, ClassRef item) {
+    return new MethodFluentImpl.ExceptionsNestedImpl(index, item);
   }
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> editException(java.lang.Integer index) {
+  public MethodFluent.ExceptionsNested<A> editException(Integer index) {
     if (exceptions.size() <= index)
       throw new RuntimeException("Can't edit exceptions. Index exceeds size.");
     return setNewExceptionLike(index, buildException(index));
   }
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> editFirstException() {
+  public MethodFluent.ExceptionsNested<A> editFirstException() {
     if (exceptions.size() == 0)
       throw new RuntimeException("Can't edit first exceptions. The list is empty.");
     return setNewExceptionLike(0, buildException(0));
   }
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> editLastException() {
+  public MethodFluent.ExceptionsNested<A> editLastException() {
     int index = exceptions.size() - 1;
     if (index < 0)
       throw new RuntimeException("Can't edit last exceptions. The list is empty.");
     return setNewExceptionLike(index, buildException(index));
   }
 
-  public io.sundr.model.MethodFluent.ExceptionsNested<A> editMatchingException(
-      java.util.function.Predicate<io.sundr.model.ClassRefBuilder> predicate) {
+  public MethodFluent.ExceptionsNested<A> editMatchingException(Predicate<ClassRefBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < exceptions.size(); i++) {
       if (predicate.test(exceptions.get(i))) {
@@ -1173,7 +1174,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return (A) this;
   }
 
-  public java.lang.Boolean hasDefaultMethod() {
+  public Boolean hasDefaultMethod() {
     return true;
   }
 
@@ -1182,25 +1183,28 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
    * 
    * @return The buildable object.
    */
-  @java.lang.Deprecated
-  public io.sundr.model.Block getBlock() {
+  @Deprecated
+  public Block getBlock() {
     return this.block != null ? this.block.build() : null;
   }
 
-  public io.sundr.model.Block buildBlock() {
+  public Block buildBlock() {
     return this.block != null ? this.block.build() : null;
   }
 
-  public A withBlock(io.sundr.model.Block block) {
+  public A withBlock(Block block) {
     _visitables.get("block").remove(this.block);
     if (block != null) {
       this.block = new BlockBuilder(block);
       _visitables.get("block").add(this.block);
+    } else {
+      this.block = null;
+      _visitables.get("block").remove(this.block);
     }
     return (A) this;
   }
 
-  public java.lang.Boolean hasBlock() {
+  public Boolean hasBlock() {
     return this.block != null;
   }
 
@@ -1208,19 +1212,19 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
     return new MethodFluentImpl.BlockNestedImpl();
   }
 
-  public io.sundr.model.MethodFluent.BlockNested<A> withNewBlockLike(io.sundr.model.Block item) {
-    return new io.sundr.model.MethodFluentImpl.BlockNestedImpl(item);
+  public MethodFluent.BlockNested<A> withNewBlockLike(Block item) {
+    return new MethodFluentImpl.BlockNestedImpl(item);
   }
 
-  public io.sundr.model.MethodFluent.BlockNested<A> editBlock() {
+  public MethodFluent.BlockNested<A> editBlock() {
     return withNewBlockLike(getBlock());
   }
 
-  public io.sundr.model.MethodFluent.BlockNested<A> editOrNewBlock() {
-    return withNewBlockLike(getBlock() != null ? getBlock() : new io.sundr.model.BlockBuilder().build());
+  public MethodFluent.BlockNested<A> editOrNewBlock() {
+    return withNewBlockLike(getBlock() != null ? getBlock() : new BlockBuilder().build());
   }
 
-  public io.sundr.model.MethodFluent.BlockNested<A> editOrNewBlockLike(io.sundr.model.Block item) {
+  public MethodFluent.BlockNested<A> editOrNewBlockLike(Block item) {
     return withNewBlockLike(getBlock() != null ? getBlock() : item);
   }
 
@@ -1260,7 +1264,7 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
         defaultMethod, block, super.hashCode());
   }
 
-  public java.lang.String toString() {
+  public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (comments != null && !comments.isEmpty()) {
@@ -1312,19 +1316,19 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<MethodFluent.AnnotationsNested<N>>
-      implements io.sundr.model.MethodFluent.AnnotationsNested<N>, Nested<N> {
-    AnnotationsNestedImpl(java.lang.Integer index, AnnotationRef item) {
+      implements MethodFluent.AnnotationsNested<N>, Nested<N> {
+    AnnotationsNestedImpl(Integer index, AnnotationRef item) {
       this.index = index;
       this.builder = new AnnotationRefBuilder(this, item);
     }
 
     AnnotationsNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.AnnotationRefBuilder(this);
+      this.builder = new AnnotationRefBuilder(this);
     }
 
-    io.sundr.model.AnnotationRefBuilder builder;
-    java.lang.Integer index;
+    AnnotationRefBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) MethodFluentImpl.this.setToAnnotations(index, builder.build());
@@ -1337,19 +1341,19 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class ParametersNestedImpl<N> extends TypeParamDefFluentImpl<MethodFluent.ParametersNested<N>>
-      implements io.sundr.model.MethodFluent.ParametersNested<N>, io.sundr.builder.Nested<N> {
-    ParametersNestedImpl(java.lang.Integer index, TypeParamDef item) {
+      implements MethodFluent.ParametersNested<N>, Nested<N> {
+    ParametersNestedImpl(Integer index, TypeParamDef item) {
       this.index = index;
       this.builder = new TypeParamDefBuilder(this, item);
     }
 
     ParametersNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.TypeParamDefBuilder(this);
+      this.builder = new TypeParamDefBuilder(this);
     }
 
-    io.sundr.model.TypeParamDefBuilder builder;
-    java.lang.Integer index;
+    TypeParamDefBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) MethodFluentImpl.this.setToParameters(index, builder.build());
@@ -1362,16 +1366,16 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class TypeParamRefReturnTypeNestedImpl<N> extends TypeParamRefFluentImpl<MethodFluent.TypeParamRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.TypeParamRefReturnTypeNested<N>, io.sundr.builder.Nested<N> {
-    TypeParamRefReturnTypeNestedImpl(io.sundr.model.TypeParamRef item) {
+      implements MethodFluent.TypeParamRefReturnTypeNested<N>, Nested<N> {
+    TypeParamRefReturnTypeNestedImpl(TypeParamRef item) {
       this.builder = new TypeParamRefBuilder(this, item);
     }
 
     TypeParamRefReturnTypeNestedImpl() {
-      this.builder = new io.sundr.model.TypeParamRefBuilder(this);
+      this.builder = new TypeParamRefBuilder(this);
     }
 
-    io.sundr.model.TypeParamRefBuilder builder;
+    TypeParamRefBuilder builder;
 
     public N and() {
       return (N) MethodFluentImpl.this.withReturnType(builder.build());
@@ -1384,16 +1388,16 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class WildcardRefReturnTypeNestedImpl<N> extends WildcardRefFluentImpl<MethodFluent.WildcardRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.WildcardRefReturnTypeNested<N>, io.sundr.builder.Nested<N> {
+      implements MethodFluent.WildcardRefReturnTypeNested<N>, Nested<N> {
     WildcardRefReturnTypeNestedImpl(WildcardRef item) {
       this.builder = new WildcardRefBuilder(this, item);
     }
 
     WildcardRefReturnTypeNestedImpl() {
-      this.builder = new io.sundr.model.WildcardRefBuilder(this);
+      this.builder = new WildcardRefBuilder(this);
     }
 
-    io.sundr.model.WildcardRefBuilder builder;
+    WildcardRefBuilder builder;
 
     public N and() {
       return (N) MethodFluentImpl.this.withReturnType(builder.build());
@@ -1406,16 +1410,16 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class ClassRefReturnTypeNestedImpl<N> extends ClassRefFluentImpl<MethodFluent.ClassRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.ClassRefReturnTypeNested<N>, io.sundr.builder.Nested<N> {
-    ClassRefReturnTypeNestedImpl(io.sundr.model.ClassRef item) {
+      implements MethodFluent.ClassRefReturnTypeNested<N>, Nested<N> {
+    ClassRefReturnTypeNestedImpl(ClassRef item) {
       this.builder = new ClassRefBuilder(this, item);
     }
 
     ClassRefReturnTypeNestedImpl() {
-      this.builder = new io.sundr.model.ClassRefBuilder(this);
+      this.builder = new ClassRefBuilder(this);
     }
 
-    io.sundr.model.ClassRefBuilder builder;
+    ClassRefBuilder builder;
 
     public N and() {
       return (N) MethodFluentImpl.this.withReturnType(builder.build());
@@ -1428,16 +1432,16 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class PrimitiveRefReturnTypeNestedImpl<N> extends PrimitiveRefFluentImpl<MethodFluent.PrimitiveRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.PrimitiveRefReturnTypeNested<N>, io.sundr.builder.Nested<N> {
-    PrimitiveRefReturnTypeNestedImpl(io.sundr.model.PrimitiveRef item) {
+      implements MethodFluent.PrimitiveRefReturnTypeNested<N>, Nested<N> {
+    PrimitiveRefReturnTypeNestedImpl(PrimitiveRef item) {
       this.builder = new PrimitiveRefBuilder(this, item);
     }
 
     PrimitiveRefReturnTypeNestedImpl() {
-      this.builder = new io.sundr.model.PrimitiveRefBuilder(this);
+      this.builder = new PrimitiveRefBuilder(this);
     }
 
-    io.sundr.model.PrimitiveRefBuilder builder;
+    PrimitiveRefBuilder builder;
 
     public N and() {
       return (N) MethodFluentImpl.this.withReturnType(builder.build());
@@ -1450,16 +1454,16 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class VoidRefReturnTypeNestedImpl<N> extends VoidRefFluentImpl<MethodFluent.VoidRefReturnTypeNested<N>>
-      implements io.sundr.model.MethodFluent.VoidRefReturnTypeNested<N>, io.sundr.builder.Nested<N> {
+      implements MethodFluent.VoidRefReturnTypeNested<N>, Nested<N> {
     VoidRefReturnTypeNestedImpl(VoidRef item) {
       this.builder = new VoidRefBuilder(this, item);
     }
 
     VoidRefReturnTypeNestedImpl() {
-      this.builder = new io.sundr.model.VoidRefBuilder(this);
+      this.builder = new VoidRefBuilder(this);
     }
 
-    io.sundr.model.VoidRefBuilder builder;
+    VoidRefBuilder builder;
 
     public N and() {
       return (N) MethodFluentImpl.this.withReturnType(builder.build());
@@ -1472,19 +1476,19 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class ArgumentsNestedImpl<N> extends PropertyFluentImpl<MethodFluent.ArgumentsNested<N>>
-      implements io.sundr.model.MethodFluent.ArgumentsNested<N>, io.sundr.builder.Nested<N> {
-    ArgumentsNestedImpl(java.lang.Integer index, Property item) {
+      implements MethodFluent.ArgumentsNested<N>, Nested<N> {
+    ArgumentsNestedImpl(Integer index, Property item) {
       this.index = index;
       this.builder = new PropertyBuilder(this, item);
     }
 
     ArgumentsNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.PropertyBuilder(this);
+      this.builder = new PropertyBuilder(this);
     }
 
-    io.sundr.model.PropertyBuilder builder;
-    java.lang.Integer index;
+    PropertyBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) MethodFluentImpl.this.setToArguments(index, builder.build());
@@ -1497,19 +1501,19 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class ExceptionsNestedImpl<N> extends ClassRefFluentImpl<MethodFluent.ExceptionsNested<N>>
-      implements io.sundr.model.MethodFluent.ExceptionsNested<N>, io.sundr.builder.Nested<N> {
-    ExceptionsNestedImpl(java.lang.Integer index, io.sundr.model.ClassRef item) {
+      implements MethodFluent.ExceptionsNested<N>, Nested<N> {
+    ExceptionsNestedImpl(Integer index, ClassRef item) {
       this.index = index;
       this.builder = new ClassRefBuilder(this, item);
     }
 
     ExceptionsNestedImpl() {
       this.index = -1;
-      this.builder = new io.sundr.model.ClassRefBuilder(this);
+      this.builder = new ClassRefBuilder(this);
     }
 
-    io.sundr.model.ClassRefBuilder builder;
-    java.lang.Integer index;
+    ClassRefBuilder builder;
+    Integer index;
 
     public N and() {
       return (N) MethodFluentImpl.this.setToExceptions(index, builder.build());
@@ -1522,16 +1526,16 @@ public class MethodFluentImpl<A extends MethodFluent<A>> extends ModifierSupport
   }
 
   class BlockNestedImpl<N> extends BlockFluentImpl<MethodFluent.BlockNested<N>>
-      implements io.sundr.model.MethodFluent.BlockNested<N>, io.sundr.builder.Nested<N> {
+      implements MethodFluent.BlockNested<N>, Nested<N> {
     BlockNestedImpl(Block item) {
       this.builder = new BlockBuilder(this, item);
     }
 
     BlockNestedImpl() {
-      this.builder = new io.sundr.model.BlockBuilder(this);
+      this.builder = new BlockBuilder(this);
     }
 
-    io.sundr.model.BlockBuilder builder;
+    BlockBuilder builder;
 
     public N and() {
       return (N) MethodFluentImpl.this.withBlock(builder.build());

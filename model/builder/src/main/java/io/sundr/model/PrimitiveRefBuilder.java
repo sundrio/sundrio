@@ -1,12 +1,11 @@
 package io.sundr.model;
 
 import java.lang.Boolean;
-import java.lang.Object;
 
 import io.sundr.builder.VisitableBuilder;
 
 public class PrimitiveRefBuilder extends PrimitiveRefFluentImpl<PrimitiveRefBuilder>
-    implements VisitableBuilder<PrimitiveRef, io.sundr.model.PrimitiveRefBuilder> {
+    implements VisitableBuilder<PrimitiveRef, PrimitiveRefBuilder> {
   public PrimitiveRefBuilder() {
     this(false);
   }
@@ -16,21 +15,20 @@ public class PrimitiveRefBuilder extends PrimitiveRefFluentImpl<PrimitiveRefBuil
     this.validationEnabled = validationEnabled;
   }
 
-  public PrimitiveRefBuilder(io.sundr.model.PrimitiveRefFluent<?> fluent) {
+  public PrimitiveRefBuilder(PrimitiveRefFluent<?> fluent) {
     this(fluent, false);
   }
 
-  public PrimitiveRefBuilder(io.sundr.model.PrimitiveRefFluent<?> fluent, java.lang.Boolean validationEnabled) {
+  public PrimitiveRefBuilder(PrimitiveRefFluent<?> fluent, Boolean validationEnabled) {
     this.fluent = fluent;
     this.validationEnabled = validationEnabled;
   }
 
-  public PrimitiveRefBuilder(io.sundr.model.PrimitiveRefFluent<?> fluent, io.sundr.model.PrimitiveRef instance) {
+  public PrimitiveRefBuilder(PrimitiveRefFluent<?> fluent, PrimitiveRef instance) {
     this(fluent, instance, false);
   }
 
-  public PrimitiveRefBuilder(io.sundr.model.PrimitiveRefFluent<?> fluent, io.sundr.model.PrimitiveRef instance,
-      java.lang.Boolean validationEnabled) {
+  public PrimitiveRefBuilder(PrimitiveRefFluent<?> fluent, PrimitiveRef instance, Boolean validationEnabled) {
     this.fluent = fluent;
     fluent.withName(instance.getName());
     fluent.withDimensions(instance.getDimensions());
@@ -38,11 +36,11 @@ public class PrimitiveRefBuilder extends PrimitiveRefFluentImpl<PrimitiveRefBuil
     this.validationEnabled = validationEnabled;
   }
 
-  public PrimitiveRefBuilder(io.sundr.model.PrimitiveRef instance) {
+  public PrimitiveRefBuilder(PrimitiveRef instance) {
     this(instance, false);
   }
 
-  public PrimitiveRefBuilder(io.sundr.model.PrimitiveRef instance, java.lang.Boolean validationEnabled) {
+  public PrimitiveRefBuilder(PrimitiveRef instance, Boolean validationEnabled) {
     this.fluent = this;
     this.withName(instance.getName());
     this.withDimensions(instance.getDimensions());
@@ -50,32 +48,12 @@ public class PrimitiveRefBuilder extends PrimitiveRefFluentImpl<PrimitiveRefBuil
     this.validationEnabled = validationEnabled;
   }
 
-  io.sundr.model.PrimitiveRefFluent<?> fluent;
-  java.lang.Boolean validationEnabled;
+  PrimitiveRefFluent<?> fluent;
+  Boolean validationEnabled;
 
-  public io.sundr.model.PrimitiveRef build() {
+  public PrimitiveRef build() {
     PrimitiveRef buildable = new PrimitiveRef(fluent.getName(), fluent.getDimensions(), fluent.getAttributes());
     return buildable;
-  }
-
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    if (!super.equals(o))
-      return false;
-    PrimitiveRefBuilder that = (PrimitiveRefBuilder) o;
-    if (fluent != null && fluent != this ? !fluent.equals(that.fluent) : that.fluent != null && fluent != this)
-      return false;
-
-    if (validationEnabled != null ? !validationEnabled.equals(that.validationEnabled) : that.validationEnabled != null)
-      return false;
-    return true;
-  }
-
-  public int hashCode() {
-    return java.util.Objects.hash(fluent, validationEnabled, super.hashCode());
   }
 
 }
