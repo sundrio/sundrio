@@ -73,8 +73,8 @@ public interface Visitor<T> {
    * specified fluent.
    * 
    * @param target The candidate to check if current visitor can visit.
-   * @param <F>    The type of the candidate
-   * @return       True if matching method was found.
+   * @param <F> The type of the candidate
+   * @return True if matching method was found.
    */
   default <F> Boolean hasVisitMethodMatching(F target) {
     for (Method method : getClass().getMethods()) {
