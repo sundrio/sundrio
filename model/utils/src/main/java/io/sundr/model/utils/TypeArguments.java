@@ -99,6 +99,10 @@ public class TypeArguments {
     }
 
     List<TypeParamDef> parameters = definition.getParameters();
+    if (parameters.size() != arguments.size()) {
+      throw new IllegalStateException("Incompatible reference " + ref + " to " + definition);
+    }
+
     Map<String, TypeRef> mappings = new HashMap<>();
     for (int i = 0; i < arguments.size(); i++) {
       String name = parameters.get(i).getName();
