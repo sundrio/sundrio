@@ -48,14 +48,19 @@ public class TypeArguments {
   private static final Predicate<ClassRef> INTERNAL_JDK = c -> c.equals(Types.OBJECT_REF)
       || c.getFullyQualifiedName().startsWith("jdk.internal");
 
+  public static RichTypeDef apply(ClassRef classRef) {
+    TypeDef definition = applyGenericArguments(classRef);
+    return apply(definition);
+  }
+
   public static RichTypeDef apply(TypeDef definition) {
     // resolve hierarchy
     final List<ClassRef> classRefs = definition.getExtendsList()
         .stream()
-        .flatMap(s -> Stream.concat(Stream.of(s), apply(s).getExtendsList().stream()))
+        .flatMap(s -> Stream.concat(Stream.of(s), applyGenericArguments(s).getExtendsList().stream()))
         .collect(Collectors.toList());
 
-    final List<TypeDef> typeDefs = classRefs.stream().map(TypeArguments::apply).collect(Collectors.toList());
+    final List<TypeDef> typeDefs = classRefs.stream().map(TypeArguments::applyGenericArguments).collect(Collectors.toList());
 
     // resolve properties
     final List<Property> allProperties = applyToProperties(definition);
@@ -88,7 +93,7 @@ public class TypeArguments {
         definition.getModifiers(), definition.getAttributes());
   }
 
-  private static TypeDef apply(ClassRef ref) {
+  private static TypeDef applyGenericArguments(ClassRef ref) {
     List<TypeRef> arguments = ref.getArguments();
     TypeDef definition = GetDefinition.of(ref);
     if (arguments.isEmpty()) {
@@ -118,14 +123,14 @@ public class TypeArguments {
     return Stream
         .concat(definition.getProperties().stream(),
             definition.getExtendsList().stream().filter(INTERNAL_JDK.negate())
-                .flatMap(e -> applyToProperties(apply(e)).stream()))
+                .flatMap(e -> applyToProperties(applyGenericArguments(e)).stream()))
         .filter(Predicates.distinct(Property::withErasure)).collect(Collectors.toList());
   }
 
   private static List<Method> applyToMethods(TypeDef definition) {
     return Stream
         .concat(definition.getMethods().stream(),
-            definition.getExtendsList().stream().filter(INTERNAL_JDK.negate()).flatMap(e -> applyToMethods(apply(e)).stream()))
+            definition.getExtendsList().stream().filter(INTERNAL_JDK.negate()).flatMap(e -> applyToMethods(applyGenericArguments(e)).stream()))
         .filter(Predicates.distinct(m -> m.withErasure().getSignature())).collect(Collectors.toList());
   }
 
@@ -133,7 +138,7 @@ public class TypeArguments {
     return Stream.concat(definition.getConstructors().stream(),
         definition.getExtendsList().stream()
             .filter(INTERNAL_JDK.negate())
-            .flatMap(e -> applyToConstructors(apply(e)).stream()))
+            .flatMap(e -> applyToConstructors(applyGenericArguments(e)).stream()))
         .collect(Collectors.toList());
   }
 

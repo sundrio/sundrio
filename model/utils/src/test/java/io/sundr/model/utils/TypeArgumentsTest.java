@@ -4,6 +4,7 @@ import static io.sundr.model.utils.Collections.E;
 import static io.sundr.model.utils.Collections.K;
 import static io.sundr.model.utils.Collections.V;
 import static io.sundr.model.utils.Types.OPTIONAL;
+import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.VOID;
 import static org.junit.Assert.assertEquals;
 
@@ -74,8 +75,8 @@ public class TypeArgumentsTest {
     }
 
     @Test
-    public void propertiesAndMethodsFromSupertypesAreResolvedCorrectly() {
-        ClassRef classRef = MY_SUBCLASS.toReference(Types.STRING_REF);
+    public void propertiesAndMethodsFromSupertypesAreResolvedCorrectlyOnTypeDefinition() {
+        ClassRef classRef = MY_SUBCLASS.toReference();
         TypeDef typeDef = GetDefinition.of(classRef);
         RichTypeDef richDef = TypeArguments.apply(GetDefinition.of(classRef));
 
@@ -105,6 +106,39 @@ public class TypeArgumentsTest {
         assertEquals("java.util.List<java.util.Optional<E>> getSuperValues();",
                 methodsByName.get("getSuperValues").render());
         assertEquals("void setSuperValues(java.util.List<java.util.Optional<E>> superValues);",
+                methodsByName.get("setSuperValues").render());
+    }
+
+    @Test
+    public void propertiesAndMethodsFromSupertypesAreResolvedCorrectlyOnTypeReference() {
+        ClassRef classRef = MY_SUBCLASS.toReference(STRING_REF);
+        RichTypeDef richDef = TypeArguments.apply(classRef);
+
+        System.out.println(richDef.render());
+
+        Map<String, Property> propertiesByName = richDef.getAllProperties().stream()
+                .collect(Collectors.toMap(Property::getName, Function.identity()));
+        assertEquals(4, propertiesByName.size());
+        assertEquals("java.lang.String subValue", propertiesByName.get("subValue").render());
+        assertEquals("java.util.List<java.lang.String> subValues", propertiesByName.get("subValues").render());
+        assertEquals("java.util.Optional<java.lang.String> superValue", propertiesByName.get("superValue").render());
+        assertEquals("java.util.List<java.util.Optional<java.lang.String>> superValues", propertiesByName.get("superValues").render());
+
+        Map<String, Method> methodsByName = richDef.getAllMethods().stream()
+                .collect(Collectors.toMap(Method::getName, Function.identity()));
+        assertEquals(8, methodsByName.size());
+
+        assertEquals("java.lang.String getSubValue();", methodsByName.get("getSubValue").render());
+        assertEquals("void setSubValue(java.lang.String subValue);", methodsByName.get("setSubValue").render());
+        assertEquals("java.util.List<java.lang.String> getSubValues();", methodsByName.get("getSubValues").render());
+        assertEquals("void setSubValues(java.util.List<java.lang.String> subValues);", methodsByName.get("setSubValues").render());
+
+        assertEquals("java.util.Optional<java.lang.String> getSuperValue();", methodsByName.get("getSuperValue").render());
+        assertEquals("void setSuperValue(java.util.Optional<java.lang.String> superValue);",
+                methodsByName.get("setSuperValue").render());
+        assertEquals("java.util.List<java.util.Optional<java.lang.String>> getSuperValues();",
+                methodsByName.get("getSuperValues").render());
+        assertEquals("void setSuperValues(java.util.List<java.util.Optional<java.lang.String>> superValues);",
                 methodsByName.get("setSuperValues").render());
     }
 
