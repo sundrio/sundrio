@@ -215,12 +215,8 @@ public class TypeAs {
   public static final Function<TypeRef, TypeRef> ARRAY_AS_LIST = FunctionFactory
       .cache(item -> LIST_OF.apply(UNWRAP_ARRAY_OF.apply(item)));
 
-  public static final Function<TypeRef, TypeRef> UNWRAP_COLLECTION_OF = type -> {
-    if (type instanceof ClassRef) {
-      return extractArgument((ClassRef) type, Collections.IS_COLLECTION, 0).orElse(type);
-    }
-    return type;
-  };
+  public static final Function<TypeRef, TypeRef> UNWRAP_COLLECTION_OF = type -> Collections.getCollectionElementType(type)
+      .orElse(type);
 
   private static Optional<TypeRef> extractArgument(ClassRef classRef, Function<TypeRef, Boolean> typeCheckFn,
       int argumentIndex) {
@@ -240,16 +236,9 @@ public class TypeAs {
     }
   }
 
-  private static TypeRef unwrapMapOf(TypeRef type, int argumentIndex) {
-    if (type instanceof ClassRef) {
-      return extractArgument((ClassRef) type, Collections.IS_MAP, argumentIndex).orElse(type);
-    }
-    return type;
-  }
+  public static final Function<TypeRef, TypeRef> UNWRAP_MAP_KEY_OF = type -> Collections.getMapKeyType(type).orElse(type);
 
-  public static final Function<TypeRef, TypeRef> UNWRAP_MAP_KEY_OF = type -> unwrapMapOf(type, 0);
-
-  public static final Function<TypeRef, TypeRef> UNWRAP_MAP_VALUE_OF = type -> unwrapMapOf(type, 1);
+  public static final Function<TypeRef, TypeRef> UNWRAP_MAP_VALUE_OF = type -> Collections.getMapValueType(type).orElse(type);
 
   public static final Function<TypeRef, TypeRef> UNWRAP_OPTIONAL_OF = type -> {
     if (type instanceof ClassRef) {

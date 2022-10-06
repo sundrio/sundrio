@@ -17,6 +17,11 @@
 
 package io.sundr.model.visitors;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import io.sundr.builder.Visitor;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
@@ -25,14 +30,10 @@ import io.sundr.model.ClassRefFluent;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 import io.sundr.utils.Maps;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ApplyTypeParamMappingToTypeArguments implements Visitor<ClassRefFluent<?>> {
-  private static final AttributeKey<TypeParamRef> ALREADY_REPLACED_KEY
-          = new AttributeKey<>(ApplyTypeParamMappingToTypeArguments.class.getName() + ".ALREADY_REPLACED", boolean.class);
+  private static final AttributeKey<TypeParamRef> ALREADY_REPLACED_KEY = new AttributeKey<>(
+      ApplyTypeParamMappingToTypeArguments.class.getName() + ".ALREADY_REPLACED", boolean.class);
 
   private final Map<String, TypeRef> mappings;
 
@@ -73,7 +74,7 @@ public class ApplyTypeParamMappingToTypeArguments implements Visitor<ClassRefFlu
    * {@link #visit(ClassRefFluent)}
    *
    * @param mappings
-   *         Type argument replacement mappings
+   *        Type argument replacement mappings
    * @return Mapping with values marked by an attribute
    */
   private static Map<String, TypeRef> markTypeParamRefs(Map<String, TypeRef> mappings) {
