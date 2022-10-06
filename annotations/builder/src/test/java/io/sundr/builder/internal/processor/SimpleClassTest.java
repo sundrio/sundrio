@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.junit.Test;
 
@@ -41,6 +42,7 @@ public class SimpleClassTest extends AbstractProcessorTest {
   private final AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
 
   TypeDef stringDef = Adapters.adaptType(String.class, context);
+  TypeDef listDef = Adapters.adaptType(List.class, context);
   RichTypeDef simpleClassDef = TypeArguments.apply(Sources.readTypeDefFromResource("SimpleClass.java", context));
 
   @Test

@@ -24,15 +24,18 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
+import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.VoidRef;
+import io.sundr.model.functions.TypeCast;
 
 public class Collections {
 
@@ -72,10 +75,14 @@ public class Collections {
       .withExtendsList(ITERABLE.toReference(E.toReference()))
       .build();
 
+  public static final ClassRef COLLECTION_REF = COLLECTION.toReference();
+
   public static final TypeDef MAP = new TypeDefBuilder(TypeDef.forName(Map.class.getName()))
       .withKind(Kind.INTERFACE)
       .withParameters(K, V)
       .build();
+
+  public static final ClassRef MAP_REF = MAP.toReference();
 
   public static final TypeDef MAP_ENTRY = new TypeDefBuilder(TypeDef.forName(Map.Entry.class.getName()))
       .withKind(Kind.INTERFACE)
@@ -170,9 +177,40 @@ public class Collections {
     }
   };
 
+  public static final TypeCast AS_MAP = TypeCast.to(MAP_REF);
+  public static final TypeCast AS_COLLECTION = TypeCast.to(COLLECTION_REF);
+
+  /**
+   * If the supplied type implements {@link java.util.Collection} (directly or indirectly), determine its generic element type.
+   * Otherwise, return {@link Optional#empty()}
+   */
+  public static Optional<TypeRef> getCollectionElementType(TypeRef collectionType) {
+    return extractArgument(collectionType, AS_COLLECTION, 0);
+  }
+
+  /**
+   * If the supplied type implements {@link java.util.Map} (directly or indirectly), determine its generic key type. Otherwise,
+   * return {@link Optional#empty()}
+   */
+  public static Optional<TypeRef> getMapKeyType(TypeRef mapType) {
+    return extractArgument(mapType, AS_MAP, 0);
+  }
+
+  /**
+   * If the supplied type implements {@link java.util.Map} (directly or indirectly), determine its generic value type.
+   * Otherwise, return {@link Optional#empty()}
+   */
+  public static Optional<TypeRef> getMapValueType(TypeRef mapType) {
+    return extractArgument(mapType, AS_MAP, 1);
+  }
+
+  private static Optional<TypeRef> extractArgument(TypeRef type, TypeCast typeCast, int index) {
+    return typeCast.apply(type).map(castType -> castType.getArguments().get(index));
+  }
+
   /**
    * Checks if a {@link TypeRef} is a {@link Collection}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a Collection.
    */
