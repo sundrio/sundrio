@@ -48,7 +48,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
   }
 
   public static <T> List<T> build(List<? extends Builder<? extends T>> list) {
-    return list == null ? null : new ArrayList<T>(list.stream().map(Builder::build).collect(Collectors.toList()));
+    return list == null ? null : list.stream().map(Builder::build).collect(Collectors.toList());
   }
 
   public static <T> Set<T> build(Set<? extends Builder<? extends T>> set) {
@@ -88,30 +88,41 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
   }
 
   public F accept(List<Entry<String, Object>> path, String currentKey, Visitor... visitors) {
-    Arrays.stream(visitors)
-        .map(v -> VisitorListener.wrap(v))
-        .filter(v -> ((Visitor) v).canVisit(path, this))
-        .sorted((l, r) -> ((Visitor) r).order() - ((Visitor) l).order())
-        .forEach(v -> {
-          ((Visitor) v).visit(path, this);
-        });
+    List<Visitor> sortedVisitor = new ArrayList<>();
+    for (Visitor visitor : visitors) {
+      visitor = VisitorListener.wrap(visitor);
+      if (!visitor.canVisit(path, this)) {
+        continue;
+      }
+      sortedVisitor.add(visitor);
+    }
+    sortedVisitor.sort((l, r) -> ((Visitor) r).order() - ((Visitor) l).order());
+    for (Visitor visitor : sortedVisitor) {
+      visitor.visit(path, this);
+    }
 
     List<Entry<String, Object>> copyOfPath = path != null ? new ArrayList(path) : new ArrayList<>();
-    copyOfPath.add(new AbstractMap.SimpleEntry<String, Object>(currentKey, this));
+    copyOfPath.add(new AbstractMap.SimpleEntry<>(currentKey, this));
 
-    _visitables.forEach((key, visitables) -> {
+    for (Entry<String, List<Visitable>> entry : _visitables.entrySet()) {
       List<Entry<String, Object>> newPath = Collections.unmodifiableList(copyOfPath);
       // Copy visitables to avoid ConcurrrentModificationException when Visitors add/remove Visitables
-      new ArrayList<>(visitables).forEach(visitable -> {
-        Arrays.stream(visitors)
-            .filter(v -> v.getType() != null && v.getType().isAssignableFrom(visitable.getClass()))
-            .forEach(v -> visitable.accept(newPath, key, v));
 
-        Arrays.stream(visitors)
-            .filter(v -> v.getType() == null || !v.getType().isAssignableFrom(visitable.getClass()))
-            .forEach(v -> visitable.accept(newPath, key, v));
-      });
-    });
+      for (Visitable visitable : new ArrayList<>(entry.getValue())) {
+
+        for (Visitor visitor : visitors) {
+          if (visitor.getType() != null && visitor.getType().isAssignableFrom(visitable.getClass())) {
+            visitable.accept(newPath, entry.getKey(), visitor);
+          }
+        }
+
+        for (Visitor visitor : visitors) {
+          if (visitor.getType() == null || !visitor.getType().isAssignableFrom(visitable.getClass())) {
+            visitable.accept(newPath, entry.getKey(), visitor);
+          }
+        }
+      }
+    }
     return (F) this;
   }
 
