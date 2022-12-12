@@ -104,12 +104,11 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     List<Entry<String, Object>> copyOfPath = path != null ? new ArrayList(path) : new ArrayList<>();
     copyOfPath.add(new AbstractMap.SimpleEntry<>(currentKey, this));
 
-    for (Entry<String, List<Visitable>> entry : _visitables.entrySet()) {
+    for (Entry<String, ?> entry : _visitables.entrySet()) {
       List<Entry<String, Object>> newPath = Collections.unmodifiableList(copyOfPath);
-      // Copy visitables to avoid ConcurrrentModificationException when Visitors add/remove Visitables
 
-      for (Visitable visitable : new ArrayList<>(entry.getValue())) {
-
+      // Copy visitables to avoid ConcurrentModificationException when Visitors add/remove Visitables
+      for (Visitable<F> visitable : new ArrayList<>((List<Visitable<F>>) entry.getValue())) {
         for (Visitor visitor : visitors) {
           if (visitor.getType() != null && visitor.getType().isAssignableFrom(visitable.getClass())) {
             visitable.accept(newPath, entry.getKey(), visitor);
