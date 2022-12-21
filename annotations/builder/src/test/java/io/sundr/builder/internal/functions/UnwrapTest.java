@@ -17,18 +17,30 @@
 
 package io.sundr.builder.internal.functions;
 
+import static io.sundr.model.utils.Collections.COLLECTION;
 import static io.sundr.model.utils.Collections.SET;
+import static io.sundr.model.utils.Types.STRING;
 import static io.sundr.model.utils.Types.STRING_REF;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import io.sundr.model.ClassRef;
+import io.sundr.model.repo.DefinitionRepository;
 
 public class UnwrapTest {
 
+  @Before
+  public void setUp() {
+    DefinitionRepository.getRepository().register(SET);
+    DefinitionRepository.getRepository().register(COLLECTION);
+    DefinitionRepository.getRepository().register(STRING);
+  }
+
   @Test
   public void shouldUnwrapSet() {
+    System.out.println(SET.render());
     ClassRef setOfStrings = SET.toReference(STRING_REF);
     assertEquals(STRING_REF, TypeAs.UNWRAP_COLLECTION_OF.apply(setOfStrings));
   }
