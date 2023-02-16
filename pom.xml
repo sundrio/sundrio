@@ -90,7 +90,7 @@
 
         <!-- Formatting Plugins -->
         <formatter-maven-plugin.version>2.12.2</formatter-maven-plugin.version>
-        <impsort-maven-plugin.version>1.4.1</impsort-maven-plugin.version>
+        <impsort-maven-plugin.version>1.8.0</impsort-maven-plugin.version>
 
         <!-- Testing Version -->
         <compile-testing.version>0.5</compile-testing.version>
