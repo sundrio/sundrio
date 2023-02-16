@@ -31,6 +31,7 @@ public class ReactorContextFactory {
   private static ComparableVersion VERSION_3_0_0 = new ComparableVersion("3.0.0");
   private static ComparableVersion VERSION_3_3_0 = new ComparableVersion("3.3.0");
   private static ComparableVersion VERSION_3_8_5 = new ComparableVersion("3.8.5");
+  private static ComparableVersion VERSION_3_9_0 = new ComparableVersion("3.9.0");
 
   private final ComparableVersion version;
 
@@ -45,8 +46,10 @@ public class ReactorContextFactory {
       throw new UnsupportedOperationException("ReactorContext is not supported in maven version: " + version);
     } else if (version.compareTo(VERSION_3_3_0) < 0 || version.compareTo(VERSION_3_8_5) == 0) {
       context = create_3_2_x(result, index, classLoader, status);
-    } else {
+    } else if (version.compareTo(VERSION_3_9_0) < 0) {
       context = create_3_3_x(result, index, classLoader, status, builder);
+    } else {
+      context = create_3_9_x(result, index, classLoader, status, builder);
     }
 
     if (context == null) {
@@ -73,6 +76,16 @@ public class ReactorContextFactory {
     try {
       Constructor<ReactorContext> constructor = (Constructor<ReactorContext>) ReactorContext.class.getDeclaredConstructors()[0];
       return constructor.newInstance(result, index, classLoader, status, Reflections.getMemento(builder));
+    } catch (Throwable t) {
+      throw new RuntimeException("Could not create ReactorContext.", t);
+    }
+  }
+
+  private static ReactorContext create_3_9_x(MavenExecutionResult result, ProjectIndex index, ClassLoader classLoader,
+      ReactorBuildStatus status, LifecycleModuleBuilder builder) {
+    try {
+      Constructor<ReactorContext> constructor = (Constructor<ReactorContext>) ReactorContext.class.getDeclaredConstructors()[0];
+      return constructor.newInstance(result, index, classLoader, status);
     } catch (Throwable t) {
       throw new RuntimeException("Could not create ReactorContext.", t);
     }
