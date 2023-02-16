@@ -324,3 +324,4 @@ To avoid referencing to that path, which is known to cause issues, its required 
 - [Official Kubernetes Client](https://github.com/kubernetes-client/java)
 - [Strimzi Kafka Operator](https://github.com/strimzi/strimzi-kafka-operator)
 - [Dekorate](https://github.com/dekorateio/dekorate/)
+- [Smallrye Common](https://github.com/smallrye/smallrye-common)
