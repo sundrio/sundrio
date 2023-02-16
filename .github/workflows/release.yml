@@ -56,7 +56,7 @@ jobs:
           ./mvnw -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -Dformat.skip=true
           git checkout ${{github.base_ref}}
           git rebase release
-          ./mvnw -Prelease release:perform -DskipTests -dformat.skip=true
+          ./mvnw -Prelease release:perform -DskipTests -Dformat.skip=true
           # update examples and tests
           ./mvnw versions:set -DnewVersion=${{steps.metadata.outputs.next-version}} -Pwith-examples,with-tests -DgenerateBackupPoms=false -DoldVersion=* -DgroupId=* -DartifactId=* -Dformat.skip=true
           # commit changes
