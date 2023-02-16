@@ -45,7 +45,7 @@ jobs:
             ./mvnw install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar -P${{ matrix.profile }};
           fi
       - name: Build 
-        run: ./mvnw ${MAVEN_ARGS} clean install
+        run: ./mvnw ${MAVEN_ARGS} clean install -Dformat.skip=true
       - name: Build Kubernetes Client
         run: |
           SUNDRIO_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
