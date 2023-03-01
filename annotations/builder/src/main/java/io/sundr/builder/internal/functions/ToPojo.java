@@ -680,7 +680,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           Types.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef)
               .forEach(i -> populateReferences((ClassRef) i, generatedRefs));
           adapterImports.addAll(generatedRefs);
-          adapterImports.add(TypeAs.SHALLOW_BUILDER.apply(generatedPojo).toInternalReference());
+          adapterImports.add(TypeAs.BUILDER_REF.apply(generatedPojo.toReference()));
 
           Types.allProperties(generatedPojo).stream()
               .filter(p -> p.getTypeRef() instanceof ClassRef)

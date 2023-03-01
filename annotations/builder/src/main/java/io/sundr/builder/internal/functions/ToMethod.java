@@ -28,7 +28,6 @@ import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BOXED_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.FLUENT_REF;
-import static io.sundr.builder.internal.functions.TypeAs.SHALLOW_BUILDER;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
@@ -1237,7 +1236,7 @@ class ToMethod {
     }
 
     ClassRef unwrappedClassRef = (ClassRef) unwrappedType;
-    ClassRef builderType = SHALLOW_BUILDER.apply(GetDefinition.of(unwrappedClassRef)).toReference();
+    ClassRef builderType = TypeAs.BUILDER_REF.apply(unwrappedClassRef);
 
     //Let's reload the class from the repository if available....
     TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository()

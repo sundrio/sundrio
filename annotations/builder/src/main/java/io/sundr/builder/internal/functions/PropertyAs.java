@@ -71,7 +71,7 @@ public final class PropertyAs {
 
       if (unwrapped instanceof ClassRef) {
         TypeDef baseType = GetDefinition.of((ClassRef) unwrapped);
-        ClassRef builderType = TypeAs.SHALLOW_BUILDER.apply(baseType).toReference();
+        ClassRef builderType = TypeAs.BUILDER_REF.apply((ClassRef) unwrapped);
 
         final TypeDef nestedType = NESTED_CLASS_TYPE.apply(item);
         final ClassRef nestedRef = nestedType.toReference();
