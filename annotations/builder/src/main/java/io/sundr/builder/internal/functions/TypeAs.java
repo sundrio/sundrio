@@ -45,11 +45,8 @@ public class TypeAs {
     };
   }
 
-  static final Function<TypeDef, TypeDef> SHALLOW_BUILDER = item -> new TypeDefBuilder(item)
-      .withNewModifiers().withPublic().endModifiers()
-      .withName(item.getName() + "Builder")
-      .withInnerTypes()
-      .build();
+  static final Function<ClassRef, ClassRef> BUILDER_REF = item -> new ClassRefBuilder(item)
+      .withFullyQualifiedName(item.getFullyQualifiedName() + "Builder").build();
 
   private static final Function<TypeDef, TypeDef> SHALLOW_FLUENT = item -> {
     List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
@@ -148,14 +145,14 @@ public class TypeAs {
   };
 
   public static final Function<TypeDef, TypeDef> BUILDER = item -> {
-    TypeDef builder = SHALLOW_BUILDER.apply(item);
+    ClassRef builder = BUILDER_REF.apply(item.toInternalReference());
     TypeDef fluent = FLUENT_IMPL.apply(item);
 
     List<TypeRef> parameters = new ArrayList<>();
     for (TypeParamDef param : item.getParameters()) {
       parameters.add(param.toReference());
     }
-    parameters.add(builder.toInternalReference());
+    parameters.add(builder);
     return new TypeDefBuilder(item)
         .withKind(Kind.CLASS)
         .withNewModifiers().withPublic().endModifiers()
@@ -164,7 +161,7 @@ public class TypeAs {
         .withInnerTypes()
         .withExtendsList(fluent.toReference(parameters))
         .withImplementsList(BuilderContextManager.getContext().getVisitableBuilderInterface()
-            .toReference(item.toInternalReference(), builder.toInternalReference()))
+            .toReference(item.toInternalReference(), builder))
         .build();
   };
 
@@ -176,8 +173,8 @@ public class TypeAs {
         .withName("Editable" + item.getName())
         .withParameters(parameters)
         .withExtendsList(item.toInternalReference())
-        .withImplementsList(BuilderContextManager.getContext().getEditableInterface()
-            .toReference(SHALLOW_BUILDER.apply(item).toInternalReference()))
+        .withImplementsList(
+            BuilderContextManager.getContext().getEditableInterface().toReference(BUILDER_REF.apply(item.toReference())))
         .withInnerTypes()
         .withProperties()
         .withMethods()
