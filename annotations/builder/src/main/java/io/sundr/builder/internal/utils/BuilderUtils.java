@@ -65,7 +65,6 @@ import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.Construct;
-import io.sundr.builder.internal.functions.Descendants;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
@@ -85,7 +84,9 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
+import io.sundr.model.TypeParamRefBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.WildcardRef;
 import io.sundr.model.functions.Assignable;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
@@ -447,14 +448,39 @@ public class BuilderUtils {
     return getNextGeneric(type, Arrays.asList(excluded));
   }
 
-  public static TypeParamDef getNextGeneric(TypeDef type, Collection<TypeParamDef> excluded) {
+  public static TypeParamRef getNextGeneric(ClassRef type, TypeParamRef... excluded) {
+    return getNextGeneric(type, Arrays.asList(excluded));
+  }
+
+  public static List<TypeRef> appendNewGenericArgument(ClassRef type, TypeParamRef... excluded) {
+    List<TypeRef> arguments = new ArrayList<>(type.getArguments());
+    arguments.add(getNextGeneric(type, excluded));
+    return arguments;
+  }
+
+  public static List<TypeRef> appendNewWildcardArgument(ClassRef type) {
+    List<TypeRef> arguments = new ArrayList<>(type.getArguments());
+    arguments.add(new WildcardRef());
+    return arguments;
+  }
+
+  public static TypeParamDef getNextGeneric(TypeDef type, Collection excluded) {
     Set<String> skip = new HashSet<String>();
     for (String s : allGenericsOf(type)) {
       skip.add(s);
     }
 
-    for (TypeParamDef e : excluded) {
-      skip.add(e.getName());
+    for (Object e : excluded) {
+      if (e instanceof String) {
+        skip.add((String) e);
+      } else if (e instanceof TypeParamDef) {
+        skip.add(((TypeParamDef) e).getName());
+      } else if (e instanceof TypeParamRef) {
+        skip.add(((TypeParamRef) e).getName());
+      } else {
+        throw new IllegalArgumentException(
+            "Expected excluded Collection to contain: String, TypeParamDef or TypeParamRef, but found:" + e.getClass());
+      }
     }
 
     for (int i = 0; i < 10; i++) {
@@ -467,6 +493,28 @@ public class BuilderUtils {
       }
     }
     throw new IllegalStateException("Could not allocate generic parameter letter for: " + type.getFullyQualifiedName());
+  }
+
+  public static TypeParamRef getNextGeneric(ClassRef classRef, Collection<TypeParamRef> excluded) {
+    Set<String> skip = new HashSet<String>();
+    for (String s : allGenericsOf(classRef)) {
+      skip.add(s);
+    }
+
+    for (TypeParamRef e : excluded) {
+      skip.add(e.getName());
+    }
+
+    for (int i = 0; i < 10; i++) {
+      for (int j = 0; j < GENERIC_NAMES.length; j++) {
+
+        String name = GENERIC_NAMES[j] + ((i > 0) ? String.valueOf(i) : "");
+        if (!skip.contains(name)) {
+          return new TypeParamRefBuilder().withName(name).build();
+        }
+      }
+    }
+    throw new IllegalStateException("Could not allocate generic parameter letter for: " + classRef.getFullyQualifiedName());
   }
 
   public static Set<String> allGenericsOf(TypeDef clazz) {
@@ -774,46 +822,33 @@ public class BuilderUtils {
     return statements;
   }
 
-  public static List<Statement> toEquals(TypeDef type, Collection<Property> properties) {
+  public static List<Statement> toEquals(Nameable nameable, Collection<Property> properties) {
     List<Statement> statements = new ArrayList<>();
 
-    String simpleName = type.getName();
-    ClassRef superClass = type.getExtendsList().isEmpty() ? TypeDef.OBJECT_REF : type.getExtendsList().iterator().next();
+    String simpleName = nameable.getName();
     statements.add(new StringStatement("if (this == o) return true;"));
     statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
 
-    //If base fluent is the superclass just skip.
-    final BuilderContext context = BuilderContextManager.getContext();
-    final String superClassFQN = superClass.getFullyQualifiedName();
-    if (!context.getBaseFluentClass().getFullyQualifiedName().equals(superClassFQN)
-        && !OBJECT_FULLY_QUALIFIED_NAME.equals(superClassFQN)) {
-      statements.add(new StringStatement("if (!super.equals(o)) return false;"));
-    }
+    statements.add(new StringStatement("if (!super.equals(o)) return false;"));
     statements.add(new StringStatement(
         new StringBuilder().append(simpleName).append(" that = (").append(simpleName).append(") o;").toString()));
 
     for (Property property : properties) {
-      String name = property.getName();
-      if (Types.isPrimitive(property.getTypeRef())) {
-        statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != ").append("that.")
-            .append(name).append(") return false;").toString()));
-      } else if (property.getTypeRef() instanceof ClassRef
-          && Descendants.isDescendant(type, GetDefinition.of((ClassRef) property.getTypeRef()))) {
-        statements.add(new StringStatement(new StringBuilder()
-            .append("if (").append(name).append(" != null &&").append(name).append(" != this ? !").append(name)
-            .append(".equals(that.").append(name).append(") :")
-            .append("that.").append(name).append(" != null &&").append(name).append(" != this ) return false;").append("\n")
-            .toString()));
+      String propertyName = property.getName();
+      TypeRef propertyType = property.getTypeRef();
+      if (Types.isPrimitive(propertyType)) {
+        statements
+            .add(new StringStatement(new StringBuilder().append("if (").append(propertyName).append(" != ").append("that.")
+                .append(propertyName).append(") return false;").toString()));
       } else {
-        statements.add(new StringStatement(new StringBuilder().append("if (").append(name).append(" != null ? !").append(name)
-            .append(".equals(that.").append(name).append(") :")
-            .append("that.").append(name).append(" != null) return false;").toString()));
-
+        statements.add(new StringStatement(new StringBuilder()
+            .append("if (").append(propertyName).append(" != null && !").append(propertyName).append(".equals(that.")
+            .append(propertyName).append(")) return false;").append("\n")
+            .toString()));
       }
     }
 
     statements.add(new StringStatement("return true;"));
     return statements;
   }
-
 }
