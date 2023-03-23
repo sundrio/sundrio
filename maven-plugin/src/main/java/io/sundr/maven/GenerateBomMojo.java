@@ -373,7 +373,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     toBuild.getModel().setProfiles(project.getModel().getProfiles());
 
     //We want to avoid having the generated stuff wiped.
-    toBuild.getProperties().put("clean.skip", "true");  // for maven clean 2.x
+    toBuild.getProperties().put("clean.skip", "true"); // for maven clean 2.x
     toBuild.getProperties().put("maven.clean.skip", "true"); // for maven clean 3.x
     toBuild.getModel().getBuild().setDirectory(bomDir.getAbsolutePath());
     toBuild.getModel().getBuild().setOutputDirectory(new File(bomDir, "target").getAbsolutePath());
