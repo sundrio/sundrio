@@ -39,7 +39,6 @@ import io.sundr.builder.annotations.Inline;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
-import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
 import io.sundr.model.ClassRef;
@@ -94,13 +93,13 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     return elements.getTypeElement(c) != null;
   }
 
-  static TypeDef inlineableOf(BuilderContext ctx, TypeDef type, Inline inline) {
+  static TypeDef inlineableOf(BuilderContext ctx, RichTypeDef type, Inline inline) {
     final String inlineableName = !inline.name().isEmpty()
         ? inline.name()
         : inline.prefix() + type.getName() + inline.suffix();
 
     List<Method> constructors = new ArrayList<Method>();
-    final TypeDef builderType = TypeAs.BUILDER.apply(type);
+    final TypeDef builderType = ClazzAs.BUILDER.apply(type);
     TypeDef inlineType = BuilderUtils.getInlineType(ctx, inline);
     TypeDef returnType = BuilderUtils.getInlineReturnType(ctx, inline, type);
     final ClassRef inlineTypeRef = inlineType.toReference(returnType.toReference());
@@ -116,7 +115,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     TypeRef functionType = Constants.FUNCTION.toReference(type.toInternalReference(), returnType.toInternalReference());
 
     Property builderProperty = new PropertyBuilder()
-        .withTypeRef(TypeAs.BUILDER.apply(type).toInternalReference())
+        .withTypeRef(builderType.toInternalReference())
         .withName(BUILDER)
         .withNewModifiers().withPrivate().withFinal().endModifiers()
         .build();
@@ -233,11 +232,11 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
       ExternalBuildables externalBuildables = typeDef.getAttribute(EXTERNAL_BUILDABLE);
       if (buildable != null) {
         for (final Inline inline : buildable.inline()) {
-          generate(inlineableOf(ctx, typeDef, inline));
+          generate(inlineableOf(ctx, richTypeDef, inline));
         }
       } else if (externalBuildables != null) {
         for (final Inline inline : externalBuildables.inline()) {
-          generate(inlineableOf(ctx, typeDef, inline));
+          generate(inlineableOf(ctx, richTypeDef, inline));
         }
       }
     }
