@@ -26,7 +26,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import io.sundr.FunctionFactory;
-import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.model.*;
 import io.sundr.model.functions.GetDefinition;
@@ -45,124 +44,60 @@ public class TypeAs {
     };
   }
 
-  static final Function<ClassRef, ClassRef> BUILDER_REF = item -> new ClassRefBuilder(item)
-      .withFullyQualifiedName(item.getFullyQualifiedName() + "Builder").build();
+  /**
+   * Something -> SomethingBuilder
+   **/
+  public static final Function<ClassRef, ClassRef> BUILDER_REF = item -> new ClassRefBuilder(item)
+      .withFullyQualifiedName(item.getFullyQualifiedName() + "Builder")
+      .withArguments(item.getArguments())
+      .build();
 
-  private static final Function<TypeDef, TypeDef> SHALLOW_FLUENT = item -> {
-    List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
-    parameters.add(getNextGeneric(item));
+  /**
+   * Distance<Integer> -> DistanceFluent<Integer, A>
+   **/
+  public static final Function<ClassRef, ClassRef> FLUENT_A_REF = item -> new ClassRefBuilder(item)
+      .withFullyQualifiedName(item.getFullyQualifiedName() + "Fluent")
+      .withArguments(appendNewGenericArgument(item))
+      .build();
 
-    return new TypeDefBuilder(item)
-        .withKind(Kind.INTERFACE)
-        .withNewModifiers().withPublic().endModifiers()
-        .withName(item.getName() + "Fluent")
-        .withParameters(parameters)
-        .withInnerTypes()
+  /**
+   * Distance<Integer> -> DistanceFluent<Integer, ?>
+   **/
+  public static final Function<ClassRef, ClassRef> FLUENT_Q_REF = item -> new ClassRefBuilder(item)
+      .withFullyQualifiedName(item.getFullyQualifiedName() + "Fluent")
+      .addToArguments(Q)
+      .build();
+
+  public static final Function<ClassRef, ClassRef> FLUENT_IMPL_REF = item -> {
+    return new ClassRefBuilder(item).withFullyQualifiedName(item.getFullyQualifiedName() + "FluentImpl")
+        .addToArguments(BUILDER_REF.apply(item))
         .build();
   };
 
-  static final Function<TypeDef, TypeDef> FLUENT_INTERFACE = item -> {
-    BuilderContext ctx = BuilderContextManager.getContext();
-    TypeDef fluent = SHALLOW_FLUENT.apply(item);
-
-    List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
-    List<TypeRef> superClassParameters = new ArrayList<>();
-
-    TypeParamDef nextParameter = getNextGeneric(item, parameters);
-
-    ClassRef builableSuperClassRef = findBuildableSuperClassRef(item);
-
-    TypeDef buildableSuperClass = findBuildableSuperClass(item);
-    if (builableSuperClassRef != null) {
-      superClassParameters.addAll(builableSuperClassRef.getArguments());
-    }
-
-    TypeParamDef parameterFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluent.toInternalReference()).build();
-    parameters.add(parameterFluent);
-    superClassParameters.add(parameterFluent.toReference());
-
-    TypeDef superClass = buildableSuperClass != null
-        ? SHALLOW_FLUENT.apply(buildableSuperClass)
-        : ctx.getFluentInterface();
-
-    return new TypeDefBuilder(item)
-        .withKind(Kind.INTERFACE)
-        .withNewModifiers().withPublic().endModifiers()
-        .withName(item.getName() + "Fluent")
-        .withPackageName(item.getPackageName())
-        .withParameters(parameters)
-        .withExtendsList(superClass.toReference(superClassParameters))
-        .withImplementsList()
-        .withInnerTypes()
-        .build();
-  };
-
-  static final Function<TypeDef, TypeDef> FLUENT_IMPL = new Function<TypeDef, TypeDef>() {
-    public TypeDef apply(TypeDef item) {
-      BuilderContext ctx = BuilderContextManager.getContext();
-      TypeDef fluent = SHALLOW_FLUENT.apply(item);
-
-      List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
-      List<TypeRef> superClassParameters = new ArrayList<>();
-      TypeParamDef nextParameter = getNextGeneric(item, parameters);
-
-      ClassRef builableSuperClassRef = findBuildableSuperClassRef(item);
-      if (builableSuperClassRef != null) {
-        superClassParameters.addAll(builableSuperClassRef.getArguments());
+  public static final Function<ClassRef, ClassRef> VISITABLE_BUILDER_REF = new Function<ClassRef, ClassRef>() {
+    public ClassRef apply(ClassRef item) {
+      ClassRef uwrapped = (ClassRef) combine(UNWRAP_OPTIONAL_OF, UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
+      if (uwrapped instanceof ClassRef) {
+        uwrapped = new ClassRefBuilder((ClassRef) uwrapped).build();
       }
-
-      TypeParamDef parameterFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluent.toInternalReference()).build();
-      parameters.add(parameterFluent);
-      superClassParameters.add(parameterFluent.toReference());
-
-      TypeDef buildableSuperClass = findBuildableSuperClass(item);
-
-      TypeDef superClass = buildableSuperClass != null
-          ? FLUENT_IMPL.apply(buildableSuperClass)
-          : ctx.getBaseFluentClass();
-
-      return new TypeDefBuilder(item)
-          .withKind(Kind.CLASS)
-          .withNewModifiers().withPublic().endModifiers()
-          .withName(item.getName() + "FluentImpl")
-          .withPackageName(item.getPackageName())
-          .withParameters(parameters)
-          .withExtendsList(superClass.toReference(superClassParameters))
-          .withImplementsList(SHALLOW_FLUENT.apply(item).toInternalReference())
-          .withInnerTypes()
-          .build();
+      if (Types.isAbstract(uwrapped) || GetDefinition.of(uwrapped).getKind() == Kind.INTERFACE) {
+        WildcardRef wildcardRef = new WildcardRefBuilder().addToBounds(uwrapped).build();
+        return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(wildcardRef, Q);
+      }
+      return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(uwrapped,
+          BUILDER_REF.apply(uwrapped));
     }
-
   };
 
-  static final Function<TypeDef, ClassRef> FLUENT_REF = item -> {
-    List<TypeRef> parameters = new ArrayList<>();
-    for (TypeParamDef param : item.getParameters()) {
-      parameters.add(param.toReference());
+  public static final Function<ClassRef, ClassRef> VISITABLE_BUILDER_Q_REF = new Function<ClassRef, ClassRef>() {
+    public ClassRef apply(ClassRef item) {
+      ClassRef baseType = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
+      if (baseType instanceof ClassRef) {
+        baseType = new ClassRefBuilder((ClassRef) baseType).build();
+      }
+      WildcardRef wildcardRef = new WildcardRefBuilder().addToBounds(baseType).build();
+      return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(wildcardRef, Q);
     }
-    parameters.add(Q);
-    return SHALLOW_FLUENT.apply(item).toReference(parameters);
-  };
-
-  public static final Function<TypeDef, TypeDef> BUILDER = item -> {
-    ClassRef builder = BUILDER_REF.apply(item.toInternalReference());
-    TypeDef fluent = FLUENT_IMPL.apply(item);
-
-    List<TypeRef> parameters = new ArrayList<>();
-    for (TypeParamDef param : item.getParameters()) {
-      parameters.add(param.toReference());
-    }
-    parameters.add(builder);
-    return new TypeDefBuilder(item)
-        .withKind(Kind.CLASS)
-        .withNewModifiers().withPublic().endModifiers()
-        .withName(item.getName() + "Builder")
-        .withParameters(item.getParameters())
-        .withInnerTypes()
-        .withExtendsList(fluent.toReference(parameters))
-        .withImplementsList(BuilderContextManager.getContext().getVisitableBuilderInterface()
-            .toReference(item.toInternalReference(), builder))
-        .build();
   };
 
   static final Function<TypeDef, TypeDef> EDITABLE = item -> {
@@ -181,17 +116,6 @@ public class TypeAs {
         .withConstructors()
         .build();
 
-  };
-
-  public static final Function<TypeRef, ClassRef> VISITABLE_BUILDER = new Function<TypeRef, ClassRef>() {
-    public ClassRef apply(TypeRef item) {
-      TypeRef baseType = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF).apply(item);
-      if (baseType instanceof ClassRef) {
-        baseType = new ClassRefBuilder((ClassRef) baseType).withArguments().build();
-      }
-      WildcardRef wildcardRef = new WildcardRefBuilder().addToBounds(baseType).build();
-      return BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(wildcardRef, Q);
-    }
   };
 
   public static final Function<TypeRef, TypeRef> UNWRAP_ARRAY_OF = item -> {

@@ -47,6 +47,7 @@ import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Modifiers;
@@ -58,6 +59,7 @@ import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
+import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.functions.GetDefinition;
@@ -72,22 +74,40 @@ public class ClazzAs {
   public static final Function<RichTypeDef, TypeDef> FLUENT_INTERFACE = FunctionFactory
       .wrap(new Function<RichTypeDef, TypeDef>() {
         public TypeDef apply(RichTypeDef item) {
+
+          BuilderContext ctx = BuilderContextManager.getContext();
           List<Method> methods = new ArrayList<Method>();
           List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
-          TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
-          TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
+          ClassRef itemRef = item.toInternalReference();
+          ClassRef fluentRef = TypeAs.FLUENT_A_REF.apply(itemRef);
 
-          //The generic letter is always the last
-          final TypeParamDef genericType = fluentType.getParameters().get(fluentType.getParameters().size() - 1);
+          List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
+          List<TypeRef> superClassParameters = new ArrayList<>();
+
+          TypeParamDef nextParameter = getNextGeneric(item, parameters);
+          ClassRef builableSuperClassRef = findBuildableSuperClassRef(item);
+
+          TypeDef buildableSuperClass = findBuildableSuperClass(item);
+          if (builableSuperClassRef != null) {
+            superClassParameters.addAll(builableSuperClassRef.getArguments());
+          }
+
+          TypeParamDef parameterFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluentRef).build();
+          parameters.add(parameterFluent);
+          superClassParameters.add(parameterFluent.toReference());
+
+          ClassRef superClass = buildableSuperClass != null ? TypeAs.FLUENT_A_REF.apply(builableSuperClassRef)
+              : ctx.getFluentInterface().toReference(superClassParameters);
+
+          final TypeParamRef genericType = (TypeParamRef) superClass.getArguments().get(superClass.getArguments().size() - 1);
 
           item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
             final TypeRef unwrapped = TypeAs
                 .combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
                 .apply(property.getTypeRef());
             Property toAdd = new PropertyBuilder(property).withNewModifiers().endModifiers()
-                .addToAttributes(ORIGIN_TYPEDEF, item)
-                .addToAttributes(OUTER_INTERFACE, fluentType).addToAttributes(OUTER_CLASS, fluentImplType)
-                .addToAttributes(GENERIC_TYPE_REF, genericType.toReference()).withComments().withAnnotations().build();
+                .addToAttributes(ORIGIN_TYPEDEF, item).addToAttributes(OUTER_TYPE, fluentRef)
+                .addToAttributes(OUTER_TYPE, fluentRef).addToAttributes(GENERIC_TYPE_REF, genericType).build();
 
             boolean isBuildable = isBuildable(unwrapped);
             boolean isArray = Types.isArray(toAdd.getTypeRef());
@@ -181,26 +201,43 @@ public class ClazzAs {
             }
           });
 
-          return new TypeDefBuilder(fluentType).withComments("Generated").withAnnotations().withInnerTypes(nestedClazzes)
-              .withProperties()
-              .withMethods(methods)
-              .accept(new AddNoArgWithMethod())
-              .build();
+          return new TypeDefBuilder().withComments("Generated").withAnnotations().withNewModifiers().withPublic().endModifiers()
+              .withKind(Kind.INTERFACE).withPackageName(item.getPackageName()).withName(item.getName() + "Fluent")
+              .withParameters(parameters).withExtendsList(superClass).withImplementsList().withProperties().withMethods(methods)
+              .withInnerTypes(nestedClazzes).accept(new AddNoArgWithMethod()).build();
 
         }
       });
 
   public static final Function<RichTypeDef, TypeDef> FLUENT_IMPL = FunctionFactory.wrap(new Function<RichTypeDef, TypeDef>() {
     public TypeDef apply(RichTypeDef item) {
+      BuilderContext ctx = BuilderContextManager.getContext();
       List<Method> constructors = new ArrayList<Method>();
       List<Method> methods = new ArrayList<Method>();
       List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
       final List<Property> properties = new ArrayList<Property>();
-      TypeDef fluentType = TypeAs.FLUENT_INTERFACE.apply(item);
-      final TypeDef fluentImplType = TypeAs.FLUENT_IMPL.apply(item);
 
-      //The generic letter is always the last
-      final TypeParamDef genericType = fluentImplType.getParameters().get(fluentImplType.getParameters().size() - 1);
+      ClassRef itemRef = item.toInternalReference();
+      ClassRef fluentRef = TypeAs.FLUENT_A_REF.apply(itemRef);
+      ClassRef fluentImpl = TypeAs.FLUENT_IMPL_REF.apply(itemRef);
+
+      List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
+      TypeParamDef nextParameter = getNextGeneric(item, parameters);
+      TypeParamDef parameterFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluentRef).build();
+      parameters.add(parameterFluent);
+
+      List<TypeRef> superClassParameters = new ArrayList<>();
+      ClassRef buildableSuperClassRef = findBuildableSuperClassRef(item);
+      if (buildableSuperClassRef != null) {
+        superClassParameters.addAll(buildableSuperClassRef.getArguments());
+      }
+
+      superClassParameters.add(parameterFluent.toReference());
+      ClassRef superClassRef = buildableSuperClassRef != null
+          ? new ClassRefBuilder(buildableSuperClassRef)
+              .withFullyQualifiedName(buildableSuperClassRef.getFullyQualifiedName() + "FluentImpl")
+              .withArguments(superClassParameters).build()
+          : ctx.getBaseFluentClass().toReference(superClassParameters);
 
       Method emptyConstructor = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
@@ -229,8 +266,9 @@ public class ClazzAs {
 
         Property toAdd = new PropertyBuilder(property)
             .withNewModifiers().withPrivate().endModifiers()
-            .addToAttributes(ORIGIN_TYPEDEF, item).addToAttributes(OUTER_INTERFACE, fluentType)
-            .addToAttributes(OUTER_CLASS, fluentImplType).addToAttributes(GENERIC_TYPE_REF, genericType.toReference())
+            .addToAttributes(ORIGIN_TYPEDEF, item)
+            .addToAttributes(OUTER_TYPE, fluentImpl)
+            .addToAttributes(GENERIC_TYPE_REF, nextParameter.toReference())
             .withComments().withAnnotations().build();
 
         Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
@@ -320,7 +358,7 @@ public class ClazzAs {
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
           .withTypeRef(Types.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
-          .withStatements(BuilderUtils.toEquals(fluentImplType, properties)).endBlock()
+          .withStatements(BuilderUtils.toEquals(fluentImpl, properties)).endBlock()
           .build();
 
       Method hashCode = new MethodBuilder()
@@ -332,16 +370,22 @@ public class ClazzAs {
       Method toString = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(io.sundr.model.utils.Types.STRING_REF).withName("toString").withNewBlock()
-          .withStatements(BuilderUtils.toString(fluentImplType.getName(), properties)).endBlock()
+          .withStatements(BuilderUtils.toString(fluentImpl.getName(), properties)).endBlock()
           .build();
 
       methods.add(equals);
       methods.add(hashCode);
       methods.add(toString);
 
-      return BuilderContextManager.getContext().getDefinitionRepository()
+      return ctx.getDefinitionRepository()
           .register(
-              new TypeDefBuilder(fluentImplType).withComments("Generated")
+              new TypeDefBuilder().withComments("Generated")
+                  .withModifiers(Modifiers.from(Modifier.PUBLIC))
+                  .withPackageName(fluentImpl.getPackageName())
+                  .withName(fluentImpl.getName())
+                  .withParameters(parameters)
+                  .withExtendsList(superClassRef)
+                  .withImplementsList(fluentRef)
                   .withAnnotations(
                       new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
                           .addToParameters("value", "unchecked").build())
@@ -358,10 +402,11 @@ public class ClazzAs {
       final Modifier[] modifiers = item.isAbstract() ? new Modifier[] { Modifier.PUBLIC, Modifier.ABSTRACT }
           : new Modifier[] { Modifier.PUBLIC };
 
-      final TypeDef builderType = TypeAs.BUILDER.apply(item);
-      ClassRef instanceRef = item.toInternalReference();
-
-      ClassRef fluent = TypeAs.FLUENT_REF.apply(item);
+      ClassRef itemRef = item.toInternalReference();
+      ClassRef fluent = TypeAs.FLUENT_Q_REF.apply(itemRef);
+      ClassRef fluentImplRef = TypeAs.FLUENT_IMPL_REF.apply(itemRef);
+      ClassRef builderRef = TypeAs.BUILDER_REF.apply(itemRef);
+      ClassRef visitableBuilderRef = TypeAs.VISITABLE_BUILDER_REF.apply(itemRef);
 
       Optional<TypeDef> buildableInterface = item.getImplementsList().stream().map(GetDefinition::of)
           .filter(t -> t.getAnnotations().stream()
@@ -412,13 +457,13 @@ public class ClazzAs {
 
       Method instanceAndFluentCosntructor = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
-          .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(instanceRef)
+          .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(itemRef)
           .withName("instance").and().withNewBlock().addNewStringStatementStatement("this(fluent, instance, false);").endBlock()
           .build();
 
       Method instanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
-          .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
+          .and().addNewArgument().withTypeRef(itemRef).withName("instance").and().addNewArgument()
           .withTypeRef(Types.BOOLEAN_REF).withName("validationEnabled").and()
           .withNewBlock()
           .addAllToStatements(toInstanceConstructorBody(item, item, "fluent"))
@@ -427,12 +472,12 @@ public class ClazzAs {
           .build();
 
       Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
-          .withTypeRef(instanceRef).withName("instance").and().withNewBlock()
+          .withTypeRef(itemRef).withName("instance").and().withNewBlock()
           .addNewStringStatementStatement("this(instance,false);").endBlock()
           .build();
 
       Method instanceAndValidationEnabledConstructor = new MethodBuilder()
-          .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(instanceRef)
+          .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(itemRef)
           .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
           .withName("validationEnabled").and()
           .withNewBlock()
@@ -499,7 +544,7 @@ public class ClazzAs {
         constructors.add(sourceInstanceConstructor);
       });
 
-      Method build = new MethodBuilder().withModifiers(Modifiers.from(modifiers)).withReturnType(instanceRef)
+      Method build = new MethodBuilder().withModifiers(Modifiers.from(modifiers)).withReturnType(itemRef)
           .withName("build")
           .withNewBlock()
           .withStatements(toBuild(item, item))
@@ -529,7 +574,7 @@ public class ClazzAs {
 
         Method instanceAndFluentAndValidatorConstructor = new MethodBuilder()
             .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
-            .and().addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument()
+            .and().addNewArgument().withTypeRef(itemRef).withName("instance").and().addNewArgument()
             .withTypeRef(validatorRef).withName("validator").and()
             .withNewBlock()
             .withStatements(toInstanceConstructorBody(item, item, "fluent"))
@@ -539,7 +584,7 @@ public class ClazzAs {
             .build();
 
         Method instanceAndValidatorConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .addNewArgument().withTypeRef(instanceRef).withName("instance").and().addNewArgument().withTypeRef(validatorRef)
+            .addNewArgument().withTypeRef(itemRef).withName("instance").and().addNewArgument().withTypeRef(validatorRef)
             .withName("validator").and()
             .withNewBlock()
             .withStatements(toInstanceConstructorBody(item, item, "this"))
@@ -560,19 +605,19 @@ public class ClazzAs {
             .build();
 
         Method usingValidation = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .withReturnType(builderType.toInternalReference())
+            .withReturnType(builderRef)
             .withName("usingValidation")
             .withNewBlock()
-            .addNewStringStatementStatement("return new " + builderType.getName() + "(this, true);")
+            .addNewStringStatementStatement("return new " + builderRef.getName() + "(this, true);")
             .endBlock()
             .build();
 
         Method usingValidator = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .withReturnType(builderType.toInternalReference())
+            .withReturnType(builderRef)
             .withName("usingValidator")
             .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
             .withNewBlock()
-            .addNewStringStatementStatement("return new " + builderType.getName() + "(this, validator);")
+            .addNewStringStatementStatement("return new " + builderRef.getName() + "(this, validator);")
             .endBlock()
             .build();
 
@@ -588,8 +633,17 @@ public class ClazzAs {
       }
 
       return BuilderContextManager.getContext().getDefinitionRepository()
-          .register(new TypeDefBuilder(builderType).withAnnotations().withModifiers(Modifiers.from(modifiers))
-              .withProperties(fields).withConstructors(constructors).withMethods(methods).build());
+          .register(new TypeDefBuilder()
+              .withAnnotations()
+              .withPackageName(item.getPackageName())
+              .withName(item.getName() + "Builder")
+              .withParameters(item.getParameters())
+              .withExtendsList(fluentImplRef)
+              .withImplementsList(visitableBuilderRef)
+              .withNewModifiers().withPublic().endModifiers()
+              .withProperties(fields)
+              .withConstructors(constructors)
+              .withMethods(methods).build());
     }
 
   });
@@ -619,23 +673,21 @@ public class ClazzAs {
       Modifier[] modifiers = item.isAbstract() ? new Modifier[] { Modifier.PUBLIC, Modifier.ABSTRACT }
           : new Modifier[] { Modifier.PUBLIC };
 
+      ClassRef itemRef = item.toInternalReference();
       TypeDef editableType = TypeAs.EDITABLE.apply(item);
-      final TypeDef builderType = TypeAs.BUILDER.apply(item);
+      final ClassRef builderRef = TypeAs.BUILDER_REF.apply(itemRef);
 
       List<Method> constructors = new ArrayList<Method>();
       List<Method> methods = new ArrayList<Method>();
 
-      constructors.addAll(item.getConstructors().stream()
-          .filter(c -> !c.isPrivate())
-          .map(c -> superConstructorOf(c, editableType))
-          .collect(Collectors.toList()));
+      constructors.addAll(item.getConstructors().stream().filter(c -> !c.isPrivate())
+          .map(c -> superConstructorOf(c, editableType)).collect(Collectors.toList()));
 
-      Method edit = new MethodBuilder().withModifiers(Modifiers.from(modifiers))
-          .withReturnType(builderType.toInternalReference()).withName("edit").withNewBlock()
-          .addToStatements(new StringStatement(new Supplier<String>() {
+      Method edit = new MethodBuilder().withModifiers(Modifiers.from(modifiers)).withReturnType(builderRef).withName("edit")
+          .withNewBlock().addToStatements(new StringStatement(new Supplier<String>() {
             @Override
             public String get() {
-              return "return new " + builderType.getName() + "(this);";
+              return "return new " + builderRef.getName() + "(this);";
             }
           })).endBlock().build();
 
@@ -646,8 +698,7 @@ public class ClazzAs {
           .register(BuilderContextManager.getContext().getBuildableRepository()
               .register(new TypeDefBuilder(editableType).withComments("Generated").withAnnotations()
                   .withModifiers(Modifiers.from(modifiers)).withConstructors(constructors).withMethods(methods)
-                  .addToAttributes(BUILDABLE_ENABLED, true)
-                  .addToAttributes(GENERATED, true) // We want to know that its a generated type...
+                  .addToAttributes(BUILDABLE_ENABLED, true).addToAttributes(GENERATED, true) // We want to know that its a generated type...
                   .addToAttributes(IGNORE_PROPERTIES, item.getAttribute(IGNORE_PROPERTIES)) // We want to know that its a generated type...
                   .build()));
     }

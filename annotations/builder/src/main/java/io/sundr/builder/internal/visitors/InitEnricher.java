@@ -77,8 +77,8 @@ public class InitEnricher implements Visitor<PropertyBuilder> {
       ClassRef unwarppedClassRef = (unwrapped instanceof ClassRef) ? (ClassRef) unwrapped : null;
 
       targetType = isAbstract(unwarppedClassRef) || GetDefinition.of(unwarppedClassRef).getKind() == Kind.INTERFACE
-          ? TypeAs.VISITABLE_BUILDER.apply(unwarppedClassRef)
-          : TypeAs.BUILDER.apply(GetDefinition.of(unwarppedClassRef)).toInternalReference();
+          ? TypeAs.VISITABLE_BUILDER_Q_REF.apply(unwarppedClassRef)
+          : TypeAs.BUILDER_REF.apply(unwarppedClassRef);
     }
 
     boolean isArray = Types.isArray(typeRef);

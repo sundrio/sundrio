@@ -70,7 +70,6 @@ import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Nameable;
@@ -602,13 +601,6 @@ public class BuilderUtils {
     return "";
   }
 
-  public static ClassRef buildableRef(TypeRef typeRef) {
-    ClassRef unwrapped = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
-    return isAbstract(unwrapped) || GetDefinition.of(unwrapped).getKind() == Kind.INTERFACE
-        ? TypeAs.VISITABLE_BUILDER.apply(unwrapped)
-        : TypeAs.BUILDER.apply(GetDefinition.of(unwrapped)).toInternalReference();
-  }
-
   public static Property arrayAsList(Property property) {
     TypeRef typeRef = property.getTypeRef();
     TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
@@ -647,8 +639,8 @@ public class BuilderUtils {
     // For fields that are concrete we can possibly create an instance of a VisitableBuilder.
     // For everything else we can have a builder e.g. Builder<Foo> = () -> fooInstance but it won't be visitable
     ClassRef builderType = Types.isConcrete(targetType)
-        ? TypeAs.BUILDER.apply(GetDefinition.of(targetType)).toInternalReference()
-        : TypeAs.VISITABLE_BUILDER.apply(targetType);
+        ? TypeAs.BUILDER_REF.apply(targetType)
+        : TypeAs.VISITABLE_BUILDER_REF.apply(targetType);
 
     if (isArray || isList) {
       ClassRef listRef = isArray || isAbstractList

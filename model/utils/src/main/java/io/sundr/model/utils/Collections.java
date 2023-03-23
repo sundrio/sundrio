@@ -184,8 +184,8 @@ public class Collections {
    * If the supplied type implements {@link java.util.Collection} (directly or indirectly), determine its generic element type.
    * Otherwise, return {@link Optional#empty()}
    */
-  public static Optional<TypeRef> getCollectionElementType(TypeRef collectionType) {
-    return extractArgument(collectionType, AS_COLLECTION, 0);
+  public static Optional<TypeRef> getCollectionElementType(TypeRef type) {
+    return extractArgument(type, AS_COLLECTION, 0);
   }
 
   /**
