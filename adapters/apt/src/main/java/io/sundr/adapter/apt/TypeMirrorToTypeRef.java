@@ -53,7 +53,7 @@ public class TypeMirrorToTypeRef implements Function<TypeMirror, TypeRef> {
     if (typeRef instanceof ClassRef && element instanceof TypeElement) {
       TypeElement typeElement = (TypeElement) element;
       String fqcn = typeElement.toString();
-      context.getReferences().add((TypeElement) element);
+      context.addReference(typeElement);
       return new ClassRefBuilder((ClassRef) typeRef).withFullyQualifiedName(fqcn).build();
     }
     return typeRef;

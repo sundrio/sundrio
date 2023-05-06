@@ -22,7 +22,6 @@ import static io.sundr.adapter.apt.utils.Apt.getPackageName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -87,6 +86,28 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
 
   @Override
   public TypeDef apply(TypeElement classElement) {
+    TypeDef result = buildAndRegister(classElement);
+
+    //Also register other types
+    if (context.isDeep()) {
+      context.getReferences().stream()
+          .filter(t -> !t.toString().startsWith("sun.") && !t.toString().startsWith("com.sun."))
+          .forEach(t -> {
+            String fqcn = t.toString();
+            context.getDefinitionRepository().registerIfAbsent(fqcn, () -> apply(t));
+          });
+      context.getReferences().clear();
+    }
+
+    return result;
+  }
+
+  private TypeDef buildAndRegister(TypeElement classElement) {
+    TypeDef existing = context.getDefinitionRepository().getDefinition(classElement.toString(), false);
+    if (existing != null) {
+      return existing;
+    }
+
     // Check SuperClass
     Kind kind = Kind.CLASS;
 
@@ -160,7 +181,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
 
     List<TypeDef> innerTypes = new ArrayList<TypeDef>();
     for (TypeElement innerElement : ElementFilter.typesIn(classElement.getEnclosedElements())) {
-      TypeDef innerType = context.getDefinitionRepository().register(apply(innerElement));
+      TypeDef innerType = buildAndRegister(innerElement);
       if (innerType == null) {
         throw new IllegalStateException("Inner type for:" + innerElement + " is null");
       }
@@ -192,26 +213,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
       builder.addToAnnotations(annotationAdapterFunction.apply(annotationMirror));
     }
     //Let's register the full blown definition
-    TypeDef result = context.getDefinitionRepository().register(builder.build());
-
-    //Also register other types
-    if (context.isDeep()) {
-      Set<TypeElement> references = new HashSet<>(context.getReferences());
-      references.stream()
-          .filter(t -> !t.equals(classElement))
-          .filter(t -> !t.toString().startsWith("sun.") && !t.toString().startsWith("com.sun."))
-          .forEach(t -> {
-            String fqcn = t.toString();
-            TypeDef existing = context.getDefinitionRepository().getDefinition(fqcn);
-            if (existing == null) {
-              context.getDefinitionRepository().registerIfAbsent(fqcn, () -> apply(t));
-            }
-            context.getReferences().remove(t);
-          });
-
-    }
-
-    return result;
+    return context.getDefinitionRepository().register(builder.build());
   }
 
   public Set<ExecutableElement> getInheritedMethods(TypeElement typeElement) {

@@ -120,4 +120,10 @@ public class AptContext extends AttributeSupport implements AdapterContextAware 
   public Set<TypeElement> getReferences() {
     return this.references;
   }
+
+  public void addReference(TypeElement element) {
+    if (!getDefinitionRepository().hasDefinition(element.toString())) {
+      this.references.add(element);
+    }
+  }
 }
