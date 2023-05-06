@@ -70,9 +70,7 @@ public class TypeRefTypeVisitor extends AbstractTypeVisitor6<TypeRef, Integer> {
     TypeElement element = (TypeElement) t.asElement();
 
     //TODO: need a cleaner way to get this registered.
-    if (!context.getDefinitionRepository().hasDefinition(element.toString())) {
-      context.getReferences().add(element);
-    }
+    context.addReference(element);
 
     String fqcn = element.toString();
     return new ClassRefBuilder().withFullyQualifiedName(fqcn).withDimensions(dimension)

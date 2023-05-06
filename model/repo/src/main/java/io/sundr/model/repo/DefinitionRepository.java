@@ -109,11 +109,7 @@ public class DefinitionRepository {
     }
 
     String fqcn = definition.getFullyQualifiedName();
-    if (definitions.containsKey(fqcn)) {
-      return;
-    } else {
-      definitions.put(fqcn, definition);
-    }
+    definitions.putIfAbsent(fqcn, definition);
   }
 
   public synchronized TypeDef register(TypeDef definition) {
@@ -179,18 +175,20 @@ public class DefinitionRepository {
     return definitions.containsKey(fullyQualifiedName) || suppliers.containsKey(fullyQualifiedName);
   }
 
-  public synchronized TypeDef getDefinition(String fullyQualifiedName) {
-    if (definitions.containsKey(fullyQualifiedName)) {
-      return definitions.get(fullyQualifiedName);
+  public TypeDef getDefinition(String fullyQualifiedName) {
+    return getDefinition(fullyQualifiedName, true);
+  }
+
+  public synchronized TypeDef getDefinition(String fullyQualifiedName, boolean computeIfSupplied) {
+    TypeDef definition = definitions.get(fullyQualifiedName);
+    if (definition != null || !computeIfSupplied) {
+      return definition;
     }
-    if (suppliers.containsKey(fullyQualifiedName)) {
-      TypeDef typeDef = suppliers.get(fullyQualifiedName).get();
-      if (!definitions.containsKey(fullyQualifiedName)) {
-        definitions.put(fullyQualifiedName, typeDef);
-        return typeDef;
-      } else {
-        return definitions.get(fullyQualifiedName);
-      }
+    Supplier<TypeDef> supplier = suppliers.remove(fullyQualifiedName);
+    if (supplier != null) {
+      TypeDef typeDef = supplier.get();
+      definitions.put(fullyQualifiedName, typeDef);
+      return typeDef;
     }
     return null;
   }
