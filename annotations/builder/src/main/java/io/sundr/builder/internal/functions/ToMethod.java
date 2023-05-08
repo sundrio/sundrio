@@ -318,6 +318,9 @@ class ToMethod {
       }
 
       if (!descendants.isEmpty()) {
+        statements.add(new StringStatement(
+            "if (" + argumentName + "==null){ this." + fieldName + " = null; _visitables.remove(\"" + fieldName + "\");"
+                + " return (" + returnType + ") this;}"));
         for (Property descendant : descendants) {
           ClassRef dunwraped = new ClassRefBuilder(
               (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(descendant.getTypeRef()))
@@ -326,11 +329,15 @@ class ToMethod {
 
           statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName
               + "= new " + builderRef + "((" + dunwraped + ")" + argumentName + "); _visitables.get(\"" + fieldName
-              + "\").add(this." + fieldName + ");}"));
-
+              + "\").clear(); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");}"));
           alsoImport.add(dunwraped);
           alsoImport.add(builderRef);
         }
+        statements.add(new StringStatement(
+            "VisitableBuilder<? extends " + ((ClassRef) type).getFullyQualifiedName()
+                + ",?> builder = builderOf(" + argumentName + "); "
+                + "_visitables.get(\"" + fieldName + "\").clear();_visitables.get(\"" + fieldName + "\").add(builder);"
+                + "this." + fieldName + " = builder;"));
         statements.add(new StringStatement("return (" + returnType + ") this;"));
         return statements;
       }
