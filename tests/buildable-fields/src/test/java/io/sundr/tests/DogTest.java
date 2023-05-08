@@ -40,7 +40,7 @@ public class DogTest {
         .withName("Goodgirl");
     assertNotEquals(builder1, builder2);
   }
-   
+
   @Test
   public void testGeneratedBuilderNullInstance() {
     Dog dog = new DogBuilder((Dog) null)

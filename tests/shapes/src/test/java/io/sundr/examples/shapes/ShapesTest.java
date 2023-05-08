@@ -314,4 +314,36 @@ public class ShapesTest {
     new CanvasBuilder(canvas)
         .editOrAddValueInCircleNamedShapes("testShape").and().build();
   }
+
+  @Test
+  public void testWithNullBuildable() {
+    Canvas canvas = new CanvasBuilder(new CanvasBuilder().withNewSquareCanvasShape(1, 1, 1).build())
+        .withCanvasShape(null).build();
+
+    Assert.assertNull(canvas.getCanvasShape());
+  }
+
+  @Test(expected = IllegalStateException.class)
+  public void testWithUnknownType() {
+    Canvas canvas = new CanvasBuilder()
+        .withCanvasShape(new Shape() {
+
+          @Override
+          public int getX() {
+            return 0;
+          }
+
+          @Override
+          public int getY() {
+            return 0;
+          }
+
+          @Override
+          public Optional<String> getNotes() {
+            return Optional.empty();
+          }
+        }).build();
+
+    Assert.assertNull(canvas.getCanvasShape());
+  }
 }
