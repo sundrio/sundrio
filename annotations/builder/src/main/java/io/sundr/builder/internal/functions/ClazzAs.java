@@ -785,12 +785,14 @@ public class ClazzAs {
       statements.add(new StringStatement("this.fluent = " + fluent + "; "));
     }
 
+    StringBuilder builder = new StringBuilder("if (instance != null) {\n");
+
     for (Property property : constructor.getArguments()) {
       Optional<Method> getter = Getter.findOptional(instance, property);
       getter.ifPresent(g -> {
         String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() + ")" : "";
-        statements.add(new StringStatement(new StringBuilder().append(ref).append(".with").append(property.getNameCapitalized())
-            .append("(").append(cast).append("instance.").append(g.getName()).append("()); ").toString()));
+        builder.append("      ").append(ref).append(".with").append(property.getNameCapitalized())
+            .append("(").append(cast).append("instance.").append(g.getName()).append("());\n");
       });
 
       // } else {
@@ -811,19 +813,19 @@ public class ClazzAs {
         } else if (!hasBuildableConstructorWithArgument(target, property) && Setter.has(target, property)) {
           Getter.findOptional(instance, property).map(Method::getName).ifPresent(getterName -> {
             String withName = "with" + property.getNameCapitalized();
-            statements.add(new StringStatement(new StringBuilder().append(ref).append(".").append(withName).append("(instance.")
-                .append(getterName).append("());\n").toString()));
+            builder.append("      ").append(ref).append(".").append(withName).append("(instance.")
+                .append(getterName).append("());\n");
           });
         }
       }
 
-      if (!target.getExtendsList().isEmpty()) {
-        target = BuilderContextManager.getContext().getBuildableRepository()
-            .getBuildable(target.getExtendsList().iterator().next());
-      } else {
-        return statements;
+      if (target.getExtendsList().isEmpty()) {
+        break;
       }
+      target = BuilderContextManager.getContext().getBuildableRepository()
+          .getBuildable(target.getExtendsList().iterator().next());
     }
+    statements.add(new StringStatement(builder.append("    }").toString()));
     return statements;
   }
 
