@@ -47,7 +47,6 @@ import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Modifiers;
@@ -71,145 +70,7 @@ import io.sundr.utils.Strings;
 
 public class ClazzAs {
 
-  public static final Function<RichTypeDef, TypeDef> FLUENT_INTERFACE = FunctionFactory
-      .wrap(new Function<RichTypeDef, TypeDef>() {
-        public TypeDef apply(RichTypeDef item) {
-
-          BuilderContext ctx = BuilderContextManager.getContext();
-          List<Method> methods = new ArrayList<Method>();
-          List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
-          ClassRef itemRef = item.toInternalReference();
-          ClassRef fluentRef = TypeAs.FLUENT_A_REF.apply(itemRef);
-
-          List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
-          List<TypeRef> superClassParameters = new ArrayList<>();
-
-          TypeParamDef nextParameter = getNextGeneric(item, parameters);
-          ClassRef builableSuperClassRef = findBuildableSuperClassRef(item);
-
-          TypeDef buildableSuperClass = findBuildableSuperClass(item);
-          if (builableSuperClassRef != null) {
-            superClassParameters.addAll(builableSuperClassRef.getArguments());
-          }
-
-          TypeParamDef parameterFluent = new TypeParamDefBuilder(nextParameter).addToBounds(fluentRef).build();
-          parameters.add(parameterFluent);
-          superClassParameters.add(parameterFluent.toReference());
-
-          ClassRef superClass = buildableSuperClass != null ? TypeAs.FLUENT_A_REF.apply(builableSuperClassRef)
-              : ctx.getFluentInterface().toReference(superClassParameters);
-
-          final TypeParamRef genericType = (TypeParamRef) superClass.getArguments().get(superClass.getArguments().size() - 1);
-
-          item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
-            final TypeRef unwrapped = TypeAs
-                .combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
-                .apply(property.getTypeRef());
-            Property toAdd = new PropertyBuilder(property).withNewModifiers().endModifiers()
-                .addToAttributes(ORIGIN_TYPEDEF, item).addToAttributes(OUTER_TYPE, fluentRef)
-                .addToAttributes(OUTER_TYPE, fluentRef).addToAttributes(GENERIC_TYPE_REF, genericType).build();
-
-            boolean isBuildable = isBuildable(unwrapped);
-            boolean isArray = Types.isArray(toAdd.getTypeRef());
-            boolean isSet = Types.isSet(toAdd.getTypeRef());
-            boolean isList = Types.isList(toAdd.getTypeRef());
-            boolean isMap = Types.isMap(toAdd.getTypeRef());
-            boolean isMapWithBuildableValue = isMap && isBuildable(TypeAs.UNWRAP_MAP_VALUE_OF.apply(unwrapped));
-            boolean isAbstract = isAbstract(unwrapped);
-            boolean isOptional = Types.isOptional(toAdd.getTypeRef()) || Types.isOptionalInt(toAdd.getTypeRef())
-                || Types.isOptionalDouble(toAdd.getTypeRef()) || Types.isOptionalLong(toAdd.getTypeRef());
-
-            Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
-            toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
-
-            if (isArray) {
-              Property asList = arrayAsList(toAdd);
-              methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-              methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
-              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(asList));
-              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(asList));
-              toAdd = asList;
-            } else if (isSet || isList) {
-              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(toAdd));
-              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(toAdd));
-              methods.addAll(ToMethod.GETTER.apply(toAdd));
-              methods.add(ToMethod.WITH.apply(toAdd));
-              methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
-            } else if (isMap) {
-              if (isMapWithBuildableValue && !isAbstract) {
-                methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(toAdd));
-              } else if (!descendants.isEmpty()) {
-                for (Property descendant : descendants) {
-                  methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(descendant));
-                }
-              }
-              methods.add(ToMethod.ADD_TO_MAP.apply(toAdd));
-              methods.add(ToMethod.ADD_MAP_TO_MAP.apply(toAdd));
-              methods.add(ToMethod.REMOVE_FROM_MAP.apply(toAdd));
-              methods.add(ToMethod.REMOVE_MAP_FROM_MAP.apply(toAdd));
-              methods.addAll(ToMethod.GETTER.apply(toAdd));
-              methods.add(ToMethod.WITH.apply(toAdd));
-            } else if (isOptional) {
-              methods.addAll(ToMethod.GETTER.apply(toAdd));
-              methods.addAll(ToMethod.WITH_OPTIONAL.apply(toAdd));
-            } else {
-              toAdd = new PropertyBuilder(toAdd).addToAttributes(BUILDABLE_ENABLED, isBuildable).accept(new InitEnricher())
-                  .build();
-              methods.addAll(ToMethod.GETTER.apply(toAdd));
-              methods.add(ToMethod.WITH.apply(toAdd));
-            }
-            methods.add(ToMethod.HAS.apply(toAdd));
-            methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
-
-            if (isMap) {
-              if (isMapWithBuildableValue && !isAbstract) {
-                nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
-              } else if (!descendants.isEmpty()) {
-                for (Property descendant : descendants) {
-                  nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
-                }
-              }
-            } else if (isBuildable && !isAbstract) {
-              methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
-              methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(toAdd));
-              if (isList || isArray) {
-                methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(toAdd));
-                methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
-              } else if (!isSet) {
-                methods.addAll(ToMethod.EDIT_NESTED.apply(toAdd));
-                methods.add(ToMethod.EDIT_OR_NEW.apply(toAdd));
-                methods.add(ToMethod.EDIT_OR_NEW_LIKE.apply(toAdd));
-              }
-              nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(toAdd));
-            } else if (!descendants.isEmpty()) {
-              for (Property descendant : descendants) {
-                if (Types.isCollection(descendant.getTypeRef())) {
-                  methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
-                  methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
-                } else {
-                  methods.add(ToMethod.WITH.apply(descendant));
-                }
-
-                if (isList || isArray) {
-                  methods.add(ToMethod.WITH_NEW_LIKE_NESTED_AT_INDEX.apply(descendant));
-                }
-                methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
-                methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
-                methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
-                nestedClazzes.add(PropertyAs.NESTED_INTERFACE.apply(descendant));
-              }
-            }
-          });
-
-          return new TypeDefBuilder().withComments("Generated").withAnnotations().withNewModifiers().withPublic().endModifiers()
-              .withKind(Kind.INTERFACE).withPackageName(item.getPackageName()).withName(item.getName() + "Fluent")
-              .withParameters(parameters).withExtendsList(superClass).withImplementsList().withProperties().withMethods(methods)
-              .withInnerTypes(nestedClazzes).accept(new AddNoArgWithMethod()).build();
-
-        }
-      });
-
-  public static final Function<RichTypeDef, TypeDef> FLUENT_IMPL = FunctionFactory.wrap(new Function<RichTypeDef, TypeDef>() {
+  public static final Function<RichTypeDef, TypeDef> FLUENT = FunctionFactory.wrap(new Function<RichTypeDef, TypeDef>() {
     public TypeDef apply(RichTypeDef item) {
       BuilderContext ctx = BuilderContextManager.getContext();
       List<Method> constructors = new ArrayList<Method>();
@@ -219,7 +80,7 @@ public class ClazzAs {
 
       ClassRef itemRef = item.toInternalReference();
       ClassRef fluentRef = TypeAs.FLUENT_A_REF.apply(itemRef);
-      ClassRef fluentImpl = TypeAs.FLUENT_IMPL_REF.apply(itemRef);
+      ClassRef fluent = TypeAs.FLUENT_REF.apply(itemRef);
 
       List<TypeParamDef> parameters = new ArrayList<>(item.getParameters());
       TypeParamDef nextParameter = getNextGeneric(item, parameters);
@@ -235,7 +96,7 @@ public class ClazzAs {
       superClassParameters.add(parameterFluent.toReference());
       ClassRef superClassRef = buildableSuperClassRef != null
           ? new ClassRefBuilder(buildableSuperClassRef)
-              .withFullyQualifiedName(buildableSuperClassRef.getFullyQualifiedName() + "FluentImpl")
+              .withFullyQualifiedName(buildableSuperClassRef.getFullyQualifiedName() + "Fluent")
               .withArguments(superClassParameters).build()
           : ctx.getBaseFluentClass().toReference(superClassParameters);
 
@@ -267,7 +128,7 @@ public class ClazzAs {
         Property toAdd = new PropertyBuilder(property)
             .withNewModifiers().withPrivate().endModifiers()
             .addToAttributes(ORIGIN_TYPEDEF, item)
-            .addToAttributes(OUTER_TYPE, fluentImpl)
+            .addToAttributes(OUTER_TYPE, fluent)
             .addToAttributes(GENERIC_TYPE_REF, nextParameter.toReference())
             .withComments().withAnnotations().build();
 
@@ -358,7 +219,7 @@ public class ClazzAs {
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
           .withTypeRef(Types.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
-          .withStatements(BuilderUtils.toEquals(fluentImpl, properties)).endBlock()
+          .withStatements(BuilderUtils.toEquals(fluent, properties)).endBlock()
           .build();
 
       Method hashCode = new MethodBuilder()
@@ -370,7 +231,7 @@ public class ClazzAs {
       Method toString = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(io.sundr.model.utils.Types.STRING_REF).withName("toString").withNewBlock()
-          .withStatements(BuilderUtils.toString(fluentImpl.getName(), properties)).endBlock()
+          .withStatements(BuilderUtils.toString(fluent.getName(), properties)).endBlock()
           .build();
 
       methods.add(equals);
@@ -381,11 +242,10 @@ public class ClazzAs {
           .register(
               new TypeDefBuilder().withComments("Generated")
                   .withModifiers(Modifiers.from(Modifier.PUBLIC))
-                  .withPackageName(fluentImpl.getPackageName())
-                  .withName(fluentImpl.getName())
+                  .withPackageName(fluent.getPackageName())
+                  .withName(fluent.getName())
                   .withParameters(parameters)
                   .withExtendsList(superClassRef)
-                  .withImplementsList(fluentRef)
                   .withAnnotations(
                       new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
                           .addToParameters("value", "unchecked").build())
@@ -404,7 +264,7 @@ public class ClazzAs {
 
       ClassRef itemRef = item.toInternalReference();
       ClassRef fluent = TypeAs.FLUENT_Q_REF.apply(itemRef);
-      ClassRef fluentImplRef = TypeAs.FLUENT_IMPL_REF.apply(itemRef);
+      ClassRef fluentImplRef = TypeAs.FLUENT_REF.apply(itemRef);
       ClassRef builderRef = TypeAs.BUILDER_REF.apply(itemRef);
       ClassRef visitableBuilderRef = TypeAs.VISITABLE_BUILDER_REF.apply(itemRef);
 
@@ -705,75 +565,6 @@ public class ClazzAs {
   });
 
   public static final Function<RichTypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
-
-  private static String staticAdapterBody(TypeDef pojo, TypeDef pojoBuilder, TypeDef source, boolean returnBuilder) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("return new ").append(pojoBuilder.getName()).append("()");
-
-    for (Method m : source.getMethods()) {
-      String trimmedName = Strings.deCapitalizeFirst(m.getName().replaceAll("^get", "").replaceAll("^is", ""));
-      if (m.getReturnType() instanceof ClassRef) {
-        ClassRef ref = (ClassRef) m.getReturnType();
-        Boolean hasSuperClass = pojo.getProperties()
-            .stream()
-            .filter(p -> p.getTypeRef() instanceof ClassRef && p.getName().equals(Getter.propertyNameSafe(m)))
-            .map(p -> GetDefinition.of((ClassRef) p.getTypeRef()))
-            .flatMap(c -> c.getExtendsList().stream())
-            .count() > 0;
-
-        if (GetDefinition.of(ref).isAnnotation()) {
-          TypeDef generatedType = Types.allProperties(pojo)
-              .stream()
-              .filter(p -> p.getName().equals(m.getName()))
-              .map(p -> p.getTypeRef())
-              .filter(r -> r instanceof ClassRef)
-              .map(r -> (ClassRef) r)
-              .map(c -> GetDefinition.of(c))
-              .findFirst()
-              .orElse(null);
-
-          if (generatedType != null) {
-            Method ctor = BuilderUtils.findBuildableConstructor(generatedType);
-            if (m.getReturnType().getDimensions() > 0) {
-              sb.append(".addAllTo").append(Strings.capitalizeFirst(trimmedName)).append("(")
-                  .append("Arrays.asList(")
-                  .append("instance.").append(m.getName()).append("())")
-                  .append(".stream().map(i ->")
-                  .append("new ").append(generatedType.getName()).append("(")
-                  .append(ctor.getArguments().stream()
-                      .map(p -> Getter.find(GetDefinition.of((ClassRef) m.getReturnType()), p, true))
-                      .map(g -> g.getName())
-                      .map(s -> "i." + s + "()").collect(Collectors.joining(", ")))
-                  .append(")")
-                  .append(")")
-                  .append(".collect(Collectors.toList()))");
-            } else {
-              sb.append(".with").append(Strings.capitalizeFirst(trimmedName)).append("(")
-                  .append("new ").append(generatedType.getName()).append("(")
-                  .append(ctor.getArguments().stream()
-                      .map(p -> Getter.find(GetDefinition.of((ClassRef) m.getReturnType()), p, true))
-                      .map(g -> g.getName())
-                      .map(s -> "instance." + m.getName() + "()." + s + "()").collect(Collectors.joining(", ")))
-                  .append(")")
-                  .append(")");
-            }
-            continue;
-          }
-        }
-      }
-      String withMethod = "with" + (Strings.capitalizeFirst(trimmedName));
-
-      if (Types.hasProperty(pojo, trimmedName)) {
-        sb.append(".").append(withMethod).append("(").append("instance.").append(m.getName()).append("())");
-      }
-    }
-    if (returnBuilder) {
-      sb.append(".build();");
-    } else {
-      sb.append(";");
-    }
-    return sb.toString();
-  }
 
   private static List<Statement> toInstanceConstructorBody(TypeDef clazz, TypeDef instance, String fluent) {
     Method constructor = findBuildableConstructor(clazz);

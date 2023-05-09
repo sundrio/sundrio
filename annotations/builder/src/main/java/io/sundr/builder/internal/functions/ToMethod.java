@@ -994,8 +994,7 @@ class ToMethod {
     Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
     Property valueProperty = new PropertyBuilder().withName("value").withTypeRef(valueType).build();
     ClassRef targetType = (ClassRef) valueType;
-    TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
-    TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+    TypeDef nestedType = PropertyAs.NESTED_CLASS_TYPE.apply(property);
     TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
     List<TypeParamDef> parameters = GetDefinition.of(targetType).getParameters();
@@ -1006,7 +1005,6 @@ class ToMethod {
     typeArguments.add(returnType);
 
     ClassRef rewraped = nestedType.toReference(typeArguments);
-    ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
     String methodSuffix = BuilderUtils.fullyQualifiedNameDiff(valueType, originTypeDef) + property.getNameCapitalized();
     String propertyName = property.getName();
     TypeRef baseType = valueType;
@@ -1028,7 +1026,7 @@ class ToMethod {
         .withArguments(keyProperty)
         .withNewBlock()
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
+            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
@@ -1041,7 +1039,7 @@ class ToMethod {
         .withArguments(keyProperty, valueProperty)
         .withNewBlock()
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ", " + valueProperty.getName()
+            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", " + valueProperty.getName()
                 + ");")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
@@ -1063,7 +1061,7 @@ class ToMethod {
             + " == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + "
             + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
+            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
                 + fullyQualifiedValueType + ") toEdit);")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
@@ -1084,11 +1082,11 @@ class ToMethod {
             + " == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + "
             + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
+            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
                 + fullyQualifiedValueType + ") toEdit);")
         .addNewStringStatementStatement("}")
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
+            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
@@ -1174,8 +1172,7 @@ class ToMethod {
     }
 
     TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-    TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
-    TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+    TypeDef nestedType = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
     List<TypeParamDef> parameters = GetDefinition.of(baseType).getParameters();
     List<TypeRef> typeArguments = new ArrayList<>();
@@ -1185,7 +1182,6 @@ class ToMethod {
     typeArguments.add(returnType);
 
     ClassRef rewraped = nestedType.toReference(typeArguments);
-    ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
     boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
     String prefix = isCollection ? "addNew" : "withNew";
@@ -1201,7 +1197,7 @@ class ToMethod {
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement("return new " + rewrapedImpl.getFullyQualifiedName() + "();")
+        .addNewStringStatementStatement("return new " + rewraped.getFullyQualifiedName() + "();")
         .endBlock()
         .build();
 
@@ -1268,7 +1264,7 @@ class ToMethod {
     }
 
     TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-    TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+    TypeDef nestedType = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
     List<TypeParamDef> parameters = GetDefinition.of(baseType).getParameters();
     List<TypeRef> typeArguments = new ArrayList<>();
@@ -1317,7 +1313,7 @@ class ToMethod {
     }
 
     TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-    TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+    TypeDef nestedType = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
     List<TypeParamDef> parameters = GetDefinition.of(baseType).getParameters();
     List<TypeRef> typeArguments = new ArrayList<>();
@@ -1366,8 +1362,7 @@ class ToMethod {
     }
 
     TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-    TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
-    TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+    TypeDef nestedType = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
     List<TypeParamDef> parameters = GetDefinition.of(baseType).getParameters();
     List<TypeRef> typeArguments = new ArrayList<>();
@@ -1377,7 +1372,6 @@ class ToMethod {
     typeArguments.add(returnType);
 
     ClassRef rewraped = nestedType.toReference(typeArguments);
-    ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
 
     boolean isList = IS_LIST.apply(property.getTypeRef());
     boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
@@ -1399,7 +1393,7 @@ class ToMethod {
         .endArgument()
         .withNewBlock()
         .addNewStringStatementStatement(
-            "return new " + rewrapedImpl.getFullyQualifiedName() + "(" + (isList ? "-1, " : "") + "item);")
+            "return new " + rewraped.getFullyQualifiedName() + "(" + (isList ? "-1, " : "") + "item);")
         .endBlock()
         .build();
 
@@ -1414,20 +1408,20 @@ class ToMethod {
 
     ClassRef baseType = (ClassRef) UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
     TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-    TypeDef nestedTypeImpl = PropertyAs.NESTED_CLASS_TYPE.apply(property);
+    TypeDef nestedType = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
     List<TypeRef> typeArguments = new ArrayList<>();
     for (TypeRef ignore : baseType.getArguments()) {
       typeArguments.add(Q);
     }
     typeArguments.add(returnType);
-    ClassRef rewrapedImpl = nestedTypeImpl.toReference(typeArguments);
+    ClassRef rewraped = nestedType.toReference(typeArguments);
 
     return new MethodBuilder(method)
         .addToArguments(0, INDEX)
         .withName(method.getName().replaceFirst("add", "set"))
         .editBlock()
-        .withStatements(new StringStatement("return new " + rewrapedImpl.getFullyQualifiedName() + "(index, item);"))
+        .withStatements(new StringStatement("return new " + rewraped.getFullyQualifiedName() + "(index, item);"))
         .endBlock()
         .build();
   };
@@ -1453,7 +1447,7 @@ class ToMethod {
     }
 
     TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-    TypeDef nestedType = PropertyAs.NESTED_INTERFACE_TYPE.apply(property);
+    TypeDef nestedType = PropertyAs.NESTED_CLASS_TYPE.apply(property);
 
     List<TypeRef> typeArguments = new ArrayList<>();
     for (TypeRef ignore : unwrapped.getArguments()) {

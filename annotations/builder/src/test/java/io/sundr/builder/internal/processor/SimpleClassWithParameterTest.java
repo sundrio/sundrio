@@ -44,29 +44,14 @@ public class SimpleClassWithParameterTest extends AbstractProcessorTest {
 
   @Test
   public void testFluent() {
-    TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassWithParameterDef);
+    TypeDef fluent = ClazzAs.FLUENT.apply(simpleClassWithParameterDef);
     System.out.println(fluent);
 
-    assertEquals(Kind.INTERFACE, fluent.getKind());
+    assertEquals(Kind.CLASS, fluent.getKind());
     assertEquals("SimpleClassWithParameterFluent", fluent.getName());
     assertEquals(1, fluent.getExtendsList().size());
 
     ClassRef superClass = fluent.getExtendsList().iterator().next();
-    assertEquals("Fluent", superClass.getName());
-    assertEquals(1, superClass.getArguments().size());
-    assertEquals("A", superClass.getArguments().iterator().next().toString());
-  }
-
-  @Test
-  public void testFluentImpl() {
-    TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassWithParameterDef);
-    System.out.println(fluentImpl);
-
-    assertEquals(Kind.CLASS, fluentImpl.getKind());
-    assertEquals("SimpleClassWithParameterFluentImpl", fluentImpl.getName());
-    assertEquals(1, fluentImpl.getExtendsList().size());
-
-    ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
     assertEquals("BaseFluent", superClass.getName());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());

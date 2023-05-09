@@ -214,8 +214,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         continue;
       }
       System.err.printf("\033[2K%3d%% Generating: %s\r", Math.round(percentage), typeDef.getFullyQualifiedName());
-      generate(ClazzAs.FLUENT_INTERFACE.apply(richTypeDef));
-      generate(ClazzAs.FLUENT_IMPL.apply(richTypeDef));
+      generate(ClazzAs.FLUENT.apply(richTypeDef));
       if (typeDef.isAbstract()) {
         continue;
       }

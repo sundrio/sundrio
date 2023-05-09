@@ -135,6 +135,7 @@ public final class PropertyAs {
             .build());
 
         return new TypeDefBuilder()
+            .withModifiers(Modifiers.from(Modifier.PUBLIC))
             .withKind(Kind.CLASS)
             .withName(nestedType.getName())
             .withPackageName(nestedType.getPackageName())
@@ -152,46 +153,9 @@ public final class PropertyAs {
     }
   };
 
-  public static final Function<Property, TypeDef> NESTED_INTERFACE = new Function<Property, TypeDef>() {
-    public TypeDef apply(Property item) {
-
-      TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF)
-          .apply(item.getTypeRef());
-
-      if (unwrapped instanceof ClassRef) {
-        TypeDef nestedType = NESTED_INTERFACE_TYPE.apply(item);
-
-        Set<ClassRef> nestedInterfaces = new HashSet<ClassRef>();
-        for (ClassRef n : nestedType.getImplementsList()) {
-          nestedInterfaces.add(n);
-        }
-
-        List<Method> nestedMethods = new ArrayList<Method>();
-        nestedMethods.add(ToMethod.AND.apply(item));
-        nestedMethods.add(ToMethod.END.apply(item));
-
-        return new TypeDefBuilder()
-            .withAnnotations()
-            .withModifiers(Modifiers.from(Modifier.PUBLIC))
-            .withKind(Kind.INTERFACE)
-            .withName(nestedType.getName())
-            .withPackageName(nestedType.getPackageName())
-            .withOuterTypeName(nestedType.getOuterTypeName())
-            .withParameters(nestedType.getParameters())
-            .withExtendsList(nestedType.getExtendsList())
-            .withMethods(nestedMethods)
-            .withProperties()
-            .withConstructors()
-            .build();
-      }
-      throw new IllegalStateException();
-    }
-  };
-
   public static final Function<Property, TypeDef> NESTED_CLASS_TYPE = new Function<Property, TypeDef>() {
     public TypeDef apply(Property item) {
       TypeDef shallowNestedType = SHALLOW_NESTED_TYPE.apply(item);
-      TypeDef nestedInterfaceType = NESTED_INTERFACE_TYPE.apply(item);
       ClassRef outerClass = item.getAttribute(OUTER_TYPE);
 
       //Not a typical fluent
@@ -219,71 +183,25 @@ public final class PropertyAs {
       List<TypeRef> pivotParameters = new ArrayList<TypeRef>(superClassParameters);
       pivotParameters.add(N.toReference());
 
-      ClassRef nestedInterfaceRef = nestedInterfaceType.toReference(pivotParameters);
-      superClassParameters.add(nestedInterfaceRef);
+      superClassParameters.add(shallowNestedType.toReference(pivotParameters));
 
-      ClassRef superClassFluent = new ClassRefBuilder().withFullyQualifiedName(typeDef.getFullyQualifiedName() + "FluentImpl")
+      ClassRef superClassFluent = new ClassRefBuilder().withFullyQualifiedName(typeDef.getFullyQualifiedName() + "Fluent")
           .withArguments(superClassParameters).build();
 
       return new TypeDefBuilder()
+          .withModifiers(Modifiers.from(Modifier.PUBLIC))
           .withKind(Kind.CLASS)
           .withPackageName(outerClass.getPackageName())
-          .withName(shallowNestedType.getName() + "Impl")
-          .withOuterTypeName(outerClass.getFullyQualifiedName())
+          .withName(shallowNestedType.getName())
+          // all references are local - qualified causes compilation errors
+          //.withOuterTypeName(outerClass.getFullyQualifiedName())
           .withParameters(parameters)
           .withExtendsList(superClassFluent)
-          .withImplementsList(nestedInterfaceRef,
-              BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()))
+          .withImplementsList(BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()))
           .withInnerTypes()
           .build();
     }
 
-  };
-
-  public static final Function<Property, TypeDef> NESTED_INTERFACE_TYPE = new Function<Property, TypeDef>() {
-    public TypeDef apply(Property item) {
-      ClassRef outerInterface = item.getAttribute(OUTER_TYPE);
-      TypeDef nested = new TypeDefBuilder(SHALLOW_NESTED_TYPE.apply(item))
-          .withOuterTypeName(outerInterface != null ? outerInterface.getFullyQualifiedName() : null).build();
-
-      //Not a typical fluent
-      TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF)
-          .apply(item.getTypeRef());
-      //TypeRef typeRef = TypeAs.UNWRAP_COLLECTION_OF.apply(item.getTypeRef());
-      TypeDef typeDef = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(typeRef);
-
-      if (typeDef == null) {
-        if (typeRef instanceof ClassRef) {
-          typeDef = GetDefinition.of((ClassRef) typeRef);
-        } else {
-          throw new IllegalStateException(
-              "Could not find definition from property: [" + item + "] neither in the repo nor via the object tree.");
-        }
-      }
-
-      List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
-      List<TypeRef> superClassParameters = new ArrayList<TypeRef>();
-
-      for (TypeParamDef parameter : typeDef.getParameters()) {
-        parameters.add(parameter);
-        superClassParameters.add(parameter.toReference());
-      }
-      parameters.add(N);
-      List<TypeRef> pivotParameters = new ArrayList<TypeRef>(superClassParameters);
-      pivotParameters.add(N.toReference());
-      superClassParameters.add(nested.toReference(pivotParameters));
-
-      //CircleFluent<T, CircleShapesNested<T, N>>
-      ClassRef superClassFluent = new ClassRefBuilder().withFullyQualifiedName(typeDef.getFullyQualifiedName() + "Fluent")
-          .withArguments(superClassParameters).build();
-
-      return new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName(outerInterface.getPackageName())
-          .withName(nested.getName()).withOuterTypeName(nested.getOuterTypeName()).withParameters(parameters)
-          .withOuterTypeName(outerInterface.getFullyQualifiedName()).withImplementsList()
-          .withExtendsList(BuilderContextManager.getContext().getNestedInterface().toReference(N.toReference()),
-              superClassFluent)
-          .withInnerTypes().build();
-    }
   };
 
   public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
@@ -315,7 +233,8 @@ public final class PropertyAs {
           .withPackageName(outerClass.getPackageName())
           .withName(BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + property.getNameCapitalized()
               + "Nested")
-          .withOuterTypeName(outerClass.getFullyQualifiedName())
+          // all references are local - qualified causes compilation errors
+          //.withOuterTypeName(outerClass.getFullyQualifiedName())
           .withParameters(parameters)
           .withExtendsList(typeDef.getExtendsList())
           .build();
