@@ -834,7 +834,7 @@ public class BuilderUtils {
                 .append(propertyName).append(") return false;").toString()));
       } else {
         statements.add(new StringStatement(new StringBuilder()
-            .append("if (").append(propertyName).append(" != null && !").append(propertyName).append(".equals(that.")
+            .append("if (!java.util.Objects.equals(").append(propertyName).append(", that.")
             .append(propertyName).append(")) return false;").append("\n")
             .toString()));
       }
