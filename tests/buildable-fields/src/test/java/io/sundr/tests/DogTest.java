@@ -18,6 +18,7 @@
 package io.sundr.tests;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 import java.util.Arrays;
 
@@ -30,6 +31,14 @@ public class DogTest {
     Dog dog = new DogBuilder()
         .withName("Goodgirl")
         .build();
+  }
+
+  @Test
+  public void testGeneratedBuilderEquality() {
+    DogBuilder builder1 = new DogBuilder();
+    DogBuilder builder2 = new DogBuilder()
+        .withName("Goodgirl");
+    assertNotEquals(builder1, builder2);
   }
 
   @Test
