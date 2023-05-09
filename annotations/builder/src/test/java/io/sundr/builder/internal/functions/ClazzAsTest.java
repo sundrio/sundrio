@@ -45,7 +45,7 @@ public class ClazzAsTest extends AbstractProcessorTest {
         .withConstructors(constructor)
         .build();
 
-    TypeDef result = ClazzAs.FLUENT_IMPL.apply(TypeArguments.apply(type));
+    TypeDef result = ClazzAs.FLUENT.apply(TypeArguments.apply(type));
     System.out.println(result);
   }
 }

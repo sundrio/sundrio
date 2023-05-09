@@ -68,8 +68,8 @@ public class TypeAs {
       .addToArguments(Q)
       .build();
 
-  public static final Function<ClassRef, ClassRef> FLUENT_IMPL_REF = item -> {
-    return new ClassRefBuilder(item).withFullyQualifiedName(item.getFullyQualifiedName() + "FluentImpl")
+  public static final Function<ClassRef, ClassRef> FLUENT_REF = item -> {
+    return new ClassRefBuilder(item).withFullyQualifiedName(item.getFullyQualifiedName() + "Fluent")
         .addToArguments(BUILDER_REF.apply(item))
         .build();
   };

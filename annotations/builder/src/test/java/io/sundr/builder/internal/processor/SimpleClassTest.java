@@ -47,34 +47,19 @@ public class SimpleClassTest extends AbstractProcessorTest {
 
   @Test
   public void testFluent() {
-    TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassDef);
+    TypeDef fluent = ClazzAs.FLUENT.apply(simpleClassDef);
     System.out.println(fluent);
 
-    assertEquals(Kind.INTERFACE, fluent.getKind());
+    assertEquals(Kind.CLASS, fluent.getKind());
     assertEquals("SimpleClassFluent", fluent.getName());
     assertEquals(1, fluent.getExtendsList().size());
 
+    assertTrue(hasMethod(fluent, "addToTags",
+        new ClassRefBuilder().withFullyQualifiedName(String.class.getName()).withDimensions(1).build()));
+    assertTrue(hasMethod(fluent, "removeFromTags",
+        new ClassRefBuilder().withFullyQualifiedName(String.class.getName()).withDimensions(1).build()));
+
     ClassRef superClass = fluent.getExtendsList().iterator().next();
-    assertEquals("Fluent", superClass.getName());
-    assertEquals(1, superClass.getArguments().size());
-    assertEquals("A", superClass.getArguments().iterator().next().toString());
-  }
-
-  @Test
-  public void testFluentImpl() {
-    TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassDef);
-    System.out.println(fluentImpl);
-
-    assertEquals(Kind.CLASS, fluentImpl.getKind());
-    assertEquals("SimpleClassFluentImpl", fluentImpl.getName());
-    assertEquals(1, fluentImpl.getExtendsList().size());
-
-    assertTrue(hasMethod(fluentImpl, "addToTags",
-        new ClassRefBuilder().withFullyQualifiedName(String.class.getName()).withDimensions(1).build()));
-    assertTrue(hasMethod(fluentImpl, "removeFromTags",
-        new ClassRefBuilder().withFullyQualifiedName(String.class.getName()).withDimensions(1).build()));
-
-    ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
     assertEquals("BaseFluent", superClass.getName());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());

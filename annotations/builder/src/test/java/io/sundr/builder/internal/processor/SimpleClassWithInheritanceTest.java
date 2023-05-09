@@ -49,31 +49,16 @@ public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
   }
 
   @Test
-  public void testFluent() {
-    TypeDef fluent = ClazzAs.FLUENT_INTERFACE.apply(simpleClassWithDateDef);
+  public void testFluent() throws FileNotFoundException {
+    TypeDef fluent = ClazzAs.FLUENT.apply(simpleClassWithDateDef);
     System.out.println(fluent);
 
-    assertEquals(Kind.INTERFACE, fluent.getKind());
+    assertEquals(Kind.CLASS, fluent.getKind());
     assertEquals("SimpleClassWithDateFluent", fluent.getName());
     assertEquals(1, fluent.getExtendsList().size());
 
     ClassRef superClass = fluent.getExtendsList().iterator().next();
     assertEquals("SimpleClassFluent", superClass.getName());
-    assertEquals(1, superClass.getArguments().size());
-    assertEquals("A", superClass.getArguments().iterator().next().toString());
-  }
-
-  @Test
-  public void testFluentImpl() throws FileNotFoundException {
-    TypeDef fluentImpl = ClazzAs.FLUENT_IMPL.apply(simpleClassWithDateDef);
-    System.out.println(fluentImpl);
-
-    assertEquals(Kind.CLASS, fluentImpl.getKind());
-    assertEquals("SimpleClassWithDateFluentImpl", fluentImpl.getName());
-    assertEquals(1, fluentImpl.getExtendsList().size());
-
-    ClassRef superClass = fluentImpl.getExtendsList().iterator().next();
-    assertEquals("SimpleClassFluentImpl", superClass.getName());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());
   }
