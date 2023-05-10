@@ -1414,7 +1414,7 @@ class ToMethod {
     }
     ClassRef unwrapped = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF)
         .apply(property.getTypeRef());
-    TypeRef builderRef = VISITABLE_BUILDER_REF.apply(unwrapped);
+    TypeRef builderRef = BUILDER_REF.apply(unwrapped);
 
     //Let's reload the class from the repository if available....
     TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository()
