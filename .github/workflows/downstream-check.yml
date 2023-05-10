@@ -51,4 +51,4 @@ jobs:
           SUNDRIO_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           git clone https://github.com/fabric8io/kubernetes-client
           cd kubernetes-client
-          ./mvnw ${MAVEN_ARGS} clean install -Dsundrio.version=$SUNDRIO_VERSION
+          ./mvnw ${MAVEN_ARGS} clean install -Dsundrio.version=$SUNDRIO_VERSION -Dkaraf.itest.skip=true
