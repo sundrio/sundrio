@@ -323,6 +323,7 @@ class ToMethod {
               (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(descendant.getTypeRef()))
                   .withArguments(new TypeRef[0]).build();
           ClassRef builderRef = BUILDER_REF.apply(dunwraped);
+
           statements.add(new StringStatement("if (" + argumentName + " instanceof " + dunwraped + "){ this." + fieldName
               + "= new " + builderRef + "((" + dunwraped + ")" + argumentName + "); _visitables.get(\"" + fieldName
               + "\").add(this." + fieldName + ");}"));
@@ -522,7 +523,10 @@ class ToMethod {
 
     methods.add(getter);
     if (isNested) {
-      TypeRef builderRef = VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped);
+
+      ClassRef builderRef = Types.isConcrete(unwrapped)
+          ? TypeAs.BUILDER_REF.apply((ClassRef) unwrapped)
+          : TypeAs.VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped);
 
       methods.add(new MethodBuilder(getter)
           .removeFromAnnotations(DEPRECATED_ANNOTATION)
@@ -597,7 +601,10 @@ class ToMethod {
     methods.add(getter);
 
     if (isBuildable) {
-      TypeRef builderRef = VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped);
+
+      ClassRef builderRef = Types.isConcrete(unwrapped)
+          ? TypeAs.BUILDER_REF.apply((ClassRef) unwrapped)
+          : TypeAs.VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped);
 
       methods.add(new MethodBuilder(getter)
           .removeFromAnnotations(DEPRECATED_ANNOTATION)
@@ -1414,7 +1421,10 @@ class ToMethod {
     }
     ClassRef unwrapped = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF)
         .apply(property.getTypeRef());
-    TypeRef builderRef = BUILDER_REF.apply(unwrapped);
+
+    ClassRef builderRef = Types.isConcrete(unwrapped)
+        ? TypeAs.BUILDER_REF.apply(unwrapped)
+        : TypeAs.VISITABLE_BUILDER_REF.apply(unwrapped);
 
     //Let's reload the class from the repository if available....
     TypeDef propertyTypeDef = BuilderContextManager.getContext().getDefinitionRepository()
