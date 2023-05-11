@@ -33,7 +33,27 @@ import io.sundr.examples.shapes.v1.EditableCircle;
 import io.sundr.examples.shapes.v1.Square;
 import io.sundr.examples.shapes.v1.SquareBuilder;
 
+import static org.junit.Assert.assertEquals;
+
 public class ShapesTest {
+
+  static final Shape ANON_SHAPE = new Shape() {
+
+    @Override
+    public int getX() {
+      return 0;
+    }
+
+    @Override
+    public int getY() {
+      return 0;
+    }
+
+    @Override
+    public Optional<String> getNotes() {
+      return Optional.empty();
+    }
+  };
 
   @Test
   public void testCircleBuilder() {
@@ -325,25 +345,26 @@ public class ShapesTest {
 
   @Test(expected = IllegalStateException.class)
   public void testWithUnknownType() {
-    Canvas canvas = new CanvasBuilder()
-        .withCanvasShape(new Shape() {
+    new CanvasBuilder()
+        .withCanvasShape(ANON_SHAPE).build();
+  }
 
-          @Override
-          public int getX() {
-            return 0;
-          }
+  @Test(expected = IllegalStateException.class)
+  public void testAddToUnknownType() {
+    new CanvasBuilder()
+        .addToShapes(0, ANON_SHAPE).build();
+  }
 
-          @Override
-          public int getY() {
-            return 0;
-          }
+  @Test(expected = IllegalStateException.class)
+  public void testSetToUnknownType() {
+    new CanvasBuilder()
+        .setToShapes(0, ANON_SHAPE).build();
+  }
 
-          @Override
-          public Optional<String> getNotes() {
-            return Optional.empty();
-          }
-        }).build();
-
-    Assert.assertNull(canvas.getCanvasShape());
+  @Test
+  public void addToBuilderIndexing() {
+    EditableCanvas canvas = new CanvasBuilder()
+        .addToShapes(-1, new SquareBuilder()).build();
+    assertEquals(1, canvas.getShapes().size());
   }
 }
