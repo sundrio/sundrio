@@ -283,7 +283,7 @@ class ToMethod {
       if (isBuildable(unwrapped)) {
         if (IS_COLLECTION.apply(type)) {
           statements.add(new StringStatement("if (this." + fieldName + " != null) { _visitables.get(\"" + fieldName
-              + "\").removeAll(this." + fieldName + ");}"));
+              + "\").clear();}"));
         } else if (IS_MAP.apply(type)) {
           // There is no such thing as buildable map yet.
         } else {
@@ -365,7 +365,8 @@ class ToMethod {
         .withVarArgPreferred(true)
         .withNewBlock()
         .addNewStringStatementStatement(
-            "if (this." + property.getName() + " != null) {this." + property.getName() + ".clear();}")
+            "if (this." + property.getName() + " != null) {this." + property.getName() + ".clear(); _visitables.remove(\""
+                + property.getName() + "\"); }")
         .addNewStringStatementStatement("if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :"
             + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
         .endBlock()
@@ -710,10 +711,9 @@ class ToMethod {
                 .withStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
-                    new StringStatement(builderClass + " builder = new " + builderClass + "(item);_visitables.get(\""
-                        + propertyName + "\").add(index >= 0 ? index : _visitables.get(\"" + propertyName
-                        + "\").size(), builder);this." + propertyName + ".add(index >= 0 ? index : " + propertyName
-                        + ".size(), builder); return (" + returnType + ")this;"))
+                    new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
+                    createAddOrSetIndex("add", propertyName, returnType.toString()),
+                    new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build();
 
             setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
@@ -721,12 +721,8 @@ class ToMethod {
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
                     new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
-                    new StringStatement("if (index < 0 || index >= _visitables.get(\"" + propertyName
-                        + "\").size()) { _visitables.get(\"" + propertyName + "\").add(builder); } else { _visitables.get(\""
-                        + propertyName + "\").set(index, builder);}"),
-                    new StringStatement("if (index < 0 || index >= " + propertyName + ".size()) { " + propertyName
-                        + ".add(builder); } else { " + propertyName + ".set(index, builder);}"),
-                    new StringStatement(" return (" + returnType + ")this;"))
+                    createAddOrSetIndex("set", propertyName, returnType.toString()),
+                    new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build();
 
           } else if (!descendants.isEmpty()) {
@@ -744,12 +740,20 @@ class ToMethod {
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(createAddToDescendants("addTo", descendants, true),
-                    new StringStatement("return (" + returnType + ")this;"))
+                    new StringStatement(
+                        "else { VisitableBuilder<? extends " + targetType.getFullyQualifiedName()
+                            + ",?> builder = builderOf(item);"),
+                    createAddOrSetIndex("add", propertyName, returnType.toString()),
+                    new StringStatement("} return (" + returnType + ")this;"))
                 .endBlock().build();
 
             setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(createAddToDescendants("setTo", descendants, true),
-                    new StringStatement("return (" + returnType + ")this;"))
+                    new StringStatement(
+                        "else { VisitableBuilder<? extends " + targetType.getFullyQualifiedName()
+                            + ",?> builder = builderOf(item);"),
+                    createAddOrSetIndex("set", propertyName, returnType.toString()),
+                    new StringStatement("} return (" + returnType + ")this;"))
                 .endBlock().build();
 
             methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
@@ -766,8 +770,8 @@ class ToMethod {
                 .addToStatements(
                     new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
                         + property.getAttribute(LAZY_INIT) + ";}"),
-                    new StringStatement("_visitables.get(\"" + propertyName + "\").add(index, builder);this." + propertyName
-                        + ".add(index, builder); return (" + returnType + ")this;"))
+                    createAddOrSetIndex("add", propertyName, returnType.toString()),
+                    new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build());
 
           } else {
@@ -812,6 +816,14 @@ class ToMethod {
           return new StringStatement(
               "else {  VisitableBuilder<? extends " + type + ",?> builder = builderOf(item); _visitables.get(\"" + name
                   + "\").add(builder);this." + name + ".add(builder); }");
+        }
+
+        private StringStatement createAddOrSetIndex(String op, String propertyName, String returnType) {
+          return new StringStatement(
+              "if (index < 0 || index >= " + propertyName + ".size()) { _visitables.get(\"" + propertyName
+                  + "\").add(builder); " + propertyName + ".add(builder); } else { _visitables.get(\""
+                  + propertyName + "\")." + op + "(index, builder); " + propertyName + "." + op
+                  + "(index, builder);}");
         }
       });
 
