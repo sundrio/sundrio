@@ -40,10 +40,15 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     }
 
     try {
-      return (VisitableBuilder<T, ?>) Class.forName(item.getClass().getName() + "Builder").getConstructor(item.getClass())
+      return (VisitableBuilder<T, ?>) Class.forName(item.getClass().getName() + "Builder", true, item.getClass().getClassLoader()).getConstructor(item.getClass())
           .newInstance(item);
     } catch (Exception e) {
-      throw new IllegalStateException("Failed to create builder for: " + item.getClass(), e);
+      try {
+        return (VisitableBuilder<T, ?>) Class.forName(item.getClass().getName() + "Builder").getConstructor(item.getClass())
+            .newInstance(item);
+      } catch (Exception e1) {
+        throw new IllegalStateException("Failed to create builder for: " + item.getClass(), e1);
+      }
     }
   }
 
@@ -63,6 +68,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     return new LinkedHashSet(Arrays.stream(sets).filter(Objects::nonNull).collect(Collectors.toSet()));
   }
 
+  @Override
   public F accept(Visitor... visitors) {
     return accept(Collections.emptyList(), visitors);
   }
@@ -87,6 +93,7 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     });
   }
 
+  @Override
   public F accept(List<Entry<String, Object>> path, String currentKey, Visitor... visitors) {
     List<Visitor> sortedVisitor = new ArrayList<>();
     for (Visitor visitor : visitors) {
