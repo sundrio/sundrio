@@ -95,7 +95,8 @@ public class Constants {
   public static final ClassRef ARRAYS = new ClassRefBuilder().withFullyQualifiedName(Arrays.class.getName()).build();
   public static final ClassRef COLLECTORS = new ClassRefBuilder().withFullyQualifiedName(Collectors.class.getName()).build();
 
-  public static final Property INDEX = new PropertyBuilder().withName("index").withTypeRef(io.sundr.model.utils.Types.INT_REF)
+  public static final Property INDEX = new PropertyBuilder().withName("index")
+      .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_INT_REF)
       .build();
 
   public static final TypeDef FUNCTION = new TypeDefBuilder().withKind(Kind.INTERFACE).withPackageName("java.util.function")
