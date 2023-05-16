@@ -330,7 +330,7 @@ Circle circle = new CircleBuilder()
                       .build();
 
 // Create a new CircleBuilder with edit(), set props and the build
-Circle clone = ((Editable) circle).edit().withRadius(120).build();
+Circle clone = ((EditableCircle) circle).edit().withRadius(120).build();
 ```
 
 You can disable this behaviour by using `@Buildable(editableEnabled =
