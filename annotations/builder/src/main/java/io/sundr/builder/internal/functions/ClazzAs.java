@@ -23,6 +23,7 @@ import static io.sundr.model.utils.Types.isAbstract;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +51,7 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.MethodFluent.BlockNested;
 import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
@@ -112,6 +114,8 @@ public class ClazzAs {
       constructors.add(emptyConstructor);
       constructors.add(instanceConstructor);
 
+      Set<Property> allDescendants = new LinkedHashSet<>();
+
       item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
         final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
             .apply(property.getTypeRef());
@@ -137,6 +141,7 @@ public class ClazzAs {
             .withComments().withAnnotations().build();
 
         Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
+        allDescendants.addAll(descendants);
         toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
         List<Method> methods = new ArrayList<Method>();
         if (isArray) {
@@ -201,10 +206,17 @@ public class ClazzAs {
           properties.add(buildableField(toAdd));
           for (Property descendant : descendants) {
             if (Types.isCollection(descendant.getTypeRef())) {
-              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant));
-              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant));
+              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant).stream()
+                  .map(m -> new MethodBuilder(m).addToAnnotations(DEPRECATED_ANNOTATION)
+                      .addToComments("@deprecated Use a addTo/setTo method referencing a parent type instead").build())
+                  .collect(Collectors.toList()));
+              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant).stream()
+                  .map(m -> new MethodBuilder(m).addToAnnotations(DEPRECATED_ANNOTATION)
+                      .addToComments("@deprecated Use a remove method referencing a parent type instead").build())
+                  .collect(Collectors.toList()));
             } else {
-              methods.add(ToMethod.WITH.apply(descendant));
+              methods.add(new MethodBuilder(ToMethod.WITH.apply(descendant)).addToAnnotations(DEPRECATED_ANNOTATION)
+                  .addToComments("@deprecated Use a with method referencing a parent type instead").build());
             }
             methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
             methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
@@ -252,6 +264,10 @@ public class ClazzAs {
       allMethods.add(hashCode);
       allMethods.add(toString);
 
+      if (!allDescendants.isEmpty()) {
+        allMethods.add(createDescendantBuilderMethod(allDescendants));
+      }
+
       return ctx.getDefinitionRepository()
           .register(
               new TypeDefBuilder().withComments("Generated")
@@ -267,6 +283,37 @@ public class ClazzAs {
                   .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(allMethods)
                   .accept(new AddNoArgWithMethod())
                   .build());
+    }
+
+    private Method createDescendantBuilderMethod(Set<Property> allDescendants) {
+      BlockNested<MethodBuilder> builderBuilder = new MethodBuilder().withNewModifiers().withProtected().withStatic()
+          .endModifiers()
+          .withParameters(Types.T)
+          .withArguments(new PropertyBuilder().withName("item").withTypeRef(Types.OBJECT_REF).build())
+          .withReturnType(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF))
+          .withName("builder").withNewBlock();
+      builderBuilder.addToStatements(new StringStatement("switch (item.getClass().getName()) {"));
+      Set<String> seen = new HashSet<>();
+      for (Property descendant : allDescendants) {
+        ClassRef dunwraped = new ClassRefBuilder(
+            (ClassRef) TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF)
+                .apply(descendant.getTypeRef())).withArguments(new TypeRef[0]).build();
+        String className = dunwraped.getFullyQualifiedName();
+        if (!seen.add(className) || !isBuildable(dunwraped)) {
+          continue;
+        }
+        // use a string concat for the case key to prevent conversion of fully qualified names to short names 
+        String packageName = dunwraped.getPackageName();
+        String classShortName = dunwraped.getName();
+
+        ClassRef builderRef = TypeAs.BUILDER_REF.apply(dunwraped);
+        builderBuilder.addToStatements(
+            new StringStatement("case \"" + packageName + ".\"+\"" + classShortName
+                + "\": return (VisitableBuilder<T, ?>)new " + builderRef + "(("
+                + dunwraped + ") item);"));
+      }
+      builderBuilder.addToStatements(new StringStatement("}\n return (VisitableBuilder<T, ?>)builderOf(item);"));
+      return builderBuilder.endBlock().build();
     }
   });
 
