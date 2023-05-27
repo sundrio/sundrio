@@ -1,0 +1,45 @@
+name: Release Snapshots
+
+env:
+  MAVEN_ARGS: -B -e
+
+on:
+  workflow_dispatch:
+    inputs:
+      additional_args:
+        description: Additional Maven Args
+        required: false
+        default: ''
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: release
+    strategy:
+      matrix:
+        java: [8]
+        profile: [normal]
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'temurin'
+          server-id: oss-sonatype-staging
+          server-username: OSS_SONATYPE_USERNAME
+          server-password: OSS_SONATYPE_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Install prerequisites
+        run: |
+          if [ -f $JAVA_HOME/lib/tools.jar ]; then
+            ./mvnw install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar -P${{ matrix.profile }};
+          fi
+      - name: Maven snapshot release 
+        run: |
+          ./mvnw clean deploy -DskipTests -Dformat.skip=true
+        env:
+          OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
+          OSS_SONATYPE_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
