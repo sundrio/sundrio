@@ -40,7 +40,9 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     }
 
     try {
-      return (VisitableBuilder<T, ?>) Class.forName(item.getClass().getName() + "Builder", true, item.getClass().getClassLoader()).getConstructor(item.getClass())
+      return (VisitableBuilder<T, ?>) Class
+          .forName(item.getClass().getName() + "Builder", true, item.getClass().getClassLoader())
+          .getConstructor(item.getClass())
           .newInstance(item);
     } catch (Exception e) {
       try {
