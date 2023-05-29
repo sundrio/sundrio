@@ -42,6 +42,7 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
+import io.sundr.builder.internal.checks.DublicatePropertyCheck;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
@@ -75,7 +76,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
             .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
-            .accept(new Visitor<PropertyBuilder>() {
+            .accept(new DublicatePropertyCheck(), new Visitor<PropertyBuilder>() {
               @Override
               public void visit(PropertyBuilder builder) {
                 builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
@@ -93,7 +94,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
               .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
               .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
               .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
-              .accept(new Visitor<PropertyBuilder>() {
+              .accept(new DublicatePropertyCheck(), new Visitor<PropertyBuilder>() {
                 @Override
                 public void visit(PropertyBuilder builder) {
                   builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
