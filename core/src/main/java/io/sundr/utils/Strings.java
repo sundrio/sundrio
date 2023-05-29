@@ -245,6 +245,21 @@ public final class Strings {
   }
 
   /**
+   * Converts the String into a camel case String.
+   *
+   * @param name The name.
+   * @return The name in camel case.
+   */
+  public static final String camelCase(String name) {
+    String[] parts = name.split("[^a-zA-Z0-9]");
+    return parts[0] + Stream.of(parts)
+        .skip(1)
+        .filter(s -> s != null && s.length() > 0)
+        .map(v -> Character.toUpperCase(v.charAt(0)) + v.substring(1))
+        .collect(Collectors.joining());
+  }
+
+  /**
    * Converts a name of an interface or abstract class to Pojo name.
    * Remove leading "I" and "Abstract" or trailing "Interface".
    * 
