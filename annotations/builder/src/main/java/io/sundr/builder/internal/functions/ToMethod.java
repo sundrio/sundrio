@@ -1026,7 +1026,7 @@ class ToMethod {
         .withArguments(keyProperty)
         .withNewBlock()
         .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
+            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", null);")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
@@ -1086,7 +1086,7 @@ class ToMethod {
                 + fullyQualifiedValueType + ") toEdit);")
         .addNewStringStatementStatement("}")
         .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ");")
+            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", null);")
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
@@ -1191,13 +1191,16 @@ class ToMethod {
         ? Singularize.FUNCTION.apply(property.getNameCapitalized())
         : property.getNameCapitalized()));
 
+    boolean hasIndex = Types.isArray(property.getTypeRef()) || Types.isList(property.getTypeRef());
+
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withParameters(parameters)
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement("return new " + rewraped.getFullyQualifiedName() + "();")
+        .addNewStringStatementStatement(
+            "return new " + rewraped.getFullyQualifiedName() + "(" + (hasIndex ? "-1, " : "") + "null);")
         .endBlock()
         .build();
 
