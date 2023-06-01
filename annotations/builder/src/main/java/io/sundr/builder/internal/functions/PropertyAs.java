@@ -86,30 +86,25 @@ public final class PropertyAs {
         List<Property> properties = new ArrayList<Property>();
         List<Method> constructors = new ArrayList<Method>();
         List<Statement> statementsWithItem = new ArrayList<Statement>();
-        List<Statement> statementsWithoutItem = new ArrayList<Statement>();
 
         properties.add(new PropertyBuilder()
             .withName("builder")
             .withTypeRef(builderType).build());
 
         List<Property> argumentsWithItem = new ArrayList<Property>();
-        List<Property> argumentsWithoutItem = new ArrayList<Property>();
 
         if (isArray || isList) {
           argumentsWithItem.add(INDEX);
           properties.add(INDEX);
           statementsWithItem.add(new StringStatement("this.index = index;"));
-          statementsWithoutItem.add(new StringStatement("this.index = -1;"));
         }
         if (isMap) {
           TypeRef keyType = UNWRAP_MAP_KEY_OF.apply(item.getTypeRef());
           Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
           Statement keyStatement = new StringStatement("this.key = key;");
           argumentsWithItem.add(keyProperty);
-          argumentsWithoutItem.add(keyProperty);
           properties.add(keyProperty);
           statementsWithItem.add(keyStatement);
-          statementsWithoutItem.add(keyStatement);
         }
         argumentsWithItem.add(new PropertyBuilder().withName("item").withTypeRef(unwrapped).build());
 
@@ -121,16 +116,6 @@ public final class PropertyAs {
             .withArguments(argumentsWithItem)
             .withNewBlock()
             .withStatements(statementsWithItem)
-            .endBlock()
-            .build());
-
-        statementsWithoutItem.add(new StringStatement("this.builder = new " + builderType.getFullyQualifiedName() + "(this);"));
-        constructors.add(new MethodBuilder()
-            .withName("")
-            .withReturnType(nestedRef)
-            .withArguments(argumentsWithoutItem)
-            .withNewBlock()
-            .withStatements(statementsWithoutItem)
             .endBlock()
             .build());
 
