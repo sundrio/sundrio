@@ -1174,6 +1174,13 @@ class ToMethod {
       String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
       String delegateName = delegatePrefix + property.getNameCapitalized();
 
+      if (property.hasAttribute(Constants.DESCENDANT_OF)) {
+        Property attrValue = property.getAttribute(Constants.DESCENDANT_OF);
+        if (attrValue != null) {
+          delegateName = delegatePrefix + (attrValue).getNameCapitalized();
+        }
+      }
+
       String args = Strings.join(constructor.getArguments(), Property::getName, ", ");
 
       result.add(new MethodBuilder()

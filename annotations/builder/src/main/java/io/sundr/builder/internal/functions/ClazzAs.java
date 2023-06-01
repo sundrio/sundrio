@@ -205,19 +205,6 @@ public class ClazzAs {
         } else if (!descendants.isEmpty()) {
           properties.add(buildableField(toAdd));
           for (Property descendant : descendants) {
-            if (Types.isCollection(descendant.getTypeRef())) {
-              methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(descendant).stream()
-                  .map(m -> new MethodBuilder(m).addToAnnotations(DEPRECATED_ANNOTATION)
-                      .addToComments("@deprecated Use a addTo/setTo method referencing a parent type instead").build())
-                  .collect(Collectors.toList()));
-              methods.addAll(ToMethod.REMOVE_FROM_COLLECTION.apply(descendant).stream()
-                  .map(m -> new MethodBuilder(m).addToAnnotations(DEPRECATED_ANNOTATION)
-                      .addToComments("@deprecated Use a remove method referencing a parent type instead").build())
-                  .collect(Collectors.toList()));
-            } else {
-              methods.add(new MethodBuilder(ToMethod.WITH.apply(descendant)).addToAnnotations(DEPRECATED_ANNOTATION)
-                  .addToComments("@deprecated Use a with method referencing a parent type instead").build());
-            }
             methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
             methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
             methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
@@ -289,7 +276,7 @@ public class ClazzAs {
       BlockNested<MethodBuilder> builderBuilder = new MethodBuilder().withNewModifiers().withProtected().withStatic()
           .endModifiers()
           .withParameters(Types.T)
-          .withArguments(new PropertyBuilder().withName("item").withTypeRef(Types.OBJECT_REF).build())
+          .addNewArgument().withName("item").withTypeRef(Types.OBJECT_REF).endArgument()
           .withReturnType(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF))
           .withName("builder").withNewBlock();
       builderBuilder.addToStatements(new StringStatement("switch (item.getClass().getName()) {"));
