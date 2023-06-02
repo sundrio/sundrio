@@ -36,6 +36,7 @@ import javax.lang.model.element.Modifier;
 
 import io.sundr.FunctionFactory;
 import io.sundr.adapter.apt.AptContext;
+import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
@@ -74,7 +75,7 @@ public class ClazzAs {
     public TypeDef apply(RichTypeDef item) {
       BuilderContext ctx = BuilderContextManager.getContext();
       List<Method> constructors = new ArrayList<Method>();
-      List<Method> methods = new ArrayList<Method>();
+      List<Method> allMethods = new ArrayList<Method>();
       List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
       final List<Property> properties = new ArrayList<Property>();
 
@@ -115,6 +116,9 @@ public class ClazzAs {
         final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
             .apply(property.getTypeRef());
 
+        // only looking at the field, but the getter/setter could have annotations as well
+        boolean deprecated = property.getAnnotations().stream().anyMatch(Constants.DEPRECATED_ANNOTATION::equals);
+
         final boolean isBuildable = isBuildable(unwrapped);
         final boolean isArray = Types.isArray(property.getTypeRef());
         final boolean isSet = Types.isSet(property.getTypeRef());
@@ -134,7 +138,7 @@ public class ClazzAs {
 
         Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
         toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
-
+        List<Method> methods = new ArrayList<Method>();
         if (isArray) {
           Property asList = arrayAsList(toAdd);
           methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
@@ -213,6 +217,16 @@ public class ClazzAs {
         } else {
           properties.add(buildableField(toAdd));
         }
+        for (Method m : methods) {
+          if (deprecated && !m.getAnnotations().stream().anyMatch(Constants.DEPRECATED_ANNOTATION::equals)) {
+            m = new MethodBuilder(m).addToAnnotations(Constants.DEPRECATED_ANNOTATION)
+                .addToComments(
+                    String.format("The field %s has been deprecated, please see the pojo class for more information",
+                        property.getName()))
+                .build();
+          }
+          allMethods.add(m);
+        }
       });
 
       Method equals = new MethodBuilder()
@@ -234,9 +248,9 @@ public class ClazzAs {
           .withStatements(BuilderUtils.toString(fluent.getName(), properties)).endBlock()
           .build();
 
-      methods.add(equals);
-      methods.add(hashCode);
-      methods.add(toString);
+      allMethods.add(equals);
+      allMethods.add(hashCode);
+      allMethods.add(toString);
 
       return ctx.getDefinitionRepository()
           .register(
@@ -250,7 +264,7 @@ public class ClazzAs {
                       new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
                           .addToParameters("value", "unchecked").build())
                   .withConstructors(constructors)
-                  .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(methods)
+                  .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(allMethods)
                   .accept(new AddNoArgWithMethod())
                   .build());
     }
@@ -356,11 +370,6 @@ public class ClazzAs {
       constructors.add(instanceAndValidationEnabledConstructor);
 
       buildableInterface.ifPresent(i -> {
-        List<ClassRef> getterExceptions = i.getMethods().stream()
-            .filter(Getter::is)
-            .filter(m -> m != null && m.getExceptions() != null)
-            .flatMap(m -> m.getExceptions().stream()).collect(Collectors.toList());
-
         ClassRef buildableInterfaceRef = item.getImplementsList().stream()
             .filter(candidate -> candidate.getFullyQualifiedName().equals(i.getFullyQualifiedName())).findFirst()
             .orElseThrow(() -> new IllegalStateException(
