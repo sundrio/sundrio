@@ -31,6 +31,7 @@ import io.sundr.transform.annotations.TemplateTransformation;
 @TemplateTransformation("transformation.vm") //This is just used to demonstrate how we can use velocity transformations.
 public class Canvas {
 
+  @Deprecated
   private final Shape canvasShape;
   private final Map<String, Shape> namedShapes;
   private final List<Shape> shapes;

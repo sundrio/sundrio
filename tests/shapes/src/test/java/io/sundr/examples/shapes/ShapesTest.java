@@ -16,6 +16,9 @@
 
 package io.sundr.examples.shapes;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
@@ -32,8 +35,6 @@ import io.sundr.examples.shapes.v1.CircleBuilder;
 import io.sundr.examples.shapes.v1.EditableCircle;
 import io.sundr.examples.shapes.v1.Square;
 import io.sundr.examples.shapes.v1.SquareBuilder;
-
-import static org.junit.Assert.assertEquals;
 
 public class ShapesTest {
 
@@ -366,5 +367,10 @@ public class ShapesTest {
     EditableCanvas canvas = new CanvasBuilder()
         .addToShapes(-1, new SquareBuilder()).build();
     assertEquals(1, canvas.getShapes().size());
+  }
+  
+  @Test
+  public void testDeprecatedField() throws Exception {
+    assertNotNull(CanvasBuilder.class.getMethod("hasCanvasShape").getAnnotation(Deprecated.class));
   }
 }
