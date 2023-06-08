@@ -17,7 +17,6 @@
 package io.sundr.builder.internal.functions;
 
 import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
-import static io.sundr.builder.Constants.DEPRECATED_ANNOTATION;
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
@@ -96,6 +95,19 @@ import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
 class ToMethod {
+
+  static String getterOrBuildMethodName(Property item) {
+    return (useBuildMethod(item) ? "build" + item.getNameCapitalized() : Getter.name(item));
+  }
+
+  private static boolean useBuildMethod(Property item) {
+    if (Types.isMap(item.getTypeRef())) {
+      return false;
+    }
+    TypeRef unwrapped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(item.getTypeRef());
+    return BuilderUtils.isBuildable(unwrapped)
+        || !Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(item).isEmpty();
+  }
 
   private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
   private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
@@ -481,9 +493,6 @@ class ToMethod {
       statements.add(new StringStatement("return this." + property.getName() + ";"));
     } else if (isBuildable(unwrapped)) {
       isNested = true;
-      annotations.add(DEPRECATED_ANNOTATION);
-      comments.add("This method has been deprecated, please use method " + builderName + " instead.");
-      comments.add("@return The buildable object.");
       if (isList || isSet) {
         if (isAbstractList || isAbstractSet) {
           statements.add(
@@ -504,9 +513,6 @@ class ToMethod {
       }
     } else if (!descendants.isEmpty()) {
       isNested = true;
-      annotations.add(DEPRECATED_ANNOTATION);
-      comments.add("This method has been deprecated, please use method " + builderName + " instead.");
-      comments.add("@return The buildable object.");
       if (isList || isSet) {
         statements.add(new StringStatement("return build(" + property.getName() + ");"));
       } else {
@@ -521,7 +527,7 @@ class ToMethod {
         .withComments(comments)
         .withAnnotations(annotations)
         .withNewModifiers().withPublic().endModifiers()
-        .withName(getterName)
+        .withName(isNested ? builderName : getterName)
         .withReturnType(property.getTypeRef())
         .withArguments(new Property[] {})
         .withNewBlock()
@@ -535,12 +541,6 @@ class ToMethod {
       ClassRef builderRef = Types.isConcrete(unwrapped)
           ? TypeAs.BUILDER_REF.apply((ClassRef) unwrapped)
           : TypeAs.VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped);
-
-      methods.add(new MethodBuilder(getter)
-          .removeFromAnnotations(DEPRECATED_ANNOTATION)
-          .withComments()
-          .withName("build" + property.getNameCapitalized())
-          .build());
 
       if (isList) {
         methods.add(BUILD_INDEXED.method(property, unwrapped));
@@ -585,15 +585,11 @@ class ToMethod {
         targetType.toString(),
         property.getName());
 
-    if (isBuildable) {
-      annotations.add(DEPRECATED_ANNOTATION);
-      comments.add("This method has been deprecated, please use method " + builderName + " instead.");
-    }
     Method getter = new MethodBuilder()
         .withAnnotations(annotations)
         .withComments(comments)
         .withNewModifiers().withPublic().endModifiers()
-        .withName(getterName)
+        .withName(isBuildable ? builderName : getterName)
         .withReturnType(property.getTypeRef())
         .withArguments()
         .withNewBlock()
@@ -613,12 +609,6 @@ class ToMethod {
       ClassRef builderRef = Types.isConcrete(unwrapped)
           ? TypeAs.BUILDER_REF.apply((ClassRef) unwrapped)
           : TypeAs.VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped);
-
-      methods.add(new MethodBuilder(getter)
-          .removeFromAnnotations(DEPRECATED_ANNOTATION)
-          .withComments()
-          .withName(builderName)
-          .build());
 
       methods.add(BUILD_INDEXED.method(property, unwrapped));
       methods.add(BUILD_FIRST.method(property, unwrapped));
@@ -1281,11 +1271,9 @@ class ToMethod {
     String methodNameBase = property.getNameCapitalized();
     String methodName = prefix + methodNameBase;
 
-    String statement = isOptional(baseType)
-        ? "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null  && get" + methodNameBase
-            + "().isPresent() ? get" + methodNameBase + "().get() : new " + builderType.getFullyQualifiedName() + "().build());"
-        : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): new "
-            + builderType.getFullyQualifiedName() + "().build());";
+    String statement = createWithNewStatement(property, methodNameBase,
+        "new " + builderType.getFullyQualifiedName() + "().build()");
+
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withParameters(parameters)
@@ -1331,10 +1319,7 @@ class ToMethod {
     String methodNameBase = property.getNameCapitalized();
     String methodName = prefix + methodNameBase + suffix;
 
-    String statement = isOptional(property.getTypeRef())
-        ? "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null && get" + methodNameBase
-            + "().isPresent() ? get" + methodNameBase + "().get(): item);"
-        : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase + "(): item);";
+    String statement = createWithNewStatement(property, methodNameBase, "item");
 
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
@@ -1465,10 +1450,7 @@ class ToMethod {
     String methodNameBase = property.getNameCapitalized();
     String methodName = prefix + methodNameBase;
 
-    String statement = isOptional(property.getTypeRef())
-        ? "return withNew" + methodNameBase + "Like(get" + methodNameBase + "() != null ? get" + methodNameBase
-            + "().orElse(null) : null);"
-        : "return withNew" + methodNameBase + "Like(get" + methodNameBase + "());";
+    String statement = createWithNewStatement(property, methodNameBase, "null");
 
     Method base = new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
@@ -1537,6 +1519,13 @@ class ToMethod {
     }
     return methods;
   };
+
+  private static String createWithNewStatement(Property property, String methodNameBase, String elseValue) {
+    return "return withNew" + methodNameBase + "Like(java.util.Optional.ofNullable("
+        + getterOrBuildMethodName(property) + "())"
+        + (isOptional(property.getTypeRef()) ? ".flatMap(java.util.function.Function.identity())" : "")
+        + ".orElse(" + elseValue + "));";
+  }
 
   static final Function<Property, Method> AND = new Function<Property, Method>() {
     public Method apply(Property property) {

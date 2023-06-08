@@ -100,8 +100,8 @@ public class Descendants {
 
                 if (isNestingFiltered(property, descendantRef)) {
                   continue;
-                } else if (origin.getName().equals(descendant.getName())
-                    && !origin.getPackageName().equals(descendant.getPackageName())) {
+                } else if (origin != null && (origin.getName().equals(descendant.getName())
+                    && !origin.getPackageName().equals(descendant.getPackageName()))) {
                   //We don't want to have a class that references a descendant with the same name in an other package. It's an extreme case and will not work.
                   continue;
                 }
@@ -159,8 +159,8 @@ public class Descendants {
 
               if (isNestingFiltered(property, descendantRef)) {
                 continue;
-              } else if (origin.getName().equals(descendant.getName())
-                  && !origin.getPackageName().equals(descendant.getPackageName())) {
+              } else if (origin != null && (origin.getName().equals(descendant.getName())
+                  && !origin.getPackageName().equals(descendant.getPackageName()))) {
                 //We don't want to have a class that references a descendant with the same name in an other package. It's an extreme case and will not work.
                 continue;
               }
