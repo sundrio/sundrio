@@ -637,7 +637,7 @@ public class ClazzAs {
         .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
         .append(Strings.join(constructor.getArguments(), new Function<Property, String>() {
           public String apply(Property item) {
-            return "fluent." + Getter.name(item) + "()";
+            return "fluent." + ToMethod.getterOrBuildMethodName(item) + "()";
           }
         }, ","))
         .append(");")
@@ -650,9 +650,8 @@ public class ClazzAs {
         .filter(p -> !constructor.getArguments().stream().anyMatch(a -> a.getName().equals(p.getName()))) //Exclude fields that are set via constructor!
         .forEach(property -> {
           Method setter = Setter.find(item, property);
-          String getterName = Getter.name(property);
-          statements.add(new StringStatement(new StringBuilder().append("buildable.").append(setter.getName())
-              .append("(fluent.").append(getterName).append("());").toString()));
+          statements.add(new StringStatement(new StringBuilder("buildable.").append(setter.getName())
+              .append("(fluent.").append(ToMethod.getterOrBuildMethodName(property)).append("());").toString()));
         });
 
     BuilderContext context = BuilderContextManager.getContext();
