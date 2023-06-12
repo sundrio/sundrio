@@ -32,18 +32,23 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   private final TypeRef typeRef;
   private final String name;
   private final List<String> comments;
+  private final boolean enumConstant;
+  private final boolean synthetic;
 
-  public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, Modifiers modifiers,
-      Map<AttributeKey, Object> attributes) {
+  public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, boolean enumConstant,
+      boolean synthetic, Modifiers modifiers, Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
     this.annotations = annotations;
     this.typeRef = typeRef;
     this.name = name;
     this.comments = comments;
+    this.enumConstant = enumConstant;
+    this.synthetic = synthetic;
   }
 
   public static Property newProperty(TypeRef typeRef, String name) {
-    return new Property(Collections.emptyList(), typeRef, name, Collections.emptyList(), Modifiers.create(), new HashMap<>());
+    return new Property(Collections.emptyList(), typeRef, name, Collections.emptyList(), false, false, Modifiers.create(),
+        new HashMap<>());
   }
 
   public List<AnnotationRef> getAnnotations() {
@@ -60,6 +65,14 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   public List<String> getComments() {
     return this.comments;
+  }
+
+  public boolean isEnumConstant() {
+    return this.enumConstant;
+  }
+
+  public boolean isSynthetic() {
+    return this.synthetic;
   }
 
   public String getNameCapitalized() {
@@ -101,7 +114,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
    * @return the property without any modifiers
    */
   protected Property withoutModiers() {
-    return new Property(annotations, typeRef, name, comments, Modifiers.create(), getAttributes());
+    return new Property(annotations, typeRef, name, comments, enumConstant, synthetic, Modifiers.create(), getAttributes());
   }
 
   /**
@@ -112,7 +125,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
    */
   public Property withErasure() {
     return new Property(annotations, typeRef instanceof TypeParamRef ? ((TypeParamRef) typeRef).withErasure() : typeRef, name,
-        comments, Modifiers.create(), getAttributes());
+        comments, enumConstant, synthetic, Modifiers.create(), getAttributes());
   }
 
   protected String getDefaultValue() {
@@ -145,6 +158,10 @@ public class Property extends ModifierSupport implements Renderable, Commentable
       if (other.typeRef != null)
         return false;
     } else if (!typeRef.equals(other.typeRef))
+      return false;
+    if (enumConstant != other.isEnumConstant())
+      return false;
+    if (synthetic != other.isSynthetic())
       return false;
     return true;
   }

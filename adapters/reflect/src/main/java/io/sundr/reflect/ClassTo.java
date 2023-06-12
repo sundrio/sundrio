@@ -278,9 +278,12 @@ public class ClassTo {
             .filter(c -> !item.equals(c))
             .collect(Collectors.toList()));
       }
+
       properties.add(new PropertyBuilder()
           .withName(field.getName())
           .withModifiers(Modifiers.from(field.getModifiers()))
+          .isEnumConstant(field.isEnumConstant())
+          .isSynthetic(field.isSynthetic())
           .withAnnotations(annotationRefs)
           .withTypeRef(TYPEREF.apply(field.getGenericType()))
           .build());
