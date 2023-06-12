@@ -25,6 +25,10 @@ public class Address {
   private Type type;
 
   enum Type {
-    HOME, WORK
+    HOME, WORK;
+
+    static final Type getDefault() {
+      return HOME;
+    }
   }
 }

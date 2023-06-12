@@ -186,7 +186,9 @@ public abstract class AbstractAdapterTest<T> {
     assertTrue(personType.isPresent());
     personType.ifPresent(p -> {
       assertEquals(Person.class.getName() + ".Type", p.getFullyQualifiedName());
-      Set<String> properties = GetDefinition.of(p).getProperties().stream().map(Property::getName).collect(Collectors.toSet());
+      Set<String> properties = GetDefinition.of(p).getProperties().stream()
+          .filter(prop -> prop.isEnumConstant() && !prop.isSynthetic()).map(Property::getName).collect(Collectors.toSet());
+      assertEquals(8, properties.size());
       assertTrue(properties.contains("O_MINUS"));
     });
 
@@ -201,8 +203,10 @@ public abstract class AbstractAdapterTest<T> {
       assertTrue(addressType.isPresent());
       addressType.ifPresent(a -> {
         assertEquals(Address.class.getName() + ".Type", a.getFullyQualifiedName());
-        Set<String> properties = GetDefinition.of(a).getProperties().stream().map(Property::getName)
+        Set<String> properties = GetDefinition.of(a).getProperties().stream()
+            .filter(prop -> prop.isEnumConstant() && prop.isSynthetic()).map(Property::getName)
             .collect(Collectors.toSet());
+        assertEquals(2, properties.size());
         assertTrue(properties.contains("WORK"));
       });
     });
