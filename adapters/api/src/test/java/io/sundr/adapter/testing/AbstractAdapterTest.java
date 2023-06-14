@@ -204,7 +204,7 @@ public abstract class AbstractAdapterTest<T> {
       addressType.ifPresent(a -> {
         assertEquals(Address.class.getName() + ".Type", a.getFullyQualifiedName());
         Set<String> properties = GetDefinition.of(a).getProperties().stream()
-            .filter(prop -> prop.isEnumConstant() && prop.isSynthetic()).map(Property::getName)
+            .filter(prop -> prop.isEnumConstant() && !prop.isSynthetic()).map(Property::getName)
             .collect(Collectors.toSet());
         assertEquals(2, properties.size());
         assertTrue(properties.contains("WORK"));

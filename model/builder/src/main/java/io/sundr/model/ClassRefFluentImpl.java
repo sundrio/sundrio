@@ -816,9 +816,6 @@ public class ClassRefFluentImpl<A extends ClassRefFluent<A>> extends TypeRefFlue
   }
 
   public String toString() {
-    if (true) {
-      return fullyQualifiedName;
-    }
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     if (fullyQualifiedName != null) {

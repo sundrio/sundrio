@@ -28,6 +28,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     this.withTypeRef(instance.getTypeRef());
     this.withName(instance.getName());
     this.withComments(instance.getComments());
+    this.withEnumConstant(instance.isEnumConstant());
+    this.withSynthetic(instance.isSynthetic());
     this.withModifiers(instance.getModifiers());
     this.withAttributes(instance.getAttributes());
   }
@@ -36,6 +38,8 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
   private VisitableBuilder<? extends TypeRef, ?> typeRef;
   private String name;
   private List<String> comments = new ArrayList<String>();
+  private boolean enumConstant;
+  private boolean synthetic;
 
   public A addToAnnotations(Integer index, AnnotationRef item) {
     if (this.annotations == null) {
@@ -516,6 +520,32 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     return comments != null && !comments.isEmpty();
   }
 
+  public boolean isEnumConstant() {
+    return this.enumConstant;
+  }
+
+  public A withEnumConstant(boolean enumConstant) {
+    this.enumConstant = enumConstant;
+    return (A) this;
+  }
+
+  public Boolean hasEnumConstant() {
+    return true;
+  }
+
+  public boolean isSynthetic() {
+    return this.synthetic;
+  }
+
+  public A withSynthetic(boolean synthetic) {
+    this.synthetic = synthetic;
+    return (A) this;
+  }
+
+  public Boolean hasSynthetic() {
+    return true;
+  }
+
   public boolean equals(Object o) {
     if (this == o)
       return true;
@@ -532,11 +562,15 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
       return false;
     if (comments != null ? !comments.equals(that.comments) : that.comments != null)
       return false;
+    if (enumConstant != that.enumConstant)
+      return false;
+    if (synthetic != that.synthetic)
+      return false;
     return true;
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(annotations, typeRef, name, comments, super.hashCode());
+    return java.util.Objects.hash(annotations, typeRef, name, comments, enumConstant, synthetic, super.hashCode());
   }
 
   public String toString() {
@@ -556,10 +590,22 @@ public class PropertyFluentImpl<A extends PropertyFluent<A>> extends ModifierSup
     }
     if (comments != null && !comments.isEmpty()) {
       sb.append("comments:");
-      sb.append(comments);
+      sb.append(comments + ",");
     }
+    sb.append("enumConstant:");
+    sb.append(enumConstant + ",");
+    sb.append("synthetic:");
+    sb.append(synthetic);
     sb.append("}");
     return sb.toString();
+  }
+
+  public A withEnumConstant() {
+    return withEnumConstant(true);
+  }
+
+  public A withSynthetic() {
+    return withSynthetic(true);
   }
 
   class AnnotationsNestedImpl<N> extends AnnotationRefFluentImpl<PropertyFluent.AnnotationsNested<N>>

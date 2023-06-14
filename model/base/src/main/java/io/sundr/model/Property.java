@@ -46,6 +46,18 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     this.synthetic = synthetic;
   }
 
+  @Deprecated
+  public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, Modifiers modifiers,
+      Map<AttributeKey, Object> attributes) {
+    super(modifiers, attributes);
+    this.annotations = annotations;
+    this.typeRef = typeRef;
+    this.name = name;
+    this.comments = comments;
+    this.enumConstant = false;
+    this.synthetic = false;
+  }
+
   public static Property newProperty(TypeRef typeRef, String name) {
     return new Property(Collections.emptyList(), typeRef, name, Collections.emptyList(), false, false, Modifiers.create(),
         new HashMap<>());

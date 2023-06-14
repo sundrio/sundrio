@@ -182,6 +182,8 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
       properties.add(new PropertyBuilder()
           .withName(field.getName())
           .withModifiers(Modifiers.from(field.getModifiers()))
+          .withEnumConstant(field.isEnumConstant())
+          .withSynthetic(field.isSynthetic())
           .withAnnotations(annotationRefs)
           .withTypeRef(typeToTypeRef.apply(field.getGenericType()))
           .build());
