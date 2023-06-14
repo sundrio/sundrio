@@ -368,7 +368,7 @@ public class ShapesTest {
         .addToShapes(-1, new SquareBuilder()).build();
     assertEquals(1, canvas.getShapes().size());
   }
-  
+
   @Test
   public void testDeprecatedField() throws Exception {
     assertNotNull(CanvasBuilder.class.getMethod("hasCanvasShape").getAnnotation(Deprecated.class));

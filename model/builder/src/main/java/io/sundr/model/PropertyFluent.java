@@ -148,6 +148,22 @@ public interface PropertyFluent<A extends PropertyFluent<A>> extends ModifierSup
 
   public Boolean hasComments();
 
+  public boolean isEnumConstant();
+
+  public A withEnumConstant(boolean enumConstant);
+
+  public Boolean hasEnumConstant();
+
+  public boolean isSynthetic();
+
+  public A withSynthetic(boolean synthetic);
+
+  public Boolean hasSynthetic();
+
+  public A withEnumConstant();
+
+  public A withSynthetic();
+
   public interface AnnotationsNested<N> extends Nested<N>, AnnotationRefFluent<PropertyFluent.AnnotationsNested<N>> {
     public N and();
 

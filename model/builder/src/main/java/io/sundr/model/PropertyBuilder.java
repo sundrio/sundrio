@@ -34,6 +34,8 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
     fluent.withTypeRef(instance.getTypeRef());
     fluent.withName(instance.getName());
     fluent.withComments(instance.getComments());
+    fluent.withEnumConstant(instance.isEnumConstant());
+    fluent.withSynthetic(instance.isSynthetic());
     fluent.withModifiers(instance.getModifiers());
     fluent.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
@@ -49,6 +51,8 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
     this.withTypeRef(instance.getTypeRef());
     this.withName(instance.getName());
     this.withComments(instance.getComments());
+    this.withEnumConstant(instance.isEnumConstant());
+    this.withSynthetic(instance.isSynthetic());
     this.withModifiers(instance.getModifiers());
     this.withAttributes(instance.getAttributes());
     this.validationEnabled = validationEnabled;
@@ -59,7 +63,7 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
 
   public Property build() {
     Property buildable = new Property(fluent.getAnnotations(), fluent.getTypeRef(), fluent.getName(), fluent.getComments(),
-        fluent.getModifiers(), fluent.getAttributes());
+        fluent.isEnumConstant(), fluent.isSynthetic(), fluent.getModifiers(), fluent.getAttributes());
     return buildable;
   }
 

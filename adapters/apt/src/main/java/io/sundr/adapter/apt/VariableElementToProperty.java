@@ -32,6 +32,7 @@ import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
 public class VariableElementToProperty implements Function<VariableElement, Property> {
@@ -53,6 +54,7 @@ public class VariableElementToProperty implements Function<VariableElement, Prop
     String name = variableElement.getSimpleName().toString();
 
     TypeRef type = referenceAdapterFunction.apply(variableElement.asType());
+    boolean isEnum = Types.isEnum(type);
     List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
     for (AnnotationMirror annotationMirror : variableElement.getAnnotationMirrors()) {
       annotations.add(annotationAdapterFunction.apply(annotationMirror));
@@ -62,7 +64,10 @@ public class VariableElementToProperty implements Function<VariableElement, Prop
     List<String> commentList = Strings.isNullOrEmpty(comments) ? new ArrayList<>()
         : Arrays.stream(comments.split(NEWLINE_PATTERN)).map(String::trim).filter(s -> !s.isEmpty())
             .collect(Collectors.toList());
+
     return new PropertyBuilder().withComments(commentList).withName(name).withTypeRef(type).withAnnotations(annotations)
+        .withEnumConstant(isEnum)
+        .withSynthetic(false)
         .withModifiers(Modifiers.from(variableElement.getModifiers())).build();
   }
 
