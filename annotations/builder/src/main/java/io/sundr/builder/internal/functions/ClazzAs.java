@@ -436,8 +436,7 @@ public class ClazzAs {
             .withName("instance").and().addNewArgument().withTypeRef(Types.BOOLEAN_REF)
             .withName("validationEnabled").and()
             .withNewBlock()
-            .addAllToStatements(toInstanceConstructorBody(item, i, "this"))
-            .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
+            .addNewStringStatementStatement("this(this, instance, validationEnabled);")
             .endBlock()
             .build();
 
