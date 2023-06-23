@@ -619,6 +619,10 @@ public class ClazzAs {
       statements.add(new StringStatement("this.fluent = " + fluent + "; "));
     }
 
+    if (hasDefaultConstructor(clazz)) {
+      statements.add(new StringStatement("instance = (instance != null ? instance : new " + clazz.getName() + "());\n"));
+    }
+
     StringBuilder builder = new StringBuilder("if (instance != null) {\n");
 
     for (Property property : constructor.getArguments()) {
