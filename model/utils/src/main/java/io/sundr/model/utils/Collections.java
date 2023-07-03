@@ -205,7 +205,9 @@ public class Collections {
   }
 
   private static Optional<TypeRef> extractArgument(TypeRef type, TypeCast typeCast, int index) {
-    return typeCast.apply(type).map(castType -> castType.getArguments().get(index));
+    return typeCast.apply(type)
+        .filter(castType -> castType.getArguments() != null && castType.getArguments().size() > index)
+        .map(castType -> castType.getArguments().get(index));
   }
 
   /**
