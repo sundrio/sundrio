@@ -23,6 +23,16 @@ import io.sundr.builder.annotations.Buildable;
  * A simple Pojo that demonstrates default fields are preserved
  */
 @Buildable
-public class WithDefaults extends AbstractWithDefaults {
+public abstract class AbstractWithDefaults {
+
+  private String field = "Hello";
+
+  public String getField() {
+    return field;
+  }
+
+  public void setField(String field) {
+    this.field = field;
+  }
 
 }
