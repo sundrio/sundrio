@@ -43,7 +43,6 @@ import static io.sundr.model.utils.Collections.IS_LIST;
 import static io.sundr.model.utils.Collections.IS_MAP;
 import static io.sundr.model.utils.Collections.IS_SET;
 import static io.sundr.model.utils.Collections.LIST;
-import static io.sundr.model.utils.Types.BOOLEAN_REF;
 import static io.sundr.model.utils.Types.N_REF;
 import static io.sundr.model.utils.Types.Q;
 import static io.sundr.model.utils.Types.T_REF;
@@ -447,7 +446,7 @@ class ToMethod {
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
-        .withReturnType(BOOLEAN_REF)
+        .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
         .withArguments()
         .withNewBlock()
         .withStatements(statements)
@@ -539,15 +538,17 @@ class ToMethod {
       if (isList || isSet) {
         methods.add(MatchingType.BUILD.method(property, unwrapped, predicate, builderRef, Collections.emptyList(),
             Collections.emptyList()));
-        methods.add(MatchingType.HAS.method(property, BOOLEAN_REF, predicate, builderRef, Collections.emptyList(),
-            Collections.emptyList()));
+        methods
+            .add(MatchingType.HAS.method(property, Types.PRIMITIVE_BOOLEAN_REF, predicate, builderRef, Collections.emptyList(),
+                Collections.emptyList()));
       }
     } else if (isList) {
       methods.add(GET_INDEXED.method(property, unwrapped));
       methods.add(GET_FIRST.method(property, unwrapped));
       methods.add(GET_LAST.method(property, unwrapped));
       methods.add(MatchingType.GET.method(property, unwrapped, predicate, unwrapped, annotations, Collections.emptyList()));
-      methods.add(MatchingType.HAS.method(property, BOOLEAN_REF, predicate, unwrapped, annotations, Collections.emptyList()));
+      methods.add(MatchingType.HAS.method(property, Types.PRIMITIVE_BOOLEAN_REF, predicate, unwrapped, annotations,
+          Collections.emptyList()));
     }
     return methods;
   });
@@ -605,7 +606,7 @@ class ToMethod {
       methods.add(MatchingType.BUILD.method(property, unwrapped, predicate, builderRef, Collections.emptyList(),
           Collections.emptyList()));
 
-      methods.add(MatchingType.HAS.method(property, BOOLEAN_REF, predicate, builderRef, Collections.emptyList(),
+      methods.add(MatchingType.HAS.method(property, Types.PRIMITIVE_BOOLEAN_REF, predicate, builderRef, Collections.emptyList(),
           Collections.emptyList()));
     }
     return methods;
