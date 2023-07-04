@@ -23,7 +23,7 @@
     <name>Sundrio :: Examples :: Builder :: Hello Lombok</name>
 
     <properties>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     </properties>
 
