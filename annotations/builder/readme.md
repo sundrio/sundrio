@@ -20,6 +20,7 @@ This project provides annotation processors the provide the following features:
 - Support for JDK8 Optional types.
 - Support for generating Pojos and Builders from interfaces.
 - Support generating Builders for 3rd party classes.
+- Support lombok annotations (@Getter, @Setter & @AllArgsConstructor (partially))
 
 #### The builder interface
 All the generated builders implement the `Builder` interface which looks like:
@@ -62,9 +63,24 @@ context of the builder ([see below](#builder-inheritance)).
 
 ### Generating Builders
 
-On any POJO you can add the `@Buildable` annotation on a single
+On any POJO you can add the `@Buildable` annotation on the class or on a single
 constructor. On compile time a builder will get generated that will
 contain methods for all of the constructor arguments (or all properties that have a getter and a setter). 
+
+#### Structural requirements
+
+The fields exposed to the builder need to have:
+
+- getters
+- setters or setable through the `all arguments constructor` or the annotated one.
+
+Fields and constructor arguments need to match exactly. Autoboxing is not supported.
+
+##### Lombok
+
+Getters, setters and cosntructors annotated with lombok are meant to work as of 0.100.1.
+**Note** `@AllArgsConstructor` will be only respsected for class with no superclass.
+
 For example:
 
 ```java
