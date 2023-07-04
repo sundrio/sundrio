@@ -31,6 +31,7 @@
 
     <modules>
       <module>hello-world</module>
+      <module>hello-lombok</module>
       <module>hello-nested</module>
       <module>hello-builder-package</module>
     </modules>
