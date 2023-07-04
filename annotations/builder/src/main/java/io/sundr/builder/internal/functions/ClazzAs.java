@@ -609,7 +609,7 @@ public class ClazzAs {
 
   public static final Function<RichTypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
 
-  private static List<Statement> toInstanceConstructorBody(TypeDef clazz, TypeDef instance, String fluent) {
+  private static List<Statement> toInstanceConstructorBody(RichTypeDef clazz, TypeDef instance, String fluent) {
     Method constructor = findBuildableConstructor(clazz);
     List<Statement> statements = new ArrayList<Statement>();
     final String ref = fluent != null && !fluent.isEmpty() ? fluent : "this";
@@ -638,31 +638,19 @@ public class ClazzAs {
       // }
     }
 
-    TypeDef target = clazz;
-    Set<String> propertiesToIgnore = clazz.hasAttribute(IGNORE_PROPERTIES)
-        ? new HashSet<>(Arrays.asList(clazz.getAttribute(IGNORE_PROPERTIES)))
-        : new HashSet<>();
-
-    //Iterate parent objects and check for properties with setters but not ctor arguments.
-    while (target != null && !Types.OBJECT.equals(target) && BuilderUtils.isRegisteredAsBuildable(target)) { // We want to allow abstract parents marked as buildable
-      for (Property property : target.getProperties()) {
-        if (propertiesToIgnore.contains(property.getName())) {
-          continue;
-        } else if (!hasBuildableConstructorWithArgument(target, property) && Setter.has(target, property)) {
-          Getter.findOptional(instance, property).map(Method::getName).ifPresent(getterName -> {
+    Predicate<Property> propertyFilter = isPropertyApplicable(clazz, false);
+    clazz.getAllProperties().stream()
+        .filter(propertyFilter)
+        .filter(p -> Setter.hasOrInherits(clazz, p))
+        .forEach(property -> {
+          Optional<Method> optionalGetter = Getter.findOptional(instance, property);
+          if (optionalGetter.isPresent()) {
             String withName = "with" + property.getNameCapitalized();
             builder.append("      ").append(ref).append(".").append(withName).append("(instance.")
-                .append(getterName).append("());\n");
-          });
-        }
-      }
+                .append(optionalGetter.map(Method::getName).get()).append("());\n");
+          }
+        });
 
-      if (target.getExtendsList().isEmpty()) {
-        break;
-      }
-      target = BuilderContextManager.getContext().getBuildableRepository()
-          .getBuildable(target.getExtendsList().iterator().next());
-    }
     statements.add(new StringStatement(builder.append("    }").toString()));
     return statements;
   }
