@@ -18,6 +18,10 @@ package io.sundr.model.utils;
 
 import static io.sundr.utils.Strings.capitalizeFirst;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import io.sundr.SundrException;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
@@ -37,14 +41,20 @@ public class Setter {
   public static Method find(TypeDef type, Property property) {
     TypeDef current = type;
     while (current != null && !current.equals(TypeDef.OBJECT)) {
+      // Sort methods by method name length.
+      List<Method> sortedMethods = current.getMethods()
+          .stream()
+          .sorted(Comparator.comparingInt(m -> m.getName().length()))
+          .collect(Collectors.toList());
+
       //1st pass strict
-      for (Method method : current.getMethods()) {
+      for (Method method : sortedMethods) {
         if (isApplicable(method, property, true)) {
           return method;
         }
       }
       //2nd pass relaxed
-      for (Method method : current.getMethods()) {
+      for (Method method : sortedMethods) {
         if (isApplicable(method, property, false)) {
           return method;
         }
@@ -68,14 +78,20 @@ public class Setter {
    * @return The setter method if found. Throws exception if no setter is matched.
    */
   public static Method find(RichTypeDef richType, Property property) {
+    // Sort methods by method name length.
+    List<Method> sortedMethods = richType.getAllMethods()
+        .stream()
+        .sorted(Comparator.comparingInt(m -> m.getName().length()))
+        .collect(Collectors.toList());
+
     //1st pass strict
-    for (Method method : richType.getAllMethods()) {
+    for (Method method : sortedMethods) {
       if (isApplicable(method, property, true)) {
         return method;
       }
     }
     //2nd pass relaxed
-    for (Method method : richType.getAllMethods()) {
+    for (Method method : sortedMethods) {
       if (isApplicable(method, property, false)) {
         return method;
       }
