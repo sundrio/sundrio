@@ -32,6 +32,7 @@
     <modules>
         <module>arrays</module>
         <module>buildable-fields</module>
+        <module>buildable-pojos</module>
         <module>shapes</module>
         <module>shapes-extension</module>
         <module>visitor-filtering</module>
