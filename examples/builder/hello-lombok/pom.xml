@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.sundr</groupId>
     <artifactId>builder-hello-lombok-example</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.100.2</version>
     <name>Sundrio :: Examples :: Builder :: Hello Lombok</name>
 
     <properties>
