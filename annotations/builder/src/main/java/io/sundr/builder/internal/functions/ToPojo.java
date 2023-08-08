@@ -415,7 +415,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     //We can't just rely on what getters are present in the superclass.
     //We NEED to make sure that the superclass constructor arguments are in place and then add everything else.
     for (Property p : arguments) {
-      if (!constructorArgs.contains(p)) {
+      boolean hasMatching = constructorArgs.stream().anyMatch(a -> a.getName().equals(p.getName()));
+      if (!hasMatching) {
         constructorArgs.add(p);
       }
     }
