@@ -53,6 +53,9 @@ public class BuilderContextManager {
             + context.getBuilderPackage() + " already exists.");
       } else if (!generateBuilderPackage.equals(context.getGenerateBuilderPackage())) {
         throw new IllegalStateException("Cannot use different values for generate builder package in a single project.");
+      } else if (validationEnabled && !context.isValidationEnabled()) {
+        context = new BuilderContext(elements, types, generateBuilderPackage, validationEnabled, packageName, inlineables);
+        return context;
       } else {
         return context;
       }

@@ -329,6 +329,7 @@ public class ClazzAs {
           .findFirst();
 
       List<Method> constructors = new ArrayList<Method>();
+      List<Method> basicConstructors = new ArrayList<Method>();
       List<Method> methods = new ArrayList<Method>();
       final List<Property> fields = new ArrayList<Property>();
 
@@ -364,58 +365,10 @@ public class ClazzAs {
           .addNewStringStatementStatement("this.copyInstance(instance);").endBlock()
           .build();
 
-      constructors.add(emptyConstructor);
-      constructors.add(fluentConstructor);
-      constructors.add(instanceAndFluentCosntructor);
-      constructors.add(instanceConstructor);
-
-      if (validationEnabled) {
-        Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF)
-            .withName("validationEnabled").build();
-
-        fields.add(validationEnabledProperty);
-
-        Method validationEnabledConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .addNewArgument().withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and()
-            .withNewBlock()
-            .addToStatements(new StringStatement("this();"), new StringStatement("this.validationEnabled=validationEnabled;"))
-            .endBlock().build();
-
-        Method fluentAndValidationConstructor = new MethodBuilder()
-            .withNewModifiers().withPublic().endModifiers()
-            .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument()
-            .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
-            .addToStatements(new StringStatement("this(fluent);"),
-                new StringStatement("this.validationEnabled=validationEnabled;"))
-            .endBlock().build();
-
-        Method instanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
-            .withNewModifiers().withPublic().endModifiers().addNewArgument()
-            .withTypeRef(fluent).withName("fluent")
-            .and().addNewArgument().withTypeRef(itemRef).withName("instance").and().addNewArgument()
-            .withTypeRef(Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and()
-            .withNewBlock()
-            .addNewStringStatementStatement("this(fluent, instance);")
-            .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
-            .endBlock()
-            .build();
-
-        Method instanceAndValidationEnabledConstructor = new MethodBuilder()
-            .withNewModifiers().withPublic().endModifiers().addNewArgument()
-            .withTypeRef(itemRef)
-            .withName("instance").and().addNewArgument().withTypeRef(Types.PRIMITIVE_BOOLEAN_REF)
-            .withName("validationEnabled").and()
-            .withNewBlock()
-            .addNewStringStatementStatement("this(instance);")
-            .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
-            .endBlock()
-            .build();
-
-        constructors.add(validationEnabledConstructor);
-        constructors.add(fluentAndValidationConstructor);
-        constructors.add(instanceAndFluentAndValidationEnabledCosntructor);
-        constructors.add(instanceAndValidationEnabledConstructor);
-      }
+      basicConstructors.add(emptyConstructor);
+      basicConstructors.add(fluentConstructor);
+      basicConstructors.add(instanceAndFluentCosntructor);
+      basicConstructors.add(instanceConstructor);
 
       buildableInterface.ifPresent(i -> {
         ClassRef buildableInterfaceRef = item.getImplementsList().stream()
@@ -435,36 +388,11 @@ public class ClazzAs {
             .addAllToStatements(toInstanceConstructorBody(item, i, "this")).endBlock()
             .build();
 
-        constructors.add(sourceInstanceAndFluentCosntructor);
-        constructors.add(sourceInstanceConstructor);
-
-        if (validationEnabled) {
-          Method sourceInstanceAndFluentAndValidationEnabledCosntructor = new MethodBuilder()
-              .withNewModifiers().withPublic(validationEnabled).withPrivate(!validationEnabled).endModifiers().addNewArgument()
-              .withTypeRef(fluent).withName("fluent")
-              .and().addNewArgument().withTypeRef(buildableInterfaceRef).withName("instance").and().addNewArgument()
-              .withTypeRef(Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and()
-              .withNewBlock()
-              .addNewStringStatementStatement("this(fluent, instance);")
-              .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
-              .endBlock()
-              .build();
-
-          Method sourceInstanceAndValidationEnabledConstructor = new MethodBuilder()
-              .withNewModifiers().withPublic(validationEnabled).withPrivate(!validationEnabled).endModifiers().addNewArgument()
-              .withTypeRef(buildableInterfaceRef)
-              .withName("instance").and().addNewArgument().withTypeRef(Types.PRIMITIVE_BOOLEAN_REF)
-              .withName("validationEnabled").and()
-              .withNewBlock()
-              .addNewStringStatementStatement("this(instance);")
-              .addNewStringStatementStatement("this.validationEnabled = validationEnabled; ")
-              .endBlock()
-              .build();
-
-          constructors.add(sourceInstanceAndFluentAndValidationEnabledCosntructor);
-          constructors.add(sourceInstanceAndValidationEnabledConstructor);
-        }
+        basicConstructors.add(sourceInstanceAndFluentCosntructor);
+        basicConstructors.add(sourceInstanceConstructor);
       });
+
+      constructors.addAll(basicConstructors);
 
       Method build = new MethodBuilder().withModifiers(Modifiers.from(modifiers)).withReturnType(itemRef)
           .withName("build")
@@ -479,52 +407,45 @@ public class ClazzAs {
       //
 
       if (validationEnabled) {
+        Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF)
+            .withName("validationEnabled").build();
+
+        fields.add(validationEnabledProperty);
+
+        basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
+            .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
+            .addNewStringStatementStatement(
+                c.getArguments().stream().map(Property::getName).collect(Collectors.joining(", ", "this(", ");")))
+            .addNewStringStatementStatement("this.validationEnabled=validationEnabled;").endBlock().build())
+            .forEach(constructors::add);
+
         ClassRef validatorRef = new ClassRefBuilder().withFullyQualifiedName("javax.validation.Validator").build();
 
         Property validatorProperty = new PropertyBuilder().withName("validator").withTypeRef(validatorRef).build();
 
         fields.add(validatorProperty);
-        Method validatorConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .addNewArgument().withTypeRef(validatorRef).withName("validator").and().withNewBlock()
-            .addToStatements(new StringStatement(new Supplier<String>() {
-              @Override
-              public String get() {
-                return hasDefaultConstructor(item) ? "this(new " + item.getName() + "(), true);"
-                    : "this.fluent = this; this.validator=validator; \n this.validationEnabled = validator != null;";
-              }
-            })).endBlock().build();
 
-        Method instanceAndFluentAndValidatorConstructor = new MethodBuilder()
-            .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
-            .and().addNewArgument().withTypeRef(itemRef).withName("instance").and().addNewArgument()
-            .withTypeRef(validatorRef).withName("validator").and()
-            .withNewBlock()
-            .addNewStringStatementStatement("this(fluent, instance);")
-            .addNewStringStatementStatement("this.validator = validator;")
-            .addNewStringStatementStatement("this.validationEnabled = validator != null; ")
-            .endBlock()
-            .build();
+        BuilderContext context = BuilderContextManager.getContext();
+        if (context.isExternalvalidatorSupported()) {
+          basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
+              .withTypeRef(validatorRef).withName("validator").and().withNewBlock()
+              .addNewStringStatementStatement(
+                  c.getArguments().stream().map(Property::getName).collect(Collectors.joining(", ", "this(", ");")))
+              .addNewStringStatementStatement("this.validator=validator;")
+              .addNewStringStatementStatement("this.validationEnabled = validator != null;").endBlock().build())
+              .forEach(constructors::add);
 
-        Method instanceAndValidatorConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .addNewArgument().withTypeRef(itemRef).withName("instance").and().addNewArgument().withTypeRef(validatorRef)
-            .withName("validator").and()
-            .withNewBlock()
-            .addNewStringStatementStatement("this(instance);")
-            .addNewStringStatementStatement("this.validator = validator;")
-            .addNewStringStatementStatement("this.validationEnabled = validator != null; ")
-            .endBlock()
-            .build();
+          Method usingValidator = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
+              .withReturnType(builderRef)
+              .withName("usingValidator")
+              .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
+              .withNewBlock()
+              .addNewStringStatementStatement("return new " + builderRef.getName() + "(this, validator);")
+              .endBlock()
+              .build();
 
-        Method fluentAndValidatorConstructor = new MethodBuilder()
-            .withNewModifiers().withPublic().endModifiers().addNewArgument().withTypeRef(fluent).withName("fluent")
-            .and().addNewArgument()
-            .withTypeRef(validatorRef).withName("validator").and()
-            .withNewBlock()
-            .addNewStringStatementStatement("this.fluent = fluent;")
-            .addNewStringStatementStatement("this.validator = validator;")
-            .addNewStringStatementStatement("this.validationEnabled = validator != null; ")
-            .endBlock()
-            .build();
+          methods.add(usingValidator);
+        }
 
         Method usingValidation = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
             .withReturnType(builderRef)
@@ -534,24 +455,7 @@ public class ClazzAs {
             .endBlock()
             .build();
 
-        Method usingValidator = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .withReturnType(builderRef)
-            .withName("usingValidator")
-            .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
-            .withNewBlock()
-            .addNewStringStatementStatement("return new " + builderRef.getName() + "(this, validator);")
-            .endBlock()
-            .build();
-
-        BuilderContext context = BuilderContextManager.getContext();
         methods.add(usingValidation);
-        if (context.isExternalvalidatorSupported()) {
-          methods.add(usingValidator);
-        }
-        constructors.add(validatorConstructor);
-        constructors.add(instanceAndFluentAndValidatorConstructor);
-        constructors.add(instanceAndValidatorConstructor);
-        constructors.add(fluentAndValidatorConstructor);
       }
 
       return BuilderContextManager.getContext().getDefinitionRepository()
@@ -701,12 +605,15 @@ public class ClazzAs {
         });
 
     BuilderContext context = BuilderContextManager.getContext();
-    if (context.isExternalvalidatorSupported()) {
-      statements.add(new StringStatement(
-          "if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable, validator);}"));
-    } else if (context.isValidationEnabled()) {
-      statements.add(new StringStatement(
-          "if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable);}"));
+    final boolean validationEnabled = item.hasAttribute(VALIDATION_ENABLED) ? item.getAttribute(VALIDATION_ENABLED) : false;
+    if (validationEnabled) {
+      if (context.isExternalvalidatorSupported()) {
+        statements.add(new StringStatement(
+            "if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable, validator);}"));
+      } else {
+        statements.add(new StringStatement(
+            "if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable);}"));
+      }
     }
     statements.add(new StringStatement("return buildable;"));
     return statements;
