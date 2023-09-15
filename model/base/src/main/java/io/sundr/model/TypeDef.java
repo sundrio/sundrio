@@ -481,11 +481,12 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
       sb.append(SEMICOLN).append(NEWLINE).append(indent);
     });
 
+    sb.append(NEWLINE);
     for (Method method : getMethods()) {
       sb.append(method.renderComments(indent));
       sb.append(method.renderAnnotations(indent));
       sb.append(method.render(this));
-      sb.append(NEWLINE).append(indent);
+      sb.append(NEWLINE);
     }
 
     for (TypeDef innerType : innerTypes) {
