@@ -87,7 +87,7 @@ public class AnnotationRef extends AttributeSupport implements Renderable {
     } else if (value instanceof AnnotationRef) {
       return value.toString();
     } else {
-      return DQ + value + DQ;
+      return DQ + value.toString().replaceAll("^\"|\"$", "") + DQ;
     }
   }
 
@@ -120,14 +120,19 @@ public class AnnotationRef extends AttributeSupport implements Renderable {
       sb.append(OP);
       boolean first = true;
 
-      for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-        Object value = entry.getValue();
-        if (first) {
-          first = false;
-        } else {
-          sb.append(SPACE).append(COMA);
+      if (parameters.size() == 1 && parameters.containsKey("value")) {
+        Object value = parameters.get("value");
+        sb.append(toString(value));
+      } else {
+        for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+          Object value = entry.getValue();
+          if (first) {
+            first = false;
+          } else {
+            sb.append(SPACE).append(COMA);
+          }
+          sb.append(entry.getKey()).append(SPACE).append(EQ).append(SPACE).append(toString(value));
         }
-        sb.append(entry.getKey()).append(SPACE).append(EQ).append(SPACE).append(toString(value));
       }
       sb.append(CP);
     }
