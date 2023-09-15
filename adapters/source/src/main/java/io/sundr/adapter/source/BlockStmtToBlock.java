@@ -17,25 +17,36 @@
 
 package io.sundr.adapter.source;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.Statement;
 
 import io.sundr.model.Block;
 import io.sundr.model.BlockBuilder;
+import io.sundr.model.Node;
 import io.sundr.model.StringStatementBuilder;
 
 public class BlockStmtToBlock implements Function<BlockStmt, Block> {
 
   @Override
   public Block apply(BlockStmt block) {
+    List<Statement> statements = block != null && block.getStmts() != null ? block.getStmts() : Collections.emptyList();
+    List<String> lines = new ArrayList<>();
+
+    for (Statement statement : statements) {
+      for (String line : statement.toString().split(Node.NEWLINE_PATTERN)) {
+        lines.add("  " + line);
+      }
+    }
+
     return new BlockBuilder()
-        .withStatements(block != null
-            ? block.getStmts().stream().map(s -> new StringStatementBuilder().withSupplier(() -> s.toString()).build())
-                .collect(Collectors.toList())
-            : Collections.emptyList())
+        .withStatements(
+            lines.stream().map(s -> new StringStatementBuilder().withSupplier(() -> s).build()).collect(Collectors.toList()))
         .build();
   }
 }

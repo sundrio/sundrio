@@ -32,17 +32,16 @@ public interface Commentable extends Node {
   /**
    * Render the comments.
    * 
-   * @param indent the identation to use for the comments
    * @return the rendered comments as a string.
    */
-  default String renderComments(String indent) {
+  default String renderComments() {
     StringBuilder sb = new StringBuilder();
     if (getComments() != null && !getComments().isEmpty()) {
       sb.append(NEWLINE);
-      sb.append(indent).append(OC).append(NEWLINE);
+      sb.append(OC).append(NEWLINE);
       sb.append(
-          getComments().stream().map(line -> indent + CLP + line + NEWLINE).collect(Collectors.joining()));
-      sb.append(indent).append(CC).append(NEWLINE);
+          getComments().stream().map(line -> CLP + line + NEWLINE).collect(Collectors.joining()));
+      sb.append(CC).append(NEWLINE);
     }
     return sb.toString();
   }

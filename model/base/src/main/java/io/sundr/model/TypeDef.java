@@ -437,8 +437,6 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   public String render() {
     StringBuilder tb = new StringBuilder(); // Top StringBuffer: (package and imports).
     StringBuilder sb = new StringBuilder();
-    String indent = outerTypeName == null ? "  " : "    ";
-    String halfIndent = outerTypeName == null ? "" : "  ";
     Collection<ClassRef> references = getReferenceMap().values();
 
     // We only need to render those for the outermost type
@@ -451,51 +449,58 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     }
 
     if (comments != null && !comments.isEmpty()) {
-      sb.append(renderComments(SPACE));
+      sb.append(renderComments());
     }
 
     if (annotations != null && !annotations.isEmpty()) {
-      sb.append(renderAnnotations(indent));
+      sb.append(renderAnnotations());
     }
 
     renderDefinition(sb);
-    sb.append(OB).append(NEWLINE).append(indent);
+    sb.append(OB).append(NEWLINE);
 
     if (kind != Kind.INTERFACE) {
+      StringBuilder cb = new StringBuilder();
       for (Method constructors : getConstructors()) {
-        sb.append(constructors.renderComments(indent));
-        sb.append(constructors.renderAnnotations(indent));
-        sb.append(constructors.render(this));
-        sb.append(NEWLINE).append(indent);
+        cb.append(constructors.renderComments());
+        cb.append(constructors.renderAnnotations());
+        cb.append(constructors.render(this));
+        cb.append(NEWLINE);
       }
+      sb.append(indent(cb.toString()));
     }
 
-    sb.append(NEWLINE);
+    StringBuilder pb = new StringBuilder();
     getProperties().stream().filter(p -> kind != Kind.INTERFACE || p.isStatic()).forEach(field -> {
-      sb.append(field.renderComments(indent));
-      sb.append(field.renderAnnotations(indent));
-      sb.append(field.render(this));
+      pb.append(field.renderComments());
+      pb.append(field.renderAnnotations());
+      pb.append(field.render(this));
       if (field.getAttribute(INIT) != null) {
-        sb.append(" = ").append(field.getDefaultValue());
+        pb.append(" = ").append(field.getDefaultValue());
       }
 
-      sb.append(SEMICOLN).append(NEWLINE).append(indent);
+      pb.append(SEMICOLN).append(NEWLINE);
     });
+    sb.append(indent(pb.toString()));
 
-    sb.append(NEWLINE);
+    StringBuilder mb = new StringBuilder();
+    mb.append(NEWLINE);
     for (Method method : getMethods()) {
-      sb.append(method.renderComments(indent));
-      sb.append(method.renderAnnotations(indent));
-      sb.append(method.render(this));
-      sb.append(NEWLINE);
+      mb.append(method.renderComments());
+      mb.append(method.renderAnnotations());
+      mb.append(method.render(this));
+      mb.append(NEWLINE);
     }
+    sb.append(indent(mb.toString()));
 
+    StringBuilder ib = new StringBuilder();
     for (TypeDef innerType : innerTypes) {
-      sb.append(innerType.render());
-      sb.append(NEWLINE).append(indent);
+      ib.append(innerType.render());
+      ib.append(NEWLINE);
     }
+    sb.append(indent(ib.toString()));
 
-    sb.append(NEWLINE).append(halfIndent).append(CB);
+    sb.append(NEWLINE).append(CB);
     String top = tb.toString();
     String content = sb.toString();
     for (ClassRef ref : references) {

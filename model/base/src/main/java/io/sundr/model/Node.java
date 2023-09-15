@@ -18,11 +18,14 @@ package io.sundr.model;
 
 public interface Node {
 
+  String INDENT = "  ";
+
   String DOT = ".";
   String COMA = ",";
   String SEMICOLN = ";";
   String SPACE = " ";
   String NEWLINE = "\n";
+  String NEWLINE_PATTERN = "\n|\r";
 
   String AT = "@";
 
@@ -55,4 +58,11 @@ public interface Node {
   String JAVA_LANG_OBJECT = "java.lang.Object";
   String JAVA_LANG_ENUM = "java.lang.Enum";
 
+  default String indent(String s) {
+    StringBuilder sb = new StringBuilder();
+    for (String line : s.split(NEWLINE_PATTERN)) {
+      sb.append(INDENT).append(line).append(NEWLINE);
+    }
+    return sb.toString();
+  }
 }
