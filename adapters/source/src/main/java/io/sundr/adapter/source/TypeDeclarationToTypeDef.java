@@ -117,7 +117,14 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           for (VariableDeclarator var : fieldDeclaration.getVariables()) {
             TypeRef fieldDeclRef = typeToTypeRef.apply(fieldDeclaration.getType());
             TypeRef typeRef = checkAgainstTypeParamRef(fieldDeclRef, parameters);
+
+            List<AnnotationRef> fieldAnnotations = new ArrayList<AnnotationRef>();
+            for (AnnotationExpr annotationExpressions : fieldDeclaration.getAnnotations()) {
+              fieldAnnotations.add(ANNOTATIONREF.apply(annotationExpressions));
+            }
+
             properties.add(new PropertyBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
+                .withAnnotations(fieldAnnotations)
                 .withModifiers(Modifiers.from(fieldDeclaration.getModifiers()))
                 .addToAttributes(Attributeable.INIT, var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
                 .build());

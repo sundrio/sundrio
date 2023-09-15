@@ -470,6 +470,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
       }
     }
 
+    sb.append(NEWLINE);
     getProperties().stream().filter(p -> kind != Kind.INTERFACE || p.isStatic()).forEach(field -> {
       sb.append(field.renderComments(indent));
       sb.append(field.renderAnnotations(indent));
