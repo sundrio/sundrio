@@ -27,15 +27,13 @@ public interface Annotatable extends Node {
   /**
    * Render the annotations.
    * 
-   * @param indent the indentation to use for rendering the annotations
    * @return the rendered annotations.
    */
-  default String renderAnnotations(String indent) {
+  default String renderAnnotations() {
     StringBuilder sb = new StringBuilder();
     if (getAnnotations() != null && !getAnnotations().isEmpty()) {
       sb.append(
-          getAnnotations().stream().map(Renderable::render).map(line -> indent + line + NEWLINE).collect(Collectors.joining()));
-      sb.append(indent); //This one is to make sure that lines with annotations are aligned with the rest
+          getAnnotations().stream().map(Renderable::render).map(line -> line + NEWLINE).collect(Collectors.joining()));
     }
     return sb.toString();
   }

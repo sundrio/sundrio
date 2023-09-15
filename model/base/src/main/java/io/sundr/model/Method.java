@@ -281,12 +281,11 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
         || (enclosingType != null && enclosingType.getKind() != Kind.INTERFACE);
 
     if (renderBody) {
-      String indent = enclosingType != null && enclosingType.getOuterTypeName() != null ? "    " : "  ";
       sb.append(SPACE).append(OB).append(NEWLINE);
       if (getBlock() != null) {
-        sb.append(getBlock().getStatements().stream().map(s -> indent + "  " + s + NEWLINE).collect(Collectors.joining()));
+        sb.append(getBlock().getStatements().stream().map(s -> INDENT + s + NEWLINE).collect(Collectors.joining()));
       }
-      sb.append(indent).append(CB);
+      sb.append(CB).append(NEWLINE);
     } else {
       sb.append(SEMICOLN);
     }
