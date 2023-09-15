@@ -17,10 +17,15 @@
 
 package io.sundr.adapter.source;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.MemberValuePair;
+import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
@@ -33,7 +38,23 @@ public class AnnotationExprToAnnotationRef implements Function<AnnotationExpr, A
   public AnnotationRef apply(AnnotationExpr annotation) {
     String name = annotation.getName().getName();
     String packageName = PACKAGENAME.apply(annotation);
+    Map<String, Object> parameters = new HashMap<>();
+
+    if (annotation instanceof SingleMemberAnnotationExpr) {
+      SingleMemberAnnotationExpr single = (SingleMemberAnnotationExpr) annotation;
+      String key = "value";
+      Object value = single.getMemberValue().toString();
+      parameters.put(key, value);
+    } else if (annotation instanceof NormalAnnotationExpr) {
+      NormalAnnotationExpr normal = (NormalAnnotationExpr) annotation;
+      for (MemberValuePair pair : normal.getPairs()) {
+        String key = pair.getName().toString();
+        Object value = pair.getData();
+        parameters.put(key, value);
+      }
+    }
     return new AnnotationRefBuilder().withNewClassRef().withFullyQualifiedName(packageName + "." + name).endClassRef()
+        .withParameters(parameters)
         .build();
   }
 }
