@@ -36,7 +36,7 @@
       </dependency>
       <dependency>
         <groupId>io.sundr</groupId>
-        <artifactId>sundr-model-utils</artifactId>
+        <artifactId>sundr-model-repo</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -56,18 +56,6 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-jar-plugin</artifactId>
-              <version>${maven-jar-plugin.version}</version>
-              <executions>
-                <execution>
-                  <goals>
-                    <goal>test-jar</goal>
-                  </goals>
-                </execution>
-              </executions>
             </plugin>
         </plugins>
     </build>

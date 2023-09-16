@@ -30,6 +30,7 @@
 
     <modules>
       <module>api</module>
+      <module>testing</module>
       <module>reflect</module>
       <module>apt</module>
       <module>source</module>

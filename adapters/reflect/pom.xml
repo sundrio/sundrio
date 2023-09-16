@@ -42,7 +42,7 @@
 
       <dependency>
         <groupId>io.sundr</groupId>
-        <artifactId>sundr-adapter-api</artifactId>
+        <artifactId>sundr-adapter-testing</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
         <scope>test</scope>

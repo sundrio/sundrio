@@ -25,15 +25,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.sundr</groupId>
-    <artifactId>sundr-adapter-apt</artifactId>
-    <name>Sundrio :: Adapters :: APT</name>
+    <artifactId>sundr-adapter-testing</artifactId>
+    <name>Sundrio :: Adapters :: Testing</name>
 
     <dependencies>
-      <dependency>
-        <groupId>io.sundr</groupId>
-        <artifactId>sundr-model-utils</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <dependency>
         <groupId>io.sundr</groupId>
         <artifactId>sundr-adapter-api</artifactId>
@@ -42,10 +37,8 @@
 
       <dependency>
         <groupId>io.sundr</groupId>
-        <artifactId>sundr-adapter-testing</artifactId>
+        <artifactId>sundr-model-utils</artifactId>
         <version>${project.version}</version>
-        <classifier>tests</classifier>
-        <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -53,13 +46,6 @@
         <artifactId>junit</artifactId>
         <scope>test</scope>
       </dependency>
-
-      <dependency>
-        <groupId>com.google.testing.compile</groupId>
-        <artifactId>compile-testing</artifactId>
-        <scope>test</scope>
-      </dependency>
-
     </dependencies>
 
     <build>
@@ -67,11 +53,23 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>${maven-jar-plugin.version}</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>test-jar</goal>
+                  </goals>
+                </execution>
+              </executions>
             </plugin>
         </plugins>
     </build>
