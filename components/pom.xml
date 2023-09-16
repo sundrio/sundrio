@@ -31,5 +31,6 @@
 
     <modules>
         <module>swagger</module>
+        <module>jakarta</module>
     </modules>
 </project>
