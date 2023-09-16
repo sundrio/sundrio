@@ -20,6 +20,8 @@ package io.sundr.model;
 import java.util.List;
 import java.util.Map;
 
+import io.sundr.model.utils.TypeArguments;
+
 public class RichTypeDef extends TypeDef {
 
   private final List<Property> allProperties;
@@ -41,6 +43,10 @@ public class RichTypeDef extends TypeDef {
     this.allProperties = allProperties;
     this.allConstructors = allConstructors;
     this.allMethods = allMethods;
+  }
+
+  public static RichTypeDef createFrom(TypeDef typeDef) {
+    return TypeArguments.apply(typeDef);
   }
 
   public List<Property> getAllProperties() {
