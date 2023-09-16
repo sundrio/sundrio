@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class AnnotationRef extends AttributeSupport implements Renderable {
@@ -87,7 +88,10 @@ public class AnnotationRef extends AttributeSupport implements Renderable {
     } else if (value instanceof AnnotationRef) {
       return value.toString();
     } else {
-      return DQ + value + DQ;
+      return DQ + value.toString()
+          .replaceAll("^" + Pattern.quote(DQ), "")
+          .replaceAll(Pattern.quote(DQ) + "$", "")
+          + DQ;
     }
   }
 
@@ -122,7 +126,7 @@ public class AnnotationRef extends AttributeSupport implements Renderable {
 
       if (parameters.size() == 1 && parameters.containsKey("value")) {
         Object value = parameters.get("value");
-        sb.append(value);
+        sb.append(toString(value));
       } else {
         for (Map.Entry<String, Object> entry : parameters.entrySet()) {
           Object value = entry.getValue();

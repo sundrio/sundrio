@@ -16,6 +16,8 @@
 
 package io.sundr.codegen.velocity.directives;
 
+import static io.sundr.utils.Strings.indent;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -83,10 +85,10 @@ public class MethodDirective extends Directive {
       String onetab = tab(level * 4);
       String twotabs = tab((level + 1) * 4);
       if (!method.getAnnotations().isEmpty()) {
-        writer.append(onetab).append(method.renderAnnotations(onetab));
+        writer.append(onetab).append(indent(onetab, method.renderAnnotations()));
       }
       if (!method.getComments().isEmpty()) {
-        writer.append(onetab).append(method.renderComments(onetab));
+        writer.append(onetab).append(indent(onetab, method.renderComments()));
       }
       writer.append(onetab).append(method.renderDefinition(DefinitionScope.get()));
       List<String> lines = getLines(block);
