@@ -41,6 +41,9 @@ public final class Strings {
       "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", "void", "class", "finally", "long",
       "strictfp", "volatile", "const", "float", "native", "super", "while");
 
+  private static String NEWLINE = "\n";
+  private static String NEWLINE_PATTERN = "\n|\r";
+
   public static final class ToString<X> implements Function<X, String> {
     public String apply(X item) {
       return String.valueOf(item);
@@ -292,5 +295,13 @@ public final class Strings {
     }
 
     return candidate;
+  }
+
+  public static String indent(String indent, String s) {
+    StringBuilder sb = new StringBuilder();
+    for (String line : s.split(NEWLINE_PATTERN)) {
+      sb.append(indent).append(line).append(NEWLINE);
+    }
+    return sb.toString();
   }
 }

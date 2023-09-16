@@ -16,6 +16,8 @@
 
 package io.sundr.codegen.velocity.directives;
 
+import static io.sundr.utils.Strings.indent;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -92,10 +94,10 @@ public class ClassDirective extends Directive {
   private void writeClazz(Writer writer, TypeDef type, String block) throws IOException {
     if (type != null) {
       if (!type.getAnnotations().isEmpty()) {
-        writer.append("  ").append(type.renderAnnotations("  "));
+        writer.append("  ").append(indent("  ", type.renderAnnotations()));
       }
       if (!type.getComments().isEmpty()) {
-        writer.append("  ").append(type.renderComments("  "));
+        writer.append("  ").append(indent("  ", type.renderComments()));
       }
 
       writer.append(type.renderDefinition());
