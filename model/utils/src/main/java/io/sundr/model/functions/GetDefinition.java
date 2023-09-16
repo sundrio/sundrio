@@ -17,8 +17,11 @@
 
 package io.sundr.model.functions;
 
+import java.util.Optional;
 import java.util.function.Function;
 
+import io.sundr.adapter.api.AdapterContext;
+import io.sundr.adapter.api.TypeLookup;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Nameable;
 import io.sundr.model.TypeDef;
@@ -40,20 +43,17 @@ public class GetDefinition implements Function<ClassRef, TypeDef> {
   @Override
   public TypeDef apply(ClassRef t) {
     String fullyQualifiedName = t.getFullyQualifiedName();
-    TypeDef def = DefinitionRepository.getRepository().getDefinition(fullyQualifiedName);
-    if (def != null) {
-      return def;
-    }
+    return Optional.ofNullable(DefinitionRepository.getRepository().getDefinition(fullyQualifiedName))
+        .orElseGet(() -> TypeLookup.lookup(fullyQualifiedName, AdapterContext.getContext()).orElseGet(() -> {
+          String packageName = Nameable.getPackageName(fullyQualifiedName);
+          String className = Nameable.getClassName(fullyQualifiedName);
+          String outerTypeName = Nameable.getOuterTypeName(fullyQualifiedName);
 
-    String packageName = Nameable.getPackageName(fullyQualifiedName);
-    String className = Nameable.getClassName(fullyQualifiedName);
-    String outerTypeName = Nameable.getOuterTypeName(fullyQualifiedName);
-
-    return new TypeDefBuilder()
-        .withName(className)
-        .withPackageName(packageName)
-        .withOuterTypeName(outerTypeName)
-        .build();
+          return new TypeDefBuilder()
+              .withName(className)
+              .withPackageName(packageName)
+              .withOuterTypeName(outerTypeName)
+              .build();
+        }));
   }
-
 }
