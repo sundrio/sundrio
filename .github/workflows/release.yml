@@ -15,7 +15,7 @@ jobs:
     name: release
     strategy:
       matrix:
-        java: [8]
+        java: [11]
         profile: [normal]
     if: ${{github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true}}
     steps:
@@ -31,7 +31,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 11 
           distribution: 'temurin'
           server-id: oss-sonatype-staging
           server-username: OSS_SONATYPE_USERNAME

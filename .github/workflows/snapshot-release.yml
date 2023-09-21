@@ -16,7 +16,7 @@ jobs:
     name: release
     strategy:
       matrix:
-        java: [8]
+        java: [11]
         profile: [normal]
     steps:
       - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 11
           distribution: 'temurin'
           server-id: oss-sonatype-snapshots
           server-username: OSS_SONATYPE_USERNAME
