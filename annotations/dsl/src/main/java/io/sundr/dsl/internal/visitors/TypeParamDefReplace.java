@@ -35,7 +35,7 @@ public class TypeParamDefReplace implements Visitor<TypeDefBuilder> {
 
   public void visit(TypeDefBuilder builder) {
     List<TypeParamDef> updated = new ArrayList<TypeParamDef>();
-    for (TypeParamDef parameter : builder.getParameters()) {
+    for (TypeParamDef parameter : builder.buildParameters()) {
       if (parameter.equals(target)) {
         updated.add(replacement);
       } else {

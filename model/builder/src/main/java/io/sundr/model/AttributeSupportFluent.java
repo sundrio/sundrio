@@ -1,27 +1,117 @@
 package io.sundr.model;
 
-import java.lang.Boolean;
 import java.lang.Object;
+import java.lang.String;
+import java.lang.SuppressWarnings;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.sundr.builder.Fluent;
+import io.sundr.builder.BaseFluent;
 
 /**
  * Generated
  */
-public interface AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends Fluent<A> {
-  public A addToAttributes(AttributeKey key, Object value);
+@SuppressWarnings("unchecked")
+public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends BaseFluent<A> {
+  public AttributeSupportFluent() {
+  }
 
-  public A addToAttributes(Map<AttributeKey, Object> map);
+  public AttributeSupportFluent(AttributeSupport instance) {
+    if (instance != null) {
+      this.withAttributes(instance.getAttributes());
+    }
+  }
 
-  public A removeFromAttributes(AttributeKey key);
+  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
 
-  public A removeFromAttributes(Map<AttributeKey, Object> map);
+  public A addToAttributes(AttributeKey key, Object value) {
+    if (this.attributes == null && key != null && value != null) {
+      this.attributes = new LinkedHashMap();
+    }
+    if (key != null && value != null) {
+      this.attributes.put(key, value);
+    }
+    return (A) this;
+  }
 
-  public Map<AttributeKey, Object> getAttributes();
+  public A addToAttributes(Map<AttributeKey, Object> map) {
+    if (this.attributes == null && map != null) {
+      this.attributes = new LinkedHashMap();
+    }
+    if (map != null) {
+      this.attributes.putAll(map);
+    }
+    return (A) this;
+  }
 
-  public <K, V> A withAttributes(Map<AttributeKey, Object> attributes);
+  public A removeFromAttributes(AttributeKey key) {
+    if (this.attributes == null) {
+      return (A) this;
+    }
+    if (key != null && this.attributes != null) {
+      this.attributes.remove(key);
+    }
+    return (A) this;
+  }
 
-  public Boolean hasAttributes();
+  public A removeFromAttributes(Map<AttributeKey, Object> map) {
+    if (this.attributes == null) {
+      return (A) this;
+    }
+    if (map != null) {
+      for (Object key : map.keySet()) {
+        if (this.attributes != null) {
+          this.attributes.remove(key);
+        }
+      }
+    }
+    return (A) this;
+  }
+
+  public Map<AttributeKey, Object> getAttributes() {
+    return this.attributes;
+  }
+
+  public <K, V> A withAttributes(Map<AttributeKey, Object> attributes) {
+    if (attributes == null) {
+      this.attributes = null;
+    } else {
+      this.attributes = new LinkedHashMap(attributes);
+    }
+    return (A) this;
+  }
+
+  public boolean hasAttributes() {
+    return this.attributes != null;
+  }
+
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    AttributeSupportFluent that = (AttributeSupportFluent) o;
+    if (!java.util.Objects.equals(attributes, that.attributes))
+      return false;
+
+    return true;
+  }
+
+  public int hashCode() {
+    return java.util.Objects.hash(attributes, super.hashCode());
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (attributes != null && !attributes.isEmpty()) {
+      sb.append("attributes:");
+      sb.append(attributes);
+    }
+    sb.append("}");
+    return sb.toString();
+  }
 
 }

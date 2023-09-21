@@ -4,8 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
-    implements VisitableBuilder<ClassRef, ClassRefBuilder> {
+public class ClassRefBuilder extends ClassRefFluent<ClassRefBuilder> implements VisitableBuilder<ClassRef, ClassRefBuilder> {
   public ClassRefBuilder() {
     this(false);
   }
@@ -30,10 +29,12 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
 
   public ClassRefBuilder(ClassRefFluent<?> fluent, ClassRef instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withFullyQualifiedName(instance.getFullyQualifiedName());
-    fluent.withDimensions(instance.getDimensions());
-    fluent.withArguments(instance.getArguments());
-    fluent.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      fluent.withFullyQualifiedName(instance.getFullyQualifiedName());
+      fluent.withDimensions(instance.getDimensions());
+      fluent.withArguments(instance.getArguments());
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -43,10 +44,12 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
 
   public ClassRefBuilder(ClassRef instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withFullyQualifiedName(instance.getFullyQualifiedName());
-    this.withDimensions(instance.getDimensions());
-    this.withArguments(instance.getArguments());
-    this.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      this.withFullyQualifiedName(instance.getFullyQualifiedName());
+      this.withDimensions(instance.getDimensions());
+      this.withArguments(instance.getArguments());
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -54,7 +57,7 @@ public class ClassRefBuilder extends ClassRefFluentImpl<ClassRefBuilder>
   Boolean validationEnabled;
 
   public ClassRef build() {
-    ClassRef buildable = new ClassRef(fluent.getFullyQualifiedName(), fluent.getDimensions(), fluent.getArguments(),
+    ClassRef buildable = new ClassRef(fluent.getFullyQualifiedName(), fluent.getDimensions(), fluent.buildArguments(),
         fluent.getAttributes());
     return buildable;
   }

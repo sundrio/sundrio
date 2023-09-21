@@ -35,7 +35,7 @@ public class TypeArgumentReplace implements Visitor<ClassRefBuilder> {
 
   public void visit(ClassRefBuilder builder) {
     List<TypeRef> updated = new ArrayList<TypeRef>();
-    for (TypeRef typeArgument : builder.getArguments()) {
+    for (TypeRef typeArgument : builder.buildArguments()) {
       if (typeArgument.equals(target)) {
         updated.add(replacement);
       } else {

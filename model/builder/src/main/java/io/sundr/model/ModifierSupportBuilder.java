@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSupportBuilder>
+public class ModifierSupportBuilder extends ModifierSupportFluent<ModifierSupportBuilder>
     implements VisitableBuilder<ModifierSupport, ModifierSupportBuilder> {
   public ModifierSupportBuilder() {
     this(false);
@@ -30,8 +30,10 @@ public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSu
 
   public ModifierSupportBuilder(ModifierSupportFluent<?> fluent, ModifierSupport instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withModifiers(instance.getModifiers());
-    fluent.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      fluent.withModifiers(instance.getModifiers());
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -41,8 +43,10 @@ public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSu
 
   public ModifierSupportBuilder(ModifierSupport instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withModifiers(instance.getModifiers());
-    this.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      this.withModifiers(instance.getModifiers());
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -50,7 +54,7 @@ public class ModifierSupportBuilder extends ModifierSupportFluentImpl<ModifierSu
   Boolean validationEnabled;
 
   public ModifierSupport build() {
-    ModifierSupport buildable = new ModifierSupport(fluent.getModifiers(), fluent.getAttributes());
+    ModifierSupport buildable = new ModifierSupport(fluent.buildModifiers(), fluent.getAttributes());
     return buildable;
   }
 

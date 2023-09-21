@@ -17,7 +17,7 @@
 
 package io.sundr.model;
 
-public interface Renderable {
+public interface Renderable extends Node {
 
   /**
    * Render the type into a {@link String} for the purpose of code generation.
@@ -43,5 +43,24 @@ public interface Renderable {
    */
   default String render(TypeDef enclosingType) {
     return toString();
+  }
+
+  /**
+   * Render the specified content adding a tab as indentation for each line.
+   * Tab does not refer to the actual tab character but to two space characters.
+   * Thing of it as tab size 2 and expand tab to spaces.
+   * 
+   * @param content one or more lines
+   * @return the indented String
+   **/
+  default String tab(String... content) {
+    StringBuilder sb = new StringBuilder();
+    for (String c : content) {
+      String[] lines = c.split(NEWLINE_PATTERN);
+      for (String line : lines) {
+        sb.append(INDENT).append(line).append(NEWLINE);
+      }
+    }
+    return sb.toString();
   }
 }

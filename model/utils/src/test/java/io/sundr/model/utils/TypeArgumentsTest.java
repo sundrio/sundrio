@@ -22,7 +22,6 @@ import static io.sundr.model.utils.Collections.K;
 import static io.sundr.model.utils.Collections.V;
 import static io.sundr.model.utils.Types.OPTIONAL;
 import static io.sundr.model.utils.Types.STRING_REF;
-import static io.sundr.model.utils.Types.VOID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -176,7 +175,7 @@ public class TypeArgumentsTest {
 
             .addNewMethod().withName("get" + Strings.capitalizeFirst(name)).withReturnType(type).endMethod()
 
-            .addNewMethod().withName("set" + Strings.capitalizeFirst(name)).withVoidRefReturnType(VOID)
+            .addNewMethod().withName("set" + Strings.capitalizeFirst(name)).withNewVoidRefReturnType().endVoidRefReturnType()
             .addNewArgument().withTypeRef(type).withName(name).endArgument().endMethod();
       }
     };

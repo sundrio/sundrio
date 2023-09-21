@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder>
+public class WildcardRefBuilder extends WildcardRefFluent<WildcardRefBuilder>
     implements VisitableBuilder<WildcardRef, WildcardRefBuilder> {
   public WildcardRefBuilder() {
     this(false);
@@ -28,9 +28,13 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
 
   public WildcardRefBuilder(WildcardRefFluent<?> fluent, WildcardRef instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withBoundKind(instance.getBoundKind());
-    fluent.withBounds(instance.getBounds());
-    fluent.withAttributes(instance.getAttributes());
+    instance = (instance != null ? instance : new WildcardRef());
+
+    if (instance != null) {
+      fluent.withBoundKind(instance.getBoundKind());
+      fluent.withBounds(instance.getBounds());
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -40,9 +44,13 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
 
   public WildcardRefBuilder(WildcardRef instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withBoundKind(instance.getBoundKind());
-    this.withBounds(instance.getBounds());
-    this.withAttributes(instance.getAttributes());
+    instance = (instance != null ? instance : new WildcardRef());
+
+    if (instance != null) {
+      this.withBoundKind(instance.getBoundKind());
+      this.withBounds(instance.getBounds());
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -50,7 +58,7 @@ public class WildcardRefBuilder extends WildcardRefFluentImpl<WildcardRefBuilder
   Boolean validationEnabled;
 
   public WildcardRef build() {
-    WildcardRef buildable = new WildcardRef(fluent.getBoundKind(), fluent.getBounds(), fluent.getAttributes());
+    WildcardRef buildable = new WildcardRef(fluent.getBoundKind(), fluent.buildBounds(), fluent.getAttributes());
     return buildable;
   }
 

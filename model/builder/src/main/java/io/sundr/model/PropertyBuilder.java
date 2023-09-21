@@ -4,8 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
-    implements VisitableBuilder<Property, PropertyBuilder> {
+public class PropertyBuilder extends PropertyFluent<PropertyBuilder> implements VisitableBuilder<Property, PropertyBuilder> {
   public PropertyBuilder() {
     this(false);
   }
@@ -30,14 +29,16 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
 
   public PropertyBuilder(PropertyFluent<?> fluent, Property instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withAnnotations(instance.getAnnotations());
-    fluent.withTypeRef(instance.getTypeRef());
-    fluent.withName(instance.getName());
-    fluent.withComments(instance.getComments());
-    fluent.withEnumConstant(instance.isEnumConstant());
-    fluent.withSynthetic(instance.isSynthetic());
-    fluent.withModifiers(instance.getModifiers());
-    fluent.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      fluent.withAnnotations(instance.getAnnotations());
+      fluent.withTypeRef(instance.getTypeRef());
+      fluent.withName(instance.getName());
+      fluent.withComments(instance.getComments());
+      fluent.withEnumConstant(instance.isEnumConstant());
+      fluent.withSynthetic(instance.isSynthetic());
+      fluent.withModifiers(instance.getModifiers());
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -47,14 +48,16 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
 
   public PropertyBuilder(Property instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withAnnotations(instance.getAnnotations());
-    this.withTypeRef(instance.getTypeRef());
-    this.withName(instance.getName());
-    this.withComments(instance.getComments());
-    this.withEnumConstant(instance.isEnumConstant());
-    this.withSynthetic(instance.isSynthetic());
-    this.withModifiers(instance.getModifiers());
-    this.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      this.withAnnotations(instance.getAnnotations());
+      this.withTypeRef(instance.getTypeRef());
+      this.withName(instance.getName());
+      this.withComments(instance.getComments());
+      this.withEnumConstant(instance.isEnumConstant());
+      this.withSynthetic(instance.isSynthetic());
+      this.withModifiers(instance.getModifiers());
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -62,8 +65,8 @@ public class PropertyBuilder extends PropertyFluentImpl<PropertyBuilder>
   Boolean validationEnabled;
 
   public Property build() {
-    Property buildable = new Property(fluent.getAnnotations(), fluent.getTypeRef(), fluent.getName(), fluent.getComments(),
-        fluent.isEnumConstant(), fluent.isSynthetic(), fluent.getModifiers(), fluent.getAttributes());
+    Property buildable = new Property(fluent.buildAnnotations(), fluent.buildTypeRef(), fluent.getName(), fluent.getComments(),
+        fluent.isEnumConstant(), fluent.isSynthetic(), fluent.buildModifiers(), fluent.getAttributes());
     return buildable;
   }
 

@@ -1,10 +1,11 @@
 package io.sundr.model;
 
-import java.lang.Boolean;
-import java.lang.Deprecated;
-import java.lang.Integer;
+import java.lang.Object;
 import java.lang.String;
+import java.lang.SuppressWarnings;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -13,71 +14,288 @@ import io.sundr.builder.Nested;
 /**
  * Generated
  */
-public interface TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends AttributeSupportFluent<A> {
-  public String getName();
+@SuppressWarnings("unchecked")
+public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends AttributeSupportFluent<A> {
+  public TypeParamDefFluent() {
+  }
 
-  public A withName(String name);
+  public TypeParamDefFluent(TypeParamDef instance) {
+    if (instance != null) {
+      this.withName(instance.getName());
+      this.withBounds(instance.getBounds());
+      this.withAttributes(instance.getAttributes());
+    }
+  }
 
-  public Boolean hasName();
+  private String name;
+  private ArrayList<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
 
-  public A addToBounds(Integer index, ClassRef item);
+  public String getName() {
+    return this.name;
+  }
 
-  public A setToBounds(Integer index, ClassRef item);
+  public A withName(String name) {
+    this.name = name;
+    return (A) this;
+  }
 
-  public A addToBounds(io.sundr.model.ClassRef... items);
+  public boolean hasName() {
+    return this.name != null;
+  }
 
-  public A addAllToBounds(Collection<ClassRef> items);
+  public A addToBounds(int index, ClassRef item) {
+    if (this.bounds == null) {
+      this.bounds = new ArrayList<ClassRefBuilder>();
+    }
+    ClassRefBuilder builder = new ClassRefBuilder(item);
+    if (index < 0 || index >= bounds.size()) {
+      _visitables.get("bounds").add(builder);
+      bounds.add(builder);
+    } else {
+      _visitables.get("bounds").add(index, builder);
+      bounds.add(index, builder);
+    }
+    return (A) this;
+  }
 
-  public A removeFromBounds(io.sundr.model.ClassRef... items);
+  public A setToBounds(int index, ClassRef item) {
+    if (this.bounds == null) {
+      this.bounds = new ArrayList<ClassRefBuilder>();
+    }
+    ClassRefBuilder builder = new ClassRefBuilder(item);
+    if (index < 0 || index >= bounds.size()) {
+      _visitables.get("bounds").add(builder);
+      bounds.add(builder);
+    } else {
+      _visitables.get("bounds").set(index, builder);
+      bounds.set(index, builder);
+    }
+    return (A) this;
+  }
 
-  public A removeAllFromBounds(Collection<ClassRef> items);
+  public A addToBounds(io.sundr.model.ClassRef... items) {
+    if (this.bounds == null) {
+      this.bounds = new ArrayList<ClassRefBuilder>();
+    }
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").add(builder);
+      this.bounds.add(builder);
+    }
+    return (A) this;
+  }
 
-  public A removeMatchingFromBounds(Predicate<ClassRefBuilder> predicate);
+  public A addAllToBounds(Collection<ClassRef> items) {
+    if (this.bounds == null) {
+      this.bounds = new ArrayList<ClassRefBuilder>();
+    }
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").add(builder);
+      this.bounds.add(builder);
+    }
+    return (A) this;
+  }
 
-  /**
-   * This method has been deprecated, please use method buildBounds instead.
-   * 
-   * @return The buildable object.
-   */
-  @Deprecated
-  public List<ClassRef> getBounds();
+  public A removeFromBounds(io.sundr.model.ClassRef... items) {
+    if (this.bounds == null)
+      return (A) this;
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").remove(builder);
+      this.bounds.remove(builder);
+    }
+    return (A) this;
+  }
 
-  public List<ClassRef> buildBounds();
+  public A removeAllFromBounds(Collection<ClassRef> items) {
+    if (this.bounds == null)
+      return (A) this;
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").remove(builder);
+      this.bounds.remove(builder);
+    }
+    return (A) this;
+  }
 
-  public ClassRef buildBound(Integer index);
+  public A removeMatchingFromBounds(Predicate<ClassRefBuilder> predicate) {
+    if (bounds == null)
+      return (A) this;
+    final Iterator<ClassRefBuilder> each = bounds.iterator();
+    final List visitables = _visitables.get("bounds");
+    while (each.hasNext()) {
+      ClassRefBuilder builder = each.next();
+      if (predicate.test(builder)) {
+        visitables.remove(builder);
+        each.remove();
+      }
+    }
+    return (A) this;
+  }
 
-  public ClassRef buildFirstBound();
+  public List<ClassRef> buildBounds() {
+    return bounds != null ? build(bounds) : null;
+  }
 
-  public ClassRef buildLastBound();
+  public ClassRef buildBound(int index) {
+    return this.bounds.get(index).build();
+  }
 
-  public ClassRef buildMatchingBound(Predicate<ClassRefBuilder> predicate);
+  public ClassRef buildFirstBound() {
+    return this.bounds.get(0).build();
+  }
 
-  public Boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate);
+  public ClassRef buildLastBound() {
+    return this.bounds.get(bounds.size() - 1).build();
+  }
 
-  public A withBounds(List<ClassRef> bounds);
+  public ClassRef buildMatchingBound(Predicate<ClassRefBuilder> predicate) {
+    for (ClassRefBuilder item : bounds) {
+      if (predicate.test(item)) {
+        return item.build();
+      }
+    }
+    return null;
+  }
 
-  public A withBounds(io.sundr.model.ClassRef... bounds);
+  public boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate) {
+    for (ClassRefBuilder item : bounds) {
+      if (predicate.test(item)) {
+        return true;
+      }
+    }
+    return false;
+  }
 
-  public Boolean hasBounds();
+  public A withBounds(List<ClassRef> bounds) {
+    if (this.bounds != null) {
+      _visitables.get("bounds").clear();
+    }
+    if (bounds != null) {
+      this.bounds = new ArrayList();
+      for (ClassRef item : bounds) {
+        this.addToBounds(item);
+      }
+    } else {
+      this.bounds = null;
+    }
+    return (A) this;
+  }
 
-  public TypeParamDefFluent.BoundsNested<A> addNewBound();
+  public A withBounds(io.sundr.model.ClassRef... bounds) {
+    if (this.bounds != null) {
+      this.bounds.clear();
+      _visitables.remove("bounds");
+    }
+    if (bounds != null) {
+      for (ClassRef item : bounds) {
+        this.addToBounds(item);
+      }
+    }
+    return (A) this;
+  }
 
-  public TypeParamDefFluent.BoundsNested<A> addNewBoundLike(ClassRef item);
+  public boolean hasBounds() {
+    return bounds != null && !bounds.isEmpty();
+  }
 
-  public TypeParamDefFluent.BoundsNested<A> setNewBoundLike(Integer index, ClassRef item);
+  public BoundsNested<A> addNewBound() {
+    return new BoundsNested(-1, null);
+  }
 
-  public TypeParamDefFluent.BoundsNested<A> editBound(Integer index);
+  public BoundsNested<A> addNewBoundLike(ClassRef item) {
+    return new BoundsNested(-1, item);
+  }
 
-  public TypeParamDefFluent.BoundsNested<A> editFirstBound();
+  public BoundsNested<A> setNewBoundLike(int index, ClassRef item) {
+    return new BoundsNested(index, item);
+  }
 
-  public TypeParamDefFluent.BoundsNested<A> editLastBound();
+  public BoundsNested<A> editBound(int index) {
+    if (bounds.size() <= index)
+      throw new RuntimeException("Can't edit bounds. Index exceeds size.");
+    return setNewBoundLike(index, buildBound(index));
+  }
 
-  public TypeParamDefFluent.BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate);
+  public BoundsNested<A> editFirstBound() {
+    if (bounds.size() == 0)
+      throw new RuntimeException("Can't edit first bounds. The list is empty.");
+    return setNewBoundLike(0, buildBound(0));
+  }
 
-  public interface BoundsNested<N> extends Nested<N>, ClassRefFluent<TypeParamDefFluent.BoundsNested<N>> {
-    public N and();
+  public BoundsNested<A> editLastBound() {
+    int index = bounds.size() - 1;
+    if (index < 0)
+      throw new RuntimeException("Can't edit last bounds. The list is empty.");
+    return setNewBoundLike(index, buildBound(index));
+  }
 
-    public N endBound();
+  public BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate) {
+    int index = -1;
+    for (int i = 0; i < bounds.size(); i++) {
+      if (predicate.test(bounds.get(i))) {
+        index = i;
+        break;
+      }
+    }
+    if (index < 0)
+      throw new RuntimeException("Can't edit matching bounds. No match found.");
+    return setNewBoundLike(index, buildBound(index));
+  }
+
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    TypeParamDefFluent that = (TypeParamDefFluent) o;
+    if (!java.util.Objects.equals(name, that.name))
+      return false;
+
+    if (!java.util.Objects.equals(bounds, that.bounds))
+      return false;
+
+    return true;
+  }
+
+  public int hashCode() {
+    return java.util.Objects.hash(name, bounds, super.hashCode());
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (name != null) {
+      sb.append("name:");
+      sb.append(name + ",");
+    }
+    if (bounds != null && !bounds.isEmpty()) {
+      sb.append("bounds:");
+      sb.append(bounds);
+    }
+    sb.append("}");
+    return sb.toString();
+  }
+
+  public class BoundsNested<N> extends ClassRefFluent<BoundsNested<N>> implements Nested<N> {
+    BoundsNested(int index, ClassRef item) {
+      this.index = index;
+      this.builder = new ClassRefBuilder(this, item);
+    }
+
+    ClassRefBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) TypeParamDefFluent.this.setToBounds(index, builder.build());
+    }
+
+    public N endBound() {
+      return and();
+    }
 
   }
 

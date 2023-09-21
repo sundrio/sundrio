@@ -16,9 +16,10 @@
 
 package io.sundr.model;
 
+import java.util.Arrays;
 import java.util.List;
 
-public class Block {
+public class Block implements Statement {
 
   private List<Statement> statements;
 
@@ -26,8 +27,21 @@ public class Block {
     this.statements = statements;
   }
 
+  public Block(Statement... statements) {
+    this.statements = Arrays.asList(statements);
+  }
+
   public List<Statement> getStatements() {
     return statements;
   }
 
+  @Override
+  public String render(TypeDef enclosingType) {
+    StringBuilder sb = new StringBuilder();
+    for (Statement statement : statements) {
+      sb.append(statement.render());
+      sb.append(NEWLINE);
+    }
+    return sb.toString();
+  }
 }

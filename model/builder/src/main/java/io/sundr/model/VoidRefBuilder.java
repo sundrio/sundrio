@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements VisitableBuilder<VoidRef, VoidRefBuilder> {
+public class VoidRefBuilder extends VoidRefFluent<VoidRefBuilder> implements VisitableBuilder<VoidRef, VoidRefBuilder> {
   public VoidRefBuilder() {
     this(false);
   }
@@ -27,7 +27,11 @@ public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements
 
   public VoidRefBuilder(VoidRefFluent<?> fluent, VoidRef instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withAttributes(instance.getAttributes());
+    instance = (instance != null ? instance : new VoidRef());
+
+    if (instance != null) {
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -37,7 +41,11 @@ public class VoidRefBuilder extends VoidRefFluentImpl<VoidRefBuilder> implements
 
   public VoidRefBuilder(VoidRef instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withAttributes(instance.getAttributes());
+    instance = (instance != null ? instance : new VoidRef());
+
+    if (instance != null) {
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 

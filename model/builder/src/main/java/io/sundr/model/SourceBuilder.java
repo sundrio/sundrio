@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class SourceBuilder extends SourceFluentImpl<SourceBuilder> implements VisitableBuilder<Source, SourceBuilder> {
+public class SourceBuilder extends SourceFluent<SourceBuilder> implements VisitableBuilder<Source, SourceBuilder> {
   public SourceBuilder() {
     this(false);
   }
@@ -27,7 +27,11 @@ public class SourceBuilder extends SourceFluentImpl<SourceBuilder> implements Vi
 
   public SourceBuilder(SourceFluent<?> fluent, Source instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withTypes(instance.getTypes());
+    instance = (instance != null ? instance : new Source());
+
+    if (instance != null) {
+      fluent.withTypes(instance.getTypes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -37,7 +41,11 @@ public class SourceBuilder extends SourceFluentImpl<SourceBuilder> implements Vi
 
   public SourceBuilder(Source instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withTypes(instance.getTypes());
+    instance = (instance != null ? instance : new Source());
+
+    if (instance != null) {
+      this.withTypes(instance.getTypes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -45,7 +53,7 @@ public class SourceBuilder extends SourceFluentImpl<SourceBuilder> implements Vi
   Boolean validationEnabled;
 
   public Source build() {
-    Source buildable = new Source(fluent.getTypes());
+    Source buildable = new Source(fluent.buildTypes());
     return buildable;
   }
 

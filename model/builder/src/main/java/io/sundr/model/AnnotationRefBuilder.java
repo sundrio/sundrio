@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefBuilder>
+public class AnnotationRefBuilder extends AnnotationRefFluent<AnnotationRefBuilder>
     implements VisitableBuilder<AnnotationRef, AnnotationRefBuilder> {
   public AnnotationRefBuilder() {
     this(false);
@@ -30,9 +30,11 @@ public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefB
 
   public AnnotationRefBuilder(AnnotationRefFluent<?> fluent, AnnotationRef instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withClassRef(instance.getClassRef());
-    fluent.withParameters(instance.getParameters());
-    fluent.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      fluent.withClassRef(instance.getClassRef());
+      fluent.withParameters(instance.getParameters());
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -42,9 +44,11 @@ public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefB
 
   public AnnotationRefBuilder(AnnotationRef instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withClassRef(instance.getClassRef());
-    this.withParameters(instance.getParameters());
-    this.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      this.withClassRef(instance.getClassRef());
+      this.withParameters(instance.getParameters());
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -52,7 +56,7 @@ public class AnnotationRefBuilder extends AnnotationRefFluentImpl<AnnotationRefB
   Boolean validationEnabled;
 
   public AnnotationRef build() {
-    AnnotationRef buildable = new AnnotationRef(fluent.getClassRef(), fluent.getParameters(), fluent.getAttributes());
+    AnnotationRef buildable = new AnnotationRef(fluent.buildClassRef(), fluent.getParameters(), fluent.getAttributes());
     return buildable;
   }
 
