@@ -65,20 +65,19 @@ public class CreateCopyMethod implements Visitor<TypeDefFluent<?>> {
       }
       ClassRef firstClassRef = (ClassRef) first;
       if (!firstClassRef.getFullyQualifiedName().equals(typeDef.getFullyQualifiedName())) {
-          return false;
+        return false;
       }
 
       TypeRef second = arguments.get(1).getTypeRef();
-       if (!(second instanceof ClassRef)) {
+      if (!(second instanceof ClassRef)) {
         return false;
       }
       ClassRef secondClassRef = (ClassRef) first;
       if (!secondClassRef.getFullyQualifiedName().equals(typeDef.getFullyQualifiedName())) {
-          return false;
+        return false;
       }
       return true;
     });
-
 
     type.addNewMethod()
         .withReturnType(Types.VOID)
