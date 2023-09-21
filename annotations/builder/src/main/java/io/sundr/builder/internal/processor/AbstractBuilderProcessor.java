@@ -192,7 +192,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
           @Override
           public void visit(ClassRefBuilder builder) {
             List<TypeRef> updatedArguments = new ArrayList<TypeRef>();
-            for (TypeRef arg : builder.getArguments()) {
+            for (TypeRef arg : builder.buildArguments()) {
               if (arg.equals(builderType.toInternalReference())) {
                 updatedArguments.add(shallowInlineType.toInternalReference());
               } else {

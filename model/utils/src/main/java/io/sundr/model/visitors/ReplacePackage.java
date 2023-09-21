@@ -62,16 +62,16 @@ public class ReplacePackage implements Visitor<Builder> {
   }
 
   private void visitMethodBuilder(MethodBuilder builder) {
-    if (builder.getReturnType() instanceof ClassRef) {
-      ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.getReturnType());
+    if (builder.buildReturnType() instanceof ClassRef) {
+      ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.buildReturnType());
       builder.withReturnType(classRefBuilder.accept(visitor, this).build());
     }
   }
 
   private void visitPropertyBuilder(PropertyBuilder builder) {
 
-    if (builder.getTypeRef() instanceof ClassRef) {
-      ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.getTypeRef());
+    if (builder.buildTypeRef() instanceof ClassRef) {
+      ClassRefBuilder classRefBuilder = new ClassRefBuilder((ClassRef) builder.buildTypeRef());
       builder.withTypeRef(classRefBuilder.accept(visitor, this).build());
     }
   }
@@ -80,7 +80,7 @@ public class ReplacePackage implements Visitor<Builder> {
     builder.withFullyQualifiedName(builder.getFullyQualifiedName().replace(target, replacement)).accept(visitor);
 
     List<TypeRef> updatedArguments = new ArrayList<TypeRef>();
-    for (TypeRef arg : builder.getArguments()) {
+    for (TypeRef arg : builder.buildArguments()) {
       if (arg instanceof ClassRef && ((ClassRef) arg).getPackageName().equals(target)) {
         updatedArguments.add(new ClassRefBuilder((ClassRef) arg).accept(visitor).build());
       } else {

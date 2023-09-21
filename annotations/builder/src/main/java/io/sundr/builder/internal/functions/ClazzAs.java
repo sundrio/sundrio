@@ -51,7 +51,6 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
-import io.sundr.model.MethodFluent.BlockNested;
 import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
@@ -280,13 +279,9 @@ public class ClazzAs {
     }
 
     private Method createDescendantBuilderMethod(Set<Property> allDescendants) {
-      BlockNested<MethodBuilder> builderBuilder = new MethodBuilder().withNewModifiers().withProtected().withStatic()
-          .endModifiers()
-          .withParameters(Types.T)
-          .addNewArgument().withName("item").withTypeRef(Types.OBJECT_REF).endArgument()
-          .withReturnType(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF))
-          .withName("builder").withNewBlock();
-      builderBuilder.addToStatements(new StringStatement("switch (item.getClass().getName()) {"));
+      List<Statement> statements = new ArrayList<>();
+      statements.add(new StringStatement("switch (item.getClass().getName()) {"));
+
       Set<String> seen = new HashSet<>();
       for (Property descendant : allDescendants) {
         ClassRef dunwraped = new ClassRefBuilder(
@@ -301,13 +296,21 @@ public class ClazzAs {
         String classShortName = dunwraped.getName();
 
         ClassRef builderRef = TypeAs.BUILDER_REF.apply(dunwraped);
-        builderBuilder.addToStatements(
-            new StringStatement("case \"" + packageName + ".\"+\"" + classShortName
-                + "\": return (VisitableBuilder<T, ?>)new " + builderRef + "(("
-                + dunwraped + ") item);"));
+        statements.add(new StringStatement("case \"" + packageName + ".\"+\"" + classShortName
+            + "\": return (VisitableBuilder<T, ?>)new " + builderRef + "(("
+            + dunwraped + ") item);"));
       }
-      builderBuilder.addToStatements(new StringStatement("}\n return (VisitableBuilder<T, ?>)builderOf(item);"));
-      return builderBuilder.endBlock().build();
+      statements.add(new StringStatement("}\n return (VisitableBuilder<T, ?>)builderOf(item);"));
+
+      return new MethodBuilder().withNewModifiers().withProtected().withStatic()
+          .endModifiers()
+          .withParameters(Types.T)
+          .addNewArgument().withName("item").withTypeRef(Types.OBJECT_REF).endArgument()
+          .withReturnType(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF))
+          .withName("builder")
+          .withNewBlock()
+          .withStatements(statements)
+          .endBlock().build();
     }
   });
 

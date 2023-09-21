@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class TypeParamRefBuilder extends TypeParamRefFluentImpl<TypeParamRefBuilder>
+public class TypeParamRefBuilder extends TypeParamRefFluent<TypeParamRefBuilder>
     implements VisitableBuilder<TypeParamRef, TypeParamRefBuilder> {
   public TypeParamRefBuilder() {
     this(false);
@@ -30,9 +30,11 @@ public class TypeParamRefBuilder extends TypeParamRefFluentImpl<TypeParamRefBuil
 
   public TypeParamRefBuilder(TypeParamRefFluent<?> fluent, TypeParamRef instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withName(instance.getName());
-    fluent.withDimensions(instance.getDimensions());
-    fluent.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      fluent.withName(instance.getName());
+      fluent.withDimensions(instance.getDimensions());
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -42,9 +44,11 @@ public class TypeParamRefBuilder extends TypeParamRefFluentImpl<TypeParamRefBuil
 
   public TypeParamRefBuilder(TypeParamRef instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withName(instance.getName());
-    this.withDimensions(instance.getDimensions());
-    this.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      this.withName(instance.getName());
+      this.withDimensions(instance.getDimensions());
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 

@@ -73,7 +73,7 @@ public class Generics {
   private static final Visitor<ClassRefBuilder> UNWRAP_CLASSREF_VISITOR = new Visitor<ClassRefBuilder>() {
     public void visit(ClassRefBuilder builder) {
       List<TypeRef> unwrappedArguments = new ArrayList<TypeRef>();
-      for (TypeRef argument : builder.getArguments()) {
+      for (TypeRef argument : builder.buildArguments()) {
         TypeRef key = getKeyForValue(GENERIC_MAPPINGS, argument);
         if (TRANSPARENT_REF.equals(key)) {
           continue;

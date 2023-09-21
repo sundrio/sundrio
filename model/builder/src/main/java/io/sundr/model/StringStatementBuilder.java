@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class StringStatementBuilder extends StringStatementFluentImpl<StringStatementBuilder>
+public class StringStatementBuilder extends StringStatementFluent<StringStatementBuilder>
     implements VisitableBuilder<StringStatement, StringStatementBuilder> {
   public StringStatementBuilder() {
     this(false);
@@ -30,7 +30,9 @@ public class StringStatementBuilder extends StringStatementFluentImpl<StringStat
 
   public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withSupplier(instance.getSupplier());
+    if (instance != null) {
+      fluent.withSupplier(instance.getSupplier());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -40,7 +42,9 @@ public class StringStatementBuilder extends StringStatementFluentImpl<StringStat
 
   public StringStatementBuilder(StringStatement instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withSupplier(instance.getSupplier());
+    if (instance != null) {
+      this.withSupplier(instance.getSupplier());
+    }
     this.validationEnabled = validationEnabled;
   }
 

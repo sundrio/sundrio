@@ -4,7 +4,7 @@ import java.lang.Boolean;
 
 import io.sundr.builder.VisitableBuilder;
 
-public class AttributeSupportBuilder extends AttributeSupportFluentImpl<AttributeSupportBuilder>
+public class AttributeSupportBuilder extends AttributeSupportFluent<AttributeSupportBuilder>
     implements VisitableBuilder<AttributeSupport, AttributeSupportBuilder> {
   public AttributeSupportBuilder() {
     this(false);
@@ -30,7 +30,9 @@ public class AttributeSupportBuilder extends AttributeSupportFluentImpl<Attribut
 
   public AttributeSupportBuilder(AttributeSupportFluent<?> fluent, AttributeSupport instance, Boolean validationEnabled) {
     this.fluent = fluent;
-    fluent.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      fluent.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 
@@ -40,7 +42,9 @@ public class AttributeSupportBuilder extends AttributeSupportFluentImpl<Attribut
 
   public AttributeSupportBuilder(AttributeSupport instance, Boolean validationEnabled) {
     this.fluent = this;
-    this.withAttributes(instance.getAttributes());
+    if (instance != null) {
+      this.withAttributes(instance.getAttributes());
+    }
     this.validationEnabled = validationEnabled;
   }
 

@@ -22,6 +22,7 @@ public interface Node {
 
   String DOT = ".";
   String COMA = ",";
+  String COLN = ":";
   String SEMICOLN = ";";
   String SPACE = " ";
   String NEWLINE = "\n";

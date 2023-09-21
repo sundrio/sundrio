@@ -31,6 +31,6 @@ public class TypeParamDefColletor extends TypedVisitor<TypeDefBuilder> {
   }
 
   public void visit(TypeDefBuilder builder) {
-    collection.addAll(builder.getParameters());
+    collection.addAll(builder.buildParameters());
   }
 }

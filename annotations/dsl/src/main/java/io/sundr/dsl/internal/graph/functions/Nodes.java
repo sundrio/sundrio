@@ -172,7 +172,7 @@ public class Nodes {
 
           reCombinedType = new TypeDefBuilder(reCombinedType).accept(TypeDefBuilder.class, builder -> {
             List<ClassRef> updatedInterfaces = new ArrayList<ClassRef>();
-            for (ClassRef interfaceRef : builder.getExtendsList()) {
+            for (ClassRef interfaceRef : builder.buildExtendsList()) {
               if (interfaceRef.equals(selfRef)) {
                 updatedInterfaces.add(GetDefinition.of(selfRef).toReference(reCombinedRef));
               } else {

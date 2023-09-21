@@ -32,7 +32,7 @@ public class TypeParamRefColletor implements Visitor<ClassRefBuilder> {
   }
 
   public void visit(ClassRefBuilder builder) {
-    for (TypeRef argument : builder.getArguments()) {
+    for (TypeRef argument : builder.buildArguments()) {
       if (argument instanceof TypeParamRef) {
         collection.add((TypeParamRef) argument);
       }

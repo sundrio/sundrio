@@ -16,5 +16,5 @@
 
 package io.sundr.model;
 
-public interface Statement {
+public interface Statement extends Renderable {
 }
