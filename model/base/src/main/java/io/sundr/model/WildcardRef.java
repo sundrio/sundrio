@@ -71,13 +71,13 @@ public class WildcardRef extends TypeRef {
   }
 
   @Override
-  public String render(TypeDef enclosing) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
     if (bounds == null || bounds.isEmpty()) {
       sb.append("?");
     } else {
       sb.append(
-          String.format(boundKind.format, bounds.stream().map(b -> b.render(enclosing)).collect(Collectors.joining(COMA))));
+          String.format(boundKind.format, bounds.stream().map(b -> b.render()).collect(Collectors.joining(COMA))));
     }
     return sb.toString();
   }

@@ -119,12 +119,12 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
   }
 
   @Override
-  public String render(TypeDef enclosingType) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append(fullyQualifiedName);
     if (arguments.size() > 0) {
       sb.append(LT);
-      sb.append(arguments.stream().map(a -> a.render(enclosingType)).collect(Collectors.joining(COMA)));
+      sb.append(arguments.stream().map(a -> a.render()).collect(Collectors.joining(COMA)));
       sb.append(GT);
     }
 

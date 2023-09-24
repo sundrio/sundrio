@@ -229,12 +229,12 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
 
     if (parameters != null && !parameters.isEmpty()) {
       sb.append(LT);
-      sb.append(parameters.stream().map(p -> p.render(enclosingType)).collect(Collectors.joining(COMA)));
+      sb.append(parameters.stream().map(p -> p.render()).collect(Collectors.joining(COMA)));
       sb.append(GT);
     }
 
     if (name != null) {
-      sb.append(returnType.render(enclosingType));
+      sb.append(returnType.render());
       sb.append(SPACE).append(name);
     } else if (enclosingType != null
         && enclosingType.getFullyQualifiedName().equals(((ClassRef) returnType).getFullyQualifiedName())) {
@@ -249,19 +249,19 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
 
     sb.append(OP);
     if (!varArgPreferred) {
-      sb.append(arguments.stream().map(a -> (String) a.withoutModiers().render(enclosingType))
+      sb.append(arguments.stream().map(a -> (String) a.withoutModiers().render())
           .collect(Collectors.joining(COMA)));
     } else if (!arguments.isEmpty()) {
       List<Property> args = arguments.subList(0, arguments.size() - 1);
       Property varArg = arguments.get(arguments.size() - 1);
-      sb.append(args.stream().map(a -> a.render(enclosingType)).collect(Collectors.joining(COMA)));
+      sb.append(args.stream().map(a -> a.render()).collect(Collectors.joining(COMA)));
       if (!args.isEmpty()) {
         sb.append(COMA);
       }
       if (varArg.getTypeRef().getDimensions() == 1) {
         sb.append(varArg.getTypeRef().withDimensions(0)).append(VARARG).append(SPACE);
       } else {
-        sb.append(varArg.getTypeRef().render(enclosingType)).append(SPACE);
+        sb.append(varArg.getTypeRef().render()).append(SPACE);
       }
       sb.append(varArg.getName());
     }
@@ -269,11 +269,14 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
 
     if (exceptions != null && !exceptions.isEmpty()) {
       sb.append(SPACE).append(THROWS).append(SPACE)
-          .append(exceptions.stream().map(e -> e.render(enclosingType)).collect(Collectors.joining(COMA)));
+          .append(exceptions.stream().map(e -> e.render()).collect(Collectors.joining(COMA)));
     }
   }
 
-  @Override
+  public String render() {
+    return render(null);
+  }
+
   public String render(TypeDef enclosingType) {
     StringBuilder sb = new StringBuilder();
     renderDefinition(sb, enclosingType);

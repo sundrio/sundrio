@@ -36,7 +36,7 @@ public class Block implements Statement {
   }
 
   @Override
-  public String render(TypeDef enclosingType) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
     for (Statement statement : statements) {
       sb.append(statement.render());

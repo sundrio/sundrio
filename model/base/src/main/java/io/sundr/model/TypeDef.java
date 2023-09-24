@@ -417,19 +417,19 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
 
     if (parameters != null && !parameters.isEmpty()) {
       sb.append(LT);
-      sb.append(parameters.stream().map(p -> p.render(this)).collect(Collectors.joining(COMA)));
+      sb.append(parameters.stream().map(p -> p.render()).collect(Collectors.joining(COMA)));
       sb.append(GT);
     }
 
     if (extendsList != null && !extendsList.isEmpty()
         && (extendsList.size() != 1 || !extendsList.contains(OBJECT.toReference()))) {
       sb.append(SPACE).append(EXTENDS).append(SPACE);
-      sb.append(extendsList.stream().map(e -> e.render(this)).collect(Collectors.joining(COMA)));
+      sb.append(extendsList.stream().map(e -> e.render()).collect(Collectors.joining(COMA)));
     }
 
     if (implementsList != null && !implementsList.isEmpty()) {
       sb.append(SPACE).append(IMPLEMENTS).append(SPACE);
-      sb.append(implementsList.stream().map(i -> i.render(this)).collect(Collectors.joining(COMA)));
+      sb.append(implementsList.stream().map(i -> i.render()).collect(Collectors.joining(COMA)));
     }
   }
 
@@ -474,7 +474,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     getProperties().stream().filter(p -> kind != Kind.INTERFACE || p.isStatic()).forEach(field -> {
       pb.append(field.renderComments());
       pb.append(field.renderAnnotations());
-      pb.append(field.render(this));
+      pb.append(field.render());
       if (field.getAttribute(INIT) != null) {
         pb.append(" = ").append(field.getDefaultValue());
       }

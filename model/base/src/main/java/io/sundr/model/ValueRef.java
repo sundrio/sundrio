@@ -58,12 +58,7 @@ public class ValueRef implements Expression {
   }
 
   @Override
-  public String render(TypeDef enclosingType) {
+  public String render() {
     return toString(value);
-  }
-
-  @Override
-  public String toString() {
-    return render();
   }
 }

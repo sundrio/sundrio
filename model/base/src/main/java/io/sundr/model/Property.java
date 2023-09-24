@@ -189,7 +189,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   }
 
   @Override
-  public String render(TypeDef enclosingType) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
 
     if (isPublic()) {
@@ -208,7 +208,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
       sb.append(FINAL).append(SPACE);
     }
 
-    sb.append(typeRef.render(enclosingType)).append(SPACE);
+    sb.append(typeRef.render()).append(SPACE);
     sb.append(name);
 
     return sb.toString();

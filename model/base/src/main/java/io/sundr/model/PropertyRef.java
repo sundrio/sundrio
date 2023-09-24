@@ -13,7 +13,7 @@ public class PropertyRef implements Expression {
   }
 
   @Override
-  public String render(TypeDef enclosingType) {
+  public String render() {
     return property.getName();
   }
 }

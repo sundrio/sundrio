@@ -18,7 +18,7 @@ public class While implements Statement {
     return statement;
   }
 
-  public String render(TypeDef typeDef) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("while").append(SPACE).append(OP).append(condition.render()).append(CP)
         .append(SPACE).append(OB).append(NEWLINE);

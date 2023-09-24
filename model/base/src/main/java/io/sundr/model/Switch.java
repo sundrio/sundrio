@@ -27,7 +27,7 @@ public class Switch implements Statement {
     return defaultCase;
   }
 
-  public String render(TypeDef type) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("switch");
     sb.append(SPACE);
@@ -40,13 +40,13 @@ public class Switch implements Statement {
       sb.append(NEWLINE);
       sb.append(tab("case " + entry.getKey().render() + ":"));
       sb.append(NEWLINE);
-      sb.append(tab(tab(entry.getValue().render(type), NEWLINE, "break;")));
+      sb.append(tab(tab(entry.getValue().render(), NEWLINE, "break;")));
     }
     defaultCase.ifPresent(d -> {
       sb.append(NEWLINE);
       sb.append(tab("default:"));
       sb.append(NEWLINE);
-      sb.append(tab(tab(d.render(type))));
+      sb.append(tab(tab(d.render())));
     });
     sb.append(NEWLINE);
     sb.append(CB);
