@@ -1,5 +1,6 @@
 package io.sundr.model;
 
+import static java.util.regex.Pattern.quote;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Optional;
@@ -13,7 +14,7 @@ public class IfTest {
   static final ClassRef INTEGER = ClassRef.forName("java.lang.Integer");
 
   static String unindent(String s) {
-    return s.replaceAll(Pattern.quote(Node.NEWLINE), "").replaceAll(Pattern.quote("{  "), "{");
+    return s.replaceAll(Pattern.quote(Node.NEWLINE), "").replaceAll(quote("{  "), "{");
   }
 
   @Test

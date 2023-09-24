@@ -30,18 +30,6 @@ public interface Renderable extends Node {
    * @return the {@link String} representation of the object as it's meant to appear in the generated code.
    */
   default String render() {
-    return render(null);
-  }
-
-  /**
-   * Render the type into a {@link String} for the purpose of code generation.
-   * This is slightly different from the `toString()` method as `toString()` is mostly needed for logging / debugging.
-   * In contrast with its no-arg equivallent this method is idempotent.
-   *
-   * @param enclosingType The type that encoses the current {@link Renderable}.
-   * @return the {@link String} representation of the object as it's meant to appear in the generated code.
-   */
-  default String render(TypeDef enclosingType) {
     return toString();
   }
 

@@ -25,7 +25,6 @@ import org.apache.velocity.context.InternalContextAdapter;
 import org.apache.velocity.runtime.directive.Directive;
 import org.apache.velocity.runtime.parser.node.Node;
 
-import io.sundr.codegen.velocity.DefinitionScope;
 import io.sundr.model.Property;
 import io.sundr.model.utils.Types;
 
@@ -55,7 +54,7 @@ public class FieldDirective extends Directive {
 
   private void writeField(Writer writer, Property field, String block) throws IOException {
     if (field != null) {
-      writer.append(field.render(DefinitionScope.get()));
+      writer.append(field.render());
 
       if (field.getAttribute(INIT) != null) {
         writer.append(" = ").append(getDefaultValue(field));

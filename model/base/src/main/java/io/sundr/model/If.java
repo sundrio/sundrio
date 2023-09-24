@@ -30,7 +30,7 @@ public class If implements Statement {
     return elseStatement;
   }
 
-  public String render(TypeDef typeDef) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("if").append(SPACE)
         .append(OP).append(condition.render()).append(CP)

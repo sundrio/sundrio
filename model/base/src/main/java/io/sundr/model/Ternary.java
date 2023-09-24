@@ -24,7 +24,7 @@ public class Ternary implements Expression {
     return alternative;
   }
 
-  public String render(TypeDef typeDef) {
+  public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append(condition.render())
         .append(" ? ")

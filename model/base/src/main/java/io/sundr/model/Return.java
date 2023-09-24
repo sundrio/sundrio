@@ -7,9 +7,4 @@ public class Return implements Statement {
   public String render() {
     return "return " + expression.render();
   }
-
-  @Override
-  public String render(TypeDef enclosingType) {
-    return render();
-  }
 }
