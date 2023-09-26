@@ -13,6 +13,10 @@ public class VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A> 
   }
 
   public VoidRefFluent(VoidRef instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(VoidRef instance) {
     instance = (instance != null ? instance : new VoidRef());
 
     if (instance != null) {

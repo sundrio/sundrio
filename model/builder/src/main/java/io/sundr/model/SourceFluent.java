@@ -21,14 +21,18 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
   }
 
   public SourceFluent(Source instance) {
+    this.copyInstance(instance);
+  }
+
+  private ArrayList<TypeDefBuilder> types = new ArrayList<TypeDefBuilder>();
+
+  protected void copyInstance(Source instance) {
     instance = (instance != null ? instance : new Source());
 
     if (instance != null) {
       this.withTypes(instance.getTypes());
     }
   }
-
-  private ArrayList<TypeDefBuilder> types = new ArrayList<TypeDefBuilder>();
 
   public A addToTypes(int index, TypeDef item) {
     if (this.types == null) {

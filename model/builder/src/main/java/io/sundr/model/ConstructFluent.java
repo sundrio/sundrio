@@ -22,15 +22,19 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
   }
 
   public ConstructFluent(Construct instance) {
-    if (instance != null) {
-      this.withType(instance.getType());
-      this.withParameters(instance.getParameters());
-    }
+    this.copyInstance(instance);
   }
 
   private ClassRefBuilder type;
   private ArrayList<VisitableBuilder<? extends TypeRef, ?>> parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
   private ArrayList<VisitableBuilder<? extends Expression, ?>> arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+
+  protected void copyInstance(Construct instance) {
+    if (instance != null) {
+      this.withType(instance.getType());
+      this.withParameters(instance.getParameters());
+    }
+  }
 
   public ClassRef buildType() {
     return this.type != null ? this.type.build() : null;

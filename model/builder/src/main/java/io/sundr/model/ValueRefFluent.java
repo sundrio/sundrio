@@ -15,12 +15,16 @@ public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
   }
 
   public ValueRefFluent(ValueRef instance) {
+    this.copyInstance(instance);
+  }
+
+  private Object value;
+
+  protected void copyInstance(ValueRef instance) {
     if (instance != null) {
       this.withValue(instance.getValue());
     }
   }
-
-  private Object value;
 
   public Object getValue() {
     return this.value;

@@ -13,6 +13,10 @@ public class EqualsFluent<A extends EqualsFluent<A>> extends BinaryExpressionFlu
   }
 
   public EqualsFluent(Equals instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Equals instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

@@ -15,6 +15,10 @@ public class BreakFluent<A extends BreakFluent<A>> extends BaseFluent<A> {
   }
 
   public BreakFluent(Break instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Break instance) {
     instance = (instance != null ? instance : new Break());
 
     if (instance != null) {

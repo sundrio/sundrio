@@ -16,12 +16,16 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
   }
 
   public PropertyRefFluent(PropertyRef instance) {
+    this.copyInstance(instance);
+  }
+
+  private PropertyBuilder property;
+
+  protected void copyInstance(PropertyRef instance) {
     if (instance != null) {
       this.withProperty(instance.getProperty());
     }
   }
-
-  private PropertyBuilder property;
 
   public Property buildProperty() {
     return this.property != null ? this.property.build() : null;

@@ -17,12 +17,16 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
   }
 
   public NegativeFluent(Negative instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> expresion;
+
+  protected void copyInstance(Negative instance) {
     if (instance != null) {
       this.withExpresion(instance.getExpresion());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> expresion;
 
   public Expression buildExpresion() {
     return this.expresion != null ? this.expresion.build() : null;

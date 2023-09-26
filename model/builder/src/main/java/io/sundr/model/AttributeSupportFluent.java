@@ -17,12 +17,16 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
   }
 
   public AttributeSupportFluent(AttributeSupport instance) {
+    this.copyInstance(instance);
+  }
+
+  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
+
+  protected void copyInstance(AttributeSupport instance) {
     if (instance != null) {
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
 
   public A addToAttributes(AttributeKey key, Object value) {
     if (this.attributes == null && key != null && value != null) {

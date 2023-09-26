@@ -13,6 +13,10 @@ public class RightShiftFluent<A extends RightShiftFluent<A>> extends BinaryExpre
   }
 
   public RightShiftFluent(RightShift instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(RightShift instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

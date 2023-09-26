@@ -15,13 +15,17 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
   }
 
   public ModifierSupportFluent(ModifierSupport instance) {
+    this.copyInstance(instance);
+  }
+
+  private ModifiersBuilder modifiers;
+
+  protected void copyInstance(ModifierSupport instance) {
     if (instance != null) {
       this.withModifiers(instance.getModifiers());
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private ModifiersBuilder modifiers;
 
   public Modifiers buildModifiers() {
     return this.modifiers != null ? this.modifiers.build() : null;

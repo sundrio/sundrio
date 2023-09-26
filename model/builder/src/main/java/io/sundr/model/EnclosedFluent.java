@@ -17,12 +17,16 @@ public class EnclosedFluent<A extends EnclosedFluent<A>> extends BaseFluent<A> {
   }
 
   public EnclosedFluent(Enclosed instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> expresion;
+
+  protected void copyInstance(Enclosed instance) {
     if (instance != null) {
       this.withExpresion(instance.getExpresion());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> expresion;
 
   public Expression buildExpresion() {
     return this.expresion != null ? this.expresion.build() : null;

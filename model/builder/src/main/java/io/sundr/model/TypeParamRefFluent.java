@@ -13,15 +13,19 @@ public class TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRef
   }
 
   public TypeParamRefFluent(TypeParamRef instance) {
+    this.copyInstance(instance);
+  }
+
+  private String name;
+  private int dimensions;
+
+  protected void copyInstance(TypeParamRef instance) {
     if (instance != null) {
       this.withName(instance.getName());
       this.withDimensions(instance.getDimensions());
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private String name;
-  private int dimensions;
 
   public String getName() {
     return this.name;

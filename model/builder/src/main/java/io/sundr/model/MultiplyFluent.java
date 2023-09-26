@@ -13,6 +13,10 @@ public class MultiplyFluent<A extends MultiplyFluent<A>> extends BinaryExpressio
   }
 
   public MultiplyFluent(Multiply instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Multiply instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

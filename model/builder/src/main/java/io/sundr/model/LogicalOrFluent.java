@@ -13,6 +13,10 @@ public class LogicalOrFluent<A extends LogicalOrFluent<A>> extends BinaryExpress
   }
 
   public LogicalOrFluent(LogicalOr instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(LogicalOr instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

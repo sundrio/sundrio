@@ -21,6 +21,21 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public MethodFluent(Method instance) {
+    this.copyInstance(instance);
+  }
+
+  private List<String> comments = new ArrayList<String>();
+  private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
+  private ArrayList<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
+  private String name;
+  private VisitableBuilder<? extends TypeRef, ?> returnType;
+  private ArrayList<PropertyBuilder> arguments = new ArrayList<PropertyBuilder>();
+  private boolean varArgPreferred;
+  private ArrayList<ClassRefBuilder> exceptions = new ArrayList<ClassRefBuilder>();
+  private boolean defaultMethod;
+  private BlockBuilder block;
+
+  protected void copyInstance(Method instance) {
     if (instance != null) {
       this.withComments(instance.getComments());
       this.withAnnotations(instance.getAnnotations());
@@ -36,17 +51,6 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private List<String> comments = new ArrayList<String>();
-  private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
-  private ArrayList<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
-  private String name;
-  private VisitableBuilder<? extends TypeRef, ?> returnType;
-  private ArrayList<PropertyBuilder> arguments = new ArrayList<PropertyBuilder>();
-  private boolean varArgPreferred;
-  private ArrayList<ClassRefBuilder> exceptions = new ArrayList<ClassRefBuilder>();
-  private boolean defaultMethod;
-  private BlockBuilder block;
 
   public A addToComments(int index, String item) {
     if (this.comments == null) {

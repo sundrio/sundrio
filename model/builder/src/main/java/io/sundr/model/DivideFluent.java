@@ -13,6 +13,10 @@ public class DivideFluent<A extends DivideFluent<A>> extends BinaryExpressionFlu
   }
 
   public DivideFluent(Divide instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Divide instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

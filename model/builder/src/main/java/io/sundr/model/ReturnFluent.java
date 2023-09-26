@@ -15,6 +15,10 @@ public class ReturnFluent<A extends ReturnFluent<A>> extends BaseFluent<A> {
   }
 
   public ReturnFluent(Return instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Return instance) {
     instance = (instance != null ? instance : new Return());
 
     if (instance != null) {

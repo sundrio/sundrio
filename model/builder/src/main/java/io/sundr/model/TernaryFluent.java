@@ -17,16 +17,20 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public TernaryFluent(Ternary instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> condition;
+  private VisitableBuilder<? extends Expression, ?> result;
+  private VisitableBuilder<? extends Expression, ?> alternative;
+
+  protected void copyInstance(Ternary instance) {
     if (instance != null) {
       this.withCondition(instance.getCondition());
       this.withResult(instance.getResult());
       this.withAlternative(instance.getAlternative());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> condition;
-  private VisitableBuilder<? extends Expression, ?> result;
-  private VisitableBuilder<? extends Expression, ?> alternative;
 
   public Expression buildCondition() {
     return this.condition != null ? this.condition.build() : null;

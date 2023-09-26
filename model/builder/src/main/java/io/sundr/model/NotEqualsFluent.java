@@ -13,6 +13,10 @@ public class NotEqualsFluent<A extends NotEqualsFluent<A>> extends BinaryExpress
   }
 
   public NotEqualsFluent(NotEquals instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(NotEquals instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

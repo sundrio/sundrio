@@ -15,6 +15,10 @@ public class ThisFluent<A extends ThisFluent<A>> extends BaseFluent<A> {
   }
 
   public ThisFluent(This instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(This instance) {
     instance = (instance != null ? instance : new This());
 
     if (instance != null) {

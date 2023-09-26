@@ -13,6 +13,10 @@ public class LogicalAndFluent<A extends LogicalAndFluent<A>> extends BinaryExpre
   }
 
   public LogicalAndFluent(LogicalAnd instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(LogicalAnd instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

@@ -22,6 +22,15 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
   }
 
   public ForFluent(For instance) {
+    this.copyInstance(instance);
+  }
+
+  private ArrayList<VisitableBuilder<? extends Expression, ?>> init = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+  private VisitableBuilder<? extends Expression, ?> compare;
+  private ArrayList<VisitableBuilder<? extends Expression, ?>> update = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+  private VisitableBuilder<? extends Statement, ?> body;
+
+  protected void copyInstance(For instance) {
     if (instance != null) {
       this.withInit(instance.getInit());
       this.withCompare(instance.getCompare());
@@ -29,11 +38,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       this.withBody(instance.getBody());
     }
   }
-
-  private ArrayList<VisitableBuilder<? extends Expression, ?>> init = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
-  private VisitableBuilder<? extends Expression, ?> compare;
-  private ArrayList<VisitableBuilder<? extends Expression, ?>> update = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
-  private VisitableBuilder<? extends Statement, ?> body;
 
   public A addToInit(VisitableBuilder<? extends Expression, ?> builder) {
     if (this.init == null) {

@@ -17,12 +17,16 @@ public class NotFluent<A extends NotFluent<A>> extends BaseFluent<A> {
   }
 
   public NotFluent(Not instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> expresion;
+
+  protected void copyInstance(Not instance) {
     if (instance != null) {
       this.withExpresion(instance.getExpresion());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> expresion;
 
   public Expression buildExpresion() {
     return this.expresion != null ? this.expresion.build() : null;

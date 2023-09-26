@@ -22,12 +22,16 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
   }
 
   public BlockFluent(Block instance) {
+    this.copyInstance(instance);
+  }
+
+  private ArrayList<VisitableBuilder<? extends Statement, ?>> statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
+
+  protected void copyInstance(Block instance) {
     if (instance != null) {
       this.withStatements(instance.getStatements());
     }
   }
-
-  private ArrayList<VisitableBuilder<? extends Statement, ?>> statements = new ArrayList<VisitableBuilder<? extends Statement, ?>>();
 
   public A addToStatements(VisitableBuilder<? extends Statement, ?> builder) {
     if (this.statements == null) {

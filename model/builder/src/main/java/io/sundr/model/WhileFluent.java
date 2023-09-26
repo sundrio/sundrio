@@ -17,14 +17,18 @@ public class WhileFluent<A extends WhileFluent<A>> extends BaseFluent<A> {
   }
 
   public WhileFluent(While instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> condition;
+  private VisitableBuilder<? extends Statement, ?> statement;
+
+  protected void copyInstance(While instance) {
     if (instance != null) {
       this.withCondition(instance.getCondition());
       this.withStatement(instance.getStatement());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> condition;
-  private VisitableBuilder<? extends Statement, ?> statement;
 
   public Expression buildCondition() {
     return this.condition != null ? this.condition.build() : null;

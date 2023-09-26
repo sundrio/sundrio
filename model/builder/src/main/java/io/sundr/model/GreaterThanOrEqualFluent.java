@@ -13,6 +13,10 @@ public class GreaterThanOrEqualFluent<A extends GreaterThanOrEqualFluent<A>> ext
   }
 
   public GreaterThanOrEqualFluent(GreaterThanOrEqual instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(GreaterThanOrEqual instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

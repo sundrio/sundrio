@@ -20,16 +20,20 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
   }
 
   public SwitchFluent(Switch instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> expression;
+  private Map<ValueRef, Block> cases = new LinkedHashMap<ValueRef, Block>();
+  private Optional<BlockBuilder> defaultCase = Optional.empty();
+
+  protected void copyInstance(Switch instance) {
     if (instance != null) {
       this.withExpression(instance.getExpression());
       this.withCases(instance.getCases());
       this.withDefaultCase(instance.getDefaultCase());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> expression;
-  private Map<ValueRef, Block> cases = new LinkedHashMap<ValueRef, Block>();
-  private Optional<BlockBuilder> defaultCase = Optional.empty();
 
   public Expression buildExpression() {
     return this.expression != null ? this.expression.build() : null;

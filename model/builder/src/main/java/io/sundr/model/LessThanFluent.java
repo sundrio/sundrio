@@ -13,6 +13,10 @@ public class LessThanFluent<A extends LessThanFluent<A>> extends BinaryExpressio
   }
 
   public LessThanFluent(LessThan instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(LessThan instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());
