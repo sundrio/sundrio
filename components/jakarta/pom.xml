@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+       Copyright 2018 The original authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>components</artifactId>
+        <groupId>io.sundr</groupId>
+        <version>999-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <groupId>io.sundr</groupId>
+    <artifactId>sundr-jakarta</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Sundrio :: Components :: Jakarta APIs</name>
+
+    <properties>
+        <cdi-api.version>4.0.1</cdi-api.version>
+        <rs-api.version>3.1.0</rs-api.version>
+        <transaction-api.version>2.0.1</transaction-api.version>
+        <persistence-api.version>3.1.0</persistence-api.version>
+        <java.compiler.version>1.8</java.compiler.version>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-model</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-reflect</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-source</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>jakarta.enterprise</groupId>
+          <artifactId>jakarta.enterprise.cdi-api</artifactId>
+          <version>${cdi-api.version}</version>
+          <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>jakarta.ws.rs</groupId>
+          <artifactId>jakarta.ws.rs-api</artifactId>
+          <version>${rs-api.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>jakarta.transaction</groupId>
+          <artifactId>jakarta.transaction-api</artifactId>
+          <version>${transaction-api.version}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>jakarta.persistence</groupId>
+          <artifactId>jakarta.persistence-api</artifactId>
+          <version>${persistence-api.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                  <include>io/sundr/jakarta/templates/*.java</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

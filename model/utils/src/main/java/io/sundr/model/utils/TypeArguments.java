@@ -147,7 +147,7 @@ public class TypeArguments {
     return mappings;
   }
 
-  private static TypeDef applyGenericArguments(ClassRef ref) {
+  public static TypeDef applyGenericArguments(ClassRef ref) {
     TypeDef definition = GetDefinition.of(ref);
     Map<String, TypeRef> mappings = getGenericArgumentsMappings(ref, definition);
 

@@ -27,9 +27,13 @@ import io.sundr.model.Method;
 import io.sundr.model.Property;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
+import io.sundr.model.VoidRef;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class Setter {
+
+  public static final String SET_PREFIX = "set";
+  public static final VoidRef VOID = new VoidRef();
 
   /**
    * Find the setter of the specified property in the type.
@@ -98,6 +102,44 @@ public class Setter {
     }
     throw new SundrException(
         "No setter found for property: " + property.getName() + " on class: " + richType.getFullyQualifiedName());
+  }
+
+  public static boolean is(Method method) {
+    return is(method, false);
+  }
+
+  /**
+   * Checks if the specified method is a setter.
+   * 
+   * @param method The method.
+   * @param acceptPrefixless Flag to enable support of prefixless getters.
+   * @return
+   */
+  public static boolean is(Method method, boolean acceptPrefixless) {
+    int length = method.getName().length();
+
+    if (method.isPrivate() || method.isStatic()) {
+      return false;
+    }
+
+    if (method.getArguments().size() != 1) {
+      return false;
+    }
+
+    // Setters, should never ever throw exceptions. If they do their are not getters.
+    // If we relax, this limitation, `throws` will leak into areas that is undesirable (usability & maintainance wise).
+    if (method.getExceptions() != null && !method.getExceptions().isEmpty()) {
+      return false;
+    }
+
+    if (acceptPrefixless) {
+      return true;
+    }
+
+    if (method.getName().startsWith(SET_PREFIX)) {
+      return length > SET_PREFIX.length();
+    }
+    return false;
   }
 
   public static boolean has(TypeDef clazz, Property property) {
