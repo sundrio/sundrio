@@ -22,19 +22,35 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Property extends ModifierSupport implements Renderable, Commentable, Annotatable {
 
+  private final List<String> comments;
   private final List<AnnotationRef> annotations;
   private final TypeRef typeRef;
   private final String name;
-  private final List<String> comments;
+  private final Optional<Expression> initialValue;
   private final boolean enumConstant;
   private final boolean synthetic;
 
+  public Property(Modifiers modifiers, Map<AttributeKey, Object> attributes, List<String> comments,
+      List<AnnotationRef> annotations, TypeRef typeRef, String name, Optional<Expression> initialValue,
+      boolean enumConstant, boolean synthetic) {
+    super(modifiers, attributes);
+    this.comments = comments;
+    this.annotations = annotations;
+    this.typeRef = typeRef;
+    this.name = name;
+    this.initialValue = initialValue;
+    this.enumConstant = enumConstant;
+    this.synthetic = synthetic;
+  }
+
+  @Deprecated
   public Property(List<AnnotationRef> annotations, TypeRef typeRef, String name, List<String> comments, boolean enumConstant,
       boolean synthetic, Modifiers modifiers, Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
@@ -44,6 +60,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     this.comments = comments;
     this.enumConstant = enumConstant;
     this.synthetic = synthetic;
+    this.initialValue = Optional.empty();
   }
 
   @Deprecated
@@ -56,6 +73,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     this.comments = comments;
     this.enumConstant = false;
     this.synthetic = false;
+    this.initialValue = Optional.empty();
   }
 
   public static Property newProperty(TypeRef typeRef, String name) {
@@ -85,6 +103,10 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   public boolean isSynthetic() {
     return this.synthetic;
+  }
+
+  public Optional<Expression> getInitialValue() {
+    return initialValue;
   }
 
   public String getNameCapitalized() {
@@ -138,6 +160,49 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   public Property withErasure() {
     return new Property(annotations, typeRef instanceof TypeParamRef ? ((TypeParamRef) typeRef).withErasure() : typeRef, name,
         comments, enumConstant, synthetic, Modifiers.create(), getAttributes());
+  }
+
+  /**
+   * Get the property without its initial value.
+   * 
+   * @return the property.
+   */
+  public Property withoutInitialValue() {
+    return new Property(getModifiers(), getAttributes(), comments, annotations, typeRef, name, Optional.empty(), enumConstant,
+        synthetic);
+  }
+
+  /**
+   * Get the property with the specified object as iniital value.
+   * 
+   * @param initialValue an {@link Object}
+   * @return the property.
+   */
+  public Property withInitialValue(Object initialValue) {
+    return new Property(getModifiers(), getAttributes(), comments, annotations, typeRef, name,
+        Optional.of(ValueRef.from(initialValue)), enumConstant, synthetic);
+  }
+
+  /**
+   * Get the property with the specified object as iniital value.
+   * 
+   * @param initialValue an {@link Expression}
+   * @return the property.
+   */
+  public Property withInitialValue(Expression initialValue) {
+    return new Property(getModifiers(), getAttributes(), comments, annotations, typeRef, name, Optional.of(initialValue),
+        enumConstant, synthetic);
+  }
+
+  /**
+   * Get the property with the specified initial value
+   * 
+   * @param initialValue an {@link Optional} {@link Expression}
+   * @return the property.
+   */
+  public Property withInitialValue(Optional<Expression> initialValue) {
+    return new Property(getModifiers(), getAttributes(), comments, annotations, typeRef, name, initialValue, enumConstant,
+        synthetic);
   }
 
   protected String getDefaultValue() {
