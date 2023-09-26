@@ -32,12 +32,45 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <annotationProcessors>
                         <processor>io.sundr.resourcecify.internal.processor.ResourcecifyProcessor</processor>
                     </annotationProcessors>
                 </configuration>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-shade-plugin</artifactId>
+              <version>${maven-shade-plugin.version}</version>
+              <executions>
+                <execution>
+                  <id>normal</id>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>shade</goal>
+                  </goals>
+                  <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>internal</shadedClassifierName> 
+                    <artifactSet>
+                      <includes>
+                        <include>io.sundr:*</include>
+                      </includes>
+                    </artifactSet>
+                    <relocations>
+                      <relocation>
+                        <pattern>io.sundr</pattern>
+                        <shadedPattern>io.sundr.internal</shadedPattern>
+                      </relocation>
+                    </relocations>
+                    <transformers>
+                      <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                    </transformers>
+                    <createDependencyReducedPom>true</createDependencyReducedPom>
+                  </configuration>
+                </execution>
+              </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
