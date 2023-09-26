@@ -205,14 +205,23 @@ public class Property extends ModifierSupport implements Renderable, Commentable
         synthetic);
   }
 
+  /**
+   * Get the default value of the property
+   * The mehotd is deprecated, use {@link #getInitialValue()} instead.
+   * 
+   * @return String the default value of the Property
+   */
+  @Deprecated
   protected String getDefaultValue() {
-    Object value = getAttribute(INIT);
-    if (getTypeRef() instanceof ClassRef && ((ClassRef) getTypeRef()).getFullyQualifiedName().equals(JAVA_LANG_STRING)
-        && getTypeRef().getDimensions() == 0 && !String.valueOf(value).startsWith("\"")) {
-      return "\"" + value + "\"";
-    } else {
-      return String.valueOf(value);
-    }
+    return getInitialValue().map(Expression::render).orElseGet(() -> {
+      Object value = getAttribute(INIT);
+      if (getTypeRef() instanceof ClassRef && ((ClassRef) getTypeRef()).getFullyQualifiedName().equals(JAVA_LANG_STRING)
+          && getTypeRef().getDimensions() == 0 && !String.valueOf(value).startsWith("\"")) {
+        return "\"" + value + "\"";
+      } else {
+        return String.valueOf(value);
+      }
+    });
   }
 
   @Override
