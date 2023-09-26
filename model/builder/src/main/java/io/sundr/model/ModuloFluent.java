@@ -13,6 +13,10 @@ public class ModuloFluent<A extends ModuloFluent<A>> extends BinaryExpressionFlu
   }
 
   public ModuloFluent(Modulo instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Modulo instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

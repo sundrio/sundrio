@@ -17,14 +17,18 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
   }
 
   public AssignFluent(Assign instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> target;
+  private VisitableBuilder<? extends Expression, ?> value;
+
+  protected void copyInstance(Assign instance) {
     if (instance != null) {
       this.withTarget(instance.getTarget());
       this.withValue(instance.getValue());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> target;
-  private VisitableBuilder<? extends Expression, ?> value;
 
   public Expression buildTarget() {
     return this.target != null ? this.target.build() : null;

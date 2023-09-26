@@ -17,14 +17,18 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
   }
 
   public BinaryExpressionFluent(BinaryExpression instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> left;
+  private VisitableBuilder<? extends Expression, ?> right;
+
+  protected void copyInstance(BinaryExpression instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> left;
-  private VisitableBuilder<? extends Expression, ?> right;
 
   public Expression buildLeft() {
     return this.left != null ? this.left.build() : null;

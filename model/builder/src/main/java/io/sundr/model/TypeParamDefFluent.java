@@ -20,15 +20,19 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public TypeParamDefFluent(TypeParamDef instance) {
+    this.copyInstance(instance);
+  }
+
+  private String name;
+  private ArrayList<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
+
+  protected void copyInstance(TypeParamDef instance) {
     if (instance != null) {
       this.withName(instance.getName());
       this.withBounds(instance.getBounds());
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private String name;
-  private ArrayList<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
 
   public String getName() {
     return this.name;

@@ -17,11 +17,15 @@ public class PostDecrementFluent<A extends PostDecrementFluent<A>> extends BaseF
   }
 
   public PostDecrementFluent(PostDecrement instance) {
-    if (instance != null) {
-    }
+    this.copyInstance(instance);
   }
 
   private VisitableBuilder<? extends Expression, ?> expression;
+
+  protected void copyInstance(PostDecrement instance) {
+    if (instance != null) {
+    }
+  }
 
   public Expression buildExpression() {
     return this.expression != null ? this.expression.build() : null;

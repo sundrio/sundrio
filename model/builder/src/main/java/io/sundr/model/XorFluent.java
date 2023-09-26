@@ -13,6 +13,10 @@ public class XorFluent<A extends XorFluent<A>> extends BinaryExpressionFluent<A>
   }
 
   public XorFluent(Xor instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Xor instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

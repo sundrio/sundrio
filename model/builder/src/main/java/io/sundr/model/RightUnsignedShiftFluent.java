@@ -13,6 +13,10 @@ public class RightUnsignedShiftFluent<A extends RightUnsignedShiftFluent<A>> ext
   }
 
   public RightUnsignedShiftFluent(RightUnsignedShift instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(RightUnsignedShift instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

@@ -17,16 +17,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
   }
 
   public ForeachFluent(Foreach instance) {
+    this.copyInstance(instance);
+  }
+
+  private DeclareBuilder declare;
+  private VisitableBuilder<? extends Expression, ?> expression;
+  private VisitableBuilder<? extends Statement, ?> body;
+
+  protected void copyInstance(Foreach instance) {
     if (instance != null) {
       this.withDeclare(instance.getDeclare());
       this.withExpression(instance.getExpression());
       this.withBody(instance.getBody());
     }
   }
-
-  private DeclareBuilder declare;
-  private VisitableBuilder<? extends Expression, ?> expression;
-  private VisitableBuilder<? extends Statement, ?> body;
 
   public Declare buildDeclare() {
     return this.declare != null ? this.declare.build() : null;

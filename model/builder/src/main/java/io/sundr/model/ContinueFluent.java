@@ -15,6 +15,10 @@ public class ContinueFluent<A extends ContinueFluent<A>> extends BaseFluent<A> {
   }
 
   public ContinueFluent(Continue instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Continue instance) {
     instance = (instance != null ? instance : new Continue());
 
     if (instance != null) {

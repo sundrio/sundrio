@@ -13,6 +13,10 @@ public class PlusFluent<A extends PlusFluent<A>> extends BinaryExpressionFluent<
   }
 
   public PlusFluent(Plus instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(Plus instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

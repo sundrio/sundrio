@@ -20,6 +20,24 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public TypeDefFluent(TypeDef instance) {
+    this.copyInstance(instance);
+  }
+
+  private Kind kind;
+  private String packageName;
+  private String name;
+  private List<String> comments = new ArrayList<String>();
+  private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
+  private ArrayList<ClassRefBuilder> extendsList = new ArrayList<ClassRefBuilder>();
+  private ArrayList<ClassRefBuilder> implementsList = new ArrayList<ClassRefBuilder>();
+  private ArrayList<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
+  private ArrayList<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
+  private ArrayList<MethodBuilder> constructors = new ArrayList<MethodBuilder>();
+  private ArrayList<MethodBuilder> methods = new ArrayList<MethodBuilder>();
+  private String outerTypeName;
+  private ArrayList<TypeDefBuilder> innerTypes = new ArrayList<TypeDefBuilder>();
+
+  protected void copyInstance(TypeDef instance) {
     if (instance != null) {
       this.withKind(instance.getKind());
       this.withPackageName(instance.getPackageName());
@@ -38,20 +56,6 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private Kind kind;
-  private String packageName;
-  private String name;
-  private List<String> comments = new ArrayList<String>();
-  private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
-  private ArrayList<ClassRefBuilder> extendsList = new ArrayList<ClassRefBuilder>();
-  private ArrayList<ClassRefBuilder> implementsList = new ArrayList<ClassRefBuilder>();
-  private ArrayList<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
-  private ArrayList<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
-  private ArrayList<MethodBuilder> constructors = new ArrayList<MethodBuilder>();
-  private ArrayList<MethodBuilder> methods = new ArrayList<MethodBuilder>();
-  private String outerTypeName;
-  private ArrayList<TypeDefBuilder> innerTypes = new ArrayList<TypeDefBuilder>();
 
   public Kind getKind() {
     return this.kind;

@@ -17,11 +17,15 @@ public class PostIncrementFluent<A extends PostIncrementFluent<A>> extends BaseF
   }
 
   public PostIncrementFluent(PostIncrement instance) {
-    if (instance != null) {
-    }
+    this.copyInstance(instance);
   }
 
   private VisitableBuilder<? extends Expression, ?> expression;
+
+  protected void copyInstance(PostIncrement instance) {
+    if (instance != null) {
+    }
+  }
 
   public Expression buildExpression() {
     return this.expression != null ? this.expression.build() : null;

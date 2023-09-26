@@ -18,16 +18,20 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public IfFluent(If instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> condition;
+  private VisitableBuilder<? extends Statement, ?> statement;
+  private Optional<Statement> elseStatement = Optional.empty();
+
+  protected void copyInstance(If instance) {
     if (instance != null) {
       this.withCondition(instance.getCondition());
       this.withStatement(instance.getStatement());
       this.withElseStatement(instance.getElseStatement());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> condition;
-  private VisitableBuilder<? extends Statement, ?> statement;
-  private Optional<Statement> elseStatement = Optional.empty();
 
   public Expression buildCondition() {
     return this.condition != null ? this.condition.build() : null;

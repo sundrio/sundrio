@@ -21,6 +21,13 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
   }
 
   public WildcardRefFluent(WildcardRef instance) {
+    this.copyInstance(instance);
+  }
+
+  private WildcardRef.BoundKind boundKind;
+  private ArrayList<VisitableBuilder<? extends TypeRef, ?>> bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+
+  protected void copyInstance(WildcardRef instance) {
     instance = (instance != null ? instance : new WildcardRef());
 
     if (instance != null) {
@@ -29,9 +36,6 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private WildcardRef.BoundKind boundKind;
-  private ArrayList<VisitableBuilder<? extends TypeRef, ?>> bounds = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
 
   public WildcardRef.BoundKind getBoundKind() {
     return this.boundKind;

@@ -17,15 +17,19 @@ public class AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends Attri
   }
 
   public AnnotationRefFluent(AnnotationRef instance) {
+    this.copyInstance(instance);
+  }
+
+  private ClassRefBuilder classRef;
+  private Map<String, Object> parameters = new LinkedHashMap<String, Object>();
+
+  protected void copyInstance(AnnotationRef instance) {
     if (instance != null) {
       this.withClassRef(instance.getClassRef());
       this.withParameters(instance.getParameters());
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private ClassRefBuilder classRef;
-  private Map<String, Object> parameters = new LinkedHashMap<String, Object>();
 
   public ClassRef buildClassRef() {
     return this.classRef != null ? this.classRef.build() : null;

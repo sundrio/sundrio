@@ -13,6 +13,10 @@ public class LessThanOrEqualFluent<A extends LessThanOrEqualFluent<A>> extends B
   }
 
   public LessThanOrEqualFluent(LessThanOrEqual instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(LessThanOrEqual instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

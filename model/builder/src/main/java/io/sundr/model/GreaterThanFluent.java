@@ -13,6 +13,10 @@ public class GreaterThanFluent<A extends GreaterThanFluent<A>> extends BinaryExp
   }
 
   public GreaterThanFluent(GreaterThan instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(GreaterThan instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

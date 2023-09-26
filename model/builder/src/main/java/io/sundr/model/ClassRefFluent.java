@@ -21,6 +21,14 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   }
 
   public ClassRefFluent(ClassRef instance) {
+    this.copyInstance(instance);
+  }
+
+  private String fullyQualifiedName;
+  private int dimensions;
+  private ArrayList<VisitableBuilder<? extends TypeRef, ?>> arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+
+  protected void copyInstance(ClassRef instance) {
     if (instance != null) {
       this.withFullyQualifiedName(instance.getFullyQualifiedName());
       this.withDimensions(instance.getDimensions());
@@ -28,10 +36,6 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private String fullyQualifiedName;
-  private int dimensions;
-  private ArrayList<VisitableBuilder<? extends TypeRef, ?>> arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
 
   public String getFullyQualifiedName() {
     return this.fullyQualifiedName;

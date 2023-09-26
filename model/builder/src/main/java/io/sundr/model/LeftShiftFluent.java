@@ -13,6 +13,10 @@ public class LeftShiftFluent<A extends LeftShiftFluent<A>> extends BinaryExpress
   }
 
   public LeftShiftFluent(LeftShift instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(LeftShift instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

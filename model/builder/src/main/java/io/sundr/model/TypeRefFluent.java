@@ -13,6 +13,10 @@ public class TypeRefFluent<A extends TypeRefFluent<A>> extends AttributeSupportF
   }
 
   public TypeRefFluent(TypeRef instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(TypeRef instance) {
     if (instance != null) {
       this.withAttributes(instance.getAttributes());
     }

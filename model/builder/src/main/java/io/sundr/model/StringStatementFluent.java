@@ -16,12 +16,16 @@ public class StringStatementFluent<A extends StringStatementFluent<A>> extends B
   }
 
   public StringStatementFluent(StringStatement instance) {
+    this.copyInstance(instance);
+  }
+
+  private Supplier<String> supplier;
+
+  protected void copyInstance(StringStatement instance) {
     if (instance != null) {
       this.withSupplier(instance.getSupplier());
     }
   }
-
-  private Supplier<String> supplier;
 
   public Supplier<String> getSupplier() {
     return this.supplier;

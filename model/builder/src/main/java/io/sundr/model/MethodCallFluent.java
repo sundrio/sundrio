@@ -22,6 +22,15 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
   }
 
   public MethodCallFluent(MethodCall instance) {
+    this.copyInstance(instance);
+  }
+
+  private String name;
+  private VisitableBuilder<? extends Expression, ?> scope;
+  private ArrayList<VisitableBuilder<? extends TypeRef, ?>> parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+  private ArrayList<VisitableBuilder<? extends Expression, ?>> arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+
+  protected void copyInstance(MethodCall instance) {
     if (instance != null) {
       this.withName(instance.getName());
       this.withScope(instance.getScope());
@@ -29,11 +38,6 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
       this.withArguments(instance.getArguments());
     }
   }
-
-  private String name;
-  private VisitableBuilder<? extends Expression, ?> scope;
-  private ArrayList<VisitableBuilder<? extends TypeRef, ?>> parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
-  private ArrayList<VisitableBuilder<? extends Expression, ?>> arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
 
   public String getName() {
     return this.name;

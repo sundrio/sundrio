@@ -17,12 +17,16 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
   }
 
   public PreDecrementFluent(PreDecrement instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> expression;
+
+  protected void copyInstance(PreDecrement instance) {
     if (instance != null) {
       this.withExpression(instance.getExpression());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> expression;
 
   public Expression buildExpression() {
     return this.expression != null ? this.expression.build() : null;

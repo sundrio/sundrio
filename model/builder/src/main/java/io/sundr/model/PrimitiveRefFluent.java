@@ -13,15 +13,19 @@ public class PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRef
   }
 
   public PrimitiveRefFluent(PrimitiveRef instance) {
+    this.copyInstance(instance);
+  }
+
+  private String name;
+  private int dimensions;
+
+  protected void copyInstance(PrimitiveRef instance) {
     if (instance != null) {
       this.withName(instance.getName());
       this.withDimensions(instance.getDimensions());
       this.withAttributes(instance.getAttributes());
     }
   }
-
-  private String name;
-  private int dimensions;
 
   public String getName() {
     return this.name;

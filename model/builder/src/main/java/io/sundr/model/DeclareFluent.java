@@ -22,14 +22,18 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
   }
 
   public DeclareFluent(Declare instance) {
+    this.copyInstance(instance);
+  }
+
+  private ArrayList<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
+  private Optional<Expression> value = Optional.empty();
+
+  protected void copyInstance(Declare instance) {
     if (instance != null) {
       this.withProperties(instance.getProperties());
       this.withValue(instance.getValue());
     }
   }
-
-  private ArrayList<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
-  private Optional<Expression> value = Optional.empty();
 
   public A addToProperties(int index, Property item) {
     if (this.properties == null) {

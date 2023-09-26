@@ -17,12 +17,16 @@ public class InverseFluent<A extends InverseFluent<A>> extends BaseFluent<A> {
   }
 
   public InverseFluent(Inverse instance) {
+    this.copyInstance(instance);
+  }
+
+  private VisitableBuilder<? extends Expression, ?> expresion;
+
+  protected void copyInstance(Inverse instance) {
     if (instance != null) {
       this.withExpresion(instance.getExpresion());
     }
   }
-
-  private VisitableBuilder<? extends Expression, ?> expresion;
 
   public Expression buildExpresion() {
     return this.expresion != null ? this.expresion.build() : null;

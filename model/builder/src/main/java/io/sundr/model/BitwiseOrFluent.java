@@ -13,6 +13,10 @@ public class BitwiseOrFluent<A extends BitwiseOrFluent<A>> extends BinaryExpress
   }
 
   public BitwiseOrFluent(BitwiseOr instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(BitwiseOr instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
@@ -21,24 +22,147 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public PropertyFluent(Property instance) {
-    if (instance != null) {
-      this.withAnnotations(instance.getAnnotations());
-      this.withTypeRef(instance.getTypeRef());
-      this.withName(instance.getName());
-      this.withComments(instance.getComments());
-      this.withEnumConstant(instance.isEnumConstant());
-      this.withSynthetic(instance.isSynthetic());
-      this.withModifiers(instance.getModifiers());
-      this.withAttributes(instance.getAttributes());
-    }
+    this.copyInstance(instance);
   }
 
+  private List<String> comments = new ArrayList<String>();
   private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
   private VisitableBuilder<? extends TypeRef, ?> typeRef;
   private String name;
-  private List<String> comments = new ArrayList<String>();
+  private Optional<Expression> initialValue = Optional.empty();
   private boolean enumConstant;
   private boolean synthetic;
+
+  protected void copyInstance(Property instance) {
+    if (instance != null) {
+      this.withModifiers(instance.getModifiers());
+      this.withAttributes(instance.getAttributes());
+      this.withComments(instance.getComments());
+      this.withAnnotations(instance.getAnnotations());
+      this.withTypeRef(instance.getTypeRef());
+      this.withName(instance.getName());
+      this.withInitialValue(instance.getInitialValue());
+      this.withEnumConstant(instance.isEnumConstant());
+      this.withSynthetic(instance.isSynthetic());
+    }
+  }
+
+  public A addToComments(int index, String item) {
+    if (this.comments == null) {
+      this.comments = new ArrayList<String>();
+    }
+    this.comments.add(index, item);
+    return (A) this;
+  }
+
+  public A setToComments(int index, String item) {
+    if (this.comments == null) {
+      this.comments = new ArrayList<String>();
+    }
+    this.comments.set(index, item);
+    return (A) this;
+  }
+
+  public A addToComments(java.lang.String... items) {
+    if (this.comments == null) {
+      this.comments = new ArrayList<String>();
+    }
+    for (String item : items) {
+      this.comments.add(item);
+    }
+    return (A) this;
+  }
+
+  public A addAllToComments(Collection<String> items) {
+    if (this.comments == null) {
+      this.comments = new ArrayList<String>();
+    }
+    for (String item : items) {
+      this.comments.add(item);
+    }
+    return (A) this;
+  }
+
+  public A removeFromComments(java.lang.String... items) {
+    if (this.comments == null)
+      return (A) this;
+    for (String item : items) {
+      this.comments.remove(item);
+    }
+    return (A) this;
+  }
+
+  public A removeAllFromComments(Collection<String> items) {
+    if (this.comments == null)
+      return (A) this;
+    for (String item : items) {
+      this.comments.remove(item);
+    }
+    return (A) this;
+  }
+
+  public List<String> getComments() {
+    return this.comments;
+  }
+
+  public String getComment(int index) {
+    return this.comments.get(index);
+  }
+
+  public String getFirstComment() {
+    return this.comments.get(0);
+  }
+
+  public String getLastComment() {
+    return this.comments.get(comments.size() - 1);
+  }
+
+  public String getMatchingComment(Predicate<String> predicate) {
+    for (String item : comments) {
+      if (predicate.test(item)) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  public boolean hasMatchingComment(Predicate<String> predicate) {
+    for (String item : comments) {
+      if (predicate.test(item)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public A withComments(List<String> comments) {
+    if (comments != null) {
+      this.comments = new ArrayList();
+      for (String item : comments) {
+        this.addToComments(item);
+      }
+    } else {
+      this.comments = null;
+    }
+    return (A) this;
+  }
+
+  public A withComments(java.lang.String... comments) {
+    if (this.comments != null) {
+      this.comments.clear();
+      _visitables.remove("comments");
+    }
+    if (comments != null) {
+      for (String item : comments) {
+        this.addToComments(item);
+      }
+    }
+    return (A) this;
+  }
+
+  public boolean hasComments() {
+    return comments != null && !comments.isEmpty();
+  }
 
   public A addToAnnotations(int index, AnnotationRef item) {
     if (this.annotations == null) {
@@ -315,121 +439,30 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
     return this.name != null;
   }
 
-  public A addToComments(int index, String item) {
-    if (this.comments == null) {
-      this.comments = new ArrayList<String>();
-    }
-    this.comments.add(index, item);
-    return (A) this;
-  }
-
-  public A setToComments(int index, String item) {
-    if (this.comments == null) {
-      this.comments = new ArrayList<String>();
-    }
-    this.comments.set(index, item);
-    return (A) this;
-  }
-
-  public A addToComments(java.lang.String... items) {
-    if (this.comments == null) {
-      this.comments = new ArrayList<String>();
-    }
-    for (String item : items) {
-      this.comments.add(item);
-    }
-    return (A) this;
-  }
-
-  public A addAllToComments(Collection<String> items) {
-    if (this.comments == null) {
-      this.comments = new ArrayList<String>();
-    }
-    for (String item : items) {
-      this.comments.add(item);
-    }
-    return (A) this;
-  }
-
-  public A removeFromComments(java.lang.String... items) {
-    if (this.comments == null)
-      return (A) this;
-    for (String item : items) {
-      this.comments.remove(item);
-    }
-    return (A) this;
-  }
-
-  public A removeAllFromComments(Collection<String> items) {
-    if (this.comments == null)
-      return (A) this;
-    for (String item : items) {
-      this.comments.remove(item);
-    }
-    return (A) this;
-  }
-
-  public List<String> getComments() {
-    return this.comments;
-  }
-
-  public String getComment(int index) {
-    return this.comments.get(index);
-  }
-
-  public String getFirstComment() {
-    return this.comments.get(0);
-  }
-
-  public String getLastComment() {
-    return this.comments.get(comments.size() - 1);
-  }
-
-  public String getMatchingComment(Predicate<String> predicate) {
-    for (String item : comments) {
-      if (predicate.test(item)) {
-        return item;
-      }
-    }
-    return null;
-  }
-
-  public boolean hasMatchingComment(Predicate<String> predicate) {
-    for (String item : comments) {
-      if (predicate.test(item)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  public A withComments(List<String> comments) {
-    if (comments != null) {
-      this.comments = new ArrayList();
-      for (String item : comments) {
-        this.addToComments(item);
-      }
+  public A withInitialValue(Optional<Expression> initialValue) {
+    if (initialValue == null || !initialValue.isPresent()) {
+      this.initialValue = Optional.empty();
     } else {
-      this.comments = null;
+      this.initialValue = initialValue;
     }
     return (A) this;
   }
 
-  public A withComments(java.lang.String... comments) {
-    if (this.comments != null) {
-      this.comments.clear();
-      _visitables.remove("comments");
-    }
-    if (comments != null) {
-      for (String item : comments) {
-        this.addToComments(item);
-      }
+  public A withInitialValue(Expression initialValue) {
+    if (initialValue == null) {
+      this.initialValue = Optional.empty();
+    } else {
+      this.initialValue = Optional.of(initialValue);
     }
     return (A) this;
   }
 
-  public boolean hasComments() {
-    return comments != null && !comments.isEmpty();
+  public Optional<Expression> getInitialValue() {
+    return this.initialValue;
+  }
+
+  public boolean hasInitialValue() {
+    return initialValue != null && initialValue.isPresent();
   }
 
   public boolean isEnumConstant() {
@@ -466,6 +499,9 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
     if (!super.equals(o))
       return false;
     PropertyFluent that = (PropertyFluent) o;
+    if (!java.util.Objects.equals(comments, that.comments))
+      return false;
+
     if (!java.util.Objects.equals(annotations, that.annotations))
       return false;
 
@@ -475,7 +511,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
     if (!java.util.Objects.equals(name, that.name))
       return false;
 
-    if (!java.util.Objects.equals(comments, that.comments))
+    if (!java.util.Objects.equals(initialValue, that.initialValue))
       return false;
 
     if (enumConstant != that.enumConstant)
@@ -486,12 +522,17 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(annotations, typeRef, name, comments, enumConstant, synthetic, super.hashCode());
+    return java.util.Objects.hash(comments, annotations, typeRef, name, initialValue, enumConstant, synthetic,
+        super.hashCode());
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
+    if (comments != null && !comments.isEmpty()) {
+      sb.append("comments:");
+      sb.append(comments + ",");
+    }
     if (annotations != null && !annotations.isEmpty()) {
       sb.append("annotations:");
       sb.append(annotations + ",");
@@ -504,9 +545,9 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
       sb.append("name:");
       sb.append(name + ",");
     }
-    if (comments != null && !comments.isEmpty()) {
-      sb.append("comments:");
-      sb.append(comments + ",");
+    if (initialValue != null) {
+      sb.append("initialValue:");
+      sb.append(initialValue + ",");
     }
     sb.append("enumConstant:");
     sb.append(enumConstant + ",");

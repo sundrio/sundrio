@@ -13,6 +13,10 @@ public class BitwiseAndFluent<A extends BitwiseAndFluent<A>> extends BinaryExpre
   }
 
   public BitwiseAndFluent(BitwiseAnd instance) {
+    this.copyInstance(instance);
+  }
+
+  protected void copyInstance(BitwiseAnd instance) {
     if (instance != null) {
       this.withLeft(instance.getLeft());
       this.withRight(instance.getRight());

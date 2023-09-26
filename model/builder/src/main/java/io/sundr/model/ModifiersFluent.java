@@ -15,6 +15,20 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
   }
 
   public ModifiersFluent(Modifiers instance) {
+    this.copyInstance(instance);
+  }
+
+  private boolean _private;
+  private boolean _protected;
+  private boolean _public;
+  private boolean _abstract;
+  private boolean _final;
+  private boolean _native;
+  private boolean _static;
+  private boolean _synchronized;
+  private boolean _transient;
+
+  protected void copyInstance(Modifiers instance) {
     instance = (instance != null ? instance : new Modifiers());
 
     if (instance != null) {
@@ -29,16 +43,6 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
       this.withTransient(instance.isTransient());
     }
   }
-
-  private boolean _private;
-  private boolean _protected;
-  private boolean _public;
-  private boolean _abstract;
-  private boolean _final;
-  private boolean _native;
-  private boolean _static;
-  private boolean _synchronized;
-  private boolean _transient;
 
   public boolean isPrivate() {
     return this._private;
