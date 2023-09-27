@@ -20,7 +20,6 @@ public class BreakFluent<A extends BreakFluent<A>> extends BaseFluent<A> {
 
   protected void copyInstance(Break instance) {
     instance = (instance != null ? instance : new Break());
-
     if (instance != null) {
     }
   }

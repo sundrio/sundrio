@@ -68,34 +68,34 @@ public final class Types {
   public static final TypeDef PARAMETERIZED_TYPE = TypeDef.forName(ParameterizedType.class.getName());
 
   public static final TypeDef OBJECT = TypeDef.OBJECT;
-  public static final TypeRef OBJECT_REF = OBJECT.toInternalReference();
+  public static final ClassRef OBJECT_REF = OBJECT.toInternalReference();
 
   public static final TypeDef STRING = TypeDef.forName(String.class.getName());
-  public static final TypeRef STRING_REF = STRING.toReference();
+  public static final ClassRef STRING_REF = STRING.toReference();
 
   public static final TypeDef BOOLEAN = TypeDef.forName(Boolean.class.getName());
   public static final TypeRef BOOLEAN_REF = BOOLEAN.toInternalReference();
 
   public static final TypeDef BYTE = TypeDef.forName(Byte.class.getName());
-  public static final TypeRef BYTE_REF = BYTE.toInternalReference();
+  public static final ClassRef BYTE_REF = BYTE.toInternalReference();
 
   public static final TypeDef CHARACTER = TypeDef.forName(Character.class.getName());
-  public static final TypeRef CHARACTER_REF = CHARACTER.toInternalReference();
+  public static final ClassRef CHARACTER_REF = CHARACTER.toInternalReference();
 
   public static final TypeDef SHORT = TypeDef.forName(Short.class.getName());
-  public static final TypeRef SHORT_REF = SHORT.toInternalReference();
+  public static final ClassRef SHORT_REF = SHORT.toInternalReference();
 
   public static final TypeDef INT = TypeDef.forName(Integer.class.getName());
-  public static final TypeRef INT_REF = INT.toInternalReference();
+  public static final ClassRef INT_REF = INT.toInternalReference();
 
   public static final TypeDef LONG = TypeDef.forName(Long.class.getName());
-  public static final TypeRef LONG_REF = LONG.toInternalReference();
+  public static final ClassRef LONG_REF = LONG.toInternalReference();
 
   public static final TypeDef DOUBLE = TypeDef.forName(Double.class.getName());
-  public static final TypeRef DOUBLE_REF = DOUBLE.toInternalReference();
+  public static final ClassRef DOUBLE_REF = DOUBLE.toInternalReference();
 
   public static final TypeDef FLOAT = TypeDef.forName(Float.class.getName());
-  public static final TypeRef FLOAT_REF = FLOAT.toInternalReference();
+  public static final ClassRef FLOAT_REF = FLOAT.toInternalReference();
 
   public static final TypeDef OPTIONAL = new TypeDefBuilder(TypeDef.forName(Optional.class.getName()))
       .withKind(Kind.CLASS)

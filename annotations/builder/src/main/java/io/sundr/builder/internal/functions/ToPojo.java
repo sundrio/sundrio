@@ -20,15 +20,14 @@ import static io.sundr.builder.Constants.ADDITIONAL_BUILDABLES;
 import static io.sundr.builder.Constants.ADDITIONAL_TYPES;
 import static io.sundr.builder.Constants.ARRAYS;
 import static io.sundr.builder.Constants.COLLECTORS;
-import static io.sundr.builder.Constants.TO_STRING_ARRAY_SNIPPET;
 import static io.sundr.builder.internal.functions.ClazzAs.BUILDER;
 import static io.sundr.builder.internal.functions.ClazzAs.POJO;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
-import static io.sundr.utils.Strings.loadResourceQuietly;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -61,22 +60,31 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.Assign;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
+import io.sundr.model.Block;
+import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Declare;
+import io.sundr.model.Expression;
+import io.sundr.model.For;
+import io.sundr.model.If;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.PropertyFluent;
+import io.sundr.model.Return;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.Statement;
 import io.sundr.model.StringStatement;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.ValueRef;
 import io.sundr.model.functions.Assignable;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
@@ -87,8 +95,6 @@ import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
 public class ToPojo implements Function<RichTypeDef, TypeDef> {
-
-  private static final String TO_STRING_ARRAY_TEXT = loadResourceQuietly(TO_STRING_ARRAY_SNIPPET);
 
   //A stack of variable names to be used for lambda expressions.
   //We need them because nested lambdas may clash.
@@ -596,6 +602,12 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endBlock()
           .build();
 
+      Property o = Property.newProperty("o");
+      Property s = Property.newProperty(String.class, "s");
+      Property l = Property.newProperty(List.class, "l");
+      Property i = Property.newProperty(int.class, "i");
+      Property larray = Property.newProperty(String[].class, "larray");
+
       Method staticToStringArray = new MethodBuilder()
           .withNewModifiers().withPublic().withStatic().endModifiers()
           .withName("toStringArray")
@@ -605,7 +617,24 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endArgument()
           .withReturnType(Types.STRING_REF.withDimensions(1))
           .withNewBlock()
-          .addToStatements(new StringStatement(TO_STRING_ARRAY_TEXT))
+          .withStatements(
+              new If(o.toReference().instanceOf(Types.STRING_REF.withDimensions(1)),
+                  new Return(o.toReference().cast(Types.STRING_REF.withDimensions(1)))),
+
+              new If(o.toReference().instanceOf(Types.STRING_REF),
+                  new Block(
+                      new Declare(s, o.toReference().cast(Types.STRING_REF)),
+                      new Return(s.toReference().call("split", ValueRef.from(",[ ]*"))))),
+              new If(o.toReference().instanceOf(List.class), new Block(
+                  new Declare(l, new Cast(List.class, o)),
+                  new Declare(larray, Expression.createNewArray(String.class, l.toReference().call("size"))),
+                  new For(new Declare(i, 0),
+                      Expression.eq(i.toReference(), l.toReference().call("size")),
+                      i.toReference().postIncrement(),
+                      new Assign(larray.toReference().index(i.toReference()),
+                          Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference())))
+                              .toStatement()))),
+              new Return(Expression.createNewArray(String.class, 0)))
           .endBlock()
           .build();
 
@@ -649,9 +678,9 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       additionalMethods.add(equals);
       additionalMethods.add(hashCode);
 
-      for (Object o : adapters) {
-        if (o instanceof AnnotationRef) {
-          AnnotationRef r = (AnnotationRef) o;
+      for (Object obj : adapters) {
+        if (obj instanceof AnnotationRef) {
+          AnnotationRef r = (AnnotationRef) obj;
           String name = String.valueOf(r.getParameters().getOrDefault("name", ""));
           String prefix = String.valueOf(r.getParameters().getOrDefault("prefix", ""));
           String suffix = String.valueOf(r.getParameters().getOrDefault("suffix", ""));
@@ -678,8 +707,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
             adapterImports.add(COLLECTORS);
           }
           List<ClassRef> generatedRefs = new ArrayList<>();
-          Types.allProperties(generatedPojo).stream().map(i -> i.getTypeRef()).filter(i -> i instanceof ClassRef)
-              .forEach(i -> populateReferences((ClassRef) i, generatedRefs));
+          Types.allProperties(generatedPojo).stream().map(p -> p.getTypeRef()).filter(t -> t instanceof ClassRef)
+              .forEach(t -> populateReferences((ClassRef) t, generatedRefs));
           adapterImports.addAll(generatedRefs);
           adapterImports.add(TypeAs.BUILDER_REF.apply(generatedPojo.toReference()));
 

@@ -30,8 +30,7 @@ public class Ternary implements Expression {
         .append(" ? ")
         .append(result.render())
         .append(" : ")
-        .append(alternative.render())
-        .append(";");
+        .append(alternative.render());
     return sb.toString();
   }
 }

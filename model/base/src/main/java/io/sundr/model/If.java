@@ -18,6 +18,10 @@ public class If implements Statement {
     this(condition, statement, Optional.ofNullable(elseStatement));
   }
 
+  public If(Expression condition, Statement statement) {
+    this(condition, statement, Optional.empty());
+  }
+
   public Expression getCondition() {
     return condition;
   }
@@ -44,6 +48,7 @@ public class If implements Statement {
         sb.append(e.render());
       } else {
         sb.append(OB);
+        sb.append(NEWLINE);
         sb.append(tab(e.render()));
         sb.append(CB);
       }

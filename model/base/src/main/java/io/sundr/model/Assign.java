@@ -14,12 +14,12 @@ public class Assign implements ExpressionOrStatement {
     this(new PropertyRef(property), value);
   }
 
-  public Expression getTarget() {
-    return target;
-  }
-
   public Assign(Property property, Object value, Object... rest) {
     this(property, ValueRef.from(value, rest));
+  }
+
+  public Expression getTarget() {
+    return target;
   }
 
   public Expression getValue() {

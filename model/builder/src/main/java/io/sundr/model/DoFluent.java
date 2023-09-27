@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.lang.Class;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -63,6 +65,26 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     return (A) withCondition(new Multiply(left, right));
   }
 
+  public NewArrayConditionNested<A> withNewNewArrayCondition() {
+    return new NewArrayConditionNested(null);
+  }
+
+  public NewArrayConditionNested<A> withNewNewArrayConditionLike(NewArray item) {
+    return new NewArrayConditionNested(item);
+  }
+
+  public A withNewNewArrayCondition(Class type, Integer[] sizes) {
+    return (A) withCondition(new NewArray(type, sizes));
+  }
+
+  public InstanceOfConditionNested<A> withNewInstanceOfCondition() {
+    return new InstanceOfConditionNested(null);
+  }
+
+  public InstanceOfConditionNested<A> withNewInstanceOfConditionLike(InstanceOf item) {
+    return new InstanceOfConditionNested(item);
+  }
+
   public MethodCallConditionNested<A> withNewMethodCallCondition() {
     return new MethodCallConditionNested(null);
   }
@@ -77,6 +99,14 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
 
   public InverseConditionNested<A> withNewInverseConditionLike(Inverse item) {
     return new InverseConditionNested(item);
+  }
+
+  public IndexConditionNested<A> withNewIndexCondition() {
+    return new IndexConditionNested(null);
+  }
+
+  public IndexConditionNested<A> withNewIndexConditionLike(Index item) {
+    return new IndexConditionNested(item);
   }
 
   public GreaterThanOrEqualConditionNested<A> withNewGreaterThanOrEqualCondition() {
@@ -207,6 +237,30 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     return (A) withCondition(new GreaterThan(left, right));
   }
 
+  public DeclareConditionNested<A> withNewDeclareCondition() {
+    return new DeclareConditionNested(null);
+  }
+
+  public DeclareConditionNested<A> withNewDeclareConditionLike(Declare item) {
+    return new DeclareConditionNested(item);
+  }
+
+  public A withNewDeclareCondition(Class type, String name) {
+    return (A) withCondition(new Declare(type, name));
+  }
+
+  public A withNewDeclareCondition(Class type, String name, Object value) {
+    return (A) withCondition(new Declare(type, name, value));
+  }
+
+  public CastConditionNested<A> withNewCastCondition() {
+    return new CastConditionNested(null);
+  }
+
+  public CastConditionNested<A> withNewCastConditionLike(Cast item) {
+    return new CastConditionNested(item);
+  }
+
   public ModuloConditionNested<A> withNewModuloCondition() {
     return new ModuloConditionNested(null);
   }
@@ -293,6 +347,14 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
 
   public PostDecrementConditionNested<A> withNewPostDecrementConditionLike(PostDecrement item) {
     return new PostDecrementConditionNested(item);
+  }
+
+  public LambdaConditionNested<A> withNewLambdaCondition() {
+    return new LambdaConditionNested(null);
+  }
+
+  public LambdaConditionNested<A> withNewLambdaConditionLike(Lambda item) {
+    return new LambdaConditionNested(item);
   }
 
   public NotConditionNested<A> withNewNotCondition() {
@@ -440,6 +502,14 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     return this.statement != null;
   }
 
+  public MethodCallStatementNested<A> withNewMethodCallStatement() {
+    return new MethodCallStatementNested(null);
+  }
+
+  public MethodCallStatementNested<A> withNewMethodCallStatementLike(MethodCall item) {
+    return new MethodCallStatementNested(item);
+  }
+
   public SwitchStatementNested<A> withNewSwitchStatement() {
     return new SwitchStatementNested(null);
   }
@@ -462,6 +532,14 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
 
   public DeclareStatementNested<A> withNewDeclareStatementLike(Declare item) {
     return new DeclareStatementNested(item);
+  }
+
+  public A withNewDeclareStatement(Class type, String name) {
+    return (A) withStatement(new Declare(type, name));
+  }
+
+  public A withNewDeclareStatement(Class type, String name, Object value) {
+    return (A) withStatement(new Declare(type, name, value));
   }
 
   public WhileStatementNested<A> withNewWhileStatement() {
@@ -528,6 +606,14 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     return new IfStatementNested(item);
   }
 
+  public LambdaStatementNested<A> withNewLambdaStatement() {
+    return new LambdaStatementNested(null);
+  }
+
+  public LambdaStatementNested<A> withNewLambdaStatementLike(Lambda item) {
+    return new LambdaStatementNested(item);
+  }
+
   public ReturnStatementNested<A> withNewReturnStatement() {
     return new ReturnStatementNested(null);
   }
@@ -536,12 +622,24 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     return new ReturnStatementNested(item);
   }
 
+  public A withNewReturnStatement(Object object) {
+    return (A) withStatement(new Return(object));
+  }
+
   public AssignStatementNested<A> withNewAssignStatement() {
     return new AssignStatementNested(null);
   }
 
   public AssignStatementNested<A> withNewAssignStatementLike(Assign item) {
     return new AssignStatementNested(item);
+  }
+
+  public StatementAdapterStatementNested<A> withNewStatementAdapterStatement() {
+    return new StatementAdapterStatementNested(null);
+  }
+
+  public StatementAdapterStatementNested<A> withNewStatementAdapterStatementLike(StatementAdapter item) {
+    return new StatementAdapterStatementNested(item);
   }
 
   public ForStatementNested<A> withNewForStatement() {
@@ -562,10 +660,8 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     DoFluent that = (DoFluent) o;
     if (!java.util.Objects.equals(condition, that.condition))
       return false;
-
     if (!java.util.Objects.equals(statement, that.statement))
       return false;
-
     return true;
   }
 
@@ -592,10 +688,16 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     switch (item.getClass().getName()) {
       case "io.sundr.model." + "Multiply":
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "NewArray":
+        return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
+      case "io.sundr.model." + "InstanceOf":
+        return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
+      case "io.sundr.model." + "Index":
+        return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -618,6 +720,10 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "Cast":
+        return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
       case "io.sundr.model." + "ValueRef":
@@ -636,6 +742,8 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
       case "io.sundr.model." + "PostDecrement":
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Not":
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
@@ -666,8 +774,6 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
       case "io.sundr.model." + "Break":
         return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
-      case "io.sundr.model." + "Declare":
-        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
       case "io.sundr.model." + "While":
         return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
       case "io.sundr.model." + "Continue":
@@ -684,6 +790,8 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
       case "io.sundr.model." + "Return":
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
+      case "io.sundr.model." + "StatementAdapter":
+        return (VisitableBuilder<T, ?>) new StatementAdapterBuilder((StatementAdapter) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -702,6 +810,40 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     }
 
     public N endMultiplyCondition() {
+      return and();
+    }
+
+  }
+
+  public class NewArrayConditionNested<N> extends NewArrayFluent<NewArrayConditionNested<N>> implements Nested<N> {
+    NewArrayConditionNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withCondition(builder.build());
+    }
+
+    public N endNewArrayCondition() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfConditionNested<N> extends InstanceOfFluent<InstanceOfConditionNested<N>> implements Nested<N> {
+    InstanceOfConditionNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withCondition(builder.build());
+    }
+
+    public N endInstanceOfCondition() {
       return and();
     }
 
@@ -736,6 +878,23 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     }
 
     public N endInverseCondition() {
+      return and();
+    }
+
+  }
+
+  public class IndexConditionNested<N> extends IndexFluent<IndexConditionNested<N>> implements Nested<N> {
+    IndexConditionNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withCondition(builder.build());
+    }
+
+    public N endIndexCondition() {
       return and();
     }
 
@@ -929,6 +1088,40 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareConditionNested<N> extends DeclareFluent<DeclareConditionNested<N>> implements Nested<N> {
+    DeclareConditionNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withCondition(builder.build());
+    }
+
+    public N endDeclareCondition() {
+      return and();
+    }
+
+  }
+
+  public class CastConditionNested<N> extends CastFluent<CastConditionNested<N>> implements Nested<N> {
+    CastConditionNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withCondition(builder.build());
+    }
+
+    public N endCastCondition() {
+      return and();
+    }
+
+  }
+
   public class ModuloConditionNested<N> extends ModuloFluent<ModuloConditionNested<N>> implements Nested<N> {
     ModuloConditionNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -1079,6 +1272,23 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostDecrementCondition() {
+      return and();
+    }
+
+  }
+
+  public class LambdaConditionNested<N> extends LambdaFluent<LambdaConditionNested<N>> implements Nested<N> {
+    LambdaConditionNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withCondition(builder.build());
+    }
+
+    public N endLambdaCondition() {
       return and();
     }
 
@@ -1308,6 +1518,23 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class MethodCallStatementNested<N> extends MethodCallFluent<MethodCallStatementNested<N>> implements Nested<N> {
+    MethodCallStatementNested(MethodCall item) {
+      this.builder = new MethodCallBuilder(this, item);
+    }
+
+    MethodCallBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withStatement(builder.build());
+    }
+
+    public N endMethodCallStatement() {
+      return and();
+    }
+
+  }
+
   public class SwitchStatementNested<N> extends SwitchFluent<SwitchStatementNested<N>> implements Nested<N> {
     SwitchStatementNested(Switch item) {
       this.builder = new SwitchBuilder(this, item);
@@ -1478,6 +1705,23 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class LambdaStatementNested<N> extends LambdaFluent<LambdaStatementNested<N>> implements Nested<N> {
+    LambdaStatementNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withStatement(builder.build());
+    }
+
+    public N endLambdaStatement() {
+      return and();
+    }
+
+  }
+
   public class ReturnStatementNested<N> extends ReturnFluent<ReturnStatementNested<N>> implements Nested<N> {
     ReturnStatementNested(Return item) {
       this.builder = new ReturnBuilder(this, item);
@@ -1507,6 +1751,24 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignStatement() {
+      return and();
+    }
+
+  }
+
+  public class StatementAdapterStatementNested<N> extends StatementAdapterFluent<StatementAdapterStatementNested<N>>
+      implements Nested<N> {
+    StatementAdapterStatementNested(StatementAdapter item) {
+      this.builder = new StatementAdapterBuilder(this, item);
+    }
+
+    StatementAdapterBuilder builder;
+
+    public N and() {
+      return (N) DoFluent.this.withStatement(builder.build());
+    }
+
+    public N endStatementAdapterStatement() {
       return and();
     }
 

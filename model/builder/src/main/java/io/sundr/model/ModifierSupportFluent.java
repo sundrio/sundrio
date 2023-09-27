@@ -77,7 +77,6 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
     ModifierSupportFluent that = (ModifierSupportFluent) o;
     if (!java.util.Objects.equals(modifiers, that.modifiers))
       return false;
-
     return true;
   }
 

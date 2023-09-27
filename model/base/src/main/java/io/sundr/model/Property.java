@@ -76,6 +76,14 @@ public class Property extends ModifierSupport implements Renderable, Commentable
     this.initialValue = Optional.empty();
   }
 
+  public static Property newProperty(String name) {
+    return newProperty(ClassRef.OBJECT, name);
+  }
+
+  public static Property newProperty(Class type, String name) {
+    return newProperty(ClassRef.forClass(type), name);
+  }
+
   public static Property newProperty(TypeRef typeRef, String name) {
     return new Property(Collections.emptyList(), typeRef, name, Collections.emptyList(), false, false, Modifiers.create(),
         new HashMap<>());
@@ -222,6 +230,10 @@ public class Property extends ModifierSupport implements Renderable, Commentable
         return String.valueOf(value);
       }
     });
+  }
+
+  public PropertyRef toReference() {
+    return new PropertyRef(this);
   }
 
   @Override

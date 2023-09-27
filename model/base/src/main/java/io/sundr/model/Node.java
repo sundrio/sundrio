@@ -24,6 +24,7 @@ public interface Node {
   String COMA = ",";
   String COLN = ":";
   String SEMICOLN = ";";
+  String SEMICOLN_SUFFIX_PATTERN = ";$";
   String SPACE = " ";
   String NEWLINE = "\n";
   String NEWLINE_PATTERN = "\n|\r";
@@ -58,6 +59,8 @@ public interface Node {
   String JAVA_LANG_STRING = "java.lang.String";
   String JAVA_LANG_OBJECT = "java.lang.Object";
   String JAVA_LANG_ENUM = "java.lang.Enum";
+
+  String EMPTY = "";
 
   default String indent(String s) {
     StringBuilder sb = new StringBuilder();

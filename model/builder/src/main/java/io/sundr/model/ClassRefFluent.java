@@ -318,12 +318,10 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
     ClassRefFluent that = (ClassRefFluent) o;
     if (!java.util.Objects.equals(fullyQualifiedName, that.fullyQualifiedName))
       return false;
-
     if (dimensions != that.dimensions)
       return false;
     if (!java.util.Objects.equals(arguments, that.arguments))
       return false;
-
     return true;
   }
 

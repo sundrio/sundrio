@@ -286,7 +286,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     if (renderBody) {
       sb.append(SPACE).append(OB).append(NEWLINE);
       if (getBlock() != null) {
-        sb.append(getBlock().getStatements().stream().map(s -> INDENT + s + NEWLINE).collect(Collectors.joining()));
+        sb.append(getBlock().render());
       }
       sb.append(CB).append(NEWLINE);
     } else {

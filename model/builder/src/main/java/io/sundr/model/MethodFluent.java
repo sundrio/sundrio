@@ -1123,32 +1123,24 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
     MethodFluent that = (MethodFluent) o;
     if (!java.util.Objects.equals(comments, that.comments))
       return false;
-
     if (!java.util.Objects.equals(annotations, that.annotations))
       return false;
-
     if (!java.util.Objects.equals(parameters, that.parameters))
       return false;
-
     if (!java.util.Objects.equals(name, that.name))
       return false;
-
     if (!java.util.Objects.equals(returnType, that.returnType))
       return false;
-
     if (!java.util.Objects.equals(arguments, that.arguments))
       return false;
-
     if (varArgPreferred != that.varArgPreferred)
       return false;
     if (!java.util.Objects.equals(exceptions, that.exceptions))
       return false;
-
     if (defaultMethod != that.defaultMethod)
       return false;
     if (!java.util.Objects.equals(block, that.block))
       return false;
-
     return true;
   }
 

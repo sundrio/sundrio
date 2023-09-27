@@ -258,10 +258,8 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
     TypeParamDefFluent that = (TypeParamDefFluent) o;
     if (!java.util.Objects.equals(name, that.name))
       return false;
-
     if (!java.util.Objects.equals(bounds, that.bounds))
       return false;
-
     return true;
   }
 

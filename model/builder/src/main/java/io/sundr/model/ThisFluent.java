@@ -20,7 +20,6 @@ public class ThisFluent<A extends ThisFluent<A>> extends BaseFluent<A> {
 
   protected void copyInstance(This instance) {
     instance = (instance != null ? instance : new This());
-
     if (instance != null) {
     }
   }

@@ -63,7 +63,6 @@ public class TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRef
     TypeParamRefFluent that = (TypeParamRefFluent) o;
     if (!java.util.Objects.equals(name, that.name))
       return false;
-
     if (dimensions != that.dimensions)
       return false;
     return true;

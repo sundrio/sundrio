@@ -50,7 +50,6 @@ public class StringStatementFluent<A extends StringStatementFluent<A>> extends B
     StringStatementFluent that = (StringStatementFluent) o;
     if (!java.util.Objects.equals(supplier, that.supplier))
       return false;
-
     return true;
   }
 

@@ -12,6 +12,14 @@ public class Foreach implements Statement {
     this.body = body;
   }
 
+  public Foreach(Property declarationProperty, Expression expression, Statement body) {
+    this(new Declare(declarationProperty), expression, body);
+  }
+
+  public Foreach(Property declarationProperty, Property expressionProperty, Statement body) {
+    this(new Declare(declarationProperty), expressionProperty.toReference(), body);
+  }
+
   public Declare getDeclare() {
     return declare;
   }
@@ -29,7 +37,7 @@ public class Foreach implements Statement {
     StringBuilder sb = new StringBuilder();
     sb.append("for").append(SPACE).append(OP);
     sb.append(declare.render().replaceAll(";$", ""));
-    sb.append(COLN);
+    sb.append(" : ");
     sb.append(expression.render());
     sb.append(CP);
     sb.append(SPACE).append(OB).append(NEWLINE);

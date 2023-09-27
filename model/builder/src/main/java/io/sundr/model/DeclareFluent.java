@@ -272,10 +272,8 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
     DeclareFluent that = (DeclareFluent) o;
     if (!java.util.Objects.equals(properties, that.properties))
       return false;
-
     if (!java.util.Objects.equals(value, that.value))
       return false;
-
     return true;
   }
 

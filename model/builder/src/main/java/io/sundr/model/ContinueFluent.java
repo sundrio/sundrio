@@ -20,7 +20,6 @@ public class ContinueFluent<A extends ContinueFluent<A>> extends BaseFluent<A> {
 
   protected void copyInstance(Continue instance) {
     instance = (instance != null ? instance : new Continue());
-
     if (instance != null) {
     }
   }

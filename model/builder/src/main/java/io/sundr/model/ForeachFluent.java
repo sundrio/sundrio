@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.lang.Class;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -50,6 +52,14 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   public boolean hasDeclare() {
     return this.declare != null;
+  }
+
+  public A withNewDeclare(Class type, String name) {
+    return (A) withDeclare(new Declare(type, name));
+  }
+
+  public A withNewDeclare(Class type, String name, Object value) {
+    return (A) withDeclare(new Declare(type, name, value));
   }
 
   public DeclareNested<A> withNewDeclare() {
@@ -105,6 +115,26 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return (A) withExpression(new Multiply(left, right));
   }
 
+  public NewArrayExpressionNested<A> withNewNewArrayExpression() {
+    return new NewArrayExpressionNested(null);
+  }
+
+  public NewArrayExpressionNested<A> withNewNewArrayExpressionLike(NewArray item) {
+    return new NewArrayExpressionNested(item);
+  }
+
+  public A withNewNewArrayExpression(Class type, Integer[] sizes) {
+    return (A) withExpression(new NewArray(type, sizes));
+  }
+
+  public InstanceOfExpressionNested<A> withNewInstanceOfExpression() {
+    return new InstanceOfExpressionNested(null);
+  }
+
+  public InstanceOfExpressionNested<A> withNewInstanceOfExpressionLike(InstanceOf item) {
+    return new InstanceOfExpressionNested(item);
+  }
+
   public MethodCallExpressionNested<A> withNewMethodCallExpression() {
     return new MethodCallExpressionNested(null);
   }
@@ -119,6 +149,14 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   public InverseExpressionNested<A> withNewInverseExpressionLike(Inverse item) {
     return new InverseExpressionNested(item);
+  }
+
+  public IndexExpressionNested<A> withNewIndexExpression() {
+    return new IndexExpressionNested(null);
+  }
+
+  public IndexExpressionNested<A> withNewIndexExpressionLike(Index item) {
+    return new IndexExpressionNested(item);
   }
 
   public GreaterThanOrEqualExpressionNested<A> withNewGreaterThanOrEqualExpression() {
@@ -249,6 +287,30 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return (A) withExpression(new GreaterThan(left, right));
   }
 
+  public DeclareExpressionNested<A> withNewDeclareExpression() {
+    return new DeclareExpressionNested(null);
+  }
+
+  public DeclareExpressionNested<A> withNewDeclareExpressionLike(Declare item) {
+    return new DeclareExpressionNested(item);
+  }
+
+  public A withNewDeclareExpression(Class type, String name) {
+    return (A) withExpression(new Declare(type, name));
+  }
+
+  public A withNewDeclareExpression(Class type, String name, Object value) {
+    return (A) withExpression(new Declare(type, name, value));
+  }
+
+  public CastExpressionNested<A> withNewCastExpression() {
+    return new CastExpressionNested(null);
+  }
+
+  public CastExpressionNested<A> withNewCastExpressionLike(Cast item) {
+    return new CastExpressionNested(item);
+  }
+
   public ModuloExpressionNested<A> withNewModuloExpression() {
     return new ModuloExpressionNested(null);
   }
@@ -335,6 +397,14 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   public PostDecrementExpressionNested<A> withNewPostDecrementExpressionLike(PostDecrement item) {
     return new PostDecrementExpressionNested(item);
+  }
+
+  public LambdaExpressionNested<A> withNewLambdaExpression() {
+    return new LambdaExpressionNested(null);
+  }
+
+  public LambdaExpressionNested<A> withNewLambdaExpressionLike(Lambda item) {
+    return new LambdaExpressionNested(item);
   }
 
   public NotExpressionNested<A> withNewNotExpression() {
@@ -482,6 +552,14 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return this.body != null;
   }
 
+  public MethodCallBodyNested<A> withNewMethodCallBody() {
+    return new MethodCallBodyNested(null);
+  }
+
+  public MethodCallBodyNested<A> withNewMethodCallBodyLike(MethodCall item) {
+    return new MethodCallBodyNested(item);
+  }
+
   public SwitchBodyNested<A> withNewSwitchBody() {
     return new SwitchBodyNested(null);
   }
@@ -504,6 +582,14 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   public DeclareBodyNested<A> withNewDeclareBodyLike(Declare item) {
     return new DeclareBodyNested(item);
+  }
+
+  public A withNewDeclareBody(Class type, String name) {
+    return (A) withBody(new Declare(type, name));
+  }
+
+  public A withNewDeclareBody(Class type, String name, Object value) {
+    return (A) withBody(new Declare(type, name, value));
   }
 
   public WhileBodyNested<A> withNewWhileBody() {
@@ -570,6 +656,14 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new IfBodyNested(item);
   }
 
+  public LambdaBodyNested<A> withNewLambdaBody() {
+    return new LambdaBodyNested(null);
+  }
+
+  public LambdaBodyNested<A> withNewLambdaBodyLike(Lambda item) {
+    return new LambdaBodyNested(item);
+  }
+
   public ReturnBodyNested<A> withNewReturnBody() {
     return new ReturnBodyNested(null);
   }
@@ -578,12 +672,24 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new ReturnBodyNested(item);
   }
 
+  public A withNewReturnBody(Object object) {
+    return (A) withBody(new Return(object));
+  }
+
   public AssignBodyNested<A> withNewAssignBody() {
     return new AssignBodyNested(null);
   }
 
   public AssignBodyNested<A> withNewAssignBodyLike(Assign item) {
     return new AssignBodyNested(item);
+  }
+
+  public StatementAdapterBodyNested<A> withNewStatementAdapterBody() {
+    return new StatementAdapterBodyNested(null);
+  }
+
+  public StatementAdapterBodyNested<A> withNewStatementAdapterBodyLike(StatementAdapter item) {
+    return new StatementAdapterBodyNested(item);
   }
 
   public ForBodyNested<A> withNewForBody() {
@@ -604,13 +710,10 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     ForeachFluent that = (ForeachFluent) o;
     if (!java.util.Objects.equals(declare, that.declare))
       return false;
-
     if (!java.util.Objects.equals(expression, that.expression))
       return false;
-
     if (!java.util.Objects.equals(body, that.body))
       return false;
-
     return true;
   }
 
@@ -641,10 +744,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     switch (item.getClass().getName()) {
       case "io.sundr.model." + "Multiply":
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "NewArray":
+        return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
+      case "io.sundr.model." + "InstanceOf":
+        return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
+      case "io.sundr.model." + "Index":
+        return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -667,6 +776,10 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "Cast":
+        return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
       case "io.sundr.model." + "ValueRef":
@@ -685,6 +798,8 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
       case "io.sundr.model." + "PostDecrement":
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Not":
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
@@ -715,8 +830,6 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
       case "io.sundr.model." + "Break":
         return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
-      case "io.sundr.model." + "Declare":
-        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
       case "io.sundr.model." + "While":
         return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
       case "io.sundr.model." + "Continue":
@@ -733,6 +846,8 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
       case "io.sundr.model." + "Return":
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
+      case "io.sundr.model." + "StatementAdapter":
+        return (VisitableBuilder<T, ?>) new StatementAdapterBuilder((StatementAdapter) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -773,6 +888,40 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class NewArrayExpressionNested<N> extends NewArrayFluent<NewArrayExpressionNested<N>> implements Nested<N> {
+    NewArrayExpressionNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endNewArrayExpression() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfExpressionNested<N> extends InstanceOfFluent<InstanceOfExpressionNested<N>> implements Nested<N> {
+    InstanceOfExpressionNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endInstanceOfExpression() {
+      return and();
+    }
+
+  }
+
   public class MethodCallExpressionNested<N> extends MethodCallFluent<MethodCallExpressionNested<N>> implements Nested<N> {
     MethodCallExpressionNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -802,6 +951,23 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N endInverseExpression() {
+      return and();
+    }
+
+  }
+
+  public class IndexExpressionNested<N> extends IndexFluent<IndexExpressionNested<N>> implements Nested<N> {
+    IndexExpressionNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endIndexExpression() {
       return and();
     }
 
@@ -995,6 +1161,40 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareExpressionNested<N> extends DeclareFluent<DeclareExpressionNested<N>> implements Nested<N> {
+    DeclareExpressionNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endDeclareExpression() {
+      return and();
+    }
+
+  }
+
+  public class CastExpressionNested<N> extends CastFluent<CastExpressionNested<N>> implements Nested<N> {
+    CastExpressionNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endCastExpression() {
+      return and();
+    }
+
+  }
+
   public class ModuloExpressionNested<N> extends ModuloFluent<ModuloExpressionNested<N>> implements Nested<N> {
     ModuloExpressionNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -1145,6 +1345,23 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostDecrementExpression() {
+      return and();
+    }
+
+  }
+
+  public class LambdaExpressionNested<N> extends LambdaFluent<LambdaExpressionNested<N>> implements Nested<N> {
+    LambdaExpressionNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endLambdaExpression() {
       return and();
     }
 
@@ -1375,6 +1592,23 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class MethodCallBodyNested<N> extends MethodCallFluent<MethodCallBodyNested<N>> implements Nested<N> {
+    MethodCallBodyNested(MethodCall item) {
+      this.builder = new MethodCallBuilder(this, item);
+    }
+
+    MethodCallBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withBody(builder.build());
+    }
+
+    public N endMethodCallBody() {
+      return and();
+    }
+
+  }
+
   public class SwitchBodyNested<N> extends SwitchFluent<SwitchBodyNested<N>> implements Nested<N> {
     SwitchBodyNested(Switch item) {
       this.builder = new SwitchBuilder(this, item);
@@ -1545,6 +1779,23 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class LambdaBodyNested<N> extends LambdaFluent<LambdaBodyNested<N>> implements Nested<N> {
+    LambdaBodyNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withBody(builder.build());
+    }
+
+    public N endLambdaBody() {
+      return and();
+    }
+
+  }
+
   public class ReturnBodyNested<N> extends ReturnFluent<ReturnBodyNested<N>> implements Nested<N> {
     ReturnBodyNested(Return item) {
       this.builder = new ReturnBuilder(this, item);
@@ -1574,6 +1825,24 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignBody() {
+      return and();
+    }
+
+  }
+
+  public class StatementAdapterBodyNested<N> extends StatementAdapterFluent<StatementAdapterBodyNested<N>>
+      implements Nested<N> {
+    StatementAdapterBodyNested(StatementAdapter item) {
+      this.builder = new StatementAdapterBuilder(this, item);
+    }
+
+    StatementAdapterBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withBody(builder.build());
+    }
+
+    public N endStatementAdapterBody() {
       return and();
     }
 

@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Construct implements Expression {
@@ -14,6 +16,26 @@ public class Construct implements Expression {
     this.arguments = arguments;
   }
 
+  public Construct(ClassRef type, List<Expression> arguments) {
+    this(type, Collections.emptyList(), arguments);
+  }
+
+  public Construct(ClassRef type, Expression... arguments) {
+    this(type, Collections.emptyList(), Arrays.asList(arguments));
+  }
+
+  public Construct(Class type, List<TypeRef> parameters, List<Expression> arguments) {
+    this(ClassRef.forName(type.getName()), parameters, arguments);
+  }
+
+  public Construct(Class type, List<Expression> arguments) {
+    this(ClassRef.forName(type.getName()), Collections.emptyList(), arguments);
+  }
+
+  public Construct(Class type, Expression... arguments) {
+    this(ClassRef.forName(type.getName()), Collections.emptyList(), Arrays.asList(arguments));
+  }
+
   public ClassRef getType() {
     return type;
   }
@@ -22,7 +44,7 @@ public class Construct implements Expression {
     return parameters;
   }
 
-  public List<Expression> getarguments() {
+  public List<Expression> getArguments() {
     return arguments;
   }
 

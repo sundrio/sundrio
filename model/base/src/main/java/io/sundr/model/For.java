@@ -45,7 +45,7 @@ public class For implements Statement {
   public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("for").append(SPACE).append(OP);
-    sb.append(init.stream().map(e -> e.render()).collect(Collectors.joining(",")));
+    sb.append(init.stream().map(e -> e.render()).map(Renderable::noSemicolon).collect(Collectors.joining(",")));
     sb.append(SEMICOLN);
     sb.append(compare.render());
     sb.append(SEMICOLN);

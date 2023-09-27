@@ -501,19 +501,14 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
     PropertyFluent that = (PropertyFluent) o;
     if (!java.util.Objects.equals(comments, that.comments))
       return false;
-
     if (!java.util.Objects.equals(annotations, that.annotations))
       return false;
-
     if (!java.util.Objects.equals(typeRef, that.typeRef))
       return false;
-
     if (!java.util.Objects.equals(name, that.name))
       return false;
-
     if (!java.util.Objects.equals(initialValue, that.initialValue))
       return false;
-
     if (enumConstant != that.enumConstant)
       return false;
     if (synthetic != that.synthetic)

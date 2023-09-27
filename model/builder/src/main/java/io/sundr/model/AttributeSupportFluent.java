@@ -99,7 +99,6 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
     AttributeSupportFluent that = (AttributeSupportFluent) o;
     if (!java.util.Objects.equals(attributes, that.attributes))
       return false;
-
     return true;
   }
 

@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.lang.Class;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -65,6 +67,26 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withCondition(new Multiply(left, right));
   }
 
+  public NewArrayConditionNested<A> withNewNewArrayCondition() {
+    return new NewArrayConditionNested(null);
+  }
+
+  public NewArrayConditionNested<A> withNewNewArrayConditionLike(NewArray item) {
+    return new NewArrayConditionNested(item);
+  }
+
+  public A withNewNewArrayCondition(Class type, Integer[] sizes) {
+    return (A) withCondition(new NewArray(type, sizes));
+  }
+
+  public InstanceOfConditionNested<A> withNewInstanceOfCondition() {
+    return new InstanceOfConditionNested(null);
+  }
+
+  public InstanceOfConditionNested<A> withNewInstanceOfConditionLike(InstanceOf item) {
+    return new InstanceOfConditionNested(item);
+  }
+
   public MethodCallConditionNested<A> withNewMethodCallCondition() {
     return new MethodCallConditionNested(null);
   }
@@ -79,6 +101,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   public InverseConditionNested<A> withNewInverseConditionLike(Inverse item) {
     return new InverseConditionNested(item);
+  }
+
+  public IndexConditionNested<A> withNewIndexCondition() {
+    return new IndexConditionNested(null);
+  }
+
+  public IndexConditionNested<A> withNewIndexConditionLike(Index item) {
+    return new IndexConditionNested(item);
   }
 
   public GreaterThanOrEqualConditionNested<A> withNewGreaterThanOrEqualCondition() {
@@ -209,6 +239,30 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withCondition(new GreaterThan(left, right));
   }
 
+  public DeclareConditionNested<A> withNewDeclareCondition() {
+    return new DeclareConditionNested(null);
+  }
+
+  public DeclareConditionNested<A> withNewDeclareConditionLike(Declare item) {
+    return new DeclareConditionNested(item);
+  }
+
+  public A withNewDeclareCondition(Class type, String name) {
+    return (A) withCondition(new Declare(type, name));
+  }
+
+  public A withNewDeclareCondition(Class type, String name, Object value) {
+    return (A) withCondition(new Declare(type, name, value));
+  }
+
+  public CastConditionNested<A> withNewCastCondition() {
+    return new CastConditionNested(null);
+  }
+
+  public CastConditionNested<A> withNewCastConditionLike(Cast item) {
+    return new CastConditionNested(item);
+  }
+
   public ModuloConditionNested<A> withNewModuloCondition() {
     return new ModuloConditionNested(null);
   }
@@ -295,6 +349,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   public PostDecrementConditionNested<A> withNewPostDecrementConditionLike(PostDecrement item) {
     return new PostDecrementConditionNested(item);
+  }
+
+  public LambdaConditionNested<A> withNewLambdaCondition() {
+    return new LambdaConditionNested(null);
+  }
+
+  public LambdaConditionNested<A> withNewLambdaConditionLike(Lambda item) {
+    return new LambdaConditionNested(item);
   }
 
   public NotConditionNested<A> withNewNotCondition() {
@@ -454,6 +516,26 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withResult(new Multiply(left, right));
   }
 
+  public NewArrayResultNested<A> withNewNewArrayResult() {
+    return new NewArrayResultNested(null);
+  }
+
+  public NewArrayResultNested<A> withNewNewArrayResultLike(NewArray item) {
+    return new NewArrayResultNested(item);
+  }
+
+  public A withNewNewArrayResult(Class type, Integer[] sizes) {
+    return (A) withResult(new NewArray(type, sizes));
+  }
+
+  public InstanceOfResultNested<A> withNewInstanceOfResult() {
+    return new InstanceOfResultNested(null);
+  }
+
+  public InstanceOfResultNested<A> withNewInstanceOfResultLike(InstanceOf item) {
+    return new InstanceOfResultNested(item);
+  }
+
   public MethodCallResultNested<A> withNewMethodCallResult() {
     return new MethodCallResultNested(null);
   }
@@ -468,6 +550,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   public InverseResultNested<A> withNewInverseResultLike(Inverse item) {
     return new InverseResultNested(item);
+  }
+
+  public IndexResultNested<A> withNewIndexResult() {
+    return new IndexResultNested(null);
+  }
+
+  public IndexResultNested<A> withNewIndexResultLike(Index item) {
+    return new IndexResultNested(item);
   }
 
   public GreaterThanOrEqualResultNested<A> withNewGreaterThanOrEqualResult() {
@@ -598,6 +688,30 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withResult(new GreaterThan(left, right));
   }
 
+  public DeclareResultNested<A> withNewDeclareResult() {
+    return new DeclareResultNested(null);
+  }
+
+  public DeclareResultNested<A> withNewDeclareResultLike(Declare item) {
+    return new DeclareResultNested(item);
+  }
+
+  public A withNewDeclareResult(Class type, String name) {
+    return (A) withResult(new Declare(type, name));
+  }
+
+  public A withNewDeclareResult(Class type, String name, Object value) {
+    return (A) withResult(new Declare(type, name, value));
+  }
+
+  public CastResultNested<A> withNewCastResult() {
+    return new CastResultNested(null);
+  }
+
+  public CastResultNested<A> withNewCastResultLike(Cast item) {
+    return new CastResultNested(item);
+  }
+
   public ModuloResultNested<A> withNewModuloResult() {
     return new ModuloResultNested(null);
   }
@@ -684,6 +798,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   public PostDecrementResultNested<A> withNewPostDecrementResultLike(PostDecrement item) {
     return new PostDecrementResultNested(item);
+  }
+
+  public LambdaResultNested<A> withNewLambdaResult() {
+    return new LambdaResultNested(null);
+  }
+
+  public LambdaResultNested<A> withNewLambdaResultLike(Lambda item) {
+    return new LambdaResultNested(item);
   }
 
   public NotResultNested<A> withNewNotResult() {
@@ -843,6 +965,26 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withAlternative(new Multiply(left, right));
   }
 
+  public NewArrayAlternativeNested<A> withNewNewArrayAlternative() {
+    return new NewArrayAlternativeNested(null);
+  }
+
+  public NewArrayAlternativeNested<A> withNewNewArrayAlternativeLike(NewArray item) {
+    return new NewArrayAlternativeNested(item);
+  }
+
+  public A withNewNewArrayAlternative(Class type, Integer[] sizes) {
+    return (A) withAlternative(new NewArray(type, sizes));
+  }
+
+  public InstanceOfAlternativeNested<A> withNewInstanceOfAlternative() {
+    return new InstanceOfAlternativeNested(null);
+  }
+
+  public InstanceOfAlternativeNested<A> withNewInstanceOfAlternativeLike(InstanceOf item) {
+    return new InstanceOfAlternativeNested(item);
+  }
+
   public MethodCallAlternativeNested<A> withNewMethodCallAlternative() {
     return new MethodCallAlternativeNested(null);
   }
@@ -857,6 +999,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   public InverseAlternativeNested<A> withNewInverseAlternativeLike(Inverse item) {
     return new InverseAlternativeNested(item);
+  }
+
+  public IndexAlternativeNested<A> withNewIndexAlternative() {
+    return new IndexAlternativeNested(null);
+  }
+
+  public IndexAlternativeNested<A> withNewIndexAlternativeLike(Index item) {
+    return new IndexAlternativeNested(item);
   }
 
   public GreaterThanOrEqualAlternativeNested<A> withNewGreaterThanOrEqualAlternative() {
@@ -987,6 +1137,30 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withAlternative(new GreaterThan(left, right));
   }
 
+  public DeclareAlternativeNested<A> withNewDeclareAlternative() {
+    return new DeclareAlternativeNested(null);
+  }
+
+  public DeclareAlternativeNested<A> withNewDeclareAlternativeLike(Declare item) {
+    return new DeclareAlternativeNested(item);
+  }
+
+  public A withNewDeclareAlternative(Class type, String name) {
+    return (A) withAlternative(new Declare(type, name));
+  }
+
+  public A withNewDeclareAlternative(Class type, String name, Object value) {
+    return (A) withAlternative(new Declare(type, name, value));
+  }
+
+  public CastAlternativeNested<A> withNewCastAlternative() {
+    return new CastAlternativeNested(null);
+  }
+
+  public CastAlternativeNested<A> withNewCastAlternativeLike(Cast item) {
+    return new CastAlternativeNested(item);
+  }
+
   public ModuloAlternativeNested<A> withNewModuloAlternative() {
     return new ModuloAlternativeNested(null);
   }
@@ -1073,6 +1247,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   public PostDecrementAlternativeNested<A> withNewPostDecrementAlternativeLike(PostDecrement item) {
     return new PostDecrementAlternativeNested(item);
+  }
+
+  public LambdaAlternativeNested<A> withNewLambdaAlternative() {
+    return new LambdaAlternativeNested(null);
+  }
+
+  public LambdaAlternativeNested<A> withNewLambdaAlternativeLike(Lambda item) {
+    return new LambdaAlternativeNested(item);
   }
 
   public NotAlternativeNested<A> withNewNotAlternative() {
@@ -1209,13 +1391,10 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     TernaryFluent that = (TernaryFluent) o;
     if (!java.util.Objects.equals(condition, that.condition))
       return false;
-
     if (!java.util.Objects.equals(result, that.result))
       return false;
-
     if (!java.util.Objects.equals(alternative, that.alternative))
       return false;
-
     return true;
   }
 
@@ -1246,10 +1425,16 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     switch (item.getClass().getName()) {
       case "io.sundr.model." + "Multiply":
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "NewArray":
+        return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
+      case "io.sundr.model." + "InstanceOf":
+        return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
+      case "io.sundr.model." + "Index":
+        return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -1272,6 +1457,10 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "Cast":
+        return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
       case "io.sundr.model." + "ValueRef":
@@ -1290,6 +1479,8 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
       case "io.sundr.model." + "PostDecrement":
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Not":
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
@@ -1337,6 +1528,40 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class NewArrayConditionNested<N> extends NewArrayFluent<NewArrayConditionNested<N>> implements Nested<N> {
+    NewArrayConditionNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endNewArrayCondition() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfConditionNested<N> extends InstanceOfFluent<InstanceOfConditionNested<N>> implements Nested<N> {
+    InstanceOfConditionNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endInstanceOfCondition() {
+      return and();
+    }
+
+  }
+
   public class MethodCallConditionNested<N> extends MethodCallFluent<MethodCallConditionNested<N>> implements Nested<N> {
     MethodCallConditionNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -1366,6 +1591,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endInverseCondition() {
+      return and();
+    }
+
+  }
+
+  public class IndexConditionNested<N> extends IndexFluent<IndexConditionNested<N>> implements Nested<N> {
+    IndexConditionNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endIndexCondition() {
       return and();
     }
 
@@ -1559,6 +1801,40 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareConditionNested<N> extends DeclareFluent<DeclareConditionNested<N>> implements Nested<N> {
+    DeclareConditionNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endDeclareCondition() {
+      return and();
+    }
+
+  }
+
+  public class CastConditionNested<N> extends CastFluent<CastConditionNested<N>> implements Nested<N> {
+    CastConditionNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endCastCondition() {
+      return and();
+    }
+
+  }
+
   public class ModuloConditionNested<N> extends ModuloFluent<ModuloConditionNested<N>> implements Nested<N> {
     ModuloConditionNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -1709,6 +1985,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostDecrementCondition() {
+      return and();
+    }
+
+  }
+
+  public class LambdaConditionNested<N> extends LambdaFluent<LambdaConditionNested<N>> implements Nested<N> {
+    LambdaConditionNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endLambdaCondition() {
       return and();
     }
 
@@ -1955,6 +2248,40 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class NewArrayResultNested<N> extends NewArrayFluent<NewArrayResultNested<N>> implements Nested<N> {
+    NewArrayResultNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endNewArrayResult() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfResultNested<N> extends InstanceOfFluent<InstanceOfResultNested<N>> implements Nested<N> {
+    InstanceOfResultNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endInstanceOfResult() {
+      return and();
+    }
+
+  }
+
   public class MethodCallResultNested<N> extends MethodCallFluent<MethodCallResultNested<N>> implements Nested<N> {
     MethodCallResultNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -1984,6 +2311,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endInverseResult() {
+      return and();
+    }
+
+  }
+
+  public class IndexResultNested<N> extends IndexFluent<IndexResultNested<N>> implements Nested<N> {
+    IndexResultNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endIndexResult() {
       return and();
     }
 
@@ -2177,6 +2521,40 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareResultNested<N> extends DeclareFluent<DeclareResultNested<N>> implements Nested<N> {
+    DeclareResultNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endDeclareResult() {
+      return and();
+    }
+
+  }
+
+  public class CastResultNested<N> extends CastFluent<CastResultNested<N>> implements Nested<N> {
+    CastResultNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endCastResult() {
+      return and();
+    }
+
+  }
+
   public class ModuloResultNested<N> extends ModuloFluent<ModuloResultNested<N>> implements Nested<N> {
     ModuloResultNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -2326,6 +2704,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostDecrementResult() {
+      return and();
+    }
+
+  }
+
+  public class LambdaResultNested<N> extends LambdaFluent<LambdaResultNested<N>> implements Nested<N> {
+    LambdaResultNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endLambdaResult() {
       return and();
     }
 
@@ -2571,6 +2966,40 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class NewArrayAlternativeNested<N> extends NewArrayFluent<NewArrayAlternativeNested<N>> implements Nested<N> {
+    NewArrayAlternativeNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endNewArrayAlternative() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfAlternativeNested<N> extends InstanceOfFluent<InstanceOfAlternativeNested<N>> implements Nested<N> {
+    InstanceOfAlternativeNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endInstanceOfAlternative() {
+      return and();
+    }
+
+  }
+
   public class MethodCallAlternativeNested<N> extends MethodCallFluent<MethodCallAlternativeNested<N>> implements Nested<N> {
     MethodCallAlternativeNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -2600,6 +3029,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endInverseAlternative() {
+      return and();
+    }
+
+  }
+
+  public class IndexAlternativeNested<N> extends IndexFluent<IndexAlternativeNested<N>> implements Nested<N> {
+    IndexAlternativeNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endIndexAlternative() {
       return and();
     }
 
@@ -2793,6 +3239,40 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareAlternativeNested<N> extends DeclareFluent<DeclareAlternativeNested<N>> implements Nested<N> {
+    DeclareAlternativeNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endDeclareAlternative() {
+      return and();
+    }
+
+  }
+
+  public class CastAlternativeNested<N> extends CastFluent<CastAlternativeNested<N>> implements Nested<N> {
+    CastAlternativeNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endCastAlternative() {
+      return and();
+    }
+
+  }
+
   public class ModuloAlternativeNested<N> extends ModuloFluent<ModuloAlternativeNested<N>> implements Nested<N> {
     ModuloAlternativeNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -2944,6 +3424,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostDecrementAlternative() {
+      return and();
+    }
+
+  }
+
+  public class LambdaAlternativeNested<N> extends LambdaFluent<LambdaAlternativeNested<N>> implements Nested<N> {
+    LambdaAlternativeNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endLambdaAlternative() {
       return and();
     }
 

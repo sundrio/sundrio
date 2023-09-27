@@ -16,13 +16,11 @@
 
 package io.sundr.builder.internal.functions;
 
-import static io.sundr.builder.Constants.BUILDABLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.INDEX;
 import static io.sundr.builder.Constants.OUTER_TYPE;
-import static io.sundr.builder.Constants.SIMPLE_ARRAY_GETTER_SNIPPET;
 import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BOXED_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BUILDER_REF;
@@ -37,12 +35,16 @@ import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.model.Attributeable.LAZY_INIT;
+import static io.sundr.model.Expression.call;
+import static io.sundr.model.Expression.cast;
+import static io.sundr.model.Expression.enclosed;
 import static io.sundr.model.utils.Collections.COLLECTION;
 import static io.sundr.model.utils.Collections.IS_COLLECTION;
 import static io.sundr.model.utils.Collections.IS_LIST;
 import static io.sundr.model.utils.Collections.IS_MAP;
 import static io.sundr.model.utils.Collections.IS_SET;
 import static io.sundr.model.utils.Collections.LIST;
+import static io.sundr.model.utils.Optionals.OPTIONAL;
 import static io.sundr.model.utils.Types.N_REF;
 import static io.sundr.model.utils.Types.Q;
 import static io.sundr.model.utils.Types.T_REF;
@@ -57,12 +59,12 @@ import static io.sundr.model.utils.Types.isOptionalLong;
 import static io.sundr.model.utils.Types.isPrimitive;
 import static io.sundr.model.utils.Types.isSet;
 import static io.sundr.utils.Strings.capitalizeFirst;
-import static io.sundr.utils.Strings.loadResourceQuietly;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -76,17 +78,27 @@ import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
+import io.sundr.model.Block;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Declare;
+import io.sundr.model.Expression;
+import io.sundr.model.Foreach;
+import io.sundr.model.If;
+import io.sundr.model.Lambda;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.Return;
 import io.sundr.model.Statement;
 import io.sundr.model.StringStatement;
+import io.sundr.model.Ternary;
+import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.ValueRef;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.model.utils.Getter;
@@ -108,24 +120,22 @@ class ToMethod {
         || !Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(item).isEmpty();
   }
 
-  private static final String BUILDABLE_ARRAY_GETTER_TEXT = loadResourceQuietly(BUILDABLE_ARRAY_GETTER_SNIPPET);
-  private static final String SIMPLE_ARRAY_GETTER_TEXT = loadResourceQuietly(SIMPLE_ARRAY_GETTER_SNIPPET);
-
   private enum GeneratorType {
-    FIRST("First", "0"), LAST("Last", "%s.size() - 1"), INDEXED("", "index", true);
+    FIRST("First", p -> ValueRef.from(0)), LAST("Last", p -> p.toReference().call("size").minus(1)), INDEXED("",
+        p -> Property.newProperty("index").toReference(), true);
 
-    GeneratorType(String name, String indexStatementFmt) {
-      this(name, indexStatementFmt, false);
+    GeneratorType(String name, Function<Property, Expression> toIndexExpression) {
+      this(name, toIndexExpression, false);
     }
 
-    GeneratorType(String name, String indexStatementFmt, boolean appendIndexArg) {
+    GeneratorType(String name, Function<Property, Expression> toIndexExpression, boolean appendIndexArg) {
       this.name = name;
-      this.indexStatementFmt = indexStatementFmt;
+      this.toIndexExpression = toIndexExpression;
       this.appendIndexArg = appendIndexArg;
     }
 
-    private String indexStatement(Property property) {
-      return String.format(indexStatementFmt, property.getName());
+    private Expression indexExpression(Property property) {
+      return toIndexExpression.apply(property);
     }
 
     private void addIndexIfNeeded(MethodBuilder methodBuilder) {
@@ -135,7 +145,7 @@ class ToMethod {
     }
 
     private final String name;
-    private final String indexStatementFmt;
+    private final Function<Property, Expression> toIndexExpression;
     private final boolean appendIndexArg;
   }
 
@@ -147,8 +157,8 @@ class ToMethod {
       }
 
       @Override
-      public String doWithItem() {
-        return "";
+      public Expression doWithItem(Expression expression) {
+        return expression;
       }
     };
     GeneratorCustomizer builderCustomizer = new GeneratorCustomizer() {
@@ -158,14 +168,14 @@ class ToMethod {
       }
 
       @Override
-      public String doWithItem() {
-        return ".build()";
+      public Expression doWithItem(Expression expression) {
+        return expression.call("build");
       }
     };
 
     String methodPrefix(Property property);
 
-    String doWithItem();
+    Expression doWithItem(Expression expression);
   }
 
   private static class GetterGenerator {
@@ -188,8 +198,8 @@ class ToMethod {
       type.addIndexIfNeeded(methodBuilder);
 
       methodBuilder.withNewBlock()
-          .withStatements(new StringStatement("return this." + property.getName() + ".get(" + type.indexStatement(property)
-              + ")" + customizer.doWithItem() + ";"))
+          .withStatements(
+              new Return(customizer.doWithItem(new This().property(property).call("get", type.indexExpression(property)))))
           .endBlock()
           .build();
       return methodBuilder.build();
@@ -239,11 +249,18 @@ class ToMethod {
     }
 
     private Statement statement(Property property, TypeRef builderRef) {
+      Property item = Property.newProperty(builderRef, "item");
+      Property predicate = Property.newProperty("predicate");
+      Property matchProperty = Property.newProperty(match);
+      Property nonMatchProperty = Property.newProperty(nonMatch);
+
       if (match != null && nonMatch != null) {
-        return new StringStatement("for (" + builderRef + " item: " + property.getName()
-            + ") { if(predicate.test(item)){ return " + match + ";} } return " + nonMatch + ";");
+        return new Block(new Foreach(item, property, new If(predicate.toReference().call("test", item.toReference()),
+            new Return(matchProperty))),
+            new Return(nonMatchProperty));
       } else {
-        return new StringStatement("return " + property.getName() + ".removeIf(item -> predicate.test(item));");
+        return new Return(property.toReference().call("removeIf",
+            new Lambda("item", predicate.toReference().call("test", item.toReference()).toStatement())));
       }
     }
 
@@ -293,50 +310,67 @@ class ToMethod {
 
       if (isBuildable(unwrapped)) {
         if (IS_COLLECTION.apply(type)) {
-          statements.add(new StringStatement("if (this." + fieldName + " != null) { _visitables.get(\"" + fieldName
-              + "\").clear();}"));
+          statements.add(new If(
+              //Condition
+              Expression.notNull(new This().property(fieldName)),
+              //Then
+              new This().property("_visitables").call("get", ValueRef.from(fieldName)).call("clear").toStatement()));
         } else if (IS_MAP.apply(type)) {
           // There is no such thing as buildable map yet.
         } else {
-          statements.add(new StringStatement("_visitables.get(\"" + fieldName + "\").remove(this." + fieldName + ");"));
+          statements.add(new This().property("_visitables").call("remove", new This().property(fieldName)).toStatement());
         }
       }
 
       if (IS_MAP.apply(type)) {
-        statements.add(new StringStatement("if (" + fieldName + " == null) { this." + fieldName + " =  null;} else {this."
-            + fieldName + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(fieldName))
-            + ";} return (" + returnType + ") this;"));
+        statements.add(new If(
+            //Condition
+            Expression.isNull(property.toReference()),
+            //Then
+            new This().property(property).assignNull().toStatement(),
+            //Else
+            new This().property(property).assignNew(LinkedHashMap.class, property.toReference()).toStatement()));
+
+        statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       } else if (IS_LIST.apply(type) || IS_SET.apply(type)) {
         String addToMethodName = "addTo" + property.getNameCapitalized();
-        statements.add(new StringStatement("if (" + argumentName + " != null) {this." + fieldName + " = "
-            + property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList()) + "; for (" + unwrapped.toString()
-            + " item : " + argumentName + "){this." + addToMethodName + "(item);}} else { this." + fieldName
-            + " = null;} return (" + returnType + ") this;"));
+        ClassRef newInstanceType = IS_LIST.apply(type) ? io.sundr.model.utils.Collections.ARRAY_LIST.toReference(unwrapped)
+            : io.sundr.model.utils.Collections.LINKED_HASH_SET.toReference(unwrapped);
+        if (Types.isConcrete(type)) {
+          newInstanceType = (ClassRef) type;
+        }
+
+        Property item = Property.newProperty(unwrapped, "item");
+        statements.add(new If(
+            //Condition
+            Expression.notNull(property.toReference()),
+            //Then
+            new Block(new This().property(property).assignNew(newInstanceType).toStatement(),
+                new Foreach(item, property.toReference(), new This().call(addToMethodName, item.toReference()).toStatement())),
+            //Else
+            new This().property(property).assignNull().toStatement()));
+
+        statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       }
 
       if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
         String builderClass = builder.getFullyQualifiedName();
-        statements.add(new StringStatement(
-            "if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "(" + argumentName
-                + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");}"
-                + " else { this." + fieldName + " = null; _visitables.get(\"" + fieldName + "\").remove(this." + fieldName
-                + "); }"
-                + " return (" + returnType + ") this;"));
+        statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "("
+            + argumentName + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");}" + " else { this."
+            + fieldName + " = null; _visitables.get(\"" + fieldName + "\").remove(this." + fieldName + "); }" + " return ("
+            + returnType + ") this;"));
         return statements;
       }
 
       if (!descendants.isEmpty()) {
-        statements.add(new StringStatement(
-            "if (" + argumentName + "==null){ this." + fieldName + " = null; _visitables.remove(\"" + fieldName + "\");"
-                + " return (" + returnType + ") this;}"));
-        statements.add(new StringStatement(
-            "VisitableBuilder<? extends " + ((ClassRef) type).getFullyQualifiedName()
-                + ",?> builder = builder(" + argumentName + "); "
-                + "_visitables.get(\"" + fieldName + "\").clear();_visitables.get(\"" + fieldName + "\").add(builder);"
-                + "this." + fieldName + " = builder;"));
+        statements.add(new StringStatement("if (" + argumentName + "==null){ this." + fieldName
+            + " = null; _visitables.remove(\"" + fieldName + "\");" + " return (" + returnType + ") this;}"));
+        statements.add(new StringStatement("VisitableBuilder<? extends " + ((ClassRef) type).getFullyQualifiedName()
+            + ",?> builder = builder(" + argumentName + "); " + "_visitables.get(\"" + fieldName
+            + "\").clear();_visitables.get(\"" + fieldName + "\").add(builder);" + "this." + fieldName + " = builder;"));
         statements.add(new StringStatement("return (" + returnType + ") this;"));
         return statements;
       }
@@ -383,9 +417,9 @@ class ToMethod {
     String source = fieldName; //The expression we assign to the field from no optional.
     String prepareSource = "";
     String prepareOptionalSource = "";
+    ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
 
     if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
-      ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
       prepareSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + "); _visitables.get(\""
           + fieldName + "\").add(b);";
       prepareOptionalSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName
@@ -393,7 +427,7 @@ class ToMethod {
       optionalSource = "Optional.of(b)";
       source = "b";
     }
-
+    Property b = Property.newProperty(builder, "b");
     methods.add(
         new MethodBuilder()
             .withNewModifiers().withPublic().endModifiers()
@@ -401,26 +435,30 @@ class ToMethod {
             .withReturnType(returnType)
             .withArguments(property)
             .withNewBlock()
-            .addNewStringStatementStatement("if (" + fieldName + " == null || !" + fieldName + ".isPresent()) { this."
-                + fieldName + " = " + property.getAttribute(INIT) + "; } else {" + prepareOptionalSource + " this." + fieldName
-                + " = " + optionalSource + "; } return (" + returnType + ") this;")
+            .withStatements(
+                new If(property.toReference().isNull().or(property.toReference().call("isPresent").not()),
+                    new This().property(property).assign(Expression.call((ClassRef) property.getTypeRef(), "empty"))
+                        .toStatement(),
+
+                    isBuildable(unwrapped) && !isAbstract(unwrapped)
+                        ? new Block(
+                            new Declare(b, Expression.createNew(builder, property.toReference().call("get"))).toStatement(),
+                            Property.newProperty("_visitables").toReference().call("get", property.toReference())
+                                .call("add", b.toReference()).toStatement())
+                        : new This().property(property).assign(property.toReference()).toStatement()),
+                new Return(Expression.cast(returnType, new This())))
             .endBlock()
             .build());
 
-    Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped).build();
-    methods.add(
-        new MethodBuilder()
-            .withNewModifiers().withPublic().endModifiers()
-            .withName(methodName)
-            .withReturnType(returnType)
-            .withArguments(genericProperty)
-            .withNewBlock()
-            .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = "
-                + property.getAttribute(INIT) + "; } else {" + prepareSource + " this." + fieldName + " = "
-                + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; } return (" + returnType
-                + ") this;")
-            .endBlock()
-            .build());
+    Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped)
+        .build();
+    methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withName(methodName)
+        .withReturnType(returnType).withArguments(genericProperty).withNewBlock()
+        .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = "
+            + property.getAttribute(INIT) + "; } else {" + prepareSource + " this." + fieldName + " = "
+            + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; } return (" + returnType
+            + ") this;")
+        .endBlock().build());
 
     return methods;
   });
@@ -431,16 +469,15 @@ class ToMethod {
     List<Statement> statements = new ArrayList<>();
 
     if (isPrimitive(property.getTypeRef())) {
-      statements.add(new StringStatement("return true;"));
+      statements.add(new Return(true));
     } else if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
       statements
-          .add(new StringStatement("return " + property.getName() + " != null && !" + property.getName() + ".isEmpty();"));
+          .add(new Return(new This().property(property).notNull().and(new This().property(property).call("isEmpty").not())));
     } else if (isOptional(property.getTypeRef()) || isOptionalInt(property.getTypeRef())
         || isOptionalLong(property.getTypeRef()) || isOptionalDouble(property.getTypeRef())) {
-      statements
-          .add(new StringStatement("return " + property.getName() + " != null && " + property.getName() + ".isPresent();"));
+      statements.add(new Return(new This().property(property).notNull().and(new This().property(property).call("isPresent"))));
     } else {
-      statements.add(new StringStatement("return this." + property.getName() + " != null;"));
+      statements.add(new Return(new This().property(property).notNull()));
     }
 
     return new MethodBuilder()
@@ -477,37 +514,53 @@ class ToMethod {
     descendants.addAll(Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property));
 
     if (isMap) {
-      statements.add(new StringStatement("return this." + property.getName() + ";"));
+      statements.add(new This().property(property).ret());
     } else if (isBuildable(unwrapped)) {
       isNested = true;
       if (isList || isSet) {
         if (isAbstractList || isAbstractSet) {
-          statements.add(
-              new StringStatement("return " + property.getName() + " != null ? build(" + property.getName() + ") : null;"));
+          statements.add(new Return(Expression.ternary(new This().property(property).notNull(),
+              Expression.newCall("build", property.toReference()),
+              Expression.NULL)));
         } else {
-          statements.add(new StringStatement("return " + property.getName() + " != null ? new "
-              + ((ClassRef) property.getTypeRef()).getName() + "(build(" + property.getName() + ")) : null;"));
+          statements.add(new Return(Expression.ternary(new This().property(property).notNull(),
+              Expression.createNew((ClassRef) property.getTypeRef(), Expression.newCall("build", property.toReference())),
+              Expression.NULL)));
         }
       } else if (isOptional) {
-        statements.add(new StringStatement("return (" + property.getTypeRef() + ") (this." + property.getName()
-            + "!=null && this." + property.getName() + ".isPresent() ? "
-            + property.getAttribute(INIT_FUNCTION)
-                .apply(Collections.singletonList("this." + property.getName() + ".get().build()"))
-            + " : " + property.getAttribute(INIT) + ");"));
+        statements.add(new Return(cast(property.getTypeRef(),
+            enclosed(
+                new Ternary(
+                    //Condition
+                    new This().property(property).notNull().and(new This().property(property).call("isPresent")),
+                    //Then
+                    call(OPTIONAL, "of", new This().property(property).call("get").call("build")),
+                    //Else
+                    call(OPTIONAL, "empty"))))));
       } else {
-        statements.add(
-            new StringStatement("return this." + property.getName() + "!=null ?this." + property.getName() + ".build():null;"));
+        statements.add(new Return(new Ternary(
+            //Condition
+            new This().property(property).notNull(),
+            //Then
+            new This().property(property).call("build"),
+            //Else
+            Expression.NULL)));
       }
     } else if (!descendants.isEmpty()) {
       isNested = true;
       if (isList || isSet) {
-        statements.add(new StringStatement("return build(" + property.getName() + ");"));
+        statements.add(new Return(Expression.newCall("build", property.toReference())));
       } else {
-        statements.add(
-            new StringStatement("return this." + property.getName() + "!=null?this." + property.getName() + ".build():null;"));
+        statements.add(new Return(new Ternary(
+            //Condition
+            new This().property(property).notNull(),
+            //Then
+            new This().property(property).call("build"),
+            //Else
+            Expression.NULL)));
       }
     } else {
-      statements.add(new StringStatement("return this." + property.getName() + ";"));
+      statements.add(new Return(new This().property(property)));
     }
 
     Method getter = new MethodBuilder()
@@ -566,13 +619,24 @@ class ToMethod {
     TypeRef type = property.getTypeRef();
     Boolean isBuildable = isBuildable(type);
     TypeRef targetType = isBuildable ? VISITABLE_BUILDER_REF.apply((ClassRef) type) : UNWRAP_ARRAY_OF.apply(type);
-    String body = String.format(isBuildable ? BUILDABLE_ARRAY_GETTER_TEXT : SIMPLE_ARRAY_GETTER_TEXT,
-        property.getName(),
-        property.getName(),
-        type.toString(),
-        unwrapped.toString(),
-        targetType.toString(),
-        property.getName());
+
+    List<Statement> statements = new ArrayList<>();
+
+    Property size = Property.newProperty(Types.PRIMITIVE_INT_REF, "size");
+    Property result = Property.newProperty(property.getTypeRef(), "result");
+    Property index = Property.newProperty(Types.PRIMITIVE_INT_REF, "index");
+    Property item = Property.newProperty(targetType, "item");
+
+    statements.addAll(Arrays.asList(
+        new Declare(size,
+            Expression.ternary(property.toReference().notNull(), property.toReference().call("size"), ValueRef.from(0))),
+        new Declare(result, Expression.createNewArray(unwrapped, size.toReference())),
+        new If(size.toReference().eq(ValueRef.from(0)), new Return(result.toReference())),
+        new Declare(index, ValueRef.from(0)),
+        new Foreach(item, property,
+            result.toReference().index(index.toReference().postIncrement())
+                .assign(isBuildable ? item.toReference().call("build") : item.toReference()).toStatement()),
+        new Return(result)));
 
     Method getter = new MethodBuilder()
         .withAnnotations(annotations)
@@ -582,7 +646,7 @@ class ToMethod {
         .withReturnType(property.getTypeRef())
         .withArguments()
         .withNewBlock()
-        .addNewStringStatementStatement(body)
+        .withStatements(statements)
         .endBlock()
         .addToAttributes(ALSO_IMPORT,
             isBuildable
@@ -647,22 +711,19 @@ class ToMethod {
             }
           }
 
-          StringStatement init = new StringStatement("if (this." + propertyName + " == null) {this." + propertyName + " = "
-              + property.getAttribute(LAZY_INIT) + ";}");
+          StringStatement init = new StringStatement(
+              "if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}");
           Method addSingleItemAtIndex = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).addToArguments(INDEX)
               .addToArguments(unwrappedProperty).withNewBlock()
-              .withStatements(
-                  init,
-                  new StringStatement("this." + propertyName + ".add(index, item);"),
+              .withStatements(init, new StringStatement("this." + propertyName + ".add(index, item);"),
                   new StringStatement("return (" + returnType + ")this;"))
               .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           Method setSingleItemAtIndex = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(setMethodName).withReturnType(returnType).addToArguments(INDEX)
               .addToArguments(unwrappedProperty).withNewBlock()
-              .withStatements(
-                  init,
+              .withStatements(init,
                   new StringStatement("this." + propertyName + ".set(index, item); return (" + returnType + ")this;"))
               .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
@@ -683,17 +744,13 @@ class ToMethod {
                 + "\").add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
-                .withStatements(
-                    init,
-                    new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
+                .withStatements(init, new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
                     createAddOrSetIndex("add", propertyName, returnType.toString()),
                     new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build();
 
             setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
-                .withStatements(
-                    init,
-                    new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
+                .withStatements(init, new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
                     createAddOrSetIndex("set", propertyName, returnType.toString()),
                     new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build();
@@ -702,41 +759,39 @@ class ToMethod {
             final ClassRef targetType = (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
 
-            statements.add(new StringStatement("for (" + targetType.toString() + " item : items) { "
-                + "VisitableBuilder<? extends " + targetType.getFullyQualifiedName()
-                + ",?> builder = builder(item); _visitables.get(\"" + propertyName
-                + "\").add(builder);this." + propertyName + ".add(builder); }"));
+            statements
+                .add(new StringStatement("for (" + targetType.toString() + " item : items) { " + "VisitableBuilder<? extends "
+                    + targetType.getFullyQualifiedName() + ",?> builder = builder(item); _visitables.get(\"" + propertyName
+                    + "\").add(builder);this." + propertyName + ".add(builder); }"));
             statements.add(new StringStatement("return (" + returnType + ")this;"));
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(init,
-                    new StringStatement("VisitableBuilder<? extends " + targetType.getFullyQualifiedName()
-                        + ",?> builder = builder(item);"),
+                    new StringStatement(
+                        "VisitableBuilder<? extends " + targetType.getFullyQualifiedName() + ",?> builder = builder(item);"),
                     createAddOrSetIndex("add", propertyName, returnType.toString()),
                     new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build();
 
             setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(init,
-                    new StringStatement("VisitableBuilder<? extends " + targetType.getFullyQualifiedName()
-                        + ",?> builder = builder(item);"),
+                    new StringStatement(
+                        "VisitableBuilder<? extends " + targetType.getFullyQualifiedName() + ",?> builder = builder(item);"),
                     createAddOrSetIndex("set", propertyName, returnType.toString()),
                     new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build();
 
-            methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
-                .withName(addVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
-                .addToStatements(
-                    init,
-                    new StringStatement("_visitables.get(\"" + propertyName + "\").add(builder);this." + propertyName
-                        + ".add(builder); return (" + returnType + ")this;"))
-                .endBlock().build());
+            methods
+                .add(
+                    new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
+                        .withName(addVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
+                        .addToStatements(init, new StringStatement("_visitables.get(\"" + propertyName
+                            + "\").add(builder);this." + propertyName + ".add(builder); return (" + returnType + ")this;"))
+                        .endBlock().build());
 
             methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
                 .withName(addVarargMethodName).withReturnType(returnType).withArguments(INDEX, builderProperty).withNewBlock()
-                .addToStatements(
-                    init,
-                    createAddOrSetIndex("add", propertyName, returnType.toString()),
+                .addToStatements(init, createAddOrSetIndex("add", propertyName, returnType.toString()),
                     new StringStatement("return (" + returnType + ")this;"))
                 .endBlock().build());
 
@@ -753,8 +808,7 @@ class ToMethod {
           Method addAllToCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addAllMethodName).withReturnType(returnType)
               .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
-              .addAllToStatements(statements).endBlock()
-              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
+              .addAllToStatements(statements).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           if (io.sundr.model.utils.Collections.IS_LIST.apply(property.getTypeRef())) {
             methods.add(addSingleItemAtIndex);
@@ -767,11 +821,9 @@ class ToMethod {
         }
 
         private StringStatement createAddOrSetIndex(String op, String propertyName, String returnType) {
-          return new StringStatement(
-              "if (index < 0 || index >= " + propertyName + ".size()) { _visitables.get(\"" + propertyName
-                  + "\").add(builder); " + propertyName + ".add(builder); } else { _visitables.get(\""
-                  + propertyName + "\")." + op + "(index, builder); " + propertyName + "." + op
-                  + "(index, builder);}");
+          return new StringStatement("if (index < 0 || index >= " + propertyName + ".size()) { _visitables.get(\""
+              + propertyName + "\").add(builder); " + propertyName + ".add(builder); } else { _visitables.get(\"" + propertyName
+              + "\")." + op + "(index, builder); " + propertyName + "." + op + "(index, builder);}");
         }
       });
 
@@ -820,30 +872,28 @@ class ToMethod {
             alsoImport.add(LIST.toInternalReference());
             statements.add(nullCheck(returnType, propertyName));
             statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new "
-                + builderClass + "(item);_visitables.get(\"" + propertyName + "\").remove(builder); "
-                + "this." + propertyName + ".remove(builder);} return (" + returnType + ")this;"));
+                + builderClass + "(item);_visitables.get(\"" + propertyName + "\").remove(builder); " + "this." + propertyName
+                + ".remove(builder);} return (" + returnType + ")this;"));
           } else if (!descendants.isEmpty()) {
             final ClassRef targetType = (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
             statements.add(nullCheck(returnType, propertyName));
             statements.add(new StringStatement("for (" + targetType.toString() + " item : items) {"));
             statements.add(new StringStatement("VisitableBuilder<? extends " + targetType.getFullyQualifiedName()
-                + ",?> builder = builder(item); _visitables.get(\"" + property.getName()
-                + "\").remove(builder);this." + property.getName() + ".remove(builder);"));
+                + ",?> builder = builder(item); _visitables.get(\"" + property.getName() + "\").remove(builder);this."
+                + property.getName() + ".remove(builder);"));
             statements.add(new StringStatement("} return (" + returnType + ")this;"));
 
             methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
                 .withName(removeVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
-                .addToStatements(
-                    nullCheck(returnType, propertyName),
-                    new StringStatement("_visitables.get(\"" + propertyName + "\").remove(builder);this." + propertyName
-                        + ".remove(builder); return (" + returnType + ")this;"))
+                .addToStatements(nullCheck(returnType, propertyName), new StringStatement("_visitables.get(\"" + propertyName
+                    + "\").remove(builder);this." + propertyName + ".remove(builder); return (" + returnType + ")this;"))
                 .endBlock().build());
           } else {
             isSimple = true;
             statements.add(nullCheck(returnType, propertyName));
-            statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) { "
-                + "this." + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
+            statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) { " + "this."
+                + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
           }
 
           Method removeVarargFromCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
@@ -871,8 +921,7 @@ class ToMethod {
             alsoImport.add(new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").build());
             alsoImport.add((ClassRef) builderType);
             methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).withNewModifiers()
-                .withPublic().endModifiers()
-                .withReturnType(returnType).withParameters(parameters)
+                .withPublic().endModifiers().withReturnType(returnType).withParameters(parameters)
                 .withName(removeMatchingMethodName).addNewArgument().withName("predicate")
                 .withTypeRef(Constants.PREDICATE.toReference(builder)).endArgument().withNewBlock()
                 .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")

@@ -1,5 +1,0 @@
-Function<%s, %s>() {
-    public %s apply(%s item) {
-        return item;
-    }
-}
