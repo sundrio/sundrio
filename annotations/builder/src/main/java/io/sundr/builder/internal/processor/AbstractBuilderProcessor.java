@@ -20,9 +20,7 @@ import static io.sundr.builder.Constants.ADDITIONAL_BUILDABLES;
 import static io.sundr.builder.Constants.ADDITIONAL_TYPES;
 import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.builder.Constants.EDITABLE_ENABLED;
-import static io.sundr.builder.Constants.EMPTY_FUNCTION_SNIPPET;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
-import static io.sundr.utils.Strings.loadResourceQuietly;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,13 +39,16 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
+import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Expression;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.RichTypeDef;
+import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
@@ -166,18 +167,21 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .build());
 
     if (type.equals(returnType)) {
+      Property item = Property.newProperty(type.toInternalReference(), ITEM);
+      Property a = Property.newProperty(ClassRef.OBJECT, "a");
+
       constructors.add(new MethodBuilder()
+          .withNewModifiers().withPublic().endModifiers()
           .withReturnType(inlineTypeRef)
           .withName(EMPTY)
-          .addNewArgument()
-          .withName(ITEM)
-          .withTypeRef(type.toInternalReference())
-          .and()
-          .withNewModifiers().withPublic().endModifiers()
+          .withArguments(item)
           .withNewBlock()
-          .addNewStringStatementStatement(String.format(NEW_BUILDER_AND_EMTPY_FUNCTION_FORMAT, builderType.getName(),
-              String.format(EMPTY_FUNCTION_TEXT, type.toInternalReference(), returnType.toInternalReference(),
-                  returnType.toInternalReference(), type.toInternalReference())))
+          .addToStatements(
+              Expression.newCall("super", item.toReference()).toStatement(),
+              new Assign(new This().property("builder"),
+                  Expression.createNew(builderType.toInternalReference(), new This(), item.toReference()))
+                      .toStatement(),
+              new Assign(new This().property("function"), Expression.lamba(a, a.toReference())).toStatement())
           .endBlock()
           .build());
     }
@@ -279,8 +283,6 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     }
     generateBuildables(builderContext, additonalBuildables);
   }
-
-  private static final String EMPTY_FUNCTION_TEXT = loadResourceQuietly(EMPTY_FUNCTION_SNIPPET);
 
   private static final String BUILDER = "builder";
   private static final String FUNCTION = "function";

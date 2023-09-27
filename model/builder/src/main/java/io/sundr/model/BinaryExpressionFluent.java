@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.lang.Class;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -63,6 +65,26 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return (A) withLeft(new Multiply(left, right));
   }
 
+  public NewArrayLeftNested<A> withNewNewArrayLeft() {
+    return new NewArrayLeftNested(null);
+  }
+
+  public NewArrayLeftNested<A> withNewNewArrayLeftLike(NewArray item) {
+    return new NewArrayLeftNested(item);
+  }
+
+  public A withNewNewArrayLeft(Class type, Integer[] sizes) {
+    return (A) withLeft(new NewArray(type, sizes));
+  }
+
+  public InstanceOfLeftNested<A> withNewInstanceOfLeft() {
+    return new InstanceOfLeftNested(null);
+  }
+
+  public InstanceOfLeftNested<A> withNewInstanceOfLeftLike(InstanceOf item) {
+    return new InstanceOfLeftNested(item);
+  }
+
   public MethodCallLeftNested<A> withNewMethodCallLeft() {
     return new MethodCallLeftNested(null);
   }
@@ -77,6 +99,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   public InverseLeftNested<A> withNewInverseLeftLike(Inverse item) {
     return new InverseLeftNested(item);
+  }
+
+  public IndexLeftNested<A> withNewIndexLeft() {
+    return new IndexLeftNested(null);
+  }
+
+  public IndexLeftNested<A> withNewIndexLeftLike(Index item) {
+    return new IndexLeftNested(item);
   }
 
   public GreaterThanOrEqualLeftNested<A> withNewGreaterThanOrEqualLeft() {
@@ -207,6 +237,30 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return (A) withLeft(new GreaterThan(left, right));
   }
 
+  public DeclareLeftNested<A> withNewDeclareLeft() {
+    return new DeclareLeftNested(null);
+  }
+
+  public DeclareLeftNested<A> withNewDeclareLeftLike(Declare item) {
+    return new DeclareLeftNested(item);
+  }
+
+  public A withNewDeclareLeft(Class type, String name) {
+    return (A) withLeft(new Declare(type, name));
+  }
+
+  public A withNewDeclareLeft(Class type, String name, Object value) {
+    return (A) withLeft(new Declare(type, name, value));
+  }
+
+  public CastLeftNested<A> withNewCastLeft() {
+    return new CastLeftNested(null);
+  }
+
+  public CastLeftNested<A> withNewCastLeftLike(Cast item) {
+    return new CastLeftNested(item);
+  }
+
   public ModuloLeftNested<A> withNewModuloLeft() {
     return new ModuloLeftNested(null);
   }
@@ -293,6 +347,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   public PostDecrementLeftNested<A> withNewPostDecrementLeftLike(PostDecrement item) {
     return new PostDecrementLeftNested(item);
+  }
+
+  public LambdaLeftNested<A> withNewLambdaLeft() {
+    return new LambdaLeftNested(null);
+  }
+
+  public LambdaLeftNested<A> withNewLambdaLeftLike(Lambda item) {
+    return new LambdaLeftNested(item);
   }
 
   public NotLeftNested<A> withNewNotLeft() {
@@ -452,6 +514,26 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return (A) withRight(new Multiply(left, right));
   }
 
+  public NewArrayRightNested<A> withNewNewArrayRight() {
+    return new NewArrayRightNested(null);
+  }
+
+  public NewArrayRightNested<A> withNewNewArrayRightLike(NewArray item) {
+    return new NewArrayRightNested(item);
+  }
+
+  public A withNewNewArrayRight(Class type, Integer[] sizes) {
+    return (A) withRight(new NewArray(type, sizes));
+  }
+
+  public InstanceOfRightNested<A> withNewInstanceOfRight() {
+    return new InstanceOfRightNested(null);
+  }
+
+  public InstanceOfRightNested<A> withNewInstanceOfRightLike(InstanceOf item) {
+    return new InstanceOfRightNested(item);
+  }
+
   public MethodCallRightNested<A> withNewMethodCallRight() {
     return new MethodCallRightNested(null);
   }
@@ -466,6 +548,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   public InverseRightNested<A> withNewInverseRightLike(Inverse item) {
     return new InverseRightNested(item);
+  }
+
+  public IndexRightNested<A> withNewIndexRight() {
+    return new IndexRightNested(null);
+  }
+
+  public IndexRightNested<A> withNewIndexRightLike(Index item) {
+    return new IndexRightNested(item);
   }
 
   public GreaterThanOrEqualRightNested<A> withNewGreaterThanOrEqualRight() {
@@ -596,6 +686,30 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return (A) withRight(new GreaterThan(left, right));
   }
 
+  public DeclareRightNested<A> withNewDeclareRight() {
+    return new DeclareRightNested(null);
+  }
+
+  public DeclareRightNested<A> withNewDeclareRightLike(Declare item) {
+    return new DeclareRightNested(item);
+  }
+
+  public A withNewDeclareRight(Class type, String name) {
+    return (A) withRight(new Declare(type, name));
+  }
+
+  public A withNewDeclareRight(Class type, String name, Object value) {
+    return (A) withRight(new Declare(type, name, value));
+  }
+
+  public CastRightNested<A> withNewCastRight() {
+    return new CastRightNested(null);
+  }
+
+  public CastRightNested<A> withNewCastRightLike(Cast item) {
+    return new CastRightNested(item);
+  }
+
   public ModuloRightNested<A> withNewModuloRight() {
     return new ModuloRightNested(null);
   }
@@ -682,6 +796,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   public PostDecrementRightNested<A> withNewPostDecrementRightLike(PostDecrement item) {
     return new PostDecrementRightNested(item);
+  }
+
+  public LambdaRightNested<A> withNewLambdaRight() {
+    return new LambdaRightNested(null);
+  }
+
+  public LambdaRightNested<A> withNewLambdaRightLike(Lambda item) {
+    return new LambdaRightNested(item);
   }
 
   public NotRightNested<A> withNewNotRight() {
@@ -818,10 +940,8 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     BinaryExpressionFluent that = (BinaryExpressionFluent) o;
     if (!java.util.Objects.equals(left, that.left))
       return false;
-
     if (!java.util.Objects.equals(right, that.right))
       return false;
-
     return true;
   }
 
@@ -848,10 +968,16 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     switch (item.getClass().getName()) {
       case "io.sundr.model." + "Multiply":
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "NewArray":
+        return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
+      case "io.sundr.model." + "InstanceOf":
+        return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
+      case "io.sundr.model." + "Index":
+        return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -874,6 +1000,10 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "Cast":
+        return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
       case "io.sundr.model." + "ValueRef":
@@ -892,6 +1022,8 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
       case "io.sundr.model." + "PostDecrement":
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Not":
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
@@ -939,6 +1071,40 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   }
 
+  public class NewArrayLeftNested<N> extends NewArrayFluent<NewArrayLeftNested<N>> implements Nested<N> {
+    NewArrayLeftNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endNewArrayLeft() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfLeftNested<N> extends InstanceOfFluent<InstanceOfLeftNested<N>> implements Nested<N> {
+    InstanceOfLeftNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endInstanceOfLeft() {
+      return and();
+    }
+
+  }
+
   public class MethodCallLeftNested<N> extends MethodCallFluent<MethodCallLeftNested<N>> implements Nested<N> {
     MethodCallLeftNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -968,6 +1134,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endInverseLeft() {
+      return and();
+    }
+
+  }
+
+  public class IndexLeftNested<N> extends IndexFluent<IndexLeftNested<N>> implements Nested<N> {
+    IndexLeftNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endIndexLeft() {
       return and();
     }
 
@@ -1161,6 +1344,40 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   }
 
+  public class DeclareLeftNested<N> extends DeclareFluent<DeclareLeftNested<N>> implements Nested<N> {
+    DeclareLeftNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endDeclareLeft() {
+      return and();
+    }
+
+  }
+
+  public class CastLeftNested<N> extends CastFluent<CastLeftNested<N>> implements Nested<N> {
+    CastLeftNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endCastLeft() {
+      return and();
+    }
+
+  }
+
   public class ModuloLeftNested<N> extends ModuloFluent<ModuloLeftNested<N>> implements Nested<N> {
     ModuloLeftNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -1310,6 +1527,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endPostDecrementLeft() {
+      return and();
+    }
+
+  }
+
+  public class LambdaLeftNested<N> extends LambdaFluent<LambdaLeftNested<N>> implements Nested<N> {
+    LambdaLeftNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endLambdaLeft() {
       return and();
     }
 
@@ -1554,6 +1788,40 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   }
 
+  public class NewArrayRightNested<N> extends NewArrayFluent<NewArrayRightNested<N>> implements Nested<N> {
+    NewArrayRightNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endNewArrayRight() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfRightNested<N> extends InstanceOfFluent<InstanceOfRightNested<N>> implements Nested<N> {
+    InstanceOfRightNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endInstanceOfRight() {
+      return and();
+    }
+
+  }
+
   public class MethodCallRightNested<N> extends MethodCallFluent<MethodCallRightNested<N>> implements Nested<N> {
     MethodCallRightNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -1583,6 +1851,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endInverseRight() {
+      return and();
+    }
+
+  }
+
+  public class IndexRightNested<N> extends IndexFluent<IndexRightNested<N>> implements Nested<N> {
+    IndexRightNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endIndexRight() {
       return and();
     }
 
@@ -1776,6 +2061,40 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   }
 
+  public class DeclareRightNested<N> extends DeclareFluent<DeclareRightNested<N>> implements Nested<N> {
+    DeclareRightNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endDeclareRight() {
+      return and();
+    }
+
+  }
+
+  public class CastRightNested<N> extends CastFluent<CastRightNested<N>> implements Nested<N> {
+    CastRightNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endCastRight() {
+      return and();
+    }
+
+  }
+
   public class ModuloRightNested<N> extends ModuloFluent<ModuloRightNested<N>> implements Nested<N> {
     ModuloRightNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -1925,6 +2244,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endPostDecrementRight() {
+      return and();
+    }
+
+  }
+
+  public class LambdaRightNested<N> extends LambdaFluent<LambdaRightNested<N>> implements Nested<N> {
+    LambdaRightNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endLambdaRight() {
       return and();
     }
 

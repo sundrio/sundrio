@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.lang.Class;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -61,6 +63,26 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
     return (A) withExpression(new Multiply(left, right));
   }
 
+  public NewArrayExpressionNested<A> withNewNewArrayExpression() {
+    return new NewArrayExpressionNested(null);
+  }
+
+  public NewArrayExpressionNested<A> withNewNewArrayExpressionLike(NewArray item) {
+    return new NewArrayExpressionNested(item);
+  }
+
+  public A withNewNewArrayExpression(Class type, Integer[] sizes) {
+    return (A) withExpression(new NewArray(type, sizes));
+  }
+
+  public InstanceOfExpressionNested<A> withNewInstanceOfExpression() {
+    return new InstanceOfExpressionNested(null);
+  }
+
+  public InstanceOfExpressionNested<A> withNewInstanceOfExpressionLike(InstanceOf item) {
+    return new InstanceOfExpressionNested(item);
+  }
+
   public MethodCallExpressionNested<A> withNewMethodCallExpression() {
     return new MethodCallExpressionNested(null);
   }
@@ -75,6 +97,14 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
 
   public InverseExpressionNested<A> withNewInverseExpressionLike(Inverse item) {
     return new InverseExpressionNested(item);
+  }
+
+  public IndexExpressionNested<A> withNewIndexExpression() {
+    return new IndexExpressionNested(null);
+  }
+
+  public IndexExpressionNested<A> withNewIndexExpressionLike(Index item) {
+    return new IndexExpressionNested(item);
   }
 
   public GreaterThanOrEqualExpressionNested<A> withNewGreaterThanOrEqualExpression() {
@@ -205,6 +235,30 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
     return (A) withExpression(new GreaterThan(left, right));
   }
 
+  public DeclareExpressionNested<A> withNewDeclareExpression() {
+    return new DeclareExpressionNested(null);
+  }
+
+  public DeclareExpressionNested<A> withNewDeclareExpressionLike(Declare item) {
+    return new DeclareExpressionNested(item);
+  }
+
+  public A withNewDeclareExpression(Class type, String name) {
+    return (A) withExpression(new Declare(type, name));
+  }
+
+  public A withNewDeclareExpression(Class type, String name, Object value) {
+    return (A) withExpression(new Declare(type, name, value));
+  }
+
+  public CastExpressionNested<A> withNewCastExpression() {
+    return new CastExpressionNested(null);
+  }
+
+  public CastExpressionNested<A> withNewCastExpressionLike(Cast item) {
+    return new CastExpressionNested(item);
+  }
+
   public ModuloExpressionNested<A> withNewModuloExpression() {
     return new ModuloExpressionNested(null);
   }
@@ -291,6 +345,14 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
 
   public PostDecrementExpressionNested<A> withNewPostDecrementExpressionLike(PostDecrement item) {
     return new PostDecrementExpressionNested(item);
+  }
+
+  public LambdaExpressionNested<A> withNewLambdaExpression() {
+    return new LambdaExpressionNested(null);
+  }
+
+  public LambdaExpressionNested<A> withNewLambdaExpressionLike(Lambda item) {
+    return new LambdaExpressionNested(item);
   }
 
   public NotExpressionNested<A> withNewNotExpression() {
@@ -427,7 +489,6 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
     PreDecrementFluent that = (PreDecrementFluent) o;
     if (!java.util.Objects.equals(expression, that.expression))
       return false;
-
     return true;
   }
 
@@ -450,10 +511,16 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
     switch (item.getClass().getName()) {
       case "io.sundr.model." + "Multiply":
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "NewArray":
+        return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
+      case "io.sundr.model." + "InstanceOf":
+        return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
+      case "io.sundr.model." + "Index":
+        return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -476,6 +543,10 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "Cast":
+        return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
       case "io.sundr.model." + "ValueRef":
@@ -494,6 +565,8 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
       case "io.sundr.model." + "PostDecrement":
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Not":
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
@@ -541,6 +614,40 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
 
   }
 
+  public class NewArrayExpressionNested<N> extends NewArrayFluent<NewArrayExpressionNested<N>> implements Nested<N> {
+    NewArrayExpressionNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) PreDecrementFluent.this.withExpression(builder.build());
+    }
+
+    public N endNewArrayExpression() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfExpressionNested<N> extends InstanceOfFluent<InstanceOfExpressionNested<N>> implements Nested<N> {
+    InstanceOfExpressionNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) PreDecrementFluent.this.withExpression(builder.build());
+    }
+
+    public N endInstanceOfExpression() {
+      return and();
+    }
+
+  }
+
   public class MethodCallExpressionNested<N> extends MethodCallFluent<MethodCallExpressionNested<N>> implements Nested<N> {
     MethodCallExpressionNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -570,6 +677,23 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
     }
 
     public N endInverseExpression() {
+      return and();
+    }
+
+  }
+
+  public class IndexExpressionNested<N> extends IndexFluent<IndexExpressionNested<N>> implements Nested<N> {
+    IndexExpressionNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) PreDecrementFluent.this.withExpression(builder.build());
+    }
+
+    public N endIndexExpression() {
       return and();
     }
 
@@ -763,6 +887,40 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
 
   }
 
+  public class DeclareExpressionNested<N> extends DeclareFluent<DeclareExpressionNested<N>> implements Nested<N> {
+    DeclareExpressionNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) PreDecrementFluent.this.withExpression(builder.build());
+    }
+
+    public N endDeclareExpression() {
+      return and();
+    }
+
+  }
+
+  public class CastExpressionNested<N> extends CastFluent<CastExpressionNested<N>> implements Nested<N> {
+    CastExpressionNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) PreDecrementFluent.this.withExpression(builder.build());
+    }
+
+    public N endCastExpression() {
+      return and();
+    }
+
+  }
+
   public class ModuloExpressionNested<N> extends ModuloFluent<ModuloExpressionNested<N>> implements Nested<N> {
     ModuloExpressionNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -913,6 +1071,23 @@ public class PreDecrementFluent<A extends PreDecrementFluent<A>> extends BaseFlu
     }
 
     public N endPostDecrementExpression() {
+      return and();
+    }
+
+  }
+
+  public class LambdaExpressionNested<N> extends LambdaFluent<LambdaExpressionNested<N>> implements Nested<N> {
+    LambdaExpressionNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) PreDecrementFluent.this.withExpression(builder.build());
+    }
+
+    public N endLambdaExpression() {
       return and();
     }
 

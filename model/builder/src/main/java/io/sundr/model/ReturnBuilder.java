@@ -4,11 +4,11 @@ import io.sundr.builder.VisitableBuilder;
 
 public class ReturnBuilder extends ReturnFluent<ReturnBuilder> implements VisitableBuilder<Return, ReturnBuilder> {
   public ReturnBuilder() {
-    this(new Return());
+    this.fluent = this;
   }
 
   public ReturnBuilder(ReturnFluent<?> fluent) {
-    this(fluent, new Return());
+    this.fluent = fluent;
   }
 
   public ReturnBuilder(ReturnFluent<?> fluent, Return instance) {
@@ -24,7 +24,7 @@ public class ReturnBuilder extends ReturnFluent<ReturnBuilder> implements Visita
   ReturnFluent<?> fluent;
 
   public Return build() {
-    Return buildable = new Return();
+    Return buildable = new Return(fluent.buildExpression());
     return buildable;
   }
 

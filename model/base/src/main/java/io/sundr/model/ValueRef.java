@@ -40,6 +40,8 @@ public class ValueRef implements Expression {
         array[i] = Array.get(value, i);
       }
       return OB + Arrays.stream(array).map(ValueRef::toString).collect(Collectors.joining(", ")) + CB;
+    } else if (value instanceof Expression) {
+      return ((Expression) value).render();
     } else if (value instanceof Number) {
       return String.valueOf(value);
     } else if (value instanceof Boolean) {
@@ -48,13 +50,14 @@ public class ValueRef implements Expression {
       return DQ + value + DQ;
     } else if (value instanceof Property) {
       return ((Property) value).getName();
+    } else if (value instanceof TypeDef) {
+      return ((TypeDef) value).getFullyQualifiedName() + ".class";
     } else if (value instanceof ClassRef) {
       return ((ClassRef) value).getFullyQualifiedName() + ".class";
     } else if (value instanceof PrimitiveRef) {
       return ((PrimitiveRef) value).getName() + ".class";
     }
     return "";
-
   }
 
   @Override

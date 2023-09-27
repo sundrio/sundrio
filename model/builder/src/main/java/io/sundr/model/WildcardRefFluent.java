@@ -29,7 +29,6 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
 
   protected void copyInstance(WildcardRef instance) {
     instance = (instance != null ? instance : new WildcardRef());
-
     if (instance != null) {
       this.withBoundKind(instance.getBoundKind());
       this.withBounds(instance.getBounds());
@@ -305,10 +304,8 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
     WildcardRefFluent that = (WildcardRefFluent) o;
     if (!java.util.Objects.equals(boundKind, that.boundKind))
       return false;
-
     if (!java.util.Objects.equals(bounds, that.bounds))
       return false;
-
     return true;
   }
 

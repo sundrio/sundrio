@@ -49,7 +49,6 @@ public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
     ValueRefFluent that = (ValueRefFluent) o;
     if (!java.util.Objects.equals(value, that.value))
       return false;
-
     return true;
   }
 

@@ -30,7 +30,6 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
 
   protected void copyInstance(Modifiers instance) {
     instance = (instance != null ? instance : new Modifiers());
-
     if (instance != null) {
       this.withPrivate(instance.isPrivate());
       this.withProtected(instance.isProtected());

@@ -1,5 +1,6 @@
 package io.sundr.model;
 
+import java.lang.Class;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -218,6 +219,18 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     return statements != null && !statements.isEmpty();
   }
 
+  public MethodCallStatementsNested<A> addNewMethodCallStatement() {
+    return new MethodCallStatementsNested(-1, null);
+  }
+
+  public MethodCallStatementsNested<A> addNewMethodCallStatementLike(MethodCall item) {
+    return new MethodCallStatementsNested(-1, item);
+  }
+
+  public MethodCallStatementsNested<A> setNewMethodCallStatementLike(int index, MethodCall item) {
+    return new MethodCallStatementsNested(index, item);
+  }
+
   public SwitchStatementsNested<A> addNewSwitchStatement() {
     return new SwitchStatementsNested(-1, null);
   }
@@ -248,6 +261,14 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
 
   public DeclareStatementsNested<A> addNewDeclareStatementLike(Declare item) {
     return new DeclareStatementsNested(-1, item);
+  }
+
+  public A addNewDeclareStatement(Class type, String name) {
+    return (A) addToStatements(new Declare(type, name));
+  }
+
+  public A addNewDeclareStatement(Class type, String name, Object value) {
+    return (A) addToStatements(new Declare(type, name, value));
   }
 
   public DeclareStatementsNested<A> setNewDeclareStatementLike(int index, Declare item) {
@@ -346,12 +367,28 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     return new IfStatementsNested(index, item);
   }
 
+  public LambdaStatementsNested<A> addNewLambdaStatement() {
+    return new LambdaStatementsNested(-1, null);
+  }
+
+  public LambdaStatementsNested<A> addNewLambdaStatementLike(Lambda item) {
+    return new LambdaStatementsNested(-1, item);
+  }
+
+  public LambdaStatementsNested<A> setNewLambdaStatementLike(int index, Lambda item) {
+    return new LambdaStatementsNested(index, item);
+  }
+
   public ReturnStatementsNested<A> addNewReturnStatement() {
     return new ReturnStatementsNested(-1, null);
   }
 
   public ReturnStatementsNested<A> addNewReturnStatementLike(Return item) {
     return new ReturnStatementsNested(-1, item);
+  }
+
+  public A addNewReturnStatement(Object object) {
+    return (A) addToStatements(new Return(object));
   }
 
   public ReturnStatementsNested<A> setNewReturnStatementLike(int index, Return item) {
@@ -368,6 +405,18 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
 
   public AssignStatementsNested<A> setNewAssignStatementLike(int index, Assign item) {
     return new AssignStatementsNested(index, item);
+  }
+
+  public StatementAdapterStatementsNested<A> addNewStatementAdapterStatement() {
+    return new StatementAdapterStatementsNested(-1, null);
+  }
+
+  public StatementAdapterStatementsNested<A> addNewStatementAdapterStatementLike(StatementAdapter item) {
+    return new StatementAdapterStatementsNested(-1, item);
+  }
+
+  public StatementAdapterStatementsNested<A> setNewStatementAdapterStatementLike(int index, StatementAdapter item) {
+    return new StatementAdapterStatementsNested(index, item);
   }
 
   public ForStatementsNested<A> addNewForStatement() {
@@ -392,7 +441,6 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     BlockFluent that = (BlockFluent) o;
     if (!java.util.Objects.equals(statements, that.statements))
       return false;
-
     return true;
   }
 
@@ -413,6 +461,8 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
+      case "io.sundr.model." + "MethodCall":
+        return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Switch":
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
       case "io.sundr.model." + "Break":
@@ -433,14 +483,37 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new BlockBuilder((Block) item);
       case "io.sundr.model." + "If":
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Return":
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+      case "io.sundr.model." + "StatementAdapter":
+        return (VisitableBuilder<T, ?>) new StatementAdapterBuilder((StatementAdapter) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
     return (VisitableBuilder<T, ?>) builderOf(item);
+  }
+
+  public class MethodCallStatementsNested<N> extends MethodCallFluent<MethodCallStatementsNested<N>> implements Nested<N> {
+    MethodCallStatementsNested(int index, MethodCall item) {
+      this.index = index;
+      this.builder = new MethodCallBuilder(this, item);
+    }
+
+    MethodCallBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endMethodCallStatement() {
+      return and();
+    }
+
   }
 
   public class SwitchStatementsNested<N> extends SwitchFluent<SwitchStatementsNested<N>> implements Nested<N> {
@@ -634,6 +707,25 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class LambdaStatementsNested<N> extends LambdaFluent<LambdaStatementsNested<N>> implements Nested<N> {
+    LambdaStatementsNested(int index, Lambda item) {
+      this.index = index;
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endLambdaStatement() {
+      return and();
+    }
+
+  }
+
   public class ReturnStatementsNested<N> extends ReturnFluent<ReturnStatementsNested<N>> implements Nested<N> {
     ReturnStatementsNested(int index, Return item) {
       this.index = index;
@@ -667,6 +759,26 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignStatement() {
+      return and();
+    }
+
+  }
+
+  public class StatementAdapterStatementsNested<N> extends StatementAdapterFluent<StatementAdapterStatementsNested<N>>
+      implements Nested<N> {
+    StatementAdapterStatementsNested(int index, StatementAdapter item) {
+      this.index = index;
+      this.builder = new StatementAdapterBuilder(this, item);
+    }
+
+    StatementAdapterBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endStatementAdapterStatement() {
       return and();
     }
 

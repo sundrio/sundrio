@@ -63,7 +63,6 @@ public class PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRef
     PrimitiveRefFluent that = (PrimitiveRefFluent) o;
     if (!java.util.Objects.equals(name, that.name))
       return false;
-
     if (dimensions != that.dimensions)
       return false;
     return true;

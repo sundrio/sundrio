@@ -28,7 +28,6 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
 
   protected void copyInstance(Source instance) {
     instance = (instance != null ? instance : new Source());
-
     if (instance != null) {
       this.withTypes(instance.getTypes());
     }
@@ -249,7 +248,6 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
     SourceFluent that = (SourceFluent) o;
     if (!java.util.Objects.equals(types, that.types))
       return false;
-
     return true;
   }
 

@@ -51,4 +51,8 @@ public interface Renderable extends Node {
     }
     return sb.toString();
   }
+
+  public static String noSemicolon(String content) {
+    return content.replaceAll(SEMICOLN_SUFFIX_PATTERN, EMPTY);
+  }
 }

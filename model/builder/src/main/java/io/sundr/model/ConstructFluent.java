@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.lang.Class;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -33,6 +35,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     if (instance != null) {
       this.withType(instance.getType());
       this.withParameters(instance.getParameters());
+      this.withArguments(instance.getArguments());
     }
   }
 
@@ -522,6 +525,34 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     return new MultiplyArgumentsNested(index, item);
   }
 
+  public NewArrayArgumentsNested<A> addNewNewArrayArgument() {
+    return new NewArrayArgumentsNested(-1, null);
+  }
+
+  public NewArrayArgumentsNested<A> addNewNewArrayArgumentLike(NewArray item) {
+    return new NewArrayArgumentsNested(-1, item);
+  }
+
+  public A addNewNewArrayArgument(Class type, Integer[] sizes) {
+    return (A) addToArguments(new NewArray(type, sizes));
+  }
+
+  public NewArrayArgumentsNested<A> setNewNewArrayArgumentLike(int index, NewArray item) {
+    return new NewArrayArgumentsNested(index, item);
+  }
+
+  public InstanceOfArgumentsNested<A> addNewInstanceOfArgument() {
+    return new InstanceOfArgumentsNested(-1, null);
+  }
+
+  public InstanceOfArgumentsNested<A> addNewInstanceOfArgumentLike(InstanceOf item) {
+    return new InstanceOfArgumentsNested(-1, item);
+  }
+
+  public InstanceOfArgumentsNested<A> setNewInstanceOfArgumentLike(int index, InstanceOf item) {
+    return new InstanceOfArgumentsNested(index, item);
+  }
+
   public MethodCallArgumentsNested<A> addNewMethodCallArgument() {
     return new MethodCallArgumentsNested(-1, null);
   }
@@ -544,6 +575,18 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
 
   public InverseArgumentsNested<A> setNewInverseArgumentLike(int index, Inverse item) {
     return new InverseArgumentsNested(index, item);
+  }
+
+  public IndexArgumentsNested<A> addNewIndexArgument() {
+    return new IndexArgumentsNested(-1, null);
+  }
+
+  public IndexArgumentsNested<A> addNewIndexArgumentLike(Index item) {
+    return new IndexArgumentsNested(-1, item);
+  }
+
+  public IndexArgumentsNested<A> setNewIndexArgumentLike(int index, Index item) {
+    return new IndexArgumentsNested(index, item);
   }
 
   public GreaterThanOrEqualArgumentsNested<A> addNewGreaterThanOrEqualArgument() {
@@ -718,6 +761,38 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     return new GreaterThanArgumentsNested(index, item);
   }
 
+  public DeclareArgumentsNested<A> addNewDeclareArgument() {
+    return new DeclareArgumentsNested(-1, null);
+  }
+
+  public DeclareArgumentsNested<A> addNewDeclareArgumentLike(Declare item) {
+    return new DeclareArgumentsNested(-1, item);
+  }
+
+  public A addNewDeclareArgument(Class type, String name) {
+    return (A) addToArguments(new Declare(type, name));
+  }
+
+  public A addNewDeclareArgument(Class type, String name, Object value) {
+    return (A) addToArguments(new Declare(type, name, value));
+  }
+
+  public DeclareArgumentsNested<A> setNewDeclareArgumentLike(int index, Declare item) {
+    return new DeclareArgumentsNested(index, item);
+  }
+
+  public CastArgumentsNested<A> addNewCastArgument() {
+    return new CastArgumentsNested(-1, null);
+  }
+
+  public CastArgumentsNested<A> addNewCastArgumentLike(Cast item) {
+    return new CastArgumentsNested(-1, item);
+  }
+
+  public CastArgumentsNested<A> setNewCastArgumentLike(int index, Cast item) {
+    return new CastArgumentsNested(index, item);
+  }
+
   public ModuloArgumentsNested<A> addNewModuloArgument() {
     return new ModuloArgumentsNested(-1, null);
   }
@@ -840,6 +915,18 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
 
   public PostDecrementArgumentsNested<A> setNewPostDecrementArgumentLike(int index, PostDecrement item) {
     return new PostDecrementArgumentsNested(index, item);
+  }
+
+  public LambdaArgumentsNested<A> addNewLambdaArgument() {
+    return new LambdaArgumentsNested(-1, null);
+  }
+
+  public LambdaArgumentsNested<A> addNewLambdaArgumentLike(Lambda item) {
+    return new LambdaArgumentsNested(-1, item);
+  }
+
+  public LambdaArgumentsNested<A> setNewLambdaArgumentLike(int index, Lambda item) {
+    return new LambdaArgumentsNested(index, item);
   }
 
   public NotArgumentsNested<A> addNewNotArgument() {
@@ -1028,13 +1115,10 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     ConstructFluent that = (ConstructFluent) o;
     if (!java.util.Objects.equals(type, that.type))
       return false;
-
     if (!java.util.Objects.equals(parameters, that.parameters))
       return false;
-
     if (!java.util.Objects.equals(arguments, that.arguments))
       return false;
-
     return true;
   }
 
@@ -1075,10 +1159,16 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
         return (VisitableBuilder<T, ?>) new WildcardRefBuilder((WildcardRef) item);
       case "io.sundr.model." + "Multiply":
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "NewArray":
+        return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
+      case "io.sundr.model." + "InstanceOf":
+        return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
+      case "io.sundr.model." + "Index":
+        return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -1101,6 +1191,10 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "Cast":
+        return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
       case "io.sundr.model." + "ValueRef":
@@ -1119,6 +1213,8 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
       case "io.sundr.model." + "PostDecrement":
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Not":
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
@@ -1282,6 +1378,44 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
 
   }
 
+  public class NewArrayArgumentsNested<N> extends NewArrayFluent<NewArrayArgumentsNested<N>> implements Nested<N> {
+    NewArrayArgumentsNested(int index, NewArray item) {
+      this.index = index;
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endNewArrayArgument() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfArgumentsNested<N> extends InstanceOfFluent<InstanceOfArgumentsNested<N>> implements Nested<N> {
+    InstanceOfArgumentsNested(int index, InstanceOf item) {
+      this.index = index;
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endInstanceOfArgument() {
+      return and();
+    }
+
+  }
+
   public class MethodCallArgumentsNested<N> extends MethodCallFluent<MethodCallArgumentsNested<N>> implements Nested<N> {
     MethodCallArgumentsNested(int index, MethodCall item) {
       this.index = index;
@@ -1315,6 +1449,25 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     }
 
     public N endInverseArgument() {
+      return and();
+    }
+
+  }
+
+  public class IndexArgumentsNested<N> extends IndexFluent<IndexArgumentsNested<N>> implements Nested<N> {
+    IndexArgumentsNested(int index, Index item) {
+      this.index = index;
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endIndexArgument() {
       return and();
     }
 
@@ -1530,6 +1683,44 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
 
   }
 
+  public class DeclareArgumentsNested<N> extends DeclareFluent<DeclareArgumentsNested<N>> implements Nested<N> {
+    DeclareArgumentsNested(int index, Declare item) {
+      this.index = index;
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endDeclareArgument() {
+      return and();
+    }
+
+  }
+
+  public class CastArgumentsNested<N> extends CastFluent<CastArgumentsNested<N>> implements Nested<N> {
+    CastArgumentsNested(int index, Cast item) {
+      this.index = index;
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endCastArgument() {
+      return and();
+    }
+
+  }
+
   public class ModuloArgumentsNested<N> extends ModuloFluent<ModuloArgumentsNested<N>> implements Nested<N> {
     ModuloArgumentsNested(int index, Modulo item) {
       this.index = index;
@@ -1698,6 +1889,25 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     }
 
     public N endPostDecrementArgument() {
+      return and();
+    }
+
+  }
+
+  public class LambdaArgumentsNested<N> extends LambdaFluent<LambdaArgumentsNested<N>> implements Nested<N> {
+    LambdaArgumentsNested(int index, Lambda item) {
+      this.index = index;
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endLambdaArgument() {
       return and();
     }
 

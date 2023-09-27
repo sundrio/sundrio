@@ -142,10 +142,8 @@ public class AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends Attri
     AnnotationRefFluent that = (AnnotationRefFluent) o;
     if (!java.util.Objects.equals(classRef, that.classRef))
       return false;
-
     if (!java.util.Objects.equals(parameters, that.parameters))
       return false;
-
     return true;
   }
 

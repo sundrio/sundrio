@@ -164,10 +164,4 @@ public class Constants {
 
   public static List<ClassRef> VALIDATION_REFS = Arrays.<ClassRef> asList(VALIDATION, VALIDATOR, VALIDATOR_FACTORY,
       VALIDATION_EXCEPTION, CONSTRAIN_VIOLATION, CONSTRAIN_VIOLATION_EXCEPTION, Collections.SET.toInternalReference());
-
-  public static final String SIMPLE_ARRAY_GETTER_SNIPPET = "snippets/simple-array-getter.txt";
-  public static final String BUILDABLE_ARRAY_GETTER_SNIPPET = "snippets/buildable-array-getter.txt";
-  public static final String EMPTY_FUNCTION_SNIPPET = "snippets/empty-function.txt";
-  public static final String TO_STRING_ARRAY_SNIPPET = "snippets/to-string-array.txt";
-
 }

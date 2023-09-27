@@ -17,4 +17,8 @@
 package io.sundr.model;
 
 public interface Statement extends Renderable {
+
+  public static Statement ret(Expression expression) {
+    return new Return(expression);
+  }
 }

@@ -5,14 +5,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.body.VariableDeclaratorId;
+import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.DoubleLiteralExpr;
 import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.LongLiteralExpr;
@@ -38,7 +41,10 @@ import io.sundr.model.Enclosed;
 import io.sundr.model.Equals;
 import io.sundr.model.GreaterThan;
 import io.sundr.model.GreaterThanOrEqual;
+import io.sundr.model.Index;
+import io.sundr.model.InstanceOf;
 import io.sundr.model.Inverse;
+import io.sundr.model.Lambda;
 import io.sundr.model.LeftShift;
 import io.sundr.model.LessThan;
 import io.sundr.model.LessThanOrEqual;
@@ -197,9 +203,19 @@ public class ExpressionConverter {
       }
       methodCallExpr.getScope();
     } else if (expression instanceof LambdaExpr) {
+      LambdaExpr lambdaExpr = (LambdaExpr) expression;
+      return new Lambda(lambdaExpr.getParameters().stream().map(Parameter::getId).map(VariableDeclaratorId::getName)
+          .collect(Collectors.toList()), StatementConverter.convertStatement(lambdaExpr.getBody()));
     } else if (expression instanceof EnclosedExpr) {
       EnclosedExpr enclosedExpr = (EnclosedExpr) expression;
       return new Enclosed(convertExpression(enclosedExpr.getInner()));
+    } else if (expression instanceof InstanceOfExpr) {
+      InstanceOfExpr instanceOfExpr = (InstanceOfExpr) expression;
+      return new InstanceOf(convertExpression(instanceOfExpr.getExpr()),
+          (ClassRef) SOURCE_ADAPTER.getReferenceAdapterFunction().apply((ClassOrInterfaceType) instanceOfExpr.getType()));
+    } else if (expression instanceof ArrayAccessExpr) {
+      ArrayAccessExpr arrayAccessExpr = (ArrayAccessExpr) expression;
+      return new Index(convertExpression(arrayAccessExpr.getName()), convertExpression(arrayAccessExpr.getIndex()));
     }
     return null;
   }

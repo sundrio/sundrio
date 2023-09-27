@@ -39,8 +39,7 @@ public class Block implements Statement {
   public String render() {
     StringBuilder sb = new StringBuilder();
     for (Statement statement : statements) {
-      sb.append(statement.render());
-      sb.append(NEWLINE);
+      sb.append(tab(statement.render()));
     }
     return sb.toString();
   }

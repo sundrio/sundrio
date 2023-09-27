@@ -8,7 +8,7 @@ public class PostIncrement implements Expression {
     this.expression = expression;
   }
 
-  public Expression getexpression() {
+  public Expression getExpression() {
     return expression;
   }
 

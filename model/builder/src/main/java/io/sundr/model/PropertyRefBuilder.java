@@ -25,7 +25,7 @@ public class PropertyRefBuilder extends PropertyRefFluent<PropertyRefBuilder>
   PropertyRefFluent<?> fluent;
 
   public PropertyRef build() {
-    PropertyRef buildable = new PropertyRef(fluent.buildProperty());
+    PropertyRef buildable = new PropertyRef(fluent.buildProperty(), fluent.buildScope());
     return buildable;
   }
 

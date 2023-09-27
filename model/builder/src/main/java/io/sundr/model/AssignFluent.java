@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.lang.Class;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
 import java.lang.SuppressWarnings;
@@ -63,6 +65,26 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return (A) withTarget(new Multiply(left, right));
   }
 
+  public NewArrayTargetNested<A> withNewNewArrayTarget() {
+    return new NewArrayTargetNested(null);
+  }
+
+  public NewArrayTargetNested<A> withNewNewArrayTargetLike(NewArray item) {
+    return new NewArrayTargetNested(item);
+  }
+
+  public A withNewNewArrayTarget(Class type, Integer[] sizes) {
+    return (A) withTarget(new NewArray(type, sizes));
+  }
+
+  public InstanceOfTargetNested<A> withNewInstanceOfTarget() {
+    return new InstanceOfTargetNested(null);
+  }
+
+  public InstanceOfTargetNested<A> withNewInstanceOfTargetLike(InstanceOf item) {
+    return new InstanceOfTargetNested(item);
+  }
+
   public MethodCallTargetNested<A> withNewMethodCallTarget() {
     return new MethodCallTargetNested(null);
   }
@@ -77,6 +99,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   public InverseTargetNested<A> withNewInverseTargetLike(Inverse item) {
     return new InverseTargetNested(item);
+  }
+
+  public IndexTargetNested<A> withNewIndexTarget() {
+    return new IndexTargetNested(null);
+  }
+
+  public IndexTargetNested<A> withNewIndexTargetLike(Index item) {
+    return new IndexTargetNested(item);
   }
 
   public GreaterThanOrEqualTargetNested<A> withNewGreaterThanOrEqualTarget() {
@@ -207,6 +237,30 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return (A) withTarget(new GreaterThan(left, right));
   }
 
+  public DeclareTargetNested<A> withNewDeclareTarget() {
+    return new DeclareTargetNested(null);
+  }
+
+  public DeclareTargetNested<A> withNewDeclareTargetLike(Declare item) {
+    return new DeclareTargetNested(item);
+  }
+
+  public A withNewDeclareTarget(Class type, String name) {
+    return (A) withTarget(new Declare(type, name));
+  }
+
+  public A withNewDeclareTarget(Class type, String name, Object value) {
+    return (A) withTarget(new Declare(type, name, value));
+  }
+
+  public CastTargetNested<A> withNewCastTarget() {
+    return new CastTargetNested(null);
+  }
+
+  public CastTargetNested<A> withNewCastTargetLike(Cast item) {
+    return new CastTargetNested(item);
+  }
+
   public ModuloTargetNested<A> withNewModuloTarget() {
     return new ModuloTargetNested(null);
   }
@@ -293,6 +347,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   public PostDecrementTargetNested<A> withNewPostDecrementTargetLike(PostDecrement item) {
     return new PostDecrementTargetNested(item);
+  }
+
+  public LambdaTargetNested<A> withNewLambdaTarget() {
+    return new LambdaTargetNested(null);
+  }
+
+  public LambdaTargetNested<A> withNewLambdaTargetLike(Lambda item) {
+    return new LambdaTargetNested(item);
   }
 
   public NotTargetNested<A> withNewNotTarget() {
@@ -452,6 +514,26 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return (A) withValue(new Multiply(left, right));
   }
 
+  public NewArrayValueNested<A> withNewNewArrayValue() {
+    return new NewArrayValueNested(null);
+  }
+
+  public NewArrayValueNested<A> withNewNewArrayValueLike(NewArray item) {
+    return new NewArrayValueNested(item);
+  }
+
+  public A withNewNewArrayValue(Class type, Integer[] sizes) {
+    return (A) withValue(new NewArray(type, sizes));
+  }
+
+  public InstanceOfValueNested<A> withNewInstanceOfValue() {
+    return new InstanceOfValueNested(null);
+  }
+
+  public InstanceOfValueNested<A> withNewInstanceOfValueLike(InstanceOf item) {
+    return new InstanceOfValueNested(item);
+  }
+
   public MethodCallValueNested<A> withNewMethodCallValue() {
     return new MethodCallValueNested(null);
   }
@@ -466,6 +548,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   public InverseValueNested<A> withNewInverseValueLike(Inverse item) {
     return new InverseValueNested(item);
+  }
+
+  public IndexValueNested<A> withNewIndexValue() {
+    return new IndexValueNested(null);
+  }
+
+  public IndexValueNested<A> withNewIndexValueLike(Index item) {
+    return new IndexValueNested(item);
   }
 
   public GreaterThanOrEqualValueNested<A> withNewGreaterThanOrEqualValue() {
@@ -596,6 +686,30 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return (A) withValue(new GreaterThan(left, right));
   }
 
+  public DeclareValueNested<A> withNewDeclareValue() {
+    return new DeclareValueNested(null);
+  }
+
+  public DeclareValueNested<A> withNewDeclareValueLike(Declare item) {
+    return new DeclareValueNested(item);
+  }
+
+  public A withNewDeclareValue(Class type, String name) {
+    return (A) withValue(new Declare(type, name));
+  }
+
+  public A withNewDeclareValue(Class type, String name, Object value) {
+    return (A) withValue(new Declare(type, name, value));
+  }
+
+  public CastValueNested<A> withNewCastValue() {
+    return new CastValueNested(null);
+  }
+
+  public CastValueNested<A> withNewCastValueLike(Cast item) {
+    return new CastValueNested(item);
+  }
+
   public ModuloValueNested<A> withNewModuloValue() {
     return new ModuloValueNested(null);
   }
@@ -682,6 +796,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   public PostDecrementValueNested<A> withNewPostDecrementValueLike(PostDecrement item) {
     return new PostDecrementValueNested(item);
+  }
+
+  public LambdaValueNested<A> withNewLambdaValue() {
+    return new LambdaValueNested(null);
+  }
+
+  public LambdaValueNested<A> withNewLambdaValueLike(Lambda item) {
+    return new LambdaValueNested(item);
   }
 
   public NotValueNested<A> withNewNotValue() {
@@ -818,10 +940,8 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     AssignFluent that = (AssignFluent) o;
     if (!java.util.Objects.equals(target, that.target))
       return false;
-
     if (!java.util.Objects.equals(value, that.value))
       return false;
-
     return true;
   }
 
@@ -848,10 +968,16 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     switch (item.getClass().getName()) {
       case "io.sundr.model." + "Multiply":
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "NewArray":
+        return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
+      case "io.sundr.model." + "InstanceOf":
+        return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
+      case "io.sundr.model." + "Index":
+        return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -874,6 +1000,10 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "Cast":
+        return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
       case "io.sundr.model." + "ValueRef":
@@ -892,6 +1022,8 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
       case "io.sundr.model." + "PostDecrement":
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
       case "io.sundr.model." + "Not":
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
@@ -939,6 +1071,40 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class NewArrayTargetNested<N> extends NewArrayFluent<NewArrayTargetNested<N>> implements Nested<N> {
+    NewArrayTargetNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endNewArrayTarget() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfTargetNested<N> extends InstanceOfFluent<InstanceOfTargetNested<N>> implements Nested<N> {
+    InstanceOfTargetNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endInstanceOfTarget() {
+      return and();
+    }
+
+  }
+
   public class MethodCallTargetNested<N> extends MethodCallFluent<MethodCallTargetNested<N>> implements Nested<N> {
     MethodCallTargetNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -968,6 +1134,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endInverseTarget() {
+      return and();
+    }
+
+  }
+
+  public class IndexTargetNested<N> extends IndexFluent<IndexTargetNested<N>> implements Nested<N> {
+    IndexTargetNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endIndexTarget() {
       return and();
     }
 
@@ -1161,6 +1344,40 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareTargetNested<N> extends DeclareFluent<DeclareTargetNested<N>> implements Nested<N> {
+    DeclareTargetNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endDeclareTarget() {
+      return and();
+    }
+
+  }
+
+  public class CastTargetNested<N> extends CastFluent<CastTargetNested<N>> implements Nested<N> {
+    CastTargetNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endCastTarget() {
+      return and();
+    }
+
+  }
+
   public class ModuloTargetNested<N> extends ModuloFluent<ModuloTargetNested<N>> implements Nested<N> {
     ModuloTargetNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -1310,6 +1527,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostDecrementTarget() {
+      return and();
+    }
+
+  }
+
+  public class LambdaTargetNested<N> extends LambdaFluent<LambdaTargetNested<N>> implements Nested<N> {
+    LambdaTargetNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endLambdaTarget() {
       return and();
     }
 
@@ -1555,6 +1789,40 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class NewArrayValueNested<N> extends NewArrayFluent<NewArrayValueNested<N>> implements Nested<N> {
+    NewArrayValueNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    NewArrayBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endNewArrayValue() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfValueNested<N> extends InstanceOfFluent<InstanceOfValueNested<N>> implements Nested<N> {
+    InstanceOfValueNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    InstanceOfBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endInstanceOfValue() {
+      return and();
+    }
+
+  }
+
   public class MethodCallValueNested<N> extends MethodCallFluent<MethodCallValueNested<N>> implements Nested<N> {
     MethodCallValueNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -1584,6 +1852,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endInverseValue() {
+      return and();
+    }
+
+  }
+
+  public class IndexValueNested<N> extends IndexFluent<IndexValueNested<N>> implements Nested<N> {
+    IndexValueNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    IndexBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endIndexValue() {
       return and();
     }
 
@@ -1777,6 +2062,40 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareValueNested<N> extends DeclareFluent<DeclareValueNested<N>> implements Nested<N> {
+    DeclareValueNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    DeclareBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endDeclareValue() {
+      return and();
+    }
+
+  }
+
+  public class CastValueNested<N> extends CastFluent<CastValueNested<N>> implements Nested<N> {
+    CastValueNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    CastBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endCastValue() {
+      return and();
+    }
+
+  }
+
   public class ModuloValueNested<N> extends ModuloFluent<ModuloValueNested<N>> implements Nested<N> {
     ModuloValueNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
@@ -1926,6 +2245,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostDecrementValue() {
+      return and();
+    }
+
+  }
+
+  public class LambdaValueNested<N> extends LambdaFluent<LambdaValueNested<N>> implements Nested<N> {
+    LambdaValueNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    LambdaBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endLambdaValue() {
       return and();
     }
 

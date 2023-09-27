@@ -1848,43 +1848,30 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
     TypeDefFluent that = (TypeDefFluent) o;
     if (!java.util.Objects.equals(kind, that.kind))
       return false;
-
     if (!java.util.Objects.equals(packageName, that.packageName))
       return false;
-
     if (!java.util.Objects.equals(name, that.name))
       return false;
-
     if (!java.util.Objects.equals(comments, that.comments))
       return false;
-
     if (!java.util.Objects.equals(annotations, that.annotations))
       return false;
-
     if (!java.util.Objects.equals(extendsList, that.extendsList))
       return false;
-
     if (!java.util.Objects.equals(implementsList, that.implementsList))
       return false;
-
     if (!java.util.Objects.equals(parameters, that.parameters))
       return false;
-
     if (!java.util.Objects.equals(properties, that.properties))
       return false;
-
     if (!java.util.Objects.equals(constructors, that.constructors))
       return false;
-
     if (!java.util.Objects.equals(methods, that.methods))
       return false;
-
     if (!java.util.Objects.equals(outerTypeName, that.outerTypeName))
       return false;
-
     if (!java.util.Objects.equals(innerTypes, that.innerTypes))
       return false;
-
     return true;
   }
 
