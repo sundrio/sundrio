@@ -358,24 +358,39 @@ class ToMethod {
       if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
         String builderClass = builder.getFullyQualifiedName();
-        statements.add(new StringStatement("if (" + argumentName + "!=null){ this." + fieldName + "= new " + builderClass + "("
-            + argumentName + "); _visitables.get(\"" + fieldName + "\").add(this." + fieldName + ");}" + " else { this."
-            + fieldName + " = null; _visitables.get(\"" + fieldName + "\").remove(this." + fieldName + "); }" + " return ("
-            + returnType + ") this;"));
+        statements.add(new If(property.toReference().notNull(),
+            new Block(
+                new This().property(property).assignNew(builder, property.toReference()).toStatement(),
+                new This().property("_visitables").call("get", ValueRef.from(property.getName()))
+                    .call("add", new This().property(property)).toStatement()),
+            new Block(
+                new This().property(property).assignNull().toStatement(),
+                new This().property("_visitables").call("get", ValueRef.from(property.getName()))
+                    .call("remove", new This().property(property)).toStatement())));
+        statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       }
 
       if (!descendants.isEmpty()) {
-        statements.add(new StringStatement("if (" + argumentName + "==null){ this." + fieldName
-            + " = null; _visitables.remove(\"" + fieldName + "\");" + " return (" + returnType + ") this;}"));
-        statements.add(new StringStatement("VisitableBuilder<? extends " + ((ClassRef) type).getFullyQualifiedName()
-            + ",?> builder = builder(" + argumentName + "); " + "_visitables.get(\"" + fieldName
-            + "\").clear();_visitables.get(\"" + fieldName + "\").add(builder);" + "this." + fieldName + " = builder;"));
-        statements.add(new StringStatement("return (" + returnType + ") this;"));
+        Property builder = Property.newProperty(VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped), "builder");
+        Property field = Property.newProperty(builder.getTypeRef(), fieldName);
+        statements.add(new If(property.toReference().isNull(),
+            new Block(
+                new This().property(field).assignNull().toStatement(),
+                new This().property("_visitables").call("remove", ValueRef.from(field.getName())).toStatement(),
+                new Return(Expression.cast(returnType, new This()))),
+            new Block(
+                new Declare(builder, Expression.newCall("builder", property.toReference())).toStatement(),
+                new This().property("_visitables").call("clear").toStatement(),
+                new This().property("_visitables").call("get", ValueRef.from(field.getName()))
+                    .call("add", builder.toReference()).toStatement(),
+                new This().property(field).assign(builder).toStatement(),
+                new Return(Expression.cast(returnType, new This())))));
         return statements;
       }
 
-      statements.add(new StringStatement("this." + fieldName + "=" + argumentName + "; return (" + returnType + ") this;"));
+      statements.add(new This().property(property).assign(property).toStatement());
+      statements.add(new Return(Expression.cast(returnType, new This())));
       return statements;
     }
   });
