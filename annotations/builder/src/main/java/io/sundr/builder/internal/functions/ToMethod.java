@@ -359,14 +359,11 @@ class ToMethod {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
         String builderClass = builder.getFullyQualifiedName();
         statements.add(new If(property.toReference().notNull(),
-            new Block(
-                new This().property(property).assignNew(builder, property.toReference()).toStatement(),
+            new Block(new This().property(property).assignNew(builder, property.toReference()).toStatement(),
                 new This().property("_visitables").call("get", ValueRef.from(property.getName()))
                     .call("add", new This().property(property)).toStatement()),
-            new Block(
-                new This().property(property).assignNull().toStatement(),
-                new This().property("_visitables").call("get", ValueRef.from(property.getName()))
-                    .call("remove", new This().property(property)).toStatement())));
+            new Block(new This().property(property).assignNull().toStatement(), new This().property("_visitables")
+                .call("get", ValueRef.from(property.getName())).call("remove", new This().property(property)).toStatement())));
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       }
@@ -375,12 +372,10 @@ class ToMethod {
         Property builder = Property.newProperty(VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped), "builder");
         Property field = Property.newProperty(builder.getTypeRef(), fieldName);
         statements.add(new If(property.toReference().isNull(),
-            new Block(
-                new This().property(field).assignNull().toStatement(),
+            new Block(new This().property(field).assignNull().toStatement(),
                 new This().property("_visitables").call("remove", ValueRef.from(field.getName())).toStatement(),
                 new Return(Expression.cast(returnType, new This()))),
-            new Block(
-                new Declare(builder, Expression.newCall("builder", property.toReference())).toStatement(),
+            new Block(new Declare(builder, Expression.newCall("builder", property.toReference())).toStatement(),
                 new This().property("_visitables").call("clear").toStatement(),
                 new This().property("_visitables").call("get", ValueRef.from(field.getName()))
                     .call("add", builder.toReference()).toStatement(),
@@ -405,6 +400,9 @@ class ToMethod {
     TypeRef arrayType = ARRAY_OF.apply(unwraped);
     Property arrayProperty = new PropertyBuilder(property).withTypeRef(arrayType).build();
 
+    Property _visitables = Property.newProperty("_visitables");
+    Property item = Property.newProperty(unwraped, "item");
+
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
@@ -412,11 +410,16 @@ class ToMethod {
         .withArguments(arrayProperty)
         .withVarArgPreferred(true)
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "if (this." + property.getName() + " != null) {this." + property.getName() + ".clear(); _visitables.remove(\""
-                + property.getName() + "\"); }")
-        .addNewStringStatementStatement("if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :"
-            + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
+        .withStatements(
+            new If(new This().property(property).notNull(),
+                new Block(
+                    new This().property(property).call("clear").toStatement(),
+                    _visitables.toReference().call("remove", ValueRef.from(property.getName())).toStatement()),
+                new Block(
+                    new If(property.toReference().notNull(),
+                        new Foreach(new Declare(item), arrayProperty.toReference(),
+                            new This().call(addToMethodName, item.toReference()).toStatement())))),
+            new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build();
   });
