@@ -405,6 +405,9 @@ class ToMethod {
     TypeRef arrayType = ARRAY_OF.apply(unwraped);
     Property arrayProperty = new PropertyBuilder(property).withTypeRef(arrayType).build();
 
+    Property _visitables = Property.newProperty("_visitables");
+    Property item = Property.newProperty(unwraped, "item");
+
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withName(methodName)
@@ -412,11 +415,15 @@ class ToMethod {
         .withArguments(arrayProperty)
         .withVarArgPreferred(true)
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "if (this." + property.getName() + " != null) {this." + property.getName() + ".clear(); _visitables.remove(\""
-                + property.getName() + "\"); }")
-        .addNewStringStatementStatement("if (" + property.getName() + " != null) {for (" + unwraped.toString() + " item :"
-            + property.getName() + "){ this." + addToMethodName + "(item);}} return (" + returnType + ") this;")
+        .withStatements(
+            new If(new This().property(property).notNull(),
+                new Block(
+                    new This().property(property).call("clear"),
+                    _visitables.toReference().call("remove", ValueRef.from(property.getName())))),
+            new If(property.toReference().notNull(),
+                new Foreach(new Declare(item), arrayProperty.toReference(),
+                    new This().call(addToMethodName, item.toReference()))),
+            new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build();
   });
@@ -1596,7 +1603,7 @@ class ToMethod {
         .withReturnType(N_REF)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement("return and();")
+        .withStatements(new Return(Expression.newCall("and")))
         .endBlock()
         .build();
   });
