@@ -1179,7 +1179,7 @@ class ToMethod {
           .withReturnType(returnType)
           .withArguments(constructor.getArguments()).withName(ownName).withParameters(baseType.getParameters()).withNewBlock()
           .addNewStringStatementStatement(
-              "return (" + returnType + ")" + delegateName + "(new " + baseType.getName() + "(" + args + "));")
+              "return (" + returnType + ")" + delegateName + "(new " + baseType.getFullyQualifiedName() + "(" + args + "));")
           .endBlock().build());
     }
 
