@@ -1600,7 +1600,7 @@ class ToMethod {
         .withReturnType(N_REF)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement("return and();")
+        .withStatements(new Return(Expression.newCall("and")))
         .endBlock()
         .build();
   });
