@@ -17,6 +17,7 @@
 package io.sundr.model.visitors;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +50,7 @@ public class ReplacePackage implements Visitor<Builder> {
     };
   }
 
+  @Override
   public void visit(Builder builder) {
     if (builder instanceof TypeDefBuilder) {
       visitTypeDefBuilder((TypeDefBuilder) builder);
@@ -97,7 +99,7 @@ public class ReplacePackage implements Visitor<Builder> {
     if (builder.getAttributes().containsKey(TypeDef.ALSO_IMPORT)) {
       Set<ClassRef> updatedImports = new LinkedHashSet<ClassRef>();
 
-      for (ClassRef classRef : (Set<ClassRef>) builder.getAttributes().get(TypeDef.ALSO_IMPORT)) {
+      for (ClassRef classRef : (Collection<ClassRef>) builder.getAttributes().get(TypeDef.ALSO_IMPORT)) {
         if (target.equals(classRef.getPackageName())) {
           updatedImports.add(new ClassRefBuilder(classRef).accept(this).build());
         } else {
