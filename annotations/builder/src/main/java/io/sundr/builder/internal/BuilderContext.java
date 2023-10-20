@@ -73,11 +73,10 @@ public class BuilderContext {
   private final TypeDef visitorListenerInterface;
   private final TypeDef visitorWiretapClass;
   private final TypeDef delegatingVisitorClass;
-  private final TypeDef fluentInterface;
   private final TypeDef builderInterface;
   private final TypeDef nestedInterface;
   private final TypeDef editableInterface;
-  private final TypeDef visitableInterface;
+  private TypeDef visitableInterface;
   private final TypeDef visitableBuilderInterface;
   private final TypeDef visitableMapClass;
   private final TypeDef inlineableBase;
@@ -875,19 +874,6 @@ public class BuilderContext {
         .accept(new ReplacePackage("io.sundr.builder", builderPackage))
         .build();
 
-    fluentInterface = new TypeDefBuilder()
-        .withNewModifiers().withPublic().endModifiers()
-        .withKind(Kind.INTERFACE)
-        .withPackageName("io.sundr.builder")
-        .withName("Fluent")
-        .addNewParameter()
-        .withName("F")
-        .withBounds(
-            new ClassRefBuilder().withFullyQualifiedName("io.sundr.builder.Fluent").withArguments(F.toReference()).build())
-        .endParameter()
-        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
-        .build();
-
     nestedInterface = new TypeDefBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.INTERFACE)
@@ -983,6 +969,19 @@ public class BuilderContext {
         .accept(new ApplyImportsFromResources("io/sundr/builder/VisitableMap.java"))
         .build();
 
+    // rebuild visitable now that visitableMapClass is available
+    visitableInterface = new TypeDefBuilder(visitableInterface)
+        .addNewMethod()
+        .withDefaultMethod(true)
+        .withNewModifiers().withPublic().endModifiers()
+        .withName("getVisitableMap")
+        .withReturnType(OPTIONAL.toReference(visitableMapClass.toReference()))
+        .endMethod()
+        .accept(new ReplacePackage("io.sundr.builder", builderPackage))
+        .accept(new ApplyMethodBlockFromResources("Visitable", "io/sundr/builder/Visitable.java", true))
+        .accept(new ApplyImportsFromResources("io/sundr/builder/Visitable.java"))
+        .build();
+
     baseFluentClass = new TypeDefBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withKind(Kind.CLASS)
@@ -990,9 +989,7 @@ public class BuilderContext {
         .withName("BaseFluent")
         .addNewParameter()
         .withName("F")
-        .withBounds(fluentInterface.toReference(F.toReference()))
         .endParameter()
-        .withImplementsList(fluentInterface.toReference(F.toReference()), visitableInterface.toReference(F.toReference()))
 
         .addNewProperty()
         .withNewModifiers().withPublic().withStatic().withFinal().endModifiers()
@@ -1077,66 +1074,8 @@ public class BuilderContext {
 
         .addNewMethod()
         .withNewModifiers().withPublic().endModifiers()
-        .withName("accept")
-        .withReturnType(F.toReference())
-        .addNewArgument()
-        .withName("visitors")
-        .withTypeRef(new ClassRefBuilder().withFullyQualifiedName(Visitor.class.getName()).withDimensions(1).build())
-        .endArgument()
-        .withVarArgPreferred(true)
-        .endMethod()
-
-        .addNewMethod()
-        .withNewModifiers().withPublic().endModifiers()
-        .withName("accept")
-        .withParameters(V)
-        .withReturnType(F.toReference())
-        .addNewArgument()
-        .withTypeRef(CLASS.toReference(V.toReference()))
-        .withName("type")
-        .endArgument()
-        .addNewArgument()
-        .withTypeRef(visitorInterface.toReference(V.toReference()))
-        .withNewModifiers().withFinal().endModifiers()
-        .withName("visitor")
-        .endArgument()
-        .withVarArgPreferred(true)
-        .endMethod()
-
-        .addNewMethod()
-        .withNewModifiers().withPublic().endModifiers()
-        .withName("accept")
-        .withReturnType(F.toReference())
-        .addNewArgument()
-        .withName("path")
-        .withTypeRef(Collections.LIST.toReference(Collections.MAP_ENTRY.toReference(STRING_REF, TypeDef.OBJECT_REF)))
-        .endArgument()
-        .addNewArgument()
-        .withTypeRef(
-            new ClassRefBuilder().withFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1).build())
-        .withName("visitors")
-        .endArgument()
-        .withVarArgPreferred(true)
-        .endMethod()
-
-        .addNewMethod()
-        .withNewModifiers().withPublic().endModifiers()
-        .withName("accept")
-        .withReturnType(F.toReference())
-        .addNewArgument()
-        .withName("path")
-        .withTypeRef(Collections.LIST.toReference(Collections.MAP_ENTRY.toReference(STRING_REF, TypeDef.OBJECT_REF)))
-        .endArgument()
-        .addNewArgument()
-        .withTypeRef(STRING_REF)
-        .withName("currentKey")
-        .endArgument()
-        .addNewArgument()
-        .withTypeRef(
-            new ClassRefBuilder().withFullyQualifiedName(visitorInterface.getFullyQualifiedName()).withDimensions(1).build())
-        .withName("visitors")
-        .endArgument()
-        .withVarArgPreferred(true)
+        .withName("getVisitableMap")
+        .withReturnType(OPTIONAL.toReference(visitableMapClass.toReference()))
         .endMethod()
 
         .addNewMethod()
@@ -1272,10 +1211,6 @@ public class BuilderContext {
 
   public TypeDef getBaseFluentClass() {
     return baseFluentClass;
-  }
-
-  public TypeDef getFluentInterface() {
-    return fluentInterface;
   }
 
   public TypeDef getBuilderInterface() {

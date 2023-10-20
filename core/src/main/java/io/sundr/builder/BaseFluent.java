@@ -16,18 +16,16 @@
 
 package io.sundr.builder;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> {
+public class BaseFluent<F> {
 
   public final VisitableMap _visitables = new VisitableMap();
 
@@ -71,75 +69,6 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
   }
 
   @Override
-  public F accept(Visitor... visitors) {
-    return accept(Collections.emptyList(), visitors);
-  }
-
-  @Override
-  public <V> F accept(Class<V> type, Visitor<V> visitor) {
-    return accept(Collections.emptyList(), new Visitor<V>() {
-      @Override
-      public Class<V> getType() {
-        return type;
-      }
-
-      @Override
-      public void visit(List<Entry<String, Object>> path, V element) {
-        visitor.visit(path, element);
-      }
-
-      @Override
-      public void visit(V element) {
-        visitor.visit(element);
-      }
-    });
-  }
-
-  @Override
-  public F accept(List<Entry<String, Object>> path, String currentKey, Visitor... visitors) {
-    List<Visitor> sortedVisitor = new ArrayList<>();
-    for (Visitor visitor : visitors) {
-      visitor = VisitorListener.wrap(visitor);
-      if (!visitor.canVisit(path, this)) {
-        continue;
-      }
-      sortedVisitor.add(visitor);
-    }
-    sortedVisitor.sort((l, r) -> ((Visitor) r).order() - ((Visitor) l).order());
-    for (Visitor visitor : sortedVisitor) {
-      visitor.visit(path, this);
-    }
-
-    List<Entry<String, Object>> copyOfPath = path != null ? new ArrayList(path) : new ArrayList<>();
-    copyOfPath.add(new AbstractMap.SimpleEntry<>(currentKey, this));
-
-    for (Entry<String, ?> entry : _visitables.entrySet()) {
-      List<Entry<String, Object>> newPath = Collections.unmodifiableList(copyOfPath);
-
-      // Copy visitables to avoid ConcurrentModificationException when Visitors add/remove Visitables
-      for (Visitable<F> visitable : new ArrayList<>((List<Visitable<F>>) entry.getValue())) {
-        for (Visitor visitor : visitors) {
-          if (visitor.getType() != null && visitor.getType().isAssignableFrom(visitable.getClass())) {
-            visitable.accept(newPath, entry.getKey(), visitor);
-          }
-        }
-
-        for (Visitor visitor : visitors) {
-          if (visitor.getType() == null || !visitor.getType().isAssignableFrom(visitable.getClass())) {
-            visitable.accept(newPath, entry.getKey(), visitor);
-          }
-        }
-      }
-    }
-    return (F) this;
-  }
-
-  @Override
-  public F accept(List<Entry<String, Object>> path, Visitor... visitors) {
-    return accept(path, "", visitors);
-  }
-
-  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
@@ -156,5 +85,9 @@ public class BaseFluent<F extends Fluent<F>> implements Fluent<F>, Visitable<F> 
     if (getClass() != obj.getClass())
       return false;
     return true;
+  }
+
+  public Optional<VisitableMap> getVisitableMap() {
+    return Optional.of(_visitables);
   }
 }
