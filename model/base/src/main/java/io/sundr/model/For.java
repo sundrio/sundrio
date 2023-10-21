@@ -52,7 +52,7 @@ public class For implements Statement {
     sb.append(update.stream().map(e -> e.render()).collect(Collectors.joining(",")));
     sb.append(CP);
     sb.append(SPACE).append(OB).append(NEWLINE);
-    sb.append(tab(body.render()));
+    sb.append(tab(body.renderStatement()));
     sb.append(CB).append(NEWLINE);
     return sb.toString();
   }

@@ -6,6 +6,10 @@ public interface Expression extends Renderable {
 
   public static Expression NULL = new ValueRef(null);
 
+  default String renderExpression() {
+    return render();
+  }
+
   public static Expression not(Expression expression) {
     return new Not(expression);
   }

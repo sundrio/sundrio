@@ -41,7 +41,7 @@ public class Foreach implements Statement {
     sb.append(expression.render());
     sb.append(CP);
     sb.append(SPACE).append(OB).append(NEWLINE);
-    sb.append(tab(body.render()));
+    sb.append(tab(body.renderStatement()));
     sb.append(CB).append(NEWLINE);
     return sb.toString();
   }

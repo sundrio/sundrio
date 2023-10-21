@@ -305,14 +305,6 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     return new AssignStatementNested(item);
   }
 
-  public StatementAdapterStatementNested<A> withNewStatementAdapterStatement() {
-    return new StatementAdapterStatementNested(null);
-  }
-
-  public StatementAdapterStatementNested<A> withNewStatementAdapterStatementLike(StatementAdapter item) {
-    return new StatementAdapterStatementNested(item);
-  }
-
   public ForStatementNested<A> withNewForStatement() {
     return new ForStatementNested(null);
   }
@@ -385,8 +377,6 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "StatementAdapter":
-        return (VisitableBuilder<T, ?>) new StatementAdapterBuilder((StatementAdapter) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -626,24 +616,6 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignStatement() {
-      return and();
-    }
-
-  }
-
-  public class StatementAdapterStatementNested<N> extends StatementAdapterFluent<StatementAdapterStatementNested<N>>
-      implements Nested<N> {
-    StatementAdapterStatementNested(StatementAdapter item) {
-      this.builder = new StatementAdapterBuilder(this, item);
-    }
-
-    StatementAdapterBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endStatementAdapterStatement() {
       return and();
     }
 

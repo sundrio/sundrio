@@ -40,7 +40,7 @@ public class If implements Statement {
         .append(OP).append(condition.render()).append(CP)
         .append(SPACE).append(OB).append(NEWLINE);
 
-    sb.append(tab(statement.render()));
+    sb.append(tab(statement.renderStatement()));
     sb.append(CB);
     elseStatement.ifPresent(e -> {
       sb.append(" else ");
@@ -49,7 +49,7 @@ public class If implements Statement {
       } else {
         sb.append(OB);
         sb.append(NEWLINE);
-        sb.append(tab(e.render()));
+        sb.append(tab(e.renderStatement()));
         sb.append(CB);
       }
     });
