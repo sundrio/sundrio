@@ -21,7 +21,7 @@ public class Do implements Statement {
   public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("do").append(SPACE).append(OB).append(NEWLINE);
-    sb.append(tab(statement.render()));
+    sb.append(tab(statement.renderStatement()));
     sb.append(CB).append(" while ").append(OP).append(condition.render()).append(CP).append(SEMICOLN).append(NEWLINE);
     return sb.toString();
   }

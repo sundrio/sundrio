@@ -21,4 +21,8 @@ public interface Statement extends Renderable {
   public static Statement ret(Expression expression) {
     return new Return(expression);
   }
+
+  default String renderStatement() {
+    return render();
+  }
 }

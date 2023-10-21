@@ -22,7 +22,7 @@ public class While implements Statement {
     StringBuilder sb = new StringBuilder();
     sb.append("while").append(SPACE).append(OP).append(condition.render()).append(CP)
         .append(SPACE).append(OB).append(NEWLINE);
-    sb.append(tab(statement.render()));
+    sb.append(tab(statement.renderStatement()));
     sb.append(CB).append(NEWLINE);
     return sb.toString();
   }

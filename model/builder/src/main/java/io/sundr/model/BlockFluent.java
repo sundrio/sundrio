@@ -407,18 +407,6 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     return new AssignStatementsNested(index, item);
   }
 
-  public StatementAdapterStatementsNested<A> addNewStatementAdapterStatement() {
-    return new StatementAdapterStatementsNested(-1, null);
-  }
-
-  public StatementAdapterStatementsNested<A> addNewStatementAdapterStatementLike(StatementAdapter item) {
-    return new StatementAdapterStatementsNested(-1, item);
-  }
-
-  public StatementAdapterStatementsNested<A> setNewStatementAdapterStatementLike(int index, StatementAdapter item) {
-    return new StatementAdapterStatementsNested(index, item);
-  }
-
   public ForStatementsNested<A> addNewForStatement() {
     return new ForStatementsNested(-1, null);
   }
@@ -489,8 +477,6 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "StatementAdapter":
-        return (VisitableBuilder<T, ?>) new StatementAdapterBuilder((StatementAdapter) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -759,26 +745,6 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignStatement() {
-      return and();
-    }
-
-  }
-
-  public class StatementAdapterStatementsNested<N> extends StatementAdapterFluent<StatementAdapterStatementsNested<N>>
-      implements Nested<N> {
-    StatementAdapterStatementsNested(int index, StatementAdapter item) {
-      this.index = index;
-      this.builder = new StatementAdapterBuilder(this, item);
-    }
-
-    StatementAdapterBuilder builder;
-    int index;
-
-    public N and() {
-      return (N) BlockFluent.this.setToStatements(index, builder.build());
-    }
-
-    public N endStatementAdapterStatement() {
       return and();
     }
 

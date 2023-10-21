@@ -632,8 +632,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                       Expression.eq(i.toReference(), l.toReference().call("size")),
                       i.toReference().postIncrement(),
                       new Assign(larray.toReference().index(i.toReference()),
-                          Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference())))
-                              .toStatement()))),
+                          Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference())))))),
               new Return(Expression.createNewArray(String.class, 0)))
           .endBlock()
           .build();

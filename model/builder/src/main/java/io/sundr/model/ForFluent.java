@@ -2205,14 +2205,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new AssignBodyNested(item);
   }
 
-  public StatementAdapterBodyNested<A> withNewStatementAdapterBody() {
-    return new StatementAdapterBodyNested(null);
-  }
-
-  public StatementAdapterBodyNested<A> withNewStatementAdapterBodyLike(StatementAdapter item) {
-    return new StatementAdapterBodyNested(item);
-  }
-
   public ForBodyNested<A> withNewForBody() {
     return new ForBodyNested(null);
   }
@@ -2373,8 +2365,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
       case "io.sundr.model." + "Return":
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
-      case "io.sundr.model." + "StatementAdapter":
-        return (VisitableBuilder<T, ?>) new StatementAdapterBuilder((StatementAdapter) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -4935,24 +4925,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignBody() {
-      return and();
-    }
-
-  }
-
-  public class StatementAdapterBodyNested<N> extends StatementAdapterFluent<StatementAdapterBodyNested<N>>
-      implements Nested<N> {
-    StatementAdapterBodyNested(StatementAdapter item) {
-      this.builder = new StatementAdapterBuilder(this, item);
-    }
-
-    StatementAdapterBuilder builder;
-
-    public N and() {
-      return (N) ForFluent.this.withBody(builder.build());
-    }
-
-    public N endStatementAdapterBody() {
       return and();
     }
 
