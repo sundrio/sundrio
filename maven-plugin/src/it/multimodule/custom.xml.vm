@@ -27,48 +27,56 @@
     <description>Bill of material</description>
     #if ($model.url)
 
-        <url>${model.url}</url>#end
+    <url>${model.url}</url>#end
     #if ($model.licenses && !$model.licenses.isEmpty())
 
-        <licenses>#foreach($l in $model.licenses)
+    <licenses>#foreach($l in $model.licenses)
 
-            <license>
-                <name>${l.name}</name>
-                <url>${l.url}</url>
-                <distribution>${l.distribution}</distribution>
-            </license>#end
+        <license>
+            <name>${l.name}</name>
+            <url>${l.url}</url>
+            <distribution>${l.distribution}</distribution>
+        </license>#end
 
-        </licenses>
+    </licenses>
     #end
-
     #if ($model.scm)
 
-        <scm>
-            <connection>${model.scm.connection}</connection>
-            <developerConnection>${model.scm.developerConnection}</developerConnection>
-            <url>${model.scm.connection}</url>
-            <tag>${model.scm.tag}</tag>
-        </scm>
+    <scm>
+        <connection>${model.scm.connection}</connection>
+        <developerConnection>${model.scm.developerConnection}</developerConnection>
+        <url>${model.scm.connection}</url>
+        <tag>${model.scm.tag}</tag>
+    </scm>
     #end
+    #if ($model.distributionManagement && $model.distributionManagement.repository)
 
+    <distributionManagement>
+      <repository>
+        <id>${model.distributionManagement.repository.id}</id>
+        <name>${model.distributionManagement.repository.name}</name>
+        <url>${model.distributionManagiment.repository.url}</url>
+      </repository>
+    </distributionManagement>
+    #end
     #if ($model.developers && !$model.developers.isEmpty())
-        <developers>#foreach($d in $model.developers)
+    <developers>#foreach($d in $model.developers)
 
-            <developer>
-                <id>${d.id}</id>
-                <name>${d.name}</name>#if($d.email)
+        <developer>
+            <id>${d.id}</id>
+            <name>${d.name}</name>#if($d.email)
 
-                <email>${d.email}</email>#end#if($d.url)
+            <email>${d.email}</email>#end#if($d.url)
 
-                <url>${d.url}</url>#end#if($d.organization)
+            <url>${d.url}</url>#end#if($d.organization)
 
-                <organization>${d.organization}</organization>#end#if($d.organizationUrl)
+            <organization>${d.organization}</organization>#end#if($d.organizationUrl)
 
-                <organizationUrl>${d.organizationUrl}</organizationUrl>#end
+            <organizationUrl>${d.organizationUrl}</organizationUrl>#end
 
-            </developer>#end
+        </developer>#end
 
-        </developers>#end
+    </developers>#end
 
     <dependencyManagement>
         <dependencies>#foreach($d in $model.dependencyManagement.dependencies)
@@ -97,21 +105,5 @@
 
         </dependencies>
     </dependencyManagement>
-    #if (!$model.build.pluginManagement.plugins.isEmpty())
-
-        <build>
-            <pluginManagement>
-                <plugins>#foreach($p in $model.build.pluginManagement.plugins)
-
-                    <plugin>
-                        <groupId>${p.groupId}</groupId>
-                        <artifactId>${p.artifactId}</artifactId>
-                        <version>${p.version}</version>
-                    </plugin>#end
-
-                </plugins>
-            </pluginManagement>
-        </build>
-    #end
 
 </project>

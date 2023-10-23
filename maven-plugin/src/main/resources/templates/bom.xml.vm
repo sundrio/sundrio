@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${model.groupId}</groupId>
@@ -12,48 +10,72 @@
     <description>${model.description}</description>
     #if ($model.url)
 
-        <url>${model.url}</url>#end
+    <url>${model.url}</url>#end
     #if ($model.licenses && !$model.licenses.isEmpty())
 
-        <licenses>#foreach($l in $model.licenses)
+    <licenses>#foreach($l in $model.licenses)
 
-            <license>
-                <name>${l.name}</name>
-                <url>${l.url}</url>
-                <distribution>${l.distribution}</distribution>
-            </license>#end
+        <license>
+            <name>${l.name}</name>
+            <url>${l.url}</url>
+            <distribution>${l.distribution}</distribution>
+        </license>#end
 
-        </licenses>
+    </licenses>
     #end
 
     #if ($model.scm)
 
-        <scm>
-            <connection>${model.scm.connection}</connection>
-            <developerConnection>${model.scm.developerConnection}</developerConnection>
-            <url>${model.scm.url}</url>
-            <tag>${model.scm.tag}</tag>
-        </scm>
+    <scm>
+        <connection>${model.scm.connection}</connection>
+        <developerConnection>${model.scm.developerConnection}</developerConnection>
+        <url>${model.scm.url}</url>
+        <tag>${model.scm.tag}</tag>
+    </scm>
     #end
+    #if ($model.distributionManagement)
 
+    <distributionManagement>
+      #if ($model.distributionManagement.repository)
+
+      <repository>
+        <id>${model.distributionManagement.repository.id}</id>
+        <name>${model.distributionManagement.repository.name}</name>
+        <url>${model.distributionManagement.repository.url}</url>
+        <layout>${model.distributionManagement.repository.layout}</layout>
+      </repository>
+      #end
+      #if ($model.distributionManagement.snapshotRepository)
+
+      <snapshotRepository>
+        <id>${model.distributionManagement.snapshotRepository.id}</id>
+        <name>${model.distributionManagement.snapshotRepository.name}</name>
+        <url>${model.distributionManagement.snapshotRepository.url}</url>
+        <layout>${model.distributionManagement.snapshotRepository.layout}</layout>
+      </snapshotRepository>
+      #end
+
+    </distributionManagement>
+    #end
     #if ($model.developers && !$model.developers.isEmpty())
-        <developers>#foreach($d in $model.developers)
 
-            <developer>
-                <id>${d.id}</id>
-                <name>${d.name}</name>#if($d.email)
+    <developers>#foreach($d in $model.developers)
 
-                <email>${d.email}</email>#end#if($d.url)
+        <developer>
+            <id>${d.id}</id>
+            <name>${d.name}</name>#if($d.email)
 
-                <url>${d.url}</url>#end#if($d.organization)
+            <email>${d.email}</email>#end#if($d.url)
 
-                <organization>${d.organization}</organization>#end#if($d.organizationUrl)
+            <url>${d.url}</url>#end#if($d.organization)
 
-                <organizationUrl>${d.organizationUrl}</organizationUrl>#end
+            <organization>${d.organization}</organization>#end#if($d.organizationUrl)
 
-            </developer>#end
+            <organizationUrl>${d.organizationUrl}</organizationUrl>#end
 
-        </developers>#end
+        </developer>#end
+
+    </developers>#end
 
     <dependencyManagement>
         <dependencies>#foreach($d in $model.dependencyManagement.dependencies)
@@ -82,21 +104,4 @@
 
         </dependencies>
     </dependencyManagement>
-    #if (!$model.build.pluginManagement.plugins.isEmpty())
-
-        <build>
-            <pluginManagement>
-                <plugins>#foreach($p in $model.build.pluginManagement.plugins)
-
-                    <plugin>
-                        <groupId>${p.groupId}</groupId>
-                        <artifactId>${p.artifactId}</artifactId>
-                        <version>${p.version}</version>
-                    </plugin>#end
-
-                </plugins>
-            </pluginManagement>
-        </build>
-    #end
-
 </project>
