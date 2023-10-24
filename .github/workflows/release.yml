@@ -63,7 +63,11 @@ jobs:
           ./mvnw versions:set -DnewVersion=${{steps.metadata.outputs.next-version}} -Pwith-examples,with-tests -DgenerateBackupPoms=false -DoldVersion=* -DgroupId=* -DartifactId=* -Dformat.skip=true
           # commit changes
           git add --all
-          git commit -m "chore: Set examples and tests version to ${{steps.metadata.outputs.current-version}}"
+          if git diff-index --quiet HEAD --; then
+              echo "No changes to commit."
+          else
+            git commit -m "chore: Set examples and tests version to ${{steps.metadata.outputs.current-version}}"
+          fi
           git push origin ${{steps.metadata.outputs.current-version}}
           # checkout release branch
           git checkout ${{github.base_ref}}
@@ -71,7 +75,11 @@ jobs:
           ./mvnw versions:set -DnewVersion=${{steps.metadata.outputs.next-version}} -Pwith-examples,with-tests -DgenerateBackupPoms=false -DoldVersion=* -DgroupId=* -DartifactId=* -Dformat.skip=true
           # commit changes
           git add --all
-          git commit -m "chore: Set examples and tests version to ${{steps.metadata.outputs.current-version}}"
+          if git diff-index --quiet HEAD --; then
+              echo "No changes to commit."
+          else
+            git commit -m "chore: Set examples and tests version to ${{steps.metadata.outputs.current-version}}"
+          fi
           git push origin ${{github.base_ref}}
         env:
           OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
