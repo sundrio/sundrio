@@ -552,10 +552,12 @@ public class ClazzAs {
 
     StringBuilder builder = new StringBuilder("if (instance != null) {\n");
 
+    Set<String> constructorProperties = new HashSet<>();
     for (Property property : constructor.getArguments()) {
       Optional<Method> getter = Getter.findOptional(instance, property);
       getter.ifPresent(g -> {
         String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() + ")" : "";
+        constructorProperties.add(property.getNameCapitalized());
         builder.append("      ").append(ref).append(".with").append(property.getNameCapitalized())
             .append("(").append(cast).append("instance.").append(g.getName()).append("());\n");
       });
@@ -568,6 +570,7 @@ public class ClazzAs {
     Predicate<Property> propertyFilter = isPropertyApplicable(clazz, false);
     clazz.getAllProperties().stream()
         .filter(propertyFilter)
+        .filter(p -> !constructorProperties.contains(p.getNameCapitalized()))
         .filter(p -> Setter.hasOrInherits(clazz, p))
         .forEach(property -> {
           Optional<Method> optionalGetter = Getter.findOptional(instance, property);

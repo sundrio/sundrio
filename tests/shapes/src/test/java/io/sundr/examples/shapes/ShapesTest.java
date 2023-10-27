@@ -35,6 +35,7 @@ import io.sundr.examples.shapes.v1.CircleBuilder;
 import io.sundr.examples.shapes.v1.EditableCircle;
 import io.sundr.examples.shapes.v1.Square;
 import io.sundr.examples.shapes.v1.SquareBuilder;
+import io.sundr.examples.v2.CitemBuilder;
 
 public class ShapesTest {
 
@@ -372,5 +373,12 @@ public class ShapesTest {
   @Test
   public void testDeprecatedField() throws Exception {
     assertNotNull(CanvasBuilder.class.getMethod("hasCanvasShape").getAnnotation(Deprecated.class));
+  }
+
+  @Test
+  public void testWithBuildableVisitableTracking() throws Exception {
+    CitemBuilder builder = new CitemBuilder();
+    builder.withNewLabel().endLabel().withNewLabel().endLabel();
+    assertEquals(1, builder.getVisitableMap().get().get("label").size());
   }
 }
