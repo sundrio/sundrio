@@ -46,6 +46,7 @@ import io.sundr.builder.internal.checks.DublicatePropertyCheck;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.lombok.AddLombokAllArgsConstructor;
 import io.sundr.builder.internal.visitors.lombok.AddLombokGetters;
+import io.sundr.builder.internal.visitors.lombok.AddLombokSetters;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -78,7 +79,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
             .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
-            .accept(new AddLombokAllArgsConstructor(), new AddLombokGetters(), new AddLombokGetters(),
+            .accept(new AddLombokAllArgsConstructor(), new AddLombokGetters(), new AddLombokSetters(),
                 new DublicatePropertyCheck(),
                 new Visitor<PropertyBuilder>() {
                   @Override

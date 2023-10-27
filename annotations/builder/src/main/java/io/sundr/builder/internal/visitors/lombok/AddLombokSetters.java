@@ -5,6 +5,9 @@ import io.sundr.builder.internal.visitors.AddSetters;
 public class AddLombokSetters extends AddSetters {
 
   public AddLombokSetters() {
-    super(def -> def.hasMatchingAnnotation(a -> a.buildClassRef().getFullyQualifiedName().equals("lombok.Setter")));
+    super(def -> def.hasMatchingAnnotation(a -> {
+      String name = a.buildClassRef().getFullyQualifiedName();
+      return name.equals("lombok.Setter") || name.equals("lombok.Data");
+    }));
   }
 }
