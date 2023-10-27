@@ -20,7 +20,7 @@ This project provides annotation processors the provide the following features:
 - Support for JDK8 Optional types.
 - Support for generating Pojos and Builders from interfaces.
 - Support generating Builders for 3rd party classes.
-- Support lombok annotations (@Getter, @Setter & @AllArgsConstructor (partially))
+- Support lombok annotations (@Getter, @Setter, @Data & @AllArgsConstructor (partially))
 
 #### The builder interface
 All the generated builders implement the `Builder` interface which looks like:
