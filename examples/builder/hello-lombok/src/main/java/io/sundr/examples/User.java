@@ -22,12 +22,12 @@ import io.sundr.builder.annotations.Buildable;
 
 @Buildable
 @Data
-public class World {
+public class User {
 
   private String firstName;
   private String lastName;
 
-  public World() {
+  public User() {
   }
 
   @Override

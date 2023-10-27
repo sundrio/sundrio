@@ -21,12 +21,12 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class WorldTest {
+public class UserTest {
 
   @Test
   public void testPersonBulder() {
-    World world = new WorldBuilder().withFirstName("John").withLastName("Doe").build();
-    assertEquals("John", world.getFirstName());
+    User user = new UserBuilder().withFirstName("John").withLastName("Doe").build();
+    assertEquals("John", user.getFirstName());
   }
 
 }
