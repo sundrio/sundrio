@@ -318,7 +318,7 @@ class ToMethod {
         } else if (IS_MAP.apply(type)) {
           // There is no such thing as buildable map yet.
         } else {
-          statements.add(new This().property("_visitables").call("remove", new This().property(fieldName)));
+          statements.add(new This().property("_visitables").call("remove", ValueRef.from(fieldName)));
         }
       }
 
