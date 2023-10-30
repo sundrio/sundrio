@@ -67,6 +67,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -359,14 +360,11 @@ class ToMethod {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
         String builderClass = builder.getFullyQualifiedName();
         statements.add(new If(property.toReference().notNull(),
-            new Block(
-                new This().property(property).assignNew(builder, property.toReference()),
-                new This().property("_visitables").call("get", ValueRef.from(property.getName()))
-                    .call("add", new This().property(property))),
-            new Block(
-                new This().property(property).assignNull(),
-                new This().property("_visitables").call("get", ValueRef.from(property.getName()))
-                    .call("remove", new This().property(property)))));
+            new Block(new This().property(property).assignNew(builder, property.toReference()),
+                new This().property("_visitables").call("get", ValueRef.from(property.getName())).call("add",
+                    new This().property(property))),
+            new Block(new This().property(property).assignNull(), new This().property("_visitables")
+                .call("get", ValueRef.from(property.getName())).call("remove", new This().property(property)))));
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       }
@@ -375,17 +373,14 @@ class ToMethod {
         Property builder = Property.newProperty(VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped), "builder");
         Property field = Property.newProperty(builder.getTypeRef(), fieldName);
         statements.add(new If(property.toReference().isNull(),
-            new Block(
-                new This().property(field).assignNull(),
+            new Block(new This().property(field).assignNull(),
                 new This().property("_visitables").call("remove", ValueRef.from(field.getName())),
                 new Return(Expression.cast(returnType, new This()))),
-            new Block(
-                new Declare(builder, Expression.newCall("builder", property.toReference())),
+            new Block(new Declare(builder, Expression.newCall("builder", property.toReference())),
                 new This().property("_visitables").call("clear"),
-                new This().property("_visitables").call("get", ValueRef.from(field.getName()))
-                    .call("add", builder.toReference()),
-                new This().property(field).assign(builder),
-                new Return(Expression.cast(returnType, new This())))));
+                new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("add",
+                    builder.toReference()),
+                new This().property(field).assign(builder), new Return(Expression.cast(returnType, new This())))));
         return statements;
       }
 
@@ -457,8 +452,9 @@ class ToMethod {
                     isBuildable(unwrapped) && !isAbstract(unwrapped)
                         ? new Block(
                             new Declare(b, Expression.createNew(builder, property.toReference().call("get"))),
-                            Property.newProperty("_visitables").toReference().call("get", property.toReference())
-                                .call("add", b.toReference()))
+                            Property.newProperty("_visitables").toReference().call("get", ValueRef.from(property.getName()))
+                                .call("add", b.toReference()),
+                            new This().property(property).assign(Expression.call(Optional.class, "of", b.toReference())))
                         : new This().property(property).assign(property.toReference())),
                 new Return(Expression.cast(returnType, new This())))
             .endBlock()
