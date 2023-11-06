@@ -38,6 +38,8 @@ public class Canvas {
   private final Artist artist;
   private final Date date;
   private final Map<String, String> notes;
+  private io.sundr.examples.shapes.v1.Square v1;
+  private io.sundr.examples.shapes.v2.Square v2;
 
   public Canvas(Shape canvasShape, Map<String, Shape> namedShapes, List<Shape> shapes, Artist artist, Date date,
       Map<String, String> notes) {
@@ -72,4 +74,21 @@ public class Canvas {
   public Map<String, String> getNotes() {
     return notes;
   }
+
+  public io.sundr.examples.shapes.v1.Square getV1() {
+    return v1;
+  }
+
+  public io.sundr.examples.shapes.v2.Square getV2() {
+    return v2;
+  }
+
+  public void setV1(io.sundr.examples.shapes.v1.Square v1) {
+    this.v1 = v1;
+  }
+
+  public void setV2(io.sundr.examples.shapes.v2.Square v2) {
+    this.v2 = v2;
+  }
+
 }
