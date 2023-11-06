@@ -18,39 +18,17 @@ package io.sundr.examples.shapes;
 
 import io.sundr.builder.annotations.Buildable;
 
-public class Artist {
+@Buildable
+public class _1Odd {
 
-  private String firstName;
-  private String lastName;
-  private _1Odd oddity;
+  private String field;
 
-  @Buildable
-  public Artist(String firstName, String lastName) {
-    this.firstName = firstName;
-    this.lastName = lastName;
+  public String getField() {
+    return field;
   }
 
-  public String getFirstName() {
-    return firstName;
+  public void setField(String field) {
+    this.field = field;
   }
 
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
-
-  public String getLastName() {
-    return lastName;
-  }
-
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
-
-  public _1Odd getOddity() {
-    return oddity;
-  }
-
-  public void setOddity(_1Odd oddity) {
-    this.oddity = oddity;
-  }
 }

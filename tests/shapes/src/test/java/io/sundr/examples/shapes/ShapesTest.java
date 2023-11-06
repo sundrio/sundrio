@@ -56,6 +56,12 @@ public class ShapesTest {
       return Optional.empty();
     }
   };
+  
+  @Test
+  public void testArtistBuilder() {
+    Artist artist = new ArtistBuilder().withNewOddity().withField("x").endOddity().build();
+    assertEquals("x", artist.getOddity().getField());
+  }
 
   @Test
   public void testCircleBuilder() {
