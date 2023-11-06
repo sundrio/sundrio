@@ -66,13 +66,27 @@ public interface Nameable extends Node {
   }
 
   static String getClassName(String fullyQualifiedName) {
-    return Arrays.stream(fullyQualifiedName.split(PACKAGE_SEPARATOR_REGEX)).filter(after(IS_UPPER_CASE))
-        .collect(Collectors.joining(DOT));
+    String[] parts = fullyQualifiedName.split(PACKAGE_SEPARATOR_REGEX);
+
+    String result = Arrays.stream(parts).filter(after(IS_UPPER_CASE)).collect(Collectors.joining(DOT));
+
+    if (!result.isEmpty()) {
+      return result;
+    }
+
+    return parts[parts.length - 1];
   }
 
   static String getPackageName(String fullyQualifiedName) {
-    return Arrays.stream(fullyQualifiedName.split(PACKAGE_SEPARATOR_REGEX)).filter(until(IS_UPPER_CASE))
-        .collect(Collectors.joining(DOT));
+    String[] parts = fullyQualifiedName.split(PACKAGE_SEPARATOR_REGEX);
+
+    String result = Arrays.stream(parts).filter(until(IS_UPPER_CASE)).collect(Collectors.joining(DOT));
+
+    if (!result.equals(fullyQualifiedName)) {
+      return result;
+    }
+
+    return Arrays.asList(parts).subList(0, parts.length - 1).stream().collect(Collectors.joining(DOT));
   }
 
   static <T> Predicate<T> until(final Predicate<T> predicate) {
