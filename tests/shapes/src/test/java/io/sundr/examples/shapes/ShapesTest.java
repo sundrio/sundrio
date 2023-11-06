@@ -387,4 +387,11 @@ public class ShapesTest {
     builder.withNewLabel().endLabel().withNewLabel().endLabel();
     assertEquals(1, builder.getVisitableMap().get().get("label").size());
   }
+
+  @Test
+  public void testBuildablePropertyMethodNames() throws Exception {
+    assertNotNull(CanvasBuilder.class.getMethod("withNewV1", null));
+    assertNotNull(CanvasBuilder.class.getMethod("withNewV2", null));
+  }
+
 }

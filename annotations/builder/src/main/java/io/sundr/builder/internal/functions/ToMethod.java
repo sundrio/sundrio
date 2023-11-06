@@ -1183,7 +1183,10 @@ class ToMethod {
     boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
     String prefix = isCollection ? "addNew" : "withNew";
 
-    prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
+    // synthetic properties of descendants need a prefix as the class names may collide
+    if (property.hasAttribute(Constants.DESCENDANT_OF)) {
+      prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
+    }
     String methodName = (prefix + (isCollection
         ? Singularize.FUNCTION.apply(property.getNameCapitalized())
         : property.getNameCapitalized()));
@@ -1224,11 +1227,13 @@ class ToMethod {
       boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
       String ownPrefix = isCollection ? "addNew" : "withNew";
 
-      ownPrefix += BuilderUtils.fullyQualifiedNameDiff(baseType.toInternalReference(), originTypeDef);
+      if (property.hasAttribute(Constants.DESCENDANT_OF)) {
+        ownPrefix += BuilderUtils.fullyQualifiedNameDiff(baseType.toInternalReference(), originTypeDef);
+      }
       String ownName = ownPrefix
           + (isCollection ? Singularize.FUNCTION.apply(property.getNameCapitalized()) : property.getNameCapitalized());
 
-      String delegatePrefix = IS_COLLECTION.apply(property.getTypeRef()) ? "addTo" : "with";
+      String delegatePrefix = isCollection ? "addTo" : "with";
       String delegateName = delegatePrefix + property.getNameCapitalized();
 
       if (property.hasAttribute(Constants.DESCENDANT_OF)) {

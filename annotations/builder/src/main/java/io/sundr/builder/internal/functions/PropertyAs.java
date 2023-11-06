@@ -213,10 +213,15 @@ public final class PropertyAs {
       }
       parameters.add(N);
 
+      // synthetic properties of descendants need a prefix as the class names may collide
+      String prefix = property.hasAttribute(Constants.DESCENDANT_OF)
+          ? BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef)
+          : "";
+
       return new TypeDefBuilder()
           .withKind(Kind.INTERFACE)
           .withPackageName(outerClass.getPackageName())
-          .withName(BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef) + property.getNameCapitalized()
+          .withName(prefix + property.getNameCapitalized()
               + "Nested")
           // all references are local - qualified causes compilation errors
           //.withOuterTypeName(outerClass.getFullyQualifiedName())
