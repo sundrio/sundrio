@@ -27,9 +27,16 @@ import java.lang.annotation.Target;
 public @interface AnnotationSelector {
 
   /**
-   * The package to use for selecting classes.
+   * The annotation class to use for selecting classes.
    * 
    * @return
    */
   Class<? extends Annotation> value();
+
+  /**
+   * The package selector to use to filter selected annotated classes.
+   * 
+   * @return
+   */
+  PackageSelector[] packages() default {};
 }
