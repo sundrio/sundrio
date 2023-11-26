@@ -196,7 +196,15 @@ public class TemplateTransformationProcessor extends AbstractCodeGeneratingProce
       if (o instanceof TypeElement) {
         TypeDef typeDef = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement((Element) o), AptContext.getContext()))
             .build();
-        definitions.put(typeDef.getFullyQualifiedName(), typeDef);
+        for (PackageSelector packageSelector : selector.packages()) {
+          if (typeDef.getPackageName().equals(packageSelector.value())) {
+            Pattern pattern = Pattern.compile(packageSelector.pattern());
+            Matcher m = pattern.matcher(typeDef.getName());
+            if (m.matches()) {
+              definitions.put(typeDef.getFullyQualifiedName(), typeDef);
+            }
+          }
+        }
       }
     }
   }
