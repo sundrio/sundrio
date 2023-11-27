@@ -56,7 +56,7 @@ public class ShapesTest {
       return Optional.empty();
     }
   };
-  
+
   @Test
   public void testArtistBuilder() {
     Artist artist = new ArtistBuilder().withNewOddity().withField("x").endOddity().build();
