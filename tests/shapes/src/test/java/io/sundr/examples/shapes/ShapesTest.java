@@ -17,6 +17,7 @@
 package io.sundr.examples.shapes;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Collections;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -390,8 +392,12 @@ public class ShapesTest {
 
   @Test
   public void testBuildablePropertyMethodNames() throws Exception {
-    assertNotNull(CanvasBuilder.class.getMethod("withNewV1", null));
-    assertNotNull(CanvasBuilder.class.getMethod("withNewV2", null));
+    CanvasBuilder builder = new CanvasBuilder();
+    // should contain V1 begin / end methods
+    builder.withNewV1().endV1();
+    builder.withNewV2().endV2();
+    // should not contain any methods with an additional prefix
+    assertFalse(Stream.of(CanvasBuilder.class.getMethods()).map(m -> m.getName()).anyMatch(n -> n.contains("V1V1") || n.contains("V2V2")));
   }
 
 }

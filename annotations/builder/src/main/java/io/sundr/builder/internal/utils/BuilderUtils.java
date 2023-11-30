@@ -29,7 +29,6 @@ import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.model.Attributeable.LAZY_INIT;
 import static io.sundr.model.utils.Types.STRING_REF;
-import static io.sundr.model.utils.Types.isAbstract;
 import static io.sundr.utils.Strings.capitalizeFirst;
 
 import java.io.File;
@@ -66,6 +65,7 @@ import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.Construct;
 import io.sundr.builder.internal.functions.TypeAs;
+import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
@@ -96,7 +96,6 @@ import io.sundr.model.utils.Types;
 
 public class BuilderUtils {
 
-  private static final String OBJECT_FULLY_QUALIFIED_NAME = Object.class.getName();
   private static final String[] NON_INLINABLE_PACKAGES = { "java", "javax", "sun", "com.sun" };
   private static final List<String> ADDITIONALINLINABLE_ARGUMENTS = Arrays.asList(Class.class.getCanonicalName(),
       File.class.getCanonicalName(), Path.class.getCanonicalName());
@@ -560,6 +559,25 @@ public class BuilderUtils {
 
   private static final String[] GENERIC_NAMES = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
       "P", "Q", "R", "S" };
+
+  /**
+   * Create a qualified name for the given property - if it is not a descendant, then just the capitalized
+   * name will be used.
+   */
+  public static String qualifyPropertyName(Property property, TypeRef typeRef, TypeDef originType) {
+    return qualifyPropertyName(property, typeRef, originType, false);
+  }
+
+  /**
+   * Create a qualified name for the given property. If useSingular is true the root property name will be changed
+   * to the singular form.
+   */
+  public static String qualifyPropertyName(Property property, TypeRef typeRef, TypeDef originType, boolean useSingular) {
+    return (property.hasAttribute(Constants.DESCENDANT_OF) ? BuilderUtils.fullyQualifiedNameDiff(typeRef, originType) : "")
+        + (useSingular
+            ? Singularize.FUNCTION.apply(property.getNameCapitalized())
+            : property.getNameCapitalized());
+  }
 
   public static String fullyQualifiedNameDiff(TypeRef typeRef, TypeDef originType) {
     Map<String, String> map = DefinitionRepository.getRepository().getReferenceMap();
