@@ -58,7 +58,6 @@ import static io.sundr.model.utils.Types.isOptionalInt;
 import static io.sundr.model.utils.Types.isOptionalLong;
 import static io.sundr.model.utils.Types.isPrimitive;
 import static io.sundr.model.utils.Types.isSet;
-import static io.sundr.utils.Strings.capitalizeFirst;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -715,8 +714,7 @@ class ToMethod {
 
           String addVarargMethodName = "addTo" + property.getNameCapitalized();
           String setMethodName = "setTo" + property.getNameCapitalized();
-          String addAllMethodName = "addAllTo" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef)
-              + property.getNameCapitalized();
+          String addAllMethodName = "addAllTo" + BuilderUtils.qualifyPropertyName(property, baseType, originTypeDef);
 
           Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property);
 
@@ -862,10 +860,9 @@ class ToMethod {
           List<TypeParamDef> parameters = new ArrayList<>();
 
           String removeVarargMethodName = "removeFrom" + property.getNameCapitalized();
-          String removeAllMethodName = "removeAllFrom" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef)
-              + property.getNameCapitalized();
-          String removeMatchingMethodName = "removeMatchingFrom" + BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef)
-              + property.getNameCapitalized();
+          String removeAllMethodName = "removeAllFrom" + BuilderUtils.qualifyPropertyName(property, baseType, originTypeDef);
+          String removeMatchingMethodName = "removeMatchingFrom"
+              + BuilderUtils.qualifyPropertyName(property, baseType, originTypeDef);
 
           String propertyName = property.getName();
           List<Statement> statements = new ArrayList<>();
@@ -1002,7 +999,7 @@ class ToMethod {
     typeArguments.add(returnType);
 
     ClassRef rewraped = nestedType.toReference(typeArguments);
-    String methodSuffix = BuilderUtils.fullyQualifiedNameDiff(valueType, originTypeDef) + property.getNameCapitalized();
+    String methodSuffix = BuilderUtils.qualifyPropertyName(property, valueType, originTypeDef);
     String propertyName = property.getName();
     TypeRef baseType = valueType;
     if (property.hasAttribute(Constants.DESCENDANT_OF)) {
@@ -1183,13 +1180,7 @@ class ToMethod {
     boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
     String prefix = isCollection ? "addNew" : "withNew";
 
-    // synthetic properties of descendants need a prefix as the class names may collide
-    if (property.hasAttribute(Constants.DESCENDANT_OF)) {
-      prefix += BuilderUtils.fullyQualifiedNameDiff(baseType, originTypeDef);
-    }
-    String methodName = (prefix + (isCollection
-        ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-        : property.getNameCapitalized()));
+    String methodName = prefix + BuilderUtils.qualifyPropertyName(property, baseType, originTypeDef, isCollection);
 
     boolean hasIndex = Types.isArray(property.getTypeRef()) || Types.isList(property.getTypeRef());
 
@@ -1227,11 +1218,8 @@ class ToMethod {
       boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
       String ownPrefix = isCollection ? "addNew" : "withNew";
 
-      if (property.hasAttribute(Constants.DESCENDANT_OF)) {
-        ownPrefix += BuilderUtils.fullyQualifiedNameDiff(baseType.toInternalReference(), originTypeDef);
-      }
       String ownName = ownPrefix
-          + (isCollection ? Singularize.FUNCTION.apply(property.getNameCapitalized()) : property.getNameCapitalized());
+          + BuilderUtils.qualifyPropertyName(property, baseType.toInternalReference(), originTypeDef, isCollection);
 
       String delegatePrefix = isCollection ? "addTo" : "with";
       String delegateName = delegatePrefix + property.getNameCapitalized();
@@ -1464,10 +1452,8 @@ class ToMethod {
 
     ClassRef rewraped = nestedType.toReference(typeArguments);
 
-    String prefix = "edit";
-    prefix += BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef);
+    String methodName = "edit" + BuilderUtils.qualifyPropertyName(property, property.getTypeRef(), originTypeDef);
     String methodNameBase = property.getNameCapitalized();
-    String methodName = prefix + methodNameBase;
 
     String statement = createWithNewStatement(property, methodNameBase, "null");
 
@@ -1594,10 +1580,8 @@ class ToMethod {
 
   static final Function<Property, Method> END = FunctionFactory.cache(property -> {
     TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
-    String methodName = "end" + BuilderUtils.fullyQualifiedNameDiff(property.getTypeRef(), originTypeDef)
-        + capitalizeFirst(IS_COLLECTION.apply(property.getTypeRef())
-            ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-            : property.getNameCapitalized());
+    boolean isCollection = IS_COLLECTION.apply(property.getTypeRef());
+    String methodName = "end" + BuilderUtils.qualifyPropertyName(property, property.getTypeRef(), originTypeDef, isCollection);
 
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
