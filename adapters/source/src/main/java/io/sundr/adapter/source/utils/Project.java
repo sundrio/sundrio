@@ -54,7 +54,7 @@ public class Project {
 
   /**
    * Get the optional package of the fully qualified class name.
-   * 
+   *
    * @param fqcn the fully qualified class name
    * @return the package wrapped in optional or empty.
    **/
@@ -66,7 +66,7 @@ public class Project {
 
   /**
    * Get the class name of the fully qualified class name.
-   * 
+   *
    * @param fqcn the fully qualified class name
    * @return the class name.
    **/
@@ -78,7 +78,7 @@ public class Project {
    * Search the project and find a java source file matching the specified
    * fully qualified class name.
    * The function searches the project sources.
-   * 
+   *
    * @param sourceRoot the root source directory to use.
    * @param fqcn the fully qualified class name
    * @return an optional path or empty if file not found.
@@ -107,7 +107,7 @@ public class Project {
    * Search the project and find a java source file matching the specified
    * fully qualified class name.
    * The function searches the project sources.
-   * 
+   *
    * @param fqcn the fully qualified class name
    * @return an optional path or empty if file not found.
    **/
@@ -119,7 +119,7 @@ public class Project {
    * Search the project and find a java test file matching the specified
    * fully qualified class name.
    * The function searches the project sources.
-   * 
+   *
    * @param fqcn the fully qualified class name
    * @return an optional path or empty if file not found.
    **/
@@ -129,7 +129,7 @@ public class Project {
 
   /**
    * Read the content of the file
-   * 
+   *
    * @param path The path to the file
    * @return The content in String
    */

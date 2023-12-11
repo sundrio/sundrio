@@ -68,7 +68,7 @@ public @interface Buildable {
    * expose).
    *
    * In such cases `ignore` can be used.
-   * 
+   *
    * @return the names of the properties to ignore.
    */
   String[] ignore() default {};

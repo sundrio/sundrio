@@ -286,12 +286,13 @@ public class ClazzAs {
       for (Property descendant : allDescendants) {
         ClassRef dunwraped = new ClassRefBuilder(
             (ClassRef) TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF)
-                .apply(descendant.getTypeRef())).withArguments(new TypeRef[0]).build();
+                .apply(descendant.getTypeRef()))
+            .withArguments(new TypeRef[0]).build();
         String className = dunwraped.getFullyQualifiedName();
         if (!seen.add(className) || !isBuildable(dunwraped)) {
           continue;
         }
-        // use a string concat for the case key to prevent conversion of fully qualified names to short names 
+        // use a string concat for the case key to prevent conversion of fully qualified names to short names
         String packageName = dunwraped.getPackageName();
         String classShortName = dunwraped.getName();
 

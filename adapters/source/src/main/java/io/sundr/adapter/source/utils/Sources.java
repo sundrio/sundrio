@@ -1,18 +1,18 @@
 /**
  * Copyright 2015 The original authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
 **/
 
 package io.sundr.adapter.source.utils;
@@ -40,7 +40,7 @@ public class Sources {
 
   /**
    * Read the first {@link TypeDef} instance from an {@link InputStream}.
-   * 
+   *
    * @param is the {@link InputStream}
    * @return the first {@link TypeDef} instance, or throw an exception if none is found.
    */
@@ -50,7 +50,7 @@ public class Sources {
 
   /**
    * Read a {@link List} of {@link TypeDef} instances from an {@link InputStream}.
-   * 
+   *
    * @param is the {@link InputStream}
    * @return a {@link List} of {@link TypeDef} instances.
    */
@@ -61,7 +61,7 @@ public class Sources {
 
   /**
    * Read a {@link List} of {@link TypeDeclaration} instances from an {@link InputStream}.
-   * 
+   *
    * @param is the {@link InputStream}
    * @return a {@link List} of {@link TypeDeclaration} instances.
    */
@@ -72,7 +72,7 @@ public class Sources {
 
   /**
    * Read a {@link TypeDeclaration} instance from an {@link InputStream}.
-   * 
+   *
    * @param is the {@link InputStream}
    * @return the {@link TypeDeclaration} instance.
    */
@@ -82,7 +82,7 @@ public class Sources {
 
   /**
    * Read a {@link List} of {@link TypeDeclaration} instances from a classpath resource.
-   * 
+   *
    * @param resourceName the {@link InputStream}
    * @return a {@link List} of {@link TypeDeclaration} instances.
    */
@@ -93,7 +93,7 @@ public class Sources {
 
   /**
    * Read a {@link TypeDeclaration} instance from a classpath resource.
-   * 
+   *
    * @param resourceName the {@link InputStream}
    * @return the {@link TypeDeclaration} instance.
    */
@@ -103,7 +103,7 @@ public class Sources {
 
   /**
    * Read the first {@link TypeDef} instance from a classpath resource.
-   * 
+   *
    * @param resourceName the {@link InputStream}
    * @param ctx the {@link AdapterContext}
    * @return the first {@link TypeDef} instance, or throw an exception if none is found.
@@ -115,7 +115,7 @@ public class Sources {
 
   /**
    * Read a {@link List} of {@link TypeDef} instances from a classpath resource.
-   * 
+   *
    * @param resourceName the {@link InputStream}
    * @return a {@link List} of {@link TypeDef} instances.
    */
@@ -152,7 +152,7 @@ public class Sources {
 
   /**
    * Closes multiple {@link Closeable} objects swallowing exceptions.
-   * 
+   *
    * @param cloasebales The {@link Closeable} objects.
    */
   private static void closeQuietly(Closeable... cloasebales) {

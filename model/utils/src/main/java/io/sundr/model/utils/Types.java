@@ -164,7 +164,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeDef} is an instance of an other {@link TypeDef}.
-   * 
+   *
    * @param type The type to compare.
    * @param targetType The target type.
    * @param function
@@ -219,7 +219,7 @@ public final class Types {
 
   /**
    * Creates a new generic TypeParamRef.
-   * 
+   *
    * @param letter The letter of the type.
    * @return The param reference.
    */
@@ -229,7 +229,7 @@ public final class Types {
 
   /**
    * Creates a new TypeParamDef.
-   * 
+   *
    * @param letter The letter of the type.
    * @return The param definition.
    */
@@ -239,7 +239,7 @@ public final class Types {
 
   /**
    * Removes parameters from a TypeDef.
-   * 
+   *
    * @param base The base type.
    * @return The unwraped TypeDef.
    */
@@ -300,7 +300,7 @@ public final class Types {
 
   /**
    * Checks a {@link TypeRef} is an enum.
-   * 
+   *
    * @param typeRef The type to check.
    * @return True if its an enum type.
    */
@@ -314,7 +314,7 @@ public final class Types {
 
   /**
    * Checks a {@link TypeRef} is of an abstract type.
-   * 
+   *
    * @param typeRef The type to check.
    * @return True if its an abstract type.
    */
@@ -329,7 +329,7 @@ public final class Types {
 
   /**
    * Checks if {@link TypeRef} is of an concrete
-   * 
+   *
    * @param typeRef The type to check.
    * @return True if its an concrete type.
    */
@@ -344,7 +344,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a primitive type.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a primitive type.
    */
@@ -354,7 +354,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link Map}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a Map.
    */
@@ -364,7 +364,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.List}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a List.
    */
@@ -374,7 +374,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.Set}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a Set.
    */
@@ -384,7 +384,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link Collection}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a Collection.
    */
@@ -394,7 +394,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link Boolean} or boolean.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link Boolean} or boolean.
    */
@@ -410,7 +410,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is an array.
-   * 
+   *
    * @param type The type to check.
    * @return True if its an array.B
    */
@@ -429,7 +429,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.Optional}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.Optional}.
    */
@@ -443,7 +443,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.OptionalInt}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.OptionalInt}.
    */
@@ -457,7 +457,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.OptionalDouble}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.OptionalDouble}.
    */
@@ -471,7 +471,7 @@ public final class Types {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.OptionalLong}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.OptionalLong}.
    */
@@ -485,7 +485,7 @@ public final class Types {
 
   /**
    * Check if type is an internal JDK type.
-   * 
+   *
    * @return true if jdk type, false otherwise.
    */
   public static boolean isJdkType(TypeRef type) {
@@ -509,7 +509,7 @@ public final class Types {
 
   /**
    * Check if method exists on the specified type.
-   * 
+   *
    * @param typeDef The type.
    * @param method The method name.
    * @return True if method is found, false otherwise.
@@ -525,7 +525,7 @@ public final class Types {
 
   /**
    * Checks if property exists on the specified type.
-   * 
+   *
    * @param typeDef The type.
    * @param property The property name.
    * @return True if method is found, false otherwise.
@@ -541,7 +541,7 @@ public final class Types {
 
   /**
    * All properties (including inherited).
-   * 
+   *
    * @param typeDef The type.
    * @return A list with all properties.
    */
@@ -554,7 +554,7 @@ public final class Types {
 
   /**
    * Unrolls the hierararchy of a specified type.
-   * 
+   *
    * @param typeDef The specified type.
    * @return A set that contains all the hierarching (including the specified type).
    */
@@ -571,7 +571,7 @@ public final class Types {
 
   /***
    * A utility that tries to get a fully qualified class name from an unknown object.
-   * 
+   *
    * @param o The object.
    * @return The classname if found or the string representation of the object.
    */

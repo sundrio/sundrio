@@ -32,7 +32,7 @@ final class Reflections {
 
   /**
    * Read using reflection the SessionScope of the {@link org.apache.maven.lifecycle.internal.LifecycleModuleBuilder}.
-   * 
+   *
    * @param source The {@link org.apache.maven.lifecycle.internal.LifecycleModuleBuilder}
    * @return The {@link org.apache.maven.session.scope.internal.SessionScope.Memento}
    * @throws Exception
@@ -48,7 +48,7 @@ final class Reflections {
 
   /**
    * Read any field that matches the specified name.
-   * 
+   *
    * @param obj The obj to read from.
    * @param names The var-arg of names.
    * @return The value of the first field that matches or null if no match is found.

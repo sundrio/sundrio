@@ -1,18 +1,18 @@
 /**
  * Copyright 2015 The original authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
 **/
 
 package io.sundr.adapter.apt;
@@ -89,7 +89,7 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
 
   /**
    * Checks if there is error extracting the specified annotation parameter
-   * 
+   *
    * @param entry the entry that represents the annotation param.
    */
   private void checkEntry(Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry) {
@@ -105,7 +105,7 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
 
   /**
    * Convert the specified {@link List} into an array.
-   * 
+   *
    * @return an {@link Object} instance that holds the array.
    */
   private static Object toArray(List list) {
@@ -129,7 +129,7 @@ public class AnnotationMirrorToAnnotationRef implements Function<AnnotationMirro
    * Converts boxed type into into its primitve equivalent.
    * This method also supports {@link com.sun.tools.javac.code.Symbol$VarSymbol} which are used internally and that makes the
    * method extremely falky.
-   * 
+   *
    * @return a matching primitve or the input type if no match was found.
    */
   private static Class toPrimitive(Class t) {

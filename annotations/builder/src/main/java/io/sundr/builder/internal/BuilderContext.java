@@ -1052,7 +1052,7 @@ public class BuilderContext {
         .addNewArgument()
         .withTypeRef(new ClassRefBuilder(Collections.LIST
             .toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS).withBounds(T.toReference()).build()))
-                .withDimensions(1).build())
+            .withDimensions(1).build())
         .withName("lists")
         .endArgument()
         .withVarArgPreferred(true)
@@ -1066,7 +1066,7 @@ public class BuilderContext {
         .addNewArgument()
         .withTypeRef(new ClassRefBuilder(Collections.SET
             .toReference(new WildcardRefBuilder().withBoundKind(BoundKind.EXTENDS).withBounds(T.toReference()).build()))
-                .withDimensions(1).build())
+            .withDimensions(1).build())
         .withName("sets")
         .endArgument()
         .withVarArgPreferred(true)

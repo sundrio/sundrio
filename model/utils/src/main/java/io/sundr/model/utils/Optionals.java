@@ -104,7 +104,7 @@ public class Optionals {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.Optional}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.Optional}.
    */
@@ -114,7 +114,7 @@ public class Optionals {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.OptionalInt}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.OptionalInt}.
    */
@@ -124,7 +124,7 @@ public class Optionals {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.OptionalDouble}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.OptionalDouble}.
    */
@@ -134,7 +134,7 @@ public class Optionals {
 
   /**
    * Checks if a {@link TypeRef} is a {@link java.util.OptionalLong}.
-   * 
+   *
    * @param type The type to check.
    * @return True if its a {@link java.util.OptionalLong}.
    */

@@ -71,7 +71,7 @@ public abstract class AbstractCodeGeneratingProcessor extends AbstractProcessor 
 
   /**
    * Checks if class already exists.
-   * 
+   *
    * @param typeDef The type definition to check if exists.
    * @return True if class can be found, false otherwise.
    */

@@ -152,7 +152,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   /**
    * This is only used for rendering method arguments, where we usually string modifiers.
-   * 
+   *
    * @return the property without any modifiers
    */
   protected Property withoutModiers() {
@@ -162,7 +162,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   /**
    * Get the property after the type erasure is applied.
    * This in essense means that the type parameters are replaced by Object.
-   * 
+   *
    * @return the 'erased` property.
    */
   public Property withErasure() {
@@ -172,7 +172,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   /**
    * Get the property without its initial value.
-   * 
+   *
    * @return the property.
    */
   public Property withoutInitialValue() {
@@ -182,7 +182,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   /**
    * Get the property with the specified object as iniital value.
-   * 
+   *
    * @param initialValue an {@link Object}
    * @return the property.
    */
@@ -193,7 +193,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   /**
    * Get the property with the specified object as iniital value.
-   * 
+   *
    * @param initialValue an {@link Expression}
    * @return the property.
    */
@@ -204,7 +204,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   /**
    * Get the property with the specified initial value
-   * 
+   *
    * @param initialValue an {@link Optional} {@link Expression}
    * @return the property.
    */
@@ -216,7 +216,7 @@ public class Property extends ModifierSupport implements Renderable, Commentable
   /**
    * Get the default value of the property
    * The mehotd is deprecated, use {@link #getInitialValue()} instead.
-   * 
+   *
    * @return String the default value of the Property
    */
   @Deprecated

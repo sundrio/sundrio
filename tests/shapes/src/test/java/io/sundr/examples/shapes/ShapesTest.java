@@ -397,7 +397,8 @@ public class ShapesTest {
     builder.withNewV1().endV1();
     builder.withNewV2().endV2();
     // should not contain any methods with an additional prefix
-    assertFalse(Stream.of(CanvasBuilder.class.getMethods()).map(m -> m.getName()).anyMatch(n -> n.contains("V1V1") || n.contains("V2V2")));
+    assertFalse(Stream.of(CanvasBuilder.class.getMethods()).map(m -> m.getName())
+        .anyMatch(n -> n.contains("V1V1") || n.contains("V2V2")));
   }
 
 }

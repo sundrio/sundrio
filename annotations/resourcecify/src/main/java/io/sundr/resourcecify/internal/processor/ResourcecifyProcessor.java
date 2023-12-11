@@ -94,7 +94,7 @@ public class ResourcecifyProcessor extends AbstractProcessor {
 
   /**
    * Copy one {@link FileObject} into an other.
-   * 
+   *
    * @param source The source {@link FileObject}.
    * @param target The target {@link FileObject}.
    * @throws IOException

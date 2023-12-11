@@ -40,7 +40,7 @@ public class Getter {
 
   /**
    * Find the getter of the specified property in the type.
-   * 
+   *
    * @param clazz The class.
    * @param property The property.
    * @return The getter method if found. Throws exception if no getter is matched.
@@ -59,7 +59,7 @@ public class Getter {
 
   /**
    * Find the getter of the specified property in the type.
-   * 
+   *
    * @param clazz The class.
    * @param property The property.
    * @param acceptPrefixless Flag to accept prefixless getters.
@@ -98,7 +98,7 @@ public class Getter {
 
   /**
    * Checks if the specified method is a getter.
-   * 
+   *
    * @param method The specified method.
    * @return True if getter, false otherwise.
    */
@@ -108,7 +108,7 @@ public class Getter {
 
   /**
    * Checks if the specified method is a getter.
-   * 
+   *
    * @param method The method.
    * @param acceptPrefixless Flag to enable support of prefixless getters.
    * @return
@@ -221,7 +221,7 @@ public class Getter {
 
   /**
    * Return the getter name for the specified {@link Property}.
-   * 
+   *
    * @param property The property.
    * @return The name.
    */
@@ -231,7 +231,7 @@ public class Getter {
 
   /**
    * Return the property name for the specified getter {@link Method method}.
-   * 
+   *
    * @param method The method.
    * @return The name.
    */
@@ -260,7 +260,7 @@ public class Getter {
   /**
    * Return the property name for the specified getter {@link Method method}.
    * This method will not check if the method is an actual getter and will return the method name if not.
-   * 
+   *
    * @param method The method.
    * @return The name, or the method name if method is not a typical getter..
    */
