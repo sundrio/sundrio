@@ -225,7 +225,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                   context.getDefinitionRepository());
               superClass = new TypeDefBuilder(
                   Adapters.adaptType(aptContext.getElements().getTypeElement(superClassName), aptContext.getAdapterContext()))
-                      .build();
+                  .build();
 
               BuilderContextManager.getContext().getDefinitionRepository().register(superClass);
               BuilderContextManager.getContext().getBuildableRepository().register(superClass);
@@ -300,10 +300,10 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
               AnnotationRef inheritedPojoRef = (pojoRef != null ? new AnnotationRefBuilder(pojoRef)
                   : new AnnotationRefBuilder())
-                      .removeFromParameters("name")
-                      .removeFromParameters("superClass")
-                      .removeFromParameters("interfaces")
-                      .build();
+                  .removeFromParameters("name")
+                  .removeFromParameters("superClass")
+                  .removeFromParameters("interfaces")
+                  .build();
 
               TypeDef p = hasPojoAnnotation(GetDefinition.of(ref))
                   ? POJO.apply(TypeArguments.apply(GetDefinition.of(ref)))
@@ -772,7 +772,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Converts a reference from the source type, to the target type by using the builder.
-   * 
+   *
    * @param ref The ref.
    * @param source The source type of the reference..
    * @param target The target type.
@@ -787,7 +787,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Converts a reference from the source type, to the target.
-   * 
+   *
    * @param ref The ref.
    * @param source The source type of the reference..
    * @param target The target type.
@@ -806,7 +806,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that given a reference of the specified type, reads the specified property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -836,7 +836,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an object property from a reference using a getter.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -848,7 +848,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -869,7 +869,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an object array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -900,7 +900,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads a primitive array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -917,7 +917,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads a primitive array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -935,7 +935,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Converts a map describing the source type, to the target type by using the builder.
-   * 
+   *
    * @param ref The ref.
    * @param source The source type of the reference (e.g. the annotation).
    * @param target The target type (e.g. the generated pojo).
@@ -950,7 +950,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Converts a map describing the source type, to the target.
-   * 
+   *
    * @param ref The ref.
    * @param source The source type of the reference (e.g. the annotation).
    * @param target The target type (e.g. the generated pojo).
@@ -969,7 +969,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that given a reference of the specified type, reads the specified property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -1008,7 +1008,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an object property from a reference using a getter.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -1034,7 +1034,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an enum property from a reference using a getter.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -1060,7 +1060,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an enum property from a reference using a getter.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -1086,7 +1086,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -1107,7 +1107,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads an object array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -1143,7 +1143,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads a primitive array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.
@@ -1163,7 +1163,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
   /**
    * Returns the string representation of the code that reads a primitive array property.
-   * 
+   *
    * @param ref The reference.
    * @param source The type of the reference.
    * @param property The property to read.

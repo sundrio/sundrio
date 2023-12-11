@@ -27,7 +27,7 @@ public @interface ResourceSelector {
 
   /**
    * The package to use for selecting classes.
-   * 
+   *
    * @return
    */
   String value();

@@ -247,7 +247,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
 
   /**
    * Creates a {@link ClassRef} for the current definition with the specified arguments.
-   * 
+   *
    * @param arguments The arguments to be passed to the reference.
    * @return a {@link ClassRef} for the currnet type, with the specified type arguments
    */
@@ -286,7 +286,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   /**
    * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties
    * etc). It uses as arguments the same 'letters' as the parameters definition.
-   * 
+   *
    * @return a {@link ClassRef} for the currnet type, using the type parameter names as as arguments.
    */
   public ClassRef toInternalReference() {
@@ -300,7 +300,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
 
   /**
    * Creates a {@link ClassRef} without bounds.
-   * 
+   *
    * @return a {@link ClassRef} for the currnet type, with the specified type arguments
    */
   public ClassRef toUnboundedReference() {

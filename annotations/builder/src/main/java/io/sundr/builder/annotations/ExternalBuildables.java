@@ -55,14 +55,14 @@ public @interface ExternalBuildables {
 
   /**
    * Ignore properties
-   * 
+   *
    * @return the names of the properties to ignore.
    */
   String[] ignore() default {};
 
   /**
    * When enabled the external buildables generator will not generates class are present on class path.
-   * 
+   *
    * @return true if skipping should be performed, false otherwise.
    */
   boolean skipExistingTypes() default true;

@@ -57,7 +57,7 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
     this.block = block;
   }
 
-  // For testing 
+  // For testing
   public static Method newMethod(String name, TypeRef returnType, boolean varArgPrefered, Property... arguments) {
     return new Method(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), name, returnType,
         Arrays.asList(arguments), varArgPrefered, Collections.emptyList(), false, null, Modifiers.create(), new HashMap<>());

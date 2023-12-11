@@ -209,7 +209,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
               .orElseThrow(() -> new IllegalStateException("Neither bom template URL nor bom template resource was found.")));
       CodeGenerator.newGenerator(Model.class)
           .withOutput(output)
-          .skipping(t -> false) //don't skip 
+          .skipping(t -> false) //don't skip
           .withRenderer(renderer)
           .generate(projectToGenerate.getModel());
 
@@ -470,7 +470,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   /**
    * Collects dependencies, including transitives.
    * Project dependencies retain their scope, while test only dependencies (including transitives) will have test scope.
-   * 
+   *
    * @param projectDependencies
    * @return
    */

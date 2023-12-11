@@ -45,7 +45,7 @@ public class PathAwareTypedVisitor<V, P> implements Visitor<V> {
 
   /**
    * Checks if the specified visitor has a visit method compatible with the specified fluent.
-   * 
+   *
    * @param target The candidate to check if current visitor can visit.
    * @param <F> The type of the candidate
    * @return True if matching method was found.

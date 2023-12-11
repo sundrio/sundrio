@@ -86,7 +86,7 @@ public class Construct implements Function<List<String>, String> {
 
   /**
    * Checks that a constructor with the required number of arguments is found.
-   * 
+   *
    * @param arguments
    */
   private void checkConstructorArguments(int arguments) {
@@ -107,7 +107,7 @@ public class Construct implements Function<List<String>, String> {
 
   /**
    * Checks that a factory method with the required number of arguments is found.
-   * 
+   *
    * @param arguments
    */
   private void checkFactoryMethodArguments(int arguments) {

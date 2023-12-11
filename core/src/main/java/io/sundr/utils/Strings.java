@@ -212,7 +212,7 @@ public final class Strings {
   /**
    * Remove repeating strings that are appearing in the name.
    * This is done by splitting words (camel case) and using each word once.
-   * 
+   *
    * @param name The name to compact.
    * @return The compact name.
    */
@@ -226,7 +226,7 @@ public final class Strings {
 
   /**
    * Adds an underscore to the specified String, if its a Java Keyword.
-   * 
+   *
    * @param name The specified string.
    * @return The specified string if not a keyword, the string prefixed with underscore otherwise.
    */
@@ -239,7 +239,7 @@ public final class Strings {
 
   /**
    * Converts the string into a safe field name.
-   * 
+   *
    * @param name The field name.
    * @return The safe field name.
    */
@@ -265,7 +265,7 @@ public final class Strings {
   /**
    * Converts a name of an interface or abstract class to Pojo name.
    * Remove leading "I" and "Abstract" or trailing "Interface".
-   * 
+   *
    * @param name The name to convert.
    * @param prefix The prefix to use if needed.
    * @param suffix The suffix to user if needed.

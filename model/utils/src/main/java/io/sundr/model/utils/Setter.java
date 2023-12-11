@@ -33,7 +33,7 @@ public class Setter {
 
   /**
    * Find the setter of the specified property in the type.
-   * 
+   *
    * @param type The class.
    * @param property The property.
    * @return The setter method if found. Throws exception if no setter is matched.
@@ -72,7 +72,7 @@ public class Setter {
 
   /**
    * Find the setter of the specified property in the rich type.
-   * 
+   *
    * @param richType The class.
    * @param property The property.
    * @return The setter method if found. Throws exception if no setter is matched.

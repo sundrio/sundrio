@@ -18,7 +18,7 @@ package io.sundr.builder;
 
 /**
  * An interface that describes an Inlineable object.
- * 
+ *
  * @param <T> The object to inline.
  */
 public interface Inlineable<T> {

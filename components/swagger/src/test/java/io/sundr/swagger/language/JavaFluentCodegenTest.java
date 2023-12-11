@@ -36,14 +36,14 @@ public class JavaFluentCodegenTest {
    * .required("name");
    * final DefaultCodegen codegen = new JavaFluentCodegen();
    * final CodegenModel cm = codegen.fromModel("sample", model);
-   * 
+   *
    * Assert.assertEquals(cm.name, "sample");
    * Assert.assertEquals(cm.classname, "Sample");
    * Assert.assertEquals(cm.description, "a sample model");
    * Assert.assertEquals(cm.vars.size(), 3);
-   * 
+   *
    * final List<CodegenProperty> vars = cm.vars;
-   * 
+   *
    * final CodegenProperty property1 = vars.get(0);
    * Assert.assertEquals(property1.baseName, "id");
    * Assert.assertEquals(property1.getter, "getId");
@@ -55,7 +55,7 @@ public class JavaFluentCodegenTest {
    * Assert.assertTrue(property1.hasMore);
    * Assert.assertTrue(property1.required);
    * Assert.assertTrue(property1.isNotContainer);
-   * 
+   *
    * final CodegenProperty property2 = vars.get(1);
    * Assert.assertEquals(property2.baseName, "name");
    * Assert.assertEquals(property2.getter, "getName");
@@ -68,7 +68,7 @@ public class JavaFluentCodegenTest {
    * Assert.assertTrue(property2.hasMore);
    * Assert.assertTrue(property2.required);
    * Assert.assertTrue(property2.isNotContainer);
-   * 
+   *
    * final CodegenProperty property3 = vars.get(2);
    * Assert.assertEquals(property3.baseName, "createdAt");
    * Assert.assertEquals(property3.getter, "getCreatedAt");

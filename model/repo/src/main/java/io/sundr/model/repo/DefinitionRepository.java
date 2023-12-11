@@ -61,7 +61,7 @@ public class DefinitionRepository {
    * So, when this method is used from within a call to Definition.withRepository(repo).call(...) it will return the value of
    * repo instead of the Singleton intance.
    * The same goes for Definition.withNewRepository(repo -{@literal >} { ... }).
-   * 
+   *
    * @return the scoped instance if called from within withRepo/withNewRepo lambda, or the singleton instance otherwise.
    */
   public static synchronized final DefinitionRepository getRepository() {
@@ -76,7 +76,7 @@ public class DefinitionRepository {
 
   /**
    * Create a new instance of the repository, without messing with the singleton
-   * 
+   *
    * @return a new instance
    */
   public static DefinitionRepository createRepository() {

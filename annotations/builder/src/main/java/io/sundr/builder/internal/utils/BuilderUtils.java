@@ -154,7 +154,7 @@ public class BuilderUtils {
 
   /**
    * Checks if {@link ClassRef} is buildable.
-   * 
+   *
    * @param ref The reference.
    * @return True if buildable repository contains the ref or builder for the reference is present.
    */
@@ -185,7 +185,7 @@ public class BuilderUtils {
 
   /**
    * Returns all references of a {@link ClassRef} that are considered buildable.
-   * 
+   *
    * @param ref The reference.
    * @return The list with all detected references.
    */
@@ -260,7 +260,7 @@ public class BuilderUtils {
 
   /**
    * Checks if method has a specific argument.
-   * 
+   *
    * @param method The method.
    * @param property The argument.
    * @return True if matching argument if found.
@@ -773,7 +773,7 @@ public class BuilderUtils {
 
   /**
    * Get all the enclosingTypes.
-   * 
+   *
    * @param typeDef the typeDef that we check for enclosed buildables.
    * @return all the enclosingTypes.
    */

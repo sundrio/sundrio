@@ -1,18 +1,18 @@
 /**
  * Copyright 2015 The original authors.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
 **/
 
 package io.sundr.swagger.language;
@@ -29,7 +29,7 @@ public class ArtifactUtil {
 
   /**
    * Extracts the groupId from the specified coordinates
-   * 
+   *
    * @param coordinates the maven coordinates
    * @return the groupId
    */
@@ -39,7 +39,7 @@ public class ArtifactUtil {
 
   /**
    * Extracts the artifactId from the specified coordinates
-   * 
+   *
    * @param coordinates the maven coordinates
    * @return the artifactId
    */
@@ -49,7 +49,7 @@ public class ArtifactUtil {
 
   /**
    * Extracts the version from the specified coordinates
-   * 
+   *
    * @param coordinates the maven coordinates
    * @return the version
    */
@@ -59,7 +59,7 @@ public class ArtifactUtil {
 
   /**
    * Extracts the classifier from the specified coordinates
-   * 
+   *
    * @param coordinates the maven coordinates
    * @return the classifier as an {@link Optional} string.
    */
@@ -74,7 +74,7 @@ public class ArtifactUtil {
   /**
    * Splits the specified maven coordinates to individual parts: groupId, artifactId, version and optionally classifier.
    * The coordiante format is <groupId>:<artifactId>:<version>(:<classifier>)
-   * 
+   *
    * @param coordinates the specified maven coordinates as a string.
    * @reutrn a {@link String} array with all the coordinate parts
    */
