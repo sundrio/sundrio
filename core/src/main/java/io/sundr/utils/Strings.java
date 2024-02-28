@@ -248,18 +248,52 @@ public final class Strings {
   }
 
   /**
-   * Converts the String into a camel case String.
+   * Converts the given string to camelCase format.
+   * <p>
+   * This method takes a string input and converts it to camelCase format,
+   * where each word in the input string is capitalized (except the first word)
+   * and concatenated together without spaces. Non-alphanumeric characters are treated as word separators.
+   * <p>
+   * If the input string is {@code null}, {@code null} is returned.
+   * If the input string is empty or contains only non-alphanumeric characters, an empty string is returned.
+   * <p>
+   * For example:
    *
-   * @param name The name.
-   * @return The name in camel case.
+   * <pre>{@code
+   * camelCase("helloWorld") returns "helloWorld"
+   * camelCase("hello_world") returns "helloWorld"
+   * camelCase("hello world") returns "helloWorld"
+   * camelCase("foo-bar-baz") returns "fooBarBaz"
+   * camelCase("123_456_789") returns "123456789"
+   * camelCase("   ") returns ""
+   * camelCase(null) returns null
+   * }</pre>
+   *
+   * @param name the string to convert to camelCase
+   * @return the input string converted to camelCase format, or {@code null} if the input string is {@code null},
+   *         or an empty string if the input string is empty or contains only non-alphanumeric characters
    */
   public static final String camelCase(String name) {
+    if (name == null) {
+      return null;
+    } else if (name.isEmpty() || name.trim().isEmpty()) {
+      return "";
+    }
     String[] parts = name.split("[^a-zA-Z0-9]");
-    return parts[0] + Stream.of(parts)
-        .skip(1)
-        .filter(s -> s != null && s.length() > 0)
-        .map(v -> Character.toUpperCase(v.charAt(0)) + v.substring(1))
-        .collect(Collectors.joining());
+    if (parts.length == 0) {
+      return null;
+    }
+    StringBuilder builder = new StringBuilder();
+    for (int i = 0; i < parts.length; i++) {
+      String word = parts[i];
+      if (i == 0 || builder.toString().isEmpty()) {
+        word = word.isEmpty() ? word : word.substring(0, 1).toLowerCase() + word.substring(1);
+      } else {
+        word = word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
+      }
+      builder.append(word);
+    }
+    return builder.toString();
   }
 
   /**
