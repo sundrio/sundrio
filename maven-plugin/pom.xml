@@ -23,7 +23,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
     <artifactId>sundr-maven-plugin</artifactId>
     <name>Sundrio :: Maven Plugin</name>
     <packaging>maven-plugin</packaging>

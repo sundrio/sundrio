@@ -36,7 +36,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
-import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.InvocationResult;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
@@ -112,12 +111,12 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
   void backGroundBuild(MavenProject project) throws MojoExecutionException {
     MavenExecutionRequest executionRequest = session.getRequest();
 
-    InvocationRequest request = new DefaultInvocationRequest();
+    DefaultInvocationRequest request = new DefaultInvocationRequest();
     request.setBaseDirectory(project.getBasedir());
     request.setPomFile(project.getFile());
     request.setGoals(executionRequest.getGoals());
     request.setRecursive(false);
-    request.setInteractive(false);
+    request.setBatchMode(false);
 
     request.setProfiles(executionRequest.getActiveProfiles());
     request.setProperties(executionRequest.getUserProperties());

@@ -23,7 +23,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
     <artifactId>dsl-annotations</artifactId>
     <name>Sundrio :: Annotations :: DSL</name>
 
@@ -32,9 +31,16 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
-                    <compilerArgument>-proc:none</compilerArgument>
+                    <compilerArgs>
+                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
+                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
+                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
+                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
+                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
+                        <arg>-proc:none</arg>
+                    </compilerArgs>                    
                 </configuration>
             </plugin>
         </plugins>
@@ -59,21 +65,5 @@
         </dependency>
 
     </dependencies>
-
-    <profiles>
-        <profile>
-             <id>jdk9</id>
-             <activation>
-                 <jdk>[1,1.9)</jdk>
-             </activation>
-             <dependencies>
-                 <dependency>
-                     <groupId>com.sun</groupId>
-                     <artifactId>tools</artifactId>
-                     <optional>true</optional>
-                 </dependency>
-             </dependencies>
-        </profile>
-    </profiles>
 
 </project>

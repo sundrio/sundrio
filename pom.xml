@@ -53,11 +53,10 @@
         <format.skip>false</format.skip>
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
 
-        <maven.version>3.3.1</maven.version>
-        <maven.invoker.version>2.0.11</maven.invoker.version>
-        <maven-plugin-annotations.version>3.2</maven-plugin-annotations.version>
+        <maven.version>3.6.3</maven.version>
+        <maven.invoker.version>3.2.0</maven.invoker.version>
+        <maven-plugin-annotations.version>3.6.4</maven-plugin-annotations.version>
 
-        <sun.tools.version>8</sun.tools.version>
         <validation.api.version>2.0.1.Final</validation.api.version>
         <velocity.version>1.7</velocity.version>
         <st4.version>4.3</st4.version>
@@ -78,7 +77,7 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <maven-invoker-plugin.version>3.2.2</maven-invoker-plugin.version>
-        <maven-plugin-plugin.version>3.5</maven-plugin-plugin.version>
+        <maven-plugin-plugin.version>3.6.4</maven-plugin-plugin.version>
         <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
 
         <!-- Release Plugins -->
@@ -136,8 +135,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                     <!-- The option below starting causing `Unknown compilation error` as soon as SourceVersion annotations were removed
                          in favor of SourceVersion.latest().
                          According to: https://stackoverflow.com/questions/56646698/what-causes-an-unknown-compilation-problem-occurred the
@@ -147,6 +146,26 @@
                         <arg>-Werror</arg>
                     </compilerArgs-->
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>(11,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -191,6 +210,20 @@
                 <version>${hamcrest.version}</version>
                 <scope>test</scope>
             </dependency>
+            
+            <dependency>
+                <groupId>com.google.testing.compile</groupId>
+                <artifactId>compile-testing</artifactId>
+                <version>${compile-testing.version}</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sun</groupId>
+                        <artifactId>tools</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            
         </dependencies>
     </dependencyManagement>
 
@@ -362,50 +395,6 @@
               </plugin>
             </plugins>
           </build>
-        </profile>
-        <profile>
-             <id>jdk9</id>
-             <activation>
-                 <jdk>[1,1.9)</jdk>
-             </activation>
-             <dependencyManagement>
-                 <dependencies>
-                     <dependency>
-                         <groupId>com.sun</groupId>
-                         <artifactId>tools</artifactId>
-                         <version>${sun.tools.version}</version>
-                         <optional>true</optional>
-                     </dependency>
-                   <dependency>
-                     <groupId>com.google.testing.compile</groupId>
-                     <artifactId>compile-testing</artifactId>
-                     <version>${compile-testing.version}</version>
-                     <scope>test</scope>
-                   </dependency>
-                 </dependencies>
-             </dependencyManagement>
-        </profile>
-        <profile>
-             <id>jdk9+</id>
-             <activation>
-                 <jdk>[1.9,)</jdk>
-             </activation>
-             <dependencyManagement>
-                 <dependencies>
-                   <dependency>
-                     <groupId>com.google.testing.compile</groupId>
-                     <artifactId>compile-testing</artifactId>
-                     <version>${compile-testing.version}</version>
-                     <scope>test</scope>
-                     <exclusions>
-                       <exclusion>
-                         <groupId>com.sun</groupId>
-                         <artifactId>tools</artifactId>
-                       </exclusion>
-                     </exclusions>
-                   </dependency>
-                 </dependencies>
-             </dependencyManagement>
         </profile>
         <profile>
              <id>with-examples</id>

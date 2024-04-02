@@ -24,7 +24,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
     <artifactId>sundr-codegen-velocity</artifactId>
     <name>Sundrio :: Code generation :: Velocity</name>
 
@@ -49,19 +48,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <profiles>
-        <profile>
-             <id>jdk9</id>
-             <activation>
-                 <jdk>[1,1.9)</jdk>
-             </activation>
-             <dependencies>
-                 <dependency>
-                     <groupId>com.sun</groupId>
-                     <artifactId>tools</artifactId>
-                     <optional>true</optional>
-                 </dependency>
-             </dependencies>
-        </profile>
-    </profiles>
 </project>

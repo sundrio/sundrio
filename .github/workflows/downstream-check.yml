@@ -32,7 +32,7 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'downstream-check') || github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
-        java: [8]
+        java: [11]
         profile: [normal]
     steps:
       - name: Checkout
@@ -42,11 +42,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-      - name: Install prerequisites
-        run: |
-          if [ -f $JAVA_HOME/lib/tools.jar ]; then
-            ./mvnw install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar -P${{ matrix.profile }};
-          fi
       - name: Build 
         run: ./mvnw ${MAVEN_ARGS} clean install -Dformat.skip=true
       - name: Build Kubernetes Client

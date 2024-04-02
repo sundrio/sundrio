@@ -15,7 +15,7 @@ jobs:
     name: release
     strategy:
       matrix:
-        java: [8]
+        java: [11]
         profile: [normal]
     if: ${{github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true}}
     steps:
@@ -31,18 +31,13 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
-          java-version: 8
+          java-version: 11
           distribution: 'temurin'
           server-id: oss-sonatype-staging
           server-username: OSS_SONATYPE_USERNAME
           server-password: OSS_SONATYPE_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
-      - name: Install prerequisites
-        run: |
-          if [ -f $JAVA_HOME/lib/tools.jar ]; then
-            ./mvnw install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar -P${{ matrix.profile }};
-          fi
       - name: Configure Git author
         run: |
           git config --local user.email "action@github.com"

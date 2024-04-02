@@ -310,13 +310,7 @@ The project also includes so modules that put the code model & adapters into the
 
 # Compiling 
 
-The project is meant to be compiled using java 8.
-The project internally is using `com.sun:tools` which is found under `$JAVA_HOME/lib/tools.jar` for all java version before 11.
-To avoid referencing to that path, which is known to cause issues, its required to install it your maven local repository.
-
-    mvn install:install-file -Dfile=$JAVA_HOME/lib/tools.jar -DgroupId=com.sun -DartifactId=tools -Dversion=8 -Dpackaging=jar
-
-*Note*: To just use this project no action is required as the dependency is only needed to compile sundrio itself.
+The project is meant to be compiled using java 11.
 
 # Projects using sundrio
 

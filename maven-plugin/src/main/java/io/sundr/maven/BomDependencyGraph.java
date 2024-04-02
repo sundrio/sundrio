@@ -36,6 +36,11 @@ public class BomDependencyGraph implements ProjectDependencyGraph {
   }
 
   @Override
+  public List<MavenProject> getAllProjects() {
+    return projects;
+  }
+
+  @Override
   public List<MavenProject> getSortedProjects() {
     return projects;
   }

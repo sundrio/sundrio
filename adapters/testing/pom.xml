@@ -24,7 +24,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
     <artifactId>sundr-adapter-testing</artifactId>
     <name>Sundrio :: Adapters :: Testing</name>
 
@@ -50,15 +49,6 @@
 
     <build>
         <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-jar-plugin</artifactId>
