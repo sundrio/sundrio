@@ -23,6 +23,7 @@ import static io.sundr.dsl.internal.utils.TypeDefUtils.executableToInterface;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.isVoid;
 import static org.junit.Assert.assertEquals;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,12 +36,17 @@ import javax.lang.model.util.Types;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.sun.tools.javac.comp.Modules;
+import com.sun.tools.javac.file.JavacFileManager;
+import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.model.JavacElements;
 import com.sun.tools.javac.model.JavacTypes;
 import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.util.Options;
 
 import io.sundr.dsl.internal.processor.DslContext;
 import io.sundr.dsl.internal.type.functions.Combine;
@@ -51,10 +57,10 @@ import io.sundr.model.TypeDefBuilder;
 
 public class TypeDefUtilsTest {
 
-  private final Context context = new Context();
-  private final Elements elements = JavacElements.instance(context);
-  private final Types types = JavacTypes.instance(context);
-  private final DslContext dslContext = new DslContext(elements, types);
+  private Context context = new Context();
+  private Elements elements;
+  private Types types;
+  private DslContext dslContext;
   private final TypeDef STRING = new TypeDefBuilder().withPackageName("java.lang").withName("String").build();
   private final TypeDef INTEGER = new TypeDefBuilder().withPackageName("java.lang").withName("Integer").build();
   private final TypeDef LONG = new TypeDefBuilder().withPackageName("java.lang").withName("Long").build();
@@ -62,7 +68,20 @@ public class TypeDefUtilsTest {
   @BeforeClass
   public static void setupClass() {
     String version = System.getProperty("java.specification.version");
-    Assume.assumeTrue(version.trim().startsWith("1.8"));
+    Assume.assumeTrue(version.trim().startsWith("11"));
+  }
+
+  @Before
+  public void setup() {
+    var options = Options.instance(context);
+    new JavacFileManager(context, true, StandardCharsets.UTF_8);
+    options.put("-source", "1.8");
+    Modules modules = Modules.instance(context);
+    modules.initModules(com.sun.tools.javac.util.List.nil());
+    elements = JavacElements.instance(context);
+    types = JavacTypes.instance(context);
+    JavaCompiler.instance(context).enterDone();
+    dslContext = new DslContext(elements, types);
   }
 
   @Test
