@@ -17,10 +17,10 @@
 
 package io.sundr.codegen.apt;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.Paths;
 import java.util.function.Function;
 
@@ -62,9 +62,16 @@ public class TypeDefAptOutput implements Output<TypeDef> {
         String fqcn = Strings.isNullOrEmpty(pkg) ? name : pkg + "." + name;
 
         FileObject fileObject = filer.getResource(StandardLocation.SOURCE_OUTPUT, pkg, name + ".java");
-        File file = Paths.get(fileObject.toUri()).toFile();
+        boolean exists = false;
+        try {
+          exists = Paths.get(fileObject.toUri()).toFile().exists();
+        } catch (FileSystemNotFoundException fileSystemNotFoundException) {
+          if (!"Provider \"mem\" not installed".equals(fileSystemNotFoundException.getMessage())) {
+            throw fileSystemNotFoundException;
+          }
+        }
         //If file exists just send output to /dev/null
-        return file.exists() ? DEV_NULL : filer.createSourceFile(fqcn).openWriter();
+        return exists ? DEV_NULL : filer.createSourceFile(fqcn).openWriter();
       } catch (IOException e) {
         throw SundrException.launderThrowable(e);
       }
