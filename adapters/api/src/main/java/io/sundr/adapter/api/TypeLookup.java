@@ -27,11 +27,21 @@ public interface TypeLookup<T> {
 
   public static Optional<TypeDef> lookup(String fullyQualifiedName, AdapterContextAware context) {
     return StreamSupport.stream(ServiceLoader.load(TypeLookup.class, TypeLookup.class.getClassLoader()).spliterator(), false)
+        .filter(TypeLookup::isAvailable)
         .map(l -> l.forName(fullyQualifiedName))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .map(t -> Adapters.adaptType(t, context))
         .findFirst();
+  }
+
+  /**
+   * Checks if the lookup is available.
+   * 
+   * @return True if the lookup is available, false otherwise.
+   */
+  default boolean isAvailable() {
+    return true;
   }
 
   /**
