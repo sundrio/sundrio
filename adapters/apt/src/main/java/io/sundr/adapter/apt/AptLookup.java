@@ -26,6 +26,15 @@ import io.sundr.adapter.api.TypeLookup;
 public class AptLookup implements TypeLookup<TypeElement> {
 
   @Override
+  public boolean isAvailable() {
+    try {
+      return AptContext.getContext() != null;
+    } catch (Throwable t) {
+      return false;
+    }
+  }
+
+  @Override
   public Optional<TypeElement> forName(String fullyQualifiedName) {
     return Optional.ofNullable(AptContext.getContext().getElements().getTypeElement(fullyQualifiedName));
   }
