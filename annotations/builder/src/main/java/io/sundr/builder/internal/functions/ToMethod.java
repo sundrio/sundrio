@@ -377,7 +377,7 @@ class ToMethod {
                 new This().property("_visitables").call("remove", ValueRef.from(field.getName())),
                 new Return(Expression.cast(returnType, new This()))),
             new Block(new Declare(builder, Expression.newCall("builder", property.toReference())),
-                new This().property("_visitables").call("clear"),
+                new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("clear"),
                 new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("add",
                     builder.toReference()),
                 new This().property(field).assign(builder), new Return(Expression.cast(returnType, new This())))));
