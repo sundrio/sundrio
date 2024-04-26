@@ -37,7 +37,7 @@ public interface TypeLookup<T> {
 
   /**
    * Checks if the lookup is available.
-   * 
+   *
    * @return True if the lookup is available, false otherwise.
    */
   default boolean isAvailable() {
