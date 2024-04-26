@@ -95,12 +95,6 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   private List<RemoteRepository> aetherRemoteRepositories;
 
   /**
-   * Location of the localRepository repository.
-   */
-  @Parameter(defaultValue = "${localRepository}", readonly = true, required = true)
-  private ArtifactRepository localRepository;
-
-  /**
    * List of Remote Repositories used by the resolver
    */
   @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true, required = true)
@@ -498,7 +492,8 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
     ArtifactResolutionRequest request = new ArtifactResolutionRequest();
     request.setArtifact(getProject().getArtifact());
     request.setArtifactDependencies(dependencies);
-    request.setLocalRepository(localRepository);
+
+    request.setLocalRepository(getSession().getLocalRepository());
     request.setRemoteRepositories(remoteRepositories);
     request.setManagedVersionMap(getProject().getManagedVersionMap());
     request.setResolveTransitively(true);
