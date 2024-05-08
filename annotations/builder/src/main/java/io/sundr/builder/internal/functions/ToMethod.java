@@ -20,6 +20,8 @@ import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
 import static io.sundr.builder.Constants.GENERIC_TYPE_REF;
 import static io.sundr.builder.Constants.INDEX;
+import static io.sundr.builder.Constants.INIT_EXPRESSION;
+import static io.sundr.builder.Constants.INIT_EXPRESSION_FUNCTION;
 import static io.sundr.builder.Constants.OUTER_TYPE;
 import static io.sundr.builder.internal.functions.TypeAs.ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.BOXED_OF;
@@ -32,7 +34,6 @@ import static io.sundr.builder.internal.functions.TypeAs.combine;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
-import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.INIT_FUNCTION;
 import static io.sundr.model.Attributeable.LAZY_INIT;
 import static io.sundr.model.Expression.call;
@@ -429,21 +430,22 @@ class ToMethod {
     TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
     String methodName = "with" + property.getNameCapitalized();
     String fieldName = property.getName();
-    String optionalSource = fieldName; //The expression we assign to the field (from optional if applicable).
-    String source = fieldName; //The expression we assign to the field from no optional.
-    String prepareSource = "";
-    String prepareOptionalSource = "";
+    Expression sourceRef = property.toReference();
     ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
 
-    if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
-      prepareSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName + "); _visitables.get(\""
-          + fieldName + "\").add(b);";
-      prepareOptionalSource = builder.getName() + " b = new " + builder.getName() + "(" + fieldName
-          + ".get()); _visitables.get(\"" + fieldName + "\").add(b);";
-      optionalSource = "Optional.of(b)";
-      source = "b";
-    }
     Property b = Property.newProperty(builder, "b");
+    Block prepareBlock;
+    if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
+      prepareBlock = new Block(
+          new Declare(b, Expression.createNew(builder, sourceRef)),
+          Property.newProperty("_visitables").toReference().call("get", ValueRef.from(fieldName)).call("add", b.toReference()),
+          new This().property(property)
+              .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.singletonList(b.toReference()))));
+    } else {
+      prepareBlock = new Block(new This().property(property)
+          .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.singletonList(sourceRef))));
+    }
+
     methods.add(
         new MethodBuilder()
             .withNewModifiers().withPublic().endModifiers()
@@ -466,15 +468,17 @@ class ToMethod {
             .endBlock()
             .build());
 
-    Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped)
-        .build();
+    Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped).build();
     methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withName(methodName)
         .withReturnType(returnType).withArguments(genericProperty).withNewBlock()
-        .addNewStringStatementStatement("if (" + fieldName + " == null) { this." + fieldName + " = "
-            + property.getAttribute(INIT) + "; } else {" + prepareSource + " this." + fieldName + " = "
-            + property.getAttribute(INIT_FUNCTION).apply(Collections.singletonList(source)) + "; } return (" + returnType
-            + ") this;")
-        .endBlock().build());
+        .withStatements(new If(property.toReference().isNull(),
+            // Then
+            new This().property(fieldName).assign(property.getAttribute(INIT_EXPRESSION)),
+            // Else
+            prepareBlock),
+            new Return(Expression.cast(returnType, new This())))
+        .endBlock()
+        .build());
 
     return methods;
   });

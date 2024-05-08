@@ -19,6 +19,7 @@ package io.sundr.builder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.sundr.builder.annotations.Buildable;
@@ -28,6 +29,7 @@ import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Expression;
 import io.sundr.model.Kind;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
@@ -79,6 +81,12 @@ public class Constants {
 
   public static final AttributeKey<ExternalBuildables> EXTERNAL_BUILDABLE = new AttributeKey<ExternalBuildables>(
       "EXTERNAL_BUILDABLE", ExternalBuildables.class);
+
+  public static final AttributeKey<Expression> INIT_EXPRESSION = new AttributeKey<Expression>("INIT_EXPRESSION",
+      Expression.class);
+
+  public static final AttributeKey<Function<List<Expression>, Expression>> INIT_EXPRESSION_FUNCTION = new AttributeKey<Function<List<Expression>, Expression>>(
+      "INIT_EXPRESSION_FUNCTION", Function.class);
 
   public static final AnnotationRef BUILDABLE_ANNOTATION = new AnnotationRefBuilder()
       .withNewClassRef()

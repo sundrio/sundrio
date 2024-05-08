@@ -18,6 +18,8 @@ package io.sundr.builder.internal.visitors;
 
 import static io.sundr.builder.Constants.DESCENDANTS;
 import static io.sundr.builder.Constants.DESCENDANT_OF;
+import static io.sundr.builder.Constants.INIT_EXPRESSION;
+import static io.sundr.builder.Constants.INIT_EXPRESSION_FUNCTION;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
@@ -30,12 +32,18 @@ import static io.sundr.model.utils.Types.isAbstract;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 import io.sundr.builder.Visitor;
 import io.sundr.builder.internal.functions.Construct;
+import io.sundr.builder.internal.functions.ToConstructExpression;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Expression;
 import io.sundr.model.Kind;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
@@ -93,6 +101,11 @@ public class InitEnricher implements Visitor<PropertyBuilder> {
     boolean isOptionalDouble = Types.isOptionalDouble(typeRef);
     boolean isOptionalLong = Types.isOptionalLong(typeRef);
 
+    boolean lazyCollectionsInitEnabled = builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED)
+        && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED);
+    boolean lazyMapInitEnabled = builder.getAttributes().containsKey(LAZY_MAP_INIT_ENABLED)
+        && (Boolean) builder.getAttributes().get(LAZY_MAP_INIT_ENABLED);
+
     if (isArray || isList) {
       ClassRef listRef = isArray || isAbstractList
           ? Collections.ARRAY_LIST.toReference(targetType)
@@ -110,11 +123,10 @@ public class InitEnricher implements Visitor<PropertyBuilder> {
           .build();
 
       builder.addToAttributes(LAZY_INIT, "new " + listRef + "()")
-          .addToAttributes(INIT,
-              builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED)
-                  && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null
-                      : builder.getAttributes().get(LAZY_INIT))
+          .addToAttributes(INIT, lazyCollectionsInitEnabled ? null : builder.getAttributes().get(LAZY_INIT))
+          .addToAttributes(INIT_EXPRESSION, lazyCollectionsInitEnabled ? null : Expression.createNew(listRef))
           .addToAttributes(INIT_FUNCTION, new Construct(listDef, targetType))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(listDef, targetType))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, listRef));
     } else if (isSet) {
       ClassRef setRef = isAbstractSet
@@ -133,11 +145,10 @@ public class InitEnricher implements Visitor<PropertyBuilder> {
           .build();
 
       builder.addToAttributes(LAZY_INIT, "new " + setRef + "()")
-          .addToAttributes(INIT,
-              builder.getAttributes().containsKey(LAZY_COLLECTIONS_INIT_ENABLED)
-                  && (Boolean) builder.getAttributes().get(LAZY_COLLECTIONS_INIT_ENABLED) ? null
-                      : builder.getAttributes().get(LAZY_INIT))
+          .addToAttributes(INIT, lazyCollectionsInitEnabled ? null : builder.getAttributes().get(LAZY_INIT))
+          .addToAttributes(INIT_EXPRESSION, lazyCollectionsInitEnabled ? null : Expression.createNew(setRef))
           .addToAttributes(INIT_FUNCTION, new Construct(setDef, unwrapped))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(setDef, targetType))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, setRef));
     } else if (isMap) {
       ClassRef mapRef = isAbstractMap
@@ -156,32 +167,39 @@ public class InitEnricher implements Visitor<PropertyBuilder> {
           .build();
 
       builder.addToAttributes(LAZY_INIT, "new " + mapRef + "()")
-          .addToAttributes(INIT,
-              builder.getAttributes().containsKey(LAZY_MAP_INIT_ENABLED)
-                  && (Boolean) builder.getAttributes().get(LAZY_MAP_INIT_ENABLED) ? null
-                      : builder.getAttributes().get(LAZY_INIT))
+          .addToAttributes(INIT, lazyMapInitEnabled ? null : builder.getAttributes().get(LAZY_INIT))
+          .addToAttributes(INIT_EXPRESSION, lazyMapInitEnabled ? null : Expression.createNew(mapRef))
           .addToAttributes(INIT_FUNCTION, new Construct(mapDef, arguments))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(mapDef, targetType))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, mapRef));
     } else if (isOptional) {
       final ClassRef ref = new ClassRefBuilder(Optionals.OPTIONAL.toReference()).withArguments(java.util.Collections.EMPTY_LIST)
           .build();
       builder.addToAttributes(INIT, "Optional.empty()")
+          .addToAttributes(INIT_EXPRESSION, Expression.call(Optional.class, "empty"))
           .addToAttributes(INIT_FUNCTION, new Construct(Optionals.OPTIONAL, targetType, "of"))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(Optionals.OPTIONAL, targetType, "of"))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
     } else if (isOptionalDouble) {
       final ClassRef ref = Optionals.OPTIONAL_DOUBLE.toReference();
       builder.addToAttributes(INIT, "OptionalDouble.empty()")
+          .addToAttributes(INIT_EXPRESSION, Expression.call(OptionalDouble.class, "empty"))
           .addToAttributes(INIT_FUNCTION, new Construct(Optionals.OPTIONAL_DOUBLE, targetType, "of"))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(Optionals.OPTIONAL_DOUBLE, targetType, "of"))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
     } else if (isOptionalInt) {
       final ClassRef ref = Optionals.OPTIONAL_INT.toReference();
       builder.addToAttributes(INIT, "OptionalInt.empty()")
+          .addToAttributes(INIT_EXPRESSION, Expression.call(OptionalInt.class, "empty"))
           .addToAttributes(INIT_FUNCTION, new Construct(Optionals.OPTIONAL_INT, targetType, "of"))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(Optionals.OPTIONAL_INT, targetType, "of"))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
     } else if (isOptionalLong) {
       final ClassRef ref = Optionals.OPTIONAL_LONG.toReference();
       builder.addToAttributes(INIT, "OptionalLong.empty()")
+          .addToAttributes(INIT_EXPRESSION, Expression.call(OptionalLong.class, "empty"))
           .addToAttributes(INIT_FUNCTION, new Construct(Optionals.OPTIONAL_LONG, targetType, "of"))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(Optionals.OPTIONAL_LONG, targetType, "of"))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, ref));
     }
   }
