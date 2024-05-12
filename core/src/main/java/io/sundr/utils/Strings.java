@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,7 @@ public final class Strings {
   private static String NEWLINE_PATTERN = "\n|\r";
 
   public static final class ToString<X> implements Function<X, String> {
+    @Override
     public String apply(X item) {
       return String.valueOf(item);
     }
@@ -143,6 +145,7 @@ public final class Strings {
 
   public static String getPrefix(Iterable<String> items) {
     return getPrefix(items, new Function<String, String>() {
+      @Override
       public String apply(String item) {
         return item;
       }
@@ -213,13 +216,18 @@ public final class Strings {
    * Remove repeating strings that are appearing in the name.
    * This is done by splitting words (camel case) and using each word once.
    *
-   * @param name The name to compact.
    * @return The compact name.
    */
-  public static final String compact(String name) {
-    Set<String> parts = new LinkedHashSet<String>();
-    for (String part : name.split(SPLITTER_REGEX)) {
-      parts.add(part);
+  public static final String compact(String main, String... other) {
+    List<String> parts = new ArrayList<String>();
+    parts.add(main);
+    Set<String> seen = new HashSet<>(Arrays.asList(main.split(SPLITTER_REGEX)));
+    String[] otherParts = join(other, "").split(SPLITTER_REGEX);
+
+    for (String part : otherParts) {
+      if (seen.add(part)) {
+        parts.add(part);
+      }
     }
     return join(parts, "");
   }
@@ -244,56 +252,7 @@ public final class Strings {
    * @return The safe field name.
    */
   public static final String toFieldName(String name) {
-    return compact(prefixKeywords(name));
-  }
-
-  /**
-   * Converts the given string to camelCase format.
-   * <p>
-   * This method takes a string input and converts it to camelCase format,
-   * where each word in the input string is capitalized (except the first word)
-   * and concatenated together without spaces. Non-alphanumeric characters are treated as word separators.
-   * <p>
-   * If the input string is {@code null}, {@code null} is returned.
-   * If the input string is empty or contains only non-alphanumeric characters, an empty string is returned.
-   * <p>
-   * For example:
-   *
-   * <pre>{@code
-   * camelCase("helloWorld") returns "helloWorld"
-   * camelCase("hello_world") returns "helloWorld"
-   * camelCase("hello world") returns "helloWorld"
-   * camelCase("foo-bar-baz") returns "fooBarBaz"
-   * camelCase("123_456_789") returns "123456789"
-   * camelCase("   ") returns ""
-   * camelCase(null) returns null
-   * }</pre>
-   *
-   * @param name the string to convert to camelCase
-   * @return the input string converted to camelCase format, or {@code null} if the input string is {@code null},
-   *         or an empty string if the input string is empty or contains only non-alphanumeric characters
-   */
-  public static final String camelCase(String name) {
-    if (name == null) {
-      return null;
-    } else if (name.isEmpty() || name.trim().isEmpty()) {
-      return "";
-    }
-    String[] parts = name.split("[^a-zA-Z0-9]");
-    if (parts.length == 0) {
-      return null;
-    }
-    StringBuilder builder = new StringBuilder();
-    for (int i = 0; i < parts.length; i++) {
-      String word = parts[i];
-      if (i == 0 || builder.toString().isEmpty()) {
-        word = word.isEmpty() ? word : word.substring(0, 1).toLowerCase() + word.substring(1);
-      } else {
-        word = word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1).toLowerCase();
-      }
-      builder.append(word);
-    }
-    return builder.toString();
+    return prefixKeywords(name);
   }
 
   /**

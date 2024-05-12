@@ -192,7 +192,7 @@ public class Combine {
 
       final String prefix = Strings.getPrefix(types, toString);
 
-      return toInterfaceName(prefix + Strings.compact(Strings.join(types, new Function<TypeDef, String>() {
+      return toInterfaceName(prefix + Strings.compact("", Strings.join(types, new Function<TypeDef, String>() {
         public String apply(TypeDef item) {
           String str = stripPrefix(stripSuffix(item.getName()));
           if (str.length() > prefix.length()) {
@@ -215,7 +215,7 @@ public class Combine {
 
       final String prefix = Strings.getPrefix(types, toString);
 
-      return toInterfaceName(prefix + Strings.compact(Strings.join(types, new Function<ClassRef, String>() {
+      return toInterfaceName(prefix + Strings.compact("", Strings.join(types, new Function<ClassRef, String>() {
         public String apply(ClassRef item) {
           String str = stripPrefix(stripSuffix(item.getName()));
           if (str.length() > prefix.length()) {

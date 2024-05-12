@@ -110,7 +110,7 @@ public class Descendants {
                     .withArguments(descendantRef)
                     .build();
 
-                String propertyName = compact(deCapitalizeFirst(descendant.getName()) + property.getNameCapitalized());
+                String propertyName = compact(deCapitalizeFirst(descendant.getName()), property.getNameCapitalized());
                 result.add(new PropertyBuilder(property)
                     .withName(propertyName)
                     .withTypeRef(collectionType)
@@ -141,7 +141,7 @@ public class Descendants {
                     .withArguments(TypeAs.UNWRAP_MAP_KEY_OF.apply(baseType), descendantRef)
                     .build();
 
-                String propertyName = compact(deCapitalizeFirst(descendant.getName()) + property.getNameCapitalized());
+                String propertyName = compact(deCapitalizeFirst(descendant.getName()), property.getNameCapitalized());
                 result.add(new PropertyBuilder(property)
                     .withName(propertyName)
                     .withTypeRef(mapType)
@@ -165,7 +165,7 @@ public class Descendants {
                 continue;
               }
 
-              String propertyName = compact(deCapitalizeFirst(descendant.getName() + property.getNameCapitalized()));
+              String propertyName = compact(deCapitalizeFirst(descendant.getName()), property.getNameCapitalized());
               result.add(new PropertyBuilder(property)
                   .withName(propertyName)
                   .withTypeRef(descendantRef)

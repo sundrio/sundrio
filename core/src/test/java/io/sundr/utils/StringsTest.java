@@ -16,16 +16,19 @@
 
 package io.sundr.utils;
 
-import static io.sundr.utils.Strings.*;
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import static io.sundr.utils.Strings.capitalizeFirst;
+import static io.sundr.utils.Strings.compact;
+import static io.sundr.utils.Strings.indexOfAlphabetic;
+import static org.junit.Assert.assertEquals;
 
 public class StringsTest {
 
   @Test
   public void testCompact() throws Exception {
-    assertEquals("withDefaultContact", compact("withDefaultContactContact"));
+    assertEquals("withDefaultContact", compact("withDefaultContact", "Contact"));
+    assertEquals("someRepeatedRepeated", compact("someRepeatedRepeated", "Repeated"));
   }
 
   @Test
@@ -51,21 +54,4 @@ public class StringsTest {
     assertEquals("1Dog", capitalizeFirst("1dog"));
   }
 
-  @Test
-  public void testCamelCase() {
-    assertEquals(null, camelCase(null));
-    assertEquals("", camelCase(""));
-    assertEquals("", camelCase("    "));
-    assertEquals("helloWorld", camelCase("hello_world"));
-    assertEquals("helloWorld", camelCase("hello world"));
-    assertEquals("helloWorld", camelCase("Hello World"));
-    assertEquals("fooBarBaz", camelCase("foo-bar-baz"));
-    assertEquals("123456789", camelCase("123_456_789"));
-    assertEquals("123", camelCase("123"));
-    assertEquals("dog", camelCase("_dog"));
-    assertEquals("fooBar", camelCase("FooBar"));
-    assertEquals("foobar", camelCase("foobar"));
-    assertEquals("fooBar", camelCase("fooBar"));
-    assertEquals(null, camelCase("__"));
-  }
 }

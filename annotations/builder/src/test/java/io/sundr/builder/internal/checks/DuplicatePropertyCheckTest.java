@@ -10,7 +10,7 @@ import io.sundr.model.utils.Types;
 /**
  * DublicatePropertyCheckTest
  */
-public class DublicatePropertyCheckTest {
+public class DuplicatePropertyCheckTest {
 
   @Test(expected = IllegalStateException.class)
   public void shouldThrowException() {
@@ -26,7 +26,25 @@ public class DublicatePropertyCheckTest {
         .withName("my_property")
         .withTypeRef(Types.STRING_REF)
         .endProperty()
-        .accept(new DublicatePropertyCheck())
+        .accept(new DuplicatePropertyCheck())
+        .build();
+  }
+  
+  @Test
+  public void shouldNotThrowExceptionWithEnum() {
+    new TypeDefBuilder()
+        .withPackageName("my.pkg")
+        .withName("SomeEnum")
+        .withKind(Kind.ENUM)
+        .addNewProperty()
+        .withName("myProperty")
+        .withTypeRef(Types.STRING_REF)
+        .endProperty()
+        .addNewProperty()
+        .withName("my_property")
+        .withTypeRef(Types.STRING_REF)
+        .endProperty()
+        .accept(new DuplicatePropertyCheck())
         .build();
   }
 }

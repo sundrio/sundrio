@@ -47,7 +47,7 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.checks.DublicatePropertyCheck;
+import io.sundr.builder.internal.checks.DuplicatePropertyCheck;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.api.CodeGenerator;
 import io.sundr.codegen.apt.TypeDefAptOutput;
@@ -117,7 +117,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());
 
             TypeDef b = new TypeDefBuilder(original)
-                .accept(new DublicatePropertyCheck(), new Visitor<PropertyBuilder>() {
+                .accept(new DuplicatePropertyCheck(), new Visitor<PropertyBuilder>() {
                   @Override
                   public void visit(PropertyBuilder builder) {
                     if (isBuildable) {
@@ -168,7 +168,7 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
               && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());
 
           TypeDef r = new TypeDefBuilder(original)
-              .accept(new DublicatePropertyCheck(), new Visitor<PropertyBuilder>() {
+              .accept(new DuplicatePropertyCheck(), new Visitor<PropertyBuilder>() {
                 @Override
                 public void visit(PropertyBuilder builder) {
                   if (isBuildable) {
