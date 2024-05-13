@@ -42,7 +42,7 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.checks.DublicatePropertyCheck;
+import io.sundr.builder.internal.checks.DuplicatePropertyCheck;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.lombok.AddLombokAllArgsConstructor;
 import io.sundr.builder.internal.visitors.lombok.AddLombokGetters;
@@ -80,7 +80,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
             .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
             .accept(new AddLombokAllArgsConstructor(), new AddLombokGetters(), new AddLombokSetters(),
-                new DublicatePropertyCheck(),
+                new DuplicatePropertyCheck(),
                 new Visitor<PropertyBuilder>() {
                   @Override
                   public void visit(PropertyBuilder builder) {
@@ -100,7 +100,7 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
               .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
               .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
               .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
-              .accept(new DublicatePropertyCheck(), new Visitor<PropertyBuilder>() {
+              .accept(new DuplicatePropertyCheck(), new Visitor<PropertyBuilder>() {
                 @Override
                 public void visit(PropertyBuilder builder) {
                   builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
