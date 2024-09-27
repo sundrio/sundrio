@@ -30,8 +30,7 @@
 
     <modules>
         <module>arrays</module>
-        <!-- TODO: Disabled until https://github.com/sundrio/sundrio/issues/170 is fixed -->
-<!--        <module>buildable-duplicates</module>-->
+        <module>buildable-duplicates</module>
         <module>buildable-fields</module>
         <module>buildable-pojos</module>
         <module>shapes</module>

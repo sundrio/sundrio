@@ -58,6 +58,7 @@ import io.sundr.utils.Strings;
 public class Combine {
 
   public static Function<Collection<ClassRef>, TypeDef> TYPEREFS = new Function<Collection<ClassRef>, TypeDef>() {
+    @Override
     public TypeDef apply(Collection<ClassRef> alternatives) {
       String key = createKeyForClasses(alternatives);
       if (combinations.containsKey(key)) {
@@ -121,6 +122,7 @@ public class Combine {
 
   public static Function<Collection<TypeDef>, TypeDef> TYPEDEFS = new Function<Collection<TypeDef>, TypeDef>() {
 
+    @Override
     public TypeDef apply(Collection<TypeDef> alternatives) {
       String key = createKeyForTypes(alternatives);
       if (combinations.containsKey(key)) {
@@ -182,32 +184,11 @@ public class Combine {
     }
   };
 
-  public static final Function<Collection<TypeDef>, String> TYPEDEFS_TO_NAME = new Function<Collection<TypeDef>, String>() {
-    public String apply(Collection<TypeDef> types) {
-      final Function<TypeDef, String> toString = new Function<TypeDef, String>() {
-        public String apply(TypeDef item) {
-          return stripSuffix(item.getName());
-        }
-      };
-
-      final String prefix = Strings.getPrefix(types, toString);
-
-      return toInterfaceName(prefix + Strings.compact("", Strings.join(types, new Function<TypeDef, String>() {
-        public String apply(TypeDef item) {
-          String str = stripPrefix(stripSuffix(item.getName()));
-          if (str.length() > prefix.length()) {
-            return str.substring(prefix.length());
-          } else {
-            return str;
-          }
-        }
-      }, "")));
-    }
-  };
-
   public static final Function<Collection<ClassRef>, String> CLASSREFS_TO_NAME = new Function<Collection<ClassRef>, String>() {
+    @Override
     public String apply(Collection<ClassRef> types) {
       final Function<ClassRef, String> toString = new Function<ClassRef, String>() {
+        @Override
         public String apply(ClassRef item) {
           return stripSuffix(item.getName());
         }
@@ -216,6 +197,7 @@ public class Combine {
       final String prefix = Strings.getPrefix(types, toString);
 
       return toInterfaceName(prefix + Strings.compact("", Strings.join(types, new Function<ClassRef, String>() {
+        @Override
         public String apply(ClassRef item) {
           String str = stripPrefix(stripSuffix(item.getName()));
           if (str.length() > prefix.length()) {
@@ -230,6 +212,7 @@ public class Combine {
 
   public static final Function<List<ClassRef>, String> CLASSREFS_TO_PACKAGE = new Function<List<ClassRef>, String>() {
 
+    @Override
     public String apply(List<ClassRef> types) {
       Iterator<ClassRef> iterator = types.iterator();
       if (iterator.hasNext()) {
@@ -328,11 +311,13 @@ public class Combine {
   private static String createKeyForTypes(Collection<TypeDef> alternatives) {
     List<TypeDef> clazzes = new LinkedList<TypeDef>(alternatives);
     Collections.sort(clazzes, new Comparator<TypeDef>() {
+      @Override
       public int compare(TypeDef left, TypeDef right) {
         return left.getFullyQualifiedName().compareTo(right.getFullyQualifiedName());
       }
     });
     return Strings.join(clazzes, new Function<TypeDef, String>() {
+      @Override
       public String apply(TypeDef item) {
         return item.getFullyQualifiedName();
       }
