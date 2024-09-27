@@ -276,6 +276,7 @@ class ToMethod {
 
   static final Function<Property, Method> WITH = FunctionFactory.cache(new Function<Property, Method>() {
 
+    @Override
     public Method apply(Property property) {
       TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
       String methodName = "with" + property.getNameCapitalized();
@@ -296,7 +297,6 @@ class ToMethod {
 
     private List<Statement> getStatements(Property property, List<ClassRef> alsoImport) {
       TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
-      String argumentName = property.getName();
       String fieldName = property.getName();
       TypeRef type = property.getTypeRef();
       TypeRef unwrapped = combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(property.getTypeRef());
@@ -358,7 +358,6 @@ class ToMethod {
 
       if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
-        String builderClass = builder.getFullyQualifiedName();
         statements.add(new If(property.toReference().notNull(),
             new Block(new This().property(property).assignNew(builder, property.toReference()),
                 new This().property("_visitables").call("get", ValueRef.from(property.getName())).call("add",
@@ -455,7 +454,7 @@ class ToMethod {
             .withNewBlock()
             .withStatements(
                 new If(property.toReference().isNull().or(property.toReference().call("isPresent").not()),
-                    new This().property(property).assign(Expression.call((ClassRef) property.getTypeRef(), "empty")),
+                    new This().property(property).assign(Expression.call(property.getTypeRef(), "empty")),
 
                     isBuildable(unwrapped) && !isAbstract(unwrapped)
                         ? new Block(
@@ -698,6 +697,7 @@ class ToMethod {
 
   static final Function<Property, List<Method>> ADD_TO_COLLECTION = FunctionFactory
       .cache(new Function<Property, List<Method>>() {
+        @Override
         public List<Method> apply(final Property property) {
           List<Method> methods = new ArrayList<>();
           TypeRef baseType = UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
@@ -848,12 +848,13 @@ class ToMethod {
 
   static final Function<Property, List<Method>> REMOVE_FROM_COLLECTION = FunctionFactory
       .cache(new Function<Property, List<Method>>() {
+        @Override
         public List<Method> apply(final Property property) {
           List<Method> methods = new ArrayList<>();
           ClassRef baseType = (ClassRef) UNWRAP_COLLECTION_OF.apply(property.getTypeRef());
           TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
-          TypeRef builderType = VISITABLE_BUILDER_REF.apply((ClassRef) baseType);
+          TypeRef builderType = VISITABLE_BUILDER_REF.apply(baseType);
           Property builderProperty = new PropertyBuilder(property).withName("builder").withTypeRef(builderType).build();
 
           TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
@@ -1537,6 +1538,7 @@ class ToMethod {
   }
 
   static final Function<Property, Method> AND = new Function<Property, Method>() {
+    @Override
     public Method apply(Property property) {
       String classPrefix = getClassPrefix(property);
 
