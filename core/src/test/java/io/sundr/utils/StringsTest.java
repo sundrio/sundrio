@@ -16,12 +16,12 @@
 
 package io.sundr.utils;
 
-import org.junit.Test;
-
 import static io.sundr.utils.Strings.capitalizeFirst;
 import static io.sundr.utils.Strings.compact;
 import static io.sundr.utils.Strings.indexOfAlphabetic;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class StringsTest {
 
