@@ -29,7 +29,7 @@ public class DuplicatePropertyCheckTest {
         .accept(new DuplicatePropertyCheck())
         .build();
   }
-  
+
   @Test
   public void shouldNotThrowExceptionWithEnum() {
     new TypeDefBuilder()

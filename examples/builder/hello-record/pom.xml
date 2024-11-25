@@ -33,8 +33,11 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <source>17</source>
+                    <target>17</target>
+                    <compilerArgs>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>
