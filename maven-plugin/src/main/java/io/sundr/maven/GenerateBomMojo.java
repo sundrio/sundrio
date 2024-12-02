@@ -71,7 +71,7 @@ import io.sundr.maven.filter.ExcludesFilter;
 import io.sundr.maven.filter.Filters;
 import io.sundr.maven.filter.IncludesFilter;
 
-@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VALIDATE)
+@Mojo(name = "generate-bom", inheritByDefault = false, defaultPhase = LifecyclePhase.VALIDATE, threadSafe = true)
 public class GenerateBomMojo extends AbstractSundrioMojo {
 
   private static final Set<String> GENERATED_ARTIFACT_IDS = Collections.synchronizedSet(new HashSet<String>());
