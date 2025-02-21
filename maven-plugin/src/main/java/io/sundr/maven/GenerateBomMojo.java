@@ -179,7 +179,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
           .putAll(toDependencyMap(Filters.filter(allDependencies, Filters.createDependencyFilter(getSession(), config))));
 
       //Populate dependencies with imported boms.
-      ExternalBomResolver bomResolver = new ExternalBomResolver(getSession(), getArtifactHandler(), aetherSystem, aetherSession,
+      ExternalBomResolver bomResolver = new ExternalBomResolver(getSession(), aetherSystem, aetherSession,
           aetherRemoteRepositories, getLog());
       Map<Artifact, Dependency> externalDependencies = bomResolver.resolve(config);
       dependencies.putAll(externalDependencies);
@@ -393,6 +393,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
           projectIndex, Thread.currentThread().getContextClassLoader(),
           reactorBuildStatus, builder);
       List<TaskSegment> segments = segmentCalculator.calculateTaskSegments(session);
+
       for (TaskSegment segment : segments) {
         builder.buildProject(session, reactorContext, project, filterSegment(segment, goals));
       }
@@ -502,14 +503,15 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   }
 
   private Artifact toArtifact(Dependency dependency) {
-    return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
-        dependency.getScope(), dependency.getType(), dependency.getClassifier(),
-        getArtifactHandler());
+    return ArtifactHandlerUtil
+        .newArtifact(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
+            dependency.getScope(), dependency.getType(), dependency.getClassifier());
   }
 
   private Artifact toArtifact(Plugin plugin) {
-    return new DefaultArtifact(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null,
-        Constants.MAVEN_PLUGIN_TYPE, null, getArtifactHandler());
+    return ArtifactHandlerUtil
+        .newArtifact(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null,
+            Constants.MAVEN_PLUGIN_TYPE, null);
   }
 
   private static Map<Artifact, Dependency> toDependencyMap(Collection<Artifact> artifacts) {
@@ -556,7 +558,9 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
         filtered.add(obj);
       }
     }
-    return new TaskSegment(segment.isAggregating(), filtered.toArray());
+    TaskSegment taskSegment = new TaskSegment(segment.isAggregating());
+    taskSegment.getTasks().addAll(filtered);
+    return taskSegment;
   }
 
   private static void preProccessConfig(BomConfig config) {
