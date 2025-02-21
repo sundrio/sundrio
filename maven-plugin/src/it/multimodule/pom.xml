@@ -275,6 +275,12 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <!-- override version from parent pom, as 1.0 breaks newer maven versions -->
+            </plugin>
         </plugins>
     </build>
 
