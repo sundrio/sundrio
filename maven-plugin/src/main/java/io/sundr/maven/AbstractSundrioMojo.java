@@ -21,8 +21,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
@@ -31,7 +29,6 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.invoker.DefaultInvocationRequest;
@@ -64,19 +61,12 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
   @Parameter(defaultValue = "${altDeploymentRepository}", readonly = true, required = false)
   private String altDeploymentRepository;
 
-  @Component
-  private ArtifactHandler artifactHandler;
-
   public MavenProject getProject() {
     return project;
   }
 
   public MavenSession getSession() {
     return session;
-  }
-
-  public ArtifactHandler getArtifactHandler() {
-    return artifactHandler;
   }
 
   MavenProject readProject(File pomFile) throws IOException {
@@ -102,10 +92,7 @@ public abstract class AbstractSundrioMojo extends AbstractMojo {
 
   Artifact createArtifact(File file, String groupId, String artifactId, String version, String scope, String type,
       String classifier) {
-    DefaultArtifact artifact = new DefaultArtifact(groupId, artifactId, version, scope, type, classifier, artifactHandler);
-    artifact.setFile(file);
-    artifact.setResolved(true);
-    return artifact;
+    return ArtifactHandlerUtil.newArtifact(groupId, artifactId, version, scope, type, classifier);
   }
 
   void backGroundBuild(MavenProject project) throws MojoExecutionException {
