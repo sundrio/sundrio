@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
@@ -44,8 +43,6 @@ public class ExternalBomResolver {
 
   private MavenSession mavenSession;
 
-  private ArtifactHandler artifactHandler;
-
   private RepositorySystem system;
 
   private RepositorySystemSession session;
@@ -54,10 +51,9 @@ public class ExternalBomResolver {
 
   private Log logger;
 
-  public ExternalBomResolver(MavenSession mavenSession, ArtifactHandler artifactHandler, RepositorySystem system,
+  public ExternalBomResolver(MavenSession mavenSession, RepositorySystem system,
       RepositorySystemSession session, List<RemoteRepository> remoteRepositories, Log logger) {
     this.mavenSession = mavenSession;
-    this.artifactHandler = artifactHandler;
     this.system = system;
     this.session = session;
     this.remoteRepositories = remoteRepositories;
@@ -157,9 +153,9 @@ public class ExternalBomResolver {
 
   private Artifact toMavenArtifact(org.eclipse.aether.graph.Dependency dependency) {
     org.eclipse.aether.artifact.Artifact sa = dependency.getArtifact();
-    Artifact a = new DefaultArtifact(sa.getGroupId(), sa.getArtifactId(), sa.getVersion(), dependency.getScope(),
-        sa.getExtension(), sa.getClassifier(), artifactHandler);
-    return a;
+    return ArtifactHandlerUtil.newArtifact(
+        sa.getGroupId(), sa.getArtifactId(), sa.getVersion(), dependency.getScope(),
+        sa.getExtension(), sa.getClassifier());
   }
 
 }

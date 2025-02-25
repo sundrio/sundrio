@@ -32,6 +32,7 @@ public class ReactorContextFactory {
   private static ComparableVersion VERSION_3_3_0 = new ComparableVersion("3.3.0");
   private static ComparableVersion VERSION_3_8_5 = new ComparableVersion("3.8.5");
   private static ComparableVersion VERSION_3_9_0 = new ComparableVersion("3.9.0");
+  private static ComparableVersion VERSION_4_0_0 = new ComparableVersion("4.0.0-alpha-3");
 
   private final ComparableVersion version;
 
@@ -48,8 +49,10 @@ public class ReactorContextFactory {
       context = create_3_2_x(result, index, classLoader, status);
     } else if (version.compareTo(VERSION_3_9_0) < 0) {
       context = create_3_3_x(result, index, classLoader, status, builder);
-    } else {
+    } else if (version.compareTo(VERSION_4_0_0) < 0) {
       context = create_3_9_x(result, index, classLoader, status, builder);
+    } else {
+      context = create_4_0_x(result, classLoader, status);
     }
 
     if (context == null) {
@@ -86,6 +89,16 @@ public class ReactorContextFactory {
     try {
       Constructor<ReactorContext> constructor = (Constructor<ReactorContext>) ReactorContext.class.getDeclaredConstructors()[0];
       return constructor.newInstance(result, index, classLoader, status);
+    } catch (Throwable t) {
+      throw new RuntimeException("Could not create ReactorContext.", t);
+    }
+  }
+
+  private static ReactorContext create_4_0_x(MavenExecutionResult result, ClassLoader classLoader,
+      ReactorBuildStatus status) {
+    try {
+      Constructor<ReactorContext> constructor = (Constructor<ReactorContext>) ReactorContext.class.getDeclaredConstructors()[0];
+      return constructor.newInstance(result, classLoader, status);
     } catch (Throwable t) {
       throw new RuntimeException("Could not create ReactorContext.", t);
     }
