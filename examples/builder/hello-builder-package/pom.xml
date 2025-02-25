@@ -23,7 +23,7 @@
     <name>Sundrio :: Examples :: Builder :: Hello World with Builder Package</name>
 
     <properties>
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
     </properties>
 
     <build>
