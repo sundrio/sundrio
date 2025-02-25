@@ -78,7 +78,7 @@
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-invoker-plugin.version>3.9.0</maven-invoker-plugin.version>
         <maven-plugin-plugin.version>3.12.0</maven-plugin-plugin.version>
-        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
+        <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
 
         <!-- Release Plugins -->
         <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
