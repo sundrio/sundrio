@@ -135,8 +135,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <release>11</release>
                     <!-- The option below starting causing `Unknown compilation error` as soon as SourceVersion annotations were removed
                          in favor of SourceVersion.latest().
                          According to: https://stackoverflow.com/questions/56646698/what-causes-an-unknown-compilation-problem-occurred the
