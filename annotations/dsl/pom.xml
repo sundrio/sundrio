@@ -33,12 +33,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <compilerArgs>
-                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>
-                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
-                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>
-                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
-                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
-                        <arg>--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                         <arg>-proc:none</arg>
                     </compilerArgs>                    
                 </configuration>
@@ -53,6 +47,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+          <groupId>com.google.testing.compile</groupId>
+          <artifactId>compile-testing</artifactId>
+          <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>
