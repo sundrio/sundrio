@@ -85,12 +85,15 @@ import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
 import io.sundr.model.Foreach;
+import io.sundr.model.GreaterThanOrEqual;
 import io.sundr.model.If;
 import io.sundr.model.Lambda;
+import io.sundr.model.LessThan;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.PropertyRef;
 import io.sundr.model.Return;
 import io.sundr.model.Statement;
 import io.sundr.model.StringStatement;
@@ -839,10 +842,20 @@ class ToMethod {
           return methods;
         }
 
-        private StringStatement createAddOrSetIndex(String op, String propertyName, String returnType) {
-          return new StringStatement("if (index < 0 || index >= " + propertyName + ".size()) { _visitables.get(\""
-              + propertyName + "\").add(builder); " + propertyName + ".add(builder); } else { _visitables.get(\"" + propertyName
-              + "\")." + op + "(index, builder); " + propertyName + "." + op + "(index, builder);}");
+        private Statement createAddOrSetIndex(String op, String propertyName, String returnType) {
+          PropertyRef index = Property.newProperty("index").toReference();
+          PropertyRef property = Property.newProperty(propertyName).toReference();
+          ValueRef propertyNameValue = ValueRef.from(propertyName);
+          PropertyRef _visitables = Property.newProperty("_visitables").toReference();
+          PropertyRef builder = Property.newProperty("builder").toReference();
+          ValueRef zero = ValueRef.from(0);
+          return new If(Expression.or(new LessThan(index, zero), new GreaterThanOrEqual(index, property.call("size"))),
+              new Block(
+                  _visitables.call("get", propertyNameValue).call("add", builder),
+                  property.call("add", builder)),
+              new Block(
+                  _visitables.call("get", propertyNameValue).call("add", builder),
+                  property.call(op, index, builder)));
         }
       });
 
