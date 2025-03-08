@@ -45,7 +45,7 @@ public class TypeAs {
   }
 
   /**
-   * Something -> SomethingBuilder
+   * Something to SomethingBuilder
    **/
   public static final Function<ClassRef, ClassRef> BUILDER_REF = item -> new ClassRefBuilder(item)
       .withFullyQualifiedName(item.getFullyQualifiedName() + "Builder")
@@ -53,7 +53,7 @@ public class TypeAs {
       .build();
 
   /**
-   * Distance<Integer> -> DistanceFluent<Integer, A>
+   * Distance<Integer> to DistanceFluent<Integer, A>
    **/
   public static final Function<ClassRef, ClassRef> FLUENT_A_REF = item -> new ClassRefBuilder(item)
       .withFullyQualifiedName(item.getFullyQualifiedName() + "Fluent")
@@ -61,7 +61,7 @@ public class TypeAs {
       .build();
 
   /**
-   * Distance<Integer> -> DistanceFluent<Integer, ?>
+   * Distance<Integer> to DistanceFluent<Integer, ?>
    **/
   public static final Function<ClassRef, ClassRef> FLUENT_Q_REF = item -> new ClassRefBuilder(item)
       .withFullyQualifiedName(item.getFullyQualifiedName() + "Fluent")
