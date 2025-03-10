@@ -53,7 +53,7 @@ public class TypeAs {
       .build();
 
   /**
-   * Distance<Integer> to DistanceFluent<Integer, A>
+   * Distance&lt;Integer&gt; to DistanceFluent&lt;Integer, A&gt;
    **/
   public static final Function<ClassRef, ClassRef> FLUENT_A_REF = item -> new ClassRefBuilder(item)
       .withFullyQualifiedName(item.getFullyQualifiedName() + "Fluent")
@@ -61,7 +61,7 @@ public class TypeAs {
       .build();
 
   /**
-   * Distance<Integer> to DistanceFluent<Integer, ?>
+   * Distance&lt;Integer&gt; to DistanceFluent&lt;Integer, ?&gt;
    **/
   public static final Function<ClassRef, ClassRef> FLUENT_Q_REF = item -> new ClassRefBuilder(item)
       .withFullyQualifiedName(item.getFullyQualifiedName() + "Fluent")
