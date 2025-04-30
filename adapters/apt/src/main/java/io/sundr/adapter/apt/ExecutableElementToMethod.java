@@ -158,7 +158,7 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
     }
 
     for (AnnotationMirror annotationMirror : executableElement.getAnnotationMirrors()) {
-      methodBuilder = methodBuilder.withAnnotations(annotationAdapterFunction.apply(annotationMirror));
+      methodBuilder = methodBuilder.addToAnnotations(annotationAdapterFunction.apply(annotationMirror));
     }
     return methodBuilder.build();
   }

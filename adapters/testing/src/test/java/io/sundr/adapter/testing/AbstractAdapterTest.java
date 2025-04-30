@@ -161,6 +161,12 @@ public abstract class AbstractAdapterTest<T> {
     assertEquals("bar", annotationRef.getParameters().get("name"));
     Object params = annotationRef.getParameters().get("values");
     assertArrayEquals(new int[] { 1, 2, 3, 5, 7 }, (int[]) annotationRef.getParameters().get("values"));
+
+    Optional<Method> methodWithMultipleAnnotations = typeDef.getMethods().stream()
+        .filter(m -> m.getName().equals("baz")).findAny();
+    assertTrue(methodWithMultipleAnnotations.isPresent());
+    assertEquals(2, methodWithMultipleAnnotations.get().getAnnotations().size());
+
   }
 
   @Test
