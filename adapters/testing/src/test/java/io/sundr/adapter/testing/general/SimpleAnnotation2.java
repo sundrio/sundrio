@@ -22,7 +22,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-@Target({ TYPE, TYPE_USE })
+@Target({ TYPE, TYPE_USE, METHOD })
 @Retention(RUNTIME)
 public @interface SimpleAnnotation2 {
   String name();

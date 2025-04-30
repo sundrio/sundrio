@@ -26,4 +26,9 @@ public class ClassWithAnnotation {
   private void bar() {
   }
 
+  @SimpleAnnotation(name = "baz", values = { 1, 2, 3, 5, 7 })
+  @SimpleAnnotation2(name = "baz2", values = { 1, 2, 3, 5, 7 })
+  private void baz() {
+  }
+
 }
