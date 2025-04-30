@@ -563,6 +563,7 @@ public class BuilderUtils {
   /**
    * Create a qualified name for the given property - if it is not a descendant, then just the capitalized
    * name will be used.
+   *
    * @param property The property.
    * @param typeRef The type reference.
    * @param originType The origin type.
@@ -575,10 +576,11 @@ public class BuilderUtils {
   /**
    * Create a qualified name for the given property. If useSingular is true the root property name will be changed
    * to the singular form.
+   *
    * @param property The property.
    * @param typeRef The type reference.
    * @param originType The origin type.
-   * param useSingular Flag to use singular form
+   *        param useSingular Flag to use singular form
    * @return The qualified property name.
    */
   public static String qualifyPropertyName(Property property, TypeRef typeRef, TypeDef originType, boolean useSingular) {
