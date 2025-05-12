@@ -65,8 +65,8 @@
         <aether.version>1.0.2.v20150114</aether.version>
         <javaparser.version>2.5.1</javaparser.version>
         <swagger-annotations.version>1.5.17</swagger-annotations.version>
-        <swagger-codegen.version>3.0.1</swagger-codegen.version>
-        <swagger-codegen-generator.version>1.0.1</swagger-codegen-generator.version>
+        <swagger-codegen.version>3.0.68</swagger-codegen.version>
+        <swagger-codegen-generator.version>1.0.56</swagger-codegen-generator.version>
 
         <!-- Transitive Versions -->
         <commons-collections.version>3.2.2</commons-collections.version>
