@@ -49,4 +49,12 @@ jobs:
           SUNDRIO_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           git clone https://github.com/fabric8io/kubernetes-client
           cd kubernetes-client
+          ./mvnw ${MAVEN_ARGS} versions:set -DnewVersion=999-SNAPSHOT
           ./mvnw ${MAVEN_ARGS} clean install -Dsundrio.version=$SUNDRIO_VERSION -Dkaraf.itest.skip=true
+      - name: Build Dekorate
+        run: |
+          SUNDRIO_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          git clone https://github.com/dekorateio/dekorate
+          cd dekorate
+          ./mvnw ${MAVEN_ARGS} versions:set -DnewVersion=999-SNAPSHOT
+          ./mvnw ${MAVEN_ARGS} clean install -Dversion.sundrio=$SUNDRIO_VERSION -Dversion.kubernetes-client=999-SNAPSHOT
