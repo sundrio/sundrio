@@ -42,4 +42,4 @@ jobs:
           cache: 'maven'
       - name: Build Project
         run: |
-          ./mvnw ${MAVEN_ARGS} clean install -Pwith-examples -Dformat.skip=true
+          ./mvnw ${MAVEN_ARGS} clean install -Pwith-examples -Pwith-tests -Dformat.skip=true

@@ -107,7 +107,6 @@
         <module>maven-plugin</module>
         <module>annotations</module>
         <module>components</module>
-        <module>tests</module>
     </modules>
     
     <build>
@@ -396,6 +395,12 @@
              <id>with-examples</id>
              <modules>
                <module>examples</module>
+             </modules>
+        </profile>
+        <profile>
+             <id>with-tests</id>
+             <modules>
+               <module>tests</module>
              </modules>
         </profile>
     </profiles>
