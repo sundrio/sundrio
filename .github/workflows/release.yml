@@ -44,38 +44,14 @@ jobs:
           git config --local user.name "GitHub Action"
       - name: Setup jbang
         run: curl -Ls https://sh.jbang.dev | bash -s - app setup
-      - name: Maven release ${{steps.metadata.outputs.current-version}}
+      - name: Maven release ${{steps.metadata.outputs.current-version}} 
         run: |
-          ./mvnw clean install -DskipTests -Prelease -Dformat.skip=true
+          ./mvnw clean install -DskipTests -Prelease -Pwith-examples -Pwith-tests -Dformat.skip=true
           git checkout -b release
-          ./mvnw -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -Dformat.skip=true
+          ./mvnw -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -Dformat.skip=true -Pwith-examples -Pwith-tests 
           git checkout ${{github.base_ref}}
           git rebase release
           ./mvnw -Prelease release:perform -DskipTests -Dformat.skip=true
-          # checkout release tag
-          git checkout ${{steps.metadata.outputs.current-version}}
-          # update examples and tests
-          ./mvnw versions:set -DnewVersion=${{steps.metadata.outputs.next-version}} -Pwith-examples,with-tests -DgenerateBackupPoms=false -DoldVersion=* -DgroupId=* -DartifactId=* -Dformat.skip=true
-          # commit changes
-          git add --all
-          if git diff-index --quiet HEAD --; then
-              echo "No changes to commit."
-          else
-            git commit -m "chore: Set examples and tests version to ${{steps.metadata.outputs.current-version}}"
-          fi
-          git push origin ${{steps.metadata.outputs.current-version}}
-          # checkout release branch
-          git checkout ${{github.base_ref}}
-          # update examples and tests
-          ./mvnw versions:set -DnewVersion=${{steps.metadata.outputs.next-version}} -Pwith-examples,with-tests -DgenerateBackupPoms=false -DoldVersion=* -DgroupId=* -DartifactId=* -Dformat.skip=true
-          # commit changes
-          git add --all
-          if git diff-index --quiet HEAD --; then
-              echo "No changes to commit."
-          else
-            git commit -m "chore: Set examples and tests version to ${{steps.metadata.outputs.current-version}}"
-          fi
-          git push origin ${{github.base_ref}}
         env:
           OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
           OSS_SONATYPE_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
