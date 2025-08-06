@@ -33,7 +33,7 @@ jobs:
         with:
           java-version: 11
           distribution: 'temurin'
-          server-id: oss-sonatype-staging
+          server-id: central
           server-username: OSS_SONATYPE_USERNAME
           server-password: OSS_SONATYPE_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
