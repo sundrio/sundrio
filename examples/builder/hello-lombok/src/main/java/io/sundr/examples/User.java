@@ -17,8 +17,8 @@
 
 package io.sundr.examples;
 
-import lombok.Data;
 import io.sundr.builder.annotations.Buildable;
+import lombok.Data;
 
 @Buildable
 @Data
