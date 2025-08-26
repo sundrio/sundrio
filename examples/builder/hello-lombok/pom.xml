@@ -20,12 +20,12 @@
     <parent>
         <artifactId>builder-examples-pom</artifactId>
         <groupId>io.sundr.examples</groupId>
-        <version>0.200.11</version>
+        <version>999-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <groupId>io.sundr</groupId>
     <artifactId>builder-hello-lombok-example</artifactId>
-    <version>0.200.11</version>
+    <version>999-SNAPSHOT</version>
     <name>Sundrio :: Examples :: Builder :: Hello Lombok</name>
 
     <properties>
