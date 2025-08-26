@@ -376,9 +376,9 @@
                 <configuration>
                   <autoVersionSubmodules>true</autoVersionSubmodules>
                   <tagNameFormat>@{project.version}</tagNameFormat>
-                  <pushChanges>true</pushChanges>
-                  <localCheckout>true</localCheckout>
-                  <remoteTagging>false</remoteTagging>
+                  <pushChanges>false</pushChanges>
+                  <localCheckout>false</localCheckout>
+                  <remoteTagging>true</remoteTagging>
                   <arguments>-DskipTests=true</arguments>
                 </configuration>
               </plugin>
