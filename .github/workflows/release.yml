@@ -46,14 +46,14 @@ jobs:
           git config --local user.name "GitHub Action"
       - name: Setup jbang
         run: curl -Ls https://sh.jbang.dev | bash -s - app setup
-      - name: Maven release ${{steps.metadata.outputs.current-version}} 
+      - name: Maven release ${{steps.metadata.outputs.current-version}}
         run: |
           ./mvnw clean install -DskipTests -Prelease -Pwith-examples -Pwith-tests -Dformat.skip=true
-          git checkout -b release
-          ./mvnw -Prelease release:clean release:prepare -DreleaseVersion=${{steps.metadata.outputs.current-version}} -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} -Dformat.skip=true -Pwith-examples -Pwith-tests 
-          git checkout ${{github.base_ref}}
-          git pull --rebase origin ${{github.base_ref}}
-          ./mvnw -Prelease release:perform -DskipTests -Dformat.skip=true
+          ./mvnw -Prelease release:clean release:prepare release:perform \
+            -DreleaseVersion=${{steps.metadata.outputs.current-version}} \
+            -DdevelopmentVersion=${{steps.metadata.outputs.next-version}} \
+            -DskipTests -Dformat.skip=true -Pwith-examples -Pwith-tests \
+            -Darguments="-DskipTests -Dformat.skip=true"
         env:
           OSS_SONATYPE_USERNAME: ${{ secrets.OSS_SONATYPE_USERNAME }}
           OSS_SONATYPE_PASSWORD: ${{ secrets.OSS_SONATYPE_PASSWORD }}
