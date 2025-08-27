@@ -179,6 +179,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           List<Property> arguments = new ArrayList<Property>();
           List<ClassRef> exceptions = new ArrayList<ClassRef>();
           List<AnnotationRef> ctorAnnotations = new ArrayList<AnnotationRef>();
+          Boolean preferVarArg = false;
 
           for (AnnotationExpr annotationExpr : constructorDeclaration.getAnnotations()) {
             ctorAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
@@ -193,11 +194,17 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               ctorParamAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
             }
             TypeRef typeRef = checkAgainstTypeParamRef(typeToTypeRef.apply(parameter.getType()), parameters);
+
+            if (parameter.isVarArgs()) {
+              preferVarArg = true;
+              typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
+            }
+
             arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
                 .withModifiers(Modifiers.from(parameter.getModifiers())).withAnnotations(ctorParamAnnotations).build());
           }
           constructors.add(new MethodBuilder().withModifiers(Modifiers.from(constructorDeclaration.getModifiers()))
-              .withExceptions(exceptions)
+              .withVarArgPreferred(preferVarArg).withExceptions(exceptions)
               .withArguments(arguments).withAnnotations(ctorAnnotations)
               .withBlock(BLOCK.apply(constructorDeclaration.getBlock())).build());
         }
