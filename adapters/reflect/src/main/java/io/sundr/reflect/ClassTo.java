@@ -328,6 +328,7 @@ public class ClassTo {
           .withModifiers(Modifiers.from(constructor.getModifiers()))
           .withArguments(arguments)
           .withParameters(parameters)
+          .withVarArgPreferred(constructor.isVarArgs())
           .withAnnotations(annotationRefs)
           .withExceptions(exceptionRefs)
           .build());
@@ -356,6 +357,7 @@ public class ClassTo {
           .withReturnType(TYPEREF.apply(method.getReturnType()))
           .withArguments(arguments)
           .withParameters(parameters)
+          .withVarArgPreferred(method.isVarArgs())
           .withExceptions(exceptionRefs)
           .withAnnotations(annotationRefs)
           .withAttributes(attributes)

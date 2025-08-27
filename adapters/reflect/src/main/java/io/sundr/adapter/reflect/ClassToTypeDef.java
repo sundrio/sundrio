@@ -205,6 +205,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
           .withModifiers(Modifiers.from(constructor.getModifiers()))
           .withArguments(arguments)
           .withParameters(parameters)
+          .withVarArgPreferred(constructor.isVarArgs())
           .withAnnotations(annotationRefs)
           .withExceptions(exceptionRefs)
           .build());
@@ -233,6 +234,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
           .withReturnType(typeToTypeRef.apply(method.getGenericReturnType()))
           .withArguments(arguments)
           .withParameters(parameters)
+          .withVarArgPreferred(method.isVarArgs())
           .withExceptions(exceptionRefs)
           .withAnnotations(annotationRefs)
           .withAttributes(attributes)
