@@ -31,6 +31,16 @@ public class Block implements Statement {
     this.statements = Arrays.asList(statements);
   }
 
+  public static Statement wrap(Statement... statements) {
+    if (statements == null || statements.length == 0) {
+      return new Block();
+    }
+    if (statements.length == 1) {
+      return statements[0];
+    }
+    return new Block(statements);
+  }
+
   public List<Statement> getStatements() {
     return statements;
   }
