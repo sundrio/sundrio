@@ -639,8 +639,8 @@ class ToMethod {
     TypeDef predicate = Constants.PREDICATE;
 
     TypeRef type = property.getTypeRef();
-    Boolean isBuildable = isBuildable(type);
-    TypeRef targetType = isBuildable ? VISITABLE_BUILDER_REF.apply((ClassRef) type) : UNWRAP_ARRAY_OF.apply(type);
+    Boolean isBuildable = isBuildable(unwrapped);
+    TypeRef targetType = isBuildable ? VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped) : UNWRAP_ARRAY_OF.apply(type);
 
     List<Statement> statements = new ArrayList<>();
 
