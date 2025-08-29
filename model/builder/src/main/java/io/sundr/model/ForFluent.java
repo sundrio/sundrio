@@ -58,7 +58,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       _visitables.get("init").add(builder);
       init.add(builder);
     } else {
-      _visitables.get("init").add(index, builder);
+      _visitables.get("init").add(builder);
       init.add(index, builder);
     }
     return (A) this;
@@ -73,7 +73,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       _visitables.get("init").add(builder);
       init.add(builder);
     } else {
-      _visitables.get("init").add(index, builder);
+      _visitables.get("init").add(builder);
       init.add(index, builder);
     }
     return (A) this;
@@ -88,7 +88,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       _visitables.get("init").add(builder);
       init.add(builder);
     } else {
-      _visitables.get("init").set(index, builder);
+      _visitables.get("init").add(builder);
       init.set(index, builder);
     }
     return (A) this;
@@ -223,7 +223,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasInit() {
-    return init != null && !init.isEmpty();
+    return this.init != null && !this.init.isEmpty();
   }
 
   public MultiplyInitNested<A> addNewMultiplyInit() {
@@ -670,18 +670,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new AssignInitNested(index, item);
   }
 
-  public NegativeInitNested<A> addNewNegativeInit() {
-    return new NegativeInitNested(-1, null);
-  }
-
-  public NegativeInitNested<A> addNewNegativeInitLike(Negative item) {
-    return new NegativeInitNested(-1, item);
-  }
-
-  public NegativeInitNested<A> setNewNegativeInitLike(int index, Negative item) {
-    return new NegativeInitNested(index, item);
-  }
-
   public ThisInitNested<A> addNewThisInit() {
     return new ThisInitNested(-1, null);
   }
@@ -692,6 +680,18 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   public ThisInitNested<A> setNewThisInitLike(int index, This item) {
     return new ThisInitNested(index, item);
+  }
+
+  public NegativeInitNested<A> addNewNegativeInit() {
+    return new NegativeInitNested(-1, null);
+  }
+
+  public NegativeInitNested<A> addNewNegativeInitLike(Negative item) {
+    return new NegativeInitNested(-1, item);
+  }
+
+  public NegativeInitNested<A> setNewNegativeInitLike(int index, Negative item) {
+    return new NegativeInitNested(index, item);
   }
 
   public LogicalAndInitNested<A> addNewLogicalAndInit() {
@@ -829,14 +829,16 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
   public A withCompare(Expression compare) {
     if (compare == null) {
       this.compare = null;
-      _visitables.remove("compare");
+      this._visitables.remove("compare");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(compare);
+      ;
+      this._visitables.get("compare").clear();
+      this._visitables.get("compare").add(builder);
+      this.compare = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(compare);
-    _visitables.get("compare").clear();
-    _visitables.get("compare").add(builder);
-    this.compare = builder;
-    return (A) this;
   }
 
   public boolean hasCompare() {
@@ -1163,20 +1165,20 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new AssignCompareNested(item);
   }
 
-  public NegativeCompareNested<A> withNewNegativeCompare() {
-    return new NegativeCompareNested(null);
-  }
-
-  public NegativeCompareNested<A> withNewNegativeCompareLike(Negative item) {
-    return new NegativeCompareNested(item);
-  }
-
   public ThisCompareNested<A> withNewThisCompare() {
     return new ThisCompareNested(null);
   }
 
   public ThisCompareNested<A> withNewThisCompareLike(This item) {
     return new ThisCompareNested(item);
+  }
+
+  public NegativeCompareNested<A> withNewNegativeCompare() {
+    return new NegativeCompareNested(null);
+  }
+
+  public NegativeCompareNested<A> withNewNegativeCompareLike(Negative item) {
+    return new NegativeCompareNested(item);
   }
 
   public LogicalAndCompareNested<A> withNewLogicalAndCompare() {
@@ -1288,7 +1290,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       _visitables.get("update").add(builder);
       update.add(builder);
     } else {
-      _visitables.get("update").add(index, builder);
+      _visitables.get("update").add(builder);
       update.add(index, builder);
     }
     return (A) this;
@@ -1303,7 +1305,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       _visitables.get("update").add(builder);
       update.add(builder);
     } else {
-      _visitables.get("update").add(index, builder);
+      _visitables.get("update").add(builder);
       update.add(index, builder);
     }
     return (A) this;
@@ -1318,7 +1320,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       _visitables.get("update").add(builder);
       update.add(builder);
     } else {
-      _visitables.get("update").set(index, builder);
+      _visitables.get("update").add(builder);
       update.set(index, builder);
     }
     return (A) this;
@@ -1453,7 +1455,7 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasUpdate() {
-    return update != null && !update.isEmpty();
+    return this.update != null && !this.update.isEmpty();
   }
 
   public MultiplyUpdateNested<A> addNewMultiplyUpdate() {
@@ -1900,18 +1902,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new AssignUpdateNested(index, item);
   }
 
-  public NegativeUpdateNested<A> addNewNegativeUpdate() {
-    return new NegativeUpdateNested(-1, null);
-  }
-
-  public NegativeUpdateNested<A> addNewNegativeUpdateLike(Negative item) {
-    return new NegativeUpdateNested(-1, item);
-  }
-
-  public NegativeUpdateNested<A> setNewNegativeUpdateLike(int index, Negative item) {
-    return new NegativeUpdateNested(index, item);
-  }
-
   public ThisUpdateNested<A> addNewThisUpdate() {
     return new ThisUpdateNested(-1, null);
   }
@@ -1922,6 +1912,18 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   public ThisUpdateNested<A> setNewThisUpdateLike(int index, This item) {
     return new ThisUpdateNested(index, item);
+  }
+
+  public NegativeUpdateNested<A> addNewNegativeUpdate() {
+    return new NegativeUpdateNested(-1, null);
+  }
+
+  public NegativeUpdateNested<A> addNewNegativeUpdateLike(Negative item) {
+    return new NegativeUpdateNested(-1, item);
+  }
+
+  public NegativeUpdateNested<A> setNewNegativeUpdateLike(int index, Negative item) {
+    return new NegativeUpdateNested(index, item);
   }
 
   public LogicalAndUpdateNested<A> addNewLogicalAndUpdate() {
@@ -2059,14 +2061,16 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
   public A withBody(Statement body) {
     if (body == null) {
       this.body = null;
-      _visitables.remove("body");
+      this._visitables.remove("body");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Statement, ?> builder = builder(body);
+      ;
+      this._visitables.get("body").clear();
+      this._visitables.get("body").add(builder);
+      this.body = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Statement, ?> builder = builder(body);
-    _visitables.get("body").clear();
-    _visitables.get("body").add(builder);
-    this.body = builder;
-    return (A) this;
   }
 
   public boolean hasBody() {
@@ -2323,10 +2327,10 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -2962,25 +2966,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeInitNested<N> extends NegativeFluent<NegativeInitNested<N>> implements Nested<N> {
-    NegativeInitNested(int index, Negative item) {
-      this.index = index;
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-    int index;
-
-    public N and() {
-      return (N) ForFluent.this.setToInit(index, builder.build());
-    }
-
-    public N endNegativeInit() {
-      return and();
-    }
-
-  }
-
   public class ThisInitNested<N> extends ThisFluent<ThisInitNested<N>> implements Nested<N> {
     ThisInitNested(int index, This item) {
       this.index = index;
@@ -2995,6 +2980,25 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisInit() {
+      return and();
+    }
+
+  }
+
+  public class NegativeInitNested<N> extends NegativeFluent<NegativeInitNested<N>> implements Nested<N> {
+    NegativeInitNested(int index, Negative item) {
+      this.index = index;
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ForFluent.this.setToInit(index, builder.build());
+    }
+
+    public N endNegativeInit() {
       return and();
     }
 
@@ -3701,23 +3705,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeCompareNested<N> extends NegativeFluent<NegativeCompareNested<N>> implements Nested<N> {
-    NegativeCompareNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) ForFluent.this.withCompare(builder.build());
-    }
-
-    public N endNegativeCompare() {
-      return and();
-    }
-
-  }
-
   public class ThisCompareNested<N> extends ThisFluent<ThisCompareNested<N>> implements Nested<N> {
     ThisCompareNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -3730,6 +3717,23 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisCompare() {
+      return and();
+    }
+
+  }
+
+  public class NegativeCompareNested<N> extends NegativeFluent<NegativeCompareNested<N>> implements Nested<N> {
+    NegativeCompareNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) ForFluent.this.withCompare(builder.build());
+    }
+
+    public N endNegativeCompare() {
       return and();
     }
 
@@ -4481,25 +4485,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeUpdateNested<N> extends NegativeFluent<NegativeUpdateNested<N>> implements Nested<N> {
-    NegativeUpdateNested(int index, Negative item) {
-      this.index = index;
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-    int index;
-
-    public N and() {
-      return (N) ForFluent.this.setToUpdate(index, builder.build());
-    }
-
-    public N endNegativeUpdate() {
-      return and();
-    }
-
-  }
-
   public class ThisUpdateNested<N> extends ThisFluent<ThisUpdateNested<N>> implements Nested<N> {
     ThisUpdateNested(int index, This item) {
       this.index = index;
@@ -4514,6 +4499,25 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisUpdate() {
+      return and();
+    }
+
+  }
+
+  public class NegativeUpdateNested<N> extends NegativeFluent<NegativeUpdateNested<N>> implements Nested<N> {
+    NegativeUpdateNested(int index, Negative item) {
+      this.index = index;
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ForFluent.this.setToUpdate(index, builder.build());
+    }
+
+    public N endNegativeUpdate() {
       return and();
     }
 

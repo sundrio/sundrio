@@ -149,7 +149,7 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasParameters() {
-    return parameters != null && !parameters.isEmpty();
+    return this.parameters != null && !this.parameters.isEmpty();
   }
 
   public Statement buildStatement() {
@@ -159,14 +159,16 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
   public A withStatement(Statement statement) {
     if (statement == null) {
       this.statement = null;
-      _visitables.remove("statement");
+      this._visitables.remove("statement");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Statement, ?> builder = builder(statement);
+      ;
+      this._visitables.get("statement").clear();
+      this._visitables.get("statement").add(builder);
+      this.statement = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Statement, ?> builder = builder(statement);
-    _visitables.get("statement").clear();
-    _visitables.get("statement").add(builder);
-    this.statement = builder;
-    return (A) this;
   }
 
   public boolean hasStatement() {

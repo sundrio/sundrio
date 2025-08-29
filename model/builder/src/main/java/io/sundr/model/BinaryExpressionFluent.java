@@ -39,14 +39,16 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
   public A withLeft(Expression left) {
     if (left == null) {
       this.left = null;
-      _visitables.remove("left");
+      this._visitables.remove("left");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(left);
+      ;
+      this._visitables.get("left").clear();
+      this._visitables.get("left").add(builder);
+      this.left = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(left);
-    _visitables.get("left").clear();
-    _visitables.get("left").add(builder);
-    this.left = builder;
-    return (A) this;
   }
 
   public boolean hasLeft() {
@@ -373,20 +375,20 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return new AssignLeftNested(item);
   }
 
-  public NegativeLeftNested<A> withNewNegativeLeft() {
-    return new NegativeLeftNested(null);
-  }
-
-  public NegativeLeftNested<A> withNewNegativeLeftLike(Negative item) {
-    return new NegativeLeftNested(item);
-  }
-
   public ThisLeftNested<A> withNewThisLeft() {
     return new ThisLeftNested(null);
   }
 
   public ThisLeftNested<A> withNewThisLeftLike(This item) {
     return new ThisLeftNested(item);
+  }
+
+  public NegativeLeftNested<A> withNewNegativeLeft() {
+    return new NegativeLeftNested(null);
+  }
+
+  public NegativeLeftNested<A> withNewNegativeLeftLike(Negative item) {
+    return new NegativeLeftNested(item);
   }
 
   public LogicalAndLeftNested<A> withNewLogicalAndLeft() {
@@ -488,14 +490,16 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
   public A withRight(Expression right) {
     if (right == null) {
       this.right = null;
-      _visitables.remove("right");
+      this._visitables.remove("right");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(right);
+      ;
+      this._visitables.get("right").clear();
+      this._visitables.get("right").add(builder);
+      this.right = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(right);
-    _visitables.get("right").clear();
-    _visitables.get("right").add(builder);
-    this.right = builder;
-    return (A) this;
   }
 
   public boolean hasRight() {
@@ -822,20 +826,20 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return new AssignRightNested(item);
   }
 
-  public NegativeRightNested<A> withNewNegativeRight() {
-    return new NegativeRightNested(null);
-  }
-
-  public NegativeRightNested<A> withNewNegativeRightLike(Negative item) {
-    return new NegativeRightNested(item);
-  }
-
   public ThisRightNested<A> withNewThisRight() {
     return new ThisRightNested(null);
   }
 
   public ThisRightNested<A> withNewThisRightLike(This item) {
     return new ThisRightNested(item);
+  }
+
+  public NegativeRightNested<A> withNewNegativeRight() {
+    return new NegativeRightNested(null);
+  }
+
+  public NegativeRightNested<A> withNewNegativeRightLike(Negative item) {
+    return new NegativeRightNested(item);
   }
 
   public LogicalAndRightNested<A> withNewLogicalAndRight() {
@@ -1028,10 +1032,10 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1583,23 +1587,6 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   }
 
-  public class NegativeLeftNested<N> extends NegativeFluent<NegativeLeftNested<N>> implements Nested<N> {
-    NegativeLeftNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
-    }
-
-    public N endNegativeLeft() {
-      return and();
-    }
-
-  }
-
   public class ThisLeftNested<N> extends ThisFluent<ThisLeftNested<N>> implements Nested<N> {
     ThisLeftNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -1612,6 +1599,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endThisLeft() {
+      return and();
+    }
+
+  }
+
+  public class NegativeLeftNested<N> extends NegativeFluent<NegativeLeftNested<N>> implements Nested<N> {
+    NegativeLeftNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endNegativeLeft() {
       return and();
     }
 
@@ -2300,23 +2304,6 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
 
   }
 
-  public class NegativeRightNested<N> extends NegativeFluent<NegativeRightNested<N>> implements Nested<N> {
-    NegativeRightNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) BinaryExpressionFluent.this.withRight(builder.build());
-    }
-
-    public N endNegativeRight() {
-      return and();
-    }
-
-  }
-
   public class ThisRightNested<N> extends ThisFluent<ThisRightNested<N>> implements Nested<N> {
     ThisRightNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -2329,6 +2316,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endThisRight() {
+      return and();
+    }
+
+  }
+
+  public class NegativeRightNested<N> extends NegativeFluent<NegativeRightNested<N>> implements Nested<N> {
+    NegativeRightNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endNegativeRight() {
       return and();
     }
 

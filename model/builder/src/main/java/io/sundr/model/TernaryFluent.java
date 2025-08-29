@@ -41,14 +41,16 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   public A withCondition(Expression condition) {
     if (condition == null) {
       this.condition = null;
-      _visitables.remove("condition");
+      this._visitables.remove("condition");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(condition);
+      ;
+      this._visitables.get("condition").clear();
+      this._visitables.get("condition").add(builder);
+      this.condition = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(condition);
-    _visitables.get("condition").clear();
-    _visitables.get("condition").add(builder);
-    this.condition = builder;
-    return (A) this;
   }
 
   public boolean hasCondition() {
@@ -375,20 +377,20 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return new AssignConditionNested(item);
   }
 
-  public NegativeConditionNested<A> withNewNegativeCondition() {
-    return new NegativeConditionNested(null);
-  }
-
-  public NegativeConditionNested<A> withNewNegativeConditionLike(Negative item) {
-    return new NegativeConditionNested(item);
-  }
-
   public ThisConditionNested<A> withNewThisCondition() {
     return new ThisConditionNested(null);
   }
 
   public ThisConditionNested<A> withNewThisConditionLike(This item) {
     return new ThisConditionNested(item);
+  }
+
+  public NegativeConditionNested<A> withNewNegativeCondition() {
+    return new NegativeConditionNested(null);
+  }
+
+  public NegativeConditionNested<A> withNewNegativeConditionLike(Negative item) {
+    return new NegativeConditionNested(item);
   }
 
   public LogicalAndConditionNested<A> withNewLogicalAndCondition() {
@@ -490,14 +492,16 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   public A withResult(Expression result) {
     if (result == null) {
       this.result = null;
-      _visitables.remove("result");
+      this._visitables.remove("result");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(result);
+      ;
+      this._visitables.get("result").clear();
+      this._visitables.get("result").add(builder);
+      this.result = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(result);
-    _visitables.get("result").clear();
-    _visitables.get("result").add(builder);
-    this.result = builder;
-    return (A) this;
   }
 
   public boolean hasResult() {
@@ -824,20 +828,20 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return new AssignResultNested(item);
   }
 
-  public NegativeResultNested<A> withNewNegativeResult() {
-    return new NegativeResultNested(null);
-  }
-
-  public NegativeResultNested<A> withNewNegativeResultLike(Negative item) {
-    return new NegativeResultNested(item);
-  }
-
   public ThisResultNested<A> withNewThisResult() {
     return new ThisResultNested(null);
   }
 
   public ThisResultNested<A> withNewThisResultLike(This item) {
     return new ThisResultNested(item);
+  }
+
+  public NegativeResultNested<A> withNewNegativeResult() {
+    return new NegativeResultNested(null);
+  }
+
+  public NegativeResultNested<A> withNewNegativeResultLike(Negative item) {
+    return new NegativeResultNested(item);
   }
 
   public LogicalAndResultNested<A> withNewLogicalAndResult() {
@@ -939,14 +943,16 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   public A withAlternative(Expression alternative) {
     if (alternative == null) {
       this.alternative = null;
-      _visitables.remove("alternative");
+      this._visitables.remove("alternative");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(alternative);
+      ;
+      this._visitables.get("alternative").clear();
+      this._visitables.get("alternative").add(builder);
+      this.alternative = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(alternative);
-    _visitables.get("alternative").clear();
-    _visitables.get("alternative").add(builder);
-    this.alternative = builder;
-    return (A) this;
   }
 
   public boolean hasAlternative() {
@@ -1273,20 +1279,20 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return new AssignAlternativeNested(item);
   }
 
-  public NegativeAlternativeNested<A> withNewNegativeAlternative() {
-    return new NegativeAlternativeNested(null);
-  }
-
-  public NegativeAlternativeNested<A> withNewNegativeAlternativeLike(Negative item) {
-    return new NegativeAlternativeNested(item);
-  }
-
   public ThisAlternativeNested<A> withNewThisAlternative() {
     return new ThisAlternativeNested(null);
   }
 
   public ThisAlternativeNested<A> withNewThisAlternativeLike(This item) {
     return new ThisAlternativeNested(item);
+  }
+
+  public NegativeAlternativeNested<A> withNewNegativeAlternative() {
+    return new NegativeAlternativeNested(null);
+  }
+
+  public NegativeAlternativeNested<A> withNewNegativeAlternativeLike(Negative item) {
+    return new NegativeAlternativeNested(item);
   }
 
   public LogicalAndAlternativeNested<A> withNewLogicalAndAlternative() {
@@ -1485,10 +1491,10 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -2041,23 +2047,6 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeConditionNested<N> extends NegativeFluent<NegativeConditionNested<N>> implements Nested<N> {
-    NegativeConditionNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) TernaryFluent.this.withCondition(builder.build());
-    }
-
-    public N endNegativeCondition() {
-      return and();
-    }
-
-  }
-
   public class ThisConditionNested<N> extends ThisFluent<ThisConditionNested<N>> implements Nested<N> {
     ThisConditionNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -2070,6 +2059,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisCondition() {
+      return and();
+    }
+
+  }
+
+  public class NegativeConditionNested<N> extends NegativeFluent<NegativeConditionNested<N>> implements Nested<N> {
+    NegativeConditionNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endNegativeCondition() {
       return and();
     }
 
@@ -2760,23 +2766,6 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeResultNested<N> extends NegativeFluent<NegativeResultNested<N>> implements Nested<N> {
-    NegativeResultNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) TernaryFluent.this.withResult(builder.build());
-    }
-
-    public N endNegativeResult() {
-      return and();
-    }
-
-  }
-
   public class ThisResultNested<N> extends ThisFluent<ThisResultNested<N>> implements Nested<N> {
     ThisResultNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -2789,6 +2778,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisResult() {
+      return and();
+    }
+
+  }
+
+  public class NegativeResultNested<N> extends NegativeFluent<NegativeResultNested<N>> implements Nested<N> {
+    NegativeResultNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endNegativeResult() {
       return and();
     }
 
@@ -3480,23 +3486,6 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeAlternativeNested<N> extends NegativeFluent<NegativeAlternativeNested<N>> implements Nested<N> {
-    NegativeAlternativeNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) TernaryFluent.this.withAlternative(builder.build());
-    }
-
-    public N endNegativeAlternative() {
-      return and();
-    }
-
-  }
-
   public class ThisAlternativeNested<N> extends ThisFluent<ThisAlternativeNested<N>> implements Nested<N> {
     ThisAlternativeNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -3509,6 +3498,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisAlternative() {
+      return and();
+    }
+
+  }
+
+  public class NegativeAlternativeNested<N> extends NegativeFluent<NegativeAlternativeNested<N>> implements Nested<N> {
+    NegativeAlternativeNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endNegativeAlternative() {
       return and();
     }
 
