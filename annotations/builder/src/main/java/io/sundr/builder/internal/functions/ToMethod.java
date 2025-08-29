@@ -98,9 +98,9 @@ import io.sundr.model.PropertyBuilder;
 import io.sundr.model.PropertyRef;
 import io.sundr.model.Return;
 import io.sundr.model.Statement;
-import io.sundr.model.StringStatement;
 import io.sundr.model.Ternary;
 import io.sundr.model.This;
+import io.sundr.model.Throw;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
@@ -263,12 +263,11 @@ class ToMethod {
 
       if (match != null && nonMatch != null) {
         return new Block(new Foreach(item, property, If.condition(predicate.call("test", item))
-            .then(new Return(matchProperty))
+            .then(Return.variable(matchProperty))
             .end()),
-            new Return(nonMatchProperty));
+            Return.variable(nonMatchProperty));
       } else {
-        return new Return(property.call("removeIf",
-            new Lambda("item", (Expression) predicate.call("test", item))));
+        return Return.variable(property).call("removeIf", new Lambda("item", (Expression) predicate.call("test", item)));
       }
     }
 
@@ -485,7 +484,7 @@ class ToMethod {
     List<Statement> statements = new ArrayList<>();
 
     if (isPrimitive(property.getTypeRef())) {
-      statements.add(new Return(true));
+      statements.add(Return.True());
     } else if (isList(property.getTypeRef()) || isSet(property.getTypeRef())) {
       statements
           .add(new Return(new This().property(property).notNull().and(new This().property(property).call("isEmpty").not())));
@@ -1128,17 +1127,19 @@ class ToMethod {
         .withStatements(
             // if (this.propertyName == null || !this.propertyName.containsKey(key)) throw new RuntimeException(...);
             If.condition(thisPropertyRef.isNull().or(thisPropertyRef.call("containsKey", keyRef).not()))
-                .then(new StringStatement(
-                    "throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " +
-                        keyProperty.getName() + " + \"\\\" doesn't exist.\");"))
+                .then(Throw.runtimeException(
+                    Expression.call(String.class, "format",
+                        ValueRef.from("Can't edit %s. Entry for key '%s' doesn't exist."),
+                        ValueRef.from(propertyName), keyRef)))
                 .end(),
             // BaseType toEdit = this.propertyName.get(key);
             new Declare(toEditProperty, thisPropertyRef.call("get", keyRef)),
             // if (toEdit instanceof ValueType == false) throw new RuntimeException(...);
             If.condition(new InstanceOf(toEditProperty, valueTypeRef).not())
-                .then(new StringStatement(
-                    "throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " +
-                        keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");"))
+                .then(Throw.runtimeException(
+                    Expression.call(String.class, "format",
+                        ValueRef.from("Can't edit %s. Entry for key '%s' is not instance of %s."),
+                        ValueRef.from(propertyName), keyRef, ValueRef.from(fullyQualifiedValueType))))
                 .end(),
             // return new WrappedType(key, (ValueType) toEdit);
             new Return(Expression.createNew(rewraped, keyRef, Expression.cast(valueTypeRef, toEditProperty))))
@@ -1161,9 +1162,10 @@ class ToMethod {
                     new Declare(toEditProperty, thisPropertyRef.call("get", keyRef)),
                     // if (toEdit instanceof ValueType == false) throw new RuntimeException(...);
                     If.condition(new InstanceOf(toEditProperty, valueTypeRef).not())
-                        .then(new StringStatement(
-                            "throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " +
-                                keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");"))
+                        .then(Throw.runtimeException(
+                            Expression.call(String.class, "format",
+                                ValueRef.from("Can't edit %s. Entry for key '%s' is not instance of %s."),
+                                ValueRef.from(propertyName), keyRef, ValueRef.from(fullyQualifiedValueType))))
                         .end(),
                     // return new WrappedType(key, (ValueType) toEdit);
                     new Return(Expression.createNew(rewraped, keyRef, Expression.cast(valueTypeRef, toEditProperty))))
@@ -1594,8 +1596,10 @@ class ToMethod {
           .withStatements(
               // if (property.size() <= index) throw new RuntimeException(...);
               If.condition(new LessThanOrEqual(indexProperty, propertyRef.call("size")))
-                  .then(new StringStatement("throw new RuntimeException(\"Can't edit "
-                      + property.getName() + ". Index exceeds size.\");"))
+                  .then(Throw.runtimeException(
+                      Expression.call(String.class, "format",
+                          ValueRef.from("Can't edit %s. Index exceeds size."),
+                          ValueRef.from(property.getName()))))
                   .end(),
               // return setNewSuffixLike(index, buildSuffix(index));
               new Return(new This().call("setNew" + suffix + "Like",
@@ -1611,8 +1615,10 @@ class ToMethod {
           .withStatements(
               // if (property.size() == 0) throw new RuntimeException(...);
               If.eq(propertyRef.call("size"), ValueRef.from(0))
-                  .then(new StringStatement("throw new RuntimeException(\"Can't edit first "
-                      + property.getName() + ". The list is empty.\");"))
+                  .then(Throw.runtimeException(
+                      Expression.call(String.class, "format",
+                          ValueRef.from("Can't edit first %s. The list is empty."),
+                          ValueRef.from(property.getName()))))
                   .end(),
               // return setNewSuffixLike(0, buildSuffix(0));
               new Return(new This().call("setNew" + suffix + "Like",
@@ -1630,8 +1636,10 @@ class ToMethod {
               new Declare(indexProperty, propertyRef.call("size").minus(1)),
               // if (index < 0) throw new RuntimeException(...);
               If.lt(indexProperty, ValueRef.from(0))
-                  .then(new StringStatement("throw new RuntimeException(\"Can't edit last " + property.getName()
-                      + ". The list is empty.\");"))
+                  .then(Throw.runtimeException(
+                      Expression.call(String.class, "format",
+                          ValueRef.from("Can't edit last %s. The list is empty."),
+                          ValueRef.from(property.getName()))))
                   .end(),
               // return setNewSuffixLike(index, buildSuffix(index));
               new Return(new This().call("setNew" + suffix + "Like",
@@ -1666,13 +1674,15 @@ class ToMethod {
                           .end()),
               // if (index < 0) throw new RuntimeException(...);
               If.lt(indexProperty, ValueRef.from(0))
-                  .then(new StringStatement("throw new RuntimeException(\"Can't edit matching " + property.getName()
-                      + ". No match found.\");"))
+                  .then(Throw.runtimeException(
+                      Expression.call(String.class, "format",
+                          ValueRef.from("Can't edit matching %s. No match found."),
+                          ValueRef.from(property.getName()))))
                   .end(),
               // return setNewSuffixLike(index, buildSuffix(index));
-              new Return(new This().call("setNew" + suffix + "Like",
+              Return.This().call("setNew" + suffix + "Like",
                   indexProperty,
-                  new This().call("build" + suffix, indexProperty))))
+                  new This().call("build" + suffix, indexProperty)))
           .endBlock()
           .build());
     } else {
@@ -1706,7 +1716,7 @@ class ToMethod {
     Expression orElseCall = optionalCall.call("orElse", elseValue);
 
     // Create the return statement: return withNewMethodBaseLike(...)
-    return new Return(new This().call("withNew" + methodNameBase + "Like", orElseCall));
+    return Return.This().call("withNew" + methodNameBase + "Like", orElseCall);
   }
 
   static final Function<Property, Method> AND = new Function<Property, Method>() {
