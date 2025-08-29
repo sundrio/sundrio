@@ -17,6 +17,7 @@
 package io.sundr.builder.internal.utils;
 
 import static io.sundr.builder.Constants.DESCENDANTS;
+import static io.sundr.builder.Constants.INIT_EXPRESSION_FUNCTION;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.internal.functions.TypeAs.BOXED_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
@@ -64,6 +65,7 @@ import io.sundr.builder.internal.BuildableRepository;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.Construct;
+import io.sundr.builder.internal.functions.ToConstructExpression;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
@@ -636,12 +638,25 @@ public class BuilderUtils {
     ClassRef listRef = Collections.ARRAY_LIST.toReference(BOXED_OF.apply(unwrapped));
 
     if (Types.isPrimitive(unwrapped)) {
+      TypeDef listDef = new TypeDefBuilder(TypeDef.forName(listRef.getFullyQualifiedName()))
+          .addNewConstructor()
+          .endConstructor()
+          .addNewConstructor()
+          .addNewArgument()
+          .withTypeRef(Collections.LIST.toReference(BOXED_OF.apply(unwrapped)))
+          .withName("l")
+          .endArgument()
+          .endConstructor()
+          .build();
+
       return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(BOXED_OF.apply(unwrapped)))
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
           .addToAttributes(INIT,
               property.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && property.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED)
                   ? null
                   : " new " + listRef + "()")
+          .addToAttributes(INIT_FUNCTION, new Construct(listDef, BOXED_OF.apply(unwrapped)))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(listDef, BOXED_OF.apply(unwrapped)))
           .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef))
           .build();
     }
@@ -690,6 +705,7 @@ public class BuilderUtils {
       return new PropertyBuilder(property).withTypeRef(listRef)
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(listDef, targetType))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(listDef, targetType))
           .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
           .build();
     }
@@ -712,6 +728,7 @@ public class BuilderUtils {
       return new PropertyBuilder(property).withTypeRef(setRef)
           .addToAttributes(LAZY_INIT, " new " + setRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(setDef, targetType))
+          .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(setDef, targetType))
           .addToAttributes(ALSO_IMPORT, alsoImport(property, setRef, builderType))
           .build();
     }
