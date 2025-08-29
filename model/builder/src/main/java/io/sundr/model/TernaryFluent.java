@@ -45,7 +45,6 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(condition);
-      ;
       this._visitables.get("condition").clear();
       this._visitables.get("condition").add(builder);
       this.condition = builder;
@@ -465,6 +464,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return new PreIncrementConditionNested(item);
   }
 
+  public PropertyConditionNested<A> withNewPropertyCondition() {
+    return new PropertyConditionNested(null);
+  }
+
+  public PropertyConditionNested<A> withNewPropertyConditionLike(Property item) {
+    return new PropertyConditionNested(item);
+  }
+
   public LessThanOrEqualConditionNested<A> withNewLessThanOrEqualCondition() {
     return new LessThanOrEqualConditionNested(null);
   }
@@ -496,7 +503,6 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(result);
-      ;
       this._visitables.get("result").clear();
       this._visitables.get("result").add(builder);
       this.result = builder;
@@ -916,6 +922,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return new PreIncrementResultNested(item);
   }
 
+  public PropertyResultNested<A> withNewPropertyResult() {
+    return new PropertyResultNested(null);
+  }
+
+  public PropertyResultNested<A> withNewPropertyResultLike(Property item) {
+    return new PropertyResultNested(item);
+  }
+
   public LessThanOrEqualResultNested<A> withNewLessThanOrEqualResult() {
     return new LessThanOrEqualResultNested(null);
   }
@@ -947,7 +961,6 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(alternative);
-      ;
       this._visitables.get("alternative").clear();
       this._visitables.get("alternative").add(builder);
       this.alternative = builder;
@@ -1367,6 +1380,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return new PreIncrementAlternativeNested(item);
   }
 
+  public PropertyAlternativeNested<A> withNewPropertyAlternative() {
+    return new PropertyAlternativeNested(null);
+  }
+
+  public PropertyAlternativeNested<A> withNewPropertyAlternativeLike(Property item) {
+    return new PropertyAlternativeNested(item);
+  }
+
   public LessThanOrEqualAlternativeNested<A> withNewLessThanOrEqualAlternative() {
     return new LessThanOrEqualAlternativeNested(null);
   }
@@ -1509,6 +1530,8 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -2197,6 +2220,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementCondition() {
+      return and();
+    }
+
+  }
+
+  public class PropertyConditionNested<N> extends PropertyFluent<PropertyConditionNested<N>> implements Nested<N> {
+    PropertyConditionNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endPropertyCondition() {
       return and();
     }
 
@@ -2920,6 +2960,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class PropertyResultNested<N> extends PropertyFluent<PropertyResultNested<N>> implements Nested<N> {
+    PropertyResultNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endPropertyResult() {
+      return and();
+    }
+
+  }
+
   public class LessThanOrEqualResultNested<N> extends LessThanOrEqualFluent<LessThanOrEqualResultNested<N>>
       implements Nested<N> {
     LessThanOrEqualResultNested(LessThanOrEqual item) {
@@ -3637,6 +3694,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementAlternative() {
+      return and();
+    }
+
+  }
+
+  public class PropertyAlternativeNested<N> extends PropertyFluent<PropertyAlternativeNested<N>> implements Nested<N> {
+    PropertyAlternativeNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endPropertyAlternative() {
       return and();
     }
 

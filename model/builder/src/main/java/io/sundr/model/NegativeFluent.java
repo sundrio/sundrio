@@ -41,7 +41,6 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(expresion);
-      ;
       this._visitables.get("expresion").clear();
       this._visitables.get("expresion").add(builder);
       this.expresion = builder;
@@ -461,6 +460,14 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
     return new PreIncrementExpresionNested(item);
   }
 
+  public PropertyExpresionNested<A> withNewPropertyExpresion() {
+    return new PropertyExpresionNested(null);
+  }
+
+  public PropertyExpresionNested<A> withNewPropertyExpresionLike(Property item) {
+    return new PropertyExpresionNested(item);
+  }
+
   public LessThanOrEqualExpresionNested<A> withNewLessThanOrEqualExpresion() {
     return new LessThanOrEqualExpresionNested(null);
   }
@@ -591,6 +598,8 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1279,6 +1288,23 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementExpresion() {
+      return and();
+    }
+
+  }
+
+  public class PropertyExpresionNested<N> extends PropertyFluent<PropertyExpresionNested<N>> implements Nested<N> {
+    PropertyExpresionNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endPropertyExpresion() {
       return and();
     }
 

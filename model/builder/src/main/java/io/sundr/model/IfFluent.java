@@ -46,7 +46,6 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(condition);
-      ;
       this._visitables.get("condition").clear();
       this._visitables.get("condition").add(builder);
       this.condition = builder;
@@ -466,6 +465,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new PreIncrementConditionNested(item);
   }
 
+  public PropertyConditionNested<A> withNewPropertyCondition() {
+    return new PropertyConditionNested(null);
+  }
+
+  public PropertyConditionNested<A> withNewPropertyConditionLike(Property item) {
+    return new PropertyConditionNested(item);
+  }
+
   public LessThanOrEqualConditionNested<A> withNewLessThanOrEqualCondition() {
     return new LessThanOrEqualConditionNested(null);
   }
@@ -497,7 +504,6 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Statement, ?> builder = builder(statement);
-      ;
       this._visitables.get("statement").clear();
       this._visitables.get("statement").add(builder);
       this.statement = builder;
@@ -797,6 +803,8 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1507,6 +1515,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementCondition() {
+      return and();
+    }
+
+  }
+
+  public class PropertyConditionNested<N> extends PropertyFluent<PropertyConditionNested<N>> implements Nested<N> {
+    PropertyConditionNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) IfFluent.this.withCondition(builder.build());
+    }
+
+    public N endPropertyCondition() {
       return and();
     }
 

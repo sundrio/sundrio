@@ -43,7 +43,6 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(left);
-      ;
       this._visitables.get("left").clear();
       this._visitables.get("left").add(builder);
       this.left = builder;
@@ -463,6 +462,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return new PreIncrementLeftNested(item);
   }
 
+  public PropertyLeftNested<A> withNewPropertyLeft() {
+    return new PropertyLeftNested(null);
+  }
+
+  public PropertyLeftNested<A> withNewPropertyLeftLike(Property item) {
+    return new PropertyLeftNested(item);
+  }
+
   public LessThanOrEqualLeftNested<A> withNewLessThanOrEqualLeft() {
     return new LessThanOrEqualLeftNested(null);
   }
@@ -494,7 +501,6 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(right);
-      ;
       this._visitables.get("right").clear();
       this._visitables.get("right").add(builder);
       this.right = builder;
@@ -914,6 +920,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return new PreIncrementRightNested(item);
   }
 
+  public PropertyRightNested<A> withNewPropertyRight() {
+    return new PropertyRightNested(null);
+  }
+
+  public PropertyRightNested<A> withNewPropertyRightLike(Property item) {
+    return new PropertyRightNested(item);
+  }
+
   public LessThanOrEqualRightNested<A> withNewLessThanOrEqualRight() {
     return new LessThanOrEqualRightNested(null);
   }
@@ -1050,6 +1064,8 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1736,6 +1752,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endPreIncrementLeft() {
+      return and();
+    }
+
+  }
+
+  public class PropertyLeftNested<N> extends PropertyFluent<PropertyLeftNested<N>> implements Nested<N> {
+    PropertyLeftNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endPropertyLeft() {
       return and();
     }
 
@@ -2453,6 +2486,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endPreIncrementRight() {
+      return and();
+    }
+
+  }
+
+  public class PropertyRightNested<N> extends PropertyFluent<PropertyRightNested<N>> implements Nested<N> {
+    PropertyRightNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endPropertyRight() {
       return and();
     }
 

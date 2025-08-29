@@ -794,6 +794,18 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new PreIncrementInitNested(index, item);
   }
 
+  public PropertyInitNested<A> addNewPropertyInit() {
+    return new PropertyInitNested(-1, null);
+  }
+
+  public PropertyInitNested<A> addNewPropertyInitLike(Property item) {
+    return new PropertyInitNested(-1, item);
+  }
+
+  public PropertyInitNested<A> setNewPropertyInitLike(int index, Property item) {
+    return new PropertyInitNested(index, item);
+  }
+
   public LessThanOrEqualInitNested<A> addNewLessThanOrEqualInit() {
     return new LessThanOrEqualInitNested(-1, null);
   }
@@ -833,7 +845,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(compare);
-      ;
       this._visitables.get("compare").clear();
       this._visitables.get("compare").add(builder);
       this.compare = builder;
@@ -1251,6 +1262,14 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   public PreIncrementCompareNested<A> withNewPreIncrementCompareLike(PreIncrement item) {
     return new PreIncrementCompareNested(item);
+  }
+
+  public PropertyCompareNested<A> withNewPropertyCompare() {
+    return new PropertyCompareNested(null);
+  }
+
+  public PropertyCompareNested<A> withNewPropertyCompareLike(Property item) {
+    return new PropertyCompareNested(item);
   }
 
   public LessThanOrEqualCompareNested<A> withNewLessThanOrEqualCompare() {
@@ -2026,6 +2045,18 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new PreIncrementUpdateNested(index, item);
   }
 
+  public PropertyUpdateNested<A> addNewPropertyUpdate() {
+    return new PropertyUpdateNested(-1, null);
+  }
+
+  public PropertyUpdateNested<A> addNewPropertyUpdateLike(Property item) {
+    return new PropertyUpdateNested(-1, item);
+  }
+
+  public PropertyUpdateNested<A> setNewPropertyUpdateLike(int index, Property item) {
+    return new PropertyUpdateNested(index, item);
+  }
+
   public LessThanOrEqualUpdateNested<A> addNewLessThanOrEqualUpdate() {
     return new LessThanOrEqualUpdateNested(-1, null);
   }
@@ -2065,7 +2096,6 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Statement, ?> builder = builder(body);
-      ;
       this._visitables.get("body").clear();
       this._visitables.get("body").add(builder);
       this.body = builder;
@@ -2345,6 +2375,8 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -3138,6 +3170,25 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class PropertyInitNested<N> extends PropertyFluent<PropertyInitNested<N>> implements Nested<N> {
+    PropertyInitNested(int index, Property item) {
+      this.index = index;
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ForFluent.this.setToInit(index, builder.build());
+    }
+
+    public N endPropertyInit() {
+      return and();
+    }
+
+  }
+
   public class LessThanOrEqualInitNested<N> extends LessThanOrEqualFluent<LessThanOrEqualInitNested<N>> implements Nested<N> {
     LessThanOrEqualInitNested(int index, LessThanOrEqual item) {
       this.index = index;
@@ -3854,6 +3905,23 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementCompare() {
+      return and();
+    }
+
+  }
+
+  public class PropertyCompareNested<N> extends PropertyFluent<PropertyCompareNested<N>> implements Nested<N> {
+    PropertyCompareNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) ForFluent.this.withCompare(builder.build());
+    }
+
+    public N endPropertyCompare() {
       return and();
     }
 
@@ -4652,6 +4720,25 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementUpdate() {
+      return and();
+    }
+
+  }
+
+  public class PropertyUpdateNested<N> extends PropertyFluent<PropertyUpdateNested<N>> implements Nested<N> {
+    PropertyUpdateNested(int index, Property item) {
+      this.index = index;
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ForFluent.this.setToUpdate(index, builder.build());
+    }
+
+    public N endPropertyUpdate() {
       return and();
     }
 

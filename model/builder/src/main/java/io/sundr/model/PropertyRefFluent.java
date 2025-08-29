@@ -83,7 +83,6 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(scope);
-      ;
       this._visitables.get("scope").clear();
       this._visitables.get("scope").add(builder);
       this.scope = builder;
@@ -503,6 +502,14 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
     return new PreIncrementScopeNested(item);
   }
 
+  public PropertyScopeNested<A> withNewPropertyScope() {
+    return new PropertyScopeNested(null);
+  }
+
+  public PropertyScopeNested<A> withNewPropertyScopeLike(Property item) {
+    return new PropertyScopeNested(item);
+  }
+
   public LessThanOrEqualScopeNested<A> withNewLessThanOrEqualScope() {
     return new LessThanOrEqualScopeNested(null);
   }
@@ -639,6 +646,8 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1342,6 +1351,23 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
     }
 
     public N endPreIncrementScope() {
+      return and();
+    }
+
+  }
+
+  public class PropertyScopeNested<N> extends PropertyFluent<PropertyScopeNested<N>> implements Nested<N> {
+    PropertyScopeNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) PropertyRefFluent.this.withScope(builder.build());
+    }
+
+    public N endPropertyScope() {
       return and();
     }
 
