@@ -1,5 +1,7 @@
 package io.sundr.model;
 
+import java.util.List;
+
 public class While implements Statement {
 
   private final Expression condition;
@@ -25,5 +27,61 @@ public class While implements Statement {
     sb.append(tab(statement.renderStatement()));
     sb.append(CB).append(NEWLINE);
     return sb.toString();
+  }
+
+  //
+  // DSL
+  //
+
+  public static DslConditionStep condition(Expression condition) {
+    return new DslConditionStep(condition);
+  }
+
+  public static DslConditionStep eq(Expression left, Expression right) {
+    return new DslConditionStep(Expression.eq(left, right));
+  }
+
+  public static DslConditionStep ge(Expression left, Expression right) {
+    return new DslConditionStep(new GreaterThanOrEqual(left, right));
+  }
+
+  public static DslConditionStep gt(Expression left, Expression right) {
+    return new DslConditionStep(new GreaterThan(left, right));
+  }
+
+  public static DslConditionStep le(Expression left, Expression right) {
+    return new DslConditionStep(new LessThanOrEqual(left, right));
+  }
+
+  public static DslConditionStep lt(Expression left, Expression right) {
+    return new DslConditionStep(new LessThan(left, right));
+  }
+
+  public static DslConditionStep ne(Expression left, Expression right) {
+    return new DslConditionStep(Expression.ne(left, right));
+  }
+
+  public static DslConditionStep isNull(Expression expr) {
+    return new DslConditionStep(Expression.isNull(expr));
+  }
+
+  public static DslConditionStep notNull(Expression expr) {
+    return new DslConditionStep(Expression.notNull(expr));
+  }
+
+  public static class DslConditionStep {
+    private Expression condition;
+
+    DslConditionStep(Expression condition) {
+      this.condition = condition;
+    }
+
+    public While body(Statement... statements) {
+      return new While(condition, Block.wrap(statements));
+    }
+
+    public While body(List<Statement> statements) {
+      return new While(condition, Block.wrap(statements));
+    }
   }
 }

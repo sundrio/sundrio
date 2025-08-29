@@ -51,7 +51,7 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
       _visitables.get("statements").add(builder);
       statements.add(builder);
     } else {
-      _visitables.get("statements").add(index, builder);
+      _visitables.get("statements").add(builder);
       statements.add(index, builder);
     }
     return (A) this;
@@ -66,7 +66,7 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
       _visitables.get("statements").add(builder);
       statements.add(builder);
     } else {
-      _visitables.get("statements").add(index, builder);
+      _visitables.get("statements").add(builder);
       statements.add(index, builder);
     }
     return (A) this;
@@ -81,7 +81,7 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
       _visitables.get("statements").add(builder);
       statements.add(builder);
     } else {
-      _visitables.get("statements").set(index, builder);
+      _visitables.get("statements").add(builder);
       statements.set(index, builder);
     }
     return (A) this;
@@ -216,7 +216,7 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasStatements() {
-    return statements != null && !statements.isEmpty();
+    return this.statements != null && !this.statements.isEmpty();
   }
 
   public MethodCallStatementsNested<A> addNewMethodCallStatement() {

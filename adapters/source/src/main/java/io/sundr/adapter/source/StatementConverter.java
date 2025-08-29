@@ -30,17 +30,19 @@ public class StatementConverter {
 
     if (statement instanceof IfStmt) {
       IfStmt ifStmt = (IfStmt) statement;
-      return new If(convertExpression(ifStmt.getCondition()), convertStatement(ifStmt.getThenStmt()),
-          convertStatement(ifStmt.getElseStmt()));
+      return If.condition(convertExpression(ifStmt.getCondition()))
+          .then(convertStatement(ifStmt.getThenStmt()))
+          .orElse(convertStatement(ifStmt.getElseStmt()));
     } else if (statement instanceof WhileStmt) {
       WhileStmt whileStmt = (WhileStmt) statement;
-      return new While(convertExpression(whileStmt.getCondition()), convertStatement(whileStmt.getBody()));
+      return While.condition(convertExpression(whileStmt.getCondition()))
+          .body(convertStatement(whileStmt.getBody()));
     } else if (statement instanceof ForStmt) {
       ForStmt forStmt = (ForStmt) statement;
-      return new For(forStmt.getInit().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()),
-          convertExpression(forStmt.getCompare()),
-          forStmt.getUpdate().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()),
-          convertStatement(forStmt.getBody()));
+      return For.init(forStmt.getInit().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()))
+          .compare(convertExpression(forStmt.getCompare()))
+          .update(forStmt.getUpdate().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()))
+          .body(convertStatement(forStmt.getBody()));
     } else if (statement instanceof ForeachStmt) {
       ForeachStmt foreachStmt = (ForeachStmt) statement;
       return new Foreach(convertVarDeclaration(foreachStmt.getVariable()), convertExpression(foreachStmt.getIterable()),

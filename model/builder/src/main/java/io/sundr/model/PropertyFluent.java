@@ -161,7 +161,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public boolean hasComments() {
-    return comments != null && !comments.isEmpty();
+    return this.comments != null && !this.comments.isEmpty();
   }
 
   public A addToAnnotations(int index, AnnotationRef item) {
@@ -173,7 +173,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
       _visitables.get("annotations").add(builder);
       annotations.add(builder);
     } else {
-      _visitables.get("annotations").add(index, builder);
+      _visitables.get("annotations").add(builder);
       annotations.add(index, builder);
     }
     return (A) this;
@@ -188,7 +188,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
       _visitables.get("annotations").add(builder);
       annotations.add(builder);
     } else {
-      _visitables.get("annotations").set(index, builder);
+      _visitables.get("annotations").add(builder);
       annotations.set(index, builder);
     }
     return (A) this;
@@ -256,7 +256,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public List<AnnotationRef> buildAnnotations() {
-    return annotations != null ? build(annotations) : null;
+    return this.annotations != null ? build(annotations) : null;
   }
 
   public AnnotationRef buildAnnotation(int index) {
@@ -291,7 +291,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
 
   public A withAnnotations(List<AnnotationRef> annotations) {
     if (this.annotations != null) {
-      _visitables.get("annotations").clear();
+      this._visitables.get("annotations").clear();
     }
     if (annotations != null) {
       this.annotations = new ArrayList();
@@ -318,7 +318,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public boolean hasAnnotations() {
-    return annotations != null && !annotations.isEmpty();
+    return this.annotations != null && !this.annotations.isEmpty();
   }
 
   public AnnotationsNested<A> addNewAnnotation() {
@@ -372,14 +372,16 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   public A withTypeRef(TypeRef typeRef) {
     if (typeRef == null) {
       this.typeRef = null;
-      _visitables.remove("typeRef");
+      this._visitables.remove("typeRef");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends TypeRef, ?> builder = builder(typeRef);
+      ;
+      this._visitables.get("typeRef").clear();
+      this._visitables.get("typeRef").add(builder);
+      this.typeRef = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends TypeRef, ?> builder = builder(typeRef);
-    _visitables.get("typeRef").clear();
-    _visitables.get("typeRef").add(builder);
-    this.typeRef = builder;
-    return (A) this;
   }
 
   public boolean hasTypeRef() {
@@ -441,7 +443,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
 
   public A withInitialValue(Optional<Expression> initialValue) {
     if (initialValue == null || !initialValue.isPresent()) {
-      this.initialValue = Optional.empty();
+      this.initialValue = java.util.Optional.empty();
     } else {
       this.initialValue = initialValue;
     }
@@ -450,9 +452,9 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
 
   public A withInitialValue(Expression initialValue) {
     if (initialValue == null) {
-      this.initialValue = Optional.empty();
+      this.initialValue = java.util.Optional.empty();
     } else {
-      this.initialValue = Optional.of(initialValue);
+      this.initialValue = java.util.Optional.of(initialValue);
     }
     return (A) this;
   }
@@ -462,7 +464,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public boolean hasInitialValue() {
-    return initialValue != null && initialValue.isPresent();
+    return this.initialValue != null && this.initialValue.isPresent();
   }
 
   public boolean isEnumConstant() {

@@ -55,7 +55,8 @@ public class Construct implements Expression {
     if (!parameters.isEmpty()) {
       sb.append(parameters.stream().map(TypeRef::render).collect(java.util.stream.Collectors.joining(", ", "<", ">")));
     }
-    sb.append(arguments.stream().map(Expression::render).collect(java.util.stream.Collectors.joining(", ", "(", ")")));
+    sb.append(
+        arguments.stream().map(Expression::renderExpression).collect(java.util.stream.Collectors.joining(", ", "(", ")")));
     return sb.toString();
   }
 }

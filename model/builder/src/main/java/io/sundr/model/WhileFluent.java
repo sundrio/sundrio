@@ -39,14 +39,16 @@ public class WhileFluent<A extends WhileFluent<A>> extends BaseFluent<A> {
   public A withCondition(Expression condition) {
     if (condition == null) {
       this.condition = null;
-      _visitables.remove("condition");
+      this._visitables.remove("condition");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(condition);
+      ;
+      this._visitables.get("condition").clear();
+      this._visitables.get("condition").add(builder);
+      this.condition = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(condition);
-    _visitables.get("condition").clear();
-    _visitables.get("condition").add(builder);
-    this.condition = builder;
-    return (A) this;
   }
 
   public boolean hasCondition() {
@@ -373,20 +375,20 @@ public class WhileFluent<A extends WhileFluent<A>> extends BaseFluent<A> {
     return new AssignConditionNested(item);
   }
 
-  public NegativeConditionNested<A> withNewNegativeCondition() {
-    return new NegativeConditionNested(null);
-  }
-
-  public NegativeConditionNested<A> withNewNegativeConditionLike(Negative item) {
-    return new NegativeConditionNested(item);
-  }
-
   public ThisConditionNested<A> withNewThisCondition() {
     return new ThisConditionNested(null);
   }
 
   public ThisConditionNested<A> withNewThisConditionLike(This item) {
     return new ThisConditionNested(item);
+  }
+
+  public NegativeConditionNested<A> withNewNegativeCondition() {
+    return new NegativeConditionNested(null);
+  }
+
+  public NegativeConditionNested<A> withNewNegativeConditionLike(Negative item) {
+    return new NegativeConditionNested(item);
   }
 
   public LogicalAndConditionNested<A> withNewLogicalAndCondition() {
@@ -488,14 +490,16 @@ public class WhileFluent<A extends WhileFluent<A>> extends BaseFluent<A> {
   public A withStatement(Statement statement) {
     if (statement == null) {
       this.statement = null;
-      _visitables.remove("statement");
+      this._visitables.remove("statement");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Statement, ?> builder = builder(statement);
+      ;
+      this._visitables.get("statement").clear();
+      this._visitables.get("statement").add(builder);
+      this.statement = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Statement, ?> builder = builder(statement);
-    _visitables.get("statement").clear();
-    _visitables.get("statement").add(builder);
-    this.statement = builder;
-    return (A) this;
   }
 
   public boolean hasStatement() {
@@ -740,10 +744,10 @@ public class WhileFluent<A extends WhileFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1318,23 +1322,6 @@ public class WhileFluent<A extends WhileFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeConditionNested<N> extends NegativeFluent<NegativeConditionNested<N>> implements Nested<N> {
-    NegativeConditionNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) WhileFluent.this.withCondition(builder.build());
-    }
-
-    public N endNegativeCondition() {
-      return and();
-    }
-
-  }
-
   public class ThisConditionNested<N> extends ThisFluent<ThisConditionNested<N>> implements Nested<N> {
     ThisConditionNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -1347,6 +1334,23 @@ public class WhileFluent<A extends WhileFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisCondition() {
+      return and();
+    }
+
+  }
+
+  public class NegativeConditionNested<N> extends NegativeFluent<NegativeConditionNested<N>> implements Nested<N> {
+    NegativeConditionNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) WhileFluent.this.withCondition(builder.build());
+    }
+
+    public N endNegativeCondition() {
       return and();
     }
 

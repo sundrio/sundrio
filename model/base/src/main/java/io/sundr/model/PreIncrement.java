@@ -14,6 +14,6 @@ public class PreIncrement implements Expression {
 
   @Override
   public String render() {
-    return "++" + expression.render();
+    return "++" + expression.renderExpression();
   }
 }

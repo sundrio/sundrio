@@ -10,14 +10,6 @@ public class Assign implements ExpressionOrStatement {
     this.value = value;
   }
 
-  public Assign(Property property, Expression value) {
-    this(new PropertyRef(property), value);
-  }
-
-  public Assign(Property property, Object value, Object... rest) {
-    this(property, ValueRef.from(value, rest));
-  }
-
   public Expression getTarget() {
     return target;
   }
@@ -27,6 +19,25 @@ public class Assign implements ExpressionOrStatement {
   }
 
   public String render() {
-    return target.render() + " = " + value.render();
+    return target.renderExpression() + " = " + value.renderExpression();
+  }
+
+  //
+  // DSL
+  //
+  public static DslToStep to(Expression target) {
+    return new DslToStep(target);
+  }
+
+  public static class DslToStep {
+    private final Expression target;
+
+    public DslToStep(Expression target) {
+      this.target = target;
+    }
+
+    public Assign value(Object value, Object... more) {
+      return new Assign(target, ValueRef.from(value, more));
+    }
   }
 }

@@ -28,9 +28,9 @@ public class Ternary implements Expression {
     StringBuilder sb = new StringBuilder();
     sb.append(condition.render())
         .append(" ? ")
-        .append(result.render())
+        .append(result.renderExpression())
         .append(" : ")
-        .append(alternative.render());
+        .append(alternative.renderExpression());
     return sb.toString();
   }
 }

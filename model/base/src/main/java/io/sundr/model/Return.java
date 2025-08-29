@@ -21,6 +21,6 @@ public class Return implements Statement {
   }
 
   public String render() {
-    return "return " + expression.render() + SEMICOLN;
+    return "return " + expression.renderExpression() + SEMICOLN;
   }
 }

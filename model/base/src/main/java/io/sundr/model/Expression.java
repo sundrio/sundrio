@@ -235,7 +235,7 @@ public interface Expression extends Renderable {
   }
 
   default Assign assign(Property property) {
-    return new Assign(this, property.toReference());
+    return new Assign(this, property);
   }
 
   default Assign assignNew(Class type, Expression... arguments) {

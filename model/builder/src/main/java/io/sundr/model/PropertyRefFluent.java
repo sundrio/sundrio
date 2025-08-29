@@ -37,13 +37,13 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
   }
 
   public A withProperty(Property property) {
-    _visitables.get("property").remove(this.property);
+    this._visitables.remove("property");
     if (property != null) {
       this.property = new PropertyBuilder(property);
-      _visitables.get("property").add(this.property);
+      this._visitables.get("property").add(this.property);
     } else {
       this.property = null;
-      _visitables.get("property").remove(this.property);
+      this._visitables.get("property").remove(this.property);
     }
     return (A) this;
   }
@@ -79,14 +79,16 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
   public A withScope(Expression scope) {
     if (scope == null) {
       this.scope = null;
-      _visitables.remove("scope");
+      this._visitables.remove("scope");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(scope);
+      ;
+      this._visitables.get("scope").clear();
+      this._visitables.get("scope").add(builder);
+      this.scope = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(scope);
-    _visitables.get("scope").clear();
-    _visitables.get("scope").add(builder);
-    this.scope = builder;
-    return (A) this;
   }
 
   public boolean hasScope() {
@@ -413,20 +415,20 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
     return new AssignScopeNested(item);
   }
 
-  public NegativeScopeNested<A> withNewNegativeScope() {
-    return new NegativeScopeNested(null);
-  }
-
-  public NegativeScopeNested<A> withNewNegativeScopeLike(Negative item) {
-    return new NegativeScopeNested(item);
-  }
-
   public ThisScopeNested<A> withNewThisScope() {
     return new ThisScopeNested(null);
   }
 
   public ThisScopeNested<A> withNewThisScopeLike(This item) {
     return new ThisScopeNested(item);
+  }
+
+  public NegativeScopeNested<A> withNewNegativeScope() {
+    return new NegativeScopeNested(null);
+  }
+
+  public NegativeScopeNested<A> withNewNegativeScopeLike(Negative item) {
+    return new NegativeScopeNested(item);
   }
 
   public LogicalAndScopeNested<A> withNewLogicalAndScope() {
@@ -619,10 +621,10 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1191,23 +1193,6 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
 
   }
 
-  public class NegativeScopeNested<N> extends NegativeFluent<NegativeScopeNested<N>> implements Nested<N> {
-    NegativeScopeNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) PropertyRefFluent.this.withScope(builder.build());
-    }
-
-    public N endNegativeScope() {
-      return and();
-    }
-
-  }
-
   public class ThisScopeNested<N> extends ThisFluent<ThisScopeNested<N>> implements Nested<N> {
     ThisScopeNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -1220,6 +1205,23 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
     }
 
     public N endThisScope() {
+      return and();
+    }
+
+  }
+
+  public class NegativeScopeNested<N> extends NegativeFluent<NegativeScopeNested<N>> implements Nested<N> {
+    NegativeScopeNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) PropertyRefFluent.this.withScope(builder.build());
+    }
+
+    public N endNegativeScope() {
       return and();
     }
 

@@ -39,14 +39,16 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
   public A withTarget(Expression target) {
     if (target == null) {
       this.target = null;
-      _visitables.remove("target");
+      this._visitables.remove("target");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(target);
+      ;
+      this._visitables.get("target").clear();
+      this._visitables.get("target").add(builder);
+      this.target = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(target);
-    _visitables.get("target").clear();
-    _visitables.get("target").add(builder);
-    this.target = builder;
-    return (A) this;
   }
 
   public boolean hasTarget() {
@@ -373,20 +375,20 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return new AssignTargetNested(item);
   }
 
-  public NegativeTargetNested<A> withNewNegativeTarget() {
-    return new NegativeTargetNested(null);
-  }
-
-  public NegativeTargetNested<A> withNewNegativeTargetLike(Negative item) {
-    return new NegativeTargetNested(item);
-  }
-
   public ThisTargetNested<A> withNewThisTarget() {
     return new ThisTargetNested(null);
   }
 
   public ThisTargetNested<A> withNewThisTargetLike(This item) {
     return new ThisTargetNested(item);
+  }
+
+  public NegativeTargetNested<A> withNewNegativeTarget() {
+    return new NegativeTargetNested(null);
+  }
+
+  public NegativeTargetNested<A> withNewNegativeTargetLike(Negative item) {
+    return new NegativeTargetNested(item);
   }
 
   public LogicalAndTargetNested<A> withNewLogicalAndTarget() {
@@ -488,14 +490,16 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
   public A withValue(Expression value) {
     if (value == null) {
       this.value = null;
-      _visitables.remove("value");
+      this._visitables.remove("value");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(value);
+      ;
+      this._visitables.get("value").clear();
+      this._visitables.get("value").add(builder);
+      this.value = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(value);
-    _visitables.get("value").clear();
-    _visitables.get("value").add(builder);
-    this.value = builder;
-    return (A) this;
   }
 
   public boolean hasValue() {
@@ -822,20 +826,20 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return new AssignValueNested(item);
   }
 
-  public NegativeValueNested<A> withNewNegativeValue() {
-    return new NegativeValueNested(null);
-  }
-
-  public NegativeValueNested<A> withNewNegativeValueLike(Negative item) {
-    return new NegativeValueNested(item);
-  }
-
   public ThisValueNested<A> withNewThisValue() {
     return new ThisValueNested(null);
   }
 
   public ThisValueNested<A> withNewThisValueLike(This item) {
     return new ThisValueNested(item);
+  }
+
+  public NegativeValueNested<A> withNewNegativeValue() {
+    return new NegativeValueNested(null);
+  }
+
+  public NegativeValueNested<A> withNewNegativeValueLike(Negative item) {
+    return new NegativeValueNested(item);
   }
 
   public LogicalAndValueNested<A> withNewLogicalAndValue() {
@@ -1028,10 +1032,10 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1583,23 +1587,6 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeTargetNested<N> extends NegativeFluent<NegativeTargetNested<N>> implements Nested<N> {
-    NegativeTargetNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) AssignFluent.this.withTarget(builder.build());
-    }
-
-    public N endNegativeTarget() {
-      return and();
-    }
-
-  }
-
   public class ThisTargetNested<N> extends ThisFluent<ThisTargetNested<N>> implements Nested<N> {
     ThisTargetNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -1612,6 +1599,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisTarget() {
+      return and();
+    }
+
+  }
+
+  public class NegativeTargetNested<N> extends NegativeFluent<NegativeTargetNested<N>> implements Nested<N> {
+    NegativeTargetNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endNegativeTarget() {
       return and();
     }
 
@@ -2301,23 +2305,6 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeValueNested<N> extends NegativeFluent<NegativeValueNested<N>> implements Nested<N> {
-    NegativeValueNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) AssignFluent.this.withValue(builder.build());
-    }
-
-    public N endNegativeValue() {
-      return and();
-    }
-
-  }
-
   public class ThisValueNested<N> extends ThisFluent<ThisValueNested<N>> implements Nested<N> {
     ThisValueNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -2330,6 +2317,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisValue() {
+      return and();
+    }
+
+  }
+
+  public class NegativeValueNested<N> extends NegativeFluent<NegativeValueNested<N>> implements Nested<N> {
+    NegativeValueNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endNegativeValue() {
       return and();
     }
 

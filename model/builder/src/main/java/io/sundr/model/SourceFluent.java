@@ -42,7 +42,7 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
       _visitables.get("types").add(builder);
       types.add(builder);
     } else {
-      _visitables.get("types").add(index, builder);
+      _visitables.get("types").add(builder);
       types.add(index, builder);
     }
     return (A) this;
@@ -57,7 +57,7 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
       _visitables.get("types").add(builder);
       types.add(builder);
     } else {
-      _visitables.get("types").set(index, builder);
+      _visitables.get("types").add(builder);
       types.set(index, builder);
     }
     return (A) this;
@@ -125,7 +125,7 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
   }
 
   public List<TypeDef> buildTypes() {
-    return types != null ? build(types) : null;
+    return this.types != null ? build(types) : null;
   }
 
   public TypeDef buildType(int index) {
@@ -160,7 +160,7 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
 
   public A withTypes(List<TypeDef> types) {
     if (this.types != null) {
-      _visitables.get("types").clear();
+      this._visitables.get("types").clear();
     }
     if (types != null) {
       this.types = new ArrayList();
@@ -187,7 +187,7 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasTypes() {
-    return types != null && !types.isEmpty();
+    return this.types != null && !this.types.isEmpty();
   }
 
   public A addNewType(String fullyQualifiedName) {

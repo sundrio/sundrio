@@ -15,7 +15,7 @@ public class Cast implements Expression {
   }
 
   public Cast(Class type, Property property) {
-    this(ClassRef.forClass(type), property.toReference());
+    this(ClassRef.forClass(type), property);
   }
 
   public Expression getExpression() {
@@ -28,6 +28,6 @@ public class Cast implements Expression {
 
   @Override
   public String render() {
-    return OP + type.render() + CP + SPACE + expression.render();
+    return OP + type.render() + CP + SPACE + expression.renderExpression();
   }
 }

@@ -44,14 +44,16 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
   public A withExpression(Expression expression) {
     if (expression == null) {
       this.expression = null;
-      _visitables.remove("expression");
+      this._visitables.remove("expression");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(expression);
+      ;
+      this._visitables.get("expression").clear();
+      this._visitables.get("expression").add(builder);
+      this.expression = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(expression);
-    _visitables.get("expression").clear();
-    _visitables.get("expression").add(builder);
-    this.expression = builder;
-    return (A) this;
   }
 
   public boolean hasExpression() {
@@ -378,20 +380,20 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
     return new AssignExpressionNested(item);
   }
 
-  public NegativeExpressionNested<A> withNewNegativeExpression() {
-    return new NegativeExpressionNested(null);
-  }
-
-  public NegativeExpressionNested<A> withNewNegativeExpressionLike(Negative item) {
-    return new NegativeExpressionNested(item);
-  }
-
   public ThisExpressionNested<A> withNewThisExpression() {
     return new ThisExpressionNested(null);
   }
 
   public ThisExpressionNested<A> withNewThisExpressionLike(This item) {
     return new ThisExpressionNested(item);
+  }
+
+  public NegativeExpressionNested<A> withNewNegativeExpression() {
+    return new NegativeExpressionNested(null);
+  }
+
+  public NegativeExpressionNested<A> withNewNegativeExpressionLike(Negative item) {
+    return new NegativeExpressionNested(item);
   }
 
   public LogicalAndExpressionNested<A> withNewLogicalAndExpression() {
@@ -549,34 +551,36 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
 
   public A withDefaultCase(Optional<Block> defaultCase) {
     if (defaultCase == null || !defaultCase.isPresent()) {
-      this.defaultCase = Optional.empty();
+      this.defaultCase = java.util.Optional.empty();
     } else {
       BlockBuilder b = new BlockBuilder(defaultCase.get());
+      ;
       _visitables.get("defaultCase").add(b);
-      this.defaultCase = Optional.of(b);
+      this.defaultCase = java.util.Optional.of(b);
     }
     return (A) this;
   }
 
   public A withDefaultCase(Block defaultCase) {
     if (defaultCase == null) {
-      this.defaultCase = Optional.empty();
+      this.defaultCase = java.util.Optional.empty();
     } else {
       BlockBuilder b = new BlockBuilder(defaultCase);
+      ;
       _visitables.get("defaultCase").add(b);
-      this.defaultCase = Optional.of(b);
+      this.defaultCase = java.util.Optional.of(b);
     }
     return (A) this;
   }
 
   public Optional<Block> buildDefaultCase() {
     return (Optional<Block>) (this.defaultCase != null && this.defaultCase.isPresent()
-        ? Optional.of(this.defaultCase.get().build())
-        : Optional.empty());
+        ? java.util.Optional.of(this.defaultCase.get().build())
+        : java.util.Optional.empty());
   }
 
   public boolean hasDefaultCase() {
-    return defaultCase != null && defaultCase.isPresent();
+    return this.defaultCase != null && this.defaultCase.isPresent();
   }
 
   public DefaultCaseNested<A> withNewDefaultCase() {
@@ -706,10 +710,10 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1262,23 +1266,6 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeExpressionNested<N> extends NegativeFluent<NegativeExpressionNested<N>> implements Nested<N> {
-    NegativeExpressionNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) SwitchFluent.this.withExpression(builder.build());
-    }
-
-    public N endNegativeExpression() {
-      return and();
-    }
-
-  }
-
   public class ThisExpressionNested<N> extends ThisFluent<ThisExpressionNested<N>> implements Nested<N> {
     ThisExpressionNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -1291,6 +1278,23 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisExpression() {
+      return and();
+    }
+
+  }
+
+  public class NegativeExpressionNested<N> extends NegativeFluent<NegativeExpressionNested<N>> implements Nested<N> {
+    NegativeExpressionNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) SwitchFluent.this.withExpression(builder.build());
+    }
+
+    public N endNegativeExpression() {
       return and();
     }
 

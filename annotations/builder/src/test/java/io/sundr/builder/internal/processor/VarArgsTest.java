@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.utils.Sources;
+import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
@@ -40,6 +41,9 @@ public class VarArgsTest extends AbstractProcessorTest {
 
   @Test
   public void testFluentWithBuildableVarArgs() {
+    // Register BuildableItem in the buildable repository so it's recognized as buildable
+    BuilderContextManager.getContext().getBuildableRepository().register(buildableItemDef);
+
     TypeDef fluent = ClazzAs.FLUENT.apply(varArgsClassDef);
     System.out.println(fluent);
 
@@ -50,6 +54,7 @@ public class VarArgsTest extends AbstractProcessorTest {
     boolean hasItemsMethod = false;
     boolean hasAddToItemsMethod = false;
     boolean hasRemoveFromItemsMethod = false;
+    boolean hasBuildItemsMethod = false;
 
     for (Method method : fluent.getMethods()) {
       if (method.getName().equals("withItems")) {
@@ -61,6 +66,9 @@ public class VarArgsTest extends AbstractProcessorTest {
       if (method.getName().equals("removeFromItems")) {
         hasRemoveFromItemsMethod = true;
       }
+      if (method.getName().equals("buildItems")) {
+        hasBuildItemsMethod = true;
+      }
     }
 
     System.out.println("Methods found:");
@@ -71,6 +79,7 @@ public class VarArgsTest extends AbstractProcessorTest {
     assertTrue("Should have withItems method for buildable var-args", hasItemsMethod);
     assertTrue("Should have addToItems method for buildable var-args", hasAddToItemsMethod);
     assertTrue("Should have removeFromItems method for buildable var-args", hasRemoveFromItemsMethod);
+    assertTrue("Should have buildItems method for buildable var-args", hasBuildItemsMethod);
   }
 
   @Test

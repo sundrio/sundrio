@@ -32,7 +32,7 @@ public class Switch implements Statement {
     sb.append("switch");
     sb.append(SPACE);
     sb.append(OP);
-    sb.append(expression.render());
+    sb.append(expression.renderExpression());
     sb.append(CP);
     sb.append(SPACE);
     sb.append(OB);

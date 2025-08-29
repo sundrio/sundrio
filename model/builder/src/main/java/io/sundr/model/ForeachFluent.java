@@ -39,13 +39,13 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
   }
 
   public A withDeclare(Declare declare) {
-    _visitables.get("declare").remove(this.declare);
+    this._visitables.remove("declare");
     if (declare != null) {
       this.declare = new DeclareBuilder(declare);
-      _visitables.get("declare").add(this.declare);
+      this._visitables.get("declare").add(this.declare);
     } else {
       this.declare = null;
-      _visitables.get("declare").remove(this.declare);
+      this._visitables.get("declare").remove(this.declare);
     }
     return (A) this;
   }
@@ -89,14 +89,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
   public A withExpression(Expression expression) {
     if (expression == null) {
       this.expression = null;
-      _visitables.remove("expression");
+      this._visitables.remove("expression");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(expression);
+      ;
+      this._visitables.get("expression").clear();
+      this._visitables.get("expression").add(builder);
+      this.expression = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(expression);
-    _visitables.get("expression").clear();
-    _visitables.get("expression").add(builder);
-    this.expression = builder;
-    return (A) this;
   }
 
   public boolean hasExpression() {
@@ -423,20 +425,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new AssignExpressionNested(item);
   }
 
-  public NegativeExpressionNested<A> withNewNegativeExpression() {
-    return new NegativeExpressionNested(null);
-  }
-
-  public NegativeExpressionNested<A> withNewNegativeExpressionLike(Negative item) {
-    return new NegativeExpressionNested(item);
-  }
-
   public ThisExpressionNested<A> withNewThisExpression() {
     return new ThisExpressionNested(null);
   }
 
   public ThisExpressionNested<A> withNewThisExpressionLike(This item) {
     return new ThisExpressionNested(item);
+  }
+
+  public NegativeExpressionNested<A> withNewNegativeExpression() {
+    return new NegativeExpressionNested(null);
+  }
+
+  public NegativeExpressionNested<A> withNewNegativeExpressionLike(Negative item) {
+    return new NegativeExpressionNested(item);
   }
 
   public LogicalAndExpressionNested<A> withNewLogicalAndExpression() {
@@ -538,14 +540,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
   public A withBody(Statement body) {
     if (body == null) {
       this.body = null;
-      _visitables.remove("body");
+      this._visitables.remove("body");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Statement, ?> builder = builder(body);
+      ;
+      this._visitables.get("body").clear();
+      this._visitables.get("body").add(builder);
+      this.body = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Statement, ?> builder = builder(body);
-    _visitables.get("body").clear();
-    _visitables.get("body").add(builder);
-    this.body = builder;
-    return (A) this;
   }
 
   public boolean hasBody() {
@@ -796,10 +800,10 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1391,23 +1395,6 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeExpressionNested<N> extends NegativeFluent<NegativeExpressionNested<N>> implements Nested<N> {
-    NegativeExpressionNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
-    }
-
-    public N endNegativeExpression() {
-      return and();
-    }
-
-  }
-
   public class ThisExpressionNested<N> extends ThisFluent<ThisExpressionNested<N>> implements Nested<N> {
     ThisExpressionNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -1420,6 +1407,23 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisExpression() {
+      return and();
+    }
+
+  }
+
+  public class NegativeExpressionNested<N> extends NegativeFluent<NegativeExpressionNested<N>> implements Nested<N> {
+    NegativeExpressionNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endNegativeExpression() {
       return and();
     }
 

@@ -61,14 +61,16 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
   public A withScope(Expression scope) {
     if (scope == null) {
       this.scope = null;
-      _visitables.remove("scope");
+      this._visitables.remove("scope");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(scope);
+      ;
+      this._visitables.get("scope").clear();
+      this._visitables.get("scope").add(builder);
+      this.scope = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(scope);
-    _visitables.get("scope").clear();
-    _visitables.get("scope").add(builder);
-    this.scope = builder;
-    return (A) this;
   }
 
   public boolean hasScope() {
@@ -395,20 +397,20 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     return new AssignScopeNested(item);
   }
 
-  public NegativeScopeNested<A> withNewNegativeScope() {
-    return new NegativeScopeNested(null);
-  }
-
-  public NegativeScopeNested<A> withNewNegativeScopeLike(Negative item) {
-    return new NegativeScopeNested(item);
-  }
-
   public ThisScopeNested<A> withNewThisScope() {
     return new ThisScopeNested(null);
   }
 
   public ThisScopeNested<A> withNewThisScopeLike(This item) {
     return new ThisScopeNested(item);
+  }
+
+  public NegativeScopeNested<A> withNewNegativeScope() {
+    return new NegativeScopeNested(null);
+  }
+
+  public NegativeScopeNested<A> withNewNegativeScopeLike(Negative item) {
+    return new NegativeScopeNested(item);
   }
 
   public LogicalAndScopeNested<A> withNewLogicalAndScope() {
@@ -520,7 +522,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").add(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.add(index, builder);
     }
     return (A) this;
@@ -535,7 +537,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").add(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.add(index, builder);
     }
     return (A) this;
@@ -550,7 +552,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").set(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.set(index, builder);
     }
     return (A) this;
@@ -685,7 +687,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
   }
 
   public boolean hasParameters() {
-    return parameters != null && !parameters.isEmpty();
+    return this.parameters != null && !this.parameters.isEmpty();
   }
 
   public ClassRefParametersNested<A> addNewClassRefParameter() {
@@ -765,7 +767,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").add(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.add(index, builder);
     }
     return (A) this;
@@ -780,7 +782,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").add(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.add(index, builder);
     }
     return (A) this;
@@ -795,7 +797,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").set(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.set(index, builder);
     }
     return (A) this;
@@ -930,7 +932,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
   }
 
   public boolean hasArguments() {
-    return arguments != null && !arguments.isEmpty();
+    return this.arguments != null && !this.arguments.isEmpty();
   }
 
   public MultiplyArgumentsNested<A> addNewMultiplyArgument() {
@@ -1377,18 +1379,6 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     return new AssignArgumentsNested(index, item);
   }
 
-  public NegativeArgumentsNested<A> addNewNegativeArgument() {
-    return new NegativeArgumentsNested(-1, null);
-  }
-
-  public NegativeArgumentsNested<A> addNewNegativeArgumentLike(Negative item) {
-    return new NegativeArgumentsNested(-1, item);
-  }
-
-  public NegativeArgumentsNested<A> setNewNegativeArgumentLike(int index, Negative item) {
-    return new NegativeArgumentsNested(index, item);
-  }
-
   public ThisArgumentsNested<A> addNewThisArgument() {
     return new ThisArgumentsNested(-1, null);
   }
@@ -1399,6 +1389,18 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
 
   public ThisArgumentsNested<A> setNewThisArgumentLike(int index, This item) {
     return new ThisArgumentsNested(index, item);
+  }
+
+  public NegativeArgumentsNested<A> addNewNegativeArgument() {
+    return new NegativeArgumentsNested(-1, null);
+  }
+
+  public NegativeArgumentsNested<A> addNewNegativeArgumentLike(Negative item) {
+    return new NegativeArgumentsNested(-1, item);
+  }
+
+  public NegativeArgumentsNested<A> setNewNegativeArgumentLike(int index, Negative item) {
+    return new NegativeArgumentsNested(index, item);
   }
 
   public LogicalAndArgumentsNested<A> addNewLogicalAndArgument() {
@@ -1639,10 +1641,10 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -2204,23 +2206,6 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
 
   }
 
-  public class NegativeScopeNested<N> extends NegativeFluent<NegativeScopeNested<N>> implements Nested<N> {
-    NegativeScopeNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) MethodCallFluent.this.withScope(builder.build());
-    }
-
-    public N endNegativeScope() {
-      return and();
-    }
-
-  }
-
   public class ThisScopeNested<N> extends ThisFluent<ThisScopeNested<N>> implements Nested<N> {
     ThisScopeNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -2233,6 +2218,23 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     }
 
     public N endThisScope() {
+      return and();
+    }
+
+  }
+
+  public class NegativeScopeNested<N> extends NegativeFluent<NegativeScopeNested<N>> implements Nested<N> {
+    NegativeScopeNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) MethodCallFluent.this.withScope(builder.build());
+    }
+
+    public N endNegativeScope() {
       return and();
     }
 
@@ -3081,25 +3083,6 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
 
   }
 
-  public class NegativeArgumentsNested<N> extends NegativeFluent<NegativeArgumentsNested<N>> implements Nested<N> {
-    NegativeArgumentsNested(int index, Negative item) {
-      this.index = index;
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-    int index;
-
-    public N and() {
-      return (N) MethodCallFluent.this.setToArguments(index, builder.build());
-    }
-
-    public N endNegativeArgument() {
-      return and();
-    }
-
-  }
-
   public class ThisArgumentsNested<N> extends ThisFluent<ThisArgumentsNested<N>> implements Nested<N> {
     ThisArgumentsNested(int index, This item) {
       this.index = index;
@@ -3114,6 +3097,25 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     }
 
     public N endThisArgument() {
+      return and();
+    }
+
+  }
+
+  public class NegativeArgumentsNested<N> extends NegativeFluent<NegativeArgumentsNested<N>> implements Nested<N> {
+    NegativeArgumentsNested(int index, Negative item) {
+      this.index = index;
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) MethodCallFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endNegativeArgument() {
       return and();
     }
 

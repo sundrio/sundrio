@@ -58,7 +58,7 @@ public class MethodCall implements ExpressionOrStatement {
     if (scope != null) {
       // ValueRef of class / ClassRef are rendered using the .class suffix.
       // In this case we need to remove that.
-      sb.append(scope.render().replaceAll(Pattern.quote(".class") + "$", "")).append(DOT);
+      sb.append(scope.renderExpression().replaceAll(Pattern.quote(".class") + "$", "")).append(DOT);
       if (!parameters.isEmpty()) {
         sb.append("<");
         sb.append(parameters.stream().map(TypeRef::render).collect(Collectors.joining(", ")));
@@ -68,7 +68,7 @@ public class MethodCall implements ExpressionOrStatement {
 
     sb.append(name).append(OP);
     if (!arguments.isEmpty()) {
-      sb.append(arguments.stream().map(Expression::render).collect(Collectors.joining(", ")));
+      sb.append(arguments.stream().map(Expression::renderExpression).collect(Collectors.joining(", ")));
     }
     sb.append(CP);
     return sb.toString();

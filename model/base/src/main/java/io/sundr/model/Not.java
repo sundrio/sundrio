@@ -14,6 +14,6 @@ public class Not implements Expression {
 
   @Override
   public String render() {
-    return "!" + expresion.render();
+    return "!" + expresion.renderExpression();
   }
 }

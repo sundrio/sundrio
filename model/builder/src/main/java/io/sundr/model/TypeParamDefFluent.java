@@ -56,7 +56,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
       _visitables.get("bounds").add(builder);
       bounds.add(builder);
     } else {
-      _visitables.get("bounds").add(index, builder);
+      _visitables.get("bounds").add(builder);
       bounds.add(index, builder);
     }
     return (A) this;
@@ -71,7 +71,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
       _visitables.get("bounds").add(builder);
       bounds.add(builder);
     } else {
-      _visitables.get("bounds").set(index, builder);
+      _visitables.get("bounds").add(builder);
       bounds.set(index, builder);
     }
     return (A) this;
@@ -139,7 +139,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public List<ClassRef> buildBounds() {
-    return bounds != null ? build(bounds) : null;
+    return this.bounds != null ? build(bounds) : null;
   }
 
   public ClassRef buildBound(int index) {
@@ -174,7 +174,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
 
   public A withBounds(List<ClassRef> bounds) {
     if (this.bounds != null) {
-      _visitables.get("bounds").clear();
+      this._visitables.get("bounds").clear();
     }
     if (bounds != null) {
       this.bounds = new ArrayList();
@@ -201,7 +201,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public boolean hasBounds() {
-    return bounds != null && !bounds.isEmpty();
+    return this.bounds != null && !this.bounds.isEmpty();
   }
 
   public BoundsNested<A> addNewBound() {
