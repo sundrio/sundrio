@@ -14,6 +14,6 @@ public class PreDecrement implements Expression {
 
   @Override
   public String render() {
-    return "--" + expression.render();
+    return "--" + expression.renderExpression();
   }
 }

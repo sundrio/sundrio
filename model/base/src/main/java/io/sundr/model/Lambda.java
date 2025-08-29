@@ -44,7 +44,7 @@ public class Lambda implements ExpressionOrStatement {
     sb.append(" -> ");
     //Return is implied so no need to render it.
     if (statement instanceof Return) {
-      sb.append(((Return) statement).getExpression().render());
+      sb.append(((Return) statement).getExpression().renderExpression());
     } else {
       sb.append(Renderable.noSemicolon(statement.render()));
     }

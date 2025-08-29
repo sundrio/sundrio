@@ -24,6 +24,6 @@ public class InstanceOf implements Expression {
 
   @Override
   public String render() {
-    return expression.render() + " instanceof " + type.render();
+    return expression.renderExpression() + " instanceof " + type.render();
   }
 }

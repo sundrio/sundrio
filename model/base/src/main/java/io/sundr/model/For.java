@@ -45,11 +45,11 @@ public class For implements Statement {
   public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("for").append(SPACE).append(OP);
-    sb.append(init.stream().map(e -> e.render()).map(Renderable::noSemicolon).collect(Collectors.joining(",")));
+    sb.append(init.stream().map(e -> e.renderExpression()).map(Renderable::noSemicolon).collect(Collectors.joining(",")));
     sb.append(SEMICOLN);
-    sb.append(compare.render());
+    sb.append(compare.renderExpression());
     sb.append(SEMICOLN);
-    sb.append(update.stream().map(e -> e.render()).collect(Collectors.joining(",")));
+    sb.append(update.stream().map(e -> e.renderExpression()).collect(Collectors.joining(",")));
     sb.append(CP);
     sb.append(SPACE).append(OB).append(NEWLINE);
     sb.append(tab(body.renderStatement()));

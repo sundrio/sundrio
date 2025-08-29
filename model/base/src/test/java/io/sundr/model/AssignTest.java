@@ -13,7 +13,7 @@ public class AssignTest {
   @Test
   public void testBooleanAssignment() {
     Property a = Property.newProperty(STRING, "a");
-    Assign assign = new Assign(a, false);
+    Assign assign = Assign.to(a).value(false);
     assertEquals("a = false", assign.render());
     assertEquals("a = false;", assign.renderStatement());
   }
@@ -21,7 +21,7 @@ public class AssignTest {
   @Test
   public void testNumberAssignment() {
     Property a = Property.newProperty(STRING, "a");
-    Assign assign = new Assign(a, 1);
+    Assign assign = Assign.to(a).value(1);
     assertEquals("a = 1", assign.render());
     assertEquals("a = 1;", assign.renderStatement());
   }
@@ -29,7 +29,7 @@ public class AssignTest {
   @Test
   public void testValueNumberArrayAssignment() {
     Property a = Property.newProperty(STRING, "a");
-    Assign assign = new Assign(a, 1, 2);
+    Assign assign = Assign.to(a).value(1, 2);
     assertEquals("a = {1, 2}", assign.render());
     assertEquals("a = {1, 2};", assign.renderStatement());
   }
@@ -37,7 +37,7 @@ public class AssignTest {
   @Test
   public void testValueStringAssignment() {
     Property a = Property.newProperty(STRING, "a");
-    Assign assign = new Assign(a, "hello world");
+    Assign assign = Assign.to(a).value("hello world");
     assertEquals("a = \"hello world\"", assign.render());
     assertEquals("a = \"hello world\";", assign.renderStatement());
   }
@@ -45,7 +45,7 @@ public class AssignTest {
   @Test
   public void testValueStringArrayAssignment() {
     Property a = Property.newProperty(OBJECT, "a");
-    Assign assign = new Assign(a, "hello", "world");
+    Assign assign = Assign.to(a).value("hello", "world");
     assertEquals("a = {\"hello\", \"world\"}", assign.render());
     assertEquals("a = {\"hello\", \"world\"};", assign.renderStatement());
   }
@@ -55,7 +55,7 @@ public class AssignTest {
     Property a = Property.newProperty(STRING, "a");
     Property b = Property.newProperty(STRING, "b");
 
-    Assign assign = new Assign(a, b);
+    Assign assign = Assign.to(a).value(b);
     assertEquals("a = b", assign.render());
     assertEquals("a = b;", assign.renderStatement());
   }
@@ -63,7 +63,7 @@ public class AssignTest {
   @Test
   public void testClassRefAssignment() {
     Property a = Property.newProperty(STRING, "a");
-    Assign assign = new Assign(a, STRING);
+    Assign assign = Assign.to(a).value(STRING);
     assertEquals("a = java.lang.String.class", assign.render());
     assertEquals("a = java.lang.String.class;", assign.renderStatement());
   }
@@ -75,7 +75,7 @@ public class AssignTest {
     Property c = Property.newProperty(STRING, "c");
     Expression expr = new Equals(b, c);
 
-    Assign assign = new Assign(a, expr);
+    Assign assign = Assign.to(a).value(expr);
     assertEquals("a = b == c", assign.render());
     assertEquals("a = b == c;", assign.renderStatement());
   }
