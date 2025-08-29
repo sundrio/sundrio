@@ -42,7 +42,7 @@ public class NewArray implements Expression {
   public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("new ").append(type.render());
-    sb.append(expressions.stream().map(Expression::render).collect(Collectors.joining(", ", "[", "]")));
+    sb.append(expressions.stream().map(Expression::renderExpression).collect(Collectors.joining(", ", "[", "]")));
     return sb.toString();
   }
 
