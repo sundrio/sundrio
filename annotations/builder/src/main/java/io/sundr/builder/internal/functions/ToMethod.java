@@ -34,8 +34,6 @@ import static io.sundr.builder.internal.functions.TypeAs.combine;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.model.Attributeable.ALSO_IMPORT;
-import static io.sundr.model.Attributeable.INIT_FUNCTION;
-import static io.sundr.model.Attributeable.LAZY_INIT;
 import static io.sundr.model.Expression.call;
 import static io.sundr.model.Expression.cast;
 import static io.sundr.model.Expression.enclosed;
@@ -80,15 +78,19 @@ import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.Block;
+import io.sundr.model.Break;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
+import io.sundr.model.For;
 import io.sundr.model.Foreach;
 import io.sundr.model.GreaterThanOrEqual;
 import io.sundr.model.If;
+import io.sundr.model.InstanceOf;
 import io.sundr.model.Lambda;
 import io.sundr.model.LessThan;
+import io.sundr.model.LessThanOrEqual;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
@@ -103,6 +105,7 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.ValueRef;
+import io.sundr.model.While;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.model.utils.Getter;
@@ -704,7 +707,7 @@ class ToMethod {
           final TypeRef unwrapped = BOXED_OF.apply(combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
           List<ClassRef> alsoImport = new ArrayList<>();
 
-          Property item = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
+          Property items = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
 
           Property unwrappedProperty = new PropertyBuilder(property).withName("item").withTypeRef(unwrapped).build();
 
@@ -724,20 +727,25 @@ class ToMethod {
             }
           }
 
-          StringStatement init = new StringStatement(
-              "if (this." + propertyName + " == null) {this." + propertyName + " = " + property.getAttribute(LAZY_INIT) + ";}");
+          If init = If.isNull(new This().property(propertyName))
+              .then(new This().property(propertyName)
+                  .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.emptyList())))
+              .end();
+
           Method addSingleItemAtIndex = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).addToArguments(INDEX)
               .addToArguments(unwrappedProperty).withNewBlock()
-              .withStatements(init, new StringStatement("this." + propertyName + ".add(index, item);"),
-                  new StringStatement("return (" + returnType + ")this;"))
+              .withStatements(init,
+                  new This().property(propertyName).call("add", Property.newProperty("index"), Property.newProperty("item")),
+                  new Return(Expression.cast(returnType, new This())))
               .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           Method setSingleItemAtIndex = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(setMethodName).withReturnType(returnType).addToArguments(INDEX)
               .addToArguments(unwrappedProperty).withNewBlock()
               .withStatements(init,
-                  new StringStatement("this." + propertyName + ".set(index, item); return (" + returnType + ")this;"))
+                  new This().property(propertyName).call("set", Property.newProperty("index"), Property.newProperty("item")),
+                  new Return(Expression.cast(returnType, new This())))
               .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           List<Statement> statements = new ArrayList<>();
@@ -752,75 +760,88 @@ class ToMethod {
 
             //We need to do it more
             alsoImport.add(BUILDER_REF.apply(targetType));
-            statements.add(new StringStatement("for (" + ((ClassRef) unwrapped).getFullyQualifiedName() + " item : items) {"
-                + builderClass + " builder = new " + builderClass + "(item);_visitables.get(\"" + propertyName
-                + "\").add(builder);this." + propertyName + ".add(builder);} return (" + returnType + ")this;"));
+            Property item = Property.newProperty(unwrapped, "item");
+            Property builder = Property.newProperty(BUILDER_REF.apply(targetType), "builder");
+            statements.add(new Foreach(item, Property.newProperty("items"),
+                Block.wrap(
+                    new Declare(builder, Expression.createNew(BUILDER_REF.apply(targetType), item)),
+                    Property.newProperty("_visitables").call("get", ValueRef.from(propertyName)).call("add", builder),
+                    new This().property(propertyName).call("add", builder))));
+            statements.add(new Return(Expression.cast(returnType, new This())));
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
-                .withStatements(init, new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
+                .withStatements(init,
+                    new Declare(builder, Expression.createNew(BUILDER_REF.apply(targetType), Property.newProperty("item"))),
                     createAddOrSetIndex("add", propertyName, returnType.toString()),
-                    new StringStatement("return (" + returnType + ")this;"))
+                    new Return(Expression.cast(returnType, new This())))
                 .endBlock().build();
 
             setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
-                .withStatements(init, new StringStatement(builderClass + " builder = new " + builderClass + "(item);"),
+                .withStatements(init,
+                    new Declare(builder, Expression.createNew(BUILDER_REF.apply(targetType), Property.newProperty("item"))),
                     createAddOrSetIndex("set", propertyName, returnType.toString()),
-                    new StringStatement("return (" + returnType + ")this;"))
+                    new Return(Expression.cast(returnType, new This())))
                 .endBlock().build();
 
           } else if (!descendants.isEmpty()) {
             final ClassRef targetType = (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
 
-            statements
-                .add(new StringStatement("for (" + targetType.toString() + " item : items) { " + "VisitableBuilder<? extends "
-                    + targetType.getFullyQualifiedName() + ",?> builder = builder(item); _visitables.get(\"" + propertyName
-                    + "\").add(builder);this." + propertyName + ".add(builder); }"));
-            statements.add(new StringStatement("return (" + returnType + ")this;"));
+            Property item = Property.newProperty(targetType, "item");
+            Property builder = Property.newProperty(VISITABLE_BUILDER_REF.apply(targetType), "builder");
+            statements.add(new Foreach(item, Property.newProperty("items"),
+                Block.wrap(
+                    new Declare(builder, Expression.newCall("builder", item)),
+                    Property.newProperty("_visitables").call("get", ValueRef.from(propertyName)).call("add", builder),
+                    new This().property(propertyName).call("add", builder))));
+            statements.add(new Return(Expression.cast(returnType, new This())));
 
             addSingleItemAtIndex = new MethodBuilder(addSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(init,
-                    new StringStatement(
-                        "VisitableBuilder<? extends " + targetType.getFullyQualifiedName() + ",?> builder = builder(item);"),
+                    new Declare(builder, Expression.newCall("builder", Property.newProperty("item"))),
                     createAddOrSetIndex("add", propertyName, returnType.toString()),
-                    new StringStatement("return (" + returnType + ")this;"))
+                    new Return(Expression.cast(returnType, new This())))
                 .endBlock().build();
 
             setSingleItemAtIndex = new MethodBuilder(setSingleItemAtIndex).withParameters(parameters).editBlock()
                 .withStatements(init,
-                    new StringStatement(
-                        "VisitableBuilder<? extends " + targetType.getFullyQualifiedName() + ",?> builder = builder(item);"),
+                    new Declare(builder, Expression.newCall("builder", Property.newProperty("item"))),
                     createAddOrSetIndex("set", propertyName, returnType.toString()),
-                    new StringStatement("return (" + returnType + ")this;"))
+                    new Return(Expression.cast(returnType, new This())))
                 .endBlock().build();
 
             methods
                 .add(
                     new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
                         .withName(addVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
-                        .addToStatements(init, new StringStatement("_visitables.get(\"" + propertyName
-                            + "\").add(builder);this." + propertyName + ".add(builder); return (" + returnType + ")this;"))
+                        .addToStatements(init,
+                            Property.newProperty("_visitables").call("get", ValueRef.from(propertyName)).call("add",
+                                Property.newProperty("builder")),
+                            new This().property(propertyName).call("add", Property.newProperty("builder")),
+                            new Return(Expression.cast(returnType, new This())))
                         .endBlock().build());
 
             methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
                 .withName(addVarargMethodName).withReturnType(returnType).withArguments(INDEX, builderProperty).withNewBlock()
                 .addToStatements(init, createAddOrSetIndex("add", propertyName, returnType.toString()),
-                    new StringStatement("return (" + returnType + ")this;"))
+                    new Return(Expression.cast(returnType, new This())))
                 .endBlock().build());
 
           } else {
-            statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) {this." + property.getName()
-                + ".add(item);} return (" + returnType + ")this;"));
+            Property item = Property.newProperty(unwrapped, "item");
+            statements.add(new Foreach(item, Property.newProperty("items"),
+                new This().property(property.getName()).call("add", item)));
+            statements.add(new Return(Expression.cast(returnType, new This())));
           }
 
           Method addVaragToCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-              .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).withArguments(item)
+              .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).withArguments(items)
               .withVarArgPreferred(true).withNewBlock().addAllToStatements(statements).endBlock()
               .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           Method addAllToCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addAllMethodName).withReturnType(returnType)
-              .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
+              .withArguments(new PropertyBuilder(items).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
               .addAllToStatements(statements).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           if (io.sundr.model.utils.Collections.IS_LIST.apply(property.getTypeRef())) {
@@ -857,12 +878,13 @@ class ToMethod {
           TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
           TypeRef builderType = VISITABLE_BUILDER_REF.apply(baseType);
-          Property builderProperty = new PropertyBuilder(property).withName("builder").withTypeRef(builderType).build();
+          Property visitableBuilderProperty = new PropertyBuilder(property).withName("builder").withTypeRef(builderType)
+              .build();
 
           TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
           final TypeRef unwrapped = BOXED_OF.apply(combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
           List<ClassRef> alsoImport = new ArrayList<>();
-          Property item = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
+          Property items = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
 
           List<TypeParamDef> parameters = new ArrayList<>();
 
@@ -892,38 +914,52 @@ class ToMethod {
             alsoImport.add(BUILDER_REF.apply(targetType));
             alsoImport.add(LIST.toInternalReference());
             statements.add(nullCheck(returnType, propertyName));
-            statements.add(new StringStatement("for (" + targetClass + " item : items) {" + builderClass + " builder = new "
-                + builderClass + "(item);_visitables.get(\"" + propertyName + "\").remove(builder); " + "this." + propertyName
-                + ".remove(builder);} return (" + returnType + ")this;"));
+            Property item = Property.newProperty(targetType, "item");
+            Property builder = Property.newProperty(BUILDER_REF.apply(targetType), "builder");
+            statements.add(new Foreach(item, Property.newProperty("items"),
+                Block.wrap(
+                    new Declare(builder, Expression.createNew(BUILDER_REF.apply(targetType), item)),
+                    Property.newProperty("_visitables").call("get", ValueRef.from(propertyName)).call("remove", builder),
+                    new This().property(propertyName).call("remove", builder))));
+            statements.add(new Return(Expression.cast(returnType, new This())));
           } else if (!descendants.isEmpty()) {
             final ClassRef targetType = (ClassRef) unwrapped;
             parameters.addAll(GetDefinition.of(targetType).getParameters());
             statements.add(nullCheck(returnType, propertyName));
-            statements.add(new StringStatement("for (" + targetType.toString() + " item : items) {"));
-            statements.add(new StringStatement("VisitableBuilder<? extends " + targetType.getFullyQualifiedName()
-                + ",?> builder = builder(item); _visitables.get(\"" + property.getName() + "\").remove(builder);this."
-                + property.getName() + ".remove(builder);"));
-            statements.add(new StringStatement("} return (" + returnType + ")this;"));
+            Property item = Property.newProperty(targetType, "item");
+            Property builder = Property.newProperty(VISITABLE_BUILDER_REF.apply(targetType), "builder");
+            statements.add(new Foreach(item, Property.newProperty("items"),
+                Block.wrap(
+                    new Declare(builder, Expression.newCall("builder", item)),
+                    Property.newProperty("_visitables").call("get", ValueRef.from(property.getName())).call("remove", builder),
+                    new This().property(property.getName()).call("remove", builder))));
+            statements.add(new Return(Expression.cast(returnType, new This())));
 
             methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters)
-                .withName(removeVarargMethodName).withReturnType(returnType).withArguments(builderProperty).withNewBlock()
-                .addToStatements(nullCheck(returnType, propertyName), new StringStatement("_visitables.get(\"" + propertyName
-                    + "\").remove(builder);this." + propertyName + ".remove(builder); return (" + returnType + ")this;"))
+                .withName(removeVarargMethodName).withReturnType(returnType).withArguments(visitableBuilderProperty)
+                .withNewBlock()
+                .addToStatements(nullCheck(returnType, propertyName),
+                    Property.newProperty("_visitables").call("get", ValueRef.from(propertyName)).call("remove",
+                        Property.newProperty("builder")),
+                    new This().property(propertyName).call("remove", Property.newProperty("builder")),
+                    new Return(Expression.cast(returnType, new This())))
                 .endBlock().build());
           } else {
             isSimple = true;
             statements.add(nullCheck(returnType, propertyName));
-            statements.add(new StringStatement("for (" + unwrapped.toString() + " item : items) { " + "this."
-                + property.getName() + ".remove(item);} return (" + returnType + ")this;"));
+            Property item = Property.newProperty(unwrapped, "item");
+            statements.add(new Foreach(item, Property.newProperty("items"),
+                new This().property(property.getName()).call("remove", item)));
+            statements.add(new Return(Expression.cast(returnType, new This())));
           }
 
           Method removeVarargFromCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-              .withName(removeVarargMethodName).withParameters(parameters).withReturnType(returnType).withArguments(item)
+              .withName(removeVarargMethodName).withParameters(parameters).withReturnType(returnType).withArguments(items)
               .withVarArgPreferred(true).withNewBlock().withStatements(statements).endBlock().build();
 
           Method removeAllFromCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(removeAllMethodName).withReturnType(returnType)
-              .withArguments(new PropertyBuilder(item).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
+              .withArguments(new PropertyBuilder(items).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
               .withStatements(statements).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
 
           methods.add(removeVarargFromCollection);
@@ -941,26 +977,52 @@ class ToMethod {
             }
             alsoImport.add(new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").build());
             alsoImport.add((ClassRef) builderType);
+            // Create property references for cleaner code
+            Property propertyRef = Property.newProperty(propertyName);
+            Property eachProperty = Property.newProperty(
+                new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").withArguments(builder).build(), "each");
+            Property visitablesProperty = Property
+                .newProperty(new ClassRefBuilder().withFullyQualifiedName("java.util.List").build(), "visitables");
+
+            Property builderProperty = Property.newProperty(builder, "builder");
+            Property predicateProperty = Property.newProperty("predicate");
+
             methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).withNewModifiers()
                 .withPublic().endModifiers().withReturnType(returnType).withParameters(parameters)
                 .withName(removeMatchingMethodName).addNewArgument().withName("predicate")
                 .withTypeRef(Constants.PREDICATE.toReference(builder)).endArgument().withNewBlock()
-                .addNewStringStatementStatement("if (" + propertyName + " == null) return (" + returnType + ") this;")
-                .addNewStringStatementStatement("final Iterator<" + builder + "> each = " + propertyName + ".iterator();")
-                .addNewStringStatementStatement("final List visitables = _visitables.get(\"" + propertyName + "\");")
-                .addNewStringStatementStatement("while (each.hasNext()) {")
-                .addNewStringStatementStatement("  " + builder + " builder = each.next();")
-                .addNewStringStatementStatement("  if (predicate.test(builder)) {")
-                .addNewStringStatementStatement("    visitables.remove(builder);")
-                .addNewStringStatementStatement("    each.remove();").addNewStringStatementStatement("  }")
-                .addNewStringStatementStatement("}").addNewStringStatementStatement("return (" + returnType + ")this;")
+                .withStatements(
+                    // if (propertyName == null) return (returnType) this;
+                    If.isNull(propertyRef)
+                        .then(new Return(Expression.cast(returnType, new This())))
+                        .end(),
+                    // final Iterator<builder> each = propertyName.iterator();
+                    new Declare(eachProperty, propertyRef.call("iterator")),
+                    // final List visitables = _visitables.get("propertyName");
+                    new Declare(visitablesProperty,
+                        Property.newProperty("_visitables").call("get", ValueRef.from(propertyName))),
+                    // while (each.hasNext()) { ... }
+                    While.condition(eachProperty.call("hasNext"))
+                        .body(
+                            // builder builder = each.next();
+                            new Declare(builderProperty, eachProperty.call("next")),
+                            // if (predicate.test(builder)) { visitables.remove(builder); each.remove(); }
+                            If.condition(predicateProperty.call("test", builderProperty))
+                                .then(
+                                    visitablesProperty.call("remove", builderProperty),
+                                    eachProperty.call("remove"))
+                                .end()),
+                    // return (returnType) this;
+                    new Return(Expression.cast(returnType, new This())))
                 .endBlock().build());
           }
           return methods;
         }
 
-        private StringStatement nullCheck(TypeRef returnType, String propertyName) {
-          return new StringStatement("if (this." + propertyName + " == null) return (" + returnType + ")this;");
+        private If nullCheck(TypeRef returnType, String propertyName) {
+          return If.isNull(new This().property(propertyName))
+              .then(new Return(Expression.cast(returnType, new This())))
+              .end();
         }
       });
 
@@ -975,10 +1037,15 @@ class ToMethod {
         .withReturnType(returnType)
         .withArguments(mapProperty)
         .withNewBlock()
-        .addNewStringStatementStatement("if(this." + property.getName() + " == null && map != null) { this."
-            + property.getName() + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList()) + "; }")
-        .addNewStringStatementStatement(
-            "if(map != null) { this." + property.getName() + ".putAll(map);} return (" + returnType + ")this;")
+        .withStatements(
+            If.condition(new This().property(property.getName()).isNull().and(Property.newProperty("map").notNull()))
+                .then(new This().property(property.getName())
+                    .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.emptyList())))
+                .end(),
+            If.notNull(Property.newProperty("map"))
+                .then(new This().property(property.getName()).call("putAll", Property.newProperty("map")))
+                .end(),
+            new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build();
   });
@@ -1026,8 +1093,7 @@ class ToMethod {
         .withReturnType(rewraped)
         .withArguments(keyProperty)
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", null);")
+        .withStatements(new Return(Expression.createNew(rewraped, keyProperty, Expression.NULL)))
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
@@ -1039,12 +1105,18 @@ class ToMethod {
         .withReturnType(rewraped)
         .withArguments(keyProperty, valueProperty)
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", " + valueProperty.getName()
-                + ");")
+        .withStatements(new Return(Expression.createNew(rewraped, keyProperty, valueProperty)))
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
+
+    // Create property references for cleaner code
+    Expression thisPropertyRef = new This().property(propertyName);
+    Property keyRef = Property.newProperty(keyProperty.getName());
+    Property toEditProperty = Property.newProperty(new ClassRefBuilder().withFullyQualifiedName(fullyQualifiedBaseType).build(),
+        "toEdit");
+    ClassRef runtimeExceptionRef = new ClassRefBuilder().withFullyQualifiedName("java.lang.RuntimeException").build();
+    ClassRef valueTypeRef = new ClassRefBuilder().withFullyQualifiedName(fullyQualifiedValueType).build();
 
     Method editValueIn = new MethodBuilder()
         .withParameters(parameters)
@@ -1053,17 +1125,23 @@ class ToMethod {
         .withReturnType(rewraped)
         .withArguments(keyProperty)
         .withNewBlock()
-        .addNewStringStatementStatement("if (this." + propertyName + " == null || !this." + propertyName + ".containsKey("
-            + keyProperty.getName() + ")) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + "
-            + keyProperty.getName() + " + \"\\\" doesn't exist.\");")
-        .addNewStringStatementStatement(
-            fullyQualifiedBaseType + " toEdit = this." + propertyName + ".get(" + keyProperty.getName() + ");")
-        .addNewStringStatementStatement("if (toEdit instanceof " + fullyQualifiedValueType
-            + " == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + "
-            + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
-        .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
-                + fullyQualifiedValueType + ") toEdit);")
+        .withStatements(
+            // if (this.propertyName == null || !this.propertyName.containsKey(key)) throw new RuntimeException(...);
+            If.condition(thisPropertyRef.isNull().or(thisPropertyRef.call("containsKey", keyRef).not()))
+                .then(new StringStatement(
+                    "throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " +
+                        keyProperty.getName() + " + \"\\\" doesn't exist.\");"))
+                .end(),
+            // BaseType toEdit = this.propertyName.get(key);
+            new Declare(toEditProperty, thisPropertyRef.call("get", keyRef)),
+            // if (toEdit instanceof ValueType == false) throw new RuntimeException(...);
+            If.condition(new InstanceOf(toEditProperty, valueTypeRef).not())
+                .then(new StringStatement(
+                    "throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " +
+                        keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");"))
+                .end(),
+            // return new WrappedType(key, (ValueType) toEdit);
+            new Return(Expression.createNew(rewraped, keyRef, Expression.cast(valueTypeRef, toEditProperty))))
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
@@ -1075,19 +1153,23 @@ class ToMethod {
         .withReturnType(rewraped)
         .withArguments(keyProperty)
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "if (this." + propertyName + " != null && this." + propertyName + ".containsKey(" + keyProperty.getName() + ")) {")
-        .addNewStringStatementStatement(
-            fullyQualifiedBaseType + " toEdit = this." + propertyName + ".get(" + keyProperty.getName() + ");")
-        .addNewStringStatementStatement("if (toEdit instanceof " + fullyQualifiedValueType
-            + " == false) throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + "
-            + keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");")
-        .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", ("
-                + fullyQualifiedValueType + ") toEdit);")
-        .addNewStringStatementStatement("}")
-        .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + keyProperty.getName() + ", null);")
+        .withStatements(
+            // if (this.propertyName != null && this.propertyName.containsKey(key)) { ... } else { ... }
+            If.condition(thisPropertyRef.notNull().and(thisPropertyRef.call("containsKey", keyRef)))
+                .then(
+                    // BaseType toEdit = this.propertyName.get(key);
+                    new Declare(toEditProperty, thisPropertyRef.call("get", keyRef)),
+                    // if (toEdit instanceof ValueType == false) throw new RuntimeException(...);
+                    If.condition(new InstanceOf(toEditProperty, valueTypeRef).not())
+                        .then(new StringStatement(
+                            "throw new RuntimeException(\"Can't edit " + propertyName + ". Entry for key \\\"\" + " +
+                                keyProperty.getName() + " + \"\\\" is not instance of " + fullyQualifiedValueType + ".\");"))
+                        .end(),
+                    // return new WrappedType(key, (ValueType) toEdit);
+                    new Return(Expression.createNew(rewraped, keyRef, Expression.cast(valueTypeRef, toEditProperty))))
+                .orElse(
+                    // return new WrappedType(key, null);
+                    new Return(Expression.createNew(rewraped, keyRef, Expression.NULL))))
         .endBlock()
         .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
@@ -1113,10 +1195,18 @@ class ToMethod {
         .withReturnType(returnType)
         .withArguments(new Property[] { keyProperty, valueProperty })
         .withNewBlock()
-        .addNewStringStatementStatement("if(this." + property.getName() + " == null && key != null && value != null) { this."
-            + property.getName() + " = " + property.getAttribute(INIT_FUNCTION).apply(Collections.emptyList()) + "; }")
-        .addNewStringStatementStatement("if(key != null && value != null) {this." + property.getName()
-            + ".put(key, value);} return (" + returnType + ")this;")
+        .withStatements(
+            If.condition(new This().property(property.getName()).isNull()
+                .and(Property.newProperty("key").notNull())
+                .and(Property.newProperty("value").notNull()))
+                .then(new This().property(property.getName())
+                    .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.emptyList())))
+                .end(),
+            If.condition(Property.newProperty("key").notNull().and(Property.newProperty("value").notNull()))
+                .then(new This().property(property.getName()).call("put", Property.newProperty("key"),
+                    Property.newProperty("value")))
+                .end(),
+            new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build();
   });
@@ -1132,9 +1222,17 @@ class ToMethod {
         .withReturnType(returnType)
         .withArguments(mapProperty)
         .withNewBlock()
-        .addNewStringStatementStatement("if(this." + property.getName() + " == null) { return (" + returnType + ") this; }")
-        .addNewStringStatementStatement("if(map != null) { for(Object key : map.keySet()) {if (this." + property.getName()
-            + " != null){this." + property.getName() + ".remove(key);}}} return (" + returnType + ")this;")
+        .withStatements(
+            If.isNull(new This().property(property.getName()))
+                .then(new Return(Expression.cast(returnType, new This())))
+                .end(),
+            If.notNull(Property.newProperty("map"))
+                .then(new Foreach(Property.newProperty(Object.class, "key"), Property.newProperty("map").call("keySet"),
+                    If.notNull(new This().property(property.getName()))
+                        .then(new This().property(property.getName()).call("remove", Property.newProperty("key")))
+                        .end()))
+                .end(),
+            new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build();
   });
@@ -1152,9 +1250,14 @@ class ToMethod {
         .withReturnType(returnType)
         .withArguments(keyProperty)
         .withNewBlock()
-        .addNewStringStatementStatement("if(this." + property.getName() + " == null) { return (" + returnType + ") this; }")
-        .addNewStringStatementStatement("if(key != null && this." + property.getName() + " != null) {this." + property.getName()
-            + ".remove(key);} return (" + returnType + ")this;")
+        .withStatements(
+            If.isNull(new This().property(property.getName()))
+                .then(new Return(Expression.cast(returnType, new This())))
+                .end(),
+            If.condition(Property.newProperty("key").notNull().and(new This().property(property.getName()).notNull()))
+                .then(new This().property(property.getName()).call("remove", Property.newProperty("key")))
+                .end(),
+            new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build();
   });
@@ -1197,8 +1300,9 @@ class ToMethod {
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + (hasIndex ? "-1, " : "") + "null);")
+        .withStatements(new Return(hasIndex
+            ? Expression.createNew(rewraped, ValueRef.from(-1), Expression.NULL)
+            : Expression.createNew(rewraped, Expression.NULL)))
         .endBlock()
         .build();
 
@@ -1244,8 +1348,9 @@ class ToMethod {
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(returnType)
           .withArguments(constructor.getArguments()).withName(ownName).withParameters(baseType.getParameters()).withNewBlock()
-          .addNewStringStatementStatement(
-              "return (" + returnType + ")" + delegateName + "(new " + baseType.getFullyQualifiedName() + "(" + args + "));")
+          .withStatements(new Return(Expression.cast(returnType,
+              new This().call(delegateName, Expression.createNew(baseType.toInternalReference(),
+                  constructor.getArguments().stream().map(Property::toReference).toArray(Expression[]::new))))))
           .endBlock().build());
     }
 
@@ -1285,8 +1390,8 @@ class ToMethod {
     String methodNameBase = property.getNameCapitalized();
     String methodName = prefix + methodNameBase;
 
-    String statement = createWithNewStatement(property, methodNameBase,
-        "new " + builderType.getFullyQualifiedName() + "().build()");
+    Expression elseValue = Expression.createNew(builderType).call("build");
+    Statement statement = createWithNewStatementTyped(property, methodNameBase, elseValue);
 
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
@@ -1294,7 +1399,7 @@ class ToMethod {
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement(statement)
+        .withStatements(statement)
         .endBlock()
         .build();
 
@@ -1333,7 +1438,8 @@ class ToMethod {
     String methodNameBase = property.getNameCapitalized();
     String methodName = prefix + methodNameBase + suffix;
 
-    String statement = createWithNewStatement(property, methodNameBase, "item");
+    Expression elseValue = Property.newProperty("item");
+    Statement statement = createWithNewStatementTyped(property, methodNameBase, elseValue);
 
     return new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
@@ -1345,7 +1451,7 @@ class ToMethod {
         .withTypeRef(baseType)
         .endArgument()
         .withNewBlock()
-        .addNewStringStatementStatement(statement)
+        .withStatements(statement)
         .endBlock()
         .build();
 
@@ -1394,8 +1500,9 @@ class ToMethod {
         .withTypeRef(baseType)
         .endArgument()
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "return new " + rewraped.getFullyQualifiedName() + "(" + (isList ? "-1, " : "") + "item);")
+        .withStatements(new Return(isList
+            ? Expression.createNew(rewraped, ValueRef.from(-1), Property.newProperty("item"))
+            : Expression.createNew(rewraped, Property.newProperty("item"))))
         .endBlock()
         .build();
 
@@ -1423,7 +1530,7 @@ class ToMethod {
         .addToArguments(0, INDEX)
         .withName(method.getName().replaceFirst("add", "set"))
         .editBlock()
-        .withStatements(new StringStatement("return new " + rewraped.getFullyQualifiedName() + "(index, item);"))
+        .withStatements(new Return(Expression.createNew(rewraped, Property.newProperty("index"), Property.newProperty("item"))))
         .endBlock()
         .build();
   };
@@ -1462,27 +1569,38 @@ class ToMethod {
     String methodName = "edit" + BuilderUtils.qualifyPropertyName(property, property.getTypeRef(), originTypeDef);
     String methodNameBase = property.getNameCapitalized();
 
-    String statement = createWithNewStatement(property, methodNameBase, "null");
+    Expression elseValue = Expression.NULL;
+    Statement statement = createWithNewStatementTyped(property, methodNameBase, elseValue);
 
     Method base = new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(rewraped)
         .withName(methodName)
         .withNewBlock()
-        .addNewStringStatementStatement(statement)
+        .withStatements(statement)
         .endBlock()
         .build();
 
     if (isList(property.getTypeRef()) || isArray(property.getTypeRef())) {
       String suffix = Singularize.FUNCTION.apply(property.getNameCapitalized());
+      // Create property references for cleaner code
+      Property propertyRef = Property.newProperty(property.getName());
+      Property indexProperty = Property.newProperty(int.class, "index");
+
       methods.add(new MethodBuilder(base)
           .withArguments(INDEX)
           .withName("edit" + suffix)
           .editBlock()
           .withStatements(
-              new StringStatement("if (" + property.getName() + ".size() <= index) throw new RuntimeException(\"Can't edit "
-                  + property.getName() + ". Index exceeds size.\");"),
-              new StringStatement("return setNew" + suffix + "Like(index, build" + suffix + "(index));"))
+              // if (property.size() <= index) throw new RuntimeException(...);
+              If.condition(new LessThanOrEqual(indexProperty, propertyRef.call("size")))
+                  .then(new StringStatement("throw new RuntimeException(\"Can't edit "
+                      + property.getName() + ". Index exceeds size.\");"))
+                  .end(),
+              // return setNewSuffixLike(index, buildSuffix(index));
+              new Return(new This().call("setNew" + suffix + "Like",
+                  indexProperty,
+                  new This().call("build" + suffix, indexProperty))))
           .endBlock()
           .build());
 
@@ -1491,9 +1609,15 @@ class ToMethod {
           .withArguments()
           .editBlock()
           .withStatements(
-              new StringStatement("if (" + property.getName() + ".size() == 0) throw new RuntimeException(\"Can't edit first "
-                  + property.getName() + ". The list is empty.\");"),
-              new StringStatement("return setNew" + suffix + "Like(0, build" + suffix + "(0));"))
+              // if (property.size() == 0) throw new RuntimeException(...);
+              If.eq(propertyRef.call("size"), ValueRef.from(0))
+                  .then(new StringStatement("throw new RuntimeException(\"Can't edit first "
+                      + property.getName() + ". The list is empty.\");"))
+                  .end(),
+              // return setNewSuffixLike(0, buildSuffix(0));
+              new Return(new This().call("setNew" + suffix + "Like",
+                  ValueRef.from(0),
+                  new This().call("build" + suffix, ValueRef.from(0)))))
           .endBlock()
           .build());
 
@@ -1502,12 +1626,23 @@ class ToMethod {
           .withArguments()
           .editBlock()
           .withStatements(
-              new StringStatement("int index = " + property.getName() + ".size() - 1;"),
-              new StringStatement("if (index < 0) throw new RuntimeException(\"Can't edit last " + property.getName()
-                  + ". The list is empty.\");"),
-              new StringStatement("return setNew" + suffix + "Like(index, build" + suffix + "(index));"))
+              // int index = property.size() - 1;
+              new Declare(indexProperty, propertyRef.call("size").minus(1)),
+              // if (index < 0) throw new RuntimeException(...);
+              If.lt(indexProperty, ValueRef.from(0))
+                  .then(new StringStatement("throw new RuntimeException(\"Can't edit last " + property.getName()
+                      + ". The list is empty.\");"))
+                  .end(),
+              // return setNewSuffixLike(index, buildSuffix(index));
+              new Return(new This().call("setNew" + suffix + "Like",
+                  indexProperty,
+                  new This().call("build" + suffix, indexProperty))))
           .endBlock()
           .build());
+
+      // Additional properties for editMatching method
+      Property iProperty = Property.newProperty(Types.PRIMITIVE_INT_REF, "i");
+      Property predicateProperty = Property.newProperty("predicate");
 
       methods.add(new MethodBuilder(base)
           .withName("editMatching" + suffix)
@@ -1517,13 +1652,27 @@ class ToMethod {
           .endArgument()
           .editBlock()
           .withStatements(
-              new StringStatement("int index = -1;"),
-              new StringStatement("for (int i=0;i<" + property.getName() + ".size();i++) { "),
-              new StringStatement("if (predicate.test(" + property.getName() + ".get(i))) {index = i; break;}"),
-              new StringStatement("} "),
-              new StringStatement("if (index < 0) throw new RuntimeException(\"Can't edit matching " + property.getName()
-                  + ". No match found.\");"),
-              new StringStatement("return setNew" + suffix + "Like(index, build" + suffix + "(index));"))
+              // int index = -1;
+              new Declare(indexProperty, ValueRef.from(-1)),
+              // for (int i=0; i<property.size(); i++) { if (predicate.test(property.get(i))) {index = i; break;} }
+              For.init(iProperty, ValueRef.from(0))
+                  .lt(iProperty, propertyRef.call("size"))
+                  .update(iProperty.postIncrement())
+                  .body(
+                      If.condition(predicateProperty.call("test", propertyRef.call("get", iProperty)))
+                          .then(
+                              indexProperty.assign(iProperty),
+                              new Break())
+                          .end()),
+              // if (index < 0) throw new RuntimeException(...);
+              If.lt(indexProperty, ValueRef.from(0))
+                  .then(new StringStatement("throw new RuntimeException(\"Can't edit matching " + property.getName()
+                      + ". No match found.\");"))
+                  .end(),
+              // return setNewSuffixLike(index, buildSuffix(index));
+              new Return(new This().call("setNew" + suffix + "Like",
+                  indexProperty,
+                  new This().call("build" + suffix, indexProperty))))
           .endBlock()
           .build());
     } else {
@@ -1537,6 +1686,27 @@ class ToMethod {
         + getterOrBuildMethodName(property) + "())"
         + (isOptional(property.getTypeRef()) ? ".flatMap(java.util.function.Function.identity())" : "")
         + ".orElse(" + elseValue + "));";
+  }
+
+  private static Statement createWithNewStatementTyped(Property property, String methodNameBase, Expression elseValue) {
+    // Build the method call chain: Optional.ofNullable(getterOrBuildMethodName())
+    Expression optionalCall = Expression.call(Optional.class, "ofNullable",
+        new This().call(getterOrBuildMethodName(property)));
+
+    // Add flatMap if the property type is optional
+    if (isOptional(property.getTypeRef())) {
+      ClassRef functionRef = new ClassRefBuilder()
+          .withFullyQualifiedName("java.util.function.Function")
+          .build();
+      optionalCall = optionalCall.call("flatMap",
+          Expression.call(functionRef, "identity"));
+    }
+
+    // Add orElse with the provided else value
+    Expression orElseCall = optionalCall.call("orElse", elseValue);
+
+    // Create the return statement: return withNewMethodBaseLike(...)
+    return new Return(new This().call("withNew" + methodNameBase + "Like", orElseCall));
   }
 
   static final Function<Property, Method> AND = new Function<Property, Method>() {
@@ -1568,9 +1738,20 @@ class ToMethod {
         }
       }
 
+      List<Expression> args = new ArrayList<>();
+      if (isArray || isList) {
+        args.add(Property.newProperty("index"));
+      } else if (isMap) {
+        args.add(Property.newProperty("key"));
+      }
+      args.add(Property.newProperty("builder").call("build"));
+
+      Expression target = classPrefix.isEmpty() ? new This()
+          : Property.newProperty(classPrefix.substring(0, classPrefix.length() - 1)); // Remove trailing "."
+
       return new MethodBuilder().withNewModifiers().withPublic().endModifiers().withReturnType(N_REF).withName("and")
           .withNewBlock()
-          .addNewStringStatementStatement("return (N) " + classPrefix + withMethodName + "(" + indexOrKey + "builder.build());")
+          .withStatements(new Return(Expression.cast(N_REF, target.call(withMethodName, args.toArray(new Expression[0])))))
           .endBlock().build();
 
     }
