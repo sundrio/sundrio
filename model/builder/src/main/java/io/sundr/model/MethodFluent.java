@@ -166,7 +166,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasComments() {
-    return this.comments != null && !this.comments.isEmpty();
+    return this.comments != null && !(this.comments.isEmpty());
   }
 
   public A addToAnnotations(int index, AnnotationRef item) {
@@ -323,7 +323,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasAnnotations() {
-    return this.annotations != null && !this.annotations.isEmpty();
+    return this.annotations != null && !(this.annotations.isEmpty());
   }
 
   public AnnotationsNested<A> addNewAnnotation() {
@@ -524,7 +524,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasParameters() {
-    return this.parameters != null && !this.parameters.isEmpty();
+    return this.parameters != null && !(this.parameters.isEmpty());
   }
 
   public ParametersNested<A> addNewParameter() {
@@ -800,7 +800,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasArguments() {
-    return this.arguments != null && !this.arguments.isEmpty();
+    return this.arguments != null && !(this.arguments.isEmpty());
   }
 
   public ArgumentsNested<A> addNewArgument() {
@@ -1014,7 +1014,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasExceptions() {
-    return this.exceptions != null && !this.exceptions.isEmpty();
+    return this.exceptions != null && !(this.exceptions.isEmpty());
   }
 
   public ExceptionsNested<A> addNewException() {

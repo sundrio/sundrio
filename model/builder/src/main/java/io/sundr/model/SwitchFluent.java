@@ -557,7 +557,7 @@ public class SwitchFluent<A extends SwitchFluent<A>> extends BaseFluent<A> {
   }
 
   public A withDefaultCase(Optional<Block> defaultCase) {
-    if (defaultCase == null || !defaultCase.isPresent()) {
+    if (defaultCase == null || !(defaultCase.isPresent())) {
       this.defaultCase = java.util.Optional.empty();
     } else {
       BlockBuilder b = new BlockBuilder(defaultCase.get());

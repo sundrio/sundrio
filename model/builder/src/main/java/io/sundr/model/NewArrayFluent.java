@@ -281,7 +281,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasExpressions() {
-    return this.expressions != null && !this.expressions.isEmpty();
+    return this.expressions != null && !(this.expressions.isEmpty());
   }
 
   public MultiplyExpressionsNested<A> addNewMultiplyExpression() {

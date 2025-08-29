@@ -189,7 +189,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasProperties() {
-    return this.properties != null && !this.properties.isEmpty();
+    return this.properties != null && !(this.properties.isEmpty());
   }
 
   public PropertiesNested<A> addNewProperty() {
@@ -237,7 +237,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
   }
 
   public A withValue(Optional<Expression> value) {
-    if (value == null || !value.isPresent()) {
+    if (value == null || !(value.isPresent())) {
       this.value = java.util.Optional.empty();
     } else {
       this.value = value;

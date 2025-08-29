@@ -201,7 +201,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public boolean hasBounds() {
-    return this.bounds != null && !this.bounds.isEmpty();
+    return this.bounds != null && !(this.bounds.isEmpty());
   }
 
   public BoundsNested<A> addNewBound() {

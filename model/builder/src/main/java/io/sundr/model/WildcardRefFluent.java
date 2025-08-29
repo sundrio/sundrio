@@ -231,7 +231,7 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
   }
 
   public boolean hasBounds() {
-    return this.bounds != null && !this.bounds.isEmpty();
+    return this.bounds != null && !(this.bounds.isEmpty());
   }
 
   public ClassRefBoundsNested<A> addNewClassRefBound() {

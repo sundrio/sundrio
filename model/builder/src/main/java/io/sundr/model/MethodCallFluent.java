@@ -694,7 +694,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
   }
 
   public boolean hasParameters() {
-    return this.parameters != null && !this.parameters.isEmpty();
+    return this.parameters != null && !(this.parameters.isEmpty());
   }
 
   public ClassRefParametersNested<A> addNewClassRefParameter() {
@@ -939,7 +939,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
   }
 
   public boolean hasArguments() {
-    return this.arguments != null && !this.arguments.isEmpty();
+    return this.arguments != null && !(this.arguments.isEmpty());
   }
 
   public MultiplyArgumentsNested<A> addNewMultiplyArgument() {

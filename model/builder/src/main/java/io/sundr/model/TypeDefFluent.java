@@ -210,7 +210,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasComments() {
-    return this.comments != null && !this.comments.isEmpty();
+    return this.comments != null && !(this.comments.isEmpty());
   }
 
   public A addToAnnotations(int index, AnnotationRef item) {
@@ -367,7 +367,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasAnnotations() {
-    return this.annotations != null && !this.annotations.isEmpty();
+    return this.annotations != null && !(this.annotations.isEmpty());
   }
 
   public AnnotationsNested<A> addNewAnnotation() {
@@ -568,7 +568,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasExtendsList() {
-    return this.extendsList != null && !this.extendsList.isEmpty();
+    return this.extendsList != null && !(this.extendsList.isEmpty());
   }
 
   public ExtendsListNested<A> addNewExtendsList() {
@@ -769,7 +769,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasImplementsList() {
-    return this.implementsList != null && !this.implementsList.isEmpty();
+    return this.implementsList != null && !(this.implementsList.isEmpty());
   }
 
   public ImplementsListNested<A> addNewImplementsList() {
@@ -970,7 +970,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasParameters() {
-    return this.parameters != null && !this.parameters.isEmpty();
+    return this.parameters != null && !(this.parameters.isEmpty());
   }
 
   public ParametersNested<A> addNewParameter() {
@@ -1171,7 +1171,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasProperties() {
-    return this.properties != null && !this.properties.isEmpty();
+    return this.properties != null && !(this.properties.isEmpty());
   }
 
   public PropertiesNested<A> addNewProperty() {
@@ -1372,7 +1372,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasConstructors() {
-    return this.constructors != null && !this.constructors.isEmpty();
+    return this.constructors != null && !(this.constructors.isEmpty());
   }
 
   public ConstructorsNested<A> addNewConstructor() {
@@ -1573,7 +1573,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasMethods() {
-    return this.methods != null && !this.methods.isEmpty();
+    return this.methods != null && !(this.methods.isEmpty());
   }
 
   public MethodsNested<A> addNewMethod() {
@@ -1787,7 +1787,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasInnerTypes() {
-    return this.innerTypes != null && !this.innerTypes.isEmpty();
+    return this.innerTypes != null && !(this.innerTypes.isEmpty());
   }
 
   public A addNewInnerType(String fullyQualifiedName) {

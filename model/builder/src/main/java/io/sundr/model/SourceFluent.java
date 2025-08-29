@@ -187,7 +187,7 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasTypes() {
-    return this.types != null && !this.types.isEmpty();
+    return this.types != null && !(this.types.isEmpty());
   }
 
   public A addNewType(String fullyQualifiedName) {
