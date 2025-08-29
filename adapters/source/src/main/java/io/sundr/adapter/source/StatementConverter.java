@@ -30,8 +30,9 @@ public class StatementConverter {
 
     if (statement instanceof IfStmt) {
       IfStmt ifStmt = (IfStmt) statement;
-      return new If(convertExpression(ifStmt.getCondition()), convertStatement(ifStmt.getThenStmt()),
-          convertStatement(ifStmt.getElseStmt()));
+      return If.condition(convertExpression(ifStmt.getCondition()))
+          .then(convertStatement(ifStmt.getThenStmt()))
+          .orElse(convertStatement(ifStmt.getElseStmt()));
     } else if (statement instanceof WhileStmt) {
       WhileStmt whileStmt = (WhileStmt) statement;
       return new While(convertExpression(whileStmt.getCondition()), convertStatement(whileStmt.getBody()));

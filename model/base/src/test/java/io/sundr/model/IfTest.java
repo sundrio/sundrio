@@ -3,7 +3,6 @@ package io.sundr.model;
 import static java.util.regex.Pattern.quote;
 import static org.junit.Assert.assertEquals;
 
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -20,14 +19,14 @@ public class IfTest {
   @Test
   public void testSingleCondition() {
     Property x = Property.newProperty(INTEGER, "x");
-    If stmt = new If(ValueRef.from(true), new Assign(x, 1), Optional.empty());
+    If stmt = If.condition(ValueRef.from(true)).then(new Assign(x, 1)).end();
     assertEquals("if (true) {x = 1;}", unindent(stmt.render()));
   }
 
   @Test
   public void testElse() {
     Property x = Property.newProperty(INTEGER, "x");
-    If stmt = new If(ValueRef.from(true), new Assign(x, 1), new Assign(x, 2));
+    If stmt = If.condition(ValueRef.from(true)).then(new Assign(x, 1)).orElse(new Assign(x, 2));
     assertEquals("if (true) {x = 1;} else {x = 2;}", unindent(stmt.render()));
   }
 
@@ -37,9 +36,9 @@ public class IfTest {
     Property y = Property.newProperty(INTEGER, "y");
     Property z = Property.newProperty(INTEGER, "z");
 
-    If stmt = new If(new LessThan(x, y), new Assign(z, 1),
-        new If(new Equals(x, y), new Assign(z, 2),
-            Optional.of(new Assign(z, 3))));
+    If stmt = If.lt(x.toReference(), y.toReference()).then(new Assign(z, 1))
+        .orElse(If.eq(x.toReference(), y.toReference()).then(new Assign(z, 2))
+            .orElse(new Assign(z, 3)));
     assertEquals("if (x < y) {z = 1;} else if (x == y) {z = 2;} else {z = 3;}", unindent(stmt.render()));
   }
 

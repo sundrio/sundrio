@@ -63,7 +63,6 @@ import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.Assign;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
-import io.sundr.model.Block;
 import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -618,21 +617,23 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .withReturnType(Types.STRING_REF.withDimensions(1))
           .withNewBlock()
           .withStatements(
-              new If(o.toReference().instanceOf(Types.STRING_REF.withDimensions(1)),
-                  new Return(o.toReference().cast(Types.STRING_REF.withDimensions(1)))),
+              If.condition(o.toReference().instanceOf(Types.STRING_REF.withDimensions(1)))
+                  .then(new Return(o.toReference().cast(Types.STRING_REF.withDimensions(1))))
+                  .end(),
 
-              new If(o.toReference().instanceOf(Types.STRING_REF),
-                  new Block(
-                      new Declare(s, o.toReference().cast(Types.STRING_REF)),
-                      new Return(s.toReference().call("split", ValueRef.from(",[ ]*"))))),
-              new If(o.toReference().instanceOf(List.class), new Block(
-                  new Declare(l, new Cast(List.class, o)),
-                  new Declare(larray, Expression.createNewArray(String.class, l.toReference().call("size"))),
-                  For.init(i, 0)
-                      .eq(i.toReference(), l.toReference().call("size"))
-                      .update(i.toReference().postIncrement())
-                      .body(new Assign(larray.toReference().index(i.toReference()),
-                          Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference())))))),
+              If.condition(o.toReference().instanceOf(Types.STRING_REF))
+                  .then(new Declare(s, o.toReference().cast(Types.STRING_REF)),
+                      new Return(s.toReference().call("split", ValueRef.from(",[ ]*"))))
+                  .end(),
+              If.condition(o.toReference().instanceOf(List.class))
+                  .then(new Declare(l, new Cast(List.class, o)),
+                      new Declare(larray, Expression.createNewArray(String.class, l.toReference().call("size"))),
+                      For.init(i, 0)
+                          .eq(i.toReference(), l.toReference().call("size"))
+                          .update(i.toReference().postIncrement())
+                          .body(new Assign(larray.toReference().index(i.toReference()),
+                              Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference())))))
+                  .end(),
               new Return(Expression.createNewArray(String.class, 0)))
           .endBlock()
           .build();
