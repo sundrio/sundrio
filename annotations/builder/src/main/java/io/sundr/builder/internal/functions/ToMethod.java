@@ -259,8 +259,9 @@ class ToMethod {
       Property nonMatchProperty = Property.newProperty(nonMatch);
 
       if (match != null && nonMatch != null) {
-        return new Block(new Foreach(item, property, new If(predicate.toReference().call("test", item.toReference()),
-            new Return(matchProperty))),
+        return new Block(new Foreach(item, property, If.condition(predicate.toReference().call("test", item.toReference()))
+            .then(new Return(matchProperty))
+            .end()),
             new Return(nonMatchProperty));
       } else {
         return new Return(property.toReference().call("removeIf",
@@ -314,11 +315,9 @@ class ToMethod {
 
       if (isBuildable(unwrapped)) {
         if (IS_COLLECTION.apply(type)) {
-          statements.add(new If(
-              //Condition
-              Expression.notNull(new This().property(fieldName)),
-              //Then
-              new This().property("_visitables").call("get", ValueRef.from(fieldName)).call("clear")));
+          statements.add(If.notNull(new This().property(fieldName))
+              .then(new This().property("_visitables").call("get", ValueRef.from(fieldName)).call("clear"))
+              .end());
         } else if (IS_MAP.apply(type)) {
           // There is no such thing as buildable map yet.
         } else {
@@ -327,13 +326,9 @@ class ToMethod {
       }
 
       if (IS_MAP.apply(type)) {
-        statements.add(new If(
-            //Condition
-            Expression.isNull(property.toReference()),
-            //Then
-            new This().property(property).assignNull(),
-            //Else
-            new This().property(property).assignNew(LinkedHashMap.class, property.toReference())));
+        statements.add(If.isNull(property.toReference())
+            .then(new This().property(property).assignNull())
+            .orElse(new This().property(property).assignNew(LinkedHashMap.class, property.toReference())));
 
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
@@ -346,14 +341,10 @@ class ToMethod {
         }
 
         Property item = Property.newProperty(unwrapped, "item");
-        statements.add(new If(
-            //Condition
-            Expression.notNull(property.toReference()),
-            //Then
-            new Block(new This().property(property).assignNew(newInstanceType),
-                new Foreach(item, property.toReference(), new This().call(addToMethodName, item.toReference()))),
-            //Else
-            new This().property(property).assignNull()));
+        statements.add(If.notNull(property.toReference())
+            .then(new This().property(property).assignNew(newInstanceType),
+                new Foreach(item, property.toReference(), new This().call(addToMethodName, item.toReference())))
+            .orElse(new This().property(property).assignNull()));
 
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
@@ -361,12 +352,13 @@ class ToMethod {
 
       if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
-        statements.add(new If(property.toReference().notNull(),
-            new Block(new This().property(property).assignNew(builder, property.toReference()),
+        statements.add(If.notNull(property.toReference())
+            .then(new This().property(property).assignNew(builder, property.toReference()),
                 new This().property("_visitables").call("get", ValueRef.from(property.getName())).call("add",
-                    new This().property(property))),
-            new Block(new This().property(property).assignNull(), new This().property("_visitables")
-                .call("get", ValueRef.from(property.getName())).call("remove", new This().property(property)))));
+                    new This().property(property)))
+            .orElse(new This().property(property).assignNull(),
+                new This().property("_visitables").call("get", ValueRef.from(property.getName())).call("remove",
+                    new This().property(property))));
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       }
@@ -374,15 +366,16 @@ class ToMethod {
       if (!descendants.isEmpty()) {
         Property builder = Property.newProperty(VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped), "builder");
         Property field = Property.newProperty(builder.getTypeRef(), fieldName);
-        statements.add(new If(property.toReference().isNull(),
-            new Block(new This().property(field).assignNull(),
+        statements.add(If.isNull(property.toReference())
+            .then(new This().property(field).assignNull(),
                 new This().property("_visitables").call("remove", ValueRef.from(field.getName())),
-                new Return(Expression.cast(returnType, new This()))),
-            new Block(new Declare(builder, Expression.newCall("builder", property.toReference())),
+                new Return(Expression.cast(returnType, new This())))
+            .orElse(new Declare(builder, Expression.newCall("builder", property.toReference())),
                 new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("clear"),
                 new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("add",
                     builder.toReference()),
-                new This().property(field).assign(builder), new Return(Expression.cast(returnType, new This())))));
+                new This().property(field).assign(builder),
+                new Return(Expression.cast(returnType, new This()))));
         return statements;
       }
 
@@ -413,13 +406,14 @@ class ToMethod {
         .withVarArgPreferred(true)
         .withNewBlock()
         .withStatements(
-            new If(new This().property(property).notNull(),
-                new Block(
-                    new This().property(property).call("clear"),
-                    _visitables.toReference().call("remove", ValueRef.from(property.getName())))),
-            new If(property.toReference().notNull(),
-                new Foreach(new Declare(item), arrayProperty.toReference(),
-                    new This().call(addToMethodName, item.toReference()))),
+            If.notNull(new This().property(property))
+                .then(new This().property(property).call("clear"),
+                    _visitables.toReference().call("remove", ValueRef.from(property.getName())))
+                .end(),
+            If.notNull(property.toReference())
+                .then(new Foreach(new Declare(item), arrayProperty.toReference(),
+                    new This().call(addToMethodName, item.toReference())))
+                .end(),
             new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build();
@@ -456,11 +450,10 @@ class ToMethod {
             .withArguments(property)
             .withNewBlock()
             .withStatements(
-                new If(property.toReference().isNull().or(property.toReference().call("isPresent").not()),
-                    new This().property(property).assign(Expression.call(property.getTypeRef(), "empty")),
-
-                    isBuildable(unwrapped) && !isAbstract(unwrapped)
-                        ? new Block(
+                If.condition(property.toReference().isNull().or(property.toReference().call("isPresent").not()))
+                    .then(new This().property(property).assign(Expression.call(property.getTypeRef(), "empty")))
+                    .orElse(isBuildable(unwrapped) && !isAbstract(unwrapped)
+                        ? Block.wrap(
                             new Declare(b, Expression.createNew(builder, property.toReference().call("get"))),
                             Property.newProperty("_visitables").toReference().call("get", ValueRef.from(property.getName()))
                                 .call("add", b.toReference()),
@@ -473,11 +466,9 @@ class ToMethod {
     Property genericProperty = new PropertyBuilder(property).withTypeRef(unwrapped).build();
     methods.add(new MethodBuilder().withNewModifiers().withPublic().endModifiers().withName(methodName)
         .withReturnType(returnType).withArguments(genericProperty).withNewBlock()
-        .withStatements(new If(property.toReference().isNull(),
-            // Then
-            new This().property(fieldName).assign(property.getAttribute(INIT_EXPRESSION)),
-            // Else
-            prepareBlock),
+        .withStatements(If.isNull(property.toReference())
+            .then(new This().property(fieldName).assign(property.getAttribute(INIT_EXPRESSION)))
+            .orElse(prepareBlock),
             new Return(Expression.cast(returnType, new This())))
         .endBlock()
         .build());
@@ -653,7 +644,7 @@ class ToMethod {
         new Declare(size,
             Expression.ternary(property.toReference().notNull(), property.toReference().call("size"), ValueRef.from(0))),
         new Declare(result, Expression.createNewArray(unwrapped, size.toReference())),
-        new If(size.toReference().eq(ValueRef.from(0)), new Return(result.toReference())),
+        If.eq(size.toReference(), ValueRef.from(0)).then(new Return(result.toReference())).end(),
         new Declare(index, ValueRef.from(0)),
         new Foreach(item, property,
             result.toReference().index(index.toReference().postIncrement())
@@ -849,13 +840,11 @@ class ToMethod {
           PropertyRef _visitables = Property.newProperty("_visitables").toReference();
           PropertyRef builder = Property.newProperty("builder").toReference();
           ValueRef zero = ValueRef.from(0);
-          return new If(Expression.or(new LessThan(index, zero), new GreaterThanOrEqual(index, property.call("size"))),
-              new Block(
-                  _visitables.call("get", propertyNameValue).call("add", builder),
-                  property.call("add", builder)),
-              new Block(
-                  _visitables.call("get", propertyNameValue).call("add", builder),
-                  property.call(op, index, builder)));
+          return If.condition(Expression.or(new LessThan(index, zero), new GreaterThanOrEqual(index, property.call("size"))))
+              .then(_visitables.call("get", propertyNameValue).call("add", builder),
+                  property.call("add", builder))
+              .orElse(_visitables.call("get", propertyNameValue).call("add", builder),
+                  property.call(op, index, builder));
         }
       });
 
