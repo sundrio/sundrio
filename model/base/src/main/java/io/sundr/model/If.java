@@ -39,7 +39,7 @@ public class If implements Statement {
   public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("if").append(SPACE)
-        .append(OP).append(condition.render()).append(CP)
+        .append(OP).append(condition.renderExpression()).append(CP)
         .append(SPACE).append(OB).append(NEWLINE);
 
     sb.append(tab(statement.renderStatement()));

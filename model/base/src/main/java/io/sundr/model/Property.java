@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Property extends ModifierSupport implements Renderable, Commentable, Annotatable {
+public class Property extends ModifierSupport implements Expression, Commentable, Annotatable {
 
   private final List<String> comments;
   private final List<AnnotationRef> annotations;
@@ -234,6 +234,11 @@ public class Property extends ModifierSupport implements Renderable, Commentable
 
   public PropertyRef toReference() {
     return new PropertyRef(this);
+  }
+
+  @Override
+  public String renderExpression() {
+    return toReference().renderExpression();
   }
 
   @Override

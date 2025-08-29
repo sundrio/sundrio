@@ -27,7 +27,7 @@ public class Declare implements ExpressionOrStatement {
   }
 
   public Declare(Property property, Property valueProperty) {
-    this(Arrays.asList(property), Optional.of(valueProperty.toReference()));
+    this(Arrays.asList(property), Optional.of(valueProperty));
   }
 
   public Declare(Property property) {
@@ -59,7 +59,7 @@ public class Declare implements ExpressionOrStatement {
     sb.append(typeRef.render());
     sb.append(SPACE);
     sb.append(properties.stream().map(Property::getName).collect(Collectors.joining(", ")));
-    sb.append(value.map(v -> " = " + v.render()).orElse(""));
+    sb.append(value.map(v -> " = " + v.renderExpression()).orElse(""));
     sb.append(SEMICOLN);
     return sb.toString();
   }

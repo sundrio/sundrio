@@ -17,7 +17,7 @@ public class Foreach implements Statement {
   }
 
   public Foreach(Property declarationProperty, Property expressionProperty, Statement body) {
-    this(new Declare(declarationProperty), expressionProperty.toReference(), body);
+    this(new Declare(declarationProperty), expressionProperty, body);
   }
 
   public Declare getDeclare() {
@@ -38,7 +38,7 @@ public class Foreach implements Statement {
     sb.append("for").append(SPACE).append(OP);
     sb.append(declare.render().replaceAll(";$", ""));
     sb.append(" : ");
-    sb.append(expression.render());
+    sb.append(expression.renderExpression());
     sb.append(CP);
     sb.append(SPACE).append(OB).append(NEWLINE);
     sb.append(tab(body.renderStatement()));

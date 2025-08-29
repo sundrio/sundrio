@@ -41,7 +41,7 @@ public class ValueRef implements Expression {
       }
       return OB + Arrays.stream(array).map(ValueRef::toString).collect(Collectors.joining(", ")) + CB;
     } else if (value instanceof Expression) {
-      return ((Expression) value).render();
+      return ((Expression) value).renderExpression();
     } else if (value instanceof Number) {
       return String.valueOf(value);
     } else if (value instanceof Boolean) {

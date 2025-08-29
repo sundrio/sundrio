@@ -23,7 +23,7 @@ public class BinaryExpression implements Expression {
   }
 
   public String render() {
-    return left.render() + " " + getSymbol() + " " + right.render();
+    return left.renderExpression() + " " + getSymbol() + " " + right.renderExpression();
   }
 
 }
