@@ -35,7 +35,8 @@ public class StatementConverter {
           .orElse(convertStatement(ifStmt.getElseStmt()));
     } else if (statement instanceof WhileStmt) {
       WhileStmt whileStmt = (WhileStmt) statement;
-      return new While(convertExpression(whileStmt.getCondition()), convertStatement(whileStmt.getBody()));
+      return While.condition(convertExpression(whileStmt.getCondition()))
+          .body(convertStatement(whileStmt.getBody()));
     } else if (statement instanceof ForStmt) {
       ForStmt forStmt = (ForStmt) statement;
       return For.init(forStmt.getInit().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()))
