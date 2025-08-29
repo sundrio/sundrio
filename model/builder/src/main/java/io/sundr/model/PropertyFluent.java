@@ -161,7 +161,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public boolean hasComments() {
-    return this.comments != null && !this.comments.isEmpty();
+    return this.comments != null && !(this.comments.isEmpty());
   }
 
   public A addToAnnotations(int index, AnnotationRef item) {
@@ -318,7 +318,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public boolean hasAnnotations() {
-    return this.annotations != null && !this.annotations.isEmpty();
+    return this.annotations != null && !(this.annotations.isEmpty());
   }
 
   public AnnotationsNested<A> addNewAnnotation() {
@@ -441,7 +441,7 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
   }
 
   public A withInitialValue(Optional<Expression> initialValue) {
-    if (initialValue == null || !initialValue.isPresent()) {
+    if (initialValue == null || !(initialValue.isPresent())) {
       this.initialValue = java.util.Optional.empty();
     } else {
       this.initialValue = initialValue;

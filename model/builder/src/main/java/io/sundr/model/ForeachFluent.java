@@ -618,6 +618,14 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new ContinueBodyNested(item);
   }
 
+  public ThrowBodyNested<A> withNewThrowBody() {
+    return new ThrowBodyNested(null);
+  }
+
+  public ThrowBodyNested<A> withNewThrowBodyLike(Throw item) {
+    return new ThrowBodyNested(item);
+  }
+
   public StringStatementBodyNested<A> withNewStringStatementBody() {
     return new StringStatementBodyNested(null);
   }
@@ -838,6 +846,8 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
       case "io.sundr.model." + "Continue":
         return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
+      case "io.sundr.model." + "Throw":
+        return (VisitableBuilder<T, ?>) new ThrowBuilder((Throw) item);
       case "io.sundr.model." + "StringStatement":
         return (VisitableBuilder<T, ?>) new StringStatementBuilder((StringStatement) item);
       case "io.sundr.model." + "Do":
@@ -1708,6 +1718,23 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N endContinueBody() {
+      return and();
+    }
+
+  }
+
+  public class ThrowBodyNested<N> extends ThrowFluent<ThrowBodyNested<N>> implements Nested<N> {
+    ThrowBodyNested(Throw item) {
+      this.builder = new ThrowBuilder(this, item);
+    }
+
+    ThrowBuilder builder;
+
+    public N and() {
+      return (N) ForeachFluent.this.withBody(builder.build());
+    }
+
+    public N endThrowBody() {
       return and();
     }
 

@@ -571,6 +571,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new ContinueStatementNested(item);
   }
 
+  public ThrowStatementNested<A> withNewThrowStatement() {
+    return new ThrowStatementNested(null);
+  }
+
+  public ThrowStatementNested<A> withNewThrowStatementLike(Throw item) {
+    return new ThrowStatementNested(item);
+  }
+
   public StringStatementNested<A> withNewStringStatement() {
     return new StringStatementNested(null);
   }
@@ -656,7 +664,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withElseStatement(Optional<Statement> elseStatement) {
-    if (elseStatement == null || !elseStatement.isPresent()) {
+    if (elseStatement == null || !(elseStatement.isPresent())) {
       this.elseStatement = java.util.Optional.empty();
     } else {
       this.elseStatement = elseStatement;
@@ -817,6 +825,8 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
       case "io.sundr.model." + "Continue":
         return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
+      case "io.sundr.model." + "Throw":
+        return (VisitableBuilder<T, ?>) new ThrowBuilder((Throw) item);
       case "io.sundr.model." + "StringStatement":
         return (VisitableBuilder<T, ?>) new StringStatementBuilder((StringStatement) item);
       case "io.sundr.model." + "Do":
@@ -1669,6 +1679,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endContinueStatement() {
+      return and();
+    }
+
+  }
+
+  public class ThrowStatementNested<N> extends ThrowFluent<ThrowStatementNested<N>> implements Nested<N> {
+    ThrowStatementNested(Throw item) {
+      this.builder = new ThrowBuilder(this, item);
+    }
+
+    ThrowBuilder builder;
+
+    public N and() {
+      return (N) IfFluent.this.withStatement(builder.build());
+    }
+
+    public N endThrowStatement() {
       return and();
     }
 

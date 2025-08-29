@@ -245,7 +245,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   }
 
   public boolean hasArguments() {
-    return this.arguments != null && !this.arguments.isEmpty();
+    return this.arguments != null && !(this.arguments.isEmpty());
   }
 
   public ClassRefArgumentsNested<A> addNewClassRefArgument() {

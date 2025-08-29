@@ -216,7 +216,7 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasStatements() {
-    return this.statements != null && !this.statements.isEmpty();
+    return this.statements != null && !(this.statements.isEmpty());
   }
 
   public MethodCallStatementsNested<A> addNewMethodCallStatement() {
@@ -297,6 +297,18 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
 
   public ContinueStatementsNested<A> setNewContinueStatementLike(int index, Continue item) {
     return new ContinueStatementsNested(index, item);
+  }
+
+  public ThrowStatementsNested<A> addNewThrowStatement() {
+    return new ThrowStatementsNested(-1, null);
+  }
+
+  public ThrowStatementsNested<A> addNewThrowStatementLike(Throw item) {
+    return new ThrowStatementsNested(-1, item);
+  }
+
+  public ThrowStatementsNested<A> setNewThrowStatementLike(int index, Throw item) {
+    return new ThrowStatementsNested(index, item);
   }
 
   public StringStatementStatementsNested<A> addNewStringStatementStatement() {
@@ -461,6 +473,8 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
       case "io.sundr.model." + "Continue":
         return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
+      case "io.sundr.model." + "Throw":
+        return (VisitableBuilder<T, ?>) new ThrowBuilder((Throw) item);
       case "io.sundr.model." + "StringStatement":
         return (VisitableBuilder<T, ?>) new StringStatementBuilder((StringStatement) item);
       case "io.sundr.model." + "Do":
@@ -592,6 +606,25 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     }
 
     public N endContinueStatement() {
+      return and();
+    }
+
+  }
+
+  public class ThrowStatementsNested<N> extends ThrowFluent<ThrowStatementsNested<N>> implements Nested<N> {
+    ThrowStatementsNested(int index, Throw item) {
+      this.index = index;
+      this.builder = new ThrowBuilder(this, item);
+    }
+
+    ThrowBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endThrowStatement() {
       return and();
     }
 
