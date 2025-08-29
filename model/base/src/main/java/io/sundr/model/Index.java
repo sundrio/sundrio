@@ -20,6 +20,6 @@ public class Index implements Expression {
 
   @Override
   public String render() {
-    return scope.render() + "[" + expression.render() + "]";
+    return scope.renderExpression() + "[" + expression.renderExpression() + "]";
   }
 }

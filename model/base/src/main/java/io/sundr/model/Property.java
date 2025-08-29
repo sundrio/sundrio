@@ -221,7 +221,7 @@ public class Property extends ModifierSupport implements Expression, Commentable
    */
   @Deprecated
   protected String getDefaultValue() {
-    return getInitialValue().map(Expression::render).orElseGet(() -> {
+    return getInitialValue().map(Expression::renderExpression).orElseGet(() -> {
       Object value = getAttribute(INIT);
       if (getTypeRef() instanceof ClassRef && ((ClassRef) getTypeRef()).getFullyQualifiedName().equals(JAVA_LANG_STRING)
           && getTypeRef().getDimensions() == 0 && !String.valueOf(value).startsWith("\"")) {
