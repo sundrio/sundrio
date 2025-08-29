@@ -37,10 +37,10 @@ public class StatementConverter {
       return new While(convertExpression(whileStmt.getCondition()), convertStatement(whileStmt.getBody()));
     } else if (statement instanceof ForStmt) {
       ForStmt forStmt = (ForStmt) statement;
-      return new For(forStmt.getInit().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()),
-          convertExpression(forStmt.getCompare()),
-          forStmt.getUpdate().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()),
-          convertStatement(forStmt.getBody()));
+      return For.init(forStmt.getInit().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()))
+          .compare(convertExpression(forStmt.getCompare()))
+          .update(forStmt.getUpdate().stream().map(ExpressionConverter::convertExpression).collect(Collectors.toList()))
+          .body(convertStatement(forStmt.getBody()));
     } else if (statement instanceof ForeachStmt) {
       ForeachStmt foreachStmt = (ForeachStmt) statement;
       return new Foreach(convertVarDeclaration(foreachStmt.getVariable()), convertExpression(foreachStmt.getIterable()),

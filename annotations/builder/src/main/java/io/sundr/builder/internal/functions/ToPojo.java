@@ -628,10 +628,10 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
               new If(o.toReference().instanceOf(List.class), new Block(
                   new Declare(l, new Cast(List.class, o)),
                   new Declare(larray, Expression.createNewArray(String.class, l.toReference().call("size"))),
-                  new For(new Declare(i, 0),
-                      Expression.eq(i.toReference(), l.toReference().call("size")),
-                      i.toReference().postIncrement(),
-                      new Assign(larray.toReference().index(i.toReference()),
+                  For.init(i, 0)
+                      .eq(i.toReference(), l.toReference().call("size"))
+                      .update(i.toReference().postIncrement())
+                      .body(new Assign(larray.toReference().index(i.toReference()),
                           Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference())))))),
               new Return(Expression.createNewArray(String.class, 0)))
           .endBlock()
