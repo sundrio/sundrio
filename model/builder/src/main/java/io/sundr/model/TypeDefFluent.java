@@ -210,7 +210,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasComments() {
-    return comments != null && !comments.isEmpty();
+    return this.comments != null && !this.comments.isEmpty();
   }
 
   public A addToAnnotations(int index, AnnotationRef item) {
@@ -222,7 +222,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("annotations").add(builder);
       annotations.add(builder);
     } else {
-      _visitables.get("annotations").add(index, builder);
+      _visitables.get("annotations").add(builder);
       annotations.add(index, builder);
     }
     return (A) this;
@@ -237,7 +237,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("annotations").add(builder);
       annotations.add(builder);
     } else {
-      _visitables.get("annotations").set(index, builder);
+      _visitables.get("annotations").add(builder);
       annotations.set(index, builder);
     }
     return (A) this;
@@ -305,7 +305,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<AnnotationRef> buildAnnotations() {
-    return annotations != null ? build(annotations) : null;
+    return this.annotations != null ? build(annotations) : null;
   }
 
   public AnnotationRef buildAnnotation(int index) {
@@ -340,7 +340,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withAnnotations(List<AnnotationRef> annotations) {
     if (this.annotations != null) {
-      _visitables.get("annotations").clear();
+      this._visitables.get("annotations").clear();
     }
     if (annotations != null) {
       this.annotations = new ArrayList();
@@ -367,7 +367,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasAnnotations() {
-    return annotations != null && !annotations.isEmpty();
+    return this.annotations != null && !this.annotations.isEmpty();
   }
 
   public AnnotationsNested<A> addNewAnnotation() {
@@ -423,7 +423,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("extendsList").add(builder);
       extendsList.add(builder);
     } else {
-      _visitables.get("extendsList").add(index, builder);
+      _visitables.get("extendsList").add(builder);
       extendsList.add(index, builder);
     }
     return (A) this;
@@ -438,7 +438,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("extendsList").add(builder);
       extendsList.add(builder);
     } else {
-      _visitables.get("extendsList").set(index, builder);
+      _visitables.get("extendsList").add(builder);
       extendsList.set(index, builder);
     }
     return (A) this;
@@ -506,7 +506,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<ClassRef> buildExtendsList() {
-    return extendsList != null ? build(extendsList) : null;
+    return this.extendsList != null ? build(extendsList) : null;
   }
 
   public ClassRef buildExtendsList(int index) {
@@ -541,7 +541,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withExtendsList(List<ClassRef> extendsList) {
     if (this.extendsList != null) {
-      _visitables.get("extendsList").clear();
+      this._visitables.get("extendsList").clear();
     }
     if (extendsList != null) {
       this.extendsList = new ArrayList();
@@ -568,7 +568,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasExtendsList() {
-    return extendsList != null && !extendsList.isEmpty();
+    return this.extendsList != null && !this.extendsList.isEmpty();
   }
 
   public ExtendsListNested<A> addNewExtendsList() {
@@ -624,7 +624,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("implementsList").add(builder);
       implementsList.add(builder);
     } else {
-      _visitables.get("implementsList").add(index, builder);
+      _visitables.get("implementsList").add(builder);
       implementsList.add(index, builder);
     }
     return (A) this;
@@ -639,7 +639,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("implementsList").add(builder);
       implementsList.add(builder);
     } else {
-      _visitables.get("implementsList").set(index, builder);
+      _visitables.get("implementsList").add(builder);
       implementsList.set(index, builder);
     }
     return (A) this;
@@ -707,7 +707,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<ClassRef> buildImplementsList() {
-    return implementsList != null ? build(implementsList) : null;
+    return this.implementsList != null ? build(implementsList) : null;
   }
 
   public ClassRef buildImplementsList(int index) {
@@ -742,7 +742,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withImplementsList(List<ClassRef> implementsList) {
     if (this.implementsList != null) {
-      _visitables.get("implementsList").clear();
+      this._visitables.get("implementsList").clear();
     }
     if (implementsList != null) {
       this.implementsList = new ArrayList();
@@ -769,7 +769,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasImplementsList() {
-    return implementsList != null && !implementsList.isEmpty();
+    return this.implementsList != null && !this.implementsList.isEmpty();
   }
 
   public ImplementsListNested<A> addNewImplementsList() {
@@ -825,7 +825,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").add(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.add(index, builder);
     }
     return (A) this;
@@ -840,7 +840,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").set(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.set(index, builder);
     }
     return (A) this;
@@ -908,7 +908,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<TypeParamDef> buildParameters() {
-    return parameters != null ? build(parameters) : null;
+    return this.parameters != null ? build(parameters) : null;
   }
 
   public TypeParamDef buildParameter(int index) {
@@ -943,7 +943,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withParameters(List<TypeParamDef> parameters) {
     if (this.parameters != null) {
-      _visitables.get("parameters").clear();
+      this._visitables.get("parameters").clear();
     }
     if (parameters != null) {
       this.parameters = new ArrayList();
@@ -970,7 +970,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasParameters() {
-    return parameters != null && !parameters.isEmpty();
+    return this.parameters != null && !this.parameters.isEmpty();
   }
 
   public ParametersNested<A> addNewParameter() {
@@ -1026,7 +1026,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("properties").add(builder);
       properties.add(builder);
     } else {
-      _visitables.get("properties").add(index, builder);
+      _visitables.get("properties").add(builder);
       properties.add(index, builder);
     }
     return (A) this;
@@ -1041,7 +1041,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("properties").add(builder);
       properties.add(builder);
     } else {
-      _visitables.get("properties").set(index, builder);
+      _visitables.get("properties").add(builder);
       properties.set(index, builder);
     }
     return (A) this;
@@ -1109,7 +1109,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<Property> buildProperties() {
-    return properties != null ? build(properties) : null;
+    return this.properties != null ? build(properties) : null;
   }
 
   public Property buildProperty(int index) {
@@ -1144,7 +1144,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withProperties(List<Property> properties) {
     if (this.properties != null) {
-      _visitables.get("properties").clear();
+      this._visitables.get("properties").clear();
     }
     if (properties != null) {
       this.properties = new ArrayList();
@@ -1171,7 +1171,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasProperties() {
-    return properties != null && !properties.isEmpty();
+    return this.properties != null && !this.properties.isEmpty();
   }
 
   public PropertiesNested<A> addNewProperty() {
@@ -1227,7 +1227,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("constructors").add(builder);
       constructors.add(builder);
     } else {
-      _visitables.get("constructors").add(index, builder);
+      _visitables.get("constructors").add(builder);
       constructors.add(index, builder);
     }
     return (A) this;
@@ -1242,7 +1242,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("constructors").add(builder);
       constructors.add(builder);
     } else {
-      _visitables.get("constructors").set(index, builder);
+      _visitables.get("constructors").add(builder);
       constructors.set(index, builder);
     }
     return (A) this;
@@ -1310,7 +1310,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<Method> buildConstructors() {
-    return constructors != null ? build(constructors) : null;
+    return this.constructors != null ? build(constructors) : null;
   }
 
   public Method buildConstructor(int index) {
@@ -1345,7 +1345,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withConstructors(List<Method> constructors) {
     if (this.constructors != null) {
-      _visitables.get("constructors").clear();
+      this._visitables.get("constructors").clear();
     }
     if (constructors != null) {
       this.constructors = new ArrayList();
@@ -1372,7 +1372,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasConstructors() {
-    return constructors != null && !constructors.isEmpty();
+    return this.constructors != null && !this.constructors.isEmpty();
   }
 
   public ConstructorsNested<A> addNewConstructor() {
@@ -1428,7 +1428,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("methods").add(builder);
       methods.add(builder);
     } else {
-      _visitables.get("methods").add(index, builder);
+      _visitables.get("methods").add(builder);
       methods.add(index, builder);
     }
     return (A) this;
@@ -1443,7 +1443,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("methods").add(builder);
       methods.add(builder);
     } else {
-      _visitables.get("methods").set(index, builder);
+      _visitables.get("methods").add(builder);
       methods.set(index, builder);
     }
     return (A) this;
@@ -1511,7 +1511,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<Method> buildMethods() {
-    return methods != null ? build(methods) : null;
+    return this.methods != null ? build(methods) : null;
   }
 
   public Method buildMethod(int index) {
@@ -1546,7 +1546,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withMethods(List<Method> methods) {
     if (this.methods != null) {
-      _visitables.get("methods").clear();
+      this._visitables.get("methods").clear();
     }
     if (methods != null) {
       this.methods = new ArrayList();
@@ -1573,7 +1573,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasMethods() {
-    return methods != null && !methods.isEmpty();
+    return this.methods != null && !this.methods.isEmpty();
   }
 
   public MethodsNested<A> addNewMethod() {
@@ -1642,7 +1642,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("innerTypes").add(builder);
       innerTypes.add(builder);
     } else {
-      _visitables.get("innerTypes").add(index, builder);
+      _visitables.get("innerTypes").add(builder);
       innerTypes.add(index, builder);
     }
     return (A) this;
@@ -1657,7 +1657,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
       _visitables.get("innerTypes").add(builder);
       innerTypes.add(builder);
     } else {
-      _visitables.get("innerTypes").set(index, builder);
+      _visitables.get("innerTypes").add(builder);
       innerTypes.set(index, builder);
     }
     return (A) this;
@@ -1725,7 +1725,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public List<TypeDef> buildInnerTypes() {
-    return innerTypes != null ? build(innerTypes) : null;
+    return this.innerTypes != null ? build(innerTypes) : null;
   }
 
   public TypeDef buildInnerType(int index) {
@@ -1760,7 +1760,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A withInnerTypes(List<TypeDef> innerTypes) {
     if (this.innerTypes != null) {
-      _visitables.get("innerTypes").clear();
+      this._visitables.get("innerTypes").clear();
     }
     if (innerTypes != null) {
       this.innerTypes = new ArrayList();
@@ -1787,7 +1787,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public boolean hasInnerTypes() {
-    return innerTypes != null && !innerTypes.isEmpty();
+    return this.innerTypes != null && !this.innerTypes.isEmpty();
   }
 
   public A addNewInnerType(String fullyQualifiedName) {

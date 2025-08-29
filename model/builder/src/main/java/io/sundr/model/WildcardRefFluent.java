@@ -66,7 +66,7 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
       _visitables.get("bounds").add(builder);
       bounds.add(builder);
     } else {
-      _visitables.get("bounds").add(index, builder);
+      _visitables.get("bounds").add(builder);
       bounds.add(index, builder);
     }
     return (A) this;
@@ -81,7 +81,7 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
       _visitables.get("bounds").add(builder);
       bounds.add(builder);
     } else {
-      _visitables.get("bounds").add(index, builder);
+      _visitables.get("bounds").add(builder);
       bounds.add(index, builder);
     }
     return (A) this;
@@ -96,7 +96,7 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
       _visitables.get("bounds").add(builder);
       bounds.add(builder);
     } else {
-      _visitables.get("bounds").set(index, builder);
+      _visitables.get("bounds").add(builder);
       bounds.set(index, builder);
     }
     return (A) this;
@@ -231,7 +231,7 @@ public class WildcardRefFluent<A extends WildcardRefFluent<A>> extends TypeRefFl
   }
 
   public boolean hasBounds() {
-    return bounds != null && !bounds.isEmpty();
+    return this.bounds != null && !this.bounds.isEmpty();
   }
 
   public ClassRefBoundsNested<A> addNewClassRefBound() {

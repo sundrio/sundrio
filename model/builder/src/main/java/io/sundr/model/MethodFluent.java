@@ -166,7 +166,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasComments() {
-    return comments != null && !comments.isEmpty();
+    return this.comments != null && !this.comments.isEmpty();
   }
 
   public A addToAnnotations(int index, AnnotationRef item) {
@@ -178,7 +178,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("annotations").add(builder);
       annotations.add(builder);
     } else {
-      _visitables.get("annotations").add(index, builder);
+      _visitables.get("annotations").add(builder);
       annotations.add(index, builder);
     }
     return (A) this;
@@ -193,7 +193,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("annotations").add(builder);
       annotations.add(builder);
     } else {
-      _visitables.get("annotations").set(index, builder);
+      _visitables.get("annotations").add(builder);
       annotations.set(index, builder);
     }
     return (A) this;
@@ -261,7 +261,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public List<AnnotationRef> buildAnnotations() {
-    return annotations != null ? build(annotations) : null;
+    return this.annotations != null ? build(annotations) : null;
   }
 
   public AnnotationRef buildAnnotation(int index) {
@@ -296,7 +296,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A withAnnotations(List<AnnotationRef> annotations) {
     if (this.annotations != null) {
-      _visitables.get("annotations").clear();
+      this._visitables.get("annotations").clear();
     }
     if (annotations != null) {
       this.annotations = new ArrayList();
@@ -323,7 +323,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasAnnotations() {
-    return annotations != null && !annotations.isEmpty();
+    return this.annotations != null && !this.annotations.isEmpty();
   }
 
   public AnnotationsNested<A> addNewAnnotation() {
@@ -379,7 +379,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").add(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.add(index, builder);
     }
     return (A) this;
@@ -394,7 +394,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").set(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.set(index, builder);
     }
     return (A) this;
@@ -462,7 +462,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public List<TypeParamDef> buildParameters() {
-    return parameters != null ? build(parameters) : null;
+    return this.parameters != null ? build(parameters) : null;
   }
 
   public TypeParamDef buildParameter(int index) {
@@ -497,7 +497,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A withParameters(List<TypeParamDef> parameters) {
     if (this.parameters != null) {
-      _visitables.get("parameters").clear();
+      this._visitables.get("parameters").clear();
     }
     if (parameters != null) {
       this.parameters = new ArrayList();
@@ -524,7 +524,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasParameters() {
-    return parameters != null && !parameters.isEmpty();
+    return this.parameters != null && !this.parameters.isEmpty();
   }
 
   public ParametersNested<A> addNewParameter() {
@@ -591,14 +591,16 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   public A withReturnType(TypeRef returnType) {
     if (returnType == null) {
       this.returnType = null;
-      _visitables.remove("returnType");
+      this._visitables.remove("returnType");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends TypeRef, ?> builder = builder(returnType);
+      ;
+      this._visitables.get("returnType").clear();
+      this._visitables.get("returnType").add(builder);
+      this.returnType = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends TypeRef, ?> builder = builder(returnType);
-    _visitables.get("returnType").clear();
-    _visitables.get("returnType").add(builder);
-    this.returnType = builder;
-    return (A) this;
   }
 
   public boolean hasReturnType() {
@@ -654,7 +656,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").add(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.add(index, builder);
     }
     return (A) this;
@@ -669,7 +671,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").set(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.set(index, builder);
     }
     return (A) this;
@@ -737,7 +739,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public List<Property> buildArguments() {
-    return arguments != null ? build(arguments) : null;
+    return this.arguments != null ? build(arguments) : null;
   }
 
   public Property buildArgument(int index) {
@@ -772,7 +774,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A withArguments(List<Property> arguments) {
     if (this.arguments != null) {
-      _visitables.get("arguments").clear();
+      this._visitables.get("arguments").clear();
     }
     if (arguments != null) {
       this.arguments = new ArrayList();
@@ -799,7 +801,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasArguments() {
-    return arguments != null && !arguments.isEmpty();
+    return this.arguments != null && !this.arguments.isEmpty();
   }
 
   public ArgumentsNested<A> addNewArgument() {
@@ -868,7 +870,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("exceptions").add(builder);
       exceptions.add(builder);
     } else {
-      _visitables.get("exceptions").add(index, builder);
+      _visitables.get("exceptions").add(builder);
       exceptions.add(index, builder);
     }
     return (A) this;
@@ -883,7 +885,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       _visitables.get("exceptions").add(builder);
       exceptions.add(builder);
     } else {
-      _visitables.get("exceptions").set(index, builder);
+      _visitables.get("exceptions").add(builder);
       exceptions.set(index, builder);
     }
     return (A) this;
@@ -951,7 +953,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public List<ClassRef> buildExceptions() {
-    return exceptions != null ? build(exceptions) : null;
+    return this.exceptions != null ? build(exceptions) : null;
   }
 
   public ClassRef buildException(int index) {
@@ -986,7 +988,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A withExceptions(List<ClassRef> exceptions) {
     if (this.exceptions != null) {
-      _visitables.get("exceptions").clear();
+      this._visitables.get("exceptions").clear();
     }
     if (exceptions != null) {
       this.exceptions = new ArrayList();
@@ -1013,7 +1015,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public boolean hasExceptions() {
-    return exceptions != null && !exceptions.isEmpty();
+    return this.exceptions != null && !this.exceptions.isEmpty();
   }
 
   public ExceptionsNested<A> addNewException() {
@@ -1078,13 +1080,13 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A withBlock(Block block) {
-    _visitables.get("block").remove(this.block);
+    this._visitables.remove("block");
     if (block != null) {
       this.block = new BlockBuilder(block);
-      _visitables.get("block").add(this.block);
+      this._visitables.get("block").add(this.block);
     } else {
       this.block = null;
-      _visitables.get("block").remove(this.block);
+      this._visitables.get("block").remove(this.block);
     }
     return (A) this;
   }

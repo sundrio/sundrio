@@ -37,14 +37,16 @@ public class NotFluent<A extends NotFluent<A>> extends BaseFluent<A> {
   public A withExpresion(Expression expresion) {
     if (expresion == null) {
       this.expresion = null;
-      _visitables.remove("expresion");
+      this._visitables.remove("expresion");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(expresion);
+      ;
+      this._visitables.get("expresion").clear();
+      this._visitables.get("expresion").add(builder);
+      this.expresion = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends Expression, ?> builder = builder(expresion);
-    _visitables.get("expresion").clear();
-    _visitables.get("expresion").add(builder);
-    this.expresion = builder;
-    return (A) this;
   }
 
   public boolean hasExpresion() {
@@ -371,20 +373,20 @@ public class NotFluent<A extends NotFluent<A>> extends BaseFluent<A> {
     return new AssignExpresionNested(item);
   }
 
-  public NegativeExpresionNested<A> withNewNegativeExpresion() {
-    return new NegativeExpresionNested(null);
-  }
-
-  public NegativeExpresionNested<A> withNewNegativeExpresionLike(Negative item) {
-    return new NegativeExpresionNested(item);
-  }
-
   public ThisExpresionNested<A> withNewThisExpresion() {
     return new ThisExpresionNested(null);
   }
 
   public ThisExpresionNested<A> withNewThisExpresionLike(This item) {
     return new ThisExpresionNested(item);
+  }
+
+  public NegativeExpresionNested<A> withNewNegativeExpresion() {
+    return new NegativeExpresionNested(null);
+  }
+
+  public NegativeExpresionNested<A> withNewNegativeExpresionLike(Negative item) {
+    return new NegativeExpresionNested(item);
   }
 
   public LogicalAndExpresionNested<A> withNewLogicalAndExpresion() {
@@ -571,10 +573,10 @@ public class NotFluent<A extends NotFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1127,23 +1129,6 @@ public class NotFluent<A extends NotFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeExpresionNested<N> extends NegativeFluent<NegativeExpresionNested<N>> implements Nested<N> {
-    NegativeExpresionNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) NotFluent.this.withExpresion(builder.build());
-    }
-
-    public N endNegativeExpresion() {
-      return and();
-    }
-
-  }
-
   public class ThisExpresionNested<N> extends ThisFluent<ThisExpresionNested<N>> implements Nested<N> {
     ThisExpresionNested(This item) {
       this.builder = new ThisBuilder(this, item);
@@ -1156,6 +1141,23 @@ public class NotFluent<A extends NotFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisExpresion() {
+      return and();
+    }
+
+  }
+
+  public class NegativeExpresionNested<N> extends NegativeFluent<NegativeExpresionNested<N>> implements Nested<N> {
+    NegativeExpresionNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+
+    public N and() {
+      return (N) NotFluent.this.withExpresion(builder.build());
+    }
+
+    public N endNegativeExpresion() {
       return and();
     }
 

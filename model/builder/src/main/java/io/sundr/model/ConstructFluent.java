@@ -44,13 +44,13 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
   }
 
   public A withType(ClassRef type) {
-    _visitables.get("type").remove(this.type);
+    this._visitables.remove("type");
     if (type != null) {
       this.type = new ClassRefBuilder(type);
-      _visitables.get("type").add(this.type);
+      this._visitables.get("type").add(this.type);
     } else {
       this.type = null;
-      _visitables.get("type").remove(this.type);
+      this._visitables.get("type").remove(this.type);
     }
     return (A) this;
   }
@@ -96,7 +96,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").add(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.add(index, builder);
     }
     return (A) this;
@@ -111,7 +111,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").add(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.add(index, builder);
     }
     return (A) this;
@@ -126,7 +126,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
       _visitables.get("parameters").add(builder);
       parameters.add(builder);
     } else {
-      _visitables.get("parameters").set(index, builder);
+      _visitables.get("parameters").add(builder);
       parameters.set(index, builder);
     }
     return (A) this;
@@ -261,7 +261,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
   }
 
   public boolean hasParameters() {
-    return parameters != null && !parameters.isEmpty();
+    return this.parameters != null && !this.parameters.isEmpty();
   }
 
   public ClassRefParametersNested<A> addNewClassRefParameter() {
@@ -341,7 +341,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").add(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.add(index, builder);
     }
     return (A) this;
@@ -356,7 +356,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").add(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.add(index, builder);
     }
     return (A) this;
@@ -371,7 +371,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").set(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.set(index, builder);
     }
     return (A) this;
@@ -506,7 +506,7 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
   }
 
   public boolean hasArguments() {
-    return arguments != null && !arguments.isEmpty();
+    return this.arguments != null && !this.arguments.isEmpty();
   }
 
   public MultiplyArgumentsNested<A> addNewMultiplyArgument() {
@@ -953,18 +953,6 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     return new AssignArgumentsNested(index, item);
   }
 
-  public NegativeArgumentsNested<A> addNewNegativeArgument() {
-    return new NegativeArgumentsNested(-1, null);
-  }
-
-  public NegativeArgumentsNested<A> addNewNegativeArgumentLike(Negative item) {
-    return new NegativeArgumentsNested(-1, item);
-  }
-
-  public NegativeArgumentsNested<A> setNewNegativeArgumentLike(int index, Negative item) {
-    return new NegativeArgumentsNested(index, item);
-  }
-
   public ThisArgumentsNested<A> addNewThisArgument() {
     return new ThisArgumentsNested(-1, null);
   }
@@ -975,6 +963,18 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
 
   public ThisArgumentsNested<A> setNewThisArgumentLike(int index, This item) {
     return new ThisArgumentsNested(index, item);
+  }
+
+  public NegativeArgumentsNested<A> addNewNegativeArgument() {
+    return new NegativeArgumentsNested(-1, null);
+  }
+
+  public NegativeArgumentsNested<A> addNewNegativeArgumentLike(Negative item) {
+    return new NegativeArgumentsNested(-1, item);
+  }
+
+  public NegativeArgumentsNested<A> setNewNegativeArgumentLike(int index, Negative item) {
+    return new NegativeArgumentsNested(index, item);
   }
 
   public LogicalAndArgumentsNested<A> addNewLogicalAndArgument() {
@@ -1219,10 +1219,10 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1951,25 +1951,6 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
 
   }
 
-  public class NegativeArgumentsNested<N> extends NegativeFluent<NegativeArgumentsNested<N>> implements Nested<N> {
-    NegativeArgumentsNested(int index, Negative item) {
-      this.index = index;
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-    int index;
-
-    public N and() {
-      return (N) ConstructFluent.this.setToArguments(index, builder.build());
-    }
-
-    public N endNegativeArgument() {
-      return and();
-    }
-
-  }
-
   public class ThisArgumentsNested<N> extends ThisFluent<ThisArgumentsNested<N>> implements Nested<N> {
     ThisArgumentsNested(int index, This item) {
       this.index = index;
@@ -1984,6 +1965,25 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     }
 
     public N endThisArgument() {
+      return and();
+    }
+
+  }
+
+  public class NegativeArgumentsNested<N> extends NegativeFluent<NegativeArgumentsNested<N>> implements Nested<N> {
+    NegativeArgumentsNested(int index, Negative item) {
+      this.index = index;
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endNegativeArgument() {
       return and();
     }
 

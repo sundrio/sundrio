@@ -44,7 +44,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
       _visitables.get("properties").add(builder);
       properties.add(builder);
     } else {
-      _visitables.get("properties").add(index, builder);
+      _visitables.get("properties").add(builder);
       properties.add(index, builder);
     }
     return (A) this;
@@ -59,7 +59,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
       _visitables.get("properties").add(builder);
       properties.add(builder);
     } else {
-      _visitables.get("properties").set(index, builder);
+      _visitables.get("properties").add(builder);
       properties.set(index, builder);
     }
     return (A) this;
@@ -127,7 +127,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
   }
 
   public List<Property> buildProperties() {
-    return properties != null ? build(properties) : null;
+    return this.properties != null ? build(properties) : null;
   }
 
   public Property buildProperty(int index) {
@@ -162,7 +162,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
 
   public A withProperties(List<Property> properties) {
     if (this.properties != null) {
-      _visitables.get("properties").clear();
+      this._visitables.get("properties").clear();
     }
     if (properties != null) {
       this.properties = new ArrayList();
@@ -189,7 +189,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasProperties() {
-    return properties != null && !properties.isEmpty();
+    return this.properties != null && !this.properties.isEmpty();
   }
 
   public PropertiesNested<A> addNewProperty() {
@@ -238,7 +238,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
 
   public A withValue(Optional<Expression> value) {
     if (value == null || !value.isPresent()) {
-      this.value = Optional.empty();
+      this.value = java.util.Optional.empty();
     } else {
       this.value = value;
     }
@@ -247,9 +247,9 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
 
   public A withValue(Expression value) {
     if (value == null) {
-      this.value = Optional.empty();
+      this.value = java.util.Optional.empty();
     } else {
-      this.value = Optional.of(value);
+      this.value = java.util.Optional.of(value);
     }
     return (A) this;
   }
@@ -259,7 +259,7 @@ public class DeclareFluent<A extends DeclareFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasValue() {
-    return value != null && value.isPresent();
+    return this.value != null && this.value.isPresent();
   }
 
   public boolean equals(Object o) {

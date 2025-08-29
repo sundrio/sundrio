@@ -32,13 +32,13 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
   }
 
   public A withModifiers(Modifiers modifiers) {
-    _visitables.get("modifiers").remove(this.modifiers);
+    this._visitables.remove("modifiers");
     if (modifiers != null) {
       this.modifiers = new ModifiersBuilder(modifiers);
-      _visitables.get("modifiers").add(this.modifiers);
+      this._visitables.get("modifiers").add(this.modifiers);
     } else {
       this.modifiers = null;
-      _visitables.get("modifiers").remove(this.modifiers);
+      this._visitables.get("modifiers").remove(this.modifiers);
     }
     return (A) this;
   }

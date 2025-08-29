@@ -36,13 +36,13 @@ public class AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends Attri
   }
 
   public A withClassRef(ClassRef classRef) {
-    _visitables.get("classRef").remove(this.classRef);
+    this._visitables.remove("classRef");
     if (classRef != null) {
       this.classRef = new ClassRefBuilder(classRef);
-      _visitables.get("classRef").add(this.classRef);
+      this._visitables.get("classRef").add(this.classRef);
     } else {
       this.classRef = null;
-      _visitables.get("classRef").remove(this.classRef);
+      this._visitables.get("classRef").remove(this.classRef);
     }
     return (A) this;
   }

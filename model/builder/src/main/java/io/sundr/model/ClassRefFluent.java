@@ -80,7 +80,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").add(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.add(index, builder);
     }
     return (A) this;
@@ -95,7 +95,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").add(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.add(index, builder);
     }
     return (A) this;
@@ -110,7 +110,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
     } else {
-      _visitables.get("arguments").set(index, builder);
+      _visitables.get("arguments").add(builder);
       arguments.set(index, builder);
     }
     return (A) this;
@@ -245,7 +245,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   }
 
   public boolean hasArguments() {
-    return arguments != null && !arguments.isEmpty();
+    return this.arguments != null && !this.arguments.isEmpty();
   }
 
   public ClassRefArgumentsNested<A> addNewClassRefArgument() {

@@ -44,14 +44,16 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   public A withType(TypeRef type) {
     if (type == null) {
       this.type = null;
-      _visitables.remove("type");
+      this._visitables.remove("type");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends TypeRef, ?> builder = builder(type);
+      ;
+      this._visitables.get("type").clear();
+      this._visitables.get("type").add(builder);
+      this.type = builder;
       return (A) this;
     }
-    VisitableBuilder<? extends TypeRef, ?> builder = builder(type);
-    _visitables.get("type").clear();
-    _visitables.get("type").add(builder);
-    this.type = builder;
-    return (A) this;
   }
 
   public boolean hasType() {
@@ -115,7 +117,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
       _visitables.get("expressions").add(builder);
       expressions.add(builder);
     } else {
-      _visitables.get("expressions").add(index, builder);
+      _visitables.get("expressions").add(builder);
       expressions.add(index, builder);
     }
     return (A) this;
@@ -130,7 +132,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
       _visitables.get("expressions").add(builder);
       expressions.add(builder);
     } else {
-      _visitables.get("expressions").add(index, builder);
+      _visitables.get("expressions").add(builder);
       expressions.add(index, builder);
     }
     return (A) this;
@@ -145,7 +147,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
       _visitables.get("expressions").add(builder);
       expressions.add(builder);
     } else {
-      _visitables.get("expressions").set(index, builder);
+      _visitables.get("expressions").add(builder);
       expressions.set(index, builder);
     }
     return (A) this;
@@ -280,7 +282,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean hasExpressions() {
-    return expressions != null && !expressions.isEmpty();
+    return this.expressions != null && !this.expressions.isEmpty();
   }
 
   public MultiplyExpressionsNested<A> addNewMultiplyExpression() {
@@ -727,18 +729,6 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
     return new AssignExpressionsNested(index, item);
   }
 
-  public NegativeExpressionsNested<A> addNewNegativeExpression() {
-    return new NegativeExpressionsNested(-1, null);
-  }
-
-  public NegativeExpressionsNested<A> addNewNegativeExpressionLike(Negative item) {
-    return new NegativeExpressionsNested(-1, item);
-  }
-
-  public NegativeExpressionsNested<A> setNewNegativeExpressionLike(int index, Negative item) {
-    return new NegativeExpressionsNested(index, item);
-  }
-
   public ThisExpressionsNested<A> addNewThisExpression() {
     return new ThisExpressionsNested(-1, null);
   }
@@ -749,6 +739,18 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   public ThisExpressionsNested<A> setNewThisExpressionLike(int index, This item) {
     return new ThisExpressionsNested(index, item);
+  }
+
+  public NegativeExpressionsNested<A> addNewNegativeExpression() {
+    return new NegativeExpressionsNested(-1, null);
+  }
+
+  public NegativeExpressionsNested<A> addNewNegativeExpressionLike(Negative item) {
+    return new NegativeExpressionsNested(-1, item);
+  }
+
+  public NegativeExpressionsNested<A> setNewNegativeExpressionLike(int index, Negative item) {
+    return new NegativeExpressionsNested(index, item);
   }
 
   public LogicalAndExpressionsNested<A> addNewLogicalAndExpression() {
@@ -987,10 +989,10 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "Negative":
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "This":
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
+      case "io.sundr.model." + "Negative":
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
       case "io.sundr.model." + "LogicalAnd":
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
       case "io.sundr.model." + "PostIncrement":
@@ -1691,25 +1693,6 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NegativeExpressionsNested<N> extends NegativeFluent<NegativeExpressionsNested<N>> implements Nested<N> {
-    NegativeExpressionsNested(int index, Negative item) {
-      this.index = index;
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-    int index;
-
-    public N and() {
-      return (N) NewArrayFluent.this.setToExpressions(index, builder.build());
-    }
-
-    public N endNegativeExpression() {
-      return and();
-    }
-
-  }
-
   public class ThisExpressionsNested<N> extends ThisFluent<ThisExpressionsNested<N>> implements Nested<N> {
     ThisExpressionsNested(int index, This item) {
       this.index = index;
@@ -1724,6 +1707,25 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThisExpression() {
+      return and();
+    }
+
+  }
+
+  public class NegativeExpressionsNested<N> extends NegativeFluent<NegativeExpressionsNested<N>> implements Nested<N> {
+    NegativeExpressionsNested(int index, Negative item) {
+      this.index = index;
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    NegativeBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) NewArrayFluent.this.setToExpressions(index, builder.build());
+    }
+
+    public N endNegativeExpression() {
       return and();
     }
 
