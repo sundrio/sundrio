@@ -376,7 +376,6 @@ public class PropertyFluent<A extends PropertyFluent<A>> extends ModifierSupport
       return (A) this;
     } else {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(typeRef);
-      ;
       this._visitables.get("typeRef").clear();
       this._visitables.get("typeRef").add(builder);
       this.typeRef = builder;

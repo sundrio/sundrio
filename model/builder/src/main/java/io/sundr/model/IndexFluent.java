@@ -43,7 +43,6 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(scope);
-      ;
       this._visitables.get("scope").clear();
       this._visitables.get("scope").add(builder);
       this.scope = builder;
@@ -463,6 +462,14 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     return new PreIncrementScopeNested(item);
   }
 
+  public PropertyScopeNested<A> withNewPropertyScope() {
+    return new PropertyScopeNested(null);
+  }
+
+  public PropertyScopeNested<A> withNewPropertyScopeLike(Property item) {
+    return new PropertyScopeNested(item);
+  }
+
   public LessThanOrEqualScopeNested<A> withNewLessThanOrEqualScope() {
     return new LessThanOrEqualScopeNested(null);
   }
@@ -494,7 +501,6 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(expression);
-      ;
       this._visitables.get("expression").clear();
       this._visitables.get("expression").add(builder);
       this.expression = builder;
@@ -914,6 +920,14 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     return new PreIncrementExpressionNested(item);
   }
 
+  public PropertyExpressionNested<A> withNewPropertyExpression() {
+    return new PropertyExpressionNested(null);
+  }
+
+  public PropertyExpressionNested<A> withNewPropertyExpressionLike(Property item) {
+    return new PropertyExpressionNested(item);
+  }
+
   public LessThanOrEqualExpressionNested<A> withNewLessThanOrEqualExpression() {
     return new LessThanOrEqualExpressionNested(null);
   }
@@ -1050,6 +1064,8 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1736,6 +1752,23 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementScope() {
+      return and();
+    }
+
+  }
+
+  public class PropertyScopeNested<N> extends PropertyFluent<PropertyScopeNested<N>> implements Nested<N> {
+    PropertyScopeNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) IndexFluent.this.withScope(builder.build());
+    }
+
+    public N endPropertyScope() {
       return and();
     }
 
@@ -2456,6 +2489,23 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementExpression() {
+      return and();
+    }
+
+  }
+
+  public class PropertyExpressionNested<N> extends PropertyFluent<PropertyExpressionNested<N>> implements Nested<N> {
+    PropertyExpressionNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) IndexFluent.this.withExpression(builder.build());
+    }
+
+    public N endPropertyExpression() {
       return and();
     }
 

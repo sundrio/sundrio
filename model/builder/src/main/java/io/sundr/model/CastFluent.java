@@ -43,7 +43,6 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(type);
-      ;
       this._visitables.get("type").clear();
       this._visitables.get("type").add(builder);
       this.type = builder;
@@ -106,7 +105,6 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(expression);
-      ;
       this._visitables.get("expression").clear();
       this._visitables.get("expression").add(builder);
       this.expression = builder;
@@ -526,6 +524,14 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
     return new PreIncrementExpressionNested(item);
   }
 
+  public PropertyExpressionNested<A> withNewPropertyExpression() {
+    return new PropertyExpressionNested(null);
+  }
+
+  public PropertyExpressionNested<A> withNewPropertyExpressionLike(Property item) {
+    return new PropertyExpressionNested(item);
+  }
+
   public LessThanOrEqualExpressionNested<A> withNewLessThanOrEqualExpression() {
     return new LessThanOrEqualExpressionNested(null);
   }
@@ -672,6 +678,8 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1446,6 +1454,23 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementExpression() {
+      return and();
+    }
+
+  }
+
+  public class PropertyExpressionNested<N> extends PropertyFluent<PropertyExpressionNested<N>> implements Nested<N> {
+    PropertyExpressionNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) CastFluent.this.withExpression(builder.build());
+    }
+
+    public N endPropertyExpression() {
       return and();
     }
 

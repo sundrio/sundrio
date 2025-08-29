@@ -48,7 +48,6 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(type);
-      ;
       this._visitables.get("type").clear();
       this._visitables.get("type").add(builder);
       this.type = builder;
@@ -853,6 +852,18 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
     return new PreIncrementExpressionsNested(index, item);
   }
 
+  public PropertyExpressionsNested<A> addNewPropertyExpression() {
+    return new PropertyExpressionsNested(-1, null);
+  }
+
+  public PropertyExpressionsNested<A> addNewPropertyExpressionLike(Property item) {
+    return new PropertyExpressionsNested(-1, item);
+  }
+
+  public PropertyExpressionsNested<A> setNewPropertyExpressionLike(int index, Property item) {
+    return new PropertyExpressionsNested(index, item);
+  }
+
   public LessThanOrEqualExpressionsNested<A> addNewLessThanOrEqualExpression() {
     return new LessThanOrEqualExpressionsNested(-1, null);
   }
@@ -1007,6 +1018,8 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1862,6 +1875,25 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementExpression() {
+      return and();
+    }
+
+  }
+
+  public class PropertyExpressionsNested<N> extends PropertyFluent<PropertyExpressionsNested<N>> implements Nested<N> {
+    PropertyExpressionsNested(int index, Property item) {
+      this.index = index;
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) NewArrayFluent.this.setToExpressions(index, builder.build());
+    }
+
+    public N endPropertyExpression() {
       return and();
     }
 

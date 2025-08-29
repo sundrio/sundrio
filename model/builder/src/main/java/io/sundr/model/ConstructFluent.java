@@ -1077,6 +1077,18 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     return new PreIncrementArgumentsNested(index, item);
   }
 
+  public PropertyArgumentsNested<A> addNewPropertyArgument() {
+    return new PropertyArgumentsNested(-1, null);
+  }
+
+  public PropertyArgumentsNested<A> addNewPropertyArgumentLike(Property item) {
+    return new PropertyArgumentsNested(-1, item);
+  }
+
+  public PropertyArgumentsNested<A> setNewPropertyArgumentLike(int index, Property item) {
+    return new PropertyArgumentsNested(index, item);
+  }
+
   public LessThanOrEqualArgumentsNested<A> addNewLessThanOrEqualArgument() {
     return new LessThanOrEqualArgumentsNested(-1, null);
   }
@@ -1237,6 +1249,8 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -2119,6 +2133,25 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     }
 
     public N endPreIncrementArgument() {
+      return and();
+    }
+
+  }
+
+  public class PropertyArgumentsNested<N> extends PropertyFluent<PropertyArgumentsNested<N>> implements Nested<N> {
+    PropertyArgumentsNested(int index, Property item) {
+      this.index = index;
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endPropertyArgument() {
       return and();
     }
 

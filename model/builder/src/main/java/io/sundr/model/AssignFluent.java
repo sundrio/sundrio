@@ -43,7 +43,6 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(target);
-      ;
       this._visitables.get("target").clear();
       this._visitables.get("target").add(builder);
       this.target = builder;
@@ -463,6 +462,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return new PreIncrementTargetNested(item);
   }
 
+  public PropertyTargetNested<A> withNewPropertyTarget() {
+    return new PropertyTargetNested(null);
+  }
+
+  public PropertyTargetNested<A> withNewPropertyTargetLike(Property item) {
+    return new PropertyTargetNested(item);
+  }
+
   public LessThanOrEqualTargetNested<A> withNewLessThanOrEqualTarget() {
     return new LessThanOrEqualTargetNested(null);
   }
@@ -494,7 +501,6 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Expression, ?> builder = builder(value);
-      ;
       this._visitables.get("value").clear();
       this._visitables.get("value").add(builder);
       this.value = builder;
@@ -914,6 +920,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return new PreIncrementValueNested(item);
   }
 
+  public PropertyValueNested<A> withNewPropertyValue() {
+    return new PropertyValueNested(null);
+  }
+
+  public PropertyValueNested<A> withNewPropertyValueLike(Property item) {
+    return new PropertyValueNested(item);
+  }
+
   public LessThanOrEqualValueNested<A> withNewLessThanOrEqualValue() {
     return new LessThanOrEqualValueNested(null);
   }
@@ -1050,6 +1064,8 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
       case "io.sundr.model." + "PreIncrement":
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "Property":
+        return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
@@ -1736,6 +1752,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementTarget() {
+      return and();
+    }
+
+  }
+
+  public class PropertyTargetNested<N> extends PropertyFluent<PropertyTargetNested<N>> implements Nested<N> {
+    PropertyTargetNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endPropertyTarget() {
       return and();
     }
 
@@ -2454,6 +2487,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementValue() {
+      return and();
+    }
+
+  }
+
+  public class PropertyValueNested<N> extends PropertyFluent<PropertyValueNested<N>> implements Nested<N> {
+    PropertyValueNested(Property item) {
+      this.builder = new PropertyBuilder(this, item);
+    }
+
+    PropertyBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endPropertyValue() {
       return and();
     }
 

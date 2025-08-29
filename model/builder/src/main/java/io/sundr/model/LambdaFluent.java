@@ -163,7 +163,6 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
       return (A) this;
     } else {
       VisitableBuilder<? extends Statement, ?> builder = builder(statement);
-      ;
       this._visitables.get("statement").clear();
       this._visitables.get("statement").add(builder);
       this.statement = builder;

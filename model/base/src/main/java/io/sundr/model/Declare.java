@@ -53,14 +53,19 @@ public class Declare implements ExpressionOrStatement {
     return value;
   }
 
+  @Override
   public String render() {
+    return renderExpression();
+  }
+
+  @Override
+  public String renderExpression() {
     StringBuilder sb = new StringBuilder();
     TypeRef typeRef = properties.get(0).getTypeRef();
     sb.append(typeRef.render());
     sb.append(SPACE);
     sb.append(properties.stream().map(Property::getName).collect(Collectors.joining(", ")));
     sb.append(value.map(v -> " = " + v.renderExpression()).orElse(""));
-    sb.append(SEMICOLN);
     return sb.toString();
   }
 }

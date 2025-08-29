@@ -595,7 +595,6 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
       return (A) this;
     } else {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(returnType);
-      ;
       this._visitables.get("returnType").clear();
       this._visitables.get("returnType").add(builder);
       this.returnType = builder;
