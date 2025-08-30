@@ -4,6 +4,22 @@ public class Return implements Statement {
 
   private final Expression expression;
 
+  public static Return newInstance(ClassRef type, Expression... arguments) {
+    return new Return(new Construct(type, arguments));
+  }
+
+  public static Return newInstance(ClassRef type, java.util.List<Expression> arguments) {
+    return new Return(new Construct(type, arguments));
+  }
+
+  public static Return newInstance(Class type, Expression... arguments) {
+    return new Return(new Construct(type, arguments));
+  }
+
+  public static Return newInstance(Class type, java.util.List<Expression> arguments) {
+    return new Return(new Construct(type, arguments));
+  }
+
   public Return(Expression expression) {
     this.expression = expression;
   }
