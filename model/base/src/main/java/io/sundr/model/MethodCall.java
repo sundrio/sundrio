@@ -24,6 +24,10 @@ public class MethodCall implements ExpressionOrStatement {
     this(name, scope, new ArrayList<TypeRef>(), Arrays.asList(arguments));
   }
 
+  public MethodCall(String name, Expression scope, List<Expression> arguments) {
+    this(name, scope, new ArrayList<TypeRef>(), arguments);
+  }
+
   public MethodCall(String name, ClassRef scope, Expression... arguments) {
     this(name, ValueRef.from(scope), arguments);
   }
