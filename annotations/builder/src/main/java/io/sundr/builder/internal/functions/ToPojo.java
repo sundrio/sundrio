@@ -66,20 +66,25 @@ import io.sundr.model.Attributeable;
 import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Construct;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
 import io.sundr.model.For;
 import io.sundr.model.If;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.MethodCall;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.PropertyFluent;
+import io.sundr.model.PropertyRef;
 import io.sundr.model.Return;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.Statement;
-import io.sundr.model.StringStatement;
+import io.sundr.model.Super;
+import io.sundr.model.Ternary;
+import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
@@ -354,7 +359,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                 .withComments(method.getComments())
                 .withNewModifiers().withPublic().endModifiers()
                 .withNewBlock()
-                .withStatements(new StringStatement("return this." + Strings.toFieldName(name) + ";"))
+                .withStatements(Return.This().ref(Strings.toFieldName(name)))
                 .endBlock()
                 .build();
 
@@ -365,9 +370,9 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                   .withName("is" + getter.getName().replaceAll("^get", ""))
                   .withReturnType(Types.PRIMITIVE_BOOLEAN_REF)
                   .withNewBlock()
-                  .withStatements(new StringStatement(
-                      "return this." + Strings.toFieldName(name) + " != null &&  this." + Strings.toFieldName(name)
-                          + ";"))
+                  .withStatements(new Return(
+                      Expression.notNull(This.ref(Strings.toFieldName(name)))
+                          .and(This.ref(Strings.toFieldName(name)))))
                   .endBlock()
                   .build();
               getters.add(primitiveGetter);
@@ -392,26 +397,21 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
         constructorArgs.addAll(constructor.getArguments());
       }
 
-      StringBuilder sb = new StringBuilder();
-      sb.append("super(");
-      sb.append(Strings.join(constructor.getArguments(), new Function<Property, String>() {
-        @Override
-        public String apply(Property item) {
-          return Strings.toFieldName(item.getName());
-        }
-      }, ", "));
-      sb.append(");");
-      statements.add(new StringStatement(sb.toString()));
+      // Build super constructor call arguments
+      List<Expression> superArgs = constructor.getArguments().stream()
+          .map(p -> new PropertyRef(Strings.toFieldName(p.getName()), null))
+          .collect(java.util.stream.Collectors.toList());
+      statements.add(new Super().call(superArgs));
       for (Property p : fields) {
-        statements.add(new StringStatement(fieldIntializer(p, initialize)));
+        statements.add(initializeField(p, initialize));
       }
     } else {
       for (Property p : fields) {
-        statements.add(new StringStatement(fieldIntializer(p, initialize)));
+        statements.add(initializeField(p, initialize));
       }
     }
 
-    List<Method> constructors = new ArrayList();
+    List<Method> constructors = new ArrayList<>();
 
     Method emptyConstructor = new MethodBuilder()
         .withNewModifiers().withPublic().endModifiers()
@@ -476,13 +476,14 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
             .withName(extendsList.isEmpty() ? "newBuilder" : "new" + pojoBuilder.getName()) //avoid clashes in case of inheritance
             .withReturnType(pojoBuilder.toInternalReference())
             .withNewBlock()
-            .addNewStringStatementStatement("return new " + pojoBuilder.getFullyQualifiedName() + "();")
+            .withStatements(Return.newInstance(pojoBuilder.toInternalReference()))
             .endBlock()
             .build();
 
         additionalMethods.add(staticBuilder);
 
-        StringBuilder sb = new StringBuilder().append("return new " + pojoBuilder.getFullyQualifiedName() + "()");
+        // Build chain of method calls for default values
+        Expression builderExpr = new Construct(pojoBuilder.toInternalReference());
 
         for (Method m : item.getMethods()) {
           if (m.hasAttribute(DEFAULT_VALUE)) {
@@ -496,11 +497,11 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
               continue;
             }
 
-            sb.append(
-                ".with" + Strings.capitalizeFirst(Strings.toFieldName(m.getName())) + "(" + defaultValue + ")");
+            String methodName = "with" + Strings.capitalizeFirst(Strings.toFieldName(m.getName()));
+            Expression defaultValueExpr = parseDefaultValueExpression(defaultValue, m.getReturnType());
+            builderExpr = new MethodCall(methodName, builderExpr, defaultValueExpr);
           }
         }
-        sb.append(";");
 
         Method staticBuilderFromDefaults = new MethodBuilder()
             .withNewModifiers().withPublic().withStatic().endModifiers()
@@ -508,7 +509,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
             .withName(extendsList.isEmpty() ? "newBuilderFromDefaults" : "new" + pojoBuilder.getName() + "FromDefaults") //avoid clashes in case of inheritance
             .withReturnType(pojoBuilder.toInternalReference())
             .withNewBlock()
-            .addNewStringStatementStatement(sb.toString())
+            .withStatements(new Return(builderExpr))
             .endBlock()
             .build();
 
@@ -524,7 +525,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endArgument()
           .withReturnType(generatedPojo.toInternalReference())
           .withNewBlock()
-          .addNewStringStatementStatement("return newBuilder(instance).build();")
+          .withStatements(
+              new Return(new MethodCall("newBuilder", (Expression) null, Property.newProperty("instance")).call("build")))
           .endBlock()
           .build();
 
@@ -538,7 +540,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .withReturnType(pojoBuilder.toInternalReference())
           .withNewBlock()
           .addToStatements(
-              new StringStatement(() -> "return " + convertReference("instance", item, generatedPojo, pojoBuilder) + ";"))
+              new Return(convertReferenceExpression(Property.newProperty("instance"), item, generatedPojo, pojoBuilder)))
           .endBlock()
           .build();
 
@@ -551,8 +553,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endArgument()
           .withReturnType(generatedPojo.toInternalReference())
           .withNewBlock()
-          .addToStatements(new StringStatement(
-              () -> "return " + convertMap("map", item, generatedPojo) + ";"))
+          .addToStatements(new Return(convertMapExpression(Property.newProperty("map"), generatedPojo)))
           .endBlock()
           .build();
 
@@ -565,8 +566,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .endArgument()
           .withReturnType(generatedPojo.toInternalReference())
           .withNewBlock()
-          .addToStatements(new StringStatement(
-              () -> "return " + convertMap("map", item, withoutDefaults(generatedPojo)) + ";"))
+          .addToStatements(new Return(convertMapExpression(Property.newProperty("map"), withoutDefaults(generatedPojo))))
           .endBlock()
           .build();
 
@@ -580,9 +580,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .withReturnType(pojoBuilder.toInternalReference())
           .withNewBlock()
           .addToStatements(
-              new StringStatement(
-                  () -> "return " + convertMap("map", item, withoutDefaults(generatedPojo), withoutDefaults(pojoBuilder))
-                      + ";"))
+              new Return(convertMapExpression(Property.newProperty("map"), withoutDefaults(generatedPojo),
+                  withoutDefaults(pojoBuilder))))
           .endBlock()
           .build();
 
@@ -596,8 +595,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .withReturnType(pojoBuilder.toInternalReference())
           .withNewBlock()
           .addToStatements(
-              new StringStatement(
-                  () -> "return " + convertMap("map", item, generatedPojo, pojoBuilder) + ";"))
+              new Return(convertMapExpression(Property.newProperty("map"), generatedPojo, pojoBuilder)))
           .endBlock()
           .build();
 
@@ -618,13 +616,12 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
           .withNewBlock()
           .withStatements(
               If.condition(o.toReference().instanceOf(Types.STRING_REF.withDimensions(1)))
-                  .then(new Return(o.toReference().cast(Types.STRING_REF.withDimensions(1))))
-                  .end(),
+                  .then(new Return(o.toReference().cast(Types.STRING_REF.withDimensions(1)))),
 
               If.condition(o.toReference().instanceOf(Types.STRING_REF))
                   .then(new Declare(s, o.toReference().cast(Types.STRING_REF)),
-                      new Return(s.toReference().call("split", ValueRef.from(",[ ]*"))))
-                  .end(),
+                      Return.variable(s).call("split", ValueRef.from(",[ ]*"))),
+
               If.condition(o.toReference().instanceOf(List.class))
                   .then(new Declare(l, new Cast(List.class, o)),
                       new Declare(larray, Expression.createNewArray(String.class, l.toReference().call("size"))),
@@ -632,8 +629,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                           .eq(i.toReference(), l.toReference().call("size"))
                           .update(i.toReference().postIncrement())
                           .body(new Assign(larray.toReference().index(i.toReference()),
-                              Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference())))))
-                  .end(),
+                              Expression.call(String.class, "valueOf", l.toReference().call("get", i.toReference()))))),
+
               new Return(Expression.createNewArray(String.class, 0)))
           .endBlock()
           .build();
@@ -805,6 +802,40 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     return sb.toString();
   }
 
+  private static Expression convertReferenceExpression(Expression ref, TypeDef source, TypeDef target, TypeDef targetBuilder) {
+    return new io.sundr.model.Construct(targetBuilder.toInternalReference(), convertReferenceExpression(ref, source, target));
+  }
+
+  private static Expression convertReferenceExpression(Expression ref, TypeDef source, TypeDef target) {
+    Method ctor = BuilderUtils.findBuildableConstructor(target);
+    List<Expression> arguments = ctor.getArguments().stream()
+        .map(p -> readPropertyExpression(ref, source, p))
+        .collect(toList());
+    return new io.sundr.model.Construct(target.toInternalReference(), arguments);
+  }
+
+  private static Expression readPropertyExpression(Expression ref, TypeDef source, Property property) {
+    TypeRef propertyTypeRef = property.getTypeRef();
+    Method getter = getterOf(source, property);
+    if (getter == null) {
+      return ValueRef.NULL;
+    }
+
+    TypeRef getterTypeRef = getter.getReturnType();
+    if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions()
+        && Assignable.isAssignable(propertyTypeRef).from(getterTypeRef)) {
+      return readObjectValueExpression(ref, source, property);
+    }
+
+    if (property.getTypeRef().getDimensions() > 0) {
+      return readArrayValueExpression(ref, source, property);
+    }
+    if (property.getTypeRef() instanceof ClassRef && GetDefinition.of((ClassRef) getterTypeRef).isAnnotation()) {
+      return readAnnotationValueExpression(ref.call(getter), GetDefinition.of((ClassRef) getterTypeRef), property);
+    }
+    return readObjectValueExpression(ref, source, property);
+  }
+
   /**
    * Returns the string representation of the code that given a reference of the specified type, reads the specified property.
    *
@@ -844,7 +875,62 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    * @return The code.
    */
   private static String readObjectProperty(String ref, TypeDef source, Property property) {
-    return ref + "." + getterOf(source, property).getName() + "()";
+    return readObjectPropertyExpression(ref, source, property).renderExpression();
+  }
+
+  private static Expression readObjectPropertyExpression(String ref, TypeDef source, Property property) {
+    return Property.newProperty(ref).call(getterOf(source, property));
+  }
+
+  private static Expression readObjectValueExpression(Expression expression, TypeDef source, Property property) {
+    Method getter = getterOf(source, property);
+    if (getter == null) {
+      return ValueRef.NULL;
+    }
+    return expression.call(getter);
+  }
+
+  private static Expression readArrayValueExpression(Expression expression, TypeDef source, Property property) {
+    TypeRef typeRef = property.getTypeRef();
+    if (typeRef instanceof ClassRef) {
+      return readObjectArrayValue(expression, source, property);
+    }
+    if (typeRef instanceof PrimitiveRef) {
+      return readPrimitiveArrayValueExpression(expression, source, property);
+    }
+    throw new IllegalStateException("Property should be either an object or a primitive.");
+  }
+
+  private static Expression readEnumValueExpression(Expression expression, TypeDef source, Property property) {
+    Method getter = getterOf(source, property);
+    String key = getter.getName();
+    TypeRef typeRef = property.getTypeRef();
+    String defaultValue = getDefaultValue(property);
+
+    if (defaultValue != null && defaultValue.contains(".")) {
+      defaultValue = defaultValue.substring(defaultValue.lastIndexOf(".") + 1);
+    }
+
+    if (property.hasAttribute(DEFAULT_VALUE)) {
+      Expression mapExpression = new Ternary(expression.instanceOf(Map.class),
+          expression.cast(Map.class).call("getOrDefault", ValueRef.from(key), ValueRef.from(defaultValue)),
+          ValueRef.from(defaultValue));
+      return new Cast(typeRef, ((ClassRef) typeRef).call("valueOf",
+          Expression.call(String.class, "valueOf", mapExpression)));
+    } else {
+      Expression mapGetResult = expression.cast(Map.class).call("getOrDefault", ValueRef.from(key), ValueRef.NULL);
+      Expression notNullCheck = Expression.notNull(mapGetResult);
+      Expression enumValueOf = ((ClassRef) typeRef).call("valueOf",
+          Expression.call(String.class, "valueOf", mapGetResult));
+      return new Ternary(expression.instanceOf(Map.class),
+          new Ternary(notNullCheck, enumValueOf, ValueRef.NULL),
+          ValueRef.NULL);
+    }
+  }
+
+  private static Expression readAnnotationValueExpression(Expression expression, TypeDef source, Property property) {
+    TypeDef targetType = GetDefinition.of((ClassRef) property.getTypeRef());
+    return convertReferenceExpression(expression, source, targetType);
   }
 
   /**
@@ -908,12 +994,15 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    * @return The code.
    */
   private static String readPrimitiveArrayProperty(String ref, TypeDef source, Property property) {
-    StringBuilder sb = new StringBuilder();
+    return readPrimitiveArrayPropertyExpression(ref, source, property).renderExpression();
+  }
+
+  private static Expression readPrimitiveArrayPropertyExpression(String ref, TypeDef source, Property property) {
     Method getter = getterOf(source, property);
-    sb.append("Arrays.asList(")
-        .append(ref).append(".").append(getter.getName()).append("())")
-        .append(".stream()").append(".collect(Collectors.toList())).toArray(new " + getter.getReturnType().toString() + "[])");
-    return sb.toString();
+    return ClassRef.forClass(Arrays.class).call("asList", Property.newProperty(ref).call(getter))
+        .call("stream")
+        .call("collect", ClassRef.forClass(Collectors.class).call("toList"))
+        .call("toArray", Expression.createNewArray(getter.getReturnType(), ValueRef.from("0")));
   }
 
   /**
@@ -949,6 +1038,10 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     return sb.toString();
   }
 
+  private static Expression convertMapExpression(Expression expression, TypeDef target, TypeDef targetBuilder) {
+    return new io.sundr.model.Construct(targetBuilder.toInternalReference(), convertMapExpression(expression, target));
+  }
+
   /**
    * Converts a map describing the source type, to the target.
    *
@@ -966,6 +1059,13 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     StringBuilder sb = new StringBuilder();
     sb.append("new ").append(target.getFullyQualifiedName()).append("(").append(arguments).append(")");
     return sb.toString();
+  }
+
+  private static Expression convertMapExpression(Expression expression, TypeDef target) {
+    Method ctor = BuilderUtils.findBuildableConstructor(target);
+    List<Expression> arguments = ctor.getArguments().stream().map(p -> readMapValueExpression(expression, target, p))
+        .collect(toList());
+    return new io.sundr.model.Construct(target.toInternalReference(), arguments);
   }
 
   /**
@@ -1005,6 +1105,54 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       }
     }
     return readObjectValue(ref, source, property);
+  }
+
+  private static Expression readMapObjectValue(Expression expression, TypeDef source, Property property) {
+    String key = property.getName(); // Use property name, not getter name
+    String defaultValue = getDefaultValue(property);
+    Expression defaultValueExpr;
+
+    if (defaultValue == null || defaultValue.trim().isEmpty()) {
+      defaultValueExpr = ValueRef.NULL;
+    } else {
+      defaultValueExpr = parseDefaultValueExpression(defaultValue, property.getTypeRef());
+    }
+
+    // Generate: (Type) ((Map)map).getOrDefault("propertyName", defaultValue)
+    Expression mapCast = new io.sundr.model.Enclosed(expression.cast(Map.class));
+    Expression mapGetOrDefault = mapCast.call("getOrDefault", ValueRef.from(key), defaultValueExpr);
+    return new Cast(property.getTypeRef(), mapGetOrDefault);
+  }
+
+  private static Expression readMapValueExpression(Expression expression, TypeDef source, Property property) {
+    TypeRef propertyTypeRef = property.getTypeRef();
+    Method getter = getterOf(source, property);
+    if (getter == null) {
+      return ValueRef.NULL;
+    }
+
+    TypeRef getterTypeRef = getter.getReturnType();
+    if (propertyTypeRef.getDimensions() == getterTypeRef.getDimensions()
+        && Assignable.isAssignable(propertyTypeRef).from(getterTypeRef)) {
+      return readMapObjectValue(expression, source, property);
+    }
+
+    if (property.getTypeRef().getDimensions() > 0) {
+      return readArrayValueExpression(expression, source, property);
+    }
+
+    if (getterTypeRef instanceof ClassRef) {
+      TypeDef getterTypeDef = GetDefinition.of((ClassRef) getterTypeRef);
+      if (getterTypeDef.isEnum()) {
+        return readEnumValueExpression(expression, source, property);
+      }
+      if (getterTypeDef.isAnnotation()) {
+        return readAnnotationValueExpression(
+            Expression.cast(Map.class, expression.call("get", ValueRef.from(getterOf(source, property).getName()))),
+            GetDefinition.of((ClassRef) getterTypeRef), property);
+      }
+    }
+    return readMapObjectValue(expression, source, property);
   }
 
   /**
@@ -1142,6 +1290,37 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     throw new IllegalArgumentException("Expected an object property and a matching object getter!!");
   }
 
+  private static Expression readObjectArrayValue(Expression expression, TypeDef source, Property property) {
+    Method getter = getterOf(source, property);
+    ValueRef getterName = ValueRef.from(getter.getName());
+    TypeRef getterTypeRef = getter.getReturnType();
+    TypeRef propertyTypeRef = property.getTypeRef();
+    if (propertyTypeRef instanceof ClassRef && getterTypeRef instanceof ClassRef) {
+      String nextRef = variables.pop();
+      try {
+        TypeDef propertyType = GetDefinition.of((ClassRef) propertyTypeRef);
+        TypeDef getterType = GetDefinition.of((ClassRef) getterTypeRef);
+        if (Types.STRING.equals(getterType)) {
+          return new Ternary(expression.instanceOf(Map.class),
+              new MethodCall("toStringArray", (Expression) null, new Cast(Map.class, expression).call("get", getterName)),
+              new MethodCall("toStringArray", (Expression) null, expression));
+        } else {
+          return ClassRef.forClass(Arrays.class).call("stream",
+              new Cast(Map[].class, new Ternary(expression.instanceOf(Map.class),
+                  expression.cast(Map.class).call("getOrDefault", getterName,
+                      new Cast(Map[].class, ValueRef.from("new Map[0]"))),
+                  new Cast(Map[].class, ValueRef.from("new Map[0]")))))
+              .call("map", Expression.lamba(nextRef, convertMapExpression(Property.newProperty(nextRef), propertyType)))
+              .call("toArray", Expression.lamba("size",
+                  Expression.createNewArray(propertyType.toInternalReference(), Property.newProperty(("size")))));
+        }
+      } finally {
+        variables.push(nextRef);
+      }
+    }
+    throw new IllegalArgumentException("Expected an object property and a matching object getter!!");
+  }
+
   /**
    * Returns the string representation of the code that reads a primitive array property.
    *
@@ -1151,15 +1330,19 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    * @return The code.
    */
   private static String readPrimitiveArrayValue(String ref, TypeDef source, Property property) {
-    StringBuilder sb = new StringBuilder();
+    return readPrimitiveArrayValueExpression(Property.newProperty(ref), source, property).renderExpression();
+  }
+
+  private static Expression readPrimitiveArrayValueExpression(Expression expression, TypeDef source, Property property) {
     Method getter = getterOf(source, property);
-    sb.append(indent(ref))
-        .append("Arrays.stream(")
-        .append("(" + property.getTypeRef().toString() + ")(" + ref + " instanceof Map ? ((Map)" + ref + ").getOrDefault(\""
-            + getterOf(source, property).getName() + "\" , " + getDefaultValue(property) + ") : " + getDefaultValue(property)
-            + ")")
-        .append(".toArray(size -> new " + getter.getReturnType().toString() + "[size])");
-    return sb.toString();
+    Expression getterName = ValueRef.from(getter.getName());
+    Expression defaultValue = parseDefaultValueExpression(getDefaultValue(property), property.getTypeRef());
+    return ClassRef.forClass(Arrays.class).call("stream",
+        new Cast(property.getTypeRef(), new Ternary(expression.instanceOf(Map.class),
+            expression.cast(Map.class).call("getOrDefault", getterName, defaultValue),
+            defaultValue)
+            .call("toArray",
+                Expression.lamba("size", Expression.createNewArray(getter.getReturnType(), Property.newProperty(("size")))))));
   }
 
   /**
@@ -1198,13 +1381,68 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     return result;
   }
 
-  private static String fieldIntializer(Property p, boolean initialize) {
+  private static Statement initializeField(Property p, boolean initialize) {
     if ((initialize && p.hasAttribute(DEFAULT_VALUE) && (p.getTypeRef() instanceof ClassRef)
         || p.getTypeRef().getDimensions() > 0)) {
-      return "this." + p.getName() + " = " + p.getName() + " != null ? " + p.getName() + " : " + getDefaultValue(p) + ";";
+      String defaultValue = getDefaultValue(p);
+      Expression defaultValueExpr = parseDefaultValueExpression(defaultValue, p.getTypeRef());
+      Ternary ternary = new Ternary(Expression.notNull(p), p, defaultValueExpr);
+      return Assign.to(This.ref(p)).value(ternary);
     } else {
-      return "this." + p.getName() + " = " + p.getName() + ";";
+      return Assign.to(This.ref(p)).value(p);
     }
+  }
+
+  private static Expression parseDefaultValueExpression(String defaultValue, TypeRef typeRef) {
+    if (typeRef instanceof PrimitiveRef) {
+      PrimitiveRef primitiveRef = (PrimitiveRef) typeRef;
+      switch (primitiveRef.getName()) {
+        case "int":
+          return ValueRef.from(Integer.parseInt(defaultValue));
+        case "long":
+          return ValueRef.from(Long.parseLong(defaultValue.replaceAll("L$", "")));
+        case "float":
+          return ValueRef.from(Float.parseFloat(defaultValue.replaceAll("f$", "")));
+        case "double":
+          return ValueRef.from(Double.parseDouble(defaultValue.replaceAll("d$", "")));
+        case "boolean":
+          return ValueRef.from(Boolean.parseBoolean(defaultValue));
+        case "byte":
+          return ValueRef.from(Byte.parseByte(defaultValue));
+        case "short":
+          return ValueRef.from(Short.parseShort(defaultValue));
+        case "char":
+          return ValueRef.from(defaultValue.charAt(1)); // Handle 'c' format
+      }
+    } else if (typeRef instanceof ClassRef) {
+      ClassRef classRef = (ClassRef) typeRef;
+      String className = classRef.getFullyQualifiedName();
+
+      // Handle boxed primitive types
+      switch (className) {
+        case "java.lang.Integer":
+          return ValueRef.from(Integer.parseInt(defaultValue));
+        case "java.lang.Long":
+          return ValueRef.from(Long.parseLong(defaultValue.replaceAll("L$", "")));
+        case "java.lang.Float":
+          return ValueRef.from(Float.parseFloat(defaultValue.replaceAll("f$", "")));
+        case "java.lang.Double":
+          return ValueRef.from(Double.parseDouble(defaultValue.replaceAll("d$", "")));
+        case "java.lang.Boolean":
+          return ValueRef.from(Boolean.parseBoolean(defaultValue));
+        case "java.lang.Byte":
+          return ValueRef.from(Byte.parseByte(defaultValue));
+        case "java.lang.Short":
+          return ValueRef.from(Short.parseShort(defaultValue));
+        case "java.lang.Character":
+          return ValueRef.from(defaultValue.charAt(1)); // Handle 'c' format
+        case "java.lang.String":
+          // String values are already properly quoted by getDefaultValue()
+          return ValueRef.from(defaultValue);
+      }
+    }
+    // For other types or fallback, use the string value as-is
+    return ValueRef.from(defaultValue);
   }
 
   private static String getDefaultValue(Attributeable attributeable) {
