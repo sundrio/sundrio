@@ -25,8 +25,9 @@ import io.sundr.SundrException;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
+import io.sundr.model.Return;
 import io.sundr.model.RichTypeDef;
-import io.sundr.model.StringStatement;
+import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.VoidRef;
 import io.sundr.model.functions.Assignable;
@@ -214,7 +215,7 @@ public class Getter {
         .withName(name(property))
         .withReturnType(property.getTypeRef())
         .withNewBlock()
-        .addToStatements(new StringStatement("return this." + property + ";"))
+        .addToStatements(Return.This().ref(property))
         .endBlock()
         .build();
   }

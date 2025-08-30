@@ -36,6 +36,7 @@ import javax.lang.model.element.Modifier;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Kind;
@@ -45,7 +46,7 @@ import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Statement;
-import io.sundr.model.StringStatement;
+import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -96,12 +97,12 @@ public final class PropertyAs {
         if (isArray || isList) {
           argumentsWithItem.add(INDEX);
           properties.add(INDEX);
-          statementsWithItem.add(new StringStatement("this.index = index;"));
+          statementsWithItem.add(new Assign(This.ref(INDEX), INDEX));
         }
         if (isMap) {
           TypeRef keyType = UNWRAP_MAP_KEY_OF.apply(item.getTypeRef());
           Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
-          Statement keyStatement = new StringStatement("this.key = key;");
+          Statement keyStatement = new Assign(This.ref(keyProperty), keyProperty);
           argumentsWithItem.add(keyProperty);
           properties.add(keyProperty);
           statementsWithItem.add(keyStatement);
@@ -109,7 +110,8 @@ public final class PropertyAs {
         argumentsWithItem.add(new PropertyBuilder().withName("item").withTypeRef(unwrapped).build());
 
         statementsWithItem
-            .add(new StringStatement("this.builder = new " + builderType.getFullyQualifiedName() + "(this, item);"));
+            .add(new Assign(This.ref("builder"),
+                new io.sundr.model.Construct(builderType, new This(), Property.newProperty("item"))));
         constructors.add(new MethodBuilder()
             .withName("")
             .withReturnType(nestedRef)

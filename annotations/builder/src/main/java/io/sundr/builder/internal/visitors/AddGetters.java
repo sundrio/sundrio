@@ -5,7 +5,8 @@ import java.util.function.Predicate;
 import io.sundr.builder.Visitor;
 import io.sundr.model.Kind;
 import io.sundr.model.Property;
-import io.sundr.model.StringStatement;
+import io.sundr.model.Return;
+import io.sundr.model.This;
 import io.sundr.model.TypeDefFluent;
 
 public class AddGetters implements Visitor<TypeDefFluent<?>> {
@@ -41,7 +42,7 @@ public class AddGetters implements Visitor<TypeDefFluent<?>> {
           .withReturnType(p.getTypeRef())
           .withArguments()
           .withNewBlock()
-          .withStatements(new StringStatement("return this." + p.getName() + ";"))
+          .withStatements(Return.This().ref(p))
           .endBlock()
           .endMethod();
     }
