@@ -1,5 +1,6 @@
 package io.sundr.builder.internal.visitors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -9,7 +10,7 @@ import io.sundr.model.AttributeKey;
 import io.sundr.model.Kind;
 import io.sundr.model.Property;
 import io.sundr.model.Statement;
-import io.sundr.model.StringStatement;
+import io.sundr.model.This;
 import io.sundr.model.TypeDefFluent;
 
 public class AddAllArgsConstructor implements Visitor<TypeDefFluent<?>> {
@@ -49,8 +50,10 @@ public class AddAllArgsConstructor implements Visitor<TypeDefFluent<?>> {
 
     List<Property> arguments = def.buildProperties().stream().filter(p -> !p.isStatic() && !isFinalWithValue(p))
         .collect(Collectors.toList());
-    List<Statement> setValues = arguments.stream()
-        .map(a -> new StringStatement("this." + a.getName() + " = " + a.getName() + ";")).collect(Collectors.toList());
+    List<Statement> setValues = new ArrayList<>();
+    for (Property a : arguments) {
+      setValues.add(new io.sundr.model.Assign(This.ref(a), a));
+    }
 
     def.addNewConstructor()
         .withArguments(arguments)
