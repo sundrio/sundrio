@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 public class ValueRef implements Expression {
 
+  public static ValueRef NULL = new ValueRef(null);
+
   private final Object value;
 
   public ValueRef(Object value) {
