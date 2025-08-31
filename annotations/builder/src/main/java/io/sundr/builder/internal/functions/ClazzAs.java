@@ -368,15 +368,14 @@ public class ClazzAs {
           .withNewModifiers().withPublic().endModifiers()
           .withNewBlock()
           .addToStatements(
-              hasDefaultConstructor(item) ? new MethodCall("this", (Expression) null, new Construct(item.toInternalReference()))
+              hasDefaultConstructor(item) ? This.call(new Construct(item.toInternalReference()))
                   : new Assign(This.ref("fluent"), new This()))
           .endBlock().build();
 
       Method fluentConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock()
           .addToStatements(hasDefaultConstructor(item)
-              ? new MethodCall("this", (Expression) null, Property.newProperty("fluent"),
-                  new Construct(item.toInternalReference()))
+              ? This.call(Property.newProperty("fluent"), new Construct(item.toInternalReference()))
               : new Assign(This.ref("fluent"), Property.newProperty("fluent")))
           .endBlock().build();
 
