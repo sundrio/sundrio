@@ -23,6 +23,7 @@ import static io.sundr.model.utils.Types.isAbstract;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.lang.model.element.Modifier;
@@ -47,28 +47,40 @@ import io.sundr.builder.internal.visitors.AddNoArgWithMethod;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.Assign;
+import io.sundr.model.Block;
+import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Construct;
+import io.sundr.model.Declare;
+import io.sundr.model.Expression;
+import io.sundr.model.If;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
+import io.sundr.model.MethodCall;
 import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.Return;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.Statement;
-import io.sundr.model.StringStatement;
+import io.sundr.model.Super;
+import io.sundr.model.Switch;
+import io.sundr.model.Ternary;
+import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.ValueRef;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.utils.Getter;
 import io.sundr.model.utils.Setter;
 import io.sundr.model.utils.TypeArguments;
 import io.sundr.model.utils.Types;
-import io.sundr.utils.Strings;
 
 public class ClazzAs {
 
@@ -108,7 +120,7 @@ public class ClazzAs {
 
       Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(item.toInternalReference()).withName("instance").and().withNewBlock()
-          .addNewStringStatementStatement("this.copyInstance(instance);").endBlock().build();
+          .addToStatements(new MethodCall("copyInstance", new This(), Property.newProperty("instance"))).endBlock().build();
 
       Method copyInstance = new MethodBuilder().withName("copyInstance")
           .withNewModifiers().withProtected().endModifiers()
@@ -279,8 +291,7 @@ public class ClazzAs {
     }
 
     private Method createDescendantBuilderMethod(Set<Property> allDescendants) {
-      List<Statement> statements = new ArrayList<>();
-      statements.add(new StringStatement("switch (item.getClass().getName()) {"));
+      Map<ValueRef, Block> cases = new LinkedHashMap<>();
 
       Set<String> seen = new HashSet<>();
       for (Property descendant : allDescendants) {
@@ -297,11 +308,23 @@ public class ClazzAs {
         String classShortName = dunwraped.getName();
 
         ClassRef builderRef = TypeAs.BUILDER_REF.apply(dunwraped);
-        statements.add(new StringStatement("case \"" + packageName + ".\"+\"" + classShortName
-            + "\": return (VisitableBuilder<T, ?>)new " + builderRef + "(("
-            + dunwraped + ") item);"));
+
+        // Create the return statement for this case
+        Statement returnStatement = new Return(
+            new Cast(
+                BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF),
+                new Construct(builderRef, new Cast(dunwraped, Property.newProperty("item")))));
+
+        cases.put(ValueRef.from(packageName + "." + classShortName), new Block(returnStatement));
       }
-      statements.add(new StringStatement("}\n return (VisitableBuilder<T, ?>)builderOf(item);"));
+
+      // Create the switch statement with cases and default case
+      Switch switchStatement = Switch
+          .expression(new MethodCall("getName", new MethodCall("getClass", Property.newProperty("item"))))
+          .cases(cases)
+          .defaultCase(
+              new Return(new Cast(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF),
+                  new MethodCall("builderOf", (Expression) null, Property.newProperty("item")))));
 
       return new MethodBuilder().withNewModifiers().withProtected().withStatic()
           .endModifiers()
@@ -310,7 +333,7 @@ public class ClazzAs {
           .withReturnType(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF))
           .withName("builder")
           .withNewBlock()
-          .withStatements(statements)
+          .addToStatements(switchStatement)
           .endBlock().build();
     }
   });
@@ -344,29 +367,32 @@ public class ClazzAs {
       Method emptyConstructor = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .withNewBlock()
-          .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(new " + item.getName() + "());"
-              : "this.fluent = this;")
+          .addToStatements(
+              hasDefaultConstructor(item) ? new MethodCall("this", (Expression) null, new Construct(item.toInternalReference()))
+                  : new Assign(This.ref("fluent"), new This()))
           .endBlock().build();
 
       Method fluentConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock()
-          .addNewStringStatementStatement(hasDefaultConstructor(item) ? "this(fluent, new " + item.getName() + "());"
-              : "this.fluent = fluent;")
+          .addToStatements(hasDefaultConstructor(item)
+              ? new MethodCall("this", (Expression) null, Property.newProperty("fluent"),
+                  new Construct(item.toInternalReference()))
+              : new Assign(This.ref("fluent"), Property.newProperty("fluent")))
           .endBlock().build();
 
       Method instanceAndFluentCosntructor = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(itemRef)
           .withName("instance").and().withNewBlock()
-          .addNewStringStatementStatement("this.fluent = fluent;")
-          .addNewStringStatementStatement("fluent.copyInstance(instance);")
+          .addToStatements(new Assign(This.ref("fluent"), Property.newProperty("fluent")))
+          .addToStatements(new MethodCall("copyInstance", Property.newProperty("fluent"), Property.newProperty("instance")))
           .endBlock()
           .build();
 
       Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(itemRef).withName("instance").and().withNewBlock()
-          .addNewStringStatementStatement("this.fluent = this;")
-          .addNewStringStatementStatement("this.copyInstance(instance);").endBlock()
+          .addToStatements(new Assign(This.ref("fluent"), new This()))
+          .addToStatements(new MethodCall("copyInstance", new This(), Property.newProperty("instance"))).endBlock()
           .build();
 
       basicConstructors.add(emptyConstructor);
@@ -418,9 +444,9 @@ public class ClazzAs {
 
         basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
             .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
-            .addNewStringStatementStatement(
-                c.getArguments().stream().map(Property::getName).collect(Collectors.joining(", ", "this(", ");")))
-            .addNewStringStatementStatement("this.validationEnabled=validationEnabled;").endBlock().build())
+            .addToStatements(This.call(c.getArguments()))
+            .addToStatements(new Assign(This.ref("validationEnabled"), Property.newProperty("validationEnabled"))).endBlock()
+            .build())
             .forEach(constructors::add);
 
         ClassRef validatorRef = new ClassRefBuilder().withFullyQualifiedName("javax.validation.Validator").build();
@@ -433,10 +459,11 @@ public class ClazzAs {
         if (context.isExternalvalidatorSupported()) {
           basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
               .withTypeRef(validatorRef).withName("validator").and().withNewBlock()
-              .addNewStringStatementStatement(
-                  c.getArguments().stream().map(Property::getName).collect(Collectors.joining(", ", "this(", ");")))
-              .addNewStringStatementStatement("this.validator=validator;")
-              .addNewStringStatementStatement("this.validationEnabled = validator != null;").endBlock().build())
+              .addToStatements(This.call(c.getArguments()))
+              .addToStatements(new Assign(This.ref("validator"), Property.newProperty("validator")))
+              .addToStatements(
+                  new Assign(This.ref("validationEnabled"), Property.newProperty("validator").notNull()))
+              .endBlock().build())
               .forEach(constructors::add);
 
           Method usingValidator = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
@@ -444,7 +471,7 @@ public class ClazzAs {
               .withName("usingValidator")
               .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
               .withNewBlock()
-              .addNewStringStatementStatement("return new " + builderRef.getName() + "(this, validator);")
+              .addToStatements(Return.newInstance(builderRef, new This(), Property.newProperty("validator")))
               .endBlock()
               .build();
 
@@ -455,7 +482,7 @@ public class ClazzAs {
             .withReturnType(builderRef)
             .withName("usingValidation")
             .withNewBlock()
-            .addNewStringStatementStatement("return new " + builderRef.getName() + "(this, true);")
+            .addToStatements(Return.newInstance(builderRef, new This(), ValueRef.from(true)))
             .endBlock()
             .build();
 
@@ -514,12 +541,7 @@ public class ClazzAs {
           .map(c -> superConstructorOf(c, editableType)).collect(Collectors.toList()));
 
       Method edit = new MethodBuilder().withModifiers(Modifiers.from(modifiers)).withReturnType(builderRef).withName("edit")
-          .withNewBlock().addToStatements(new StringStatement(new Supplier<String>() {
-            @Override
-            public String get() {
-              return "return new " + builderRef.getName() + "(this);";
-            }
-          })).endBlock().build();
+          .withNewBlock().addToStatements(Return.newInstance(builderRef, new This())).endBlock().build();
 
       methods.add(edit);
 
@@ -536,36 +558,43 @@ public class ClazzAs {
 
   public static final Function<RichTypeDef, TypeDef> POJO = FunctionFactory.wrap(new ToPojo());
 
-  private static List<Statement> toInstanceConstructorBody(RichTypeDef clazz, TypeDef instance, String fluent) {
+  private static List<Statement> toInstanceConstructorBody(RichTypeDef clazz, TypeDef instanceType, String fluent) {
     Method constructor = findBuildableConstructor(clazz);
     List<Statement> statements = new ArrayList<Statement>();
     final String ref = fluent != null && !fluent.isEmpty() ? fluent : "this";
 
     //We may use a reference to fluent or we may use directly "this". So we need to check.
     if (fluent != null && !fluent.isEmpty()) {
-      statements.add(new StringStatement("this.fluent = " + fluent + "; "));
+      statements.add(new Assign(This.ref("fluent"), Property.newProperty(fluent)));
     }
 
     if (!isAbstract(clazz.toReference()) && hasDefaultConstructor(clazz)) {
-      statements.add(
-          new StringStatement("instance = (instance != null ? instance : new " + clazz.getFullyQualifiedName() + "());\n"));
+      Property instance = Property.newProperty("instance");
+      statements.add(new Assign(
+          instance,
+          new Ternary(
+              Expression.notNull(instance),
+              instance,
+              new Construct(ClassRef.forName(clazz.getFullyQualifiedName())))));
     }
 
-    StringBuilder builder = new StringBuilder("if (instance != null) {\n");
+    Property instance = Property.newProperty("instance");
+    List<Statement> ifStatements = new ArrayList<>();
 
     Set<String> constructorProperties = new HashSet<>();
     for (Property property : constructor.getArguments()) {
-      Optional<Method> getter = Getter.findOptional(instance, property);
+      Optional<Method> getter = Getter.findOptional(instanceType, property);
       getter.ifPresent(g -> {
-        String cast = property.getTypeRef() instanceof TypeParamRef ? "(" + property.getTypeRef().toString() + ")" : "";
         constructorProperties.add(property.getNameCapitalized());
-        builder.append("      ").append(ref).append(".with").append(property.getNameCapitalized())
-            .append("(").append(cast).append("instance.").append(g.getName()).append("());\n");
-      });
+        Expression targetRef = ref.equals("this") ? new This() : Property.newProperty(ref);
+        Expression getterCall = new MethodCall(g.getName(), instance);
 
-      // } else {
-      //   throw new IllegalStateException("Could not find getter for property:" + property + " in class:" + clazz);
-      // }
+        // Add cast if needed
+        Expression finalExpression = property.getTypeRef() instanceof TypeParamRef ? new Cast(property.getTypeRef(), getterCall)
+            : getterCall;
+
+        ifStatements.add(new MethodCall("with" + property.getNameCapitalized(), targetRef, finalExpression));
+      });
     }
 
     Predicate<Property> propertyFilter = isPropertyApplicable(clazz, false);
@@ -574,15 +603,15 @@ public class ClazzAs {
         .filter(p -> !constructorProperties.contains(p.getNameCapitalized()))
         .filter(p -> Setter.hasOrInherits(clazz, p))
         .forEach(property -> {
-          Optional<Method> optionalGetter = Getter.findOptional(instance, property);
+          Optional<Method> optionalGetter = Getter.findOptional(instanceType, property);
           if (optionalGetter.isPresent()) {
-            String withName = "with" + property.getNameCapitalized();
-            builder.append("      ").append(ref).append(".").append(withName).append("(instance.")
-                .append(optionalGetter.map(Method::getName).get()).append("());\n");
+            Expression targetRef = ref.equals("this") ? new This() : Property.newProperty(ref);
+            Expression getterCall = new MethodCall(optionalGetter.get().getName(), instance);
+            ifStatements.add(new MethodCall("with" + property.getNameCapitalized(), targetRef, getterCall));
           }
         });
 
-    statements.add(new StringStatement(builder.append("    }").toString()));
+    statements.add(If.notNull(instance).then(ifStatements).end());
     return statements;
   }
 
@@ -590,15 +619,17 @@ public class ClazzAs {
     Method constructor = findBuildableConstructor(item);
     List<Statement> statements = new ArrayList<Statement>();
 
-    statements.add(new StringStatement(new StringBuilder()
-        .append(instanceType.getName()).append(" buildable = new ").append(instanceType.getName()).append("(")
-        .append(Strings.join(constructor.getArguments(), new Function<Property, String>() {
-          public String apply(Property item) {
-            return "fluent." + ToMethod.getterOrBuildMethodName(item) + "()";
-          }
-        }, ","))
-        .append(");")
-        .toString()));
+    // Build constructor arguments
+    List<Expression> constructorArgs = new ArrayList<>();
+    Property fluent = Property.newProperty("fluent");
+    for (Property arg : constructor.getArguments()) {
+      constructorArgs.add(new MethodCall(ToMethod.getterOrBuildMethodName(arg), fluent));
+    }
+
+    Property buildable = Property.newProperty("buildable");
+    statements.add(new Declare(
+        Property.newProperty(instanceType.toInternalReference(), "buildable"),
+        new Construct(instanceType.toReference(), constructorArgs)));
 
     Predicate<Property> propertyFilter = isPropertyApplicable(item, false);
     item.getAllProperties().stream()
@@ -607,22 +638,29 @@ public class ClazzAs {
         .filter(p -> !constructor.getArguments().stream().anyMatch(a -> a.getName().equals(p.getName()))) //Exclude fields that are set via constructor!
         .forEach(property -> {
           Method setter = Setter.find(item, property);
-          statements.add(new StringStatement(new StringBuilder("buildable.").append(setter.getName())
-              .append("(fluent.").append(ToMethod.getterOrBuildMethodName(property)).append("());").toString()));
+          statements.add(new MethodCall(
+              setter.getName(),
+              buildable,
+              new MethodCall(ToMethod.getterOrBuildMethodName(property), fluent)));
         });
 
     BuilderContext context = BuilderContextManager.getContext();
     final boolean validationEnabled = item.hasAttribute(VALIDATION_ENABLED) ? item.getAttribute(VALIDATION_ENABLED) : false;
     if (validationEnabled) {
+      Property validationEnabledProp = Property.newProperty("validationEnabled");
+      ClassRef validationUtils = ClassRef.forName(context.getBuilderPackage() + ".ValidationUtils");
+
       if (context.isExternalvalidatorSupported()) {
-        statements.add(new StringStatement(
-            "if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable, validator);}"));
+        statements.add(If.condition(validationEnabledProp)
+            .then(new MethodCall("validate", validationUtils, buildable, Property.newProperty("validator")))
+            .end());
       } else {
-        statements.add(new StringStatement(
-            "if (validationEnabled) {" + context.getBuilderPackage() + ".ValidationUtils.validate(buildable);}"));
+        statements.add(If.condition(validationEnabledProp)
+            .then(new MethodCall("validate", validationUtils, buildable))
+            .end());
       }
     }
-    statements.add(new StringStatement("return buildable;"));
+    statements.add(Return.variable("buildable"));
     return statements;
   }
 
@@ -638,12 +676,10 @@ public class ClazzAs {
         .withAnnotations(annotations)
         .withReturnType(constructorType.toReference())
         .withNewBlock()
-        .addNewStringStatementStatement(
-            "super(" + Strings.join(constructor.getArguments(), new Function<Property, String>() {
-              public String apply(Property item) {
-                return item.getName();
-              }
-            }, ", ") + ");")
+        .addToStatements(Super.call(
+            constructor.getArguments().stream()
+                .map(arg -> Property.newProperty(arg.getName()))
+                .toArray(Expression[]::new)))
         .endBlock()
         .build();
   }
