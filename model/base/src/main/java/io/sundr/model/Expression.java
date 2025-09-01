@@ -202,6 +202,10 @@ public interface Expression extends Renderable {
     return new MethodCall(name, this, expression);
   }
 
+  default MethodCall call(Method method, Expression... expression) {
+    return new MethodCall(method.getName(), this, expression);
+  }
+
   default Index index(Expression expression) {
     return new Index(this, expression);
   }
