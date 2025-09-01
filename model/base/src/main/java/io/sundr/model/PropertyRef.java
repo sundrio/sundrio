@@ -36,7 +36,7 @@ public class PropertyRef implements Expression {
   @Override
   public String render() {
     if (scope != null) {
-      return scope.render() + DOT + property.getName();
+      return scope.renderExpression() + DOT + property.getName();
     }
     return property.getName();
   }
