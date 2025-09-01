@@ -224,6 +224,14 @@ public class ThrowFluent<A extends ThrowFluent<A>> extends BaseFluent<A> {
     return (A) withException(new RightShift(left, right));
   }
 
+  public SuperExceptionNested<A> withNewSuperException() {
+    return new SuperExceptionNested(null);
+  }
+
+  public SuperExceptionNested<A> withNewSuperExceptionLike(Super item) {
+    return new SuperExceptionNested(item);
+  }
+
   public GreaterThanExceptionNested<A> withNewGreaterThanException() {
     return new GreaterThanExceptionNested(null);
   }
@@ -550,6 +558,8 @@ public class ThrowFluent<A extends ThrowFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -876,6 +886,23 @@ public class ThrowFluent<A extends ThrowFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftException() {
+      return and();
+    }
+
+  }
+
+  public class SuperExceptionNested<N> extends SuperFluent<SuperExceptionNested<N>> implements Nested<N> {
+    SuperExceptionNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) ThrowFluent.this.withException(builder.build());
+    }
+
+    public N endSuperException() {
       return and();
     }
 

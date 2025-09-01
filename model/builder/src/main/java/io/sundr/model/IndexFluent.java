@@ -226,6 +226,14 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     return (A) withScope(new RightShift(left, right));
   }
 
+  public SuperScopeNested<A> withNewSuperScope() {
+    return new SuperScopeNested(null);
+  }
+
+  public SuperScopeNested<A> withNewSuperScopeLike(Super item) {
+    return new SuperScopeNested(item);
+  }
+
   public GreaterThanScopeNested<A> withNewGreaterThanScope() {
     return new GreaterThanScopeNested(null);
   }
@@ -684,6 +692,14 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     return (A) withExpression(new RightShift(left, right));
   }
 
+  public SuperExpressionNested<A> withNewSuperExpression() {
+    return new SuperExpressionNested(null);
+  }
+
+  public SuperExpressionNested<A> withNewSuperExpressionLike(Super item) {
+    return new SuperExpressionNested(item);
+  }
+
   public GreaterThanExpressionNested<A> withNewGreaterThanExpression() {
     return new GreaterThanExpressionNested(null);
   }
@@ -1016,6 +1032,8 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1342,6 +1360,23 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftScope() {
+      return and();
+    }
+
+  }
+
+  public class SuperScopeNested<N> extends SuperFluent<SuperScopeNested<N>> implements Nested<N> {
+    SuperScopeNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) IndexFluent.this.withScope(builder.build());
+    }
+
+    public N endSuperScope() {
       return and();
     }
 
@@ -2076,6 +2111,23 @@ public class IndexFluent<A extends IndexFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftExpression() {
+      return and();
+    }
+
+  }
+
+  public class SuperExpressionNested<N> extends SuperFluent<SuperExpressionNested<N>> implements Nested<N> {
+    SuperExpressionNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) IndexFluent.this.withExpression(builder.build());
+    }
+
+    public N endSuperExpression() {
       return and();
     }
 

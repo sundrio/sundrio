@@ -228,6 +228,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withCondition(new RightShift(left, right));
   }
 
+  public SuperConditionNested<A> withNewSuperCondition() {
+    return new SuperConditionNested(null);
+  }
+
+  public SuperConditionNested<A> withNewSuperConditionLike(Super item) {
+    return new SuperConditionNested(item);
+  }
+
   public GreaterThanConditionNested<A> withNewGreaterThanCondition() {
     return new GreaterThanConditionNested(null);
   }
@@ -684,6 +692,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   public A withNewRightShiftResult(Object left, Object right) {
     return (A) withResult(new RightShift(left, right));
+  }
+
+  public SuperResultNested<A> withNewSuperResult() {
+    return new SuperResultNested(null);
+  }
+
+  public SuperResultNested<A> withNewSuperResultLike(Super item) {
+    return new SuperResultNested(item);
   }
 
   public GreaterThanResultNested<A> withNewGreaterThanResult() {
@@ -1144,6 +1160,14 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     return (A) withAlternative(new RightShift(left, right));
   }
 
+  public SuperAlternativeNested<A> withNewSuperAlternative() {
+    return new SuperAlternativeNested(null);
+  }
+
+  public SuperAlternativeNested<A> withNewSuperAlternativeLike(Super item) {
+    return new SuperAlternativeNested(item);
+  }
+
   public GreaterThanAlternativeNested<A> withNewGreaterThanAlternative() {
     return new GreaterThanAlternativeNested(null);
   }
@@ -1482,6 +1506,8 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1808,6 +1834,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftCondition() {
+      return and();
+    }
+
+  }
+
+  public class SuperConditionNested<N> extends SuperFluent<SuperConditionNested<N>> implements Nested<N> {
+    SuperConditionNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endSuperCondition() {
       return and();
     }
 
@@ -2550,6 +2593,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class SuperResultNested<N> extends SuperFluent<SuperResultNested<N>> implements Nested<N> {
+    SuperResultNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endSuperResult() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanResultNested<N> extends GreaterThanFluent<GreaterThanResultNested<N>> implements Nested<N> {
     GreaterThanResultNested(GreaterThan item) {
       this.builder = new GreaterThanBuilder(this, item);
@@ -3280,6 +3340,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftAlternative() {
+      return and();
+    }
+
+  }
+
+  public class SuperAlternativeNested<N> extends SuperFluent<SuperAlternativeNested<N>> implements Nested<N> {
+    SuperAlternativeNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endSuperAlternative() {
       return and();
     }
 

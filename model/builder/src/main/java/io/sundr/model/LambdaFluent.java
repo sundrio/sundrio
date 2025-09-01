@@ -314,6 +314,14 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     return new AssignStatementNested(item);
   }
 
+  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatement() {
+    return new IfDslThenStepStatementNested(null);
+  }
+
+  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatementLike(IfDslThenStep item) {
+    return new IfDslThenStepStatementNested(item);
+  }
+
   public ForStatementNested<A> withNewForStatement() {
     return new ForStatementNested(null);
   }
@@ -388,6 +396,8 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+      case "io.sundr.model." + "IfDslThenStep":
+        return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -644,6 +654,24 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignStatement() {
+      return and();
+    }
+
+  }
+
+  public class IfDslThenStepStatementNested<N> extends IfDslThenStepFluent<IfDslThenStepStatementNested<N>>
+      implements Nested<N> {
+    IfDslThenStepStatementNested(IfDslThenStep item) {
+      this.builder = new IfDslThenStepBuilder(this, item);
+    }
+
+    IfDslThenStepBuilder builder;
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endIfDslThenStepStatement() {
       return and();
     }
 

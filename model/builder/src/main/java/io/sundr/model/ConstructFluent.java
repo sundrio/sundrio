@@ -745,6 +745,18 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     return new RightShiftArgumentsNested(index, item);
   }
 
+  public SuperArgumentsNested<A> addNewSuperArgument() {
+    return new SuperArgumentsNested(-1, null);
+  }
+
+  public SuperArgumentsNested<A> addNewSuperArgumentLike(Super item) {
+    return new SuperArgumentsNested(-1, item);
+  }
+
+  public SuperArgumentsNested<A> setNewSuperArgumentLike(int index, Super item) {
+    return new SuperArgumentsNested(index, item);
+  }
+
   public GreaterThanArgumentsNested<A> addNewGreaterThanArgument() {
     return new GreaterThanArgumentsNested(-1, null);
   }
@@ -1201,6 +1213,8 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1673,6 +1687,25 @@ public class ConstructFluent<A extends ConstructFluent<A>> extends BaseFluent<A>
     }
 
     public N endRightShiftArgument() {
+      return and();
+    }
+
+  }
+
+  public class SuperArgumentsNested<N> extends SuperFluent<SuperArgumentsNested<N>> implements Nested<N> {
+    SuperArgumentsNested(int index, Super item) {
+      this.index = index;
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endSuperArgument() {
       return and();
     }
 

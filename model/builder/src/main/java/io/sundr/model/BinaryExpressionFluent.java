@@ -226,6 +226,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return (A) withLeft(new RightShift(left, right));
   }
 
+  public SuperLeftNested<A> withNewSuperLeft() {
+    return new SuperLeftNested(null);
+  }
+
+  public SuperLeftNested<A> withNewSuperLeftLike(Super item) {
+    return new SuperLeftNested(item);
+  }
+
   public GreaterThanLeftNested<A> withNewGreaterThanLeft() {
     return new GreaterThanLeftNested(null);
   }
@@ -684,6 +692,14 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     return (A) withRight(new RightShift(left, right));
   }
 
+  public SuperRightNested<A> withNewSuperRight() {
+    return new SuperRightNested(null);
+  }
+
+  public SuperRightNested<A> withNewSuperRightLike(Super item) {
+    return new SuperRightNested(item);
+  }
+
   public GreaterThanRightNested<A> withNewGreaterThanRight() {
     return new GreaterThanRightNested(null);
   }
@@ -1016,6 +1032,8 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1342,6 +1360,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endRightShiftLeft() {
+      return and();
+    }
+
+  }
+
+  public class SuperLeftNested<N> extends SuperFluent<SuperLeftNested<N>> implements Nested<N> {
+    SuperLeftNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endSuperLeft() {
       return and();
     }
 
@@ -2076,6 +2111,23 @@ public class BinaryExpressionFluent<A extends BinaryExpressionFluent<A>> extends
     }
 
     public N endRightShiftRight() {
+      return and();
+    }
+
+  }
+
+  public class SuperRightNested<N> extends SuperFluent<SuperRightNested<N>> implements Nested<N> {
+    SuperRightNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endSuperRight() {
       return and();
     }
 
