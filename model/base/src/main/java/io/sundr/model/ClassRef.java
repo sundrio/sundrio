@@ -50,6 +50,14 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
     return new ClassRef(c.getTypeName(), 0, Collections.emptyList(), Collections.emptyMap());
   }
 
+  public MethodCall call(String name, List<Expression> arguments) {
+    return new MethodCall(name, Property.newProperty(fullyQualifiedName), arguments);
+  }
+
+  public MethodCall call(String name, Expression... arguments) {
+    return new MethodCall(name, Property.newProperty(fullyQualifiedName), arguments);
+  }
+
   public String getFullyQualifiedName() {
     return fullyQualifiedName;
   }
