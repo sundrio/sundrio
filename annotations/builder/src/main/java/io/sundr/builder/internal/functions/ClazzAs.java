@@ -18,6 +18,7 @@ package io.sundr.builder.internal.functions;
 
 import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
+import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.utils.Types.isAbstract;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -269,6 +271,9 @@ public class ClazzAs {
                   .withName(fluent.getName())
                   .withParameters(parameters)
                   .withExtendsList(superClassRef)
+                  .addToAttributes(ALSO_IMPORT,
+                      Arrays.asList(ClassRef.forClass(Optional.class), ClassRef.forClass(Predicate.class),
+                          ClassRef.forClass(Objects.class)))
                   .withAnnotations(
                       new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
                           .addToParameters("value", "unchecked").build())

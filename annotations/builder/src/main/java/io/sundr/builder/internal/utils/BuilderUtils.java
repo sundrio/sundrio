@@ -837,7 +837,7 @@ public class BuilderUtils {
 
   public static List<Statement> toHashCode(Collection<Property> properties) {
     List<Statement> statements = new ArrayList<>();
-    statements.add(new StringStatement("return java.util.Objects.hash(" + Stream
+    statements.add(new StringStatement("return Objects.hash(" + Stream
         .concat(properties.stream().map(Property::getName), Stream.of("super.hashCode()")).collect(Collectors.joining(",  "))
         + ");"));
     return statements;
@@ -863,7 +863,7 @@ public class BuilderUtils {
                 .append(propertyName).append(") return false;").toString()));
       } else {
         statements.add(new StringStatement(new StringBuilder()
-            .append("if (!java.util.Objects.equals(").append(propertyName).append(", that.")
+            .append("if (!Objects.equals(").append(propertyName).append(", that.")
             .append(propertyName).append(")) return false;").append("\n")
             .toString()));
       }

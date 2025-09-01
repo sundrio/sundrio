@@ -1544,9 +1544,9 @@ class ToMethod {
   };
 
   private static String createWithNewStatement(Property property, String methodNameBase, String elseValue) {
-    return "return withNew" + methodNameBase + "Like(java.util.Optional.ofNullable("
+    return "return withNew" + methodNameBase + "Like(Optional.ofNullable("
         + getterOrBuildMethodName(property) + "())"
-        + (isOptional(property.getTypeRef()) ? ".flatMap(java.util.function.Function.identity())" : "")
+        + (isOptional(property.getTypeRef()) ? ".flatMap(Function.identity())" : "")
         + ".orElse(" + elseValue + "));";
   }
 

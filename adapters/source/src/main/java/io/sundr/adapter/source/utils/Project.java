@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,7 +87,7 @@ public class Project {
     String className = classNameOf(fqcn);
 
     if (packageName.isPresent()) {
-      Optional<Path> path = packageName.map(p -> p.replaceAll(Pattern.quote("."), File.separator))
+      Optional<Path> path = packageName.map(p -> p.replace(".", File.separator))
           .map(p -> new File(sourceRoot, p))
           .map(f -> new File(f, className + ".java"))
           .filter(File::exists)
