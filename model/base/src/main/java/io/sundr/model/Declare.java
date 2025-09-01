@@ -45,6 +45,33 @@ public class Declare implements ExpressionOrStatement {
     this.value = Optional.of(ValueRef.from(value));
   }
 
+  //
+  // Static factory methods
+  //
+  public static Declare newInstance(String name, Class type, Expression... arguments) {
+    if (arguments.length == 0) {
+      return new Declare(Property.newProperty(ClassRef.forClass(type), name), new Construct(type));
+    } else if (arguments.length == 1) {
+      return new Declare(Property.newProperty(ClassRef.forClass(type), name), new Construct(type, arguments[0]));
+    } else {
+      return new Declare(Property.newProperty(ClassRef.forClass(type), name), new Construct(type, arguments));
+    }
+  }
+
+  public static Declare newInstance(String name, ClassRef type, Expression... arguments) {
+    if (arguments.length == 0) {
+      return new Declare(Property.newProperty(type, name), new Construct(type));
+    } else if (arguments.length == 1) {
+      return new Declare(Property.newProperty(type, name), new Construct(type, arguments[0]));
+    } else {
+      return new Declare(Property.newProperty(type, name), new Construct(type, arguments));
+    }
+  }
+
+  public static Declare cast(String name, ClassRef type, Expression target) {
+    return new Declare(Property.newProperty(type, name), new Cast(type, target));
+  }
+
   public List<Property> getProperties() {
     return properties;
   }
