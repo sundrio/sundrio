@@ -72,14 +72,19 @@ import io.sundr.model.AnnotationRef;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Declare;
+import io.sundr.model.Expression;
+import io.sundr.model.If;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Nameable;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
+import io.sundr.model.Return;
 import io.sundr.model.Statement;
-import io.sundr.model.StringStatement;
+import io.sundr.model.Super;
+import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -87,6 +92,7 @@ import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeParamRefBuilder;
 import io.sundr.model.TypeRef;
+import io.sundr.model.ValueRef;
 import io.sundr.model.WildcardRef;
 import io.sundr.model.functions.Assignable;
 import io.sundr.model.functions.GetDefinition;
@@ -827,17 +833,61 @@ public class BuilderUtils {
 
   public static List<Statement> toString(String name, Collection<Property> properties) {
     List<Statement> statements = new ArrayList<>();
-    statements.add(new StringStatement("StringBuilder sb = new StringBuilder();"));
-    statements.add(new StringStatement("sb.append(\"{\");"));
+    statements.add(Declare.newInstance("sb", StringBuilder.class));
+    statements.add(Property.newProperty("sb").call("append", ValueRef.from("{")));
     Iterator<Property> iter = properties.iterator();
     while (iter.hasNext()) {
-      statements.add(new StringStatement(ifNotNullToString(iter.next(), iter.hasNext())));
+      statements.addAll(ifNotNullToStringStatements(iter.next(), iter.hasNext()));
     }
-    statements.add(new StringStatement("sb.append(\"}\");"));
-    statements.add(new StringStatement("return sb.toString();"));
+    statements.add(Property.newProperty("sb").call("append", ValueRef.from("}")));
+    statements.add(Return.variable("sb").call("toString"));
     return statements;
   }
 
+  public static List<Statement> ifNotNullToStringStatements(Property property, boolean hasNext) {
+    List<Statement> statements = new ArrayList<>();
+    String propertyName = property.getName();
+    Property propertyRef = Property.newProperty(propertyName);
+    Property sbRef = Property.newProperty("sb");
+
+    // Primitives should be displayed no matter what.
+    if (property.getTypeRef() instanceof PrimitiveRef) {
+      statements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
+      statements.add(sbRef.call("append", propertyRef));
+      if (hasNext) {
+        statements.add(sbRef.call("append", ValueRef.from(",")));
+      }
+      return statements;
+    }
+
+    // Collections and Maps need null and empty checks
+    if (Collections.isCollection(property.getTypeRef()) || Types.isMap(property.getTypeRef())) {
+      List<Statement> thenStatements = new ArrayList<>();
+      thenStatements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
+      thenStatements.add(sbRef.call("append", propertyRef));
+      if (hasNext) {
+        thenStatements.add(sbRef.call("append", ValueRef.from(",")));
+      }
+
+      statements.add(If.not(propertyRef.isNull())
+          .and(Expression.not(propertyRef.call("isEmpty")))
+          .then(thenStatements));
+      return statements;
+    }
+
+    // Other reference types need null checks
+    List<Statement> thenStatements = new ArrayList<>();
+    thenStatements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
+    thenStatements.add(sbRef.call("append", propertyRef));
+    if (hasNext) {
+      thenStatements.add(sbRef.call("append", ValueRef.from(",")));
+    }
+
+    statements.add(If.not(propertyRef.isNull()).then(thenStatements));
+    return statements;
+  }
+
+  @Deprecated
   public static String ifNotNullToString(Property property, boolean hasNext) {
     String suffix = hasNext ? " + \",\"" : "";
     // Primitives should be displayed no matter what.
@@ -854,39 +904,44 @@ public class BuilderUtils {
 
   public static List<Statement> toHashCode(Collection<Property> properties) {
     List<Statement> statements = new ArrayList<>();
-    statements.add(new StringStatement("return java.util.Objects.hash(" + Stream
-        .concat(properties.stream().map(Property::getName), Stream.of("super.hashCode()")).collect(Collectors.joining(",  "))
-        + ");"));
+    List<Expression> arguments = new ArrayList<>();
+    for (Property property : properties) {
+      arguments.add(property);
+    }
+    statements.add(new Return(
+        ClassRef.forClass(java.util.Objects.class).call("hash", arguments.toArray(new Expression[arguments.size()]))));
     return statements;
   }
 
   public static List<Statement> toEquals(Nameable nameable, Collection<Property> properties) {
     List<Statement> statements = new ArrayList<>();
 
-    String simpleName = nameable.getName();
-    statements.add(new StringStatement("if (this == o) return true;"));
-    statements.add(new StringStatement("if (o == null || getClass() != o.getClass()) return false;"));
+    String name = nameable.getName();
+    ClassRef type = ClassRef.forName(name);
+    Property o = Property.newProperty("o");
 
-    statements.add(new StringStatement("if (!super.equals(o)) return false;"));
-    statements.add(new StringStatement(
-        new StringBuilder().append(simpleName).append(" that = (").append(simpleName).append(") o;").toString()));
+    statements.add(If.eq(new This(), o).then(Return.True()));
+    statements.add(If.isNull(o)
+        .or(new This().call("getClass").ne(o.call("getClass")))
+        .then(Return.False()));
+
+    statements.add(If.not(new Super().call("equals", o))
+        .then(Return.False()));
+    statements.add(Declare.cast("that", type, o));
 
     for (Property property : properties) {
       String propertyName = property.getName();
       TypeRef propertyType = property.getTypeRef();
       if (Types.isPrimitive(propertyType)) {
-        statements
-            .add(new StringStatement(new StringBuilder().append("if (").append(propertyName).append(" != ").append("that.")
-                .append(propertyName).append(") return false;").toString()));
+        statements.add(If.ne(Property.newProperty(propertyName), Property.newProperty("that").property(propertyName))
+            .then(Return.False()));
       } else {
-        statements.add(new StringStatement(new StringBuilder()
-            .append("if (!java.util.Objects.equals(").append(propertyName).append(", that.")
-            .append(propertyName).append(")) return false;").append("\n")
-            .toString()));
+        statements.add(If.not(ClassRef.forClass(java.util.Objects.class).call("equals", Property.newProperty(propertyName),
+            Property.newProperty("that").property(propertyName))).then(Return.False()));
       }
     }
 
-    statements.add(new StringStatement("return true;"));
+    statements.add(Return.True());
     return statements;
   }
 }
