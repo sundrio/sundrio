@@ -4,6 +4,14 @@ public class Return implements Statement {
 
   private final Expression expression;
 
+  public static Return True() {
+    return new Return(new ValueRef(true));
+  }
+
+  public static Return False() {
+    return new Return(new ValueRef(false));
+  }
+
   public static Return newInstance(ClassRef type, Expression... arguments) {
     return new Return(new Construct(type, arguments));
   }
@@ -24,12 +32,20 @@ public class Return implements Statement {
     return new ReturnDslThisStep();
   }
 
+  public static Return This(ClassRef castTo) {
+    return new Return(new Cast(castTo, new This()));
+  }
+
   public static ReturnDslVariableStep variable(Property property) {
     return new ReturnDslVariableStep(property);
   }
 
   public static ReturnDslVariableStep variable(String variableName) {
     return new ReturnDslVariableStep(variableName);
+  }
+
+  public static Return call(String method, Expression... arguments) {
+    return new Return(new MethodCall(method, (Expression) null, arguments));
   }
 
   public static Return value(Object value) {
