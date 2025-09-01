@@ -288,6 +288,14 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
     return (A) withExpression(new RightShift(left, right));
   }
 
+  public SuperExpressionNested<A> withNewSuperExpression() {
+    return new SuperExpressionNested(null);
+  }
+
+  public SuperExpressionNested<A> withNewSuperExpressionLike(Super item) {
+    return new SuperExpressionNested(item);
+  }
+
   public GreaterThanExpressionNested<A> withNewGreaterThanExpression() {
     return new GreaterThanExpressionNested(null);
   }
@@ -630,6 +638,8 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1041,6 +1051,23 @@ public class CastFluent<A extends CastFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftExpression() {
+      return and();
+    }
+
+  }
+
+  public class SuperExpressionNested<N> extends SuperFluent<SuperExpressionNested<N>> implements Nested<N> {
+    SuperExpressionNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) CastFluent.this.withExpression(builder.build());
+    }
+
+    public N endSuperExpression() {
       return and();
     }
 

@@ -419,6 +419,18 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     return new AssignStatementsNested(index, item);
   }
 
+  public IfDslThenStepStatementsNested<A> addNewIfDslThenStepStatement() {
+    return new IfDslThenStepStatementsNested(-1, null);
+  }
+
+  public IfDslThenStepStatementsNested<A> addNewIfDslThenStepStatementLike(IfDslThenStep item) {
+    return new IfDslThenStepStatementsNested(-1, item);
+  }
+
+  public IfDslThenStepStatementsNested<A> setNewIfDslThenStepStatementLike(int index, IfDslThenStep item) {
+    return new IfDslThenStepStatementsNested(index, item);
+  }
+
   public ForStatementsNested<A> addNewForStatement() {
     return new ForStatementsNested(-1, null);
   }
@@ -491,6 +503,8 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
       case "io.sundr.model." + "Assign":
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+      case "io.sundr.model." + "IfDslThenStep":
+        return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -778,6 +792,26 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignStatement() {
+      return and();
+    }
+
+  }
+
+  public class IfDslThenStepStatementsNested<N> extends IfDslThenStepFluent<IfDslThenStepStatementsNested<N>>
+      implements Nested<N> {
+    IfDslThenStepStatementsNested(int index, IfDslThenStep item) {
+      this.index = index;
+      this.builder = new IfDslThenStepBuilder(this, item);
+    }
+
+    IfDslThenStepBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endIfDslThenStepStatement() {
       return and();
     }
 

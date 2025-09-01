@@ -226,6 +226,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return (A) withTarget(new RightShift(left, right));
   }
 
+  public SuperTargetNested<A> withNewSuperTarget() {
+    return new SuperTargetNested(null);
+  }
+
+  public SuperTargetNested<A> withNewSuperTargetLike(Super item) {
+    return new SuperTargetNested(item);
+  }
+
   public GreaterThanTargetNested<A> withNewGreaterThanTarget() {
     return new GreaterThanTargetNested(null);
   }
@@ -684,6 +692,14 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     return (A) withValue(new RightShift(left, right));
   }
 
+  public SuperValueNested<A> withNewSuperValue() {
+    return new SuperValueNested(null);
+  }
+
+  public SuperValueNested<A> withNewSuperValueLike(Super item) {
+    return new SuperValueNested(item);
+  }
+
   public GreaterThanValueNested<A> withNewGreaterThanValue() {
     return new GreaterThanValueNested(null);
   }
@@ -1016,6 +1032,8 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1342,6 +1360,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftTarget() {
+      return and();
+    }
+
+  }
+
+  public class SuperTargetNested<N> extends SuperFluent<SuperTargetNested<N>> implements Nested<N> {
+    SuperTargetNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withTarget(builder.build());
+    }
+
+    public N endSuperTarget() {
       return and();
     }
 
@@ -2077,6 +2112,23 @@ public class AssignFluent<A extends AssignFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftValue() {
+      return and();
+    }
+
+  }
+
+  public class SuperValueNested<N> extends SuperFluent<SuperValueNested<N>> implements Nested<N> {
+    SuperValueNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) AssignFluent.this.withValue(builder.build());
+    }
+
+    public N endSuperValue() {
       return and();
     }
 

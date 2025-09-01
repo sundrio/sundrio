@@ -248,6 +248,14 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     return (A) withScope(new RightShift(left, right));
   }
 
+  public SuperScopeNested<A> withNewSuperScope() {
+    return new SuperScopeNested(null);
+  }
+
+  public SuperScopeNested<A> withNewSuperScopeLike(Super item) {
+    return new SuperScopeNested(item);
+  }
+
   public GreaterThanScopeNested<A> withNewGreaterThanScope() {
     return new GreaterThanScopeNested(null);
   }
@@ -1178,6 +1186,18 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     return new RightShiftArgumentsNested(index, item);
   }
 
+  public SuperArgumentsNested<A> addNewSuperArgument() {
+    return new SuperArgumentsNested(-1, null);
+  }
+
+  public SuperArgumentsNested<A> addNewSuperArgumentLike(Super item) {
+    return new SuperArgumentsNested(-1, item);
+  }
+
+  public SuperArgumentsNested<A> setNewSuperArgumentLike(int index, Super item) {
+    return new SuperArgumentsNested(index, item);
+  }
+
   public GreaterThanArgumentsNested<A> addNewGreaterThanArgument() {
     return new GreaterThanArgumentsNested(-1, null);
   }
@@ -1630,6 +1650,8 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1966,6 +1988,23 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     }
 
     public N endRightShiftScope() {
+      return and();
+    }
+
+  }
+
+  public class SuperScopeNested<N> extends SuperFluent<SuperScopeNested<N>> implements Nested<N> {
+    SuperScopeNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) MethodCallFluent.this.withScope(builder.build());
+    }
+
+    public N endSuperScope() {
       return and();
     }
 
@@ -2829,6 +2868,25 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends BaseFluent<
     }
 
     public N endRightShiftArgument() {
+      return and();
+    }
+
+  }
+
+  public class SuperArgumentsNested<N> extends SuperFluent<SuperArgumentsNested<N>> implements Nested<N> {
+    SuperArgumentsNested(int index, Super item) {
+      this.index = index;
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) MethodCallFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endSuperArgument() {
       return and();
     }
 

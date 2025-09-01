@@ -520,6 +520,18 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
     return new RightShiftExpressionsNested(index, item);
   }
 
+  public SuperExpressionsNested<A> addNewSuperExpression() {
+    return new SuperExpressionsNested(-1, null);
+  }
+
+  public SuperExpressionsNested<A> addNewSuperExpressionLike(Super item) {
+    return new SuperExpressionsNested(-1, item);
+  }
+
+  public SuperExpressionsNested<A> setNewSuperExpressionLike(int index, Super item) {
+    return new SuperExpressionsNested(index, item);
+  }
+
   public GreaterThanExpressionsNested<A> addNewGreaterThanExpression() {
     return new GreaterThanExpressionsNested(-1, null);
   }
@@ -970,6 +982,8 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -1413,6 +1427,25 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftExpression() {
+      return and();
+    }
+
+  }
+
+  public class SuperExpressionsNested<N> extends SuperFluent<SuperExpressionsNested<N>> implements Nested<N> {
+    SuperExpressionsNested(int index, Super item) {
+      this.index = index;
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) NewArrayFluent.this.setToExpressions(index, builder.build());
+    }
+
+    public N endSuperExpression() {
       return and();
     }
 

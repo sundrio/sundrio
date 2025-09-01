@@ -229,6 +229,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return (A) withCondition(new RightShift(left, right));
   }
 
+  public SuperConditionNested<A> withNewSuperCondition() {
+    return new SuperConditionNested(null);
+  }
+
+  public SuperConditionNested<A> withNewSuperConditionLike(Super item) {
+    return new SuperConditionNested(item);
+  }
+
   public GreaterThanConditionNested<A> withNewGreaterThanCondition() {
     return new GreaterThanConditionNested(null);
   }
@@ -655,6 +663,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new AssignStatementNested(item);
   }
 
+  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatement() {
+    return new IfDslThenStepStatementNested(null);
+  }
+
+  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatementLike(IfDslThenStep item) {
+    return new IfDslThenStepStatementNested(item);
+  }
+
   public ForStatementNested<A> withNewForStatement() {
     return new ForStatementNested(null);
   }
@@ -763,6 +779,8 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -839,6 +857,8 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
       case "io.sundr.model." + "Return":
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
+      case "io.sundr.model." + "IfDslThenStep":
+        return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -1113,6 +1133,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftCondition() {
+      return and();
+    }
+
+  }
+
+  public class SuperConditionNested<N> extends SuperFluent<SuperConditionNested<N>> implements Nested<N> {
+    SuperConditionNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) IfFluent.this.withCondition(builder.build());
+    }
+
+    public N endSuperCondition() {
       return and();
     }
 
@@ -1832,6 +1869,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignStatement() {
+      return and();
+    }
+
+  }
+
+  public class IfDslThenStepStatementNested<N> extends IfDslThenStepFluent<IfDslThenStepStatementNested<N>>
+      implements Nested<N> {
+    IfDslThenStepStatementNested(IfDslThenStep item) {
+      this.builder = new IfDslThenStepBuilder(this, item);
+    }
+
+    IfDslThenStepBuilder builder;
+
+    public N and() {
+      return (N) IfFluent.this.withStatement(builder.build());
+    }
+
+    public N endIfDslThenStepStatement() {
       return and();
     }
 

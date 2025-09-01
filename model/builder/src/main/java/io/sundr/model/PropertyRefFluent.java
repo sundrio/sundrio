@@ -266,6 +266,14 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
     return (A) withScope(new RightShift(left, right));
   }
 
+  public SuperScopeNested<A> withNewSuperScope() {
+    return new SuperScopeNested(null);
+  }
+
+  public SuperScopeNested<A> withNewSuperScopeLike(Super item) {
+    return new SuperScopeNested(item);
+  }
+
   public GreaterThanScopeNested<A> withNewGreaterThanScope() {
     return new GreaterThanScopeNested(null);
   }
@@ -598,6 +606,8 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -941,6 +951,23 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends BaseFluen
     }
 
     public N endRightShiftScope() {
+      return and();
+    }
+
+  }
+
+  public class SuperScopeNested<N> extends SuperFluent<SuperScopeNested<N>> implements Nested<N> {
+    SuperScopeNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) PropertyRefFluent.this.withScope(builder.build());
+    }
+
+    public N endSuperScope() {
       return and();
     }
 

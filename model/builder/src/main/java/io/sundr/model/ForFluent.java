@@ -462,6 +462,18 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new RightShiftInitNested(index, item);
   }
 
+  public SuperInitNested<A> addNewSuperInit() {
+    return new SuperInitNested(-1, null);
+  }
+
+  public SuperInitNested<A> addNewSuperInitLike(Super item) {
+    return new SuperInitNested(-1, item);
+  }
+
+  public SuperInitNested<A> setNewSuperInitLike(int index, Super item) {
+    return new SuperInitNested(index, item);
+  }
+
   public GreaterThanInitNested<A> addNewGreaterThanInit() {
     return new GreaterThanInitNested(-1, null);
   }
@@ -1026,6 +1038,14 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   public A withNewRightShiftCompare(Object left, Object right) {
     return (A) withCompare(new RightShift(left, right));
+  }
+
+  public SuperCompareNested<A> withNewSuperCompare() {
+    return new SuperCompareNested(null);
+  }
+
+  public SuperCompareNested<A> withNewSuperCompareLike(Super item) {
+    return new SuperCompareNested(item);
   }
 
   public GreaterThanCompareNested<A> withNewGreaterThanCompare() {
@@ -1713,6 +1733,18 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new RightShiftUpdateNested(index, item);
   }
 
+  public SuperUpdateNested<A> addNewSuperUpdate() {
+    return new SuperUpdateNested(-1, null);
+  }
+
+  public SuperUpdateNested<A> addNewSuperUpdateLike(Super item) {
+    return new SuperUpdateNested(-1, item);
+  }
+
+  public SuperUpdateNested<A> setNewSuperUpdateLike(int index, Super item) {
+    return new SuperUpdateNested(index, item);
+  }
+
   public GreaterThanUpdateNested<A> addNewGreaterThanUpdate() {
     return new GreaterThanUpdateNested(-1, null);
   }
@@ -2247,6 +2279,14 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     return new AssignBodyNested(item);
   }
 
+  public IfDslThenStepBodyNested<A> withNewIfDslThenStepBody() {
+    return new IfDslThenStepBodyNested(null);
+  }
+
+  public IfDslThenStepBodyNested<A> withNewIfDslThenStepBodyLike(IfDslThenStep item) {
+    return new IfDslThenStepBodyNested(item);
+  }
+
   public ForBodyNested<A> withNewForBody() {
     return new ForBodyNested(null);
   }
@@ -2335,6 +2375,8 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -2411,6 +2453,8 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
       case "io.sundr.model." + "Return":
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
+      case "io.sundr.model." + "IfDslThenStep":
+        return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
       case "io.sundr.model." + "For":
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
@@ -2717,6 +2761,25 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftInit() {
+      return and();
+    }
+
+  }
+
+  public class SuperInitNested<N> extends SuperFluent<SuperInitNested<N>> implements Nested<N> {
+    SuperInitNested(int index, Super item) {
+      this.index = index;
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ForFluent.this.setToInit(index, builder.build());
+    }
+
+    public N endSuperInit() {
       return and();
     }
 
@@ -3510,6 +3573,23 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class SuperCompareNested<N> extends SuperFluent<SuperCompareNested<N>> implements Nested<N> {
+    SuperCompareNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) ForFluent.this.withCompare(builder.build());
+    }
+
+    public N endSuperCompare() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanCompareNested<N> extends GreaterThanFluent<GreaterThanCompareNested<N>> implements Nested<N> {
     GreaterThanCompareNested(GreaterThan item) {
       this.builder = new GreaterThanBuilder(this, item);
@@ -4272,6 +4352,25 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftUpdate() {
+      return and();
+    }
+
+  }
+
+  public class SuperUpdateNested<N> extends SuperFluent<SuperUpdateNested<N>> implements Nested<N> {
+    SuperUpdateNested(int index, Super item) {
+      this.index = index;
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) ForFluent.this.setToUpdate(index, builder.build());
+    }
+
+    public N endSuperUpdate() {
       return and();
     }
 
@@ -5043,6 +5142,23 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignBody() {
+      return and();
+    }
+
+  }
+
+  public class IfDslThenStepBodyNested<N> extends IfDslThenStepFluent<IfDslThenStepBodyNested<N>> implements Nested<N> {
+    IfDslThenStepBodyNested(IfDslThenStep item) {
+      this.builder = new IfDslThenStepBuilder(this, item);
+    }
+
+    IfDslThenStepBuilder builder;
+
+    public N and() {
+      return (N) ForFluent.this.withBody(builder.build());
+    }
+
+    public N endIfDslThenStepBody() {
       return and();
     }
 

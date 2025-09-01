@@ -224,6 +224,14 @@ public class PositiveFluent<A extends PositiveFluent<A>> extends BaseFluent<A> {
     return (A) withExpresion(new RightShift(left, right));
   }
 
+  public SuperExpresionNested<A> withNewSuperExpresion() {
+    return new SuperExpresionNested(null);
+  }
+
+  public SuperExpresionNested<A> withNewSuperExpresionLike(Super item) {
+    return new SuperExpresionNested(item);
+  }
+
   public GreaterThanExpresionNested<A> withNewGreaterThanExpresion() {
     return new GreaterThanExpresionNested(null);
   }
@@ -550,6 +558,8 @@ public class PositiveFluent<A extends PositiveFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
       case "io.sundr.model." + "RightShift":
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "Super":
+        return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
       case "io.sundr.model." + "GreaterThan":
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
       case "io.sundr.model." + "Declare":
@@ -876,6 +886,23 @@ public class PositiveFluent<A extends PositiveFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftExpresion() {
+      return and();
+    }
+
+  }
+
+  public class SuperExpresionNested<N> extends SuperFluent<SuperExpresionNested<N>> implements Nested<N> {
+    SuperExpresionNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
+
+    SuperBuilder builder;
+
+    public N and() {
+      return (N) PositiveFluent.this.withExpresion(builder.build());
+    }
+
+    public N endSuperExpresion() {
       return and();
     }
 
