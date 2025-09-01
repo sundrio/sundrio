@@ -27,6 +27,10 @@ public class Switch implements Statement {
     return defaultCase;
   }
 
+  private static boolean blockReturns(Block block) {
+    return block.getStatements().stream().anyMatch(s -> s instanceof Return);
+  }
+
   public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("switch");
@@ -40,7 +44,11 @@ public class Switch implements Statement {
       sb.append(NEWLINE);
       sb.append(tab("case " + entry.getKey().render() + ":"));
       sb.append(NEWLINE);
-      sb.append(tab(tab(entry.getValue().render(), NEWLINE, "break;")));
+      sb.append(tab(tab(entry.getValue().render())));
+      if (!blockReturns(entry.getValue())) {
+        sb.append(NEWLINE);
+        sb.append(tab(tab("break;")));
+      }
     }
     defaultCase.ifPresent(d -> {
       sb.append(NEWLINE);
@@ -51,5 +59,13 @@ public class Switch implements Statement {
     sb.append(NEWLINE);
     sb.append(CB);
     return sb.toString();
+  }
+
+  //
+  // DSL
+  //
+
+  public static SwitchDslExpressionStep expression(Expression expression) {
+    return new SwitchDslExpressionStep(expression);
   }
 }
