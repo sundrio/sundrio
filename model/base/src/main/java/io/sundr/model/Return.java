@@ -20,6 +20,26 @@ public class Return implements Statement {
     return new Return(new Construct(type, arguments));
   }
 
+  public static ReturnDslThisStep This() {
+    return new ReturnDslThisStep();
+  }
+
+  public static ReturnDslVariableStep variable(Property property) {
+    return new ReturnDslVariableStep(property);
+  }
+
+  public static ReturnDslVariableStep variable(String variableName) {
+    return new ReturnDslVariableStep(variableName);
+  }
+
+  public static Return value(Object value) {
+    return new Return(ValueRef.from(value));
+  }
+
+  public static Return Null() {
+    return new Return(ValueRef.NULL);
+  }
+
   public Return(Expression expression) {
     this.expression = expression;
   }

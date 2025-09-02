@@ -23,6 +23,7 @@ import io.sundr.builder.annotations.ExternalBuildables;
     "io.sundr.model.AttributeKey",
     "io.sundr.model.RichTypeDef",
     "io.sundr.model.SwitchDsl.*",
+    "io.sundr.model.ReturnDsl.*",
     ".*Fluent$",
     ".*FluentImpl$",
     ".*Builder$",
