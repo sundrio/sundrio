@@ -278,15 +278,15 @@ public interface Expression extends Renderable {
     return new NewArray(type, sizes);
   }
 
-  public static Lambda lamba(Property parameter, Statement statement) {
+  public static Lambda lambda(Property parameter, Statement statement) {
     return new Lambda(parameter.getName(), statement);
   }
 
-  public static Lambda lamba(Property parameter, Expression expression) {
+  public static Lambda lambda(Property parameter, Expression expression) {
     return new Lambda(parameter.getName(), expression);
   }
 
-  public static Lambda lamba(String parameter, Expression expression) {
+  public static Lambda lambda(String parameter, Expression expression) {
     return new Lambda(parameter, expression);
   }
 

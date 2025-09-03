@@ -1310,8 +1310,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                   expression.cast(Map.class).call("getOrDefault", getterName,
                       new Cast(Map[].class, ValueRef.from("new Map[0]"))),
                   new Cast(Map[].class, ValueRef.from("new Map[0]")))))
-              .call("map", Expression.lamba(nextRef, convertMapExpression(Property.newProperty(nextRef), propertyType)))
-              .call("toArray", Expression.lamba("size",
+              .call("map", Expression.lambda(nextRef, convertMapExpression(Property.newProperty(nextRef), propertyType)))
+              .call("toArray", Expression.lambda("size",
                   Expression.createNewArray(propertyType.toInternalReference(), Property.newProperty(("size")))));
         }
       } finally {
@@ -1342,7 +1342,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
             expression.cast(Map.class).call("getOrDefault", getterName, defaultValue),
             defaultValue)
             .call("toArray",
-                Expression.lamba("size", Expression.createNewArray(getter.getReturnType(), Property.newProperty(("size")))))));
+                Expression.lambda("size", Expression.createNewArray(getter.getReturnType(), Property.newProperty(("size")))))));
   }
 
   /**
