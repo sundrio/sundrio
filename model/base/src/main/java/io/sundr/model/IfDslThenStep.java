@@ -31,6 +31,14 @@ public class IfDslThenStep implements Statement {
     return new If(condition, Block.wrap(statements));
   }
 
+  void setCondition(Expression condition) {
+    this.condition = condition;
+  }
+
+  void setStatements(List<Statement> statements) {
+    this.statements = statements;
+  }
+
   @Override
   public String render() {
     return end().render();

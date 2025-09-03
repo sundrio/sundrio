@@ -523,6 +523,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return this.statement != null;
   }
 
+  public ReturnDslThisStepStatementNested<A> withNewReturnDslThisStepStatement() {
+    return new ReturnDslThisStepStatementNested(null);
+  }
+
+  public ReturnDslThisStepStatementNested<A> withNewReturnDslThisStepStatementLike(ReturnDslThisStep item) {
+    return new ReturnDslThisStepStatementNested(item);
+  }
+
   public MethodCallStatementNested<A> withNewMethodCallStatement() {
     return new MethodCallStatementNested(null);
   }
@@ -625,6 +633,18 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public BlockStatementNested<A> withNewBlockStatementLike(Block item) {
     return new BlockStatementNested(item);
+  }
+
+  public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatement() {
+    return new ReturnDslVariableStepStatementNested(null);
+  }
+
+  public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
+    return new ReturnDslVariableStepStatementNested(item);
+  }
+
+  public A withNewReturnDslVariableStepStatement(String name) {
+    return (A) withStatement(new ReturnDslVariableStep(name));
   }
 
   public IfStatementNested<A> withNewIfStatement() {
@@ -835,6 +855,8 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
       case "io.sundr.model." + "Positive":
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
+      case "io.sundr.model." + "ReturnDslThisStep":
+        return (VisitableBuilder<T, ?>) new ReturnDslThisStepBuilder((ReturnDslThisStep) item);
       case "io.sundr.model." + "Switch":
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
       case "io.sundr.model." + "Break":
@@ -853,6 +875,8 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new ForeachBuilder((Foreach) item);
       case "io.sundr.model." + "Block":
         return (VisitableBuilder<T, ?>) new BlockBuilder((Block) item);
+      case "io.sundr.model." + "ReturnDslVariableStep":
+        return (VisitableBuilder<T, ?>) new ReturnDslVariableStepBuilder((ReturnDslVariableStep) item);
       case "io.sundr.model." + "If":
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
       case "io.sundr.model." + "Return":
@@ -1619,6 +1643,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class ReturnDslThisStepStatementNested<N> extends ReturnDslThisStepFluent<ReturnDslThisStepStatementNested<N>>
+      implements Nested<N> {
+    ReturnDslThisStepStatementNested(ReturnDslThisStep item) {
+      this.builder = new ReturnDslThisStepBuilder(this, item);
+    }
+
+    ReturnDslThisStepBuilder builder;
+
+    public N and() {
+      return (N) IfFluent.this.withStatement(builder.build());
+    }
+
+    public N endReturnDslThisStepStatement() {
+      return and();
+    }
+
+  }
+
   public class MethodCallStatementNested<N> extends MethodCallFluent<MethodCallStatementNested<N>> implements Nested<N> {
     MethodCallStatementNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
@@ -1801,6 +1843,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endBlockStatement() {
+      return and();
+    }
+
+  }
+
+  public class ReturnDslVariableStepStatementNested<N>
+      extends ReturnDslVariableStepFluent<ReturnDslVariableStepStatementNested<N>> implements Nested<N> {
+    ReturnDslVariableStepStatementNested(ReturnDslVariableStep item) {
+      this.builder = new ReturnDslVariableStepBuilder(this, item);
+    }
+
+    ReturnDslVariableStepBuilder builder;
+
+    public N and() {
+      return (N) IfFluent.this.withStatement(builder.build());
+    }
+
+    public N endReturnDslVariableStepStatement() {
       return and();
     }
 
