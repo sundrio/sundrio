@@ -219,6 +219,18 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     return this.statements != null && !(this.statements.isEmpty());
   }
 
+  public ReturnDslThisStepStatementsNested<A> addNewReturnDslThisStepStatement() {
+    return new ReturnDslThisStepStatementsNested(-1, null);
+  }
+
+  public ReturnDslThisStepStatementsNested<A> addNewReturnDslThisStepStatementLike(ReturnDslThisStep item) {
+    return new ReturnDslThisStepStatementsNested(-1, item);
+  }
+
+  public ReturnDslThisStepStatementsNested<A> setNewReturnDslThisStepStatementLike(int index, ReturnDslThisStep item) {
+    return new ReturnDslThisStepStatementsNested(index, item);
+  }
+
   public MethodCallStatementsNested<A> addNewMethodCallStatement() {
     return new MethodCallStatementsNested(-1, null);
   }
@@ -367,6 +379,23 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     return new BlockStatementsNested(index, item);
   }
 
+  public ReturnDslVariableStepStatementsNested<A> addNewReturnDslVariableStepStatement() {
+    return new ReturnDslVariableStepStatementsNested(-1, null);
+  }
+
+  public ReturnDslVariableStepStatementsNested<A> addNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
+    return new ReturnDslVariableStepStatementsNested(-1, item);
+  }
+
+  public A addNewReturnDslVariableStepStatement(String name) {
+    return (A) addToStatements(new ReturnDslVariableStep(name));
+  }
+
+  public ReturnDslVariableStepStatementsNested<A> setNewReturnDslVariableStepStatementLike(int index,
+      ReturnDslVariableStep item) {
+    return new ReturnDslVariableStepStatementsNested(index, item);
+  }
+
   public IfStatementsNested<A> addNewIfStatement() {
     return new IfStatementsNested(-1, null);
   }
@@ -473,6 +502,8 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
+      case "io.sundr.model." + "ReturnDslThisStep":
+        return (VisitableBuilder<T, ?>) new ReturnDslThisStepBuilder((ReturnDslThisStep) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
       case "io.sundr.model." + "Switch":
@@ -495,6 +526,8 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new ForeachBuilder((Foreach) item);
       case "io.sundr.model." + "Block":
         return (VisitableBuilder<T, ?>) new BlockBuilder((Block) item);
+      case "io.sundr.model." + "ReturnDslVariableStep":
+        return (VisitableBuilder<T, ?>) new ReturnDslVariableStepBuilder((ReturnDslVariableStep) item);
       case "io.sundr.model." + "If":
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
       case "io.sundr.model." + "Lambda":
@@ -509,6 +542,26 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
     }
     return (VisitableBuilder<T, ?>) builderOf(item);
+  }
+
+  public class ReturnDslThisStepStatementsNested<N> extends ReturnDslThisStepFluent<ReturnDslThisStepStatementsNested<N>>
+      implements Nested<N> {
+    ReturnDslThisStepStatementsNested(int index, ReturnDslThisStep item) {
+      this.index = index;
+      this.builder = new ReturnDslThisStepBuilder(this, item);
+    }
+
+    ReturnDslThisStepBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endReturnDslThisStepStatement() {
+      return and();
+    }
+
   }
 
   public class MethodCallStatementsNested<N> extends MethodCallFluent<MethodCallStatementsNested<N>> implements Nested<N> {
@@ -716,6 +769,26 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     }
 
     public N endBlockStatement() {
+      return and();
+    }
+
+  }
+
+  public class ReturnDslVariableStepStatementsNested<N>
+      extends ReturnDslVariableStepFluent<ReturnDslVariableStepStatementsNested<N>> implements Nested<N> {
+    ReturnDslVariableStepStatementsNested(int index, ReturnDslVariableStep item) {
+      this.index = index;
+      this.builder = new ReturnDslVariableStepBuilder(this, item);
+    }
+
+    ReturnDslVariableStepBuilder builder;
+    int index;
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endReturnDslVariableStepStatement() {
       return and();
     }
 
