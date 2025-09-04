@@ -379,7 +379,7 @@
                   <tagNameFormat>@{project.version}</tagNameFormat>
                   <localCheckout>true</localCheckout>
                   <pushChanges>false</pushChanges>
-                  <remoteTagging>false</remoteTagging>
+                  <remoteTagging>true</remoteTagging>
                   <updateWorkingCopyVersions>false</updateWorkingCopyVersions>
                   <arguments>-DskipTests=true</arguments>
                 </configuration>
