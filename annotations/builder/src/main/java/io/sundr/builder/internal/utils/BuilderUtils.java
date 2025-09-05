@@ -24,7 +24,6 @@ import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_MAP_VALUE_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
-import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
 import static io.sundr.model.Attributeable.INIT_FUNCTION;
@@ -69,7 +68,6 @@ import io.sundr.builder.internal.functions.ToConstructExpression;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
-import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Declare;
@@ -663,7 +661,6 @@ public class BuilderUtils {
                   : " new " + listRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(listDef, BOXED_OF.apply(unwrapped)))
           .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(listDef, BOXED_OF.apply(unwrapped)))
-          .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef))
           .build();
     }
 
@@ -712,7 +709,6 @@ public class BuilderUtils {
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(listDef, targetType))
           .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(listDef, targetType))
-          .addToAttributes(ALSO_IMPORT, alsoImport(property, listRef, builderType))
           .build();
     }
     if (isSet) {
@@ -735,7 +731,6 @@ public class BuilderUtils {
           .addToAttributes(LAZY_INIT, " new " + setRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(setDef, targetType))
           .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(setDef, targetType))
-          .addToAttributes(ALSO_IMPORT, alsoImport(property, setRef, builderType))
           .build();
     }
 
@@ -764,20 +759,17 @@ public class BuilderUtils {
       ClassRef optionalRef = Optionals.OPTIONAL.toReference(builderType);
       return new PropertyBuilder(property).withTypeRef(optionalRef)
           .addToAttributes(INIT, " Optional.empty()")
-          .addToAttributes(ALSO_IMPORT, alsoImport(property, optionalRef, builderType))
           .build();
     }
 
     if (Types.isConcrete(builderType) && BuilderUtils.hasDefaultConstructor(builderType)
         && property.hasAttribute(DEFAULT_VALUE)) {
       return new PropertyBuilder(property).withTypeRef(builderType)
-          .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
           .addToAttributes(INIT, "new " + builderType + "()")
           .build();
     }
 
     return new PropertyBuilder(property).withTypeRef(builderType)
-        .addToAttributes(ALSO_IMPORT, alsoImport(property, builderType))
         .removeFromAttributes(INIT)
         .build();
   }
@@ -814,20 +806,6 @@ public class BuilderUtils {
   public static Map<String, ClassRef> enclosedBuildables(TypeDef typeDef) {
     Map<String, ClassRef> result = new HashMap<>();
     populateEnclosedBuildables(typeDef, result);
-    return result;
-  }
-
-  public static List<ClassRef> alsoImportAsList(Attributeable attributeable) {
-    List<ClassRef> result = new ArrayList<ClassRef>();
-    if (attributeable.hasAttribute(ALSO_IMPORT)) {
-      result.addAll(attributeable.getAttribute(ALSO_IMPORT));
-    }
-    return result;
-  }
-
-  public static List<ClassRef> alsoImport(Attributeable attributeable, ClassRef... refs) {
-    List<ClassRef> result = alsoImportAsList(attributeable);
-    result.addAll(Arrays.asList(refs));
     return result;
   }
 

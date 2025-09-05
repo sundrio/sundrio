@@ -23,7 +23,6 @@ import static io.sundr.builder.Constants.COLLECTORS;
 import static io.sundr.builder.internal.functions.ClazzAs.BUILDER;
 import static io.sundr.builder.internal.functions.ClazzAs.POJO;
 import static io.sundr.builder.internal.utils.BuilderUtils.findBuildableConstructor;
-import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Attributeable.DEFAULT_VALUE;
 import static io.sundr.model.Attributeable.INIT;
 import static java.util.stream.Collectors.joining;
@@ -735,7 +734,6 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
               .withPackageName(adapterPackage)
               .withName(!Strings.isNullOrEmpty(name) ? name : Strings.toPojoName(generatedPojo.getName(), prefix, suffix))
               .withMethods(adapterMethods)
-              .addToAttributes(ALSO_IMPORT, adapterImports)
               .build();
 
           additionalTypes.add(mapper);
@@ -746,7 +744,6 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     return DefinitionRepository.getRepository().register(new TypeDefBuilder(generatedPojo)
         .withComments("Generated")
         .addAllToMethods(additionalMethods)
-        .addToAttributes(ALSO_IMPORT, additionalImports)
         .addToAttributes(ADDITIONAL_BUILDABLES, additionalBuildables)
         .addToAttributes(ADDITIONAL_TYPES, additionalTypes)
         .build());

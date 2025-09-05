@@ -33,7 +33,6 @@ import static io.sundr.builder.internal.functions.TypeAs.VISITABLE_BUILDER_REF;
 import static io.sundr.builder.internal.functions.TypeAs.combine;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
-import static io.sundr.model.Attributeable.ALSO_IMPORT;
 import static io.sundr.model.Expression.call;
 import static io.sundr.model.Expression.cast;
 import static io.sundr.model.Expression.enclosed;
@@ -42,7 +41,6 @@ import static io.sundr.model.utils.Collections.IS_COLLECTION;
 import static io.sundr.model.utils.Collections.IS_LIST;
 import static io.sundr.model.utils.Collections.IS_MAP;
 import static io.sundr.model.utils.Collections.IS_SET;
-import static io.sundr.model.utils.Collections.LIST;
 import static io.sundr.model.utils.Optionals.OPTIONAL;
 import static io.sundr.model.utils.Types.N_REF;
 import static io.sundr.model.utils.Types.Q;
@@ -76,7 +74,6 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
-import io.sundr.model.Attributeable;
 import io.sundr.model.Block;
 import io.sundr.model.Break;
 import io.sundr.model.ClassRef;
@@ -286,7 +283,6 @@ class ToMethod {
     public Method apply(Property property) {
       TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
       String methodName = "with" + property.getNameCapitalized();
-      List<ClassRef> alsoImport = new ArrayList<>();
 
       List<TypeParamDef> parameters = new ArrayList<>();
       if (property.getTypeRef() instanceof ClassRef) {
@@ -297,11 +293,11 @@ class ToMethod {
 
       return new MethodBuilder().withNewModifiers().withPublic().endModifiers().withParameters(parameters).withName(methodName)
           .withReturnType(returnType).withArguments(property).withVarArgPreferred(true).withNewBlock()
-          .withStatements(getStatements(property, alsoImport)).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport)
+          .withStatements(getStatements(property)).endBlock()
           .build();
     }
 
-    private List<Statement> getStatements(Property property, List<ClassRef> alsoImport) {
+    private List<Statement> getStatements(Property property) {
       TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
       String fieldName = property.getName();
       TypeRef type = property.getTypeRef();
@@ -663,11 +659,6 @@ class ToMethod {
         .withNewBlock()
         .withStatements(statements)
         .endBlock()
-        .addToAttributes(ALSO_IMPORT,
-            isBuildable
-                ? Collections
-                    .singletonList(BuilderContextManager.getContext().getVisitableBuilderInterface().toInternalReference())
-                : Collections.EMPTY_LIST)
         .build();
 
     methods.add(getter);
@@ -704,7 +695,6 @@ class ToMethod {
 
           TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
           final TypeRef unwrapped = BOXED_OF.apply(combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
-          List<ClassRef> alsoImport = new ArrayList<>();
 
           Property items = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
 
@@ -737,7 +727,8 @@ class ToMethod {
               .withStatements(init,
                   new This().property(propertyName).call("add", Property.newProperty("index"), Property.newProperty("item")),
                   new Return(Expression.cast(returnType, new This())))
-              .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
+              .endBlock()
+              .build();
 
           Method setSingleItemAtIndex = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(setMethodName).withReturnType(returnType).addToArguments(INDEX)
@@ -745,7 +736,7 @@ class ToMethod {
               .withStatements(init,
                   new This().property(propertyName).call("set", Property.newProperty("index"), Property.newProperty("item")),
                   new Return(Expression.cast(returnType, new This())))
-              .endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
+              .endBlock().build();
 
           List<Statement> statements = new ArrayList<>();
           statements.add(init);
@@ -758,7 +749,6 @@ class ToMethod {
             String builderClass = targetType.getFullyQualifiedName() + "Builder";
 
             //We need to do it more
-            alsoImport.add(BUILDER_REF.apply(targetType));
             Property item = Property.newProperty(unwrapped, "item");
             Property builder = Property.newProperty(BUILDER_REF.apply(targetType), "builder");
             statements.add(new Foreach(item, Property.newProperty("items"),
@@ -836,12 +826,12 @@ class ToMethod {
           Method addVaragToCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addVarargMethodName).withReturnType(returnType).withArguments(items)
               .withVarArgPreferred(true).withNewBlock().addAllToStatements(statements).endBlock()
-              .addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
+              .build();
 
           Method addAllToCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(addAllMethodName).withReturnType(returnType)
               .withArguments(new PropertyBuilder(items).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
-              .addAllToStatements(statements).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
+              .addAllToStatements(statements).endBlock().build();
 
           if (io.sundr.model.utils.Collections.IS_LIST.apply(property.getTypeRef())) {
             methods.add(addSingleItemAtIndex);
@@ -882,7 +872,6 @@ class ToMethod {
 
           TypeRef returnType = property.hasAttribute(GENERIC_TYPE_REF) ? property.getAttribute(GENERIC_TYPE_REF) : T_REF;
           final TypeRef unwrapped = BOXED_OF.apply(combine(UNWRAP_COLLECTION_OF).apply(property.getTypeRef()));
-          List<ClassRef> alsoImport = new ArrayList<>();
           Property items = new PropertyBuilder(property).withName("items").withTypeRef(unwrapped.withDimensions(1)).build();
 
           List<TypeParamDef> parameters = new ArrayList<>();
@@ -910,8 +899,6 @@ class ToMethod {
             String builderClass = targetClass + "Builder";
 
             //We need to do it more elegantly
-            alsoImport.add(BUILDER_REF.apply(targetType));
-            alsoImport.add(LIST.toInternalReference());
             statements.add(nullCheck(returnType, propertyName));
             Property item = Property.newProperty(targetType, "item");
             Property builder = Property.newProperty(BUILDER_REF.apply(targetType), "builder");
@@ -959,7 +946,7 @@ class ToMethod {
           Method removeAllFromCollection = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
               .withParameters(parameters).withName(removeAllMethodName).withReturnType(returnType)
               .withArguments(new PropertyBuilder(items).withTypeRef(COLLECTION.toReference(unwrapped)).build()).withNewBlock()
-              .withStatements(statements).endBlock().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).build();
+              .withStatements(statements).endBlock().build();
 
           methods.add(removeVarargFromCollection);
           methods.add(removeAllFromCollection);
@@ -974,8 +961,6 @@ class ToMethod {
               }
               builder = (ClassRef) builderType;
             }
-            alsoImport.add(new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").build());
-            alsoImport.add((ClassRef) builderType);
             // Create property references for cleaner code
             Property propertyRef = Property.newProperty(propertyName);
             Property eachProperty = Property.newProperty(
@@ -986,7 +971,7 @@ class ToMethod {
             Property builderProperty = Property.newProperty(builder, "builder");
             Property predicateProperty = Property.newProperty("predicate");
 
-            methods.add(new MethodBuilder().addToAttributes(Attributeable.ALSO_IMPORT, alsoImport).withNewModifiers()
+            methods.add(new MethodBuilder().withNewModifiers()
                 .withPublic().endModifiers().withReturnType(returnType).withParameters(parameters)
                 .withName(removeMatchingMethodName).addNewArgument().withName("predicate")
                 .withTypeRef(Constants.PREDICATE.toReference(builder)).endArgument().withNewBlock()
@@ -1094,7 +1079,6 @@ class ToMethod {
         .withNewBlock()
         .withStatements(new Return(Expression.createNew(rewraped, keyProperty, Expression.NULL)))
         .endBlock()
-        .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
 
     Method addNewValueLikeTo = new MethodBuilder()
@@ -1106,7 +1090,6 @@ class ToMethod {
         .withNewBlock()
         .withStatements(new Return(Expression.createNew(rewraped, keyProperty, valueProperty)))
         .endBlock()
-        .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
 
     // Create property references for cleaner code
@@ -1144,7 +1127,6 @@ class ToMethod {
             // return new WrappedType(key, (ValueType) toEdit);
             new Return(Expression.createNew(rewraped, keyRef, Expression.cast(valueTypeRef, toEditProperty))))
         .endBlock()
-        .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
 
     Method editOrAddValueIn = new MethodBuilder()
@@ -1173,7 +1155,6 @@ class ToMethod {
                     // return new WrappedType(key, null);
                     new Return(Expression.createNew(rewraped, keyRef, Expression.NULL))))
         .endBlock()
-        .addToAttributes(Attributeable.ALSO_IMPORT, BUILDER_REF.apply(targetType))
         .build();
 
     return Arrays.asList(addNewValueTo, addNewValueLikeTo, editValueIn, editOrAddValueIn);
