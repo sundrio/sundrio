@@ -47,7 +47,16 @@ public class ClassRef extends TypeRef implements Nameable, Expression, Mappable<
   }
 
   public static ClassRef forClass(Class c) {
-    return new ClassRef(c.getTypeName(), 0, Collections.emptyList(), Collections.emptyMap());
+    String typeName = c.getTypeName();
+    int dimensions = 0;
+
+    // Count array dimensions by counting "[]" occurrences
+    while (typeName.endsWith("[]")) {
+      dimensions++;
+      typeName = typeName.substring(0, typeName.length() - 2);
+    }
+
+    return new ClassRef(typeName, dimensions, Collections.emptyList(), Collections.emptyMap());
   }
 
   public MethodCall call(String name, List<Expression> arguments) {
