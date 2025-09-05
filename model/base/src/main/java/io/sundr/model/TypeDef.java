@@ -503,21 +503,57 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     sb.append(NEWLINE).append(CB);
     String top = tb.toString();
     String content = sb.toString();
-    for (ClassRef ref : references) {
-      //If class is imported
+    content = applyImports(content, top, references);
+    return top + content;
+  }
 
-      //If under the same package then just replace the fully qualified name with the name.
-      //Nested classes under the same package will retain the outer class.
-      if (ref.getPackageName().equals(getPackageName())) {
-        content = content.replaceAll(Pattern.quote(ref.getFullyQualifiedName()) + "(?![a-zA-Z0-9\\.])", ref.getName());
+  private String applyImports(String content, String importsSection, Collection<ClassRef> references) {
+    // First, process known references
+    for (ClassRef ref : references) {
+      String fullyQualifiedName = ref.getFullyQualifiedName();
+
+      // Skip if no package (primitive types, etc.)
+      if (ref.getPackageName() == null || ref.getPackageName().isEmpty()) {
+        continue;
       }
-      // Since we import the fully qualified name, no need to retain outer class (if any).
-      else if (top.contains("import " + ref.getFullyQualifiedName() + ";")) {
-        String name = ref.getName().substring(ref.getName().lastIndexOf(DOT) + 1);
-        content = content.replaceAll(Pattern.quote(ref.getFullyQualifiedName()) + "(?![a-zA-Z0-9\\.])", name);
+
+      // If under the same package then just replace the fully qualified name with the class name.
+      // Nested classes under the same package will retain the outer class.
+      if (ref.getPackageName().equals(getPackageName())) {
+        content = content.replaceAll(Pattern.quote(fullyQualifiedName) + "(?![a-zA-Z0-9])", ref.getName());
+      }
+      // If the class is imported, replace with simple name (without package and outer class if applicable)
+      else if (importsSection.contains("import " + fullyQualifiedName + ";")) {
+        String simpleName = Nameable.getInnerTypeName(ref.getName());
+        content = content.replaceAll(Pattern.quote(fullyQualifiedName) + "(?![a-zA-Z0-9])", simpleName);
       }
     }
-    return top + content;
+
+    // Second, scan for any remaining fully qualified names that appear in imports
+    // This catches cases where the fully qualified name appears in the content but wasn't in the references
+    content = applyImports(content, importsSection);
+
+    return content;
+  }
+
+  private String applyImports(String content, String importsSection) {
+    // Extract all import statements and replace their fully qualified names in content
+    String[] importLines = importsSection.split(NEWLINE);
+    for (String line : importLines) {
+      line = line.trim();
+      if (line.startsWith("import ") && line.endsWith(";")) {
+        String fullyQualifiedName = line.substring(7, line.length() - 1); // Remove "import " and ";"
+
+        // Skip if no package (shouldn't happen in imports, but be safe)
+        if (!fullyQualifiedName.contains(DOT)) {
+          continue;
+        }
+
+        String simpleName = Nameable.getInnerTypeName(fullyQualifiedName);
+        content = content.replaceAll(Pattern.quote(fullyQualifiedName) + "(?![a-zA-Z0-9])", simpleName);
+      }
+    }
+    return content;
   }
 
   @Override
