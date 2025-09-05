@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class InstanceOf implements Expression {
 
   private final Expression expression;
@@ -20,6 +23,18 @@ public class InstanceOf implements Expression {
 
   public ClassRef getType() {
     return type;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (expression != null) {
+      refs.addAll(expression.getReferences());
+    }
+    if (type != null) {
+      refs.addAll(type.getReferences());
+    }
+    return refs;
   }
 
   @Override

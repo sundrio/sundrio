@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
+public class ClassRef extends TypeRef implements Nameable, Expression, Mappable<ClassRef> {
 
   public static final String UNKNOWN = "<unknown>";
   public static final String BRACKETS = "[]";
@@ -51,11 +51,11 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
   }
 
   public MethodCall call(String name, List<Expression> arguments) {
-    return new MethodCall(name, Property.newProperty(fullyQualifiedName), arguments);
+    return new MethodCall(name, ClassRef.forName(fullyQualifiedName), arguments);
   }
 
   public MethodCall call(String name, Expression... arguments) {
-    return new MethodCall(name, Property.newProperty(fullyQualifiedName), arguments);
+    return new MethodCall(name, ClassRef.forName(fullyQualifiedName), arguments);
   }
 
   public String getFullyQualifiedName() {
@@ -128,6 +128,11 @@ public class ClassRef extends TypeRef implements Nameable, Mappable<ClassRef> {
       sb.append(BRACKETS);
     }
     return sb.toString();
+  }
+
+  @Override
+  public String renderExpression() {
+    return fullyQualifiedName + ".class";
   }
 
   @Override

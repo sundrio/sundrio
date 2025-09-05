@@ -2,7 +2,7 @@ package io.sundr.model;
 
 import java.util.function.Function;
 
-public interface Expression extends Renderable {
+public interface Expression extends Renderable, WithReferences {
 
   public static Expression NULL = new ValueRef(null);
 

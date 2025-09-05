@@ -1,7 +1,9 @@
 package io.sundr.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Lambda implements ExpressionOrStatement {
@@ -32,6 +34,15 @@ public class Lambda implements ExpressionOrStatement {
 
   public Statement getStatement() {
     return statement;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (statement != null) {
+      refs.addAll(statement.getReferences());
+    }
+    return refs;
   }
 
   public String render() {

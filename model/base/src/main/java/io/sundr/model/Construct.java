@@ -2,7 +2,9 @@ package io.sundr.model;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Construct implements Expression {
 
@@ -46,6 +48,21 @@ public class Construct implements Expression {
 
   public List<Expression> getArguments() {
     return arguments;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    refs.addAll(type.getReferences());
+    for (TypeRef param : parameters) {
+      if (param instanceof ClassRef) {
+        refs.addAll(((ClassRef) param).getReferences());
+      }
+    }
+    for (Expression arg : arguments) {
+      refs.addAll(arg.getReferences());
+    }
+    return refs;
   }
 
   @Override

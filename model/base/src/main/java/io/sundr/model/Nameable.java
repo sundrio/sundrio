@@ -65,6 +65,15 @@ public interface Nameable extends Node {
         .map(n -> packageName != null && !packageName.isEmpty() ? packageName + DOT + n : n).findFirst().orElse(null);
   }
 
+  static String getInnerTypeName(String fullyQualifiedName) {
+    String className = getClassName(fullyQualifiedName);
+    if (!className.contains(DOT)) {
+      return className;
+    }
+    String[] parts = className.split(Pattern.quote(DOT));
+    return parts[parts.length - 1];
+  }
+
   static String getClassName(String fullyQualifiedName) {
     String[] parts = fullyQualifiedName.split(PACKAGE_SEPARATOR_REGEX);
 

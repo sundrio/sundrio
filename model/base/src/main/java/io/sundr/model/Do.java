@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Do implements Statement {
 
   private final Expression condition;
@@ -16,6 +19,18 @@ public class Do implements Statement {
 
   public Statement getStatement() {
     return statement;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (condition != null) {
+      refs.addAll(condition.getReferences());
+    }
+    if (statement != null) {
+      refs.addAll(statement.getReferences());
+    }
+    return refs;
   }
 
   public String render() {

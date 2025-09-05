@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Method extends ModifierSupport implements Renderable, Commentable, Annotatable {
+public class Method extends ModifierSupport implements Renderable, WithReferences, Commentable, Annotatable {
 
   public static final String DEFAULT = "default";
 
@@ -142,6 +142,11 @@ public class Method extends ModifierSupport implements Renderable, Commentable, 
         refs.addAll(bound.getReferences());
       }
     }
+
+    if (block != null) {
+      refs.addAll(block.getReferences());
+    }
+
     if (getAttributes().containsKey(ALSO_IMPORT)) {
       Object obj = getAttributes().get(ALSO_IMPORT);
       if (obj instanceof ClassRef) {

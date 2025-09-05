@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Cast implements Expression {
 
   private final TypeRef type;
@@ -24,6 +27,18 @@ public class Cast implements Expression {
 
   public TypeRef getType() {
     return type;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (type instanceof ClassRef) {
+      refs.addAll(((ClassRef) type).getReferences());
+    }
+    if (expression != null) {
+      refs.addAll(expression.getReferences());
+    }
+    return refs;
   }
 
   @Override

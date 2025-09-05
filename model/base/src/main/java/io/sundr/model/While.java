@@ -1,6 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class While implements Statement {
 
@@ -18,6 +20,14 @@ public class While implements Statement {
 
   public Statement getStatement() {
     return statement;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    refs.addAll(condition.getReferences());
+    refs.addAll(statement.getReferences());
+    return refs;
   }
 
   public String render() {

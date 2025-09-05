@@ -1,7 +1,9 @@
 package io.sundr.model;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class Switch implements Statement {
 
@@ -25,6 +27,26 @@ public class Switch implements Statement {
 
   public Optional<Block> getDefaultCase() {
     return defaultCase;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (expression != null) {
+      refs.addAll(expression.getReferences());
+    }
+    if (cases != null) {
+      for (Map.Entry<ValueRef, Block> entry : cases.entrySet()) {
+        if (entry.getKey() != null) {
+          refs.addAll(entry.getKey().getReferences());
+        }
+        if (entry.getValue() != null) {
+          refs.addAll(entry.getValue().getReferences());
+        }
+      }
+    }
+    defaultCase.ifPresent(d -> refs.addAll(d.getReferences()));
+    return refs;
   }
 
   private static boolean blockReturns(Block block) {

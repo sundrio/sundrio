@@ -42,4 +42,12 @@ public class NameableTest {
     assertEquals(null, Nameable.getOuterTypeName("java.util.List"));
     assertEquals("java.lang.System", Nameable.getOuterTypeName("java.lang.System.Logger"));
   }
+
+  @Test
+  public void shouldGetInnerTypeName() {
+    assertEquals("Void", Nameable.getInnerTypeName("Void"));
+    assertEquals("List", Nameable.getInnerTypeName("java.util.List"));
+    assertEquals("Entry", Nameable.getInnerTypeName("java.util.Map.Entry"));
+    assertEquals("Logger", Nameable.getInnerTypeName("java.lang.System.Logger"));
+  }
 }

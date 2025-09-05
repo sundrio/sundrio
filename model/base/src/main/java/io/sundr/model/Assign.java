@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Assign implements ExpressionOrStatement {
 
   private final Expression target;
@@ -16,6 +19,18 @@ public class Assign implements ExpressionOrStatement {
 
   public Expression getValue() {
     return value;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (target != null) {
+      refs.addAll(target.getReferences());
+    }
+    if (value != null) {
+      refs.addAll(value.getReferences());
+    }
+    return refs;
   }
 
   public String render() {

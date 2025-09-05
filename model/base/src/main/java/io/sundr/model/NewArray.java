@@ -1,7 +1,9 @@
 package io.sundr.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NewArray implements Expression {
@@ -36,6 +38,22 @@ public class NewArray implements Expression {
 
   public List<Expression> getExpressions() {
     return expressions;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (type instanceof ClassRef) {
+      refs.addAll(((ClassRef) type).getReferences());
+    }
+    if (expressions != null) {
+      for (Expression expr : expressions) {
+        if (expr != null) {
+          refs.addAll(expr.getReferences());
+        }
+      }
+    }
+    return refs;
   }
 
   @Override
