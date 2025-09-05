@@ -1,6 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class IfDslThenStep implements Statement {
   private Expression condition;
@@ -17,6 +19,22 @@ public class IfDslThenStep implements Statement {
 
   public List<Statement> getStatements() {
     return statements;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (condition != null) {
+      refs.addAll(condition.getReferences());
+    }
+    if (statements != null) {
+      for (Statement stmt : statements) {
+        if (stmt != null) {
+          refs.addAll(stmt.getReferences());
+        }
+      }
+    }
+    return refs;
   }
 
   public If orElse(Statement... elseStatement) {

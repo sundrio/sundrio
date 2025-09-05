@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Return implements Statement {
 
   private final Expression expression;
@@ -70,6 +73,13 @@ public class Return implements Statement {
 
   public Expression getExpression() {
     return expression;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    refs.addAll(expression.getReferences());
+    return refs;
   }
 
   public String render() {

@@ -1,8 +1,10 @@
 package io.sundr.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Declare implements ExpressionOrStatement {
@@ -78,6 +80,16 @@ public class Declare implements ExpressionOrStatement {
 
   public Optional<Expression> getValue() {
     return value;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    for (Property property : properties) {
+      refs.addAll(property.getReferences());
+    }
+    value.ifPresent(v -> refs.addAll(v.getReferences()));
+    return refs;
   }
 
   @Override

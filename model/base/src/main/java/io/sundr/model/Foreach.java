@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Foreach implements Statement {
 
   private final Declare declare;
@@ -30,6 +33,21 @@ public class Foreach implements Statement {
 
   public Statement getBody() {
     return body;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (declare != null) {
+      refs.addAll(declare.getReferences());
+    }
+    if (expression != null) {
+      refs.addAll(expression.getReferences());
+    }
+    if (body != null) {
+      refs.addAll(body.getReferences());
+    }
+    return refs;
   }
 
   @Override

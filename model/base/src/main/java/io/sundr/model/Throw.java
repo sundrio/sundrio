@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Throw implements Statement {
 
   private final Expression exception;
@@ -10,6 +13,13 @@ public class Throw implements Statement {
 
   public Expression getException() {
     return exception;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    refs.addAll(exception.getReferences());
+    return refs;
   }
 
   @Override

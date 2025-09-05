@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Ternary implements Expression {
 
   private Expression condition;
@@ -22,6 +25,21 @@ public class Ternary implements Expression {
 
   public Expression getAlternative() {
     return alternative;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (condition != null) {
+      refs.addAll(condition.getReferences());
+    }
+    if (result != null) {
+      refs.addAll(result.getReferences());
+    }
+    if (alternative != null) {
+      refs.addAll(alternative.getReferences());
+    }
+    return refs;
   }
 
   public String render() {

@@ -2,7 +2,9 @@ package io.sundr.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -28,12 +30,8 @@ public class MethodCall implements ExpressionOrStatement {
     this(name, scope, new ArrayList<TypeRef>(), arguments);
   }
 
-  public MethodCall(String name, ClassRef scope, Expression... arguments) {
-    this(name, ValueRef.from(scope), arguments);
-  }
-
   public MethodCall(String name, Class scope, Expression... arguments) {
-    this(name, ValueRef.from(ClassRef.forClass(scope)), arguments);
+    this(name, ClassRef.forClass(scope), arguments);
   }
 
   public MethodCall(String name, Object scope, Expression... arguments) {
@@ -54,6 +52,23 @@ public class MethodCall implements ExpressionOrStatement {
 
   public List<Expression> getArguments() {
     return arguments;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (scope != null) {
+      refs.addAll(scope.getReferences());
+    }
+    for (TypeRef param : parameters) {
+      if (param instanceof ClassRef) {
+        refs.addAll(((ClassRef) param).getReferences());
+      }
+    }
+    for (Expression arg : arguments) {
+      refs.addAll(arg.getReferences());
+    }
+    return refs;
   }
 
   @Override

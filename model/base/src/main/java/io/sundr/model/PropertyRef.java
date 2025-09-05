@@ -1,5 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class PropertyRef implements Expression {
 
   private final Property property;
@@ -31,6 +34,18 @@ public class PropertyRef implements Expression {
 
   public Expression getScope() {
     return scope;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (property != null) {
+      refs.addAll(property.getReferences());
+    }
+    if (scope != null) {
+      refs.addAll(scope.getReferences());
+    }
+    return refs;
   }
 
   @Override

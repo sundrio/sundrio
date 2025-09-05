@@ -1,10 +1,12 @@
 package io.sundr.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class SwitchDslCaseStep implements Statement {
   private Expression expression;
@@ -72,6 +74,25 @@ public class SwitchDslCaseStep implements Statement {
 
   public Switch end() {
     return new Switch(expression, cases, Optional.empty());
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (expression != null) {
+      refs.addAll(expression.getReferences());
+    }
+    if (cases != null) {
+      for (Map.Entry<ValueRef, Block> entry : cases.entrySet()) {
+        if (entry.getKey() != null) {
+          refs.addAll(entry.getKey().getReferences());
+        }
+        if (entry.getValue() != null) {
+          refs.addAll(entry.getValue().getReferences());
+        }
+      }
+    }
+    return refs;
   }
 
   @Override

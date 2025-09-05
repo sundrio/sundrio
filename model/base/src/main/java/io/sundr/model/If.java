@@ -1,6 +1,8 @@
 package io.sundr.model;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 public class If implements Statement {
 
@@ -32,6 +34,15 @@ public class If implements Statement {
 
   public Optional<Statement> getElseStatement() {
     return elseStatement;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    refs.addAll(condition.getReferences());
+    refs.addAll(statement.getReferences());
+    elseStatement.ifPresent(s -> refs.addAll(s.getReferences()));
+    return refs;
   }
 
   public String render() {

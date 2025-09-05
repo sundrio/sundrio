@@ -17,7 +17,9 @@
 package io.sundr.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Block implements Statement {
 
@@ -53,6 +55,15 @@ public class Block implements Statement {
 
   public List<Statement> getStatements() {
     return statements;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    for (Statement statement : statements) {
+      refs.addAll(statement.getReferences());
+    }
+    return refs;
   }
 
   @Override

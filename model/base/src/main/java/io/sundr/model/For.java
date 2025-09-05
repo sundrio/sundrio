@@ -1,7 +1,9 @@
 package io.sundr.model;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class For implements Statement {
@@ -39,6 +41,32 @@ public class For implements Statement {
 
   public Statement getBody() {
     return body;
+  }
+
+  @Override
+  public Set<ClassRef> getReferences() {
+    Set<ClassRef> refs = new HashSet<>();
+    if (init != null) {
+      for (Expression expr : init) {
+        if (expr != null) {
+          refs.addAll(expr.getReferences());
+        }
+      }
+    }
+    if (compare != null) {
+      refs.addAll(compare.getReferences());
+    }
+    if (update != null) {
+      for (Expression expr : update) {
+        if (expr != null) {
+          refs.addAll(expr.getReferences());
+        }
+      }
+    }
+    if (body != null) {
+      refs.addAll(body.getReferences());
+    }
+    return refs;
   }
 
   @Override
