@@ -17,6 +17,7 @@
 
 package io.sundr.model;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,9 @@ public interface Annotatable extends Node {
     StringBuilder sb = new StringBuilder();
     if (getAnnotations() != null && !getAnnotations().isEmpty()) {
       sb.append(
-          getAnnotations().stream().map(Renderable::render).map(line -> line + NEWLINE).collect(Collectors.joining()));
+          getAnnotations().stream()
+              .sorted(Comparator.comparing(a -> a.getClassRef().getName()))
+              .map(Renderable::render).map(line -> line + NEWLINE).collect(Collectors.joining()));
     }
     return sb.toString();
   }
