@@ -435,6 +435,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
 
   @Override
   public String render() {
+    boolean hasNewline = false;
     StringBuilder tb = new StringBuilder(); // Top StringBuffer: (package and imports).
     StringBuilder sb = new StringBuilder();
     Collection<ClassRef> references = getReferenceMap().values();
@@ -457,7 +458,26 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     }
 
     renderDefinition(sb);
-    sb.append(OB).append(NEWLINE);
+    sb.append(OB).append(NEWLINE).append(NEWLINE);
+    hasNewline = true;
+
+    StringBuilder pb = new StringBuilder();
+    for (Property field : properties) {
+      pb.append(field.renderComments());
+      pb.append(field.renderAnnotations());
+      pb.append(field.render());
+      if (field.getAttribute(INIT) != null) {
+        pb.append(" = ").append(field.getDefaultValue());
+      }
+      pb.append(SEMICOLN).append(NEWLINE);
+      hasNewline = false;
+    }
+    sb.append(indent(pb.toString()));
+
+    if (!hasNewline) {
+      sb.append(NEWLINE);
+      hasNewline = true;
+    }
 
     if (kind != Kind.INTERFACE) {
       StringBuilder cb = new StringBuilder();
@@ -466,25 +486,17 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
         cb.append(constructors.renderAnnotations());
         cb.append(constructors.render(this));
         cb.append(NEWLINE);
+        hasNewline = false;
       }
       sb.append(indent(cb.toString()));
     }
 
-    StringBuilder pb = new StringBuilder();
-    getProperties().stream().filter(p -> kind != Kind.INTERFACE || p.isStatic()).forEach(field -> {
-      pb.append(field.renderComments());
-      pb.append(field.renderAnnotations());
-      pb.append(field.render());
-      if (field.getAttribute(INIT) != null) {
-        pb.append(" = ").append(field.getDefaultValue());
-      }
-
-      pb.append(SEMICOLN).append(NEWLINE);
-    });
-    sb.append(indent(pb.toString()));
+    if (!hasNewline) {
+      sb.append(NEWLINE);
+      hasNewline = true;
+    }
 
     StringBuilder mb = new StringBuilder();
-    mb.append(NEWLINE);
     for (Method method : getMethods()) {
       mb.append(method.renderComments());
       mb.append(method.renderAnnotations());
@@ -500,7 +512,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     }
     sb.append(indent(ib.toString()));
 
-    sb.append(NEWLINE).append(CB);
+    sb.append(CB);
     String top = tb.toString();
     String content = sb.toString();
     content = applyImports(content, top, references);
