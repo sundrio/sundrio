@@ -444,7 +444,10 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     if (outerTypeName == null) {
       tb.append("package ").append(getPackageName()).append(SEMICOLN).append(NEWLINE);
       tb.append(NEWLINE);
-      for (String i : getImports(references)) {
+      // Sort imports alphabetically
+      List<String> sortedImports = new ArrayList<>(getImports(references));
+      Collections.sort(sortedImports);
+      for (String i : sortedImports) {
         tb.append("import ").append(i).append(SEMICOLN).append(NEWLINE);
       }
     }
@@ -462,7 +465,10 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     hasNewline = true;
 
     StringBuilder pb = new StringBuilder();
-    for (Property field : properties) {
+    // Sort properties alphabetically by name
+    List<Property> sortedProperties = new ArrayList<>(properties);
+    Collections.sort(sortedProperties, Comparator.comparing(Property::getName));
+    for (Property field : sortedProperties) {
       pb.append(field.renderComments());
       pb.append(field.renderAnnotations());
       pb.append(field.render());
@@ -481,10 +487,13 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
 
     if (kind != Kind.INTERFACE) {
       StringBuilder cb = new StringBuilder();
-      for (Method constructors : getConstructors()) {
-        cb.append(constructors.renderComments());
-        cb.append(constructors.renderAnnotations());
-        cb.append(constructors.render(this));
+      // Sort constructors by parameter count (fewer to more arguments)
+      List<Method> sortedConstructors = new ArrayList<>(getConstructors());
+      Collections.sort(sortedConstructors, Comparator.comparingInt(m -> m.getArguments().size()));
+      for (Method constructor : sortedConstructors) {
+        cb.append(constructor.renderComments());
+        cb.append(constructor.renderAnnotations());
+        cb.append(constructor.render(this));
         cb.append(NEWLINE);
         hasNewline = false;
       }
@@ -497,7 +506,10 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     }
 
     StringBuilder mb = new StringBuilder();
-    for (Method method : getMethods()) {
+    // Sort methods by: 1) method name alphabetically, 2) argument count, 3) argument names alphabetically
+    List<Method> sortedMethods = new ArrayList<>(getMethods());
+    Collections.sort(sortedMethods, createMethodComparator());
+    for (Method method : sortedMethods) {
       mb.append(method.renderComments());
       mb.append(method.renderAnnotations());
       mb.append(method.render(this));
@@ -506,7 +518,10 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     sb.append(indent(mb.toString()));
 
     StringBuilder ib = new StringBuilder();
-    for (TypeDef innerType : innerTypes) {
+    // Sort nested classes alphabetically by name
+    List<TypeDef> sortedInnerTypes = new ArrayList<>(innerTypes);
+    Collections.sort(sortedInnerTypes, Comparator.comparing(TypeDef::getName));
+    for (TypeDef innerType : sortedInnerTypes) {
       ib.append(innerType.render());
       ib.append(NEWLINE);
     }
@@ -517,6 +532,15 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     String content = sb.toString();
     content = applyImports(content, top, references);
     return top + content;
+  }
+
+  private Comparator<Method> createMethodComparator() {
+    return Comparator
+        .comparing(Method::getName, Comparator.nullsLast(String::compareTo))
+        .thenComparingInt(m -> m.getArguments().size())
+        .thenComparing(m -> m.getArguments().stream()
+            .map(Property::getName)
+            .collect(Collectors.joining(",")));
   }
 
   private String applyImports(String content, String importsSection, Collection<ClassRef> references) {
