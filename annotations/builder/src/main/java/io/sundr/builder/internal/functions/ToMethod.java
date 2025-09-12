@@ -1576,7 +1576,7 @@ class ToMethod {
           .editBlock()
           .withStatements(
               // if (property.size() <= index) throw new RuntimeException(...);
-              If.condition(new LessThanOrEqual(indexProperty, propertyRef.call("size")))
+              If.condition(new LessThanOrEqual(propertyRef.call("size"), indexProperty))
                   .then(Throw.runtimeException(
                       Expression.call(String.class, "format",
                           ValueRef.from("Can't edit %s. Index exceeds size."),
