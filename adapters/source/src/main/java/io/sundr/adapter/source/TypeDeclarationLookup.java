@@ -25,7 +25,6 @@ import java.util.Optional;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
 import io.sundr.adapter.api.TypeLookup;
-import io.sundr.adapter.source.utils.Project;
 import io.sundr.adapter.source.utils.Sources;
 
 public class TypeDeclarationLookup implements TypeLookup<TypeDeclaration> {
@@ -44,7 +43,7 @@ public class TypeDeclarationLookup implements TypeLookup<TypeDeclaration> {
     }
 
     //2. Lookup project path
-    return Project.findJavaSourceFile(fullyQualifiedName).flatMap(f -> {
+    return Project.getProject().findJavaSourceFile(fullyQualifiedName).flatMap(f -> {
       try (FileInputStream fis = new FileInputStream(f.toFile())) {
         return Optional.ofNullable(Sources.readTypeFromStream(fis));
       } catch (IOException e) {
