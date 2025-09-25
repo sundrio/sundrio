@@ -141,6 +141,18 @@
         </dependency>
 
         <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-adapter-source</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundrio-tui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>

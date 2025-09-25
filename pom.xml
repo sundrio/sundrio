@@ -39,7 +39,7 @@
       <developerConnection>scm:git:https://github.com/sundrio/sundrio.git</developerConnection>
       <url>https://github.com/sundrio/sundrio</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <developers>
         <developer>
