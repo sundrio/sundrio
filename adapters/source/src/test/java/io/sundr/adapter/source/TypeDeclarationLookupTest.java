@@ -17,13 +17,13 @@ public class TypeDeclarationLookupTest {
   @Test
   public void testTypeDeclarationLookup() {
     TypeLookup lookup = new TypeDeclarationLookup();
-    Optional<TypeDeclaration> typeDeclaration = lookup.forName("io.sundr.adapter.source.utils.Project");
+    Optional<TypeDeclaration> typeDeclaration = lookup.forName("io.sundr.adapter.source.Project");
     assertTrue(typeDeclaration.isPresent());
   }
 
   @Test
   public void testTypeLookup() {
-    Optional<TypeDef> def = TypeLookup.lookup("io.sundr.adapter.source.utils.Project", AdapterContext.getContext());
+    Optional<TypeDef> def = TypeLookup.lookup("io.sundr.adapter.source.Project", AdapterContext.getContext());
     assertTrue(def.isPresent());
   }
 }
