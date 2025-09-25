@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -394,7 +393,7 @@ public class ProjectTest {
   @Test
   public void testFindWithNullAndEmptyInput() {
     // Test null input
-    Optional<Path> nullResult = project.sources().find(null);
+    Optional<Path> nullResult = project.sources().find((String) null);
     assertFalse("Should return empty for null input", nullResult.isPresent());
 
     // Test empty input
