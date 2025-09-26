@@ -10,7 +10,6 @@ import java.nio.file.WatchService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -21,6 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.sundr.adapter.api.AdapterContext;
+import io.sundr.adapter.source.analysis.ImpactAnalysisResult;
+import io.sundr.adapter.source.analysis.ImpactAnalyzer;
 import io.sundr.adapter.source.change.ChangeDetector;
 import io.sundr.adapter.source.change.ChangeSet;
 import io.sundr.adapter.source.utils.Sources;
@@ -294,6 +295,18 @@ public class Project {
   }
 
   /**
+   * Performs impact analysis for the given ChangeSet.
+   * Analyzes the impact of changes on the codebase to find all affected files, TypeDefs, and MethodReferences.
+   *
+   * @param changeSet the changes to analyze
+   * @return the impact analysis result
+   */
+  public ImpactAnalysisResult analyzeImpact(ChangeSet changeSet) {
+    ImpactAnalyzer analyzer = new ImpactAnalyzer(this);
+    return analyzer.analyze(changeSet);
+  }
+
+  /**
    * Source type enumeration for file selection.
    */
   public enum SourceType {
@@ -512,7 +525,6 @@ public class Project {
         }
       });
     }
-
 
     private void handleFileEventWithBuffering(Path changedPath, WatchEvent.Kind<?> kind,
         Map<Path, TypeDef> previousStates,
