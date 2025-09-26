@@ -3,12 +3,30 @@ package io.sundr.adapter.source;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.sundr.adapter.api.AdapterContext;
+import io.sundr.adapter.source.change.ChangeDetector;
+import io.sundr.adapter.source.change.ChangeSet;
+import io.sundr.adapter.source.utils.Sources;
 import io.sundr.model.Nameable;
+import io.sundr.model.TypeDef;
+import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.utils.Patterns;
 
 public class Project {
@@ -180,6 +198,23 @@ public class Project {
       return Files.readAllLines(path).stream().collect(Collectors.joining(NEWLINE));
     } catch (Exception e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Read a TypeDef from a Java source file.
+   *
+   * @param path The path to the Java source file
+   * @return The TypeDef parsed from the file
+   */
+  TypeDef parse(Path path) {
+    try {
+      AdapterContext context = AdapterContext.create(DefinitionRepository.getRepository());
+      try (java.io.FileInputStream fis = new java.io.FileInputStream(path.toFile())) {
+        return Sources.readTypeDefFromStream(fis, context);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to read TypeDef from " + path, e);
     }
   }
 
@@ -402,6 +437,242 @@ public class Project {
       }
       String fileName = path.getFileName().toString();
       return !Patterns.isExcluded(fileName, excludePatterns);
+    }
+
+    /**
+     * Starts watching for file changes and computes ChangeSet differences.
+     * When files change, compares the new version with the previous version and
+     * notifies the consumer with the detected changes.
+     * Handles editor patterns like vi that delete/create files atomically.
+     *
+     * @param changeConsumer consumer that receives ChangeSet for each file change
+     * @return a CompletableFuture that can be used to control the watching
+     */
+    public CompletableFuture<Void> watch(Consumer<ChangeSet> changeConsumer) {
+      return CompletableFuture.runAsync(() -> {
+        // Keep track of previous file states for comparison
+        Map<Path, TypeDef> previousStates = new ConcurrentHashMap<>();
+
+        // Buffer for pending events to handle delete/create patterns
+        Map<Path, PendingEvent> pendingEvents = new ConcurrentHashMap<>();
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        // Initialize previous states
+        for (Path path : list()) {
+          try {
+            TypeDef typeDef = parse(path);
+            previousStates.put(path, typeDef);
+          } catch (Exception e) {
+            // Skip files that can't be read initially
+          }
+        }
+
+        try (WatchService watchService = moduleRoot.toPath().getFileSystem().newWatchService()) {
+          registerWatchDirectories(watchService);
+
+          while (!Thread.currentThread().isInterrupted()) {
+            WatchKey key;
+            try {
+              key = watchService.take();
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+              break;
+            }
+
+            for (WatchEvent<?> event : key.pollEvents()) {
+              WatchEvent.Kind<?> kind = event.kind();
+
+              if (kind == StandardWatchEventKinds.OVERFLOW) {
+                continue;
+              }
+
+              @SuppressWarnings("unchecked")
+              WatchEvent<Path> pathEvent = (WatchEvent<Path>) event;
+              Path changedPath = ((Path) key.watchable()).resolve(pathEvent.context());
+
+              // Only process if the changed file matches our selection criteria
+              if (changedPath.toString().endsWith(".java") &&
+                  matchesIncludePatterns(changedPath) &&
+                  matchesExcludePatterns(changedPath)) {
+
+                handleFileEventWithBuffering(changedPath, kind, previousStates,
+                    pendingEvents, scheduler, changeConsumer);
+              }
+            }
+
+            boolean valid = key.reset();
+            if (!valid) {
+              break;
+            }
+          }
+        } catch (Exception e) {
+          throw new RuntimeException("Error watching files", e);
+        } finally {
+          scheduler.shutdown();
+        }
+      });
+    }
+
+
+    private void handleFileEventWithBuffering(Path changedPath, WatchEvent.Kind<?> kind,
+        Map<Path, TypeDef> previousStates,
+        Map<Path, PendingEvent> pendingEvents,
+        ScheduledExecutorService scheduler,
+        Consumer<ChangeSet> changeConsumer) {
+
+      PendingEvent existingEvent = pendingEvents.get(changedPath);
+
+      if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
+        if (existingEvent != null) {
+          // Cancel any existing scheduled event
+          existingEvent.cancel();
+        }
+
+        // Schedule the delete event with a small delay to check for subsequent CREATE
+        PendingEvent deleteEvent = new PendingEvent(changedPath, kind, previousStates.get(changedPath));
+        pendingEvents.put(changedPath, deleteEvent);
+
+        deleteEvent.scheduledFuture = scheduler.schedule(() -> {
+          // Process the delete after delay (no CREATE event came)
+          pendingEvents.remove(changedPath);
+          processDeleteEvent(changedPath, previousStates, changeConsumer);
+        }, 100, TimeUnit.MILLISECONDS); // 100ms delay
+
+      } else if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
+        if (existingEvent != null && existingEvent.kind == StandardWatchEventKinds.ENTRY_DELETE) {
+          // This is a DELETE followed by CREATE - treat as MODIFY
+          existingEvent.cancel();
+          pendingEvents.remove(changedPath);
+
+          // Process as modify event
+          processModifyEvent(changedPath, previousStates, changeConsumer);
+        } else {
+          // This is a genuine CREATE event
+          processCreateEvent(changedPath, previousStates, changeConsumer);
+        }
+
+      } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+        if (existingEvent != null) {
+          // Cancel any existing event
+          existingEvent.cancel();
+          pendingEvents.remove(changedPath);
+        }
+
+        // Process modify immediately
+        processModifyEvent(changedPath, previousStates, changeConsumer);
+      }
+    }
+
+    private void processDeleteEvent(Path changedPath, Map<Path, TypeDef> previousStates,
+        Consumer<ChangeSet> changeConsumer) {
+      TypeDef previousTypeDef = previousStates.get(changedPath);
+      if (previousTypeDef != null) {
+        try {
+          ChangeSet changeSet = ChangeDetector.compare(previousTypeDef, (TypeDef) null);
+          changeConsumer.accept(changeSet);
+        } catch (Exception e) {
+          System.err.println("Error processing delete for " + changedPath + ": " + e.getMessage());
+        }
+        previousStates.remove(changedPath);
+      }
+    }
+
+    private void processCreateEvent(Path changedPath, Map<Path, TypeDef> previousStates,
+        Consumer<ChangeSet> changeConsumer) {
+      try {
+        TypeDef newTypeDef = parse(changedPath);
+        ChangeSet changeSet = ChangeDetector.compare((TypeDef) null, newTypeDef);
+        changeConsumer.accept(changeSet);
+        previousStates.put(changedPath, newTypeDef);
+      } catch (Exception e) {
+        System.err.println("Error processing create for " + changedPath + ": " + e.getMessage());
+      }
+    }
+
+    private void processModifyEvent(Path changedPath, Map<Path, TypeDef> previousStates,
+        Consumer<ChangeSet> changeConsumer) {
+      try {
+        TypeDef previousTypeDef = previousStates.get(changedPath);
+        TypeDef newTypeDef = parse(changedPath);
+
+        ChangeSet changeSet;
+        if (previousTypeDef != null) {
+          changeSet = ChangeDetector.compare(previousTypeDef, newTypeDef);
+        } else {
+          // File didn't exist before, treat as create
+          changeSet = ChangeDetector.compare((TypeDef) null, newTypeDef);
+        }
+
+        if (changeSet.hasChanges()) {
+          changeConsumer.accept(changeSet);
+        }
+
+        previousStates.put(changedPath, newTypeDef);
+      } catch (Exception e) {
+        System.err.println("Error processing modify for " + changedPath + ": " + e.getMessage());
+      }
+    }
+
+    private void registerWatchDirectories(WatchService watchService) throws Exception {
+      // Determine which directories to watch based on source type
+      switch (sourceType) {
+        case SOURCES:
+          if (srcMainJava.exists()) {
+            registerDirectoryTree(srcMainJava.toPath(), watchService);
+          }
+          break;
+        case TEST_SOURCES:
+          if (srcTestJava.exists()) {
+            registerDirectoryTree(srcTestJava.toPath(), watchService);
+          }
+          break;
+        case ALL_SOURCES:
+        default:
+          if (srcMainJava.exists()) {
+            registerDirectoryTree(srcMainJava.toPath(), watchService);
+          }
+          if (srcTestJava.exists()) {
+            registerDirectoryTree(srcTestJava.toPath(), watchService);
+          }
+          break;
+      }
+    }
+
+    private void registerDirectoryTree(Path root, WatchService watchService) throws Exception {
+      Files.walk(root)
+          .filter(Files::isDirectory)
+          .forEach(dir -> {
+            try {
+              dir.register(watchService,
+                  StandardWatchEventKinds.ENTRY_CREATE,
+                  StandardWatchEventKinds.ENTRY_DELETE,
+                  StandardWatchEventKinds.ENTRY_MODIFY);
+            } catch (Exception e) {
+              throw new RuntimeException("Failed to register directory: " + dir, e);
+            }
+          });
+    }
+  }
+
+  /**
+   * Represents a pending file system event that may be part of an atomic operation.
+   */
+  private static class PendingEvent {
+    final Path path;
+    final WatchEvent.Kind<?> kind;
+    final TypeDef previousState;
+    volatile java.util.concurrent.ScheduledFuture<?> scheduledFuture;
+
+    PendingEvent(Path path, WatchEvent.Kind<?> kind, TypeDef previousState) {
+      this.path = path;
+      this.kind = kind;
+      this.previousState = previousState;
+    }
+
+    void cancel() {
+      if (scheduledFuture != null) {
+        scheduledFuture.cancel(false);
+      }
     }
   }
 }
