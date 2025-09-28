@@ -32,6 +32,8 @@ import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.EnumConstantDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
@@ -246,6 +248,116 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
       return context.getDefinitionRepository()
           .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
               .withModifiers(Modifiers.from(type.getModifiers())).withMethods(methods).withAnnotations(annotations)
+              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
+    }
+
+    if (type instanceof EnumDeclaration) {
+      EnumDeclaration decl = (EnumDeclaration) type;
+      Kind kind = Kind.ENUM;
+
+      List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+      List<ClassRef> implementsList = new ArrayList<ClassRef>();
+      List<Property> properties = new ArrayList<Property>();
+      List<Method> methods = new ArrayList<Method>();
+      List<Method> constructors = new ArrayList<Method>();
+      List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
+
+      for (AnnotationExpr annotationExpr : decl.getAnnotations()) {
+        annotations.add(ANNOTATIONREF.apply(annotationExpr));
+      }
+
+      for (ClassOrInterfaceType classOrInterfaceType : decl.getImplements()) {
+        implementsList.add((ClassRef) classOrInterfaceToTypeRef.apply(classOrInterfaceType));
+      }
+
+      // Handle enum constants as properties
+      for (EnumConstantDeclaration enumConstant : decl.getEntries()) {
+        List<AnnotationRef> enumAnnotations = new ArrayList<AnnotationRef>();
+        for (AnnotationExpr annotationExpr : enumConstant.getAnnotations()) {
+          enumAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
+        }
+
+        // Create a property for each enum constant
+        String enumTypeName = PACKAGENAME.apply(type) + "." + decl.getName();
+        ClassRef enumType = new ClassRef(enumTypeName, 0, new ArrayList<>(), new HashMap<>());
+        properties.add(new PropertyBuilder().withName(enumConstant.getName())
+            .withTypeRef(enumType)
+            .withAnnotations(enumAnnotations)
+            .build());
+      }
+
+      // Handle fields and methods without body processing to avoid converter dependency issues
+      for (BodyDeclaration bodyDeclaration : decl.getMembers()) {
+        if (bodyDeclaration instanceof FieldDeclaration) {
+          FieldDeclaration fieldDeclaration = (FieldDeclaration) bodyDeclaration;
+          for (VariableDeclarator var : fieldDeclaration.getVariables()) {
+            TypeRef fieldDeclRef = typeToTypeRef.apply(fieldDeclaration.getType());
+            TypeRef typeRef = checkAgainstTypeParamRef(fieldDeclRef, parameters);
+
+            List<AnnotationRef> fieldAnnotations = new ArrayList<AnnotationRef>();
+            for (AnnotationExpr annotationExpressions : fieldDeclaration.getAnnotations()) {
+              fieldAnnotations.add(ANNOTATIONREF.apply(annotationExpressions));
+            }
+
+            properties.add(new PropertyBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
+                .withAnnotations(fieldAnnotations)
+                .withModifiers(Modifiers.from(fieldDeclaration.getModifiers()))
+                .build());
+          }
+        } else if (bodyDeclaration instanceof MethodDeclaration) {
+          MethodDeclaration methodDeclaration = (MethodDeclaration) bodyDeclaration;
+          List<Property> arguments = new ArrayList<Property>();
+          List<ClassRef> exceptions = new ArrayList<ClassRef>();
+          List<AnnotationRef> methodAnnotations = new ArrayList<AnnotationRef>();
+
+          for (AnnotationExpr annotationExpr : methodDeclaration.getAnnotations()) {
+            methodAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
+          }
+
+          for (ReferenceType referenceType : methodDeclaration.getThrows()) {
+            TypeRef exceptionRef = typeToTypeRef.apply(referenceType.getType());
+            if (exceptionRef instanceof ClassRef) {
+              exceptions.add((ClassRef) exceptionRef);
+            }
+          }
+
+          Boolean preferVarArg = false;
+          for (Parameter parameter : methodDeclaration.getParameters()) {
+            List<AnnotationRef> paramAnnotations = new ArrayList<AnnotationRef>();
+            for (AnnotationExpr annotationExpr : parameter.getAnnotations()) {
+              paramAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
+            }
+
+            TypeRef typeRef = typeToTypeRef.apply(parameter.getType());
+
+            if (parameter.isVarArgs()) {
+              preferVarArg = true;
+              typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
+            }
+
+            arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+                .withModifiers(Modifiers.from(parameter.getModifiers())).withAnnotations(paramAnnotations).build());
+          }
+
+          List<TypeParamDef> typeParamDefs = new ArrayList<TypeParamDef>();
+          for (TypeParameter typeParameter : methodDeclaration.getTypeParameters()) {
+            typeParamDefs.add(typeParameterToTypeParamDef.apply(typeParameter));
+          }
+
+          TypeRef returnType = checkAgainstTypeParamRef(typeToTypeRef.apply(methodDeclaration.getType()), parameters);
+          methods.add(new MethodBuilder().withName(methodDeclaration.getName())
+              .withDefaultMethod(methodDeclaration.isDefault()).withModifiers(Modifiers.from(methodDeclaration.getModifiers()))
+              .withParameters(typeParamDefs).withVarArgPreferred(preferVarArg).withReturnType(returnType)
+              .withExceptions(exceptions).withArguments(arguments).withAnnotations(methodAnnotations)
+              .build()); // No method body to avoid converter dependency issues
+        }
+      }
+
+      return context.getDefinitionRepository()
+          .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
+              .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters)
+              .withImplementsList(implementsList).withProperties(properties).withMethods(methods)
+              .withConstructors(constructors).withAnnotations(annotations)
               .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
     }
     throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");
