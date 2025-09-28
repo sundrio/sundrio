@@ -44,7 +44,7 @@ public class Ternary implements Expression {
 
   public String render() {
     StringBuilder sb = new StringBuilder();
-    sb.append(condition.render())
+    sb.append(condition.renderExpression())
         .append(" ? ")
         .append(result.renderExpression())
         .append(" : ")
