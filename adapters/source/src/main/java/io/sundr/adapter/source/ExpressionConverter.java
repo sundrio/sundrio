@@ -12,6 +12,7 @@ import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
+import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.DoubleLiteralExpr;
 import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -50,6 +51,7 @@ import io.sundr.model.LessThan;
 import io.sundr.model.LessThanOrEqual;
 import io.sundr.model.LogicalAnd;
 import io.sundr.model.LogicalOr;
+import io.sundr.model.MethodCall;
 import io.sundr.model.Minus;
 import io.sundr.model.Modulo;
 import io.sundr.model.Multiply;
@@ -66,6 +68,7 @@ import io.sundr.model.Property;
 import io.sundr.model.PropertyRef;
 import io.sundr.model.RightShift;
 import io.sundr.model.RightUnsignedShift;
+import io.sundr.model.Ternary;
 import io.sundr.model.This;
 import io.sundr.model.TypeRef;
 import io.sundr.model.ValueRef;
@@ -191,7 +194,7 @@ public class ExpressionConverter {
     } else if (expression instanceof MethodCallExpr) {
       MethodCallExpr methodCallExpr = (MethodCallExpr) expression;
       String methodName = methodCallExpr.getName();
-      List<io.sundr.model.TypeRef> parameters = new ArrayList<>();
+      List<TypeRef> parameters = new ArrayList<>();
       List<io.sundr.model.Expression> arguments = new ArrayList<>();
       for (Type type : methodCallExpr.getTypeArgs()) {
         if (type instanceof ClassOrInterfaceType) {
@@ -201,7 +204,8 @@ public class ExpressionConverter {
       for (Expression argument : methodCallExpr.getArgs()) {
         arguments.add(convertExpression(argument));
       }
-      methodCallExpr.getScope();
+      io.sundr.model.Expression scope = methodCallExpr.getScope() != null ? convertExpression(methodCallExpr.getScope()) : null;
+      return new MethodCall(methodName, scope, parameters, arguments);
     } else if (expression instanceof LambdaExpr) {
       LambdaExpr lambdaExpr = (LambdaExpr) expression;
       return new Lambda(lambdaExpr.getParameters().stream().map(Parameter::getId).map(VariableDeclaratorId::getName)
@@ -216,6 +220,12 @@ public class ExpressionConverter {
     } else if (expression instanceof ArrayAccessExpr) {
       ArrayAccessExpr arrayAccessExpr = (ArrayAccessExpr) expression;
       return new Index(convertExpression(arrayAccessExpr.getName()), convertExpression(arrayAccessExpr.getIndex()));
+    } else if (expression instanceof ConditionalExpr) {
+      ConditionalExpr conditionalExpr = (ConditionalExpr) expression;
+      return new Ternary(
+          convertExpression(conditionalExpr.getCondition()),
+          convertExpression(conditionalExpr.getThenExpr()),
+          convertExpression(conditionalExpr.getElseExpr()));
     }
     return null;
   }
