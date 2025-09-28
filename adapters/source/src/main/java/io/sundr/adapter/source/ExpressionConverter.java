@@ -21,7 +21,9 @@ import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.LongLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
@@ -82,13 +84,23 @@ public class ExpressionConverter {
   private static final TypeToTypeRef TYPEREF_ADAPTER = new TypeToTypeRef(SOURCE_ADAPTER.getReferenceAdapterFunction());
 
   public static Declare convertVarDeclaration(VariableDeclarationExpr expr) {
-    TypeRef typeRef = TYPEREF_ADAPTER.apply(expr.getType());
+    // Create adapters following the same pattern as TypeDeclarationToTypeDef
+    ClassOrInterfaceToTypeRef classOrInterfaceToTypeRef = new ClassOrInterfaceToTypeRef();
+    TypeToTypeRef typeAdapter = new TypeToTypeRef(classOrInterfaceToTypeRef);
+    TypeRef typeRef = typeAdapter.apply(expr.getType());
+
     List<Property> properties = expr.getVars().stream()
-        .map(VariableDeclarator::getId)
-        .map(VariableDeclaratorId::getName)
+        .map(v -> v.getId().getName())
         .map(n -> Property.newProperty(typeRef, n))
         .collect(Collectors.toList());
-    return new Declare(properties, Optional.empty());
+
+    // Handle initialization if present
+    Optional<io.sundr.model.Expression> initValue = Optional.empty();
+    if (!expr.getVars().isEmpty() && expr.getVars().get(0).getInit() != null) {
+      initValue = Optional.of(convertExpression(expr.getVars().get(0).getInit()));
+    }
+
+    return new Declare(properties, initValue);
   }
 
   public static io.sundr.model.Expression convertExpression(Expression expression) {
@@ -117,46 +129,56 @@ public class ExpressionConverter {
       }
     } else if (expression instanceof BinaryExpr) {
       BinaryExpr binaryExpr = (BinaryExpr) expression;
+      io.sundr.model.Expression left = convertExpression(binaryExpr.getLeft());
+      io.sundr.model.Expression right = convertExpression(binaryExpr.getRight());
+
+      // Protect against null operands that would cause NPEs during rendering
+      if (left == null || right == null) {
+        return null;
+      }
+
       switch (binaryExpr.getOperator()) {
         case plus:
-          return new Plus(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new Plus(left, right);
         case minus:
-          return new Minus(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new Minus(left, right);
         case and:
-          return new LogicalAnd(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new LogicalAnd(left, right);
         case or:
-          return new LogicalOr(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new LogicalOr(left, right);
         case binOr:
-          return new BitwiseOr(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new BitwiseOr(left, right);
         case binAnd:
-          return new BitwiseAnd(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new BitwiseAnd(left, right);
         case xor:
-          return new Xor(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new Xor(left, right);
         case equals:
-          return new Equals(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new Equals(left, right);
         case notEquals:
-          return new NotEquals(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new NotEquals(left, right);
         case greater:
-          return new GreaterThan(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new GreaterThan(left, right);
         case greaterEquals:
-          return new GreaterThanOrEqual(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new GreaterThanOrEqual(left, right);
         case less:
-          return new LessThan(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new LessThan(left, right);
         case lessEquals:
-          return new LessThanOrEqual(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new LessThanOrEqual(left, right);
         case times:
-          return new Multiply(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new Multiply(left, right);
         case divide:
-          return new Divide(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new Divide(left, right);
         case remainder:
-          return new Modulo(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new Modulo(left, right);
         case rSignedShift:
-          return new RightShift(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new RightShift(left, right);
         case rUnsignedShift:
-          return new RightUnsignedShift(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new RightUnsignedShift(left, right);
         case lShift:
-          return new LeftShift(convertExpression(binaryExpr.getLeft()), convertExpression(binaryExpr.getRight()));
+          return new LeftShift(left, right);
       }
+      // If we get here, there's an unhandled binary operator
+      return null;
     } else if (expression instanceof NameExpr) {
       NameExpr nameExpr = (NameExpr) expression;
       return new PropertyRef(Property.newProperty(OBJECT, nameExpr.getName()));
@@ -175,6 +197,8 @@ public class ExpressionConverter {
     } else if (expression instanceof BooleanLiteralExpr) {
       BooleanLiteralExpr booleanLiteralExpr = (BooleanLiteralExpr) expression;
       return new ValueRef(booleanLiteralExpr.getValue());
+    } else if (expression instanceof NullLiteralExpr) {
+      return new ValueRef(null);
     } else if (expression instanceof ThisExpr) {
       return new This();
     } else if (expression instanceof ObjectCreationExpr) {
@@ -226,6 +250,32 @@ public class ExpressionConverter {
           convertExpression(conditionalExpr.getCondition()),
           convertExpression(conditionalExpr.getThenExpr()),
           convertExpression(conditionalExpr.getElseExpr()));
+    } else if (expression instanceof MethodReferenceExpr) {
+      MethodReferenceExpr methodReferenceExpr = (MethodReferenceExpr) expression;
+      String methodName = methodReferenceExpr.getIdentifier();
+      List<TypeRef> parameters = new ArrayList<>();
+      List<io.sundr.model.Expression> arguments = new ArrayList<>();
+      io.sundr.model.Expression scope = methodReferenceExpr.getScope() != null
+          ? convertExpression(methodReferenceExpr.getScope())
+          : null;
+      return new MethodCall(methodName, scope, parameters, arguments);
+    } else if (expression instanceof VariableDeclarationExpr) {
+      VariableDeclarationExpr varDeclExpr = (VariableDeclarationExpr) expression;
+      // For variable declarations in expression context, we create a simple declaration
+      // without trying to resolve the full type, to avoid context issues
+      if (!varDeclExpr.getVars().isEmpty()) {
+        VariableDeclarator var = varDeclExpr.getVars().get(0);
+        String varName = var.getId().getName();
+        Property prop = Property.newProperty(OBJECT, varName);
+
+        if (var.getInit() != null) {
+          io.sundr.model.Expression initExpr = convertExpression(var.getInit());
+          return new Declare(prop, initExpr);
+        } else {
+          return new Declare(prop);
+        }
+      }
+      return null;
     }
     return null;
   }
