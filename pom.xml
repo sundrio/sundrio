@@ -70,6 +70,10 @@
         <swagger-codegen.version>3.0.68</swagger-codegen.version>
         <swagger-codegen-generator.version>1.0.56</swagger-codegen-generator.version>
 
+        <!-- Terminal Tooling Version -->
+        <jansi.version>2.4.1</jansi.version>
+        <jline.version>3.26.3</jline.version>
+
         <!-- Transitive Versions -->
         <commons-collections.version>3.2.2</commons-collections.version>
 
@@ -107,6 +111,7 @@
         <module>model</module>
         <module>adapters</module>
         <module>codegen</module>
+        <module>tui</module>
         <module>maven-plugin</module>
         <module>annotations</module>
         <module>components</module>
@@ -196,6 +201,22 @@
                 <groupId>com.github.javaparser</groupId>
                 <artifactId>javaparser-core</artifactId>
                 <version>${javaparser.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.fusesource.jansi</groupId>
+                <artifactId>jansi</artifactId>
+                <version>${jansi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jline</groupId>
+                <artifactId>jline-terminal</artifactId>
+                <version>${jline.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jline</groupId>
+                <artifactId>jline-reader</artifactId>
+                <version>${jline.version}</version>
             </dependency>
 
             <dependency>
