@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Method extends ModifierSupport implements Renderable, WithReferences, Commentable, Annotatable {
+public class Method extends ModifierSupport implements Renderable, WithReferences, Commentable, Annotatable, Erasable<Method> {
 
   public static final String DEFAULT = "default";
 
@@ -107,10 +107,37 @@ public class Method extends ModifierSupport implements Renderable, WithReference
     return block;
   }
 
+  @Override
   public Method withErasure() {
     return new Method(comments, annotations, parameters, name, returnType,
         arguments.stream().map(Property::withErasure).collect(Collectors.toList()), varArgPreferred, exceptions, defaultMethod,
         block, modifiers, getAttributes());
+  }
+
+  /**
+   * Returns the erasure of this method as a canonical string representation.
+   * The erasure includes the method name and parameter types, providing a stable
+   * way to compare methods regardless of object instance differences.
+   *
+   * @return the method erasure string in the format "methodName(paramType1,paramType2,...)"
+   */
+  @Override
+  public String getErasure() {
+    StringBuilder erasure = new StringBuilder();
+    erasure.append(name).append("(");
+
+    if (arguments != null && !arguments.isEmpty()) {
+      for (int i = 0; i < arguments.size(); i++) {
+        if (i > 0) {
+          erasure.append(",");
+        }
+        Property arg = arguments.get(i);
+        erasure.append(arg.getErasure());
+      }
+    }
+
+    erasure.append(")");
+    return erasure.toString();
   }
 
   public Set<ClassRef> getReferences() {
@@ -197,7 +224,6 @@ public class Method extends ModifierSupport implements Renderable, WithReference
     return true;
   }
 
-  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;

@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Property extends ModifierSupport implements Expression, Commentable, Annotatable {
+public class Property extends ModifierSupport implements Expression, Commentable, Annotatable, Erasable<Property> {
 
   private final List<String> comments;
   private final List<AnnotationRef> annotations;
@@ -165,9 +165,15 @@ public class Property extends ModifierSupport implements Expression, Commentable
    *
    * @return the 'erased` property.
    */
+  @Override
   public Property withErasure() {
     return new Property(annotations, typeRef instanceof TypeParamRef ? ((TypeParamRef) typeRef).withErasure() : typeRef, name,
         comments, enumConstant, synthetic, Modifiers.create(), getAttributes());
+  }
+
+  @Override
+  public String getErasure() {
+    return withErasure().render();
   }
 
   /**
