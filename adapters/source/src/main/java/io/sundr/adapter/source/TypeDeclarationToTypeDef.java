@@ -62,6 +62,7 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.utils.Types;
+import io.sundr.model.visitors.context.resolver.TypeDefContextRefResolver;
 
 public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeDef> {
 
@@ -217,7 +218,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters).withExtendsList(extendsList)
               .withImplementsList(implementsList).withProperties(properties).withMethods(methods)
               .withConstructors(constructors).withAnnotations(annotations)
-              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
+              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
+              .accept(new TypeDefContextRefResolver()).build());
     }
 
     if (type instanceof AnnotationDeclaration) {
@@ -248,7 +250,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
       return context.getDefinitionRepository()
           .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
               .withModifiers(Modifiers.from(type.getModifiers())).withMethods(methods).withAnnotations(annotations)
-              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
+              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
+              .accept(new TypeDefContextRefResolver()).build());
     }
 
     if (type instanceof EnumDeclaration) {
@@ -358,7 +361,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters)
               .withImplementsList(implementsList).withProperties(properties).withMethods(methods)
               .withConstructors(constructors).withAnnotations(annotations)
-              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type)).build());
+              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
+              .accept(new TypeDefContextRefResolver()).build());
     }
     throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");
   }

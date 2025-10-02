@@ -146,24 +146,7 @@ public class ImpactAnalyzer {
   }
 
   private Set<MethodReference> findMethodReferencesToMethod(MethodReference targetMethod) {
-    Set<MethodReference> callers = new HashSet<>();
-
-    // Search through all TypeDefs in the repository to find methods that directly call the target method
-    for (TypeDef typeDef : repository.getDefinitions()) {
-      for (Method method : typeDef.getMethods()) {
-        try {
-          // Use direct method references to find only immediate callers
-          Set<MethodReference> directReferences = MethodReference.getDirectMethodReferences(method, repository);
-          if (directReferences.contains(targetMethod)) {
-            MethodReference callingMethod = new MethodReference(method, typeDef);
-            callers.add(callingMethod);
-          }
-        } catch (Exception e) {
-          // Skip methods that can't be analyzed
-        }
-      }
-    }
-
+    Set<MethodReference> callers = MethodReference.getDirectMethodCallers(targetMethod, repository);
     return callers;
   }
 
@@ -174,8 +157,8 @@ public class ImpactAnalyzer {
     }
     visited.add(target);
 
-    // Find direct callers of the target method
-    Set<MethodReference> directCallers = findMethodReferencesToMethod(target);
+    // Find direct callers of the target method using the new reverse lookup method
+    Set<MethodReference> directCallers = MethodReference.getDirectMethodCallers(target, repository);
 
     for (MethodReference caller : directCallers) {
       // Add the caller as a child of the target (target impacts caller)
