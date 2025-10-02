@@ -14,16 +14,15 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
+public class SynchronizedFluent<A extends SynchronizedFluent<A>> extends BaseFluent<A> {
 
   private VisitableBuilder<? extends Statement, ?> body;
-  private DeclareBuilder declare;
-  private VisitableBuilder<? extends Expression, ?> expression;
+  private VisitableBuilder<? extends Expression, ?> lockExpression;
 
-  public ForeachFluent() {
+  public SynchronizedFluent() {
   }
 
-  public ForeachFluent(Foreach instance) {
+  public SynchronizedFluent(Synchronized instance) {
     this.copyInstance(instance);
   }
 
@@ -31,12 +30,8 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return this.body != null ? this.body.build() : null;
   }
 
-  public Declare buildDeclare() {
-    return this.declare != null ? this.declare.build() : null;
-  }
-
-  public Expression buildExpression() {
-    return this.expression != null ? this.expression.build() : null;
+  public Expression buildLockExpression() {
+    return this.lockExpression != null ? this.lockExpression.build() : null;
   }
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
@@ -175,24 +170,11 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
-  protected void copyInstance(Foreach instance) {
+  protected void copyInstance(Synchronized instance) {
     if (instance != null) {
-      this.withDeclare(instance.getDeclare());
-      this.withExpression(instance.getExpression());
+      this.withLockExpression(instance.getLockExpression());
       this.withBody(instance.getBody());
     }
-  }
-
-  public DeclareNested<A> editDeclare() {
-    return withNewDeclareLike(java.util.Optional.ofNullable(buildDeclare()).orElse(null));
-  }
-
-  public DeclareNested<A> editOrNewDeclare() {
-    return withNewDeclareLike(java.util.Optional.ofNullable(buildDeclare()).orElse(new DeclareBuilder().build()));
-  }
-
-  public DeclareNested<A> editOrNewDeclareLike(Declare item) {
-    return withNewDeclareLike(java.util.Optional.ofNullable(buildDeclare()).orElse(item));
   }
 
   public boolean equals(Object o) {
@@ -202,10 +184,8 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
       return false;
     if (!super.equals(o))
       return false;
-    ForeachFluent that = (ForeachFluent) o;
-    if (!java.util.Objects.equals(declare, that.declare))
-      return false;
-    if (!java.util.Objects.equals(expression, that.expression))
+    SynchronizedFluent that = (SynchronizedFluent) o;
+    if (!java.util.Objects.equals(lockExpression, that.lockExpression))
       return false;
     if (!java.util.Objects.equals(body, that.body))
       return false;
@@ -216,28 +196,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return this.body != null;
   }
 
-  public boolean hasDeclare() {
-    return this.declare != null;
-  }
-
-  public boolean hasExpression() {
-    return this.expression != null;
+  public boolean hasLockExpression() {
+    return this.lockExpression != null;
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(declare, expression, body, super.hashCode());
+    return java.util.Objects.hash(lockExpression, body, super.hashCode());
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (declare != null) {
-      sb.append("declare:");
-      sb.append(declare + ",");
-    }
-    if (expression != null) {
-      sb.append("expression:");
-      sb.append(expression + ",");
+    if (lockExpression != null) {
+      sb.append("lockExpression:");
+      sb.append(lockExpression + ",");
     }
     if (body != null) {
       sb.append("body:");
@@ -261,28 +233,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
   }
 
-  public A withDeclare(Declare declare) {
-    this._visitables.remove("declare");
-    if (declare != null) {
-      this.declare = new DeclareBuilder(declare);
-      this._visitables.get("declare").add(this.declare);
-    } else {
-      this.declare = null;
-      this._visitables.get("declare").remove(this.declare);
-    }
-    return (A) this;
-  }
-
-  public A withExpression(Expression expression) {
-    if (expression == null) {
-      this.expression = null;
-      this._visitables.remove("expression");
+  public A withLockExpression(Expression lockExpression) {
+    if (lockExpression == null) {
+      this.lockExpression = null;
+      this._visitables.remove("lockExpression");
       return (A) this;
     } else {
-      VisitableBuilder<? extends Expression, ?> builder = builder(expression);
-      this._visitables.get("expression").clear();
-      this._visitables.get("expression").add(builder);
-      this.expression = builder;
+      VisitableBuilder<? extends Expression, ?> builder = builder(lockExpression);
+      this._visitables.get("lockExpression").clear();
+      this._visitables.get("lockExpression").add(builder);
+      this.lockExpression = builder;
       return (A) this;
     }
   }
@@ -295,16 +255,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new AssignBodyNested(item);
   }
 
-  public AssignExpressionNested<A> withNewAssignExpression() {
-    return new AssignExpressionNested(null);
+  public AssignLockExpressionNested<A> withNewAssignLockExpression() {
+    return new AssignLockExpressionNested(null);
   }
 
-  public AssignExpressionNested<A> withNewAssignExpressionLike(Assign item) {
-    return new AssignExpressionNested(item);
-  }
-
-  public BinaryExpressionNested<A> withNewBinaryExpression() {
-    return new BinaryExpressionNested(null);
+  public AssignLockExpressionNested<A> withNewAssignLockExpressionLike(Assign item) {
+    return new AssignLockExpressionNested(item);
   }
 
   public BinaryExpressionBodyNested<A> withNewBinaryExpressionBody() {
@@ -315,8 +271,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new BinaryExpressionBodyNested(item);
   }
 
-  public BinaryExpressionNested<A> withNewBinaryExpressionLike(BinaryExpression item) {
-    return new BinaryExpressionNested(item);
+  public BinaryExpressionLockNested<A> withNewBinaryExpressionLock() {
+    return new BinaryExpressionLockNested(null);
+  }
+
+  public BinaryExpressionLockNested<A> withNewBinaryExpressionLockLike(BinaryExpression item) {
+    return new BinaryExpressionLockNested(item);
   }
 
   public BitwiseAndBodyNested<A> withNewBitwiseAndBody() {
@@ -331,16 +291,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new BitwiseAndBodyNested(item);
   }
 
-  public BitwiseAndExpressionNested<A> withNewBitwiseAndExpression() {
-    return new BitwiseAndExpressionNested(null);
+  public BitwiseAndLockExpressionNested<A> withNewBitwiseAndLockExpression() {
+    return new BitwiseAndLockExpressionNested(null);
   }
 
-  public A withNewBitwiseAndExpression(Object left, Object right) {
-    return (A) withExpression(new BitwiseAnd(left, right));
+  public A withNewBitwiseAndLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new BitwiseAnd(left, right));
   }
 
-  public BitwiseAndExpressionNested<A> withNewBitwiseAndExpressionLike(BitwiseAnd item) {
-    return new BitwiseAndExpressionNested(item);
+  public BitwiseAndLockExpressionNested<A> withNewBitwiseAndLockExpressionLike(BitwiseAnd item) {
+    return new BitwiseAndLockExpressionNested(item);
   }
 
   public BitwiseOrBodyNested<A> withNewBitwiseOrBody() {
@@ -355,16 +315,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new BitwiseOrBodyNested(item);
   }
 
-  public BitwiseOrExpressionNested<A> withNewBitwiseOrExpression() {
-    return new BitwiseOrExpressionNested(null);
+  public BitwiseOrLockExpressionNested<A> withNewBitwiseOrLockExpression() {
+    return new BitwiseOrLockExpressionNested(null);
   }
 
-  public A withNewBitwiseOrExpression(Object left, Object right) {
-    return (A) withExpression(new BitwiseOr(left, right));
+  public A withNewBitwiseOrLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new BitwiseOr(left, right));
   }
 
-  public BitwiseOrExpressionNested<A> withNewBitwiseOrExpressionLike(BitwiseOr item) {
-    return new BitwiseOrExpressionNested(item);
+  public BitwiseOrLockExpressionNested<A> withNewBitwiseOrLockExpressionLike(BitwiseOr item) {
+    return new BitwiseOrLockExpressionNested(item);
   }
 
   public BlockBodyNested<A> withNewBlockBody() {
@@ -383,20 +343,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new BreakBodyNested(item);
   }
 
-  public CastExpressionNested<A> withNewCastExpression() {
-    return new CastExpressionNested(null);
+  public CastLockExpressionNested<A> withNewCastLockExpression() {
+    return new CastLockExpressionNested(null);
   }
 
-  public CastExpressionNested<A> withNewCastExpressionLike(Cast item) {
-    return new CastExpressionNested(item);
+  public CastLockExpressionNested<A> withNewCastLockExpressionLike(Cast item) {
+    return new CastLockExpressionNested(item);
   }
 
-  public ClassRefExpressionNested<A> withNewClassRefExpression() {
-    return new ClassRefExpressionNested(null);
+  public ClassRefLockExpressionNested<A> withNewClassRefLockExpression() {
+    return new ClassRefLockExpressionNested(null);
   }
 
-  public ClassRefExpressionNested<A> withNewClassRefExpressionLike(ClassRef item) {
-    return new ClassRefExpressionNested(item);
+  public ClassRefLockExpressionNested<A> withNewClassRefLockExpressionLike(ClassRef item) {
+    return new ClassRefLockExpressionNested(item);
   }
 
   public ConstructBodyNested<A> withNewConstructBody() {
@@ -407,24 +367,24 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new ConstructBodyNested(item);
   }
 
-  public ConstructExpressionNested<A> withNewConstructExpression() {
-    return new ConstructExpressionNested(null);
+  public ConstructLockExpressionNested<A> withNewConstructLockExpression() {
+    return new ConstructLockExpressionNested(null);
   }
 
-  public ConstructExpressionNested<A> withNewConstructExpressionLike(Construct item) {
-    return new ConstructExpressionNested(item);
+  public ConstructLockExpressionNested<A> withNewConstructLockExpressionLike(Construct item) {
+    return new ConstructLockExpressionNested(item);
   }
 
-  public ContextRefExpressionNested<A> withNewContextRefExpression() {
-    return new ContextRefExpressionNested(null);
+  public ContextRefLockExpressionNested<A> withNewContextRefLockExpression() {
+    return new ContextRefLockExpressionNested(null);
   }
 
-  public A withNewContextRefExpression(String name) {
-    return (A) withExpression(new ContextRef(name));
+  public A withNewContextRefLockExpression(String name) {
+    return (A) withLockExpression(new ContextRef(name));
   }
 
-  public ContextRefExpressionNested<A> withNewContextRefExpressionLike(ContextRef item) {
-    return new ContextRefExpressionNested(item);
+  public ContextRefLockExpressionNested<A> withNewContextRefLockExpressionLike(ContextRef item) {
+    return new ContextRefLockExpressionNested(item);
   }
 
   public ContinueBodyNested<A> withNewContinueBody() {
@@ -433,18 +393,6 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   public ContinueBodyNested<A> withNewContinueBodyLike(Continue item) {
     return new ContinueBodyNested(item);
-  }
-
-  public DeclareNested<A> withNewDeclare() {
-    return new DeclareNested(null);
-  }
-
-  public A withNewDeclare(Class type, String name) {
-    return (A) withDeclare(new Declare(type, name));
-  }
-
-  public A withNewDeclare(Class type, String name, Object value) {
-    return (A) withDeclare(new Declare(type, name, value));
   }
 
   public DeclareBodyNested<A> withNewDeclareBody() {
@@ -463,24 +411,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new DeclareBodyNested(item);
   }
 
-  public DeclareExpressionNested<A> withNewDeclareExpression() {
-    return new DeclareExpressionNested(null);
+  public DeclareLockExpressionNested<A> withNewDeclareLockExpression() {
+    return new DeclareLockExpressionNested(null);
   }
 
-  public A withNewDeclareExpression(Class type, String name) {
-    return (A) withExpression(new Declare(type, name));
+  public A withNewDeclareLockExpression(Class type, String name) {
+    return (A) withLockExpression(new Declare(type, name));
   }
 
-  public A withNewDeclareExpression(Class type, String name, Object value) {
-    return (A) withExpression(new Declare(type, name, value));
+  public A withNewDeclareLockExpression(Class type, String name, Object value) {
+    return (A) withLockExpression(new Declare(type, name, value));
   }
 
-  public DeclareExpressionNested<A> withNewDeclareExpressionLike(Declare item) {
-    return new DeclareExpressionNested(item);
-  }
-
-  public DeclareNested<A> withNewDeclareLike(Declare item) {
-    return new DeclareNested(item);
+  public DeclareLockExpressionNested<A> withNewDeclareLockExpressionLike(Declare item) {
+    return new DeclareLockExpressionNested(item);
   }
 
   public DivideBodyNested<A> withNewDivideBody() {
@@ -495,16 +439,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new DivideBodyNested(item);
   }
 
-  public DivideExpressionNested<A> withNewDivideExpression() {
-    return new DivideExpressionNested(null);
+  public DivideLockExpressionNested<A> withNewDivideLockExpression() {
+    return new DivideLockExpressionNested(null);
   }
 
-  public A withNewDivideExpression(Object left, Object right) {
-    return (A) withExpression(new Divide(left, right));
+  public A withNewDivideLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new Divide(left, right));
   }
 
-  public DivideExpressionNested<A> withNewDivideExpressionLike(Divide item) {
-    return new DivideExpressionNested(item);
+  public DivideLockExpressionNested<A> withNewDivideLockExpressionLike(Divide item) {
+    return new DivideLockExpressionNested(item);
   }
 
   public DoBodyNested<A> withNewDoBody() {
@@ -515,12 +459,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new DoBodyNested(item);
   }
 
-  public DotClassExpressionNested<A> withNewDotClassExpression() {
-    return new DotClassExpressionNested(null);
+  public DotClassLockExpressionNested<A> withNewDotClassLockExpression() {
+    return new DotClassLockExpressionNested(null);
   }
 
-  public DotClassExpressionNested<A> withNewDotClassExpressionLike(DotClass item) {
-    return new DotClassExpressionNested(item);
+  public DotClassLockExpressionNested<A> withNewDotClassLockExpressionLike(DotClass item) {
+    return new DotClassLockExpressionNested(item);
   }
 
   public EmptyBodyNested<A> withNewEmptyBody() {
@@ -531,20 +475,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new EmptyBodyNested(item);
   }
 
-  public EmptyExpressionNested<A> withNewEmptyExpression() {
-    return new EmptyExpressionNested(null);
+  public EmptyLockExpressionNested<A> withNewEmptyLockExpression() {
+    return new EmptyLockExpressionNested(null);
   }
 
-  public EmptyExpressionNested<A> withNewEmptyExpressionLike(Empty item) {
-    return new EmptyExpressionNested(item);
+  public EmptyLockExpressionNested<A> withNewEmptyLockExpressionLike(Empty item) {
+    return new EmptyLockExpressionNested(item);
   }
 
-  public EnclosedExpressionNested<A> withNewEnclosedExpression() {
-    return new EnclosedExpressionNested(null);
+  public EnclosedLockExpressionNested<A> withNewEnclosedLockExpression() {
+    return new EnclosedLockExpressionNested(null);
   }
 
-  public EnclosedExpressionNested<A> withNewEnclosedExpressionLike(Enclosed item) {
-    return new EnclosedExpressionNested(item);
+  public EnclosedLockExpressionNested<A> withNewEnclosedLockExpressionLike(Enclosed item) {
+    return new EnclosedLockExpressionNested(item);
   }
 
   public EqualsBodyNested<A> withNewEqualsBody() {
@@ -559,16 +503,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new EqualsBodyNested(item);
   }
 
-  public EqualsExpressionNested<A> withNewEqualsExpression() {
-    return new EqualsExpressionNested(null);
+  public EqualsLockExpressionNested<A> withNewEqualsLockExpression() {
+    return new EqualsLockExpressionNested(null);
   }
 
-  public A withNewEqualsExpression(Object left, Object right) {
-    return (A) withExpression(new Equals(left, right));
+  public A withNewEqualsLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new Equals(left, right));
   }
 
-  public EqualsExpressionNested<A> withNewEqualsExpressionLike(Equals item) {
-    return new EqualsExpressionNested(item);
+  public EqualsLockExpressionNested<A> withNewEqualsLockExpressionLike(Equals item) {
+    return new EqualsLockExpressionNested(item);
   }
 
   public ForBodyNested<A> withNewForBody() {
@@ -599,16 +543,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new GreaterThanBodyNested(item);
   }
 
-  public GreaterThanExpressionNested<A> withNewGreaterThanExpression() {
-    return new GreaterThanExpressionNested(null);
+  public GreaterThanLockExpressionNested<A> withNewGreaterThanLockExpression() {
+    return new GreaterThanLockExpressionNested(null);
   }
 
-  public A withNewGreaterThanExpression(Object left, Object right) {
-    return (A) withExpression(new GreaterThan(left, right));
+  public A withNewGreaterThanLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new GreaterThan(left, right));
   }
 
-  public GreaterThanExpressionNested<A> withNewGreaterThanExpressionLike(GreaterThan item) {
-    return new GreaterThanExpressionNested(item);
+  public GreaterThanLockExpressionNested<A> withNewGreaterThanLockExpressionLike(GreaterThan item) {
+    return new GreaterThanLockExpressionNested(item);
   }
 
   public GreaterThanOrEqualBodyNested<A> withNewGreaterThanOrEqualBody() {
@@ -623,16 +567,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new GreaterThanOrEqualBodyNested(item);
   }
 
-  public GreaterThanOrEqualExpressionNested<A> withNewGreaterThanOrEqualExpression() {
-    return new GreaterThanOrEqualExpressionNested(null);
+  public GreaterThanOrEqualLockExpressionNested<A> withNewGreaterThanOrEqualLockExpression() {
+    return new GreaterThanOrEqualLockExpressionNested(null);
   }
 
-  public A withNewGreaterThanOrEqualExpression(Object left, Object right) {
-    return (A) withExpression(new GreaterThanOrEqual(left, right));
+  public A withNewGreaterThanOrEqualLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new GreaterThanOrEqual(left, right));
   }
 
-  public GreaterThanOrEqualExpressionNested<A> withNewGreaterThanOrEqualExpressionLike(GreaterThanOrEqual item) {
-    return new GreaterThanOrEqualExpressionNested(item);
+  public GreaterThanOrEqualLockExpressionNested<A> withNewGreaterThanOrEqualLockExpressionLike(GreaterThanOrEqual item) {
+    return new GreaterThanOrEqualLockExpressionNested(item);
   }
 
   public IfBodyNested<A> withNewIfBody() {
@@ -651,28 +595,28 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new IfDslThenStepBodyNested(item);
   }
 
-  public IndexExpressionNested<A> withNewIndexExpression() {
-    return new IndexExpressionNested(null);
+  public IndexLockExpressionNested<A> withNewIndexLockExpression() {
+    return new IndexLockExpressionNested(null);
   }
 
-  public IndexExpressionNested<A> withNewIndexExpressionLike(Index item) {
-    return new IndexExpressionNested(item);
+  public IndexLockExpressionNested<A> withNewIndexLockExpressionLike(Index item) {
+    return new IndexLockExpressionNested(item);
   }
 
-  public InstanceOfExpressionNested<A> withNewInstanceOfExpression() {
-    return new InstanceOfExpressionNested(null);
+  public InstanceOfLockExpressionNested<A> withNewInstanceOfLockExpression() {
+    return new InstanceOfLockExpressionNested(null);
   }
 
-  public InstanceOfExpressionNested<A> withNewInstanceOfExpressionLike(InstanceOf item) {
-    return new InstanceOfExpressionNested(item);
+  public InstanceOfLockExpressionNested<A> withNewInstanceOfLockExpressionLike(InstanceOf item) {
+    return new InstanceOfLockExpressionNested(item);
   }
 
-  public InverseExpressionNested<A> withNewInverseExpression() {
-    return new InverseExpressionNested(null);
+  public InverseLockExpressionNested<A> withNewInverseLockExpression() {
+    return new InverseLockExpressionNested(null);
   }
 
-  public InverseExpressionNested<A> withNewInverseExpressionLike(Inverse item) {
-    return new InverseExpressionNested(item);
+  public InverseLockExpressionNested<A> withNewInverseLockExpressionLike(Inverse item) {
+    return new InverseLockExpressionNested(item);
   }
 
   public LambdaBodyNested<A> withNewLambdaBody() {
@@ -683,12 +627,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new LambdaBodyNested(item);
   }
 
-  public LambdaExpressionNested<A> withNewLambdaExpression() {
-    return new LambdaExpressionNested(null);
+  public LambdaLockExpressionNested<A> withNewLambdaLockExpression() {
+    return new LambdaLockExpressionNested(null);
   }
 
-  public LambdaExpressionNested<A> withNewLambdaExpressionLike(Lambda item) {
-    return new LambdaExpressionNested(item);
+  public LambdaLockExpressionNested<A> withNewLambdaLockExpressionLike(Lambda item) {
+    return new LambdaLockExpressionNested(item);
   }
 
   public LeftShiftBodyNested<A> withNewLeftShiftBody() {
@@ -703,16 +647,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new LeftShiftBodyNested(item);
   }
 
-  public LeftShiftExpressionNested<A> withNewLeftShiftExpression() {
-    return new LeftShiftExpressionNested(null);
+  public LeftShiftLockExpressionNested<A> withNewLeftShiftLockExpression() {
+    return new LeftShiftLockExpressionNested(null);
   }
 
-  public A withNewLeftShiftExpression(Object left, Object right) {
-    return (A) withExpression(new LeftShift(left, right));
+  public A withNewLeftShiftLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new LeftShift(left, right));
   }
 
-  public LeftShiftExpressionNested<A> withNewLeftShiftExpressionLike(LeftShift item) {
-    return new LeftShiftExpressionNested(item);
+  public LeftShiftLockExpressionNested<A> withNewLeftShiftLockExpressionLike(LeftShift item) {
+    return new LeftShiftLockExpressionNested(item);
   }
 
   public LessThanBodyNested<A> withNewLessThanBody() {
@@ -727,16 +671,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new LessThanBodyNested(item);
   }
 
-  public LessThanExpressionNested<A> withNewLessThanExpression() {
-    return new LessThanExpressionNested(null);
+  public LessThanLockExpressionNested<A> withNewLessThanLockExpression() {
+    return new LessThanLockExpressionNested(null);
   }
 
-  public A withNewLessThanExpression(Object left, Object right) {
-    return (A) withExpression(new LessThan(left, right));
+  public A withNewLessThanLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new LessThan(left, right));
   }
 
-  public LessThanExpressionNested<A> withNewLessThanExpressionLike(LessThan item) {
-    return new LessThanExpressionNested(item);
+  public LessThanLockExpressionNested<A> withNewLessThanLockExpressionLike(LessThan item) {
+    return new LessThanLockExpressionNested(item);
   }
 
   public LessThanOrEqualBodyNested<A> withNewLessThanOrEqualBody() {
@@ -751,16 +695,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new LessThanOrEqualBodyNested(item);
   }
 
-  public LessThanOrEqualExpressionNested<A> withNewLessThanOrEqualExpression() {
-    return new LessThanOrEqualExpressionNested(null);
+  public LessThanOrEqualLockExpressionNested<A> withNewLessThanOrEqualLockExpression() {
+    return new LessThanOrEqualLockExpressionNested(null);
   }
 
-  public A withNewLessThanOrEqualExpression(Object left, Object right) {
-    return (A) withExpression(new LessThanOrEqual(left, right));
+  public A withNewLessThanOrEqualLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new LessThanOrEqual(left, right));
   }
 
-  public LessThanOrEqualExpressionNested<A> withNewLessThanOrEqualExpressionLike(LessThanOrEqual item) {
-    return new LessThanOrEqualExpressionNested(item);
+  public LessThanOrEqualLockExpressionNested<A> withNewLessThanOrEqualLockExpressionLike(LessThanOrEqual item) {
+    return new LessThanOrEqualLockExpressionNested(item);
   }
 
   public LogicalAndBodyNested<A> withNewLogicalAndBody() {
@@ -775,16 +719,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new LogicalAndBodyNested(item);
   }
 
-  public LogicalAndExpressionNested<A> withNewLogicalAndExpression() {
-    return new LogicalAndExpressionNested(null);
+  public LogicalAndLockExpressionNested<A> withNewLogicalAndLockExpression() {
+    return new LogicalAndLockExpressionNested(null);
   }
 
-  public A withNewLogicalAndExpression(Object left, Object right) {
-    return (A) withExpression(new LogicalAnd(left, right));
+  public A withNewLogicalAndLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new LogicalAnd(left, right));
   }
 
-  public LogicalAndExpressionNested<A> withNewLogicalAndExpressionLike(LogicalAnd item) {
-    return new LogicalAndExpressionNested(item);
+  public LogicalAndLockExpressionNested<A> withNewLogicalAndLockExpressionLike(LogicalAnd item) {
+    return new LogicalAndLockExpressionNested(item);
   }
 
   public LogicalOrBodyNested<A> withNewLogicalOrBody() {
@@ -799,16 +743,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new LogicalOrBodyNested(item);
   }
 
-  public LogicalOrExpressionNested<A> withNewLogicalOrExpression() {
-    return new LogicalOrExpressionNested(null);
+  public LogicalOrLockExpressionNested<A> withNewLogicalOrLockExpression() {
+    return new LogicalOrLockExpressionNested(null);
   }
 
-  public A withNewLogicalOrExpression(Object left, Object right) {
-    return (A) withExpression(new LogicalOr(left, right));
+  public A withNewLogicalOrLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new LogicalOr(left, right));
   }
 
-  public LogicalOrExpressionNested<A> withNewLogicalOrExpressionLike(LogicalOr item) {
-    return new LogicalOrExpressionNested(item);
+  public LogicalOrLockExpressionNested<A> withNewLogicalOrLockExpressionLike(LogicalOr item) {
+    return new LogicalOrLockExpressionNested(item);
   }
 
   public MethodCallBodyNested<A> withNewMethodCallBody() {
@@ -819,12 +763,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new MethodCallBodyNested(item);
   }
 
-  public MethodCallExpressionNested<A> withNewMethodCallExpression() {
-    return new MethodCallExpressionNested(null);
+  public MethodCallLockExpressionNested<A> withNewMethodCallLockExpression() {
+    return new MethodCallLockExpressionNested(null);
   }
 
-  public MethodCallExpressionNested<A> withNewMethodCallExpressionLike(MethodCall item) {
-    return new MethodCallExpressionNested(item);
+  public MethodCallLockExpressionNested<A> withNewMethodCallLockExpressionLike(MethodCall item) {
+    return new MethodCallLockExpressionNested(item);
   }
 
   public MinusBodyNested<A> withNewMinusBody() {
@@ -839,16 +783,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new MinusBodyNested(item);
   }
 
-  public MinusExpressionNested<A> withNewMinusExpression() {
-    return new MinusExpressionNested(null);
+  public MinusLockExpressionNested<A> withNewMinusLockExpression() {
+    return new MinusLockExpressionNested(null);
   }
 
-  public A withNewMinusExpression(Object left, Object right) {
-    return (A) withExpression(new Minus(left, right));
+  public A withNewMinusLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new Minus(left, right));
   }
 
-  public MinusExpressionNested<A> withNewMinusExpressionLike(Minus item) {
-    return new MinusExpressionNested(item);
+  public MinusLockExpressionNested<A> withNewMinusLockExpressionLike(Minus item) {
+    return new MinusLockExpressionNested(item);
   }
 
   public ModuloBodyNested<A> withNewModuloBody() {
@@ -863,16 +807,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new ModuloBodyNested(item);
   }
 
-  public ModuloExpressionNested<A> withNewModuloExpression() {
-    return new ModuloExpressionNested(null);
+  public ModuloLockExpressionNested<A> withNewModuloLockExpression() {
+    return new ModuloLockExpressionNested(null);
   }
 
-  public A withNewModuloExpression(Object left, Object right) {
-    return (A) withExpression(new Modulo(left, right));
+  public A withNewModuloLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new Modulo(left, right));
   }
 
-  public ModuloExpressionNested<A> withNewModuloExpressionLike(Modulo item) {
-    return new ModuloExpressionNested(item);
+  public ModuloLockExpressionNested<A> withNewModuloLockExpressionLike(Modulo item) {
+    return new ModuloLockExpressionNested(item);
   }
 
   public MultiplyBodyNested<A> withNewMultiplyBody() {
@@ -887,36 +831,36 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new MultiplyBodyNested(item);
   }
 
-  public MultiplyExpressionNested<A> withNewMultiplyExpression() {
-    return new MultiplyExpressionNested(null);
+  public MultiplyLockExpressionNested<A> withNewMultiplyLockExpression() {
+    return new MultiplyLockExpressionNested(null);
   }
 
-  public A withNewMultiplyExpression(Object left, Object right) {
-    return (A) withExpression(new Multiply(left, right));
+  public A withNewMultiplyLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new Multiply(left, right));
   }
 
-  public MultiplyExpressionNested<A> withNewMultiplyExpressionLike(Multiply item) {
-    return new MultiplyExpressionNested(item);
+  public MultiplyLockExpressionNested<A> withNewMultiplyLockExpressionLike(Multiply item) {
+    return new MultiplyLockExpressionNested(item);
   }
 
-  public NegativeExpressionNested<A> withNewNegativeExpression() {
-    return new NegativeExpressionNested(null);
+  public NegativeLockExpressionNested<A> withNewNegativeLockExpression() {
+    return new NegativeLockExpressionNested(null);
   }
 
-  public NegativeExpressionNested<A> withNewNegativeExpressionLike(Negative item) {
-    return new NegativeExpressionNested(item);
+  public NegativeLockExpressionNested<A> withNewNegativeLockExpressionLike(Negative item) {
+    return new NegativeLockExpressionNested(item);
   }
 
-  public NewArrayExpressionNested<A> withNewNewArrayExpression() {
-    return new NewArrayExpressionNested(null);
+  public NewArrayLockExpressionNested<A> withNewNewArrayLockExpression() {
+    return new NewArrayLockExpressionNested(null);
   }
 
-  public A withNewNewArrayExpression(Class type, Integer[] sizes) {
-    return (A) withExpression(new NewArray(type, sizes));
+  public A withNewNewArrayLockExpression(Class type, Integer[] sizes) {
+    return (A) withLockExpression(new NewArray(type, sizes));
   }
 
-  public NewArrayExpressionNested<A> withNewNewArrayExpressionLike(NewArray item) {
-    return new NewArrayExpressionNested(item);
+  public NewArrayLockExpressionNested<A> withNewNewArrayLockExpressionLike(NewArray item) {
+    return new NewArrayLockExpressionNested(item);
   }
 
   public NotEqualsBodyNested<A> withNewNotEqualsBody() {
@@ -931,24 +875,24 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new NotEqualsBodyNested(item);
   }
 
-  public NotEqualsExpressionNested<A> withNewNotEqualsExpression() {
-    return new NotEqualsExpressionNested(null);
+  public NotEqualsLockExpressionNested<A> withNewNotEqualsLockExpression() {
+    return new NotEqualsLockExpressionNested(null);
   }
 
-  public A withNewNotEqualsExpression(Object left, Object right) {
-    return (A) withExpression(new NotEquals(left, right));
+  public A withNewNotEqualsLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new NotEquals(left, right));
   }
 
-  public NotEqualsExpressionNested<A> withNewNotEqualsExpressionLike(NotEquals item) {
-    return new NotEqualsExpressionNested(item);
+  public NotEqualsLockExpressionNested<A> withNewNotEqualsLockExpressionLike(NotEquals item) {
+    return new NotEqualsLockExpressionNested(item);
   }
 
-  public NotExpressionNested<A> withNewNotExpression() {
-    return new NotExpressionNested(null);
+  public NotLockExpressionNested<A> withNewNotLockExpression() {
+    return new NotLockExpressionNested(null);
   }
 
-  public NotExpressionNested<A> withNewNotExpressionLike(Not item) {
-    return new NotExpressionNested(item);
+  public NotLockExpressionNested<A> withNewNotLockExpressionLike(Not item) {
+    return new NotLockExpressionNested(item);
   }
 
   public PlusBodyNested<A> withNewPlusBody() {
@@ -963,24 +907,24 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new PlusBodyNested(item);
   }
 
-  public PlusExpressionNested<A> withNewPlusExpression() {
-    return new PlusExpressionNested(null);
+  public PlusLockExpressionNested<A> withNewPlusLockExpression() {
+    return new PlusLockExpressionNested(null);
   }
 
-  public A withNewPlusExpression(Object left, Object right) {
-    return (A) withExpression(new Plus(left, right));
+  public A withNewPlusLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new Plus(left, right));
   }
 
-  public PlusExpressionNested<A> withNewPlusExpressionLike(Plus item) {
-    return new PlusExpressionNested(item);
+  public PlusLockExpressionNested<A> withNewPlusLockExpressionLike(Plus item) {
+    return new PlusLockExpressionNested(item);
   }
 
-  public PositiveExpressionNested<A> withNewPositiveExpression() {
-    return new PositiveExpressionNested(null);
+  public PositiveLockExpressionNested<A> withNewPositiveLockExpression() {
+    return new PositiveLockExpressionNested(null);
   }
 
-  public PositiveExpressionNested<A> withNewPositiveExpressionLike(Positive item) {
-    return new PositiveExpressionNested(item);
+  public PositiveLockExpressionNested<A> withNewPositiveLockExpressionLike(Positive item) {
+    return new PositiveLockExpressionNested(item);
   }
 
   public PostDecrementBodyNested<A> withNewPostDecrementBody() {
@@ -991,12 +935,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new PostDecrementBodyNested(item);
   }
 
-  public PostDecrementExpressionNested<A> withNewPostDecrementExpression() {
-    return new PostDecrementExpressionNested(null);
+  public PostDecrementLockExpressionNested<A> withNewPostDecrementLockExpression() {
+    return new PostDecrementLockExpressionNested(null);
   }
 
-  public PostDecrementExpressionNested<A> withNewPostDecrementExpressionLike(PostDecrement item) {
-    return new PostDecrementExpressionNested(item);
+  public PostDecrementLockExpressionNested<A> withNewPostDecrementLockExpressionLike(PostDecrement item) {
+    return new PostDecrementLockExpressionNested(item);
   }
 
   public PostIncrementBodyNested<A> withNewPostIncrementBody() {
@@ -1007,12 +951,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new PostIncrementBodyNested(item);
   }
 
-  public PostIncrementExpressionNested<A> withNewPostIncrementExpression() {
-    return new PostIncrementExpressionNested(null);
+  public PostIncrementLockExpressionNested<A> withNewPostIncrementLockExpression() {
+    return new PostIncrementLockExpressionNested(null);
   }
 
-  public PostIncrementExpressionNested<A> withNewPostIncrementExpressionLike(PostIncrement item) {
-    return new PostIncrementExpressionNested(item);
+  public PostIncrementLockExpressionNested<A> withNewPostIncrementLockExpressionLike(PostIncrement item) {
+    return new PostIncrementLockExpressionNested(item);
   }
 
   public PreDecrementBodyNested<A> withNewPreDecrementBody() {
@@ -1023,12 +967,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new PreDecrementBodyNested(item);
   }
 
-  public PreDecrementExpressionNested<A> withNewPreDecrementExpression() {
-    return new PreDecrementExpressionNested(null);
+  public PreDecrementLockExpressionNested<A> withNewPreDecrementLockExpression() {
+    return new PreDecrementLockExpressionNested(null);
   }
 
-  public PreDecrementExpressionNested<A> withNewPreDecrementExpressionLike(PreDecrement item) {
-    return new PreDecrementExpressionNested(item);
+  public PreDecrementLockExpressionNested<A> withNewPreDecrementLockExpressionLike(PreDecrement item) {
+    return new PreDecrementLockExpressionNested(item);
   }
 
   public PreIncrementBodyNested<A> withNewPreIncrementBody() {
@@ -1039,20 +983,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new PreIncrementBodyNested(item);
   }
 
-  public PreIncrementExpressionNested<A> withNewPreIncrementExpression() {
-    return new PreIncrementExpressionNested(null);
+  public PreIncrementLockExpressionNested<A> withNewPreIncrementLockExpression() {
+    return new PreIncrementLockExpressionNested(null);
   }
 
-  public PreIncrementExpressionNested<A> withNewPreIncrementExpressionLike(PreIncrement item) {
-    return new PreIncrementExpressionNested(item);
+  public PreIncrementLockExpressionNested<A> withNewPreIncrementLockExpressionLike(PreIncrement item) {
+    return new PreIncrementLockExpressionNested(item);
   }
 
-  public PropertyExpressionNested<A> withNewPropertyExpression() {
-    return new PropertyExpressionNested(null);
+  public PropertyLockExpressionNested<A> withNewPropertyLockExpression() {
+    return new PropertyLockExpressionNested(null);
   }
 
-  public PropertyExpressionNested<A> withNewPropertyExpressionLike(Property item) {
-    return new PropertyExpressionNested(item);
+  public PropertyLockExpressionNested<A> withNewPropertyLockExpressionLike(Property item) {
+    return new PropertyLockExpressionNested(item);
   }
 
   public PropertyRefBodyNested<A> withNewPropertyRefBody() {
@@ -1063,12 +1007,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new PropertyRefBodyNested(item);
   }
 
-  public PropertyRefExpressionNested<A> withNewPropertyRefExpression() {
-    return new PropertyRefExpressionNested(null);
+  public PropertyRefLockExpressionNested<A> withNewPropertyRefLockExpression() {
+    return new PropertyRefLockExpressionNested(null);
   }
 
-  public PropertyRefExpressionNested<A> withNewPropertyRefExpressionLike(PropertyRef item) {
-    return new PropertyRefExpressionNested(item);
+  public PropertyRefLockExpressionNested<A> withNewPropertyRefLockExpressionLike(PropertyRef item) {
+    return new PropertyRefLockExpressionNested(item);
   }
 
   public ReturnBodyNested<A> withNewReturnBody() {
@@ -1115,16 +1059,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new RightShiftBodyNested(item);
   }
 
-  public RightShiftExpressionNested<A> withNewRightShiftExpression() {
-    return new RightShiftExpressionNested(null);
+  public RightShiftLockExpressionNested<A> withNewRightShiftLockExpression() {
+    return new RightShiftLockExpressionNested(null);
   }
 
-  public A withNewRightShiftExpression(Object left, Object right) {
-    return (A) withExpression(new RightShift(left, right));
+  public A withNewRightShiftLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new RightShift(left, right));
   }
 
-  public RightShiftExpressionNested<A> withNewRightShiftExpressionLike(RightShift item) {
-    return new RightShiftExpressionNested(item);
+  public RightShiftLockExpressionNested<A> withNewRightShiftLockExpressionLike(RightShift item) {
+    return new RightShiftLockExpressionNested(item);
   }
 
   public RightUnsignedShiftBodyNested<A> withNewRightUnsignedShiftBody() {
@@ -1139,16 +1083,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new RightUnsignedShiftBodyNested(item);
   }
 
-  public RightUnsignedShiftExpressionNested<A> withNewRightUnsignedShiftExpression() {
-    return new RightUnsignedShiftExpressionNested(null);
+  public RightUnsignedShiftLockExpressionNested<A> withNewRightUnsignedShiftLockExpression() {
+    return new RightUnsignedShiftLockExpressionNested(null);
   }
 
-  public A withNewRightUnsignedShiftExpression(Object left, Object right) {
-    return (A) withExpression(new RightUnsignedShift(left, right));
+  public A withNewRightUnsignedShiftLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new RightUnsignedShift(left, right));
   }
 
-  public RightUnsignedShiftExpressionNested<A> withNewRightUnsignedShiftExpressionLike(RightUnsignedShift item) {
-    return new RightUnsignedShiftExpressionNested(item);
+  public RightUnsignedShiftLockExpressionNested<A> withNewRightUnsignedShiftLockExpressionLike(RightUnsignedShift item) {
+    return new RightUnsignedShiftLockExpressionNested(item);
   }
 
   public StringStatementBodyNested<A> withNewStringStatementBody() {
@@ -1167,12 +1111,12 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new StringStatementBodyNested(item);
   }
 
-  public SuperExpressionNested<A> withNewSuperExpression() {
-    return new SuperExpressionNested(null);
+  public SuperLockExpressionNested<A> withNewSuperLockExpression() {
+    return new SuperLockExpressionNested(null);
   }
 
-  public SuperExpressionNested<A> withNewSuperExpressionLike(Super item) {
-    return new SuperExpressionNested(item);
+  public SuperLockExpressionNested<A> withNewSuperLockExpressionLike(Super item) {
+    return new SuperLockExpressionNested(item);
   }
 
   public SwitchBodyNested<A> withNewSwitchBody() {
@@ -1191,20 +1135,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new SynchronizedBodyNested(item);
   }
 
-  public TernaryExpressionNested<A> withNewTernaryExpression() {
-    return new TernaryExpressionNested(null);
+  public TernaryLockExpressionNested<A> withNewTernaryLockExpression() {
+    return new TernaryLockExpressionNested(null);
   }
 
-  public TernaryExpressionNested<A> withNewTernaryExpressionLike(Ternary item) {
-    return new TernaryExpressionNested(item);
+  public TernaryLockExpressionNested<A> withNewTernaryLockExpressionLike(Ternary item) {
+    return new TernaryLockExpressionNested(item);
   }
 
-  public ThisExpressionNested<A> withNewThisExpression() {
-    return new ThisExpressionNested(null);
+  public ThisLockExpressionNested<A> withNewThisLockExpression() {
+    return new ThisLockExpressionNested(null);
   }
 
-  public ThisExpressionNested<A> withNewThisExpressionLike(This item) {
-    return new ThisExpressionNested(item);
+  public ThisLockExpressionNested<A> withNewThisLockExpressionLike(This item) {
+    return new ThisLockExpressionNested(item);
   }
 
   public ThrowBodyNested<A> withNewThrowBody() {
@@ -1223,16 +1167,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new TryBodyNested(item);
   }
 
-  public ValueRefExpressionNested<A> withNewValueRefExpression() {
-    return new ValueRefExpressionNested(null);
+  public ValueRefLockExpressionNested<A> withNewValueRefLockExpression() {
+    return new ValueRefLockExpressionNested(null);
   }
 
-  public A withNewValueRefExpression(Object value) {
-    return (A) withExpression(new ValueRef(value));
+  public A withNewValueRefLockExpression(Object value) {
+    return (A) withLockExpression(new ValueRef(value));
   }
 
-  public ValueRefExpressionNested<A> withNewValueRefExpressionLike(ValueRef item) {
-    return new ValueRefExpressionNested(item);
+  public ValueRefLockExpressionNested<A> withNewValueRefLockExpressionLike(ValueRef item) {
+    return new ValueRefLockExpressionNested(item);
   }
 
   public WhileBodyNested<A> withNewWhileBody() {
@@ -1255,16 +1199,16 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     return new XorBodyNested(item);
   }
 
-  public XorExpressionNested<A> withNewXorExpression() {
-    return new XorExpressionNested(null);
+  public XorLockExpressionNested<A> withNewXorLockExpression() {
+    return new XorLockExpressionNested(null);
   }
 
-  public A withNewXorExpression(Object left, Object right) {
-    return (A) withExpression(new Xor(left, right));
+  public A withNewXorLockExpression(Object left, Object right) {
+    return (A) withLockExpression(new Xor(left, right));
   }
 
-  public XorExpressionNested<A> withNewXorExpressionLike(Xor item) {
-    return new XorExpressionNested(item);
+  public XorLockExpressionNested<A> withNewXorLockExpressionLike(Xor item) {
+    return new XorLockExpressionNested(item);
   }
 
   public class AssignBodyNested<N> extends AssignFluent<AssignBodyNested<N>> implements Nested<N> {
@@ -1276,7 +1220,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endAssignBody() {
@@ -1285,19 +1229,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class AssignExpressionNested<N> extends AssignFluent<AssignExpressionNested<N>> implements Nested<N> {
+  public class AssignLockExpressionNested<N> extends AssignFluent<AssignLockExpressionNested<N>> implements Nested<N> {
 
     AssignBuilder builder;
 
-    AssignExpressionNested(Assign item) {
+    AssignLockExpressionNested(Assign item) {
       this.builder = new AssignBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endAssignExpression() {
+    public N endAssignLockExpression() {
       return and();
     }
 
@@ -1313,7 +1257,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endBinaryExpressionBody() {
@@ -1322,19 +1266,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class BinaryExpressionNested<N> extends BinaryExpressionFluent<BinaryExpressionNested<N>> implements Nested<N> {
+  public class BinaryExpressionLockNested<N> extends BinaryExpressionFluent<BinaryExpressionLockNested<N>>
+      implements Nested<N> {
 
     BinaryExpressionBuilder builder;
 
-    BinaryExpressionNested(BinaryExpression item) {
+    BinaryExpressionLockNested(BinaryExpression item) {
       this.builder = new BinaryExpressionBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endBinaryExpression() {
+    public N endBinaryExpressionLock() {
       return and();
     }
 
@@ -1349,7 +1294,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endBitwiseAndBody() {
@@ -1358,19 +1303,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class BitwiseAndExpressionNested<N> extends BitwiseAndFluent<BitwiseAndExpressionNested<N>> implements Nested<N> {
+  public class BitwiseAndLockExpressionNested<N> extends BitwiseAndFluent<BitwiseAndLockExpressionNested<N>>
+      implements Nested<N> {
 
     BitwiseAndBuilder builder;
 
-    BitwiseAndExpressionNested(BitwiseAnd item) {
+    BitwiseAndLockExpressionNested(BitwiseAnd item) {
       this.builder = new BitwiseAndBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endBitwiseAndExpression() {
+    public N endBitwiseAndLockExpression() {
       return and();
     }
 
@@ -1385,7 +1331,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endBitwiseOrBody() {
@@ -1394,19 +1340,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class BitwiseOrExpressionNested<N> extends BitwiseOrFluent<BitwiseOrExpressionNested<N>> implements Nested<N> {
+  public class BitwiseOrLockExpressionNested<N> extends BitwiseOrFluent<BitwiseOrLockExpressionNested<N>> implements Nested<N> {
 
     BitwiseOrBuilder builder;
 
-    BitwiseOrExpressionNested(BitwiseOr item) {
+    BitwiseOrLockExpressionNested(BitwiseOr item) {
       this.builder = new BitwiseOrBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endBitwiseOrExpression() {
+    public N endBitwiseOrLockExpression() {
       return and();
     }
 
@@ -1421,7 +1367,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endBlockBody() {
@@ -1439,7 +1385,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endBreakBody() {
@@ -1448,37 +1394,37 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class CastExpressionNested<N> extends CastFluent<CastExpressionNested<N>> implements Nested<N> {
+  public class CastLockExpressionNested<N> extends CastFluent<CastLockExpressionNested<N>> implements Nested<N> {
 
     CastBuilder builder;
 
-    CastExpressionNested(Cast item) {
+    CastLockExpressionNested(Cast item) {
       this.builder = new CastBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endCastExpression() {
+    public N endCastLockExpression() {
       return and();
     }
 
   }
 
-  public class ClassRefExpressionNested<N> extends ClassRefFluent<ClassRefExpressionNested<N>> implements Nested<N> {
+  public class ClassRefLockExpressionNested<N> extends ClassRefFluent<ClassRefLockExpressionNested<N>> implements Nested<N> {
 
     ClassRefBuilder builder;
 
-    ClassRefExpressionNested(ClassRef item) {
+    ClassRefLockExpressionNested(ClassRef item) {
       this.builder = new ClassRefBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endClassRefExpression() {
+    public N endClassRefLockExpression() {
       return and();
     }
 
@@ -1493,7 +1439,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endConstructBody() {
@@ -1502,37 +1448,38 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class ConstructExpressionNested<N> extends ConstructFluent<ConstructExpressionNested<N>> implements Nested<N> {
+  public class ConstructLockExpressionNested<N> extends ConstructFluent<ConstructLockExpressionNested<N>> implements Nested<N> {
 
     ConstructBuilder builder;
 
-    ConstructExpressionNested(Construct item) {
+    ConstructLockExpressionNested(Construct item) {
       this.builder = new ConstructBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endConstructExpression() {
+    public N endConstructLockExpression() {
       return and();
     }
 
   }
 
-  public class ContextRefExpressionNested<N> extends ContextRefFluent<ContextRefExpressionNested<N>> implements Nested<N> {
+  public class ContextRefLockExpressionNested<N> extends ContextRefFluent<ContextRefLockExpressionNested<N>>
+      implements Nested<N> {
 
     ContextRefBuilder builder;
 
-    ContextRefExpressionNested(ContextRef item) {
+    ContextRefLockExpressionNested(ContextRef item) {
       this.builder = new ContextRefBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endContextRefExpression() {
+    public N endContextRefLockExpression() {
       return and();
     }
 
@@ -1547,7 +1494,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endContinueBody() {
@@ -1565,7 +1512,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endDeclareBody() {
@@ -1574,37 +1521,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class DeclareExpressionNested<N> extends DeclareFluent<DeclareExpressionNested<N>> implements Nested<N> {
+  public class DeclareLockExpressionNested<N> extends DeclareFluent<DeclareLockExpressionNested<N>> implements Nested<N> {
 
     DeclareBuilder builder;
 
-    DeclareExpressionNested(Declare item) {
+    DeclareLockExpressionNested(Declare item) {
       this.builder = new DeclareBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endDeclareExpression() {
-      return and();
-    }
-
-  }
-
-  public class DeclareNested<N> extends DeclareFluent<DeclareNested<N>> implements Nested<N> {
-
-    DeclareBuilder builder;
-
-    DeclareNested(Declare item) {
-      this.builder = new DeclareBuilder(this, item);
-    }
-
-    public N and() {
-      return (N) ForeachFluent.this.withDeclare(builder.build());
-    }
-
-    public N endDeclare() {
+    public N endDeclareLockExpression() {
       return and();
     }
 
@@ -1619,7 +1548,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endDivideBody() {
@@ -1628,19 +1557,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class DivideExpressionNested<N> extends DivideFluent<DivideExpressionNested<N>> implements Nested<N> {
+  public class DivideLockExpressionNested<N> extends DivideFluent<DivideLockExpressionNested<N>> implements Nested<N> {
 
     DivideBuilder builder;
 
-    DivideExpressionNested(Divide item) {
+    DivideLockExpressionNested(Divide item) {
       this.builder = new DivideBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endDivideExpression() {
+    public N endDivideLockExpression() {
       return and();
     }
 
@@ -1655,7 +1584,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endDoBody() {
@@ -1664,19 +1593,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class DotClassExpressionNested<N> extends DotClassFluent<DotClassExpressionNested<N>> implements Nested<N> {
+  public class DotClassLockExpressionNested<N> extends DotClassFluent<DotClassLockExpressionNested<N>> implements Nested<N> {
 
     DotClassBuilder builder;
 
-    DotClassExpressionNested(DotClass item) {
+    DotClassLockExpressionNested(DotClass item) {
       this.builder = new DotClassBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endDotClassExpression() {
+    public N endDotClassLockExpression() {
       return and();
     }
 
@@ -1691,7 +1620,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endEmptyBody() {
@@ -1700,37 +1629,37 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class EmptyExpressionNested<N> extends EmptyFluent<EmptyExpressionNested<N>> implements Nested<N> {
+  public class EmptyLockExpressionNested<N> extends EmptyFluent<EmptyLockExpressionNested<N>> implements Nested<N> {
 
     EmptyBuilder builder;
 
-    EmptyExpressionNested(Empty item) {
+    EmptyLockExpressionNested(Empty item) {
       this.builder = new EmptyBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endEmptyExpression() {
+    public N endEmptyLockExpression() {
       return and();
     }
 
   }
 
-  public class EnclosedExpressionNested<N> extends EnclosedFluent<EnclosedExpressionNested<N>> implements Nested<N> {
+  public class EnclosedLockExpressionNested<N> extends EnclosedFluent<EnclosedLockExpressionNested<N>> implements Nested<N> {
 
     EnclosedBuilder builder;
 
-    EnclosedExpressionNested(Enclosed item) {
+    EnclosedLockExpressionNested(Enclosed item) {
       this.builder = new EnclosedBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endEnclosedExpression() {
+    public N endEnclosedLockExpression() {
       return and();
     }
 
@@ -1745,7 +1674,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endEqualsBody() {
@@ -1754,19 +1683,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class EqualsExpressionNested<N> extends EqualsFluent<EqualsExpressionNested<N>> implements Nested<N> {
+  public class EqualsLockExpressionNested<N> extends EqualsFluent<EqualsLockExpressionNested<N>> implements Nested<N> {
 
     EqualsBuilder builder;
 
-    EqualsExpressionNested(Equals item) {
+    EqualsLockExpressionNested(Equals item) {
       this.builder = new EqualsBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endEqualsExpression() {
+    public N endEqualsLockExpression() {
       return and();
     }
 
@@ -1781,7 +1710,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endForBody() {
@@ -1799,7 +1728,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endForeachBody() {
@@ -1817,7 +1746,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endGreaterThanBody() {
@@ -1826,19 +1755,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class GreaterThanExpressionNested<N> extends GreaterThanFluent<GreaterThanExpressionNested<N>> implements Nested<N> {
+  public class GreaterThanLockExpressionNested<N> extends GreaterThanFluent<GreaterThanLockExpressionNested<N>>
+      implements Nested<N> {
 
     GreaterThanBuilder builder;
 
-    GreaterThanExpressionNested(GreaterThan item) {
+    GreaterThanLockExpressionNested(GreaterThan item) {
       this.builder = new GreaterThanBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endGreaterThanExpression() {
+    public N endGreaterThanLockExpression() {
       return and();
     }
 
@@ -1854,7 +1784,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endGreaterThanOrEqualBody() {
@@ -1863,20 +1793,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class GreaterThanOrEqualExpressionNested<N> extends GreaterThanOrEqualFluent<GreaterThanOrEqualExpressionNested<N>>
-      implements Nested<N> {
+  public class GreaterThanOrEqualLockExpressionNested<N>
+      extends GreaterThanOrEqualFluent<GreaterThanOrEqualLockExpressionNested<N>> implements Nested<N> {
 
     GreaterThanOrEqualBuilder builder;
 
-    GreaterThanOrEqualExpressionNested(GreaterThanOrEqual item) {
+    GreaterThanOrEqualLockExpressionNested(GreaterThanOrEqual item) {
       this.builder = new GreaterThanOrEqualBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endGreaterThanOrEqualExpression() {
+    public N endGreaterThanOrEqualLockExpression() {
       return and();
     }
 
@@ -1891,7 +1821,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endIfBody() {
@@ -1909,7 +1839,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endIfDslThenStepBody() {
@@ -1918,55 +1848,56 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class IndexExpressionNested<N> extends IndexFluent<IndexExpressionNested<N>> implements Nested<N> {
+  public class IndexLockExpressionNested<N> extends IndexFluent<IndexLockExpressionNested<N>> implements Nested<N> {
 
     IndexBuilder builder;
 
-    IndexExpressionNested(Index item) {
+    IndexLockExpressionNested(Index item) {
       this.builder = new IndexBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endIndexExpression() {
+    public N endIndexLockExpression() {
       return and();
     }
 
   }
 
-  public class InstanceOfExpressionNested<N> extends InstanceOfFluent<InstanceOfExpressionNested<N>> implements Nested<N> {
+  public class InstanceOfLockExpressionNested<N> extends InstanceOfFluent<InstanceOfLockExpressionNested<N>>
+      implements Nested<N> {
 
     InstanceOfBuilder builder;
 
-    InstanceOfExpressionNested(InstanceOf item) {
+    InstanceOfLockExpressionNested(InstanceOf item) {
       this.builder = new InstanceOfBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endInstanceOfExpression() {
+    public N endInstanceOfLockExpression() {
       return and();
     }
 
   }
 
-  public class InverseExpressionNested<N> extends InverseFluent<InverseExpressionNested<N>> implements Nested<N> {
+  public class InverseLockExpressionNested<N> extends InverseFluent<InverseLockExpressionNested<N>> implements Nested<N> {
 
     InverseBuilder builder;
 
-    InverseExpressionNested(Inverse item) {
+    InverseLockExpressionNested(Inverse item) {
       this.builder = new InverseBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endInverseExpression() {
+    public N endInverseLockExpression() {
       return and();
     }
 
@@ -1981,7 +1912,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endLambdaBody() {
@@ -1990,19 +1921,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class LambdaExpressionNested<N> extends LambdaFluent<LambdaExpressionNested<N>> implements Nested<N> {
+  public class LambdaLockExpressionNested<N> extends LambdaFluent<LambdaLockExpressionNested<N>> implements Nested<N> {
 
     LambdaBuilder builder;
 
-    LambdaExpressionNested(Lambda item) {
+    LambdaLockExpressionNested(Lambda item) {
       this.builder = new LambdaBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endLambdaExpression() {
+    public N endLambdaLockExpression() {
       return and();
     }
 
@@ -2017,7 +1948,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endLeftShiftBody() {
@@ -2026,19 +1957,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class LeftShiftExpressionNested<N> extends LeftShiftFluent<LeftShiftExpressionNested<N>> implements Nested<N> {
+  public class LeftShiftLockExpressionNested<N> extends LeftShiftFluent<LeftShiftLockExpressionNested<N>> implements Nested<N> {
 
     LeftShiftBuilder builder;
 
-    LeftShiftExpressionNested(LeftShift item) {
+    LeftShiftLockExpressionNested(LeftShift item) {
       this.builder = new LeftShiftBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endLeftShiftExpression() {
+    public N endLeftShiftLockExpression() {
       return and();
     }
 
@@ -2053,7 +1984,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endLessThanBody() {
@@ -2062,19 +1993,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class LessThanExpressionNested<N> extends LessThanFluent<LessThanExpressionNested<N>> implements Nested<N> {
+  public class LessThanLockExpressionNested<N> extends LessThanFluent<LessThanLockExpressionNested<N>> implements Nested<N> {
 
     LessThanBuilder builder;
 
-    LessThanExpressionNested(LessThan item) {
+    LessThanLockExpressionNested(LessThan item) {
       this.builder = new LessThanBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endLessThanExpression() {
+    public N endLessThanLockExpression() {
       return and();
     }
 
@@ -2089,7 +2020,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endLessThanOrEqualBody() {
@@ -2098,20 +2029,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class LessThanOrEqualExpressionNested<N> extends LessThanOrEqualFluent<LessThanOrEqualExpressionNested<N>>
+  public class LessThanOrEqualLockExpressionNested<N> extends LessThanOrEqualFluent<LessThanOrEqualLockExpressionNested<N>>
       implements Nested<N> {
 
     LessThanOrEqualBuilder builder;
 
-    LessThanOrEqualExpressionNested(LessThanOrEqual item) {
+    LessThanOrEqualLockExpressionNested(LessThanOrEqual item) {
       this.builder = new LessThanOrEqualBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endLessThanOrEqualExpression() {
+    public N endLessThanOrEqualLockExpression() {
       return and();
     }
 
@@ -2126,7 +2057,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endLogicalAndBody() {
@@ -2135,19 +2066,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class LogicalAndExpressionNested<N> extends LogicalAndFluent<LogicalAndExpressionNested<N>> implements Nested<N> {
+  public class LogicalAndLockExpressionNested<N> extends LogicalAndFluent<LogicalAndLockExpressionNested<N>>
+      implements Nested<N> {
 
     LogicalAndBuilder builder;
 
-    LogicalAndExpressionNested(LogicalAnd item) {
+    LogicalAndLockExpressionNested(LogicalAnd item) {
       this.builder = new LogicalAndBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endLogicalAndExpression() {
+    public N endLogicalAndLockExpression() {
       return and();
     }
 
@@ -2162,7 +2094,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endLogicalOrBody() {
@@ -2171,19 +2103,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class LogicalOrExpressionNested<N> extends LogicalOrFluent<LogicalOrExpressionNested<N>> implements Nested<N> {
+  public class LogicalOrLockExpressionNested<N> extends LogicalOrFluent<LogicalOrLockExpressionNested<N>> implements Nested<N> {
 
     LogicalOrBuilder builder;
 
-    LogicalOrExpressionNested(LogicalOr item) {
+    LogicalOrLockExpressionNested(LogicalOr item) {
       this.builder = new LogicalOrBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endLogicalOrExpression() {
+    public N endLogicalOrLockExpression() {
       return and();
     }
 
@@ -2198,7 +2130,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endMethodCallBody() {
@@ -2207,19 +2139,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class MethodCallExpressionNested<N> extends MethodCallFluent<MethodCallExpressionNested<N>> implements Nested<N> {
+  public class MethodCallLockExpressionNested<N> extends MethodCallFluent<MethodCallLockExpressionNested<N>>
+      implements Nested<N> {
 
     MethodCallBuilder builder;
 
-    MethodCallExpressionNested(MethodCall item) {
+    MethodCallLockExpressionNested(MethodCall item) {
       this.builder = new MethodCallBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endMethodCallExpression() {
+    public N endMethodCallLockExpression() {
       return and();
     }
 
@@ -2234,7 +2167,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endMinusBody() {
@@ -2243,19 +2176,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class MinusExpressionNested<N> extends MinusFluent<MinusExpressionNested<N>> implements Nested<N> {
+  public class MinusLockExpressionNested<N> extends MinusFluent<MinusLockExpressionNested<N>> implements Nested<N> {
 
     MinusBuilder builder;
 
-    MinusExpressionNested(Minus item) {
+    MinusLockExpressionNested(Minus item) {
       this.builder = new MinusBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endMinusExpression() {
+    public N endMinusLockExpression() {
       return and();
     }
 
@@ -2270,7 +2203,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endModuloBody() {
@@ -2279,19 +2212,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class ModuloExpressionNested<N> extends ModuloFluent<ModuloExpressionNested<N>> implements Nested<N> {
+  public class ModuloLockExpressionNested<N> extends ModuloFluent<ModuloLockExpressionNested<N>> implements Nested<N> {
 
     ModuloBuilder builder;
 
-    ModuloExpressionNested(Modulo item) {
+    ModuloLockExpressionNested(Modulo item) {
       this.builder = new ModuloBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endModuloExpression() {
+    public N endModuloLockExpression() {
       return and();
     }
 
@@ -2306,7 +2239,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endMultiplyBody() {
@@ -2315,55 +2248,55 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class MultiplyExpressionNested<N> extends MultiplyFluent<MultiplyExpressionNested<N>> implements Nested<N> {
+  public class MultiplyLockExpressionNested<N> extends MultiplyFluent<MultiplyLockExpressionNested<N>> implements Nested<N> {
 
     MultiplyBuilder builder;
 
-    MultiplyExpressionNested(Multiply item) {
+    MultiplyLockExpressionNested(Multiply item) {
       this.builder = new MultiplyBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endMultiplyExpression() {
+    public N endMultiplyLockExpression() {
       return and();
     }
 
   }
 
-  public class NegativeExpressionNested<N> extends NegativeFluent<NegativeExpressionNested<N>> implements Nested<N> {
+  public class NegativeLockExpressionNested<N> extends NegativeFluent<NegativeLockExpressionNested<N>> implements Nested<N> {
 
     NegativeBuilder builder;
 
-    NegativeExpressionNested(Negative item) {
+    NegativeLockExpressionNested(Negative item) {
       this.builder = new NegativeBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endNegativeExpression() {
+    public N endNegativeLockExpression() {
       return and();
     }
 
   }
 
-  public class NewArrayExpressionNested<N> extends NewArrayFluent<NewArrayExpressionNested<N>> implements Nested<N> {
+  public class NewArrayLockExpressionNested<N> extends NewArrayFluent<NewArrayLockExpressionNested<N>> implements Nested<N> {
 
     NewArrayBuilder builder;
 
-    NewArrayExpressionNested(NewArray item) {
+    NewArrayLockExpressionNested(NewArray item) {
       this.builder = new NewArrayBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endNewArrayExpression() {
+    public N endNewArrayLockExpression() {
       return and();
     }
 
@@ -2378,7 +2311,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endNotEqualsBody() {
@@ -2387,37 +2320,37 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class NotEqualsExpressionNested<N> extends NotEqualsFluent<NotEqualsExpressionNested<N>> implements Nested<N> {
+  public class NotEqualsLockExpressionNested<N> extends NotEqualsFluent<NotEqualsLockExpressionNested<N>> implements Nested<N> {
 
     NotEqualsBuilder builder;
 
-    NotEqualsExpressionNested(NotEquals item) {
+    NotEqualsLockExpressionNested(NotEquals item) {
       this.builder = new NotEqualsBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endNotEqualsExpression() {
+    public N endNotEqualsLockExpression() {
       return and();
     }
 
   }
 
-  public class NotExpressionNested<N> extends NotFluent<NotExpressionNested<N>> implements Nested<N> {
+  public class NotLockExpressionNested<N> extends NotFluent<NotLockExpressionNested<N>> implements Nested<N> {
 
     NotBuilder builder;
 
-    NotExpressionNested(Not item) {
+    NotLockExpressionNested(Not item) {
       this.builder = new NotBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endNotExpression() {
+    public N endNotLockExpression() {
       return and();
     }
 
@@ -2432,7 +2365,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endPlusBody() {
@@ -2441,37 +2374,37 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class PlusExpressionNested<N> extends PlusFluent<PlusExpressionNested<N>> implements Nested<N> {
+  public class PlusLockExpressionNested<N> extends PlusFluent<PlusLockExpressionNested<N>> implements Nested<N> {
 
     PlusBuilder builder;
 
-    PlusExpressionNested(Plus item) {
+    PlusLockExpressionNested(Plus item) {
       this.builder = new PlusBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPlusExpression() {
+    public N endPlusLockExpression() {
       return and();
     }
 
   }
 
-  public class PositiveExpressionNested<N> extends PositiveFluent<PositiveExpressionNested<N>> implements Nested<N> {
+  public class PositiveLockExpressionNested<N> extends PositiveFluent<PositiveLockExpressionNested<N>> implements Nested<N> {
 
     PositiveBuilder builder;
 
-    PositiveExpressionNested(Positive item) {
+    PositiveLockExpressionNested(Positive item) {
       this.builder = new PositiveBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPositiveExpression() {
+    public N endPositiveLockExpression() {
       return and();
     }
 
@@ -2486,7 +2419,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endPostDecrementBody() {
@@ -2495,20 +2428,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class PostDecrementExpressionNested<N> extends PostDecrementFluent<PostDecrementExpressionNested<N>>
+  public class PostDecrementLockExpressionNested<N> extends PostDecrementFluent<PostDecrementLockExpressionNested<N>>
       implements Nested<N> {
 
     PostDecrementBuilder builder;
 
-    PostDecrementExpressionNested(PostDecrement item) {
+    PostDecrementLockExpressionNested(PostDecrement item) {
       this.builder = new PostDecrementBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPostDecrementExpression() {
+    public N endPostDecrementLockExpression() {
       return and();
     }
 
@@ -2523,7 +2456,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endPostIncrementBody() {
@@ -2532,20 +2465,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class PostIncrementExpressionNested<N> extends PostIncrementFluent<PostIncrementExpressionNested<N>>
+  public class PostIncrementLockExpressionNested<N> extends PostIncrementFluent<PostIncrementLockExpressionNested<N>>
       implements Nested<N> {
 
     PostIncrementBuilder builder;
 
-    PostIncrementExpressionNested(PostIncrement item) {
+    PostIncrementLockExpressionNested(PostIncrement item) {
       this.builder = new PostIncrementBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPostIncrementExpression() {
+    public N endPostIncrementLockExpression() {
       return and();
     }
 
@@ -2560,7 +2493,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endPreDecrementBody() {
@@ -2569,20 +2502,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class PreDecrementExpressionNested<N> extends PreDecrementFluent<PreDecrementExpressionNested<N>>
+  public class PreDecrementLockExpressionNested<N> extends PreDecrementFluent<PreDecrementLockExpressionNested<N>>
       implements Nested<N> {
 
     PreDecrementBuilder builder;
 
-    PreDecrementExpressionNested(PreDecrement item) {
+    PreDecrementLockExpressionNested(PreDecrement item) {
       this.builder = new PreDecrementBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPreDecrementExpression() {
+    public N endPreDecrementLockExpression() {
       return and();
     }
 
@@ -2597,7 +2530,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endPreIncrementBody() {
@@ -2606,38 +2539,38 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class PreIncrementExpressionNested<N> extends PreIncrementFluent<PreIncrementExpressionNested<N>>
+  public class PreIncrementLockExpressionNested<N> extends PreIncrementFluent<PreIncrementLockExpressionNested<N>>
       implements Nested<N> {
 
     PreIncrementBuilder builder;
 
-    PreIncrementExpressionNested(PreIncrement item) {
+    PreIncrementLockExpressionNested(PreIncrement item) {
       this.builder = new PreIncrementBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPreIncrementExpression() {
+    public N endPreIncrementLockExpression() {
       return and();
     }
 
   }
 
-  public class PropertyExpressionNested<N> extends PropertyFluent<PropertyExpressionNested<N>> implements Nested<N> {
+  public class PropertyLockExpressionNested<N> extends PropertyFluent<PropertyLockExpressionNested<N>> implements Nested<N> {
 
     PropertyBuilder builder;
 
-    PropertyExpressionNested(Property item) {
+    PropertyLockExpressionNested(Property item) {
       this.builder = new PropertyBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPropertyExpression() {
+    public N endPropertyLockExpression() {
       return and();
     }
 
@@ -2652,7 +2585,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endPropertyRefBody() {
@@ -2661,19 +2594,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class PropertyRefExpressionNested<N> extends PropertyRefFluent<PropertyRefExpressionNested<N>> implements Nested<N> {
+  public class PropertyRefLockExpressionNested<N> extends PropertyRefFluent<PropertyRefLockExpressionNested<N>>
+      implements Nested<N> {
 
     PropertyRefBuilder builder;
 
-    PropertyRefExpressionNested(PropertyRef item) {
+    PropertyRefLockExpressionNested(PropertyRef item) {
       this.builder = new PropertyRefBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endPropertyRefExpression() {
+    public N endPropertyRefLockExpression() {
       return and();
     }
 
@@ -2688,7 +2622,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endReturnBody() {
@@ -2707,7 +2641,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endReturnDslThisStepBody() {
@@ -2726,7 +2660,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endReturnDslVariableStepBody() {
@@ -2744,7 +2678,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endRightShiftBody() {
@@ -2753,19 +2687,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class RightShiftExpressionNested<N> extends RightShiftFluent<RightShiftExpressionNested<N>> implements Nested<N> {
+  public class RightShiftLockExpressionNested<N> extends RightShiftFluent<RightShiftLockExpressionNested<N>>
+      implements Nested<N> {
 
     RightShiftBuilder builder;
 
-    RightShiftExpressionNested(RightShift item) {
+    RightShiftLockExpressionNested(RightShift item) {
       this.builder = new RightShiftBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endRightShiftExpression() {
+    public N endRightShiftLockExpression() {
       return and();
     }
 
@@ -2781,7 +2716,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endRightUnsignedShiftBody() {
@@ -2790,20 +2725,20 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class RightUnsignedShiftExpressionNested<N> extends RightUnsignedShiftFluent<RightUnsignedShiftExpressionNested<N>>
-      implements Nested<N> {
+  public class RightUnsignedShiftLockExpressionNested<N>
+      extends RightUnsignedShiftFluent<RightUnsignedShiftLockExpressionNested<N>> implements Nested<N> {
 
     RightUnsignedShiftBuilder builder;
 
-    RightUnsignedShiftExpressionNested(RightUnsignedShift item) {
+    RightUnsignedShiftLockExpressionNested(RightUnsignedShift item) {
       this.builder = new RightUnsignedShiftBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endRightUnsignedShiftExpression() {
+    public N endRightUnsignedShiftLockExpression() {
       return and();
     }
 
@@ -2818,7 +2753,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endStringStatementBody() {
@@ -2827,19 +2762,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class SuperExpressionNested<N> extends SuperFluent<SuperExpressionNested<N>> implements Nested<N> {
+  public class SuperLockExpressionNested<N> extends SuperFluent<SuperLockExpressionNested<N>> implements Nested<N> {
 
     SuperBuilder builder;
 
-    SuperExpressionNested(Super item) {
+    SuperLockExpressionNested(Super item) {
       this.builder = new SuperBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endSuperExpression() {
+    public N endSuperLockExpression() {
       return and();
     }
 
@@ -2854,7 +2789,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endSwitchBody() {
@@ -2872,7 +2807,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endSynchronizedBody() {
@@ -2881,37 +2816,37 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class TernaryExpressionNested<N> extends TernaryFluent<TernaryExpressionNested<N>> implements Nested<N> {
+  public class TernaryLockExpressionNested<N> extends TernaryFluent<TernaryLockExpressionNested<N>> implements Nested<N> {
 
     TernaryBuilder builder;
 
-    TernaryExpressionNested(Ternary item) {
+    TernaryLockExpressionNested(Ternary item) {
       this.builder = new TernaryBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endTernaryExpression() {
+    public N endTernaryLockExpression() {
       return and();
     }
 
   }
 
-  public class ThisExpressionNested<N> extends ThisFluent<ThisExpressionNested<N>> implements Nested<N> {
+  public class ThisLockExpressionNested<N> extends ThisFluent<ThisLockExpressionNested<N>> implements Nested<N> {
 
     ThisBuilder builder;
 
-    ThisExpressionNested(This item) {
+    ThisLockExpressionNested(This item) {
       this.builder = new ThisBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endThisExpression() {
+    public N endThisLockExpression() {
       return and();
     }
 
@@ -2926,7 +2861,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endThrowBody() {
@@ -2944,7 +2879,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endTryBody() {
@@ -2953,19 +2888,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class ValueRefExpressionNested<N> extends ValueRefFluent<ValueRefExpressionNested<N>> implements Nested<N> {
+  public class ValueRefLockExpressionNested<N> extends ValueRefFluent<ValueRefLockExpressionNested<N>> implements Nested<N> {
 
     ValueRefBuilder builder;
 
-    ValueRefExpressionNested(ValueRef item) {
+    ValueRefLockExpressionNested(ValueRef item) {
       this.builder = new ValueRefBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endValueRefExpression() {
+    public N endValueRefLockExpression() {
       return and();
     }
 
@@ -2980,7 +2915,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endWhileBody() {
@@ -2998,7 +2933,7 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withBody(builder.build());
+      return (N) SynchronizedFluent.this.withBody(builder.build());
     }
 
     public N endXorBody() {
@@ -3007,19 +2942,19 @@ public class ForeachFluent<A extends ForeachFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class XorExpressionNested<N> extends XorFluent<XorExpressionNested<N>> implements Nested<N> {
+  public class XorLockExpressionNested<N> extends XorFluent<XorLockExpressionNested<N>> implements Nested<N> {
 
     XorBuilder builder;
 
-    XorExpressionNested(Xor item) {
+    XorLockExpressionNested(Xor item) {
       this.builder = new XorBuilder(this, item);
     }
 
     public N and() {
-      return (N) ForeachFluent.this.withExpression(builder.build());
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
     }
 
-    public N endXorExpression() {
+    public N endXorLockExpression() {
       return and();
     }
 

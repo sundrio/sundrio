@@ -1279,6 +1279,8 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new TryBuilder((Try) item);
       case "io.sundr.model." + "Switch":
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
+      case "io.sundr.model." + "Synchronized":
+        return (VisitableBuilder<T, ?>) new SynchronizedBuilder((Synchronized) item);
       case "io.sundr.model." + "Break":
         return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
       case "io.sundr.model." + "While":
@@ -2833,6 +2835,14 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
 
   public SwitchBodyNested<A> withNewSwitchBodyLike(Switch item) {
     return new SwitchBodyNested(item);
+  }
+
+  public SynchronizedBodyNested<A> withNewSynchronizedBody() {
+    return new SynchronizedBodyNested(null);
+  }
+
+  public SynchronizedBodyNested<A> withNewSynchronizedBodyLike(Synchronized item) {
+    return new SynchronizedBodyNested(item);
   }
 
   public TernaryCompareNested<A> withNewTernaryCompare() {
@@ -6273,6 +6283,24 @@ public class ForFluent<A extends ForFluent<A>> extends BaseFluent<A> {
     }
 
     public N endSwitchBody() {
+      return and();
+    }
+
+  }
+
+  public class SynchronizedBodyNested<N> extends SynchronizedFluent<SynchronizedBodyNested<N>> implements Nested<N> {
+
+    SynchronizedBuilder builder;
+
+    SynchronizedBodyNested(Synchronized item) {
+      this.builder = new SynchronizedBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.withBody(builder.build());
+    }
+
+    public N endSynchronizedBody() {
       return and();
     }
 
