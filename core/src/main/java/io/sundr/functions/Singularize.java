@@ -70,6 +70,7 @@ public enum Singularize implements Function<String, String> {
       new StringReplace("([ti])a$", "$1um"),
       new StringReplace("(n)ews$", "$1ews"),
       new StringReplace("(s|si|u)s$", "$1s"),
+      new StringReplace("(http|https)$", "$1"),
       new StringReplace("s$", ""));
 
   public String apply(String word) {

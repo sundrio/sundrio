@@ -30,6 +30,10 @@ public class PluralizeTest {
     assertEquals("vertices", Pluralize.FUNCTION.apply("vertex"));
     assertEquals("endpoints", Pluralize.FUNCTION.apply("endpoints"));
     assertEquals("ingresses", Pluralize.FUNCTION.apply("ingress"));
+    assertEquals("http", Pluralize.FUNCTION.apply("http"));
+    assertEquals("Http", Pluralize.FUNCTION.apply("Http"));
+    assertEquals("https", Pluralize.FUNCTION.apply("https"));
+    assertEquals("Https", Pluralize.FUNCTION.apply("Https"));
   }
 
 }

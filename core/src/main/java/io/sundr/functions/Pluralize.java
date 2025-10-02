@@ -61,7 +61,8 @@ public enum Pluralize implements Function<String, String> {
       new StringReplace("((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$", "$1$2sis"),
       new StringReplace("([ti])um$", "$1a"),
       new StringReplace("(n)ews$", "$1ews"),
-      new StringReplace("(s|si|u)s$", "$1s"));
+      new StringReplace("(s|si|u)s$", "$1s"),
+      new StringReplace("(http|https)$", "$1"));
 
   public String apply(String word) {
     if (word == null) {
