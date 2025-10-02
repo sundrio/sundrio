@@ -11,6 +11,7 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class ThisFluent<A extends ThisFluent<A>> extends BaseFluent<A> {
+
   public ThisFluent() {
   }
 

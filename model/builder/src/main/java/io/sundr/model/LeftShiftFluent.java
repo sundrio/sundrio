@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class LeftShiftFluent<A extends LeftShiftFluent<A>> extends BinaryExpressionFluent<A> {
+
   public LeftShiftFluent() {
   }
 

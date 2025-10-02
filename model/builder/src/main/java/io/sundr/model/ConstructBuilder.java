@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class ConstructBuilder extends ConstructFluent<ConstructBuilder>
     implements VisitableBuilder<Construct, ConstructBuilder> {
+
+  ConstructFluent<?> fluent;
+
   public ConstructBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class ConstructBuilder extends ConstructFluent<ConstructBuilder>
     this.fluent = fluent;
   }
 
-  public ConstructBuilder(ConstructFluent<?> fluent, Construct instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public ConstructBuilder(Construct instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  ConstructFluent<?> fluent;
+  public ConstructBuilder(ConstructFluent<?> fluent, Construct instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public Construct build() {
     Construct buildable = new Construct(fluent.buildType(), fluent.buildParameters(), fluent.buildArguments());

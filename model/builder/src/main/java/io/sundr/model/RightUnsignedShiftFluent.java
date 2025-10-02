@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class RightUnsignedShiftFluent<A extends RightUnsignedShiftFluent<A>> extends BinaryExpressionFluent<A> {
+
   public RightUnsignedShiftFluent() {
   }
 

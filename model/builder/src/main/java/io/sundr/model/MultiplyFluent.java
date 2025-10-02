@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class MultiplyFluent<A extends MultiplyFluent<A>> extends BinaryExpressionFluent<A> {
+
   public MultiplyFluent() {
   }
 

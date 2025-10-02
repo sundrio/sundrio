@@ -3,7 +3,7 @@ package io.sundr.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PreDecrement implements Expression {
+public class PreDecrement implements ExpressionOrStatement {
 
   private final Expression expression;
 

@@ -17,6 +17,9 @@ import io.sundr.builder.Nested;
  */
 @SuppressWarnings("unchecked")
 public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
+
+  private ArrayList<TypeDefBuilder> types = new ArrayList<TypeDefBuilder>();
+
   public SourceFluent() {
   }
 
@@ -24,13 +27,40 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
     this.copyInstance(instance);
   }
 
-  private ArrayList<TypeDefBuilder> types = new ArrayList<TypeDefBuilder>();
-
-  protected void copyInstance(Source instance) {
-    instance = (instance != null ? instance : new Source());
-    if (instance != null) {
-      this.withTypes(instance.getTypes());
+  public A addAllToTypes(Collection<TypeDef> items) {
+    if (this.types == null) {
+      this.types = new ArrayList<TypeDefBuilder>();
     }
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
+      _visitables.get("types").add(builder);
+      this.types.add(builder);
+    }
+    return (A) this;
+  }
+
+  public TypesNested<A> addNewType() {
+    return new TypesNested(-1, null);
+  }
+
+  public A addNewType(String fullyQualifiedName) {
+    return (A) addToTypes(new TypeDef(fullyQualifiedName));
+  }
+
+  public TypesNested<A> addNewTypeLike(TypeDef item) {
+    return new TypesNested(-1, item);
+  }
+
+  public A addToTypes(TypeDef... items) {
+    if (this.types == null) {
+      this.types = new ArrayList<TypeDefBuilder>();
+    }
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
+      _visitables.get("types").add(builder);
+      this.types.add(builder);
+    }
+    return (A) this;
   }
 
   public A addToTypes(int index, TypeDef item) {
@@ -46,90 +76,6 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
       types.add(index, builder);
     }
     return (A) this;
-  }
-
-  public A setToTypes(int index, TypeDef item) {
-    if (this.types == null) {
-      this.types = new ArrayList<TypeDefBuilder>();
-    }
-    TypeDefBuilder builder = new TypeDefBuilder(item);
-    if (index < 0 || index >= types.size()) {
-      _visitables.get("types").add(builder);
-      types.add(builder);
-    } else {
-      _visitables.get("types").add(builder);
-      types.set(index, builder);
-    }
-    return (A) this;
-  }
-
-  public A addToTypes(io.sundr.model.TypeDef... items) {
-    if (this.types == null) {
-      this.types = new ArrayList<TypeDefBuilder>();
-    }
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
-      _visitables.get("types").add(builder);
-      this.types.add(builder);
-    }
-    return (A) this;
-  }
-
-  public A addAllToTypes(Collection<TypeDef> items) {
-    if (this.types == null) {
-      this.types = new ArrayList<TypeDefBuilder>();
-    }
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
-      _visitables.get("types").add(builder);
-      this.types.add(builder);
-    }
-    return (A) this;
-  }
-
-  public A removeFromTypes(io.sundr.model.TypeDef... items) {
-    if (this.types == null)
-      return (A) this;
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
-      _visitables.get("types").remove(builder);
-      this.types.remove(builder);
-    }
-    return (A) this;
-  }
-
-  public A removeAllFromTypes(Collection<TypeDef> items) {
-    if (this.types == null)
-      return (A) this;
-    for (TypeDef item : items) {
-      TypeDefBuilder builder = new TypeDefBuilder(item);
-      _visitables.get("types").remove(builder);
-      this.types.remove(builder);
-    }
-    return (A) this;
-  }
-
-  public A removeMatchingFromTypes(Predicate<TypeDefBuilder> predicate) {
-    if (types == null)
-      return (A) this;
-    final Iterator<TypeDefBuilder> each = types.iterator();
-    final List visitables = _visitables.get("types");
-    while (each.hasNext()) {
-      TypeDefBuilder builder = each.next();
-      if (predicate.test(builder)) {
-        visitables.remove(builder);
-        each.remove();
-      }
-    }
-    return (A) this;
-  }
-
-  public List<TypeDef> buildTypes() {
-    return this.types != null ? build(types) : null;
-  }
-
-  public TypeDef buildType(int index) {
-    return this.types.get(index).build();
   }
 
   public TypeDef buildFirstType() {
@@ -149,67 +95,19 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
     return null;
   }
 
-  public boolean hasMatchingType(Predicate<TypeDefBuilder> predicate) {
-    for (TypeDefBuilder item : types) {
-      if (predicate.test(item)) {
-        return true;
-      }
+  public TypeDef buildType(int index) {
+    return this.types.get(index).build();
+  }
+
+  public List<TypeDef> buildTypes() {
+    return this.types != null ? build(types) : null;
+  }
+
+  protected void copyInstance(Source instance) {
+    instance = (instance != null ? instance : new Source());
+    if (instance != null) {
+      this.withTypes(instance.getTypes());
     }
-    return false;
-  }
-
-  public A withTypes(List<TypeDef> types) {
-    if (this.types != null) {
-      this._visitables.get("types").clear();
-    }
-    if (types != null) {
-      this.types = new ArrayList();
-      for (TypeDef item : types) {
-        this.addToTypes(item);
-      }
-    } else {
-      this.types = null;
-    }
-    return (A) this;
-  }
-
-  public A withTypes(io.sundr.model.TypeDef... types) {
-    if (this.types != null) {
-      this.types.clear();
-      _visitables.remove("types");
-    }
-    if (types != null) {
-      for (TypeDef item : types) {
-        this.addToTypes(item);
-      }
-    }
-    return (A) this;
-  }
-
-  public boolean hasTypes() {
-    return this.types != null && !(this.types.isEmpty());
-  }
-
-  public A addNewType(String fullyQualifiedName) {
-    return (A) addToTypes(new TypeDef(fullyQualifiedName));
-  }
-
-  public TypesNested<A> addNewType() {
-    return new TypesNested(-1, null);
-  }
-
-  public TypesNested<A> addNewTypeLike(TypeDef item) {
-    return new TypesNested(-1, item);
-  }
-
-  public TypesNested<A> setNewTypeLike(int index, TypeDef item) {
-    return new TypesNested(index, item);
-  }
-
-  public TypesNested<A> editType(int index) {
-    if (types.size() <= index)
-      throw new RuntimeException("Can't edit types. Index exceeds size.");
-    return setNewTypeLike(index, buildType(index));
   }
 
   public TypesNested<A> editFirstType() {
@@ -238,6 +136,12 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
     return setNewTypeLike(index, buildType(index));
   }
 
+  public TypesNested<A> editType(int index) {
+    if (types.size() <= index)
+      throw new RuntimeException("Can't edit types. Index exceeds size.");
+    return setNewTypeLike(index, buildType(index));
+  }
+
   public boolean equals(Object o) {
     if (this == o)
       return true;
@@ -251,8 +155,77 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
     return true;
   }
 
+  public boolean hasMatchingType(Predicate<TypeDefBuilder> predicate) {
+    for (TypeDefBuilder item : types) {
+      if (predicate.test(item)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean hasTypes() {
+    return this.types != null && !(this.types.isEmpty());
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(types, super.hashCode());
+  }
+
+  public A removeAllFromTypes(Collection<TypeDef> items) {
+    if (this.types == null)
+      return (A) this;
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
+      _visitables.get("types").remove(builder);
+      this.types.remove(builder);
+    }
+    return (A) this;
+  }
+
+  public A removeFromTypes(TypeDef... items) {
+    if (this.types == null)
+      return (A) this;
+    for (TypeDef item : items) {
+      TypeDefBuilder builder = new TypeDefBuilder(item);
+      _visitables.get("types").remove(builder);
+      this.types.remove(builder);
+    }
+    return (A) this;
+  }
+
+  public A removeMatchingFromTypes(Predicate<TypeDefBuilder> predicate) {
+    if (types == null)
+      return (A) this;
+    final Iterator<TypeDefBuilder> each = types.iterator();
+    final List visitables = _visitables.get("types");
+    while (each.hasNext()) {
+      TypeDefBuilder builder = each.next();
+      if (predicate.test(builder)) {
+        visitables.remove(builder);
+        each.remove();
+      }
+    }
+    return (A) this;
+  }
+
+  public TypesNested<A> setNewTypeLike(int index, TypeDef item) {
+    return new TypesNested(index, item);
+  }
+
+  public A setToTypes(int index, TypeDef item) {
+    if (this.types == null) {
+      this.types = new ArrayList<TypeDefBuilder>();
+    }
+    TypeDefBuilder builder = new TypeDefBuilder(item);
+    if (index < 0 || index >= types.size()) {
+      _visitables.get("types").add(builder);
+      types.add(builder);
+    } else {
+      _visitables.get("types").add(builder);
+      types.set(index, builder);
+    }
+    return (A) this;
   }
 
   public String toString() {
@@ -266,14 +239,43 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
     return sb.toString();
   }
 
+  public A withTypes(List<TypeDef> types) {
+    if (this.types != null) {
+      this._visitables.get("types").clear();
+    }
+    if (types != null) {
+      this.types = new ArrayList();
+      for (TypeDef item : types) {
+        this.addToTypes(item);
+      }
+    } else {
+      this.types = null;
+    }
+    return (A) this;
+  }
+
+  public A withTypes(TypeDef... types) {
+    if (this.types != null) {
+      this.types.clear();
+      _visitables.remove("types");
+    }
+    if (types != null) {
+      for (TypeDef item : types) {
+        this.addToTypes(item);
+      }
+    }
+    return (A) this;
+  }
+
   public class TypesNested<N> extends TypeDefFluent<TypesNested<N>> implements Nested<N> {
+
+    TypeDefBuilder builder;
+    int index;
+
     TypesNested(int index, TypeDef item) {
       this.index = index;
       this.builder = new TypeDefBuilder(this, item);
     }
-
-    TypeDefBuilder builder;
-    int index;
 
     public N and() {
       return (N) SourceFluent.this.setToTypes(index, builder.build());
@@ -284,5 +286,4 @@ public class SourceFluent<A extends SourceFluent<A>> extends BaseFluent<A> {
     }
 
   }
-
 }

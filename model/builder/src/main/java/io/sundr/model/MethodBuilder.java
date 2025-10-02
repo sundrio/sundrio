@@ -3,6 +3,9 @@ package io.sundr.model;
 import io.sundr.builder.VisitableBuilder;
 
 public class MethodBuilder extends MethodFluent<MethodBuilder> implements VisitableBuilder<Method, MethodBuilder> {
+
+  MethodFluent<?> fluent;
+
   public MethodBuilder() {
     this.fluent = this;
   }
@@ -11,17 +14,15 @@ public class MethodBuilder extends MethodFluent<MethodBuilder> implements Visita
     this.fluent = fluent;
   }
 
-  public MethodBuilder(MethodFluent<?> fluent, Method instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public MethodBuilder(Method instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  MethodFluent<?> fluent;
+  public MethodBuilder(MethodFluent<?> fluent, Method instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public Method build() {
     Method buildable = new Method(fluent.getComments(), fluent.buildAnnotations(), fluent.buildParameters(), fluent.getName(),

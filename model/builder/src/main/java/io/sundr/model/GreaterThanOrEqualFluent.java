@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class GreaterThanOrEqualFluent<A extends GreaterThanOrEqualFluent<A>> extends BinaryExpressionFluent<A> {
+
   public GreaterThanOrEqualFluent() {
   }
 

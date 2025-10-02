@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class IfDslConditionStepBuilder extends IfDslConditionStepFluent<IfDslConditionStepBuilder>
     implements VisitableBuilder<IfDslConditionStep, IfDslConditionStepBuilder> {
+
+  IfDslConditionStepFluent<?> fluent;
+
   public IfDslConditionStepBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class IfDslConditionStepBuilder extends IfDslConditionStepFluent<IfDslCon
     this.fluent = fluent;
   }
 
-  public IfDslConditionStepBuilder(IfDslConditionStepFluent<?> fluent, IfDslConditionStep instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public IfDslConditionStepBuilder(IfDslConditionStep instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  IfDslConditionStepFluent<?> fluent;
+  public IfDslConditionStepBuilder(IfDslConditionStepFluent<?> fluent, IfDslConditionStep instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public IfDslConditionStep build() {
     IfDslConditionStep buildable = new IfDslConditionStep(fluent.buildCondition());

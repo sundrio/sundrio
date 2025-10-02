@@ -16,6 +16,10 @@ import io.sundr.builder.Nested;
  */
 @SuppressWarnings("unchecked")
 public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends AttributeSupportFluent<A> {
+
+  private ArrayList<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
+  private String name;
+
   public TypeParamDefFluent() {
   }
 
@@ -23,28 +27,36 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
     this.copyInstance(instance);
   }
 
-  private String name;
-  private ArrayList<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
-
-  protected void copyInstance(TypeParamDef instance) {
-    if (instance != null) {
-      this.withName(instance.getName());
-      this.withBounds(instance.getBounds());
-      this.withAttributes(instance.getAttributes());
+  public A addAllToBounds(Collection<ClassRef> items) {
+    if (this.bounds == null) {
+      this.bounds = new ArrayList<ClassRefBuilder>();
     }
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public A withName(String name) {
-    this.name = name;
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").add(builder);
+      this.bounds.add(builder);
+    }
     return (A) this;
   }
 
-  public boolean hasName() {
-    return this.name != null;
+  public BoundsNested<A> addNewBound() {
+    return new BoundsNested(-1, null);
+  }
+
+  public BoundsNested<A> addNewBoundLike(ClassRef item) {
+    return new BoundsNested(-1, item);
+  }
+
+  public A addToBounds(ClassRef... items) {
+    if (this.bounds == null) {
+      this.bounds = new ArrayList<ClassRefBuilder>();
+    }
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").add(builder);
+      this.bounds.add(builder);
+    }
+    return (A) this;
   }
 
   public A addToBounds(int index, ClassRef item) {
@@ -62,88 +74,12 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
     return (A) this;
   }
 
-  public A setToBounds(int index, ClassRef item) {
-    if (this.bounds == null) {
-      this.bounds = new ArrayList<ClassRefBuilder>();
-    }
-    ClassRefBuilder builder = new ClassRefBuilder(item);
-    if (index < 0 || index >= bounds.size()) {
-      _visitables.get("bounds").add(builder);
-      bounds.add(builder);
-    } else {
-      _visitables.get("bounds").add(builder);
-      bounds.set(index, builder);
-    }
-    return (A) this;
-  }
-
-  public A addToBounds(io.sundr.model.ClassRef... items) {
-    if (this.bounds == null) {
-      this.bounds = new ArrayList<ClassRefBuilder>();
-    }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
-      _visitables.get("bounds").add(builder);
-      this.bounds.add(builder);
-    }
-    return (A) this;
-  }
-
-  public A addAllToBounds(Collection<ClassRef> items) {
-    if (this.bounds == null) {
-      this.bounds = new ArrayList<ClassRefBuilder>();
-    }
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
-      _visitables.get("bounds").add(builder);
-      this.bounds.add(builder);
-    }
-    return (A) this;
-  }
-
-  public A removeFromBounds(io.sundr.model.ClassRef... items) {
-    if (this.bounds == null)
-      return (A) this;
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
-      _visitables.get("bounds").remove(builder);
-      this.bounds.remove(builder);
-    }
-    return (A) this;
-  }
-
-  public A removeAllFromBounds(Collection<ClassRef> items) {
-    if (this.bounds == null)
-      return (A) this;
-    for (ClassRef item : items) {
-      ClassRefBuilder builder = new ClassRefBuilder(item);
-      _visitables.get("bounds").remove(builder);
-      this.bounds.remove(builder);
-    }
-    return (A) this;
-  }
-
-  public A removeMatchingFromBounds(Predicate<ClassRefBuilder> predicate) {
-    if (bounds == null)
-      return (A) this;
-    final Iterator<ClassRefBuilder> each = bounds.iterator();
-    final List visitables = _visitables.get("bounds");
-    while (each.hasNext()) {
-      ClassRefBuilder builder = each.next();
-      if (predicate.test(builder)) {
-        visitables.remove(builder);
-        each.remove();
-      }
-    }
-    return (A) this;
+  public ClassRef buildBound(int index) {
+    return this.bounds.get(index).build();
   }
 
   public List<ClassRef> buildBounds() {
     return this.bounds != null ? build(bounds) : null;
-  }
-
-  public ClassRef buildBound(int index) {
-    return this.bounds.get(index).build();
   }
 
   public ClassRef buildFirstBound() {
@@ -163,57 +99,12 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
     return null;
   }
 
-  public boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate) {
-    for (ClassRefBuilder item : bounds) {
-      if (predicate.test(item)) {
-        return true;
-      }
+  protected void copyInstance(TypeParamDef instance) {
+    if (instance != null) {
+      this.withName(instance.getName());
+      this.withBounds(instance.getBounds());
+      this.withAttributes(instance.getAttributes());
     }
-    return false;
-  }
-
-  public A withBounds(List<ClassRef> bounds) {
-    if (this.bounds != null) {
-      this._visitables.get("bounds").clear();
-    }
-    if (bounds != null) {
-      this.bounds = new ArrayList();
-      for (ClassRef item : bounds) {
-        this.addToBounds(item);
-      }
-    } else {
-      this.bounds = null;
-    }
-    return (A) this;
-  }
-
-  public A withBounds(io.sundr.model.ClassRef... bounds) {
-    if (this.bounds != null) {
-      this.bounds.clear();
-      _visitables.remove("bounds");
-    }
-    if (bounds != null) {
-      for (ClassRef item : bounds) {
-        this.addToBounds(item);
-      }
-    }
-    return (A) this;
-  }
-
-  public boolean hasBounds() {
-    return this.bounds != null && !(this.bounds.isEmpty());
-  }
-
-  public BoundsNested<A> addNewBound() {
-    return new BoundsNested(-1, null);
-  }
-
-  public BoundsNested<A> addNewBoundLike(ClassRef item) {
-    return new BoundsNested(-1, item);
-  }
-
-  public BoundsNested<A> setNewBoundLike(int index, ClassRef item) {
-    return new BoundsNested(index, item);
   }
 
   public BoundsNested<A> editBound(int index) {
@@ -263,8 +154,85 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
     return true;
   }
 
+  public String getName() {
+    return this.name;
+  }
+
+  public boolean hasBounds() {
+    return this.bounds != null && !(this.bounds.isEmpty());
+  }
+
+  public boolean hasMatchingBound(Predicate<ClassRefBuilder> predicate) {
+    for (ClassRefBuilder item : bounds) {
+      if (predicate.test(item)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean hasName() {
+    return this.name != null;
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(name, bounds, super.hashCode());
+  }
+
+  public A removeAllFromBounds(Collection<ClassRef> items) {
+    if (this.bounds == null)
+      return (A) this;
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").remove(builder);
+      this.bounds.remove(builder);
+    }
+    return (A) this;
+  }
+
+  public A removeFromBounds(ClassRef... items) {
+    if (this.bounds == null)
+      return (A) this;
+    for (ClassRef item : items) {
+      ClassRefBuilder builder = new ClassRefBuilder(item);
+      _visitables.get("bounds").remove(builder);
+      this.bounds.remove(builder);
+    }
+    return (A) this;
+  }
+
+  public A removeMatchingFromBounds(Predicate<ClassRefBuilder> predicate) {
+    if (bounds == null)
+      return (A) this;
+    final Iterator<ClassRefBuilder> each = bounds.iterator();
+    final List visitables = _visitables.get("bounds");
+    while (each.hasNext()) {
+      ClassRefBuilder builder = each.next();
+      if (predicate.test(builder)) {
+        visitables.remove(builder);
+        each.remove();
+      }
+    }
+    return (A) this;
+  }
+
+  public BoundsNested<A> setNewBoundLike(int index, ClassRef item) {
+    return new BoundsNested(index, item);
+  }
+
+  public A setToBounds(int index, ClassRef item) {
+    if (this.bounds == null) {
+      this.bounds = new ArrayList<ClassRefBuilder>();
+    }
+    ClassRefBuilder builder = new ClassRefBuilder(item);
+    if (index < 0 || index >= bounds.size()) {
+      _visitables.get("bounds").add(builder);
+      bounds.add(builder);
+    } else {
+      _visitables.get("bounds").add(builder);
+      bounds.set(index, builder);
+    }
+    return (A) this;
   }
 
   public String toString() {
@@ -282,14 +250,48 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
     return sb.toString();
   }
 
+  public A withBounds(List<ClassRef> bounds) {
+    if (this.bounds != null) {
+      this._visitables.get("bounds").clear();
+    }
+    if (bounds != null) {
+      this.bounds = new ArrayList();
+      for (ClassRef item : bounds) {
+        this.addToBounds(item);
+      }
+    } else {
+      this.bounds = null;
+    }
+    return (A) this;
+  }
+
+  public A withBounds(ClassRef... bounds) {
+    if (this.bounds != null) {
+      this.bounds.clear();
+      _visitables.remove("bounds");
+    }
+    if (bounds != null) {
+      for (ClassRef item : bounds) {
+        this.addToBounds(item);
+      }
+    }
+    return (A) this;
+  }
+
+  public A withName(String name) {
+    this.name = name;
+    return (A) this;
+  }
+
   public class BoundsNested<N> extends ClassRefFluent<BoundsNested<N>> implements Nested<N> {
+
+    ClassRefBuilder builder;
+    int index;
+
     BoundsNested(int index, ClassRef item) {
       this.index = index;
       this.builder = new ClassRefBuilder(this, item);
     }
-
-    ClassRefBuilder builder;
-    int index;
 
     public N and() {
       return (N) TypeParamDefFluent.this.setToBounds(index, builder.build());
@@ -300,5 +302,4 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
     }
 
   }
-
 }

@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class BitwiseAndFluent<A extends BitwiseAndFluent<A>> extends BinaryExpressionFluent<A> {
+
   public BitwiseAndFluent() {
   }
 

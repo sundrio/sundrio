@@ -8,16 +8,15 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class MethodCall implements ExpressionOrStatement {
+public class MethodCall extends WithScope implements ExpressionOrStatement {
 
   private final String name;
-  private final Expression scope;
   private final List<TypeRef> parameters;
   private List<Expression> arguments;
 
   public MethodCall(String name, Expression scope, List<TypeRef> parameters, List<Expression> arguments) {
+    super(scope);
     this.name = name;
-    this.scope = scope;
     this.parameters = parameters;
     this.arguments = arguments;
   }
@@ -42,10 +41,6 @@ public class MethodCall implements ExpressionOrStatement {
     return name;
   }
 
-  public Expression getScope() {
-    return scope;
-  }
-
   public List<TypeRef> getParameters() {
     return parameters;
   }
@@ -57,8 +52,8 @@ public class MethodCall implements ExpressionOrStatement {
   @Override
   public Set<ClassRef> getReferences() {
     Set<ClassRef> refs = new HashSet<>();
-    if (scope != null) {
-      refs.addAll(scope.getReferences());
+    if (getScope() != null) {
+      refs.addAll(getScope().getReferences());
     }
     for (TypeRef param : parameters) {
       if (param instanceof ClassRef) {
@@ -74,10 +69,10 @@ public class MethodCall implements ExpressionOrStatement {
   @Override
   public String render() {
     StringBuilder sb = new StringBuilder();
-    if (scope != null) {
+    if (getScope() != null) {
       // ValueRef of class / ClassRef are rendered using the .class suffix.
       // In this case we need to remove that.
-      sb.append(scope.renderExpression().replaceAll(Pattern.quote(".class") + "$", "")).append(DOT);
+      sb.append(getScope().renderExpression().replaceAll(Pattern.quote(".class") + "$", "")).append(DOT);
       if (!parameters.isEmpty()) {
         sb.append("<");
         sb.append(parameters.stream().map(TypeRef::render).collect(Collectors.joining(", ")));

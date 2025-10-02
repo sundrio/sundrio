@@ -18,47 +18,15 @@ import io.sundr.builder.VisitableBuilder;
  */
 @SuppressWarnings("unchecked")
 public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
+
+  private List<String> parameters = new ArrayList<String>();
+  private VisitableBuilder<? extends Statement, ?> statement;
+
   public LambdaFluent() {
   }
 
   public LambdaFluent(Lambda instance) {
     this.copyInstance(instance);
-  }
-
-  private List<String> parameters = new ArrayList<String>();
-  private VisitableBuilder<? extends Statement, ?> statement;
-
-  protected void copyInstance(Lambda instance) {
-    if (instance != null) {
-      this.withParameters(instance.getParameters());
-      this.withStatement(instance.getStatement());
-    }
-  }
-
-  public A addToParameters(int index, String item) {
-    if (this.parameters == null) {
-      this.parameters = new ArrayList<String>();
-    }
-    this.parameters.add(index, item);
-    return (A) this;
-  }
-
-  public A setToParameters(int index, String item) {
-    if (this.parameters == null) {
-      this.parameters = new ArrayList<String>();
-    }
-    this.parameters.set(index, item);
-    return (A) this;
-  }
-
-  public A addToParameters(java.lang.String... items) {
-    if (this.parameters == null) {
-      this.parameters = new ArrayList<String>();
-    }
-    for (String item : items) {
-      this.parameters.add(item);
-    }
-    return (A) this;
   }
 
   public A addAllToParameters(Collection<String> items) {
@@ -71,30 +39,148 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     return (A) this;
   }
 
-  public A removeFromParameters(java.lang.String... items) {
-    if (this.parameters == null)
-      return (A) this;
+  public A addToParameters(String... items) {
+    if (this.parameters == null) {
+      this.parameters = new ArrayList<String>();
+    }
     for (String item : items) {
-      this.parameters.remove(item);
+      this.parameters.add(item);
     }
     return (A) this;
   }
 
-  public A removeAllFromParameters(Collection<String> items) {
-    if (this.parameters == null)
-      return (A) this;
-    for (String item : items) {
-      this.parameters.remove(item);
+  public A addToParameters(int index, String item) {
+    if (this.parameters == null) {
+      this.parameters = new ArrayList<String>();
     }
+    this.parameters.add(index, item);
     return (A) this;
   }
 
-  public List<String> getParameters() {
-    return this.parameters;
+  public Statement buildStatement() {
+    return this.statement != null ? this.statement.build() : null;
   }
 
-  public String getParameter(int index) {
-    return this.parameters.get(index);
+  protected static <T> VisitableBuilder<T, ?> builder(Object item) {
+    switch (item.getClass().getName()) {
+      case "io.sundr.model." + "ReturnDslThisStep":
+        return (VisitableBuilder<T, ?>) new ReturnDslThisStepBuilder((ReturnDslThisStep) item);
+      case "io.sundr.model." + "Multiply":
+        return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
+      case "io.sundr.model." + "MethodCall":
+        return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
+      case "io.sundr.model." + "Try":
+        return (VisitableBuilder<T, ?>) new TryBuilder((Try) item);
+      case "io.sundr.model." + "Switch":
+        return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
+      case "io.sundr.model." + "GreaterThanOrEqual":
+        return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
+      case "io.sundr.model." + "BitwiseAnd":
+        return (VisitableBuilder<T, ?>) new BitwiseAndBuilder((BitwiseAnd) item);
+      case "io.sundr.model." + "Minus":
+        return (VisitableBuilder<T, ?>) new MinusBuilder((Minus) item);
+      case "io.sundr.model." + "LogicalOr":
+        return (VisitableBuilder<T, ?>) new LogicalOrBuilder((LogicalOr) item);
+      case "io.sundr.model." + "NotEquals":
+        return (VisitableBuilder<T, ?>) new NotEqualsBuilder((NotEquals) item);
+      case "io.sundr.model." + "Divide":
+        return (VisitableBuilder<T, ?>) new DivideBuilder((Divide) item);
+      case "io.sundr.model." + "Break":
+        return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
+      case "io.sundr.model." + "LessThan":
+        return (VisitableBuilder<T, ?>) new LessThanBuilder((LessThan) item);
+      case "io.sundr.model." + "BitwiseOr":
+        return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
+      case "io.sundr.model." + "PropertyRef":
+        return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
+      case "io.sundr.model." + "RightShift":
+        return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
+      case "io.sundr.model." + "GreaterThan":
+        return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
+      case "io.sundr.model." + "Declare":
+        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
+      case "io.sundr.model." + "While":
+        return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
+      case "io.sundr.model." + "Continue":
+        return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
+      case "io.sundr.model." + "Modulo":
+        return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
+      case "io.sundr.model." + "LeftShift":
+        return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
+      case "io.sundr.model." + "Throw":
+        return (VisitableBuilder<T, ?>) new ThrowBuilder((Throw) item);
+      case "io.sundr.model." + "StringStatement":
+        return (VisitableBuilder<T, ?>) new StringStatementBuilder((StringStatement) item);
+      case "io.sundr.model." + "Empty":
+        return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
+      case "io.sundr.model." + "BinaryExpression":
+        return (VisitableBuilder<T, ?>) new BinaryExpressionBuilder((BinaryExpression) item);
+      case "io.sundr.model." + "Equals":
+        return (VisitableBuilder<T, ?>) new EqualsBuilder((Equals) item);
+      case "io.sundr.model." + "Do":
+        return (VisitableBuilder<T, ?>) new DoBuilder((Do) item);
+      case "io.sundr.model." + "Foreach":
+        return (VisitableBuilder<T, ?>) new ForeachBuilder((Foreach) item);
+      case "io.sundr.model." + "Block":
+        return (VisitableBuilder<T, ?>) new BlockBuilder((Block) item);
+      case "io.sundr.model." + "PreDecrement":
+        return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
+      case "io.sundr.model." + "ReturnDslVariableStep":
+        return (VisitableBuilder<T, ?>) new ReturnDslVariableStepBuilder((ReturnDslVariableStep) item);
+      case "io.sundr.model." + "PostDecrement":
+        return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
+      case "io.sundr.model." + "If":
+        return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
+      case "io.sundr.model." + "Lambda":
+        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
+      case "io.sundr.model." + "Return":
+        return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
+      case "io.sundr.model." + "Assign":
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+      case "io.sundr.model." + "LogicalAnd":
+        return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
+      case "io.sundr.model." + "PostIncrement":
+        return (VisitableBuilder<T, ?>) new PostIncrementBuilder((PostIncrement) item);
+      case "io.sundr.model." + "RightUnsignedShift":
+        return (VisitableBuilder<T, ?>) new RightUnsignedShiftBuilder((RightUnsignedShift) item);
+      case "io.sundr.model." + "Plus":
+        return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
+      case "io.sundr.model." + "Construct":
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+      case "io.sundr.model." + "Xor":
+        return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
+      case "io.sundr.model." + "PreIncrement":
+        return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+      case "io.sundr.model." + "LessThanOrEqual":
+        return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
+      case "io.sundr.model." + "IfDslThenStep":
+        return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
+      case "io.sundr.model." + "For":
+        return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
+    }
+    return (VisitableBuilder<T, ?>) builderOf(item);
+  }
+
+  protected void copyInstance(Lambda instance) {
+    if (instance != null) {
+      this.withParameters(instance.getParameters());
+      this.withStatement(instance.getStatement());
+    }
+  }
+
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    LambdaFluent that = (LambdaFluent) o;
+    if (!java.util.Objects.equals(parameters, that.parameters))
+      return false;
+    if (!java.util.Objects.equals(statement, that.statement))
+      return false;
+    return true;
   }
 
   public String getFirstParameter() {
@@ -114,6 +200,14 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     return null;
   }
 
+  public String getParameter(int index) {
+    return this.parameters.get(index);
+  }
+
+  public List<String> getParameters() {
+    return this.parameters;
+  }
+
   public boolean hasMatchingParameter(Predicate<String> predicate) {
     for (String item : parameters) {
       if (predicate.test(item)) {
@@ -123,159 +217,97 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     return false;
   }
 
-  public A withParameters(List<String> parameters) {
-    if (parameters != null) {
-      this.parameters = new ArrayList();
-      for (String item : parameters) {
-        this.addToParameters(item);
-      }
-    } else {
-      this.parameters = null;
-    }
-    return (A) this;
-  }
-
-  public A withParameters(java.lang.String... parameters) {
-    if (this.parameters != null) {
-      this.parameters.clear();
-      _visitables.remove("parameters");
-    }
-    if (parameters != null) {
-      for (String item : parameters) {
-        this.addToParameters(item);
-      }
-    }
-    return (A) this;
-  }
-
   public boolean hasParameters() {
     return this.parameters != null && !(this.parameters.isEmpty());
-  }
-
-  public Statement buildStatement() {
-    return this.statement != null ? this.statement.build() : null;
-  }
-
-  public A withStatement(Statement statement) {
-    if (statement == null) {
-      this.statement = null;
-      this._visitables.remove("statement");
-      return (A) this;
-    } else {
-      VisitableBuilder<? extends Statement, ?> builder = builder(statement);
-      this._visitables.get("statement").clear();
-      this._visitables.get("statement").add(builder);
-      this.statement = builder;
-      return (A) this;
-    }
   }
 
   public boolean hasStatement() {
     return this.statement != null;
   }
 
-  public ReturnDslThisStepStatementNested<A> withNewReturnDslThisStepStatement() {
-    return new ReturnDslThisStepStatementNested(null);
+  public int hashCode() {
+    return java.util.Objects.hash(parameters, statement, super.hashCode());
   }
 
-  public ReturnDslThisStepStatementNested<A> withNewReturnDslThisStepStatementLike(ReturnDslThisStep item) {
-    return new ReturnDslThisStepStatementNested(item);
+  public A removeAllFromParameters(Collection<String> items) {
+    if (this.parameters == null)
+      return (A) this;
+    for (String item : items) {
+      this.parameters.remove(item);
+    }
+    return (A) this;
   }
 
-  public MethodCallStatementNested<A> withNewMethodCallStatement() {
-    return new MethodCallStatementNested(null);
+  public A removeFromParameters(String... items) {
+    if (this.parameters == null)
+      return (A) this;
+    for (String item : items) {
+      this.parameters.remove(item);
+    }
+    return (A) this;
   }
 
-  public MethodCallStatementNested<A> withNewMethodCallStatementLike(MethodCall item) {
-    return new MethodCallStatementNested(item);
+  public A setToParameters(int index, String item) {
+    if (this.parameters == null) {
+      this.parameters = new ArrayList<String>();
+    }
+    this.parameters.set(index, item);
+    return (A) this;
   }
 
-  public SwitchStatementNested<A> withNewSwitchStatement() {
-    return new SwitchStatementNested(null);
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (parameters != null && !parameters.isEmpty()) {
+      sb.append("parameters:");
+      sb.append(parameters + ",");
+    }
+    if (statement != null) {
+      sb.append("statement:");
+      sb.append(statement);
+    }
+    sb.append("}");
+    return sb.toString();
   }
 
-  public SwitchStatementNested<A> withNewSwitchStatementLike(Switch item) {
-    return new SwitchStatementNested(item);
+  public AssignStatementNested<A> withNewAssignStatement() {
+    return new AssignStatementNested(null);
   }
 
-  public BreakStatementNested<A> withNewBreakStatement() {
-    return new BreakStatementNested(null);
+  public AssignStatementNested<A> withNewAssignStatementLike(Assign item) {
+    return new AssignStatementNested(item);
   }
 
-  public BreakStatementNested<A> withNewBreakStatementLike(Break item) {
-    return new BreakStatementNested(item);
+  public BinaryExpressionStatementNested<A> withNewBinaryExpressionStatement() {
+    return new BinaryExpressionStatementNested(null);
   }
 
-  public DeclareStatementNested<A> withNewDeclareStatement() {
-    return new DeclareStatementNested(null);
+  public BinaryExpressionStatementNested<A> withNewBinaryExpressionStatementLike(BinaryExpression item) {
+    return new BinaryExpressionStatementNested(item);
   }
 
-  public DeclareStatementNested<A> withNewDeclareStatementLike(Declare item) {
-    return new DeclareStatementNested(item);
+  public BitwiseAndStatementNested<A> withNewBitwiseAndStatement() {
+    return new BitwiseAndStatementNested(null);
   }
 
-  public A withNewDeclareStatement(Class type, String name) {
-    return (A) withStatement(new Declare(type, name));
+  public A withNewBitwiseAndStatement(Object left, Object right) {
+    return (A) withStatement(new BitwiseAnd(left, right));
   }
 
-  public A withNewDeclareStatement(Class type, String name, Object value) {
-    return (A) withStatement(new Declare(type, name, value));
+  public BitwiseAndStatementNested<A> withNewBitwiseAndStatementLike(BitwiseAnd item) {
+    return new BitwiseAndStatementNested(item);
   }
 
-  public WhileStatementNested<A> withNewWhileStatement() {
-    return new WhileStatementNested(null);
+  public BitwiseOrStatementNested<A> withNewBitwiseOrStatement() {
+    return new BitwiseOrStatementNested(null);
   }
 
-  public WhileStatementNested<A> withNewWhileStatementLike(While item) {
-    return new WhileStatementNested(item);
+  public A withNewBitwiseOrStatement(Object left, Object right) {
+    return (A) withStatement(new BitwiseOr(left, right));
   }
 
-  public ContinueStatementNested<A> withNewContinueStatement() {
-    return new ContinueStatementNested(null);
-  }
-
-  public ContinueStatementNested<A> withNewContinueStatementLike(Continue item) {
-    return new ContinueStatementNested(item);
-  }
-
-  public ThrowStatementNested<A> withNewThrowStatement() {
-    return new ThrowStatementNested(null);
-  }
-
-  public ThrowStatementNested<A> withNewThrowStatementLike(Throw item) {
-    return new ThrowStatementNested(item);
-  }
-
-  public StringStatementNested<A> withNewStringStatement() {
-    return new StringStatementNested(null);
-  }
-
-  public StringStatementNested<A> withNewStringStatementLike(StringStatement item) {
-    return new StringStatementNested(item);
-  }
-
-  public A withNewStringStatement(String data) {
-    return (A) withStatement(new StringStatement(data));
-  }
-
-  public A withNewStringStatement(String data, Object[] parameters) {
-    return (A) withStatement(new StringStatement(data, parameters));
-  }
-
-  public DoStatementNested<A> withNewDoStatement() {
-    return new DoStatementNested(null);
-  }
-
-  public DoStatementNested<A> withNewDoStatementLike(Do item) {
-    return new DoStatementNested(item);
-  }
-
-  public ForeachStatementNested<A> withNewForeachStatement() {
-    return new ForeachStatementNested(null);
-  }
-
-  public ForeachStatementNested<A> withNewForeachStatementLike(Foreach item) {
-    return new ForeachStatementNested(item);
+  public BitwiseOrStatementNested<A> withNewBitwiseOrStatementLike(BitwiseOr item) {
+    return new BitwiseOrStatementNested(item);
   }
 
   public BlockStatementNested<A> withNewBlockStatement() {
@@ -286,16 +318,132 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     return new BlockStatementNested(item);
   }
 
-  public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatement() {
-    return new ReturnDslVariableStepStatementNested(null);
+  public BreakStatementNested<A> withNewBreakStatement() {
+    return new BreakStatementNested(null);
   }
 
-  public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
-    return new ReturnDslVariableStepStatementNested(item);
+  public BreakStatementNested<A> withNewBreakStatementLike(Break item) {
+    return new BreakStatementNested(item);
   }
 
-  public A withNewReturnDslVariableStepStatement(String name) {
-    return (A) withStatement(new ReturnDslVariableStep(name));
+  public ConstructStatementNested<A> withNewConstructStatement() {
+    return new ConstructStatementNested(null);
+  }
+
+  public ConstructStatementNested<A> withNewConstructStatementLike(Construct item) {
+    return new ConstructStatementNested(item);
+  }
+
+  public ContinueStatementNested<A> withNewContinueStatement() {
+    return new ContinueStatementNested(null);
+  }
+
+  public ContinueStatementNested<A> withNewContinueStatementLike(Continue item) {
+    return new ContinueStatementNested(item);
+  }
+
+  public DeclareStatementNested<A> withNewDeclareStatement() {
+    return new DeclareStatementNested(null);
+  }
+
+  public A withNewDeclareStatement(Class type, String name) {
+    return (A) withStatement(new Declare(type, name));
+  }
+
+  public A withNewDeclareStatement(Class type, String name, Object value) {
+    return (A) withStatement(new Declare(type, name, value));
+  }
+
+  public DeclareStatementNested<A> withNewDeclareStatementLike(Declare item) {
+    return new DeclareStatementNested(item);
+  }
+
+  public DivideStatementNested<A> withNewDivideStatement() {
+    return new DivideStatementNested(null);
+  }
+
+  public A withNewDivideStatement(Object left, Object right) {
+    return (A) withStatement(new Divide(left, right));
+  }
+
+  public DivideStatementNested<A> withNewDivideStatementLike(Divide item) {
+    return new DivideStatementNested(item);
+  }
+
+  public DoStatementNested<A> withNewDoStatement() {
+    return new DoStatementNested(null);
+  }
+
+  public DoStatementNested<A> withNewDoStatementLike(Do item) {
+    return new DoStatementNested(item);
+  }
+
+  public EmptyStatementNested<A> withNewEmptyStatement() {
+    return new EmptyStatementNested(null);
+  }
+
+  public EmptyStatementNested<A> withNewEmptyStatementLike(Empty item) {
+    return new EmptyStatementNested(item);
+  }
+
+  public EqualsStatementNested<A> withNewEqualsStatement() {
+    return new EqualsStatementNested(null);
+  }
+
+  public A withNewEqualsStatement(Object left, Object right) {
+    return (A) withStatement(new Equals(left, right));
+  }
+
+  public EqualsStatementNested<A> withNewEqualsStatementLike(Equals item) {
+    return new EqualsStatementNested(item);
+  }
+
+  public ForStatementNested<A> withNewForStatement() {
+    return new ForStatementNested(null);
+  }
+
+  public ForStatementNested<A> withNewForStatementLike(For item) {
+    return new ForStatementNested(item);
+  }
+
+  public ForeachStatementNested<A> withNewForeachStatement() {
+    return new ForeachStatementNested(null);
+  }
+
+  public ForeachStatementNested<A> withNewForeachStatementLike(Foreach item) {
+    return new ForeachStatementNested(item);
+  }
+
+  public GreaterThanOrEqualStatementNested<A> withNewGreaterThanOrEqualStatement() {
+    return new GreaterThanOrEqualStatementNested(null);
+  }
+
+  public A withNewGreaterThanOrEqualStatement(Object left, Object right) {
+    return (A) withStatement(new GreaterThanOrEqual(left, right));
+  }
+
+  public GreaterThanOrEqualStatementNested<A> withNewGreaterThanOrEqualStatementLike(GreaterThanOrEqual item) {
+    return new GreaterThanOrEqualStatementNested(item);
+  }
+
+  public GreaterThanStatementNested<A> withNewGreaterThanStatement() {
+    return new GreaterThanStatementNested(null);
+  }
+
+  public A withNewGreaterThanStatement(Object left, Object right) {
+    return (A) withStatement(new GreaterThan(left, right));
+  }
+
+  public GreaterThanStatementNested<A> withNewGreaterThanStatementLike(GreaterThan item) {
+    return new GreaterThanStatementNested(item);
+  }
+
+  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatement() {
+    return new IfDslThenStepStatementNested(null);
+  }
+
+  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatementLike(IfDslThenStep item) {
+    return new IfDslThenStepStatementNested(item);
   }
 
   public IfStatementNested<A> withNewIfStatement() {
@@ -314,314 +462,409 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
     return new LambdaStatementNested(item);
   }
 
-  public ReturnStatementNested<A> withNewReturnStatement() {
-    return new ReturnStatementNested(null);
+  public LeftShiftStatementNested<A> withNewLeftShiftStatement() {
+    return new LeftShiftStatementNested(null);
   }
 
-  public ReturnStatementNested<A> withNewReturnStatementLike(Return item) {
-    return new ReturnStatementNested(item);
+  public A withNewLeftShiftStatement(Object left, Object right) {
+    return (A) withStatement(new LeftShift(left, right));
+  }
+
+  public LeftShiftStatementNested<A> withNewLeftShiftStatementLike(LeftShift item) {
+    return new LeftShiftStatementNested(item);
+  }
+
+  public LessThanOrEqualStatementNested<A> withNewLessThanOrEqualStatement() {
+    return new LessThanOrEqualStatementNested(null);
+  }
+
+  public A withNewLessThanOrEqualStatement(Object left, Object right) {
+    return (A) withStatement(new LessThanOrEqual(left, right));
+  }
+
+  public LessThanOrEqualStatementNested<A> withNewLessThanOrEqualStatementLike(LessThanOrEqual item) {
+    return new LessThanOrEqualStatementNested(item);
+  }
+
+  public LessThanStatementNested<A> withNewLessThanStatement() {
+    return new LessThanStatementNested(null);
+  }
+
+  public A withNewLessThanStatement(Object left, Object right) {
+    return (A) withStatement(new LessThan(left, right));
+  }
+
+  public LessThanStatementNested<A> withNewLessThanStatementLike(LessThan item) {
+    return new LessThanStatementNested(item);
+  }
+
+  public LogicalAndStatementNested<A> withNewLogicalAndStatement() {
+    return new LogicalAndStatementNested(null);
+  }
+
+  public A withNewLogicalAndStatement(Object left, Object right) {
+    return (A) withStatement(new LogicalAnd(left, right));
+  }
+
+  public LogicalAndStatementNested<A> withNewLogicalAndStatementLike(LogicalAnd item) {
+    return new LogicalAndStatementNested(item);
+  }
+
+  public LogicalOrStatementNested<A> withNewLogicalOrStatement() {
+    return new LogicalOrStatementNested(null);
+  }
+
+  public A withNewLogicalOrStatement(Object left, Object right) {
+    return (A) withStatement(new LogicalOr(left, right));
+  }
+
+  public LogicalOrStatementNested<A> withNewLogicalOrStatementLike(LogicalOr item) {
+    return new LogicalOrStatementNested(item);
+  }
+
+  public MethodCallStatementNested<A> withNewMethodCallStatement() {
+    return new MethodCallStatementNested(null);
+  }
+
+  public MethodCallStatementNested<A> withNewMethodCallStatementLike(MethodCall item) {
+    return new MethodCallStatementNested(item);
+  }
+
+  public MinusStatementNested<A> withNewMinusStatement() {
+    return new MinusStatementNested(null);
+  }
+
+  public A withNewMinusStatement(Object left, Object right) {
+    return (A) withStatement(new Minus(left, right));
+  }
+
+  public MinusStatementNested<A> withNewMinusStatementLike(Minus item) {
+    return new MinusStatementNested(item);
+  }
+
+  public ModuloStatementNested<A> withNewModuloStatement() {
+    return new ModuloStatementNested(null);
+  }
+
+  public A withNewModuloStatement(Object left, Object right) {
+    return (A) withStatement(new Modulo(left, right));
+  }
+
+  public ModuloStatementNested<A> withNewModuloStatementLike(Modulo item) {
+    return new ModuloStatementNested(item);
+  }
+
+  public MultiplyStatementNested<A> withNewMultiplyStatement() {
+    return new MultiplyStatementNested(null);
+  }
+
+  public A withNewMultiplyStatement(Object left, Object right) {
+    return (A) withStatement(new Multiply(left, right));
+  }
+
+  public MultiplyStatementNested<A> withNewMultiplyStatementLike(Multiply item) {
+    return new MultiplyStatementNested(item);
+  }
+
+  public NotEqualsStatementNested<A> withNewNotEqualsStatement() {
+    return new NotEqualsStatementNested(null);
+  }
+
+  public A withNewNotEqualsStatement(Object left, Object right) {
+    return (A) withStatement(new NotEquals(left, right));
+  }
+
+  public NotEqualsStatementNested<A> withNewNotEqualsStatementLike(NotEquals item) {
+    return new NotEqualsStatementNested(item);
+  }
+
+  public PlusStatementNested<A> withNewPlusStatement() {
+    return new PlusStatementNested(null);
+  }
+
+  public A withNewPlusStatement(Object left, Object right) {
+    return (A) withStatement(new Plus(left, right));
+  }
+
+  public PlusStatementNested<A> withNewPlusStatementLike(Plus item) {
+    return new PlusStatementNested(item);
+  }
+
+  public PostDecrementStatementNested<A> withNewPostDecrementStatement() {
+    return new PostDecrementStatementNested(null);
+  }
+
+  public PostDecrementStatementNested<A> withNewPostDecrementStatementLike(PostDecrement item) {
+    return new PostDecrementStatementNested(item);
+  }
+
+  public PostIncrementStatementNested<A> withNewPostIncrementStatement() {
+    return new PostIncrementStatementNested(null);
+  }
+
+  public PostIncrementStatementNested<A> withNewPostIncrementStatementLike(PostIncrement item) {
+    return new PostIncrementStatementNested(item);
+  }
+
+  public PreDecrementStatementNested<A> withNewPreDecrementStatement() {
+    return new PreDecrementStatementNested(null);
+  }
+
+  public PreDecrementStatementNested<A> withNewPreDecrementStatementLike(PreDecrement item) {
+    return new PreDecrementStatementNested(item);
+  }
+
+  public PreIncrementStatementNested<A> withNewPreIncrementStatement() {
+    return new PreIncrementStatementNested(null);
+  }
+
+  public PreIncrementStatementNested<A> withNewPreIncrementStatementLike(PreIncrement item) {
+    return new PreIncrementStatementNested(item);
+  }
+
+  public PropertyRefStatementNested<A> withNewPropertyRefStatement() {
+    return new PropertyRefStatementNested(null);
+  }
+
+  public PropertyRefStatementNested<A> withNewPropertyRefStatementLike(PropertyRef item) {
+    return new PropertyRefStatementNested(item);
+  }
+
+  public ReturnDslThisStepStatementNested<A> withNewReturnDslThisStepStatement() {
+    return new ReturnDslThisStepStatementNested(null);
+  }
+
+  public ReturnDslThisStepStatementNested<A> withNewReturnDslThisStepStatementLike(ReturnDslThisStep item) {
+    return new ReturnDslThisStepStatementNested(item);
+  }
+
+  public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatement() {
+    return new ReturnDslVariableStepStatementNested(null);
+  }
+
+  public A withNewReturnDslVariableStepStatement(String name) {
+    return (A) withStatement(new ReturnDslVariableStep(name));
+  }
+
+  public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
+    return new ReturnDslVariableStepStatementNested(item);
+  }
+
+  public ReturnStatementNested<A> withNewReturnStatement() {
+    return new ReturnStatementNested(null);
   }
 
   public A withNewReturnStatement(Object object) {
     return (A) withStatement(new Return(object));
   }
 
-  public AssignStatementNested<A> withNewAssignStatement() {
-    return new AssignStatementNested(null);
+  public ReturnStatementNested<A> withNewReturnStatementLike(Return item) {
+    return new ReturnStatementNested(item);
   }
 
-  public AssignStatementNested<A> withNewAssignStatementLike(Assign item) {
-    return new AssignStatementNested(item);
+  public RightShiftStatementNested<A> withNewRightShiftStatement() {
+    return new RightShiftStatementNested(null);
   }
 
-  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatement() {
-    return new IfDslThenStepStatementNested(null);
+  public A withNewRightShiftStatement(Object left, Object right) {
+    return (A) withStatement(new RightShift(left, right));
   }
 
-  public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatementLike(IfDslThenStep item) {
-    return new IfDslThenStepStatementNested(item);
+  public RightShiftStatementNested<A> withNewRightShiftStatementLike(RightShift item) {
+    return new RightShiftStatementNested(item);
   }
 
-  public ForStatementNested<A> withNewForStatement() {
-    return new ForStatementNested(null);
+  public RightUnsignedShiftStatementNested<A> withNewRightUnsignedShiftStatement() {
+    return new RightUnsignedShiftStatementNested(null);
   }
 
-  public ForStatementNested<A> withNewForStatementLike(For item) {
-    return new ForStatementNested(item);
+  public A withNewRightUnsignedShiftStatement(Object left, Object right) {
+    return (A) withStatement(new RightUnsignedShift(left, right));
   }
 
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    if (!super.equals(o))
-      return false;
-    LambdaFluent that = (LambdaFluent) o;
-    if (!java.util.Objects.equals(parameters, that.parameters))
-      return false;
-    if (!java.util.Objects.equals(statement, that.statement))
-      return false;
-    return true;
+  public RightUnsignedShiftStatementNested<A> withNewRightUnsignedShiftStatementLike(RightUnsignedShift item) {
+    return new RightUnsignedShiftStatementNested(item);
   }
 
-  public int hashCode() {
-    return java.util.Objects.hash(parameters, statement, super.hashCode());
+  public StringStatementNested<A> withNewStringStatement() {
+    return new StringStatementNested(null);
   }
 
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{");
-    if (parameters != null && !parameters.isEmpty()) {
-      sb.append("parameters:");
-      sb.append(parameters + ",");
+  public A withNewStringStatement(String data) {
+    return (A) withStatement(new StringStatement(data));
+  }
+
+  public A withNewStringStatement(String data, Object[] parameters) {
+    return (A) withStatement(new StringStatement(data, parameters));
+  }
+
+  public StringStatementNested<A> withNewStringStatementLike(StringStatement item) {
+    return new StringStatementNested(item);
+  }
+
+  public SwitchStatementNested<A> withNewSwitchStatement() {
+    return new SwitchStatementNested(null);
+  }
+
+  public SwitchStatementNested<A> withNewSwitchStatementLike(Switch item) {
+    return new SwitchStatementNested(item);
+  }
+
+  public ThrowStatementNested<A> withNewThrowStatement() {
+    return new ThrowStatementNested(null);
+  }
+
+  public ThrowStatementNested<A> withNewThrowStatementLike(Throw item) {
+    return new ThrowStatementNested(item);
+  }
+
+  public TryStatementNested<A> withNewTryStatement() {
+    return new TryStatementNested(null);
+  }
+
+  public TryStatementNested<A> withNewTryStatementLike(Try item) {
+    return new TryStatementNested(item);
+  }
+
+  public WhileStatementNested<A> withNewWhileStatement() {
+    return new WhileStatementNested(null);
+  }
+
+  public WhileStatementNested<A> withNewWhileStatementLike(While item) {
+    return new WhileStatementNested(item);
+  }
+
+  public XorStatementNested<A> withNewXorStatement() {
+    return new XorStatementNested(null);
+  }
+
+  public A withNewXorStatement(Object left, Object right) {
+    return (A) withStatement(new Xor(left, right));
+  }
+
+  public XorStatementNested<A> withNewXorStatementLike(Xor item) {
+    return new XorStatementNested(item);
+  }
+
+  public A withParameters(List<String> parameters) {
+    if (parameters != null) {
+      this.parameters = new ArrayList();
+      for (String item : parameters) {
+        this.addToParameters(item);
+      }
+    } else {
+      this.parameters = null;
     }
-    if (statement != null) {
-      sb.append("statement:");
-      sb.append(statement);
-    }
-    sb.append("}");
-    return sb.toString();
+    return (A) this;
   }
 
-  protected static <T> VisitableBuilder<T, ?> builder(Object item) {
-    switch (item.getClass().getName()) {
-      case "io.sundr.model." + "ReturnDslThisStep":
-        return (VisitableBuilder<T, ?>) new ReturnDslThisStepBuilder((ReturnDslThisStep) item);
-      case "io.sundr.model." + "MethodCall":
-        return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
-      case "io.sundr.model." + "Switch":
-        return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
-      case "io.sundr.model." + "Break":
-        return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
-      case "io.sundr.model." + "Declare":
-        return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
-      case "io.sundr.model." + "While":
-        return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
-      case "io.sundr.model." + "Continue":
-        return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
-      case "io.sundr.model." + "Throw":
-        return (VisitableBuilder<T, ?>) new ThrowBuilder((Throw) item);
-      case "io.sundr.model." + "StringStatement":
-        return (VisitableBuilder<T, ?>) new StringStatementBuilder((StringStatement) item);
-      case "io.sundr.model." + "Do":
-        return (VisitableBuilder<T, ?>) new DoBuilder((Do) item);
-      case "io.sundr.model." + "Foreach":
-        return (VisitableBuilder<T, ?>) new ForeachBuilder((Foreach) item);
-      case "io.sundr.model." + "Block":
-        return (VisitableBuilder<T, ?>) new BlockBuilder((Block) item);
-      case "io.sundr.model." + "ReturnDslVariableStep":
-        return (VisitableBuilder<T, ?>) new ReturnDslVariableStepBuilder((ReturnDslVariableStep) item);
-      case "io.sundr.model." + "If":
-        return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
-      case "io.sundr.model." + "Lambda":
-        return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
-      case "io.sundr.model." + "Return":
-        return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
-      case "io.sundr.model." + "Assign":
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "IfDslThenStep":
-        return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
-      case "io.sundr.model." + "For":
-        return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
+  public A withParameters(String... parameters) {
+    if (this.parameters != null) {
+      this.parameters.clear();
+      _visitables.remove("parameters");
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
+    if (parameters != null) {
+      for (String item : parameters) {
+        this.addToParameters(item);
+      }
+    }
+    return (A) this;
   }
 
-  public class ReturnDslThisStepStatementNested<N> extends ReturnDslThisStepFluent<ReturnDslThisStepStatementNested<N>>
+  public A withStatement(Statement statement) {
+    if (statement == null) {
+      this.statement = null;
+      this._visitables.remove("statement");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Statement, ?> builder = builder(statement);
+      this._visitables.get("statement").clear();
+      this._visitables.get("statement").add(builder);
+      this.statement = builder;
+      return (A) this;
+    }
+  }
+
+  public class AssignStatementNested<N> extends AssignFluent<AssignStatementNested<N>> implements Nested<N> {
+
+    AssignBuilder builder;
+
+    AssignStatementNested(Assign item) {
+      this.builder = new AssignBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endAssignStatement() {
+      return and();
+    }
+
+  }
+
+  public class BinaryExpressionStatementNested<N> extends BinaryExpressionFluent<BinaryExpressionStatementNested<N>>
       implements Nested<N> {
-    ReturnDslThisStepStatementNested(ReturnDslThisStep item) {
-      this.builder = new ReturnDslThisStepBuilder(this, item);
-    }
 
-    ReturnDslThisStepBuilder builder;
+    BinaryExpressionBuilder builder;
+
+    BinaryExpressionStatementNested(BinaryExpression item) {
+      this.builder = new BinaryExpressionBuilder(this, item);
+    }
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
     }
 
-    public N endReturnDslThisStepStatement() {
+    public N endBinaryExpressionStatement() {
       return and();
     }
 
   }
 
-  public class MethodCallStatementNested<N> extends MethodCallFluent<MethodCallStatementNested<N>> implements Nested<N> {
-    MethodCallStatementNested(MethodCall item) {
-      this.builder = new MethodCallBuilder(this, item);
-    }
+  public class BitwiseAndStatementNested<N> extends BitwiseAndFluent<BitwiseAndStatementNested<N>> implements Nested<N> {
 
-    MethodCallBuilder builder;
+    BitwiseAndBuilder builder;
+
+    BitwiseAndStatementNested(BitwiseAnd item) {
+      this.builder = new BitwiseAndBuilder(this, item);
+    }
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
     }
 
-    public N endMethodCallStatement() {
+    public N endBitwiseAndStatement() {
       return and();
     }
 
   }
 
-  public class SwitchStatementNested<N> extends SwitchFluent<SwitchStatementNested<N>> implements Nested<N> {
-    SwitchStatementNested(Switch item) {
-      this.builder = new SwitchBuilder(this, item);
-    }
+  public class BitwiseOrStatementNested<N> extends BitwiseOrFluent<BitwiseOrStatementNested<N>> implements Nested<N> {
 
-    SwitchBuilder builder;
+    BitwiseOrBuilder builder;
+
+    BitwiseOrStatementNested(BitwiseOr item) {
+      this.builder = new BitwiseOrBuilder(this, item);
+    }
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
     }
 
-    public N endSwitchStatement() {
-      return and();
-    }
-
-  }
-
-  public class BreakStatementNested<N> extends BreakFluent<BreakStatementNested<N>> implements Nested<N> {
-    BreakStatementNested(Break item) {
-      this.builder = new BreakBuilder(this, item);
-    }
-
-    BreakBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endBreakStatement() {
-      return and();
-    }
-
-  }
-
-  public class DeclareStatementNested<N> extends DeclareFluent<DeclareStatementNested<N>> implements Nested<N> {
-    DeclareStatementNested(Declare item) {
-      this.builder = new DeclareBuilder(this, item);
-    }
-
-    DeclareBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endDeclareStatement() {
-      return and();
-    }
-
-  }
-
-  public class WhileStatementNested<N> extends WhileFluent<WhileStatementNested<N>> implements Nested<N> {
-    WhileStatementNested(While item) {
-      this.builder = new WhileBuilder(this, item);
-    }
-
-    WhileBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endWhileStatement() {
-      return and();
-    }
-
-  }
-
-  public class ContinueStatementNested<N> extends ContinueFluent<ContinueStatementNested<N>> implements Nested<N> {
-    ContinueStatementNested(Continue item) {
-      this.builder = new ContinueBuilder(this, item);
-    }
-
-    ContinueBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endContinueStatement() {
-      return and();
-    }
-
-  }
-
-  public class ThrowStatementNested<N> extends ThrowFluent<ThrowStatementNested<N>> implements Nested<N> {
-    ThrowStatementNested(Throw item) {
-      this.builder = new ThrowBuilder(this, item);
-    }
-
-    ThrowBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endThrowStatement() {
-      return and();
-    }
-
-  }
-
-  public class StringStatementNested<N> extends StringStatementFluent<StringStatementNested<N>> implements Nested<N> {
-    StringStatementNested(StringStatement item) {
-      this.builder = new StringStatementBuilder(this, item);
-    }
-
-    StringStatementBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endStringStatement() {
-      return and();
-    }
-
-  }
-
-  public class DoStatementNested<N> extends DoFluent<DoStatementNested<N>> implements Nested<N> {
-    DoStatementNested(Do item) {
-      this.builder = new DoBuilder(this, item);
-    }
-
-    DoBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endDoStatement() {
-      return and();
-    }
-
-  }
-
-  public class ForeachStatementNested<N> extends ForeachFluent<ForeachStatementNested<N>> implements Nested<N> {
-    ForeachStatementNested(Foreach item) {
-      this.builder = new ForeachBuilder(this, item);
-    }
-
-    ForeachBuilder builder;
-
-    public N and() {
-      return (N) LambdaFluent.this.withStatement(builder.build());
-    }
-
-    public N endForeachStatement() {
+    public N endBitwiseOrStatement() {
       return and();
     }
 
   }
 
   public class BlockStatementNested<N> extends BlockFluent<BlockStatementNested<N>> implements Nested<N> {
+
+    BlockBuilder builder;
+
     BlockStatementNested(Block item) {
       this.builder = new BlockBuilder(this, item);
     }
-
-    BlockBuilder builder;
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
@@ -633,30 +876,249 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class ReturnDslVariableStepStatementNested<N>
-      extends ReturnDslVariableStepFluent<ReturnDslVariableStepStatementNested<N>> implements Nested<N> {
-    ReturnDslVariableStepStatementNested(ReturnDslVariableStep item) {
-      this.builder = new ReturnDslVariableStepBuilder(this, item);
-    }
+  public class BreakStatementNested<N> extends BreakFluent<BreakStatementNested<N>> implements Nested<N> {
 
-    ReturnDslVariableStepBuilder builder;
+    BreakBuilder builder;
+
+    BreakStatementNested(Break item) {
+      this.builder = new BreakBuilder(this, item);
+    }
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
     }
 
-    public N endReturnDslVariableStepStatement() {
+    public N endBreakStatement() {
+      return and();
+    }
+
+  }
+
+  public class ConstructStatementNested<N> extends ConstructFluent<ConstructStatementNested<N>> implements Nested<N> {
+
+    ConstructBuilder builder;
+
+    ConstructStatementNested(Construct item) {
+      this.builder = new ConstructBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endConstructStatement() {
+      return and();
+    }
+
+  }
+
+  public class ContinueStatementNested<N> extends ContinueFluent<ContinueStatementNested<N>> implements Nested<N> {
+
+    ContinueBuilder builder;
+
+    ContinueStatementNested(Continue item) {
+      this.builder = new ContinueBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endContinueStatement() {
+      return and();
+    }
+
+  }
+
+  public class DeclareStatementNested<N> extends DeclareFluent<DeclareStatementNested<N>> implements Nested<N> {
+
+    DeclareBuilder builder;
+
+    DeclareStatementNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endDeclareStatement() {
+      return and();
+    }
+
+  }
+
+  public class DivideStatementNested<N> extends DivideFluent<DivideStatementNested<N>> implements Nested<N> {
+
+    DivideBuilder builder;
+
+    DivideStatementNested(Divide item) {
+      this.builder = new DivideBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endDivideStatement() {
+      return and();
+    }
+
+  }
+
+  public class DoStatementNested<N> extends DoFluent<DoStatementNested<N>> implements Nested<N> {
+
+    DoBuilder builder;
+
+    DoStatementNested(Do item) {
+      this.builder = new DoBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endDoStatement() {
+      return and();
+    }
+
+  }
+
+  public class EmptyStatementNested<N> extends EmptyFluent<EmptyStatementNested<N>> implements Nested<N> {
+
+    EmptyBuilder builder;
+
+    EmptyStatementNested(Empty item) {
+      this.builder = new EmptyBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endEmptyStatement() {
+      return and();
+    }
+
+  }
+
+  public class EqualsStatementNested<N> extends EqualsFluent<EqualsStatementNested<N>> implements Nested<N> {
+
+    EqualsBuilder builder;
+
+    EqualsStatementNested(Equals item) {
+      this.builder = new EqualsBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endEqualsStatement() {
+      return and();
+    }
+
+  }
+
+  public class ForStatementNested<N> extends ForFluent<ForStatementNested<N>> implements Nested<N> {
+
+    ForBuilder builder;
+
+    ForStatementNested(For item) {
+      this.builder = new ForBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endForStatement() {
+      return and();
+    }
+
+  }
+
+  public class ForeachStatementNested<N> extends ForeachFluent<ForeachStatementNested<N>> implements Nested<N> {
+
+    ForeachBuilder builder;
+
+    ForeachStatementNested(Foreach item) {
+      this.builder = new ForeachBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endForeachStatement() {
+      return and();
+    }
+
+  }
+
+  public class GreaterThanOrEqualStatementNested<N> extends GreaterThanOrEqualFluent<GreaterThanOrEqualStatementNested<N>>
+      implements Nested<N> {
+
+    GreaterThanOrEqualBuilder builder;
+
+    GreaterThanOrEqualStatementNested(GreaterThanOrEqual item) {
+      this.builder = new GreaterThanOrEqualBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endGreaterThanOrEqualStatement() {
+      return and();
+    }
+
+  }
+
+  public class GreaterThanStatementNested<N> extends GreaterThanFluent<GreaterThanStatementNested<N>> implements Nested<N> {
+
+    GreaterThanBuilder builder;
+
+    GreaterThanStatementNested(GreaterThan item) {
+      this.builder = new GreaterThanBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endGreaterThanStatement() {
+      return and();
+    }
+
+  }
+
+  public class IfDslThenStepStatementNested<N> extends IfDslThenStepFluent<IfDslThenStepStatementNested<N>>
+      implements Nested<N> {
+
+    IfDslThenStepBuilder builder;
+
+    IfDslThenStepStatementNested(IfDslThenStep item) {
+      this.builder = new IfDslThenStepBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endIfDslThenStepStatement() {
       return and();
     }
 
   }
 
   public class IfStatementNested<N> extends IfFluent<IfStatementNested<N>> implements Nested<N> {
+
+    IfBuilder builder;
+
     IfStatementNested(If item) {
       this.builder = new IfBuilder(this, item);
     }
-
-    IfBuilder builder;
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
@@ -669,11 +1131,12 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
   }
 
   public class LambdaStatementNested<N> extends LambdaFluent<LambdaStatementNested<N>> implements Nested<N> {
+
+    LambdaBuilder builder;
+
     LambdaStatementNested(Lambda item) {
       this.builder = new LambdaBuilder(this, item);
     }
-
-    LambdaBuilder builder;
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
@@ -685,12 +1148,342 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class LeftShiftStatementNested<N> extends LeftShiftFluent<LeftShiftStatementNested<N>> implements Nested<N> {
+
+    LeftShiftBuilder builder;
+
+    LeftShiftStatementNested(LeftShift item) {
+      this.builder = new LeftShiftBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endLeftShiftStatement() {
+      return and();
+    }
+
+  }
+
+  public class LessThanOrEqualStatementNested<N> extends LessThanOrEqualFluent<LessThanOrEqualStatementNested<N>>
+      implements Nested<N> {
+
+    LessThanOrEqualBuilder builder;
+
+    LessThanOrEqualStatementNested(LessThanOrEqual item) {
+      this.builder = new LessThanOrEqualBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endLessThanOrEqualStatement() {
+      return and();
+    }
+
+  }
+
+  public class LessThanStatementNested<N> extends LessThanFluent<LessThanStatementNested<N>> implements Nested<N> {
+
+    LessThanBuilder builder;
+
+    LessThanStatementNested(LessThan item) {
+      this.builder = new LessThanBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endLessThanStatement() {
+      return and();
+    }
+
+  }
+
+  public class LogicalAndStatementNested<N> extends LogicalAndFluent<LogicalAndStatementNested<N>> implements Nested<N> {
+
+    LogicalAndBuilder builder;
+
+    LogicalAndStatementNested(LogicalAnd item) {
+      this.builder = new LogicalAndBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endLogicalAndStatement() {
+      return and();
+    }
+
+  }
+
+  public class LogicalOrStatementNested<N> extends LogicalOrFluent<LogicalOrStatementNested<N>> implements Nested<N> {
+
+    LogicalOrBuilder builder;
+
+    LogicalOrStatementNested(LogicalOr item) {
+      this.builder = new LogicalOrBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endLogicalOrStatement() {
+      return and();
+    }
+
+  }
+
+  public class MethodCallStatementNested<N> extends MethodCallFluent<MethodCallStatementNested<N>> implements Nested<N> {
+
+    MethodCallBuilder builder;
+
+    MethodCallStatementNested(MethodCall item) {
+      this.builder = new MethodCallBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endMethodCallStatement() {
+      return and();
+    }
+
+  }
+
+  public class MinusStatementNested<N> extends MinusFluent<MinusStatementNested<N>> implements Nested<N> {
+
+    MinusBuilder builder;
+
+    MinusStatementNested(Minus item) {
+      this.builder = new MinusBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endMinusStatement() {
+      return and();
+    }
+
+  }
+
+  public class ModuloStatementNested<N> extends ModuloFluent<ModuloStatementNested<N>> implements Nested<N> {
+
+    ModuloBuilder builder;
+
+    ModuloStatementNested(Modulo item) {
+      this.builder = new ModuloBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endModuloStatement() {
+      return and();
+    }
+
+  }
+
+  public class MultiplyStatementNested<N> extends MultiplyFluent<MultiplyStatementNested<N>> implements Nested<N> {
+
+    MultiplyBuilder builder;
+
+    MultiplyStatementNested(Multiply item) {
+      this.builder = new MultiplyBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endMultiplyStatement() {
+      return and();
+    }
+
+  }
+
+  public class NotEqualsStatementNested<N> extends NotEqualsFluent<NotEqualsStatementNested<N>> implements Nested<N> {
+
+    NotEqualsBuilder builder;
+
+    NotEqualsStatementNested(NotEquals item) {
+      this.builder = new NotEqualsBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endNotEqualsStatement() {
+      return and();
+    }
+
+  }
+
+  public class PlusStatementNested<N> extends PlusFluent<PlusStatementNested<N>> implements Nested<N> {
+
+    PlusBuilder builder;
+
+    PlusStatementNested(Plus item) {
+      this.builder = new PlusBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endPlusStatement() {
+      return and();
+    }
+
+  }
+
+  public class PostDecrementStatementNested<N> extends PostDecrementFluent<PostDecrementStatementNested<N>>
+      implements Nested<N> {
+
+    PostDecrementBuilder builder;
+
+    PostDecrementStatementNested(PostDecrement item) {
+      this.builder = new PostDecrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endPostDecrementStatement() {
+      return and();
+    }
+
+  }
+
+  public class PostIncrementStatementNested<N> extends PostIncrementFluent<PostIncrementStatementNested<N>>
+      implements Nested<N> {
+
+    PostIncrementBuilder builder;
+
+    PostIncrementStatementNested(PostIncrement item) {
+      this.builder = new PostIncrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endPostIncrementStatement() {
+      return and();
+    }
+
+  }
+
+  public class PreDecrementStatementNested<N> extends PreDecrementFluent<PreDecrementStatementNested<N>> implements Nested<N> {
+
+    PreDecrementBuilder builder;
+
+    PreDecrementStatementNested(PreDecrement item) {
+      this.builder = new PreDecrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endPreDecrementStatement() {
+      return and();
+    }
+
+  }
+
+  public class PreIncrementStatementNested<N> extends PreIncrementFluent<PreIncrementStatementNested<N>> implements Nested<N> {
+
+    PreIncrementBuilder builder;
+
+    PreIncrementStatementNested(PreIncrement item) {
+      this.builder = new PreIncrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endPreIncrementStatement() {
+      return and();
+    }
+
+  }
+
+  public class PropertyRefStatementNested<N> extends PropertyRefFluent<PropertyRefStatementNested<N>> implements Nested<N> {
+
+    PropertyRefBuilder builder;
+
+    PropertyRefStatementNested(PropertyRef item) {
+      this.builder = new PropertyRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endPropertyRefStatement() {
+      return and();
+    }
+
+  }
+
+  public class ReturnDslThisStepStatementNested<N> extends ReturnDslThisStepFluent<ReturnDslThisStepStatementNested<N>>
+      implements Nested<N> {
+
+    ReturnDslThisStepBuilder builder;
+
+    ReturnDslThisStepStatementNested(ReturnDslThisStep item) {
+      this.builder = new ReturnDslThisStepBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endReturnDslThisStepStatement() {
+      return and();
+    }
+
+  }
+
+  public class ReturnDslVariableStepStatementNested<N>
+      extends ReturnDslVariableStepFluent<ReturnDslVariableStepStatementNested<N>> implements Nested<N> {
+
+    ReturnDslVariableStepBuilder builder;
+
+    ReturnDslVariableStepStatementNested(ReturnDslVariableStep item) {
+      this.builder = new ReturnDslVariableStepBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endReturnDslVariableStepStatement() {
+      return and();
+    }
+
+  }
+
   public class ReturnStatementNested<N> extends ReturnFluent<ReturnStatementNested<N>> implements Nested<N> {
+
+    ReturnBuilder builder;
+
     ReturnStatementNested(Return item) {
       this.builder = new ReturnBuilder(this, item);
     }
-
-    ReturnBuilder builder;
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
@@ -702,56 +1495,148 @@ public class LambdaFluent<A extends LambdaFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class AssignStatementNested<N> extends AssignFluent<AssignStatementNested<N>> implements Nested<N> {
-    AssignStatementNested(Assign item) {
-      this.builder = new AssignBuilder(this, item);
-    }
+  public class RightShiftStatementNested<N> extends RightShiftFluent<RightShiftStatementNested<N>> implements Nested<N> {
 
-    AssignBuilder builder;
+    RightShiftBuilder builder;
+
+    RightShiftStatementNested(RightShift item) {
+      this.builder = new RightShiftBuilder(this, item);
+    }
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
     }
 
-    public N endAssignStatement() {
+    public N endRightShiftStatement() {
       return and();
     }
 
   }
 
-  public class IfDslThenStepStatementNested<N> extends IfDslThenStepFluent<IfDslThenStepStatementNested<N>>
+  public class RightUnsignedShiftStatementNested<N> extends RightUnsignedShiftFluent<RightUnsignedShiftStatementNested<N>>
       implements Nested<N> {
-    IfDslThenStepStatementNested(IfDslThenStep item) {
-      this.builder = new IfDslThenStepBuilder(this, item);
-    }
 
-    IfDslThenStepBuilder builder;
+    RightUnsignedShiftBuilder builder;
+
+    RightUnsignedShiftStatementNested(RightUnsignedShift item) {
+      this.builder = new RightUnsignedShiftBuilder(this, item);
+    }
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
     }
 
-    public N endIfDslThenStepStatement() {
+    public N endRightUnsignedShiftStatement() {
       return and();
     }
 
   }
 
-  public class ForStatementNested<N> extends ForFluent<ForStatementNested<N>> implements Nested<N> {
-    ForStatementNested(For item) {
-      this.builder = new ForBuilder(this, item);
-    }
+  public class StringStatementNested<N> extends StringStatementFluent<StringStatementNested<N>> implements Nested<N> {
 
-    ForBuilder builder;
+    StringStatementBuilder builder;
+
+    StringStatementNested(StringStatement item) {
+      this.builder = new StringStatementBuilder(this, item);
+    }
 
     public N and() {
       return (N) LambdaFluent.this.withStatement(builder.build());
     }
 
-    public N endForStatement() {
+    public N endStringStatement() {
       return and();
     }
 
   }
 
+  public class SwitchStatementNested<N> extends SwitchFluent<SwitchStatementNested<N>> implements Nested<N> {
+
+    SwitchBuilder builder;
+
+    SwitchStatementNested(Switch item) {
+      this.builder = new SwitchBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endSwitchStatement() {
+      return and();
+    }
+
+  }
+
+  public class ThrowStatementNested<N> extends ThrowFluent<ThrowStatementNested<N>> implements Nested<N> {
+
+    ThrowBuilder builder;
+
+    ThrowStatementNested(Throw item) {
+      this.builder = new ThrowBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endThrowStatement() {
+      return and();
+    }
+
+  }
+
+  public class TryStatementNested<N> extends TryFluent<TryStatementNested<N>> implements Nested<N> {
+
+    TryBuilder builder;
+
+    TryStatementNested(Try item) {
+      this.builder = new TryBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endTryStatement() {
+      return and();
+    }
+
+  }
+
+  public class WhileStatementNested<N> extends WhileFluent<WhileStatementNested<N>> implements Nested<N> {
+
+    WhileBuilder builder;
+
+    WhileStatementNested(While item) {
+      this.builder = new WhileBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endWhileStatement() {
+      return and();
+    }
+
+  }
+
+  public class XorStatementNested<N> extends XorFluent<XorStatementNested<N>> implements Nested<N> {
+
+    XorBuilder builder;
+
+    XorStatementNested(Xor item) {
+      this.builder = new XorBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endXorStatement() {
+      return and();
+    }
+
+  }
 }

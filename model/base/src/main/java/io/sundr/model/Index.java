@@ -3,18 +3,13 @@ package io.sundr.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Index implements Expression {
+public class Index extends WithScope implements Expression {
 
-  private final Expression scope;
   private final Expression expression;
 
   public Index(Expression scope, Expression expression) {
-    this.scope = scope;
+    super(scope);
     this.expression = expression;
-  }
-
-  public Expression getScope() {
-    return scope;
   }
 
   public Expression getExpression() {
@@ -24,8 +19,8 @@ public class Index implements Expression {
   @Override
   public Set<ClassRef> getReferences() {
     Set<ClassRef> refs = new HashSet<>();
-    if (scope != null) {
-      refs.addAll(scope.getReferences());
+    if (getScope() != null) {
+      refs.addAll(getScope().getReferences());
     }
     if (expression != null) {
       refs.addAll(expression.getReferences());
@@ -35,6 +30,6 @@ public class Index implements Expression {
 
   @Override
   public String render() {
-    return scope.renderExpression() + "[" + expression.renderExpression() + "]";
+    return getScope().renderExpression() + "[" + expression.renderExpression() + "]";
   }
 }

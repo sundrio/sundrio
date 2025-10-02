@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class XorFluent<A extends XorFluent<A>> extends BinaryExpressionFluent<A> {
+
   public XorFluent() {
   }
 

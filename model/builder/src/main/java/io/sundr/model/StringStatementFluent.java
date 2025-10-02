@@ -12,6 +12,9 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class StringStatementFluent<A extends StringStatementFluent<A>> extends BaseFluent<A> {
+
+  private Supplier<String> supplier;
+
   public StringStatementFluent() {
   }
 
@@ -19,25 +22,10 @@ public class StringStatementFluent<A extends StringStatementFluent<A>> extends B
     this.copyInstance(instance);
   }
 
-  private Supplier<String> supplier;
-
   protected void copyInstance(StringStatement instance) {
     if (instance != null) {
       this.withSupplier(instance.getSupplier());
     }
-  }
-
-  public Supplier<String> getSupplier() {
-    return this.supplier;
-  }
-
-  public <T> A withSupplier(Supplier<String> supplier) {
-    this.supplier = supplier;
-    return (A) this;
-  }
-
-  public boolean hasSupplier() {
-    return this.supplier != null;
   }
 
   public boolean equals(Object o) {
@@ -53,6 +41,14 @@ public class StringStatementFluent<A extends StringStatementFluent<A>> extends B
     return true;
   }
 
+  public Supplier<String> getSupplier() {
+    return this.supplier;
+  }
+
+  public boolean hasSupplier() {
+    return this.supplier != null;
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(supplier, super.hashCode());
   }
@@ -66,6 +62,11 @@ public class StringStatementFluent<A extends StringStatementFluent<A>> extends B
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  public <T> A withSupplier(Supplier<String> supplier) {
+    this.supplier = supplier;
+    return (A) this;
   }
 
 }
