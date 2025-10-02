@@ -418,6 +418,7 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
         TypeDef testTypeDef;
         try (java.io.FileInputStream fis = new java.io.FileInputStream(testFile.toFile())) {
           testTypeDef = Sources.readTypeDefFromStream(fis, context);
+          DefinitionRepository.getRepository().registerIfAbsent(testTypeDef);
         }
 
         Set<String> referencedSources = new HashSet<>();
@@ -663,6 +664,7 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
             try (FileInputStream fis = new FileInputStream(path.toFile())) {
               TypeDef typeDef = Sources.readTypeDefFromStream(fis, context);
               testTypeDefs.put(path.toString(), typeDef);
+              DefinitionRepository.getRepository().registerIfAbsent(typeDef);
               String fqn = typeDef.getPackageName() + "." + typeDef.getName();
               getLog().debug("🧪 Test: " + typeDef.getName() + " (" + fqn + ") -> " + path);
             } catch (Exception e) {
@@ -689,6 +691,7 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
           try (FileInputStream fis = new FileInputStream(path.toFile())) {
             TypeDef typeDef = Sources.readTypeDefFromStream(fis, context);
             sourceTypeDefs.put(path.toString(), typeDef);
+            DefinitionRepository.getRepository().registerIfAbsent(typeDef);
             String fqn = typeDef.getPackageName() + "." + typeDef.getName();
           } catch (Exception e) {
             getLog().debug("Failed to analyze source file: " + path + " - " + e.getMessage());
@@ -1282,68 +1285,17 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
   private Set<String> findTestMethodsAffectedByImpact(ImpactAnalysisResult impact) {
     Set<String> affectedTestMethods = new HashSet<>();
 
-    System.out.println("  🔍 Analyzing impact for method-level test execution...");
+    Set<MethodReference> affectedMethodRefs = impact.getAffectedMethodReferences();
 
-    // Check method-level dependencies using MethodReference impact
-    for (MethodReference affectedMethodRef : impact.getAffectedMethodReferences()) {
-      String methodKey = affectedMethodRef.getOwningType().getFullyQualifiedName() + "."
-          + affectedMethodRef.getMethod().getName();
+    for (MethodReference methodRef : affectedMethodRefs) {
+      String methodKey = methodRef.getOwningType().getFullyQualifiedName() + "." + methodRef.getMethod().getName();
 
-      System.out.println("    📋 Checking affected method: " + methodKey);
-
-      Set<String> dependentTestMethods = sourceMethodToTestMethods.get(methodKey);
-      if (dependentTestMethods != null) {
-        affectedTestMethods.addAll(dependentTestMethods);
-        System.out.println("      ✅ Found " + dependentTestMethods.size() + " dependent test methods: " + dependentTestMethods);
-      } else {
-        System.out.println("      ❌ No test method dependencies found for: " + methodKey);
+      Set<String> dependentTests = sourceMethodToTestMethods.get(methodKey);
+      if (dependentTests != null) {
+        affectedTestMethods.addAll(dependentTests);
       }
     }
 
-    // If we found specific method-level dependencies, return them (don't fall back to type-level)
-    if (!affectedTestMethods.isEmpty()) {
-      System.out
-          .println("  🎯 Using specific method-level dependencies. Total affected test methods: " + affectedTestMethods.size());
-      return affectedTestMethods;
-    }
-
-    // Only check TypeDef-level dependencies as fallback when no method-level dependencies found
-    System.out.println("  🔄 No specific method dependencies found, falling back to type-level dependencies...");
-    for (TypeDef affectedType : impact.getAffectedTypeDefs()) {
-      String typeFQN = affectedType.getFullyQualifiedName();
-      System.out.println("    🏗️  Checking affected type: " + typeFQN);
-
-      // Collect all method dependencies for this type
-      Map<String, Set<String>> typeDependencies = new HashMap<>();
-      for (Map.Entry<String, Set<String>> entry : sourceMethodToTestMethods.entrySet()) {
-        String sourceMethodKey = entry.getKey();
-        if (sourceMethodKey.startsWith(typeFQN + ".")) {
-          affectedTestMethods.addAll(entry.getValue());
-          typeDependencies.put(sourceMethodKey, entry.getValue());
-        }
-      }
-
-      // Display as tree structure
-      if (!typeDependencies.isEmpty()) {
-        System.out.println("      ✅ Type-level dependencies found:");
-        var entries = typeDependencies.entrySet().toArray();
-        for (int i = 0; i < entries.length; i++) {
-          var entry = (Map.Entry<String, Set<String>>) entries[i];
-          String connector = (i == entries.length - 1) ? "└─" : "├─";
-          System.out.println("        " + connector + " " + entry.getKey());
-
-          // Show affected test methods as sub-tree
-          var testMethods = entry.getValue().toArray(new String[0]);
-          for (int j = 0; j < testMethods.length; j++) {
-            String prefix = (i == entries.length - 1) ? "         " : "      │  ";
-            String testConnector = (j == testMethods.length - 1) ? "└─" : "├─";
-            System.out.println(prefix + testConnector + " " + testMethods[j]);
-          }
-        }
-      }
-    }
-
-    System.out.println("  🎯 Total affected test methods: " + affectedTestMethods.size());
     return affectedTestMethods;
   }
 
@@ -1741,6 +1693,7 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
 
       try (FileInputStream fis = new FileInputStream(file)) {
         TypeDef newTypeDef = Sources.readTypeDefFromStream(fis, context);
+        DefinitionRepository.getRepository().registerIfAbsent(newTypeDef);
 
         // Get old snapshots
         Map<String, String> oldSnapshots = sourceFileMethodSnapshots.get(changedFilePath);
@@ -1859,6 +1812,7 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
       try (FileInputStream fis = new FileInputStream(testFile.toFile())) {
         TypeDef typeDef = Sources.readTypeDefFromStream(fis, context);
         testTypeDefs.put(testFile.toString(), typeDef);
+        DefinitionRepository.getRepository().registerIfAbsent(typeDef);
 
         // Re-map dependencies for this test
         remapTestDependencies(testFile.toString(), typeDef);
