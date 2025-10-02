@@ -33,5 +33,11 @@ public class SingularizeTest {
 
     assertEquals("child", Singularize.FUNCTION.apply("children"));
     assertEquals("Child", Singularize.FUNCTION.apply("Children"));
+
+    assertEquals("https", Singularize.FUNCTION.apply("https"));
+    assertEquals("Https", Singularize.FUNCTION.apply("Https"));
+
+    assertEquals("http", Singularize.FUNCTION.apply("http"));
+    assertEquals("Http", Singularize.FUNCTION.apply("Http"));
   }
 }
