@@ -119,7 +119,6 @@ public class ShapesTest {
     canvas = new CanvasBuilder(canvas).accept(new PathAwareTypedVisitor<CircleBuilder<Integer>, CanvasBuilder>() {
       @Override
       public void visit(List<Entry<String, Object>> path, CircleBuilder<Integer> builder) {
-        System.out.println("path:" + path);
         builder.withRadius(100 + builder.getRadius());
       }
     }).build();

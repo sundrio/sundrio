@@ -71,7 +71,6 @@ public class StringTemplateRenderer<T> extends TemplateRenderer<T> {
   public Function<T, String> getFunction() {
     return item -> {
       ST st = new ST(templateContent, '$', '$');
-      System.out.println("MODEL:" + item);
       st.add(MODEL, item);
       st.add(PARAMETERS, parameters);
       return st.render();

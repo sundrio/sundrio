@@ -179,7 +179,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
               Expression.newCall("super", item.toReference()),
               new Assign(new This().property("builder"),
                   Expression.createNew(builderType.toInternalReference(), new This(), item.toReference())),
-              new Assign(new This().property("function"), Expression.lambda(a, a.toReference())))
+              new Assign(new This().property("function"), Expression.lambda(a, (Expression) a.toReference())))
           .endBlock()
           .build());
     }
