@@ -48,7 +48,7 @@ public class SourceAdapter
   public SourceAdapter(AdapterContext context) {
     this.context = context;
     this.typeAdapterFunction = new TypeDeclarationToTypeDef(context);
-    this.referenceAdapterFunction = null;
+    this.referenceAdapterFunction = new ClassOrInterfaceToTypeRef();
     this.propertyAdapterFunction = null;
     this.methodAdapterFunction = null;
   }

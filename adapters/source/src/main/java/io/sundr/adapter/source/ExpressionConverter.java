@@ -12,10 +12,13 @@ import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
+import com.github.javaparser.ast.expr.CastExpr;
+import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.DoubleLiteralExpr;
 import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
@@ -27,6 +30,7 @@ import com.github.javaparser.ast.expr.NullLiteralExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
+import com.github.javaparser.ast.expr.TypeExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
@@ -36,8 +40,10 @@ import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.Assign;
 import io.sundr.model.BitwiseAnd;
 import io.sundr.model.BitwiseOr;
+import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Construct;
+import io.sundr.model.ContextRef;
 import io.sundr.model.Declare;
 import io.sundr.model.Divide;
 import io.sundr.model.Enclosed;
@@ -68,6 +74,7 @@ import io.sundr.model.PreDecrement;
 import io.sundr.model.PreIncrement;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyRef;
+import io.sundr.model.Return;
 import io.sundr.model.RightShift;
 import io.sundr.model.RightUnsignedShift;
 import io.sundr.model.Ternary;
@@ -101,6 +108,15 @@ public class ExpressionConverter {
     }
 
     return new Declare(properties, initValue);
+  }
+
+  public static Property convertParameter(Parameter parameter) {
+    // Create adapters following the same pattern as TypeDeclarationToTypeDef
+    ClassOrInterfaceToTypeRef classOrInterfaceToTypeRef = new ClassOrInterfaceToTypeRef();
+    TypeToTypeRef typeAdapter = new TypeToTypeRef(classOrInterfaceToTypeRef);
+    TypeRef typeRef = typeAdapter.apply(parameter.getType());
+
+    return Property.newProperty(typeRef, parameter.getId().getName());
   }
 
   public static io.sundr.model.Expression convertExpression(Expression expression) {
@@ -181,7 +197,7 @@ public class ExpressionConverter {
       return null;
     } else if (expression instanceof NameExpr) {
       NameExpr nameExpr = (NameExpr) expression;
-      return new PropertyRef(Property.newProperty(OBJECT, nameExpr.getName()));
+      return new ContextRef(nameExpr.getName());
     } else if (expression instanceof StringLiteralExpr) {
       StringLiteralExpr stringLiteralExpr = (StringLiteralExpr) expression;
       return new ValueRef(stringLiteralExpr.getValue());
@@ -204,7 +220,7 @@ public class ExpressionConverter {
     } else if (expression instanceof ObjectCreationExpr) {
       ObjectCreationExpr objectCreationExpr = (ObjectCreationExpr) expression;
       ClassRef classRef = (ClassRef) SOURCE_ADAPTER.getReferenceAdapterFunction().apply(objectCreationExpr.getType());
-      List<io.sundr.model.TypeRef> parameters = new ArrayList<>();
+      List<TypeRef> parameters = new ArrayList<>();
       List<io.sundr.model.Expression> arguments = new ArrayList<>();
       for (Type type : objectCreationExpr.getTypeArgs()) {
         if (type instanceof ClassOrInterfaceType) {
@@ -232,8 +248,22 @@ public class ExpressionConverter {
       return new MethodCall(methodName, scope, parameters, arguments);
     } else if (expression instanceof LambdaExpr) {
       LambdaExpr lambdaExpr = (LambdaExpr) expression;
+      com.github.javaparser.ast.stmt.Statement lambdaBody = lambdaExpr.getBody();
+      io.sundr.model.Statement bodyStatement;
+
+      // Check if the lambda body is an expression statement containing just an expression
+      if (lambdaBody instanceof com.github.javaparser.ast.stmt.ExpressionStmt) {
+        com.github.javaparser.ast.stmt.ExpressionStmt exprStmt = (com.github.javaparser.ast.stmt.ExpressionStmt) lambdaBody;
+        // For expression lambdas, create a return statement
+        io.sundr.model.Expression expr = convertExpression(exprStmt.getExpression());
+        bodyStatement = new Return(expr);
+      } else {
+        // For block lambdas, convert normally
+        bodyStatement = StatementConverter.convertStatement(lambdaBody);
+      }
+
       return new Lambda(lambdaExpr.getParameters().stream().map(Parameter::getId).map(VariableDeclaratorId::getName)
-          .collect(Collectors.toList()), StatementConverter.convertStatement(lambdaExpr.getBody()));
+          .collect(Collectors.toList()), bodyStatement);
     } else if (expression instanceof EnclosedExpr) {
       EnclosedExpr enclosedExpr = (EnclosedExpr) expression;
       return new Enclosed(convertExpression(enclosedExpr.getInner()));
@@ -276,6 +306,29 @@ public class ExpressionConverter {
         }
       }
       return null;
+    } else if (expression instanceof FieldAccessExpr) {
+      FieldAccessExpr fieldAccessExpr = (FieldAccessExpr) expression;
+      String fieldName = fieldAccessExpr.getFieldExpr().getName();
+      io.sundr.model.Expression scope = convertExpression(fieldAccessExpr.getScope());
+      return new PropertyRef(fieldName, scope);
+    } else if (expression instanceof TypeExpr) {
+      TypeExpr typeExpr = (TypeExpr) expression;
+      // TypeExpr represents a type reference in expression context (like in method references)
+      // For now, convert to a ContextRef with the type name
+      return new ContextRef(typeExpr.getType().toString());
+    } else if (expression instanceof ClassExpr) {
+      ClassExpr classExpr = (ClassExpr) expression;
+      // ClassExpr represents .class expressions like String.class
+      TypeRef typeRef = TYPEREF_ADAPTER.apply(classExpr.getType());
+      if (typeRef instanceof ClassRef) {
+        return ((ClassRef) typeRef).dotClass();
+      }
+      return new ContextRef(typeRef.toString() + ".class");
+    } else if (expression instanceof CastExpr) {
+      CastExpr castExpr = (CastExpr) expression;
+      TypeRef targetType = TYPEREF_ADAPTER.apply(castExpr.getType());
+      io.sundr.model.Expression expr = convertExpression(castExpr.getExpr());
+      return new Cast(targetType, expr);
     }
     return null;
   }
