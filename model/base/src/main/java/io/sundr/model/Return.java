@@ -5,7 +5,18 @@ import java.util.Set;
 
 public class Return implements Statement {
 
+  private static final Expression NOTHING = null;
+  private static final Expression NULL = ValueRef.NULL;
+
   private final Expression expression;
+
+  public static Return Nothing() {
+    return new Return(NOTHING);
+  }
+
+  public static Return Null() {
+    return new Return(NULL);
+  }
 
   public static Return True() {
     return new Return(new ValueRef(true));
@@ -55,10 +66,6 @@ public class Return implements Statement {
     return new Return(ValueRef.from(value));
   }
 
-  public static Return Null() {
-    return new Return(ValueRef.NULL);
-  }
-
   public Return(Expression expression) {
     this.expression = expression;
   }
@@ -78,11 +85,16 @@ public class Return implements Statement {
   @Override
   public Set<ClassRef> getReferences() {
     Set<ClassRef> refs = new HashSet<>();
-    refs.addAll(expression.getReferences());
+    if (expression != null) {
+      refs.addAll(expression.getReferences());
+    }
     return refs;
   }
 
   public String render() {
+    if (expression == NOTHING) {
+      return "return" + SEMICOLN;
+    }
     return "return " + expression.renderExpression() + SEMICOLN;
   }
 }

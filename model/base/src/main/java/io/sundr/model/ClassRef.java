@@ -160,4 +160,8 @@ public class ClassRef extends TypeRef implements Nameable, Expression, Mappable<
     return sb.toString();
   }
 
+  public DotClass dotClass() {
+    return new DotClass(this);
+  }
+
 }
