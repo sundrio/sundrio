@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class VoidRefFluent<A extends VoidRefFluent<A>> extends TypeRefFluent<A> {
+
   public VoidRefFluent() {
   }
 

@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class PlusFluent<A extends PlusFluent<A>> extends BinaryExpressionFluent<A> {
+
   public PlusFluent() {
   }
 

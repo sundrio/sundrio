@@ -9,6 +9,10 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRefFluent<A> {
+
+  private int dimensions;
+  private String name;
+
   public TypeParamRefFluent() {
   }
 
@@ -16,41 +20,12 @@ public class TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRef
     this.copyInstance(instance);
   }
 
-  private String name;
-  private int dimensions;
-
   protected void copyInstance(TypeParamRef instance) {
     if (instance != null) {
       this.withName(instance.getName());
       this.withDimensions(instance.getDimensions());
       this.withAttributes(instance.getAttributes());
     }
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public A withName(String name) {
-    this.name = name;
-    return (A) this;
-  }
-
-  public boolean hasName() {
-    return this.name != null;
-  }
-
-  public int getDimensions() {
-    return this.dimensions;
-  }
-
-  public A withDimensions(int dimensions) {
-    this.dimensions = dimensions;
-    return (A) this;
-  }
-
-  public boolean hasDimensions() {
-    return true;
   }
 
   public boolean equals(Object o) {
@@ -68,6 +43,22 @@ public class TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRef
     return true;
   }
 
+  public int getDimensions() {
+    return this.dimensions;
+  }
+
+  public String getName() {
+    return this.name;
+  }
+
+  public boolean hasDimensions() {
+    return true;
+  }
+
+  public boolean hasName() {
+    return this.name != null;
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(name, dimensions, super.hashCode());
   }
@@ -83,6 +74,16 @@ public class TypeParamRefFluent<A extends TypeParamRefFluent<A>> extends TypeRef
     sb.append(dimensions);
     sb.append("}");
     return sb.toString();
+  }
+
+  public A withDimensions(int dimensions) {
+    this.dimensions = dimensions;
+    return (A) this;
+  }
+
+  public A withName(String name) {
+    this.name = name;
+    return (A) this;
   }
 
 }

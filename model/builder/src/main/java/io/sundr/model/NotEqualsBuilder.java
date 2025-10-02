@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class NotEqualsBuilder extends NotEqualsFluent<NotEqualsBuilder>
     implements VisitableBuilder<NotEquals, NotEqualsBuilder> {
+
+  NotEqualsFluent<?> fluent;
+
   public NotEqualsBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class NotEqualsBuilder extends NotEqualsFluent<NotEqualsBuilder>
     this.fluent = fluent;
   }
 
-  public NotEqualsBuilder(NotEqualsFluent<?> fluent, NotEquals instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public NotEqualsBuilder(NotEquals instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  NotEqualsFluent<?> fluent;
+  public NotEqualsBuilder(NotEqualsFluent<?> fluent, NotEquals instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public NotEquals build() {
     NotEquals buildable = new NotEquals(fluent.buildLeft(), fluent.buildRight());

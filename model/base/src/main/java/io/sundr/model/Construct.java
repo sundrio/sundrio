@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Construct implements Expression {
+public class Construct implements ExpressionOrStatement {
 
   private final ClassRef type;
   private final List<TypeRef> parameters;

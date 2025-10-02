@@ -3,6 +3,9 @@ package io.sundr.model;
 import io.sundr.builder.VisitableBuilder;
 
 public class TypeDefBuilder extends TypeDefFluent<TypeDefBuilder> implements VisitableBuilder<TypeDef, TypeDefBuilder> {
+
+  TypeDefFluent<?> fluent;
+
   public TypeDefBuilder() {
     this.fluent = this;
   }
@@ -11,17 +14,15 @@ public class TypeDefBuilder extends TypeDefFluent<TypeDefBuilder> implements Vis
     this.fluent = fluent;
   }
 
-  public TypeDefBuilder(TypeDefFluent<?> fluent, TypeDef instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public TypeDefBuilder(TypeDef instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  TypeDefFluent<?> fluent;
+  public TypeDefBuilder(TypeDefFluent<?> fluent, TypeDef instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public TypeDef build() {
     TypeDef buildable = new TypeDef(fluent.getKind(), fluent.getPackageName(), fluent.getName(), fluent.getComments(),

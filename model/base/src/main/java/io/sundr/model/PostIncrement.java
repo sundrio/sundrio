@@ -3,7 +3,7 @@ package io.sundr.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class PostIncrement implements Expression {
+public class PostIncrement implements ExpressionOrStatement {
 
   private final Expression expression;
 

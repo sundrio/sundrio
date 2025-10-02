@@ -11,6 +11,9 @@ import io.sundr.builder.Nested;
  */
 @SuppressWarnings("unchecked")
 public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends AttributeSupportFluent<A> {
+
+  private ModifiersBuilder modifiers;
+
   public ModifierSupportFluent() {
   }
 
@@ -18,41 +21,15 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
     this.copyInstance(instance);
   }
 
-  private ModifiersBuilder modifiers;
+  public Modifiers buildModifiers() {
+    return this.modifiers != null ? this.modifiers.build() : null;
+  }
 
   protected void copyInstance(ModifierSupport instance) {
     if (instance != null) {
       this.withModifiers(instance.getModifiers());
       this.withAttributes(instance.getAttributes());
     }
-  }
-
-  public Modifiers buildModifiers() {
-    return this.modifiers != null ? this.modifiers.build() : null;
-  }
-
-  public A withModifiers(Modifiers modifiers) {
-    this._visitables.remove("modifiers");
-    if (modifiers != null) {
-      this.modifiers = new ModifiersBuilder(modifiers);
-      this._visitables.get("modifiers").add(this.modifiers);
-    } else {
-      this.modifiers = null;
-      this._visitables.get("modifiers").remove(this.modifiers);
-    }
-    return (A) this;
-  }
-
-  public boolean hasModifiers() {
-    return this.modifiers != null;
-  }
-
-  public ModifiersNested<A> withNewModifiers() {
-    return new ModifiersNested(null);
-  }
-
-  public ModifiersNested<A> withNewModifiersLike(Modifiers item) {
-    return new ModifiersNested(item);
   }
 
   public ModifiersNested<A> editModifiers() {
@@ -80,6 +57,10 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
     return true;
   }
 
+  public boolean hasModifiers() {
+    return this.modifiers != null;
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(modifiers, super.hashCode());
   }
@@ -95,12 +76,33 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
     return sb.toString();
   }
 
+  public A withModifiers(Modifiers modifiers) {
+    this._visitables.remove("modifiers");
+    if (modifiers != null) {
+      this.modifiers = new ModifiersBuilder(modifiers);
+      this._visitables.get("modifiers").add(this.modifiers);
+    } else {
+      this.modifiers = null;
+      this._visitables.get("modifiers").remove(this.modifiers);
+    }
+    return (A) this;
+  }
+
+  public ModifiersNested<A> withNewModifiers() {
+    return new ModifiersNested(null);
+  }
+
+  public ModifiersNested<A> withNewModifiersLike(Modifiers item) {
+    return new ModifiersNested(item);
+  }
+
   public class ModifiersNested<N> extends ModifiersFluent<ModifiersNested<N>> implements Nested<N> {
+
+    ModifiersBuilder builder;
+
     ModifiersNested(Modifiers item) {
       this.builder = new ModifiersBuilder(this, item);
     }
-
-    ModifiersBuilder builder;
 
     public N and() {
       return (N) ModifierSupportFluent.this.withModifiers(builder.build());
@@ -111,5 +113,4 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
     }
 
   }
-
 }

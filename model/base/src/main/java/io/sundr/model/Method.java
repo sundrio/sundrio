@@ -132,7 +132,10 @@ public class Method extends ModifierSupport implements Renderable, WithReference
           erasure.append(",");
         }
         Property arg = arguments.get(i);
-        erasure.append(arg.getErasure());
+        // Use erased type (handles TypeParamRef -> Object conversion) with standardized parameter names
+        TypeRef erasedType = arg.getTypeRef() instanceof TypeParamRef ? ((TypeParamRef) arg.getTypeRef()).withErasure()
+            : arg.getTypeRef();
+        erasure.append(erasedType.toString()).append(" arg").append(i);
       }
     }
 

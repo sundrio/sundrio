@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class StringStatementBuilder extends StringStatementFluent<StringStatementBuilder>
     implements VisitableBuilder<StringStatement, StringStatementBuilder> {
+
+  StringStatementFluent<?> fluent;
+
   public StringStatementBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class StringStatementBuilder extends StringStatementFluent<StringStatemen
     this.fluent = fluent;
   }
 
-  public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public StringStatementBuilder(StringStatement instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  StringStatementFluent<?> fluent;
+  public StringStatementBuilder(StringStatementFluent<?> fluent, StringStatement instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public StringStatement build() {
     StringStatement buildable = new StringStatement(fluent.getSupplier());

@@ -11,22 +11,23 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A> {
+
+  private boolean _abstract;
+  private boolean _final;
+  private boolean _native;
+  private boolean _private;
+  private boolean _protected;
+  private boolean _public;
+  private boolean _static;
+  private boolean _synchronized;
+  private boolean _transient;
+
   public ModifiersFluent() {
   }
 
   public ModifiersFluent(Modifiers instance) {
     this.copyInstance(instance);
   }
-
-  private boolean _private;
-  private boolean _protected;
-  private boolean _public;
-  private boolean _abstract;
-  private boolean _final;
-  private boolean _native;
-  private boolean _static;
-  private boolean _synchronized;
-  private boolean _transient;
 
   protected void copyInstance(Modifiers instance) {
     instance = (instance != null ? instance : new Modifiers());
@@ -41,123 +42,6 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
       this.withSynchronized(instance.isSynchronized());
       this.withTransient(instance.isTransient());
     }
-  }
-
-  public boolean isPrivate() {
-    return this._private;
-  }
-
-  public A withPrivate(boolean _private) {
-    this._private = _private;
-    return (A) this;
-  }
-
-  public boolean hasPrivate() {
-    return true;
-  }
-
-  public boolean isProtected() {
-    return this._protected;
-  }
-
-  public A withProtected(boolean _protected) {
-    this._protected = _protected;
-    return (A) this;
-  }
-
-  public boolean hasProtected() {
-    return true;
-  }
-
-  public boolean isPublic() {
-    return this._public;
-  }
-
-  public A withPublic(boolean _public) {
-    this._public = _public;
-    return (A) this;
-  }
-
-  public boolean hasPublic() {
-    return true;
-  }
-
-  public boolean isAbstract() {
-    return this._abstract;
-  }
-
-  public A withAbstract(boolean _abstract) {
-    this._abstract = _abstract;
-    return (A) this;
-  }
-
-  public boolean hasAbstract() {
-    return true;
-  }
-
-  public boolean isFinal() {
-    return this._final;
-  }
-
-  public A withFinal(boolean _final) {
-    this._final = _final;
-    return (A) this;
-  }
-
-  public boolean hasFinal() {
-    return true;
-  }
-
-  public boolean isNative() {
-    return this._native;
-  }
-
-  public A withNative(boolean _native) {
-    this._native = _native;
-    return (A) this;
-  }
-
-  public boolean hasNative() {
-    return true;
-  }
-
-  public boolean isStatic() {
-    return this._static;
-  }
-
-  public A withStatic(boolean _static) {
-    this._static = _static;
-    return (A) this;
-  }
-
-  public boolean hasStatic() {
-    return true;
-  }
-
-  public boolean isSynchronized() {
-    return this._synchronized;
-  }
-
-  public A withSynchronized(boolean _synchronized) {
-    this._synchronized = _synchronized;
-    return (A) this;
-  }
-
-  public boolean hasSynchronized() {
-    return true;
-  }
-
-  public boolean isTransient() {
-    return this._transient;
-  }
-
-  public A withTransient(boolean _transient) {
-    this._transient = _transient;
-    return (A) this;
-  }
-
-  public boolean hasTransient() {
-    return true;
   }
 
   public boolean equals(Object o) {
@@ -189,9 +73,81 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
     return true;
   }
 
+  public boolean hasAbstract() {
+    return true;
+  }
+
+  public boolean hasFinal() {
+    return true;
+  }
+
+  public boolean hasNative() {
+    return true;
+  }
+
+  public boolean hasPrivate() {
+    return true;
+  }
+
+  public boolean hasProtected() {
+    return true;
+  }
+
+  public boolean hasPublic() {
+    return true;
+  }
+
+  public boolean hasStatic() {
+    return true;
+  }
+
+  public boolean hasSynchronized() {
+    return true;
+  }
+
+  public boolean hasTransient() {
+    return true;
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(_private, _protected, _public, _abstract, _final, _native, _static, _synchronized, _transient,
         super.hashCode());
+  }
+
+  public boolean isAbstract() {
+    return this._abstract;
+  }
+
+  public boolean isFinal() {
+    return this._final;
+  }
+
+  public boolean isNative() {
+    return this._native;
+  }
+
+  public boolean isPrivate() {
+    return this._private;
+  }
+
+  public boolean isProtected() {
+    return this._protected;
+  }
+
+  public boolean isPublic() {
+    return this._public;
+  }
+
+  public boolean isStatic() {
+    return this._static;
+  }
+
+  public boolean isSynchronized() {
+    return this._synchronized;
+  }
+
+  public boolean isTransient() {
+    return this._transient;
   }
 
   public String toString() {
@@ -219,40 +175,85 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
     return sb.toString();
   }
 
-  public A withPrivate() {
-    return withPrivate(true);
-  }
-
-  public A withProtected() {
-    return withProtected(true);
-  }
-
-  public A withPublic() {
-    return withPublic(true);
-  }
-
   public A withAbstract() {
     return withAbstract(true);
+  }
+
+  public A withAbstract(boolean _abstract) {
+    this._abstract = _abstract;
+    return (A) this;
   }
 
   public A withFinal() {
     return withFinal(true);
   }
 
+  public A withFinal(boolean _final) {
+    this._final = _final;
+    return (A) this;
+  }
+
   public A withNative() {
     return withNative(true);
+  }
+
+  public A withNative(boolean _native) {
+    this._native = _native;
+    return (A) this;
+  }
+
+  public A withPrivate() {
+    return withPrivate(true);
+  }
+
+  public A withPrivate(boolean _private) {
+    this._private = _private;
+    return (A) this;
+  }
+
+  public A withProtected() {
+    return withProtected(true);
+  }
+
+  public A withProtected(boolean _protected) {
+    this._protected = _protected;
+    return (A) this;
+  }
+
+  public A withPublic() {
+    return withPublic(true);
+  }
+
+  public A withPublic(boolean _public) {
+    this._public = _public;
+    return (A) this;
   }
 
   public A withStatic() {
     return withStatic(true);
   }
 
+  public A withStatic(boolean _static) {
+    this._static = _static;
+    return (A) this;
+  }
+
   public A withSynchronized() {
     return withSynchronized(true);
   }
 
+  public A withSynchronized(boolean _synchronized) {
+    this._synchronized = _synchronized;
+    return (A) this;
+  }
+
   public A withTransient() {
     return withTransient(true);
+  }
+
+  public A withTransient(boolean _transient) {
+    this._transient = _transient;
+    return (A) this;
   }
 
 }

@@ -3,7 +3,11 @@ package io.sundr.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BinaryExpression implements Expression {
+/**
+ * Represents a binary expression with a left and right operand.
+ * While it does not have value to use as a statement, the language allows it.
+ */
+public class BinaryExpression implements ExpressionOrStatement {
 
   private final Expression left;
   private final Expression right;

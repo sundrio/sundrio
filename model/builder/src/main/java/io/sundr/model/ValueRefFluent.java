@@ -11,6 +11,9 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
+
+  private Object value;
+
   public ValueRefFluent() {
   }
 
@@ -18,25 +21,10 @@ public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
     this.copyInstance(instance);
   }
 
-  private Object value;
-
   protected void copyInstance(ValueRef instance) {
     if (instance != null) {
       this.withValue(instance.getValue());
     }
-  }
-
-  public Object getValue() {
-    return this.value;
-  }
-
-  public A withValue(Object value) {
-    this.value = value;
-    return (A) this;
-  }
-
-  public boolean hasValue() {
-    return this.value != null;
   }
 
   public boolean equals(Object o) {
@@ -52,6 +40,14 @@ public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
     return true;
   }
 
+  public Object getValue() {
+    return this.value;
+  }
+
+  public boolean hasValue() {
+    return this.value != null;
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(value, super.hashCode());
   }
@@ -65,6 +61,11 @@ public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  public A withValue(Object value) {
+    this.value = value;
+    return (A) this;
   }
 
 }

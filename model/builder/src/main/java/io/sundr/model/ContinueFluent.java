@@ -11,6 +11,7 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class ContinueFluent<A extends ContinueFluent<A>> extends BaseFluent<A> {
+
   public ContinueFluent() {
   }
 

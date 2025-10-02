@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class PostIncrementBuilder extends PostIncrementFluent<PostIncrementBuilder>
     implements VisitableBuilder<PostIncrement, PostIncrementBuilder> {
+
+  PostIncrementFluent<?> fluent;
+
   public PostIncrementBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class PostIncrementBuilder extends PostIncrementFluent<PostIncrementBuild
     this.fluent = fluent;
   }
 
-  public PostIncrementBuilder(PostIncrementFluent<?> fluent, PostIncrement instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public PostIncrementBuilder(PostIncrement instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  PostIncrementFluent<?> fluent;
+  public PostIncrementBuilder(PostIncrementFluent<?> fluent, PostIncrement instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public PostIncrement build() {
     PostIncrement buildable = new PostIncrement(fluent.buildExpression());

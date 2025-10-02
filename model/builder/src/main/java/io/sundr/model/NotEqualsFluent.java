@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class NotEqualsFluent<A extends NotEqualsFluent<A>> extends BinaryExpressionFluent<A> {
+
   public NotEqualsFluent() {
   }
 

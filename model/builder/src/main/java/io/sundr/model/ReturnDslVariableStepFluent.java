@@ -11,6 +11,9 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class ReturnDslVariableStepFluent<A extends ReturnDslVariableStepFluent<A>> extends BaseFluent<A> {
+
+  private String name;
+
   public ReturnDslVariableStepFluent() {
   }
 
@@ -18,25 +21,10 @@ public class ReturnDslVariableStepFluent<A extends ReturnDslVariableStepFluent<A
     this.copyInstance(instance);
   }
 
-  private String name;
-
   protected void copyInstance(ReturnDslVariableStep instance) {
     if (instance != null) {
       this.withName(instance.getName());
     }
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public A withName(String name) {
-    this.name = name;
-    return (A) this;
-  }
-
-  public boolean hasName() {
-    return this.name != null;
   }
 
   public boolean equals(Object o) {
@@ -52,6 +40,14 @@ public class ReturnDslVariableStepFluent<A extends ReturnDslVariableStepFluent<A
     return true;
   }
 
+  public String getName() {
+    return this.name;
+  }
+
+  public boolean hasName() {
+    return this.name != null;
+  }
+
   public int hashCode() {
     return java.util.Objects.hash(name, super.hashCode());
   }
@@ -65,6 +61,11 @@ public class ReturnDslVariableStepFluent<A extends ReturnDslVariableStepFluent<A
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  public A withName(String name) {
+    this.name = name;
+    return (A) this;
   }
 
 }

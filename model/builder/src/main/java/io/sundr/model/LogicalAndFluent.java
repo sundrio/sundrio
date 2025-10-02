@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class LogicalAndFluent<A extends LogicalAndFluent<A>> extends BinaryExpressionFluent<A> {
+
   public LogicalAndFluent() {
   }
 

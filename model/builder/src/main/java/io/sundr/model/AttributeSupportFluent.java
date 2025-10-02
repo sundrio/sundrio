@@ -13,6 +13,9 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends BaseFluent<A> {
+
+  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
+
   public AttributeSupportFluent() {
   }
 
@@ -20,12 +23,14 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
     this.copyInstance(instance);
   }
 
-  private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
-
-  protected void copyInstance(AttributeSupport instance) {
-    if (instance != null) {
-      this.withAttributes(instance.getAttributes());
+  public A addToAttributes(Map<AttributeKey, Object> map) {
+    if (this.attributes == null && map != null) {
+      this.attributes = new LinkedHashMap();
     }
+    if (map != null) {
+      this.attributes.putAll(map);
+    }
+    return (A) this;
   }
 
   public A addToAttributes(AttributeKey key, Object value) {
@@ -38,14 +43,35 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
     return (A) this;
   }
 
-  public A addToAttributes(Map<AttributeKey, Object> map) {
-    if (this.attributes == null && map != null) {
-      this.attributes = new LinkedHashMap();
+  protected void copyInstance(AttributeSupport instance) {
+    if (instance != null) {
+      this.withAttributes(instance.getAttributes());
     }
-    if (map != null) {
-      this.attributes.putAll(map);
-    }
-    return (A) this;
+  }
+
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    AttributeSupportFluent that = (AttributeSupportFluent) o;
+    if (!java.util.Objects.equals(attributes, that.attributes))
+      return false;
+    return true;
+  }
+
+  public Map<AttributeKey, Object> getAttributes() {
+    return this.attributes;
+  }
+
+  public boolean hasAttributes() {
+    return this.attributes != null;
+  }
+
+  public int hashCode() {
+    return java.util.Objects.hash(attributes, super.hashCode());
   }
 
   public A removeFromAttributes(AttributeKey key) {
@@ -72,40 +98,6 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
     return (A) this;
   }
 
-  public Map<AttributeKey, Object> getAttributes() {
-    return this.attributes;
-  }
-
-  public <K, V> A withAttributes(Map<AttributeKey, Object> attributes) {
-    if (attributes == null) {
-      this.attributes = null;
-    } else {
-      this.attributes = new LinkedHashMap(attributes);
-    }
-    return (A) this;
-  }
-
-  public boolean hasAttributes() {
-    return this.attributes != null;
-  }
-
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    if (!super.equals(o))
-      return false;
-    AttributeSupportFluent that = (AttributeSupportFluent) o;
-    if (!java.util.Objects.equals(attributes, that.attributes))
-      return false;
-    return true;
-  }
-
-  public int hashCode() {
-    return java.util.Objects.hash(attributes, super.hashCode());
-  }
-
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
@@ -115,6 +107,15 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  public <K, V> A withAttributes(Map<AttributeKey, Object> attributes) {
+    if (attributes == null) {
+      this.attributes = null;
+    } else {
+      this.attributes = new LinkedHashMap(attributes);
+    }
+    return (A) this;
   }
 
 }

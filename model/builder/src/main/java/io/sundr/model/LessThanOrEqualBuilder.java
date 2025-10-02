@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class LessThanOrEqualBuilder extends LessThanOrEqualFluent<LessThanOrEqualBuilder>
     implements VisitableBuilder<LessThanOrEqual, LessThanOrEqualBuilder> {
+
+  LessThanOrEqualFluent<?> fluent;
+
   public LessThanOrEqualBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class LessThanOrEqualBuilder extends LessThanOrEqualFluent<LessThanOrEqua
     this.fluent = fluent;
   }
 
-  public LessThanOrEqualBuilder(LessThanOrEqualFluent<?> fluent, LessThanOrEqual instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public LessThanOrEqualBuilder(LessThanOrEqual instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  LessThanOrEqualFluent<?> fluent;
+  public LessThanOrEqualBuilder(LessThanOrEqualFluent<?> fluent, LessThanOrEqual instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public LessThanOrEqual build() {
     LessThanOrEqual buildable = new LessThanOrEqual(fluent.buildLeft(), fluent.buildRight());

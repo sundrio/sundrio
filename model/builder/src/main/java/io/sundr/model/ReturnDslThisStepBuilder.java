@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class ReturnDslThisStepBuilder extends ReturnDslThisStepFluent<ReturnDslThisStepBuilder>
     implements VisitableBuilder<ReturnDslThisStep, ReturnDslThisStepBuilder> {
+
+  ReturnDslThisStepFluent<?> fluent;
+
   public ReturnDslThisStepBuilder() {
     this(new ReturnDslThisStep());
   }
@@ -12,17 +15,15 @@ public class ReturnDslThisStepBuilder extends ReturnDslThisStepFluent<ReturnDslT
     this(fluent, new ReturnDslThisStep());
   }
 
-  public ReturnDslThisStepBuilder(ReturnDslThisStepFluent<?> fluent, ReturnDslThisStep instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public ReturnDslThisStepBuilder(ReturnDslThisStep instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  ReturnDslThisStepFluent<?> fluent;
+  public ReturnDslThisStepBuilder(ReturnDslThisStepFluent<?> fluent, ReturnDslThisStep instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public ReturnDslThisStep build() {
     ReturnDslThisStep buildable = new ReturnDslThisStep();

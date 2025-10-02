@@ -15,6 +15,9 @@ import io.sundr.builder.VisitableBuilder;
  */
 @SuppressWarnings("unchecked")
 public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
+
+  private VisitableBuilder<? extends Expression, ?> expresion;
+
   public NegativeFluent() {
   }
 
@@ -22,506 +25,8 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
     this.copyInstance(instance);
   }
 
-  private VisitableBuilder<? extends Expression, ?> expresion;
-
-  protected void copyInstance(Negative instance) {
-    if (instance != null) {
-      this.withExpresion(instance.getExpresion());
-    }
-  }
-
   public Expression buildExpresion() {
     return this.expresion != null ? this.expresion.build() : null;
-  }
-
-  public A withExpresion(Expression expresion) {
-    if (expresion == null) {
-      this.expresion = null;
-      this._visitables.remove("expresion");
-      return (A) this;
-    } else {
-      VisitableBuilder<? extends Expression, ?> builder = builder(expresion);
-      this._visitables.get("expresion").clear();
-      this._visitables.get("expresion").add(builder);
-      this.expresion = builder;
-      return (A) this;
-    }
-  }
-
-  public boolean hasExpresion() {
-    return this.expresion != null;
-  }
-
-  public MultiplyExpresionNested<A> withNewMultiplyExpresion() {
-    return new MultiplyExpresionNested(null);
-  }
-
-  public MultiplyExpresionNested<A> withNewMultiplyExpresionLike(Multiply item) {
-    return new MultiplyExpresionNested(item);
-  }
-
-  public A withNewMultiplyExpresion(Object left, Object right) {
-    return (A) withExpresion(new Multiply(left, right));
-  }
-
-  public NewArrayExpresionNested<A> withNewNewArrayExpresion() {
-    return new NewArrayExpresionNested(null);
-  }
-
-  public NewArrayExpresionNested<A> withNewNewArrayExpresionLike(NewArray item) {
-    return new NewArrayExpresionNested(item);
-  }
-
-  public A withNewNewArrayExpresion(Class type, Integer[] sizes) {
-    return (A) withExpresion(new NewArray(type, sizes));
-  }
-
-  public InstanceOfExpresionNested<A> withNewInstanceOfExpresion() {
-    return new InstanceOfExpresionNested(null);
-  }
-
-  public InstanceOfExpresionNested<A> withNewInstanceOfExpresionLike(InstanceOf item) {
-    return new InstanceOfExpresionNested(item);
-  }
-
-  public MethodCallExpresionNested<A> withNewMethodCallExpresion() {
-    return new MethodCallExpresionNested(null);
-  }
-
-  public MethodCallExpresionNested<A> withNewMethodCallExpresionLike(MethodCall item) {
-    return new MethodCallExpresionNested(item);
-  }
-
-  public InverseExpresionNested<A> withNewInverseExpresion() {
-    return new InverseExpresionNested(null);
-  }
-
-  public InverseExpresionNested<A> withNewInverseExpresionLike(Inverse item) {
-    return new InverseExpresionNested(item);
-  }
-
-  public IndexExpresionNested<A> withNewIndexExpresion() {
-    return new IndexExpresionNested(null);
-  }
-
-  public IndexExpresionNested<A> withNewIndexExpresionLike(Index item) {
-    return new IndexExpresionNested(item);
-  }
-
-  public GreaterThanOrEqualExpresionNested<A> withNewGreaterThanOrEqualExpresion() {
-    return new GreaterThanOrEqualExpresionNested(null);
-  }
-
-  public GreaterThanOrEqualExpresionNested<A> withNewGreaterThanOrEqualExpresionLike(GreaterThanOrEqual item) {
-    return new GreaterThanOrEqualExpresionNested(item);
-  }
-
-  public A withNewGreaterThanOrEqualExpresion(Object left, Object right) {
-    return (A) withExpresion(new GreaterThanOrEqual(left, right));
-  }
-
-  public BitwiseAndExpresionNested<A> withNewBitwiseAndExpresion() {
-    return new BitwiseAndExpresionNested(null);
-  }
-
-  public BitwiseAndExpresionNested<A> withNewBitwiseAndExpresionLike(BitwiseAnd item) {
-    return new BitwiseAndExpresionNested(item);
-  }
-
-  public A withNewBitwiseAndExpresion(Object left, Object right) {
-    return (A) withExpresion(new BitwiseAnd(left, right));
-  }
-
-  public MinusExpresionNested<A> withNewMinusExpresion() {
-    return new MinusExpresionNested(null);
-  }
-
-  public MinusExpresionNested<A> withNewMinusExpresionLike(Minus item) {
-    return new MinusExpresionNested(item);
-  }
-
-  public A withNewMinusExpresion(Object left, Object right) {
-    return (A) withExpresion(new Minus(left, right));
-  }
-
-  public LogicalOrExpresionNested<A> withNewLogicalOrExpresion() {
-    return new LogicalOrExpresionNested(null);
-  }
-
-  public LogicalOrExpresionNested<A> withNewLogicalOrExpresionLike(LogicalOr item) {
-    return new LogicalOrExpresionNested(item);
-  }
-
-  public A withNewLogicalOrExpresion(Object left, Object right) {
-    return (A) withExpresion(new LogicalOr(left, right));
-  }
-
-  public NotEqualsExpresionNested<A> withNewNotEqualsExpresion() {
-    return new NotEqualsExpresionNested(null);
-  }
-
-  public NotEqualsExpresionNested<A> withNewNotEqualsExpresionLike(NotEquals item) {
-    return new NotEqualsExpresionNested(item);
-  }
-
-  public A withNewNotEqualsExpresion(Object left, Object right) {
-    return (A) withExpresion(new NotEquals(left, right));
-  }
-
-  public DivideExpresionNested<A> withNewDivideExpresion() {
-    return new DivideExpresionNested(null);
-  }
-
-  public DivideExpresionNested<A> withNewDivideExpresionLike(Divide item) {
-    return new DivideExpresionNested(item);
-  }
-
-  public A withNewDivideExpresion(Object left, Object right) {
-    return (A) withExpresion(new Divide(left, right));
-  }
-
-  public LessThanExpresionNested<A> withNewLessThanExpresion() {
-    return new LessThanExpresionNested(null);
-  }
-
-  public LessThanExpresionNested<A> withNewLessThanExpresionLike(LessThan item) {
-    return new LessThanExpresionNested(item);
-  }
-
-  public A withNewLessThanExpresion(Object left, Object right) {
-    return (A) withExpresion(new LessThan(left, right));
-  }
-
-  public BitwiseOrExpresionNested<A> withNewBitwiseOrExpresion() {
-    return new BitwiseOrExpresionNested(null);
-  }
-
-  public BitwiseOrExpresionNested<A> withNewBitwiseOrExpresionLike(BitwiseOr item) {
-    return new BitwiseOrExpresionNested(item);
-  }
-
-  public A withNewBitwiseOrExpresion(Object left, Object right) {
-    return (A) withExpresion(new BitwiseOr(left, right));
-  }
-
-  public PropertyRefExpresionNested<A> withNewPropertyRefExpresion() {
-    return new PropertyRefExpresionNested(null);
-  }
-
-  public PropertyRefExpresionNested<A> withNewPropertyRefExpresionLike(PropertyRef item) {
-    return new PropertyRefExpresionNested(item);
-  }
-
-  public RightShiftExpresionNested<A> withNewRightShiftExpresion() {
-    return new RightShiftExpresionNested(null);
-  }
-
-  public RightShiftExpresionNested<A> withNewRightShiftExpresionLike(RightShift item) {
-    return new RightShiftExpresionNested(item);
-  }
-
-  public A withNewRightShiftExpresion(Object left, Object right) {
-    return (A) withExpresion(new RightShift(left, right));
-  }
-
-  public SuperExpresionNested<A> withNewSuperExpresion() {
-    return new SuperExpresionNested(null);
-  }
-
-  public SuperExpresionNested<A> withNewSuperExpresionLike(Super item) {
-    return new SuperExpresionNested(item);
-  }
-
-  public GreaterThanExpresionNested<A> withNewGreaterThanExpresion() {
-    return new GreaterThanExpresionNested(null);
-  }
-
-  public GreaterThanExpresionNested<A> withNewGreaterThanExpresionLike(GreaterThan item) {
-    return new GreaterThanExpresionNested(item);
-  }
-
-  public A withNewGreaterThanExpresion(Object left, Object right) {
-    return (A) withExpresion(new GreaterThan(left, right));
-  }
-
-  public DeclareExpresionNested<A> withNewDeclareExpresion() {
-    return new DeclareExpresionNested(null);
-  }
-
-  public DeclareExpresionNested<A> withNewDeclareExpresionLike(Declare item) {
-    return new DeclareExpresionNested(item);
-  }
-
-  public A withNewDeclareExpresion(Class type, String name) {
-    return (A) withExpresion(new Declare(type, name));
-  }
-
-  public A withNewDeclareExpresion(Class type, String name, Object value) {
-    return (A) withExpresion(new Declare(type, name, value));
-  }
-
-  public CastExpresionNested<A> withNewCastExpresion() {
-    return new CastExpresionNested(null);
-  }
-
-  public CastExpresionNested<A> withNewCastExpresionLike(Cast item) {
-    return new CastExpresionNested(item);
-  }
-
-  public ModuloExpresionNested<A> withNewModuloExpresion() {
-    return new ModuloExpresionNested(null);
-  }
-
-  public ModuloExpresionNested<A> withNewModuloExpresionLike(Modulo item) {
-    return new ModuloExpresionNested(item);
-  }
-
-  public A withNewModuloExpresion(Object left, Object right) {
-    return (A) withExpresion(new Modulo(left, right));
-  }
-
-  public ValueRefExpresionNested<A> withNewValueRefExpresion() {
-    return new ValueRefExpresionNested(null);
-  }
-
-  public ValueRefExpresionNested<A> withNewValueRefExpresionLike(ValueRef item) {
-    return new ValueRefExpresionNested(item);
-  }
-
-  public A withNewValueRefExpresion(Object value) {
-    return (A) withExpresion(new ValueRef(value));
-  }
-
-  public LeftShiftExpresionNested<A> withNewLeftShiftExpresion() {
-    return new LeftShiftExpresionNested(null);
-  }
-
-  public LeftShiftExpresionNested<A> withNewLeftShiftExpresionLike(LeftShift item) {
-    return new LeftShiftExpresionNested(item);
-  }
-
-  public A withNewLeftShiftExpresion(Object left, Object right) {
-    return (A) withExpresion(new LeftShift(left, right));
-  }
-
-  public TernaryExpresionNested<A> withNewTernaryExpresion() {
-    return new TernaryExpresionNested(null);
-  }
-
-  public TernaryExpresionNested<A> withNewTernaryExpresionLike(Ternary item) {
-    return new TernaryExpresionNested(item);
-  }
-
-  public BinaryExpressionExpresionNested<A> withNewBinaryExpressionExpresion() {
-    return new BinaryExpressionExpresionNested(null);
-  }
-
-  public BinaryExpressionExpresionNested<A> withNewBinaryExpressionExpresionLike(BinaryExpression item) {
-    return new BinaryExpressionExpresionNested(item);
-  }
-
-  public EqualsExpresionNested<A> withNewEqualsExpresion() {
-    return new EqualsExpresionNested(null);
-  }
-
-  public EqualsExpresionNested<A> withNewEqualsExpresionLike(Equals item) {
-    return new EqualsExpresionNested(item);
-  }
-
-  public A withNewEqualsExpresion(Object left, Object right) {
-    return (A) withExpresion(new Equals(left, right));
-  }
-
-  public EnclosedExpresionNested<A> withNewEnclosedExpresion() {
-    return new EnclosedExpresionNested(null);
-  }
-
-  public EnclosedExpresionNested<A> withNewEnclosedExpresionLike(Enclosed item) {
-    return new EnclosedExpresionNested(item);
-  }
-
-  public PreDecrementExpresionNested<A> withNewPreDecrementExpresion() {
-    return new PreDecrementExpresionNested(null);
-  }
-
-  public PreDecrementExpresionNested<A> withNewPreDecrementExpresionLike(PreDecrement item) {
-    return new PreDecrementExpresionNested(item);
-  }
-
-  public PostDecrementExpresionNested<A> withNewPostDecrementExpresion() {
-    return new PostDecrementExpresionNested(null);
-  }
-
-  public PostDecrementExpresionNested<A> withNewPostDecrementExpresionLike(PostDecrement item) {
-    return new PostDecrementExpresionNested(item);
-  }
-
-  public LambdaExpresionNested<A> withNewLambdaExpresion() {
-    return new LambdaExpresionNested(null);
-  }
-
-  public LambdaExpresionNested<A> withNewLambdaExpresionLike(Lambda item) {
-    return new LambdaExpresionNested(item);
-  }
-
-  public NotExpresionNested<A> withNewNotExpresion() {
-    return new NotExpresionNested(null);
-  }
-
-  public NotExpresionNested<A> withNewNotExpresionLike(Not item) {
-    return new NotExpresionNested(item);
-  }
-
-  public AssignExpresionNested<A> withNewAssignExpresion() {
-    return new AssignExpresionNested(null);
-  }
-
-  public AssignExpresionNested<A> withNewAssignExpresionLike(Assign item) {
-    return new AssignExpresionNested(item);
-  }
-
-  public ThisExpresionNested<A> withNewThisExpresion() {
-    return new ThisExpresionNested(null);
-  }
-
-  public ThisExpresionNested<A> withNewThisExpresionLike(This item) {
-    return new ThisExpresionNested(item);
-  }
-
-  public NegativeExpresionNested<A> withNewNegativeExpresion() {
-    return new NegativeExpresionNested(null);
-  }
-
-  public NegativeExpresionNested<A> withNewNegativeExpresionLike(Negative item) {
-    return new NegativeExpresionNested(item);
-  }
-
-  public LogicalAndExpresionNested<A> withNewLogicalAndExpresion() {
-    return new LogicalAndExpresionNested(null);
-  }
-
-  public LogicalAndExpresionNested<A> withNewLogicalAndExpresionLike(LogicalAnd item) {
-    return new LogicalAndExpresionNested(item);
-  }
-
-  public A withNewLogicalAndExpresion(Object left, Object right) {
-    return (A) withExpresion(new LogicalAnd(left, right));
-  }
-
-  public PostIncrementExpresionNested<A> withNewPostIncrementExpresion() {
-    return new PostIncrementExpresionNested(null);
-  }
-
-  public PostIncrementExpresionNested<A> withNewPostIncrementExpresionLike(PostIncrement item) {
-    return new PostIncrementExpresionNested(item);
-  }
-
-  public RightUnsignedShiftExpresionNested<A> withNewRightUnsignedShiftExpresion() {
-    return new RightUnsignedShiftExpresionNested(null);
-  }
-
-  public RightUnsignedShiftExpresionNested<A> withNewRightUnsignedShiftExpresionLike(RightUnsignedShift item) {
-    return new RightUnsignedShiftExpresionNested(item);
-  }
-
-  public A withNewRightUnsignedShiftExpresion(Object left, Object right) {
-    return (A) withExpresion(new RightUnsignedShift(left, right));
-  }
-
-  public PlusExpresionNested<A> withNewPlusExpresion() {
-    return new PlusExpresionNested(null);
-  }
-
-  public PlusExpresionNested<A> withNewPlusExpresionLike(Plus item) {
-    return new PlusExpresionNested(item);
-  }
-
-  public A withNewPlusExpresion(Object left, Object right) {
-    return (A) withExpresion(new Plus(left, right));
-  }
-
-  public ConstructExpresionNested<A> withNewConstructExpresion() {
-    return new ConstructExpresionNested(null);
-  }
-
-  public ConstructExpresionNested<A> withNewConstructExpresionLike(Construct item) {
-    return new ConstructExpresionNested(item);
-  }
-
-  public XorExpresionNested<A> withNewXorExpresion() {
-    return new XorExpresionNested(null);
-  }
-
-  public XorExpresionNested<A> withNewXorExpresionLike(Xor item) {
-    return new XorExpresionNested(item);
-  }
-
-  public A withNewXorExpresion(Object left, Object right) {
-    return (A) withExpresion(new Xor(left, right));
-  }
-
-  public PreIncrementExpresionNested<A> withNewPreIncrementExpresion() {
-    return new PreIncrementExpresionNested(null);
-  }
-
-  public PreIncrementExpresionNested<A> withNewPreIncrementExpresionLike(PreIncrement item) {
-    return new PreIncrementExpresionNested(item);
-  }
-
-  public PropertyExpresionNested<A> withNewPropertyExpresion() {
-    return new PropertyExpresionNested(null);
-  }
-
-  public PropertyExpresionNested<A> withNewPropertyExpresionLike(Property item) {
-    return new PropertyExpresionNested(item);
-  }
-
-  public LessThanOrEqualExpresionNested<A> withNewLessThanOrEqualExpresion() {
-    return new LessThanOrEqualExpresionNested(null);
-  }
-
-  public LessThanOrEqualExpresionNested<A> withNewLessThanOrEqualExpresionLike(LessThanOrEqual item) {
-    return new LessThanOrEqualExpresionNested(item);
-  }
-
-  public A withNewLessThanOrEqualExpresion(Object left, Object right) {
-    return (A) withExpresion(new LessThanOrEqual(left, right));
-  }
-
-  public PositiveExpresionNested<A> withNewPositiveExpresion() {
-    return new PositiveExpresionNested(null);
-  }
-
-  public PositiveExpresionNested<A> withNewPositiveExpresionLike(Positive item) {
-    return new PositiveExpresionNested(item);
-  }
-
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    if (!super.equals(o))
-      return false;
-    NegativeFluent that = (NegativeFluent) o;
-    if (!java.util.Objects.equals(expresion, that.expresion))
-      return false;
-    return true;
-  }
-
-  public int hashCode() {
-    return java.util.Objects.hash(expresion, super.hashCode());
-  }
-
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("{");
-    if (expresion != null) {
-      sb.append("expresion:");
-      sb.append(expresion);
-    }
-    sb.append("}");
-    return sb.toString();
   }
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
@@ -534,6 +39,8 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
       case "io.sundr.model." + "MethodCall":
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
+      case "io.sundr.model." + "ClassRef":
+        return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
       case "io.sundr.model." + "Inverse":
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
       case "io.sundr.model." + "Index":
@@ -568,10 +75,14 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
       case "io.sundr.model." + "Modulo":
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
+      case "io.sundr.model." + "DotClass":
+        return (VisitableBuilder<T, ?>) new DotClassBuilder((DotClass) item);
       case "io.sundr.model." + "ValueRef":
         return (VisitableBuilder<T, ?>) new ValueRefBuilder((ValueRef) item);
       case "io.sundr.model." + "LeftShift":
         return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
+      case "io.sundr.model." + "Empty":
+        return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
       case "io.sundr.model." + "Ternary":
         return (VisitableBuilder<T, ?>) new TernaryBuilder((Ternary) item);
       case "io.sundr.model." + "BinaryExpression":
@@ -612,548 +123,553 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
       case "io.sundr.model." + "LessThanOrEqual":
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
+      case "io.sundr.model." + "ContextRef":
+        return (VisitableBuilder<T, ?>) new ContextRefBuilder((ContextRef) item);
       case "io.sundr.model." + "Positive":
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
     }
     return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
-  public class MultiplyExpresionNested<N> extends MultiplyFluent<MultiplyExpresionNested<N>> implements Nested<N> {
-    MultiplyExpresionNested(Multiply item) {
-      this.builder = new MultiplyBuilder(this, item);
+  protected void copyInstance(Negative instance) {
+    if (instance != null) {
+      this.withExpresion(instance.getExpresion());
     }
-
-    MultiplyBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endMultiplyExpresion() {
-      return and();
-    }
-
   }
 
-  public class NewArrayExpresionNested<N> extends NewArrayFluent<NewArrayExpresionNested<N>> implements Nested<N> {
-    NewArrayExpresionNested(NewArray item) {
-      this.builder = new NewArrayBuilder(this, item);
-    }
-
-    NewArrayBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endNewArrayExpresion() {
-      return and();
-    }
-
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
+    if (!super.equals(o))
+      return false;
+    NegativeFluent that = (NegativeFluent) o;
+    if (!java.util.Objects.equals(expresion, that.expresion))
+      return false;
+    return true;
   }
 
-  public class InstanceOfExpresionNested<N> extends InstanceOfFluent<InstanceOfExpresionNested<N>> implements Nested<N> {
-    InstanceOfExpresionNested(InstanceOf item) {
-      this.builder = new InstanceOfBuilder(this, item);
-    }
-
-    InstanceOfBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endInstanceOfExpresion() {
-      return and();
-    }
-
+  public boolean hasExpresion() {
+    return this.expresion != null;
   }
 
-  public class MethodCallExpresionNested<N> extends MethodCallFluent<MethodCallExpresionNested<N>> implements Nested<N> {
-    MethodCallExpresionNested(MethodCall item) {
-      this.builder = new MethodCallBuilder(this, item);
-    }
-
-    MethodCallBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endMethodCallExpresion() {
-      return and();
-    }
-
+  public int hashCode() {
+    return java.util.Objects.hash(expresion, super.hashCode());
   }
 
-  public class InverseExpresionNested<N> extends InverseFluent<InverseExpresionNested<N>> implements Nested<N> {
-    InverseExpresionNested(Inverse item) {
-      this.builder = new InverseBuilder(this, item);
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{");
+    if (expresion != null) {
+      sb.append("expresion:");
+      sb.append(expresion);
     }
-
-    InverseBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endInverseExpresion() {
-      return and();
-    }
-
+    sb.append("}");
+    return sb.toString();
   }
 
-  public class IndexExpresionNested<N> extends IndexFluent<IndexExpresionNested<N>> implements Nested<N> {
-    IndexExpresionNested(Index item) {
-      this.builder = new IndexBuilder(this, item);
+  public A withExpresion(Expression expresion) {
+    if (expresion == null) {
+      this.expresion = null;
+      this._visitables.remove("expresion");
+      return (A) this;
+    } else {
+      VisitableBuilder<? extends Expression, ?> builder = builder(expresion);
+      this._visitables.get("expresion").clear();
+      this._visitables.get("expresion").add(builder);
+      this.expresion = builder;
+      return (A) this;
     }
-
-    IndexBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endIndexExpresion() {
-      return and();
-    }
-
   }
 
-  public class GreaterThanOrEqualExpresionNested<N> extends GreaterThanOrEqualFluent<GreaterThanOrEqualExpresionNested<N>>
-      implements Nested<N> {
-    GreaterThanOrEqualExpresionNested(GreaterThanOrEqual item) {
-      this.builder = new GreaterThanOrEqualBuilder(this, item);
-    }
-
-    GreaterThanOrEqualBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endGreaterThanOrEqualExpresion() {
-      return and();
-    }
-
+  public AssignExpresionNested<A> withNewAssignExpresion() {
+    return new AssignExpresionNested(null);
   }
 
-  public class BitwiseAndExpresionNested<N> extends BitwiseAndFluent<BitwiseAndExpresionNested<N>> implements Nested<N> {
-    BitwiseAndExpresionNested(BitwiseAnd item) {
-      this.builder = new BitwiseAndBuilder(this, item);
-    }
-
-    BitwiseAndBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endBitwiseAndExpresion() {
-      return and();
-    }
-
+  public AssignExpresionNested<A> withNewAssignExpresionLike(Assign item) {
+    return new AssignExpresionNested(item);
   }
 
-  public class MinusExpresionNested<N> extends MinusFluent<MinusExpresionNested<N>> implements Nested<N> {
-    MinusExpresionNested(Minus item) {
-      this.builder = new MinusBuilder(this, item);
-    }
-
-    MinusBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endMinusExpresion() {
-      return and();
-    }
-
+  public BinaryExpressionExpresionNested<A> withNewBinaryExpressionExpresion() {
+    return new BinaryExpressionExpresionNested(null);
   }
 
-  public class LogicalOrExpresionNested<N> extends LogicalOrFluent<LogicalOrExpresionNested<N>> implements Nested<N> {
-    LogicalOrExpresionNested(LogicalOr item) {
-      this.builder = new LogicalOrBuilder(this, item);
-    }
-
-    LogicalOrBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endLogicalOrExpresion() {
-      return and();
-    }
-
+  public BinaryExpressionExpresionNested<A> withNewBinaryExpressionExpresionLike(BinaryExpression item) {
+    return new BinaryExpressionExpresionNested(item);
   }
 
-  public class NotEqualsExpresionNested<N> extends NotEqualsFluent<NotEqualsExpresionNested<N>> implements Nested<N> {
-    NotEqualsExpresionNested(NotEquals item) {
-      this.builder = new NotEqualsBuilder(this, item);
-    }
-
-    NotEqualsBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endNotEqualsExpresion() {
-      return and();
-    }
-
+  public BitwiseAndExpresionNested<A> withNewBitwiseAndExpresion() {
+    return new BitwiseAndExpresionNested(null);
   }
 
-  public class DivideExpresionNested<N> extends DivideFluent<DivideExpresionNested<N>> implements Nested<N> {
-    DivideExpresionNested(Divide item) {
-      this.builder = new DivideBuilder(this, item);
-    }
-
-    DivideBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endDivideExpresion() {
-      return and();
-    }
-
+  public A withNewBitwiseAndExpresion(Object left, Object right) {
+    return (A) withExpresion(new BitwiseAnd(left, right));
   }
 
-  public class LessThanExpresionNested<N> extends LessThanFluent<LessThanExpresionNested<N>> implements Nested<N> {
-    LessThanExpresionNested(LessThan item) {
-      this.builder = new LessThanBuilder(this, item);
-    }
-
-    LessThanBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endLessThanExpresion() {
-      return and();
-    }
-
+  public BitwiseAndExpresionNested<A> withNewBitwiseAndExpresionLike(BitwiseAnd item) {
+    return new BitwiseAndExpresionNested(item);
   }
 
-  public class BitwiseOrExpresionNested<N> extends BitwiseOrFluent<BitwiseOrExpresionNested<N>> implements Nested<N> {
-    BitwiseOrExpresionNested(BitwiseOr item) {
-      this.builder = new BitwiseOrBuilder(this, item);
-    }
-
-    BitwiseOrBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endBitwiseOrExpresion() {
-      return and();
-    }
-
+  public BitwiseOrExpresionNested<A> withNewBitwiseOrExpresion() {
+    return new BitwiseOrExpresionNested(null);
   }
 
-  public class PropertyRefExpresionNested<N> extends PropertyRefFluent<PropertyRefExpresionNested<N>> implements Nested<N> {
-    PropertyRefExpresionNested(PropertyRef item) {
-      this.builder = new PropertyRefBuilder(this, item);
-    }
-
-    PropertyRefBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endPropertyRefExpresion() {
-      return and();
-    }
-
+  public A withNewBitwiseOrExpresion(Object left, Object right) {
+    return (A) withExpresion(new BitwiseOr(left, right));
   }
 
-  public class RightShiftExpresionNested<N> extends RightShiftFluent<RightShiftExpresionNested<N>> implements Nested<N> {
-    RightShiftExpresionNested(RightShift item) {
-      this.builder = new RightShiftBuilder(this, item);
-    }
-
-    RightShiftBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endRightShiftExpresion() {
-      return and();
-    }
-
+  public BitwiseOrExpresionNested<A> withNewBitwiseOrExpresionLike(BitwiseOr item) {
+    return new BitwiseOrExpresionNested(item);
   }
 
-  public class SuperExpresionNested<N> extends SuperFluent<SuperExpresionNested<N>> implements Nested<N> {
-    SuperExpresionNested(Super item) {
-      this.builder = new SuperBuilder(this, item);
-    }
-
-    SuperBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endSuperExpresion() {
-      return and();
-    }
-
+  public CastExpresionNested<A> withNewCastExpresion() {
+    return new CastExpresionNested(null);
   }
 
-  public class GreaterThanExpresionNested<N> extends GreaterThanFluent<GreaterThanExpresionNested<N>> implements Nested<N> {
-    GreaterThanExpresionNested(GreaterThan item) {
-      this.builder = new GreaterThanBuilder(this, item);
-    }
-
-    GreaterThanBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endGreaterThanExpresion() {
-      return and();
-    }
-
+  public CastExpresionNested<A> withNewCastExpresionLike(Cast item) {
+    return new CastExpresionNested(item);
   }
 
-  public class DeclareExpresionNested<N> extends DeclareFluent<DeclareExpresionNested<N>> implements Nested<N> {
-    DeclareExpresionNested(Declare item) {
-      this.builder = new DeclareBuilder(this, item);
-    }
-
-    DeclareBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endDeclareExpresion() {
-      return and();
-    }
-
+  public ClassRefExpresionNested<A> withNewClassRefExpresion() {
+    return new ClassRefExpresionNested(null);
   }
 
-  public class CastExpresionNested<N> extends CastFluent<CastExpresionNested<N>> implements Nested<N> {
-    CastExpresionNested(Cast item) {
-      this.builder = new CastBuilder(this, item);
-    }
-
-    CastBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endCastExpresion() {
-      return and();
-    }
-
+  public ClassRefExpresionNested<A> withNewClassRefExpresionLike(ClassRef item) {
+    return new ClassRefExpresionNested(item);
   }
 
-  public class ModuloExpresionNested<N> extends ModuloFluent<ModuloExpresionNested<N>> implements Nested<N> {
-    ModuloExpresionNested(Modulo item) {
-      this.builder = new ModuloBuilder(this, item);
-    }
-
-    ModuloBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endModuloExpresion() {
-      return and();
-    }
-
+  public ConstructExpresionNested<A> withNewConstructExpresion() {
+    return new ConstructExpresionNested(null);
   }
 
-  public class ValueRefExpresionNested<N> extends ValueRefFluent<ValueRefExpresionNested<N>> implements Nested<N> {
-    ValueRefExpresionNested(ValueRef item) {
-      this.builder = new ValueRefBuilder(this, item);
-    }
-
-    ValueRefBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endValueRefExpresion() {
-      return and();
-    }
-
+  public ConstructExpresionNested<A> withNewConstructExpresionLike(Construct item) {
+    return new ConstructExpresionNested(item);
   }
 
-  public class LeftShiftExpresionNested<N> extends LeftShiftFluent<LeftShiftExpresionNested<N>> implements Nested<N> {
-    LeftShiftExpresionNested(LeftShift item) {
-      this.builder = new LeftShiftBuilder(this, item);
-    }
-
-    LeftShiftBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endLeftShiftExpresion() {
-      return and();
-    }
-
+  public ContextRefExpresionNested<A> withNewContextRefExpresion() {
+    return new ContextRefExpresionNested(null);
   }
 
-  public class TernaryExpresionNested<N> extends TernaryFluent<TernaryExpresionNested<N>> implements Nested<N> {
-    TernaryExpresionNested(Ternary item) {
-      this.builder = new TernaryBuilder(this, item);
-    }
-
-    TernaryBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endTernaryExpresion() {
-      return and();
-    }
-
+  public A withNewContextRefExpresion(String name) {
+    return (A) withExpresion(new ContextRef(name));
   }
 
-  public class BinaryExpressionExpresionNested<N> extends BinaryExpressionFluent<BinaryExpressionExpresionNested<N>>
-      implements Nested<N> {
-    BinaryExpressionExpresionNested(BinaryExpression item) {
-      this.builder = new BinaryExpressionBuilder(this, item);
-    }
-
-    BinaryExpressionBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endBinaryExpressionExpresion() {
-      return and();
-    }
-
+  public ContextRefExpresionNested<A> withNewContextRefExpresionLike(ContextRef item) {
+    return new ContextRefExpresionNested(item);
   }
 
-  public class EqualsExpresionNested<N> extends EqualsFluent<EqualsExpresionNested<N>> implements Nested<N> {
-    EqualsExpresionNested(Equals item) {
-      this.builder = new EqualsBuilder(this, item);
-    }
-
-    EqualsBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endEqualsExpresion() {
-      return and();
-    }
-
+  public DeclareExpresionNested<A> withNewDeclareExpresion() {
+    return new DeclareExpresionNested(null);
   }
 
-  public class EnclosedExpresionNested<N> extends EnclosedFluent<EnclosedExpresionNested<N>> implements Nested<N> {
-    EnclosedExpresionNested(Enclosed item) {
-      this.builder = new EnclosedBuilder(this, item);
-    }
-
-    EnclosedBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endEnclosedExpresion() {
-      return and();
-    }
-
+  public A withNewDeclareExpresion(Class type, String name) {
+    return (A) withExpresion(new Declare(type, name));
   }
 
-  public class PreDecrementExpresionNested<N> extends PreDecrementFluent<PreDecrementExpresionNested<N>> implements Nested<N> {
-    PreDecrementExpresionNested(PreDecrement item) {
-      this.builder = new PreDecrementBuilder(this, item);
-    }
-
-    PreDecrementBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endPreDecrementExpresion() {
-      return and();
-    }
-
+  public A withNewDeclareExpresion(Class type, String name, Object value) {
+    return (A) withExpresion(new Declare(type, name, value));
   }
 
-  public class PostDecrementExpresionNested<N> extends PostDecrementFluent<PostDecrementExpresionNested<N>>
-      implements Nested<N> {
-    PostDecrementExpresionNested(PostDecrement item) {
-      this.builder = new PostDecrementBuilder(this, item);
-    }
-
-    PostDecrementBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endPostDecrementExpresion() {
-      return and();
-    }
-
+  public DeclareExpresionNested<A> withNewDeclareExpresionLike(Declare item) {
+    return new DeclareExpresionNested(item);
   }
 
-  public class LambdaExpresionNested<N> extends LambdaFluent<LambdaExpresionNested<N>> implements Nested<N> {
-    LambdaExpresionNested(Lambda item) {
-      this.builder = new LambdaBuilder(this, item);
-    }
-
-    LambdaBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endLambdaExpresion() {
-      return and();
-    }
-
+  public DivideExpresionNested<A> withNewDivideExpresion() {
+    return new DivideExpresionNested(null);
   }
 
-  public class NotExpresionNested<N> extends NotFluent<NotExpresionNested<N>> implements Nested<N> {
-    NotExpresionNested(Not item) {
-      this.builder = new NotBuilder(this, item);
-    }
+  public A withNewDivideExpresion(Object left, Object right) {
+    return (A) withExpresion(new Divide(left, right));
+  }
 
-    NotBuilder builder;
+  public DivideExpresionNested<A> withNewDivideExpresionLike(Divide item) {
+    return new DivideExpresionNested(item);
+  }
 
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
+  public DotClassExpresionNested<A> withNewDotClassExpresion() {
+    return new DotClassExpresionNested(null);
+  }
 
-    public N endNotExpresion() {
-      return and();
-    }
+  public DotClassExpresionNested<A> withNewDotClassExpresionLike(DotClass item) {
+    return new DotClassExpresionNested(item);
+  }
 
+  public EmptyExpresionNested<A> withNewEmptyExpresion() {
+    return new EmptyExpresionNested(null);
+  }
+
+  public EmptyExpresionNested<A> withNewEmptyExpresionLike(Empty item) {
+    return new EmptyExpresionNested(item);
+  }
+
+  public EnclosedExpresionNested<A> withNewEnclosedExpresion() {
+    return new EnclosedExpresionNested(null);
+  }
+
+  public EnclosedExpresionNested<A> withNewEnclosedExpresionLike(Enclosed item) {
+    return new EnclosedExpresionNested(item);
+  }
+
+  public EqualsExpresionNested<A> withNewEqualsExpresion() {
+    return new EqualsExpresionNested(null);
+  }
+
+  public A withNewEqualsExpresion(Object left, Object right) {
+    return (A) withExpresion(new Equals(left, right));
+  }
+
+  public EqualsExpresionNested<A> withNewEqualsExpresionLike(Equals item) {
+    return new EqualsExpresionNested(item);
+  }
+
+  public GreaterThanExpresionNested<A> withNewGreaterThanExpresion() {
+    return new GreaterThanExpresionNested(null);
+  }
+
+  public A withNewGreaterThanExpresion(Object left, Object right) {
+    return (A) withExpresion(new GreaterThan(left, right));
+  }
+
+  public GreaterThanExpresionNested<A> withNewGreaterThanExpresionLike(GreaterThan item) {
+    return new GreaterThanExpresionNested(item);
+  }
+
+  public GreaterThanOrEqualExpresionNested<A> withNewGreaterThanOrEqualExpresion() {
+    return new GreaterThanOrEqualExpresionNested(null);
+  }
+
+  public A withNewGreaterThanOrEqualExpresion(Object left, Object right) {
+    return (A) withExpresion(new GreaterThanOrEqual(left, right));
+  }
+
+  public GreaterThanOrEqualExpresionNested<A> withNewGreaterThanOrEqualExpresionLike(GreaterThanOrEqual item) {
+    return new GreaterThanOrEqualExpresionNested(item);
+  }
+
+  public IndexExpresionNested<A> withNewIndexExpresion() {
+    return new IndexExpresionNested(null);
+  }
+
+  public IndexExpresionNested<A> withNewIndexExpresionLike(Index item) {
+    return new IndexExpresionNested(item);
+  }
+
+  public InstanceOfExpresionNested<A> withNewInstanceOfExpresion() {
+    return new InstanceOfExpresionNested(null);
+  }
+
+  public InstanceOfExpresionNested<A> withNewInstanceOfExpresionLike(InstanceOf item) {
+    return new InstanceOfExpresionNested(item);
+  }
+
+  public InverseExpresionNested<A> withNewInverseExpresion() {
+    return new InverseExpresionNested(null);
+  }
+
+  public InverseExpresionNested<A> withNewInverseExpresionLike(Inverse item) {
+    return new InverseExpresionNested(item);
+  }
+
+  public LambdaExpresionNested<A> withNewLambdaExpresion() {
+    return new LambdaExpresionNested(null);
+  }
+
+  public LambdaExpresionNested<A> withNewLambdaExpresionLike(Lambda item) {
+    return new LambdaExpresionNested(item);
+  }
+
+  public LeftShiftExpresionNested<A> withNewLeftShiftExpresion() {
+    return new LeftShiftExpresionNested(null);
+  }
+
+  public A withNewLeftShiftExpresion(Object left, Object right) {
+    return (A) withExpresion(new LeftShift(left, right));
+  }
+
+  public LeftShiftExpresionNested<A> withNewLeftShiftExpresionLike(LeftShift item) {
+    return new LeftShiftExpresionNested(item);
+  }
+
+  public LessThanExpresionNested<A> withNewLessThanExpresion() {
+    return new LessThanExpresionNested(null);
+  }
+
+  public A withNewLessThanExpresion(Object left, Object right) {
+    return (A) withExpresion(new LessThan(left, right));
+  }
+
+  public LessThanExpresionNested<A> withNewLessThanExpresionLike(LessThan item) {
+    return new LessThanExpresionNested(item);
+  }
+
+  public LessThanOrEqualExpresionNested<A> withNewLessThanOrEqualExpresion() {
+    return new LessThanOrEqualExpresionNested(null);
+  }
+
+  public A withNewLessThanOrEqualExpresion(Object left, Object right) {
+    return (A) withExpresion(new LessThanOrEqual(left, right));
+  }
+
+  public LessThanOrEqualExpresionNested<A> withNewLessThanOrEqualExpresionLike(LessThanOrEqual item) {
+    return new LessThanOrEqualExpresionNested(item);
+  }
+
+  public LogicalAndExpresionNested<A> withNewLogicalAndExpresion() {
+    return new LogicalAndExpresionNested(null);
+  }
+
+  public A withNewLogicalAndExpresion(Object left, Object right) {
+    return (A) withExpresion(new LogicalAnd(left, right));
+  }
+
+  public LogicalAndExpresionNested<A> withNewLogicalAndExpresionLike(LogicalAnd item) {
+    return new LogicalAndExpresionNested(item);
+  }
+
+  public LogicalOrExpresionNested<A> withNewLogicalOrExpresion() {
+    return new LogicalOrExpresionNested(null);
+  }
+
+  public A withNewLogicalOrExpresion(Object left, Object right) {
+    return (A) withExpresion(new LogicalOr(left, right));
+  }
+
+  public LogicalOrExpresionNested<A> withNewLogicalOrExpresionLike(LogicalOr item) {
+    return new LogicalOrExpresionNested(item);
+  }
+
+  public MethodCallExpresionNested<A> withNewMethodCallExpresion() {
+    return new MethodCallExpresionNested(null);
+  }
+
+  public MethodCallExpresionNested<A> withNewMethodCallExpresionLike(MethodCall item) {
+    return new MethodCallExpresionNested(item);
+  }
+
+  public MinusExpresionNested<A> withNewMinusExpresion() {
+    return new MinusExpresionNested(null);
+  }
+
+  public A withNewMinusExpresion(Object left, Object right) {
+    return (A) withExpresion(new Minus(left, right));
+  }
+
+  public MinusExpresionNested<A> withNewMinusExpresionLike(Minus item) {
+    return new MinusExpresionNested(item);
+  }
+
+  public ModuloExpresionNested<A> withNewModuloExpresion() {
+    return new ModuloExpresionNested(null);
+  }
+
+  public A withNewModuloExpresion(Object left, Object right) {
+    return (A) withExpresion(new Modulo(left, right));
+  }
+
+  public ModuloExpresionNested<A> withNewModuloExpresionLike(Modulo item) {
+    return new ModuloExpresionNested(item);
+  }
+
+  public MultiplyExpresionNested<A> withNewMultiplyExpresion() {
+    return new MultiplyExpresionNested(null);
+  }
+
+  public A withNewMultiplyExpresion(Object left, Object right) {
+    return (A) withExpresion(new Multiply(left, right));
+  }
+
+  public MultiplyExpresionNested<A> withNewMultiplyExpresionLike(Multiply item) {
+    return new MultiplyExpresionNested(item);
+  }
+
+  public NegativeExpresionNested<A> withNewNegativeExpresion() {
+    return new NegativeExpresionNested(null);
+  }
+
+  public NegativeExpresionNested<A> withNewNegativeExpresionLike(Negative item) {
+    return new NegativeExpresionNested(item);
+  }
+
+  public NewArrayExpresionNested<A> withNewNewArrayExpresion() {
+    return new NewArrayExpresionNested(null);
+  }
+
+  public A withNewNewArrayExpresion(Class type, Integer[] sizes) {
+    return (A) withExpresion(new NewArray(type, sizes));
+  }
+
+  public NewArrayExpresionNested<A> withNewNewArrayExpresionLike(NewArray item) {
+    return new NewArrayExpresionNested(item);
+  }
+
+  public NotEqualsExpresionNested<A> withNewNotEqualsExpresion() {
+    return new NotEqualsExpresionNested(null);
+  }
+
+  public A withNewNotEqualsExpresion(Object left, Object right) {
+    return (A) withExpresion(new NotEquals(left, right));
+  }
+
+  public NotEqualsExpresionNested<A> withNewNotEqualsExpresionLike(NotEquals item) {
+    return new NotEqualsExpresionNested(item);
+  }
+
+  public NotExpresionNested<A> withNewNotExpresion() {
+    return new NotExpresionNested(null);
+  }
+
+  public NotExpresionNested<A> withNewNotExpresionLike(Not item) {
+    return new NotExpresionNested(item);
+  }
+
+  public PlusExpresionNested<A> withNewPlusExpresion() {
+    return new PlusExpresionNested(null);
+  }
+
+  public A withNewPlusExpresion(Object left, Object right) {
+    return (A) withExpresion(new Plus(left, right));
+  }
+
+  public PlusExpresionNested<A> withNewPlusExpresionLike(Plus item) {
+    return new PlusExpresionNested(item);
+  }
+
+  public PositiveExpresionNested<A> withNewPositiveExpresion() {
+    return new PositiveExpresionNested(null);
+  }
+
+  public PositiveExpresionNested<A> withNewPositiveExpresionLike(Positive item) {
+    return new PositiveExpresionNested(item);
+  }
+
+  public PostDecrementExpresionNested<A> withNewPostDecrementExpresion() {
+    return new PostDecrementExpresionNested(null);
+  }
+
+  public PostDecrementExpresionNested<A> withNewPostDecrementExpresionLike(PostDecrement item) {
+    return new PostDecrementExpresionNested(item);
+  }
+
+  public PostIncrementExpresionNested<A> withNewPostIncrementExpresion() {
+    return new PostIncrementExpresionNested(null);
+  }
+
+  public PostIncrementExpresionNested<A> withNewPostIncrementExpresionLike(PostIncrement item) {
+    return new PostIncrementExpresionNested(item);
+  }
+
+  public PreDecrementExpresionNested<A> withNewPreDecrementExpresion() {
+    return new PreDecrementExpresionNested(null);
+  }
+
+  public PreDecrementExpresionNested<A> withNewPreDecrementExpresionLike(PreDecrement item) {
+    return new PreDecrementExpresionNested(item);
+  }
+
+  public PreIncrementExpresionNested<A> withNewPreIncrementExpresion() {
+    return new PreIncrementExpresionNested(null);
+  }
+
+  public PreIncrementExpresionNested<A> withNewPreIncrementExpresionLike(PreIncrement item) {
+    return new PreIncrementExpresionNested(item);
+  }
+
+  public PropertyExpresionNested<A> withNewPropertyExpresion() {
+    return new PropertyExpresionNested(null);
+  }
+
+  public PropertyExpresionNested<A> withNewPropertyExpresionLike(Property item) {
+    return new PropertyExpresionNested(item);
+  }
+
+  public PropertyRefExpresionNested<A> withNewPropertyRefExpresion() {
+    return new PropertyRefExpresionNested(null);
+  }
+
+  public PropertyRefExpresionNested<A> withNewPropertyRefExpresionLike(PropertyRef item) {
+    return new PropertyRefExpresionNested(item);
+  }
+
+  public RightShiftExpresionNested<A> withNewRightShiftExpresion() {
+    return new RightShiftExpresionNested(null);
+  }
+
+  public A withNewRightShiftExpresion(Object left, Object right) {
+    return (A) withExpresion(new RightShift(left, right));
+  }
+
+  public RightShiftExpresionNested<A> withNewRightShiftExpresionLike(RightShift item) {
+    return new RightShiftExpresionNested(item);
+  }
+
+  public RightUnsignedShiftExpresionNested<A> withNewRightUnsignedShiftExpresion() {
+    return new RightUnsignedShiftExpresionNested(null);
+  }
+
+  public A withNewRightUnsignedShiftExpresion(Object left, Object right) {
+    return (A) withExpresion(new RightUnsignedShift(left, right));
+  }
+
+  public RightUnsignedShiftExpresionNested<A> withNewRightUnsignedShiftExpresionLike(RightUnsignedShift item) {
+    return new RightUnsignedShiftExpresionNested(item);
+  }
+
+  public SuperExpresionNested<A> withNewSuperExpresion() {
+    return new SuperExpresionNested(null);
+  }
+
+  public SuperExpresionNested<A> withNewSuperExpresionLike(Super item) {
+    return new SuperExpresionNested(item);
+  }
+
+  public TernaryExpresionNested<A> withNewTernaryExpresion() {
+    return new TernaryExpresionNested(null);
+  }
+
+  public TernaryExpresionNested<A> withNewTernaryExpresionLike(Ternary item) {
+    return new TernaryExpresionNested(item);
+  }
+
+  public ThisExpresionNested<A> withNewThisExpresion() {
+    return new ThisExpresionNested(null);
+  }
+
+  public ThisExpresionNested<A> withNewThisExpresionLike(This item) {
+    return new ThisExpresionNested(item);
+  }
+
+  public ValueRefExpresionNested<A> withNewValueRefExpresion() {
+    return new ValueRefExpresionNested(null);
+  }
+
+  public A withNewValueRefExpresion(Object value) {
+    return (A) withExpresion(new ValueRef(value));
+  }
+
+  public ValueRefExpresionNested<A> withNewValueRefExpresionLike(ValueRef item) {
+    return new ValueRefExpresionNested(item);
+  }
+
+  public XorExpresionNested<A> withNewXorExpresion() {
+    return new XorExpresionNested(null);
+  }
+
+  public A withNewXorExpresion(Object left, Object right) {
+    return (A) withExpresion(new Xor(left, right));
+  }
+
+  public XorExpresionNested<A> withNewXorExpresionLike(Xor item) {
+    return new XorExpresionNested(item);
   }
 
   public class AssignExpresionNested<N> extends AssignFluent<AssignExpresionNested<N>> implements Nested<N> {
+
+    AssignBuilder builder;
+
     AssignExpresionNested(Assign item) {
       this.builder = new AssignBuilder(this, item);
     }
-
-    AssignBuilder builder;
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
@@ -1165,116 +681,104 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class ThisExpresionNested<N> extends ThisFluent<ThisExpresionNested<N>> implements Nested<N> {
-    ThisExpresionNested(This item) {
-      this.builder = new ThisBuilder(this, item);
-    }
-
-    ThisBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endThisExpresion() {
-      return and();
-    }
-
-  }
-
-  public class NegativeExpresionNested<N> extends NegativeFluent<NegativeExpresionNested<N>> implements Nested<N> {
-    NegativeExpresionNested(Negative item) {
-      this.builder = new NegativeBuilder(this, item);
-    }
-
-    NegativeBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endNegativeExpresion() {
-      return and();
-    }
-
-  }
-
-  public class LogicalAndExpresionNested<N> extends LogicalAndFluent<LogicalAndExpresionNested<N>> implements Nested<N> {
-    LogicalAndExpresionNested(LogicalAnd item) {
-      this.builder = new LogicalAndBuilder(this, item);
-    }
-
-    LogicalAndBuilder builder;
-
-    public N and() {
-      return (N) NegativeFluent.this.withExpresion(builder.build());
-    }
-
-    public N endLogicalAndExpresion() {
-      return and();
-    }
-
-  }
-
-  public class PostIncrementExpresionNested<N> extends PostIncrementFluent<PostIncrementExpresionNested<N>>
+  public class BinaryExpressionExpresionNested<N> extends BinaryExpressionFluent<BinaryExpressionExpresionNested<N>>
       implements Nested<N> {
-    PostIncrementExpresionNested(PostIncrement item) {
-      this.builder = new PostIncrementBuilder(this, item);
-    }
 
-    PostIncrementBuilder builder;
+    BinaryExpressionBuilder builder;
+
+    BinaryExpressionExpresionNested(BinaryExpression item) {
+      this.builder = new BinaryExpressionBuilder(this, item);
+    }
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
     }
 
-    public N endPostIncrementExpresion() {
+    public N endBinaryExpressionExpresion() {
       return and();
     }
 
   }
 
-  public class RightUnsignedShiftExpresionNested<N> extends RightUnsignedShiftFluent<RightUnsignedShiftExpresionNested<N>>
-      implements Nested<N> {
-    RightUnsignedShiftExpresionNested(RightUnsignedShift item) {
-      this.builder = new RightUnsignedShiftBuilder(this, item);
-    }
+  public class BitwiseAndExpresionNested<N> extends BitwiseAndFluent<BitwiseAndExpresionNested<N>> implements Nested<N> {
 
-    RightUnsignedShiftBuilder builder;
+    BitwiseAndBuilder builder;
+
+    BitwiseAndExpresionNested(BitwiseAnd item) {
+      this.builder = new BitwiseAndBuilder(this, item);
+    }
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
     }
 
-    public N endRightUnsignedShiftExpresion() {
+    public N endBitwiseAndExpresion() {
       return and();
     }
 
   }
 
-  public class PlusExpresionNested<N> extends PlusFluent<PlusExpresionNested<N>> implements Nested<N> {
-    PlusExpresionNested(Plus item) {
-      this.builder = new PlusBuilder(this, item);
-    }
+  public class BitwiseOrExpresionNested<N> extends BitwiseOrFluent<BitwiseOrExpresionNested<N>> implements Nested<N> {
 
-    PlusBuilder builder;
+    BitwiseOrBuilder builder;
+
+    BitwiseOrExpresionNested(BitwiseOr item) {
+      this.builder = new BitwiseOrBuilder(this, item);
+    }
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
     }
 
-    public N endPlusExpresion() {
+    public N endBitwiseOrExpresion() {
+      return and();
+    }
+
+  }
+
+  public class CastExpresionNested<N> extends CastFluent<CastExpresionNested<N>> implements Nested<N> {
+
+    CastBuilder builder;
+
+    CastExpresionNested(Cast item) {
+      this.builder = new CastBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endCastExpresion() {
+      return and();
+    }
+
+  }
+
+  public class ClassRefExpresionNested<N> extends ClassRefFluent<ClassRefExpresionNested<N>> implements Nested<N> {
+
+    ClassRefBuilder builder;
+
+    ClassRefExpresionNested(ClassRef item) {
+      this.builder = new ClassRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endClassRefExpresion() {
       return and();
     }
 
   }
 
   public class ConstructExpresionNested<N> extends ConstructFluent<ConstructExpresionNested<N>> implements Nested<N> {
+
+    ConstructBuilder builder;
+
     ConstructExpresionNested(Construct item) {
       this.builder = new ConstructBuilder(this, item);
     }
-
-    ConstructBuilder builder;
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
@@ -1286,29 +790,575 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class XorExpresionNested<N> extends XorFluent<XorExpresionNested<N>> implements Nested<N> {
-    XorExpresionNested(Xor item) {
-      this.builder = new XorBuilder(this, item);
-    }
+  public class ContextRefExpresionNested<N> extends ContextRefFluent<ContextRefExpresionNested<N>> implements Nested<N> {
 
-    XorBuilder builder;
+    ContextRefBuilder builder;
+
+    ContextRefExpresionNested(ContextRef item) {
+      this.builder = new ContextRefBuilder(this, item);
+    }
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
     }
 
-    public N endXorExpresion() {
+    public N endContextRefExpresion() {
+      return and();
+    }
+
+  }
+
+  public class DeclareExpresionNested<N> extends DeclareFluent<DeclareExpresionNested<N>> implements Nested<N> {
+
+    DeclareBuilder builder;
+
+    DeclareExpresionNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endDeclareExpresion() {
+      return and();
+    }
+
+  }
+
+  public class DivideExpresionNested<N> extends DivideFluent<DivideExpresionNested<N>> implements Nested<N> {
+
+    DivideBuilder builder;
+
+    DivideExpresionNested(Divide item) {
+      this.builder = new DivideBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endDivideExpresion() {
+      return and();
+    }
+
+  }
+
+  public class DotClassExpresionNested<N> extends DotClassFluent<DotClassExpresionNested<N>> implements Nested<N> {
+
+    DotClassBuilder builder;
+
+    DotClassExpresionNested(DotClass item) {
+      this.builder = new DotClassBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endDotClassExpresion() {
+      return and();
+    }
+
+  }
+
+  public class EmptyExpresionNested<N> extends EmptyFluent<EmptyExpresionNested<N>> implements Nested<N> {
+
+    EmptyBuilder builder;
+
+    EmptyExpresionNested(Empty item) {
+      this.builder = new EmptyBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endEmptyExpresion() {
+      return and();
+    }
+
+  }
+
+  public class EnclosedExpresionNested<N> extends EnclosedFluent<EnclosedExpresionNested<N>> implements Nested<N> {
+
+    EnclosedBuilder builder;
+
+    EnclosedExpresionNested(Enclosed item) {
+      this.builder = new EnclosedBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endEnclosedExpresion() {
+      return and();
+    }
+
+  }
+
+  public class EqualsExpresionNested<N> extends EqualsFluent<EqualsExpresionNested<N>> implements Nested<N> {
+
+    EqualsBuilder builder;
+
+    EqualsExpresionNested(Equals item) {
+      this.builder = new EqualsBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endEqualsExpresion() {
+      return and();
+    }
+
+  }
+
+  public class GreaterThanExpresionNested<N> extends GreaterThanFluent<GreaterThanExpresionNested<N>> implements Nested<N> {
+
+    GreaterThanBuilder builder;
+
+    GreaterThanExpresionNested(GreaterThan item) {
+      this.builder = new GreaterThanBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endGreaterThanExpresion() {
+      return and();
+    }
+
+  }
+
+  public class GreaterThanOrEqualExpresionNested<N> extends GreaterThanOrEqualFluent<GreaterThanOrEqualExpresionNested<N>>
+      implements Nested<N> {
+
+    GreaterThanOrEqualBuilder builder;
+
+    GreaterThanOrEqualExpresionNested(GreaterThanOrEqual item) {
+      this.builder = new GreaterThanOrEqualBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endGreaterThanOrEqualExpresion() {
+      return and();
+    }
+
+  }
+
+  public class IndexExpresionNested<N> extends IndexFluent<IndexExpresionNested<N>> implements Nested<N> {
+
+    IndexBuilder builder;
+
+    IndexExpresionNested(Index item) {
+      this.builder = new IndexBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endIndexExpresion() {
+      return and();
+    }
+
+  }
+
+  public class InstanceOfExpresionNested<N> extends InstanceOfFluent<InstanceOfExpresionNested<N>> implements Nested<N> {
+
+    InstanceOfBuilder builder;
+
+    InstanceOfExpresionNested(InstanceOf item) {
+      this.builder = new InstanceOfBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endInstanceOfExpresion() {
+      return and();
+    }
+
+  }
+
+  public class InverseExpresionNested<N> extends InverseFluent<InverseExpresionNested<N>> implements Nested<N> {
+
+    InverseBuilder builder;
+
+    InverseExpresionNested(Inverse item) {
+      this.builder = new InverseBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endInverseExpresion() {
+      return and();
+    }
+
+  }
+
+  public class LambdaExpresionNested<N> extends LambdaFluent<LambdaExpresionNested<N>> implements Nested<N> {
+
+    LambdaBuilder builder;
+
+    LambdaExpresionNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endLambdaExpresion() {
+      return and();
+    }
+
+  }
+
+  public class LeftShiftExpresionNested<N> extends LeftShiftFluent<LeftShiftExpresionNested<N>> implements Nested<N> {
+
+    LeftShiftBuilder builder;
+
+    LeftShiftExpresionNested(LeftShift item) {
+      this.builder = new LeftShiftBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endLeftShiftExpresion() {
+      return and();
+    }
+
+  }
+
+  public class LessThanExpresionNested<N> extends LessThanFluent<LessThanExpresionNested<N>> implements Nested<N> {
+
+    LessThanBuilder builder;
+
+    LessThanExpresionNested(LessThan item) {
+      this.builder = new LessThanBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endLessThanExpresion() {
+      return and();
+    }
+
+  }
+
+  public class LessThanOrEqualExpresionNested<N> extends LessThanOrEqualFluent<LessThanOrEqualExpresionNested<N>>
+      implements Nested<N> {
+
+    LessThanOrEqualBuilder builder;
+
+    LessThanOrEqualExpresionNested(LessThanOrEqual item) {
+      this.builder = new LessThanOrEqualBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endLessThanOrEqualExpresion() {
+      return and();
+    }
+
+  }
+
+  public class LogicalAndExpresionNested<N> extends LogicalAndFluent<LogicalAndExpresionNested<N>> implements Nested<N> {
+
+    LogicalAndBuilder builder;
+
+    LogicalAndExpresionNested(LogicalAnd item) {
+      this.builder = new LogicalAndBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endLogicalAndExpresion() {
+      return and();
+    }
+
+  }
+
+  public class LogicalOrExpresionNested<N> extends LogicalOrFluent<LogicalOrExpresionNested<N>> implements Nested<N> {
+
+    LogicalOrBuilder builder;
+
+    LogicalOrExpresionNested(LogicalOr item) {
+      this.builder = new LogicalOrBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endLogicalOrExpresion() {
+      return and();
+    }
+
+  }
+
+  public class MethodCallExpresionNested<N> extends MethodCallFluent<MethodCallExpresionNested<N>> implements Nested<N> {
+
+    MethodCallBuilder builder;
+
+    MethodCallExpresionNested(MethodCall item) {
+      this.builder = new MethodCallBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endMethodCallExpresion() {
+      return and();
+    }
+
+  }
+
+  public class MinusExpresionNested<N> extends MinusFluent<MinusExpresionNested<N>> implements Nested<N> {
+
+    MinusBuilder builder;
+
+    MinusExpresionNested(Minus item) {
+      this.builder = new MinusBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endMinusExpresion() {
+      return and();
+    }
+
+  }
+
+  public class ModuloExpresionNested<N> extends ModuloFluent<ModuloExpresionNested<N>> implements Nested<N> {
+
+    ModuloBuilder builder;
+
+    ModuloExpresionNested(Modulo item) {
+      this.builder = new ModuloBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endModuloExpresion() {
+      return and();
+    }
+
+  }
+
+  public class MultiplyExpresionNested<N> extends MultiplyFluent<MultiplyExpresionNested<N>> implements Nested<N> {
+
+    MultiplyBuilder builder;
+
+    MultiplyExpresionNested(Multiply item) {
+      this.builder = new MultiplyBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endMultiplyExpresion() {
+      return and();
+    }
+
+  }
+
+  public class NegativeExpresionNested<N> extends NegativeFluent<NegativeExpresionNested<N>> implements Nested<N> {
+
+    NegativeBuilder builder;
+
+    NegativeExpresionNested(Negative item) {
+      this.builder = new NegativeBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endNegativeExpresion() {
+      return and();
+    }
+
+  }
+
+  public class NewArrayExpresionNested<N> extends NewArrayFluent<NewArrayExpresionNested<N>> implements Nested<N> {
+
+    NewArrayBuilder builder;
+
+    NewArrayExpresionNested(NewArray item) {
+      this.builder = new NewArrayBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endNewArrayExpresion() {
+      return and();
+    }
+
+  }
+
+  public class NotEqualsExpresionNested<N> extends NotEqualsFluent<NotEqualsExpresionNested<N>> implements Nested<N> {
+
+    NotEqualsBuilder builder;
+
+    NotEqualsExpresionNested(NotEquals item) {
+      this.builder = new NotEqualsBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endNotEqualsExpresion() {
+      return and();
+    }
+
+  }
+
+  public class NotExpresionNested<N> extends NotFluent<NotExpresionNested<N>> implements Nested<N> {
+
+    NotBuilder builder;
+
+    NotExpresionNested(Not item) {
+      this.builder = new NotBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endNotExpresion() {
+      return and();
+    }
+
+  }
+
+  public class PlusExpresionNested<N> extends PlusFluent<PlusExpresionNested<N>> implements Nested<N> {
+
+    PlusBuilder builder;
+
+    PlusExpresionNested(Plus item) {
+      this.builder = new PlusBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endPlusExpresion() {
+      return and();
+    }
+
+  }
+
+  public class PositiveExpresionNested<N> extends PositiveFluent<PositiveExpresionNested<N>> implements Nested<N> {
+
+    PositiveBuilder builder;
+
+    PositiveExpresionNested(Positive item) {
+      this.builder = new PositiveBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endPositiveExpresion() {
+      return and();
+    }
+
+  }
+
+  public class PostDecrementExpresionNested<N> extends PostDecrementFluent<PostDecrementExpresionNested<N>>
+      implements Nested<N> {
+
+    PostDecrementBuilder builder;
+
+    PostDecrementExpresionNested(PostDecrement item) {
+      this.builder = new PostDecrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endPostDecrementExpresion() {
+      return and();
+    }
+
+  }
+
+  public class PostIncrementExpresionNested<N> extends PostIncrementFluent<PostIncrementExpresionNested<N>>
+      implements Nested<N> {
+
+    PostIncrementBuilder builder;
+
+    PostIncrementExpresionNested(PostIncrement item) {
+      this.builder = new PostIncrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endPostIncrementExpresion() {
+      return and();
+    }
+
+  }
+
+  public class PreDecrementExpresionNested<N> extends PreDecrementFluent<PreDecrementExpresionNested<N>> implements Nested<N> {
+
+    PreDecrementBuilder builder;
+
+    PreDecrementExpresionNested(PreDecrement item) {
+      this.builder = new PreDecrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endPreDecrementExpresion() {
       return and();
     }
 
   }
 
   public class PreIncrementExpresionNested<N> extends PreIncrementFluent<PreIncrementExpresionNested<N>> implements Nested<N> {
+
+    PreIncrementBuilder builder;
+
     PreIncrementExpresionNested(PreIncrement item) {
       this.builder = new PreIncrementBuilder(this, item);
     }
-
-    PreIncrementBuilder builder;
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
@@ -1321,11 +1371,12 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
   }
 
   public class PropertyExpresionNested<N> extends PropertyFluent<PropertyExpresionNested<N>> implements Nested<N> {
+
+    PropertyBuilder builder;
+
     PropertyExpresionNested(Property item) {
       this.builder = new PropertyBuilder(this, item);
     }
-
-    PropertyBuilder builder;
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
@@ -1337,39 +1388,148 @@ public class NegativeFluent<A extends NegativeFluent<A>> extends BaseFluent<A> {
 
   }
 
-  public class LessThanOrEqualExpresionNested<N> extends LessThanOrEqualFluent<LessThanOrEqualExpresionNested<N>>
+  public class PropertyRefExpresionNested<N> extends PropertyRefFluent<PropertyRefExpresionNested<N>> implements Nested<N> {
+
+    PropertyRefBuilder builder;
+
+    PropertyRefExpresionNested(PropertyRef item) {
+      this.builder = new PropertyRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endPropertyRefExpresion() {
+      return and();
+    }
+
+  }
+
+  public class RightShiftExpresionNested<N> extends RightShiftFluent<RightShiftExpresionNested<N>> implements Nested<N> {
+
+    RightShiftBuilder builder;
+
+    RightShiftExpresionNested(RightShift item) {
+      this.builder = new RightShiftBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endRightShiftExpresion() {
+      return and();
+    }
+
+  }
+
+  public class RightUnsignedShiftExpresionNested<N> extends RightUnsignedShiftFluent<RightUnsignedShiftExpresionNested<N>>
       implements Nested<N> {
-    LessThanOrEqualExpresionNested(LessThanOrEqual item) {
-      this.builder = new LessThanOrEqualBuilder(this, item);
-    }
 
-    LessThanOrEqualBuilder builder;
+    RightUnsignedShiftBuilder builder;
+
+    RightUnsignedShiftExpresionNested(RightUnsignedShift item) {
+      this.builder = new RightUnsignedShiftBuilder(this, item);
+    }
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
     }
 
-    public N endLessThanOrEqualExpresion() {
+    public N endRightUnsignedShiftExpresion() {
       return and();
     }
 
   }
 
-  public class PositiveExpresionNested<N> extends PositiveFluent<PositiveExpresionNested<N>> implements Nested<N> {
-    PositiveExpresionNested(Positive item) {
-      this.builder = new PositiveBuilder(this, item);
-    }
+  public class SuperExpresionNested<N> extends SuperFluent<SuperExpresionNested<N>> implements Nested<N> {
 
-    PositiveBuilder builder;
+    SuperBuilder builder;
+
+    SuperExpresionNested(Super item) {
+      this.builder = new SuperBuilder(this, item);
+    }
 
     public N and() {
       return (N) NegativeFluent.this.withExpresion(builder.build());
     }
 
-    public N endPositiveExpresion() {
+    public N endSuperExpresion() {
       return and();
     }
 
   }
 
+  public class TernaryExpresionNested<N> extends TernaryFluent<TernaryExpresionNested<N>> implements Nested<N> {
+
+    TernaryBuilder builder;
+
+    TernaryExpresionNested(Ternary item) {
+      this.builder = new TernaryBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endTernaryExpresion() {
+      return and();
+    }
+
+  }
+
+  public class ThisExpresionNested<N> extends ThisFluent<ThisExpresionNested<N>> implements Nested<N> {
+
+    ThisBuilder builder;
+
+    ThisExpresionNested(This item) {
+      this.builder = new ThisBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endThisExpresion() {
+      return and();
+    }
+
+  }
+
+  public class ValueRefExpresionNested<N> extends ValueRefFluent<ValueRefExpresionNested<N>> implements Nested<N> {
+
+    ValueRefBuilder builder;
+
+    ValueRefExpresionNested(ValueRef item) {
+      this.builder = new ValueRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endValueRefExpresion() {
+      return and();
+    }
+
+  }
+
+  public class XorExpresionNested<N> extends XorFluent<XorExpresionNested<N>> implements Nested<N> {
+
+    XorBuilder builder;
+
+    XorExpresionNested(Xor item) {
+      this.builder = new XorBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) NegativeFluent.this.withExpresion(builder.build());
+    }
+
+    public N endXorExpresion() {
+      return and();
+    }
+
+  }
 }

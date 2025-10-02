@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class GreaterThanBuilder extends GreaterThanFluent<GreaterThanBuilder>
     implements VisitableBuilder<GreaterThan, GreaterThanBuilder> {
+
+  GreaterThanFluent<?> fluent;
+
   public GreaterThanBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class GreaterThanBuilder extends GreaterThanFluent<GreaterThanBuilder>
     this.fluent = fluent;
   }
 
-  public GreaterThanBuilder(GreaterThanFluent<?> fluent, GreaterThan instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public GreaterThanBuilder(GreaterThan instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  GreaterThanFluent<?> fluent;
+  public GreaterThanBuilder(GreaterThanFluent<?> fluent, GreaterThan instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public GreaterThan build() {
     GreaterThan buildable = new GreaterThan(fluent.buildLeft(), fluent.buildRight());

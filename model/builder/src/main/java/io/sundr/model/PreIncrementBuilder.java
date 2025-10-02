@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class PreIncrementBuilder extends PreIncrementFluent<PreIncrementBuilder>
     implements VisitableBuilder<PreIncrement, PreIncrementBuilder> {
+
+  PreIncrementFluent<?> fluent;
+
   public PreIncrementBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class PreIncrementBuilder extends PreIncrementFluent<PreIncrementBuilder>
     this.fluent = fluent;
   }
 
-  public PreIncrementBuilder(PreIncrementFluent<?> fluent, PreIncrement instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public PreIncrementBuilder(PreIncrement instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  PreIncrementFluent<?> fluent;
+  public PreIncrementBuilder(PreIncrementFluent<?> fluent, PreIncrement instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public PreIncrement build() {
     PreIncrement buildable = new PreIncrement(fluent.buildExpression());

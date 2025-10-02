@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class LessThanOrEqualFluent<A extends LessThanOrEqualFluent<A>> extends BinaryExpressionFluent<A> {
+
   public LessThanOrEqualFluent() {
   }
 

@@ -11,6 +11,7 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class BreakFluent<A extends BreakFluent<A>> extends BaseFluent<A> {
+
   public BreakFluent() {
   }
 

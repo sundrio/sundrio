@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class DivideFluent<A extends DivideFluent<A>> extends BinaryExpressionFluent<A> {
+
   public DivideFluent() {
   }
 

@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class TypeRefFluent<A extends TypeRefFluent<A>> extends AttributeSupportFluent<A> {
+
   public TypeRefFluent() {
   }
 

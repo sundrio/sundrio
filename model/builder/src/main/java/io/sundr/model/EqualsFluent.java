@@ -9,6 +9,7 @@ import java.lang.SuppressWarnings;
  */
 @SuppressWarnings("unchecked")
 public class EqualsFluent<A extends EqualsFluent<A>> extends BinaryExpressionFluent<A> {
+
   public EqualsFluent() {
   }
 

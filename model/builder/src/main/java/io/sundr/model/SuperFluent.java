@@ -11,6 +11,7 @@ import io.sundr.builder.BaseFluent;
  */
 @SuppressWarnings("unchecked")
 public class SuperFluent<A extends SuperFluent<A>> extends BaseFluent<A> {
+
   public SuperFluent() {
   }
 

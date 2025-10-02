@@ -4,6 +4,9 @@ import io.sundr.builder.VisitableBuilder;
 
 public class MethodCallBuilder extends MethodCallFluent<MethodCallBuilder>
     implements VisitableBuilder<MethodCall, MethodCallBuilder> {
+
+  MethodCallFluent<?> fluent;
+
   public MethodCallBuilder() {
     this.fluent = this;
   }
@@ -12,17 +15,15 @@ public class MethodCallBuilder extends MethodCallFluent<MethodCallBuilder>
     this.fluent = fluent;
   }
 
-  public MethodCallBuilder(MethodCallFluent<?> fluent, MethodCall instance) {
-    this.fluent = fluent;
-    fluent.copyInstance(instance);
-  }
-
   public MethodCallBuilder(MethodCall instance) {
     this.fluent = this;
     this.copyInstance(instance);
   }
 
-  MethodCallFluent<?> fluent;
+  public MethodCallBuilder(MethodCallFluent<?> fluent, MethodCall instance) {
+    this.fluent = fluent;
+    fluent.copyInstance(instance);
+  }
 
   public MethodCall build() {
     MethodCall buildable = new MethodCall(fluent.getName(), fluent.buildScope(), fluent.buildParameters(),
