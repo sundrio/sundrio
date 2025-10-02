@@ -33,6 +33,7 @@ import io.sundr.model.MethodCall;
 import io.sundr.model.MethodCallBuilder;
 import io.sundr.model.MethodCallFluent;
 import io.sundr.model.Property;
+import io.sundr.model.PropertyRef;
 import io.sundr.model.TypeDef;
 
 /**
@@ -50,6 +51,7 @@ public class MethodReference {
 
   /**
    * Visitor that collects all MethodCall instances found during AST traversal.
+   * This includes both direct method calls and method calls embedded within expressions.
    */
   private static class MethodCallCollector implements Visitor<MethodCallFluent<?>> {
     private final Set<MethodCall> methodCalls = new HashSet<>();
@@ -59,6 +61,38 @@ public class MethodReference {
       MethodCallBuilder builder = new MethodCallBuilder(methodCallFluent);
       MethodCall methodCall = builder.build();
       methodCalls.add(methodCall);
+
+      // Also traverse expressions within the method call for nested method calls
+      if (methodCall.getScope() != null) {
+        extractMethodCallsFromExpression(methodCall.getScope());
+      }
+
+      for (io.sundr.model.Expression arg : methodCall.getArguments()) {
+        extractMethodCallsFromExpression(arg);
+      }
+    }
+
+    /**
+     * Recursively extract method calls from expressions
+     */
+    private void extractMethodCallsFromExpression(io.sundr.model.Expression expression) {
+      if (expression instanceof MethodCall) {
+        MethodCall methodCall = (MethodCall) expression;
+        methodCalls.add(methodCall);
+
+        // Recursively process nested expressions
+        if (methodCall.getScope() != null) {
+          extractMethodCallsFromExpression(methodCall.getScope());
+        }
+        for (io.sundr.model.Expression arg : methodCall.getArguments()) {
+          extractMethodCallsFromExpression(arg);
+        }
+      } else if (expression instanceof PropertyRef) {
+        PropertyRef propertyRef = (PropertyRef) expression;
+        if (propertyRef.getScope() != null) {
+          extractMethodCallsFromExpression(propertyRef.getScope());
+        }
+      }
     }
 
     public Set<MethodCall> getMethodCalls() {
@@ -100,13 +134,11 @@ public class MethodReference {
 
     if (method.getBlock() != null) {
       Set<MethodCall> methodCalls = findMethodCalls(method.getBlock());
-
       for (MethodCall methodCall : methodCalls) {
         Set<MethodReference> referencedMethods = resolveMethodCall(methodCall, repository);
         result.addAll(referencedMethods);
       }
     }
-
     return result;
   }
 
@@ -277,15 +309,15 @@ public class MethodReference {
         for (ClassRef classRef : scopeReferences) {
           TypeDef typeDef = repository.getDefinition(classRef.getFullyQualifiedName());
           if (typeDef != null) {
-            methods.addAll(findMethodsByName(typeDef, methodCall.getName()));
+            Set<MethodReference> foundMethods = findMethodsByName(typeDef, methodCall.getName());
+            methods.addAll(foundMethods);
           }
         }
       }
     } else {
-      // Unscoped method call - likely local method call, super type method, or static import
-      // Search through all registered TypeDefs for methods with matching name
       for (TypeDef typeDef : repository.getDefinitions()) {
-        methods.addAll(findMethodsByName(typeDef, methodCall.getName()));
+        Set<MethodReference> foundMethods = findMethodsByName(typeDef, methodCall.getName());
+        methods.addAll(foundMethods);
       }
     }
 
@@ -327,6 +359,104 @@ public class MethodReference {
   }
 
   /**
+   * Find all methods that directly call the specified target method.
+   * This is the reverse of getDirectMethodReferences() - instead of finding what a method calls,
+   * this finds what methods call the target method.
+   *
+   * @param targetMethod the method reference to find callers for
+   * @param repository the definition repository containing type definitions
+   * @return set of method references that directly call the target method
+   */
+  public static Set<MethodReference> getDirectMethodCallers(MethodReference targetMethod, DefinitionRepository repository) {
+    if (targetMethod == null) {
+      throw new IllegalArgumentException("Target method cannot be null");
+    }
+    if (repository == null) {
+      throw new IllegalArgumentException("Repository cannot be null");
+    }
+
+    Set<MethodReference> callers = new HashSet<>();
+
+    // Search through all methods in all TypeDefs to find those that call the target method
+    int methodsChecked = 0;
+    int typeDefsProcessed = 0;
+
+    for (TypeDef typeDef : repository.getDefinitions()) {
+      typeDefsProcessed++;
+      for (Method method : typeDef.getMethods()) {
+        methodsChecked++;
+        try {
+          Set<MethodReference> directReferences = getDirectMethodReferences(method, repository);
+          if (directReferences.contains(targetMethod)) {
+            callers.add(new MethodReference(method, typeDef));
+          } else if (methodsChecked <= 5) {
+            // Check if any of the references are similar to our target for debugging
+            for (MethodReference ref : directReferences) {
+              if (ref.getMethod().getName().equals(targetMethod.getMethod().getName())) {
+              }
+            }
+          }
+        } catch (Exception e) {
+        }
+      }
+    }
+
+    return callers;
+  }
+
+  /**
+   * Find all methods that directly or transitively call the specified target method.
+   * This is the reverse of getMethodReferences() - instead of finding what a method calls,
+   * this finds all methods that call the target method either directly or through a chain of calls.
+   *
+   * @param targetMethod the method reference to find callers for
+   * @param repository the definition repository containing type definitions
+   * @return set of method references that directly or transitively call the target method
+   */
+  public static Set<MethodReference> getMethodCallers(MethodReference targetMethod, DefinitionRepository repository) {
+    if (targetMethod == null) {
+      throw new IllegalArgumentException("Target method cannot be null");
+    }
+    if (repository == null) {
+      throw new IllegalArgumentException("Repository cannot be null");
+    }
+
+    Set<MethodReference> allCallers = new HashSet<>();
+    Set<MethodReference> visited = new HashSet<>();
+
+    collectCallersRecursively(targetMethod, repository, visited, allCallers);
+
+    return allCallers;
+  }
+
+  /**
+   * Recursively collects all methods that call the target method, either directly or transitively.
+   *
+   * @param targetMethod the method to find callers for
+   * @param repository the repository to search for method definitions
+   * @param visited set of already visited methods to prevent infinite recursion
+   * @param result the set to accumulate caller method references into
+   */
+  private static void collectCallersRecursively(MethodReference targetMethod, DefinitionRepository repository,
+      Set<MethodReference> visited, Set<MethodReference> result) {
+    if (targetMethod == null || visited.contains(targetMethod)) {
+      return;
+    }
+
+    visited.add(targetMethod);
+
+    // Find direct callers of the target method
+    Set<MethodReference> directCallers = getDirectMethodCallers(targetMethod, repository);
+    for (MethodReference caller : directCallers) {
+      if (!visited.contains(caller)) {
+        result.add(caller);
+        // Recursively find callers of the caller
+        collectCallersRecursively(caller, repository, visited, result);
+      }
+    }
+  }
+
+  /**
    * Clears the method resolution cache. This should be called when the repository
    * changes to ensure cached results remain valid.
    */
@@ -342,13 +472,14 @@ public class MethodReference {
       return false;
     MethodReference that = (MethodReference) obj;
 
-    // Use erasure-based comparison for methods to handle object identity issues
+    // Use erasure-based comparison for methods (now that getErasure() uses standardized parameter names)
     return method.getErasure().equals(that.method.getErasure()) &&
         owningType.getFullyQualifiedName().equals(that.owningType.getFullyQualifiedName());
   }
 
   @Override
   public int hashCode() {
+    // Use the same fields as equals() for consistent hashing
     return java.util.Objects.hash(method.getErasure(), owningType.getFullyQualifiedName());
   }
 
