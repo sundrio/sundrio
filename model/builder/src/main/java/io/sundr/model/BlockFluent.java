@@ -481,6 +481,14 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     return new SwitchStatementsNested(-1, item);
   }
 
+  public SynchronizedStatementsNested<A> addNewSynchronizedStatement() {
+    return new SynchronizedStatementsNested(-1, null);
+  }
+
+  public SynchronizedStatementsNested<A> addNewSynchronizedStatementLike(Synchronized item) {
+    return new SynchronizedStatementsNested(-1, item);
+  }
+
   public ThrowStatementsNested<A> addNewThrowStatement() {
     return new ThrowStatementsNested(-1, null);
   }
@@ -604,6 +612,8 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new TryBuilder((Try) item);
       case "io.sundr.model." + "Switch":
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
+      case "io.sundr.model." + "Synchronized":
+        return (VisitableBuilder<T, ?>) new SynchronizedBuilder((Synchronized) item);
       case "io.sundr.model." + "GreaterThanOrEqual":
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
       case "io.sundr.model." + "BitwiseAnd":
@@ -944,6 +954,10 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
 
   public SwitchStatementsNested<A> setNewSwitchStatementLike(int index, Switch item) {
     return new SwitchStatementsNested(index, item);
+  }
+
+  public SynchronizedStatementsNested<A> setNewSynchronizedStatementLike(int index, Synchronized item) {
+    return new SynchronizedStatementsNested(index, item);
   }
 
   public ThrowStatementsNested<A> setNewThrowStatementLike(int index, Throw item) {
@@ -1880,6 +1894,27 @@ public class BlockFluent<A extends BlockFluent<A>> extends BaseFluent<A> {
     }
 
     public N endSwitchStatement() {
+      return and();
+    }
+
+  }
+
+  public class SynchronizedStatementsNested<N> extends SynchronizedFluent<SynchronizedStatementsNested<N>>
+      implements Nested<N> {
+
+    SynchronizedBuilder builder;
+    int index;
+
+    SynchronizedStatementsNested(int index, Synchronized item) {
+      this.index = index;
+      this.builder = new SynchronizedBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endSynchronizedStatement() {
       return and();
     }
 

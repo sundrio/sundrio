@@ -140,6 +140,8 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
         return (VisitableBuilder<T, ?>) new TryBuilder((Try) item);
       case "io.sundr.model." + "Switch":
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
+      case "io.sundr.model." + "Synchronized":
+        return (VisitableBuilder<T, ?>) new SynchronizedBuilder((Synchronized) item);
       case "io.sundr.model." + "Break":
         return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
       case "io.sundr.model." + "While":
@@ -1144,6 +1146,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public SwitchStatementNested<A> withNewSwitchStatementLike(Switch item) {
     return new SwitchStatementNested(item);
+  }
+
+  public SynchronizedStatementNested<A> withNewSynchronizedStatement() {
+    return new SynchronizedStatementNested(null);
+  }
+
+  public SynchronizedStatementNested<A> withNewSynchronizedStatementLike(Synchronized item) {
+    return new SynchronizedStatementNested(item);
   }
 
   public TernaryConditionNested<A> withNewTernaryCondition() {
@@ -2812,6 +2822,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endSwitchStatement() {
+      return and();
+    }
+
+  }
+
+  public class SynchronizedStatementNested<N> extends SynchronizedFluent<SynchronizedStatementNested<N>> implements Nested<N> {
+
+    SynchronizedBuilder builder;
+
+    SynchronizedStatementNested(Synchronized item) {
+      this.builder = new SynchronizedBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withStatement(builder.build());
+    }
+
+    public N endSynchronizedStatement() {
       return and();
     }
 

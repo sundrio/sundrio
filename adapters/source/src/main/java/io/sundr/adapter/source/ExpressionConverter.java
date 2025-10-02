@@ -269,8 +269,21 @@ public class ExpressionConverter {
       return new Enclosed(convertExpression(enclosedExpr.getInner()));
     } else if (expression instanceof InstanceOfExpr) {
       InstanceOfExpr instanceOfExpr = (InstanceOfExpr) expression;
-      return new InstanceOf(convertExpression(instanceOfExpr.getExpr()),
-          (ClassRef) SOURCE_ADAPTER.getReferenceAdapterFunction().apply((ClassOrInterfaceType) instanceOfExpr.getType()));
+      com.github.javaparser.ast.type.Type type = instanceOfExpr.getType();
+      if (type instanceof com.github.javaparser.ast.type.ClassOrInterfaceType) {
+        return new InstanceOf(convertExpression(instanceOfExpr.getExpr()),
+            (ClassRef) SOURCE_ADAPTER.getReferenceAdapterFunction()
+                .apply((com.github.javaparser.ast.type.ClassOrInterfaceType) type));
+      } else {
+        // Handle other reference types by converting to TypeRef first
+        TypeRef typeRef = TYPEREF_ADAPTER.apply(type);
+        if (typeRef instanceof ClassRef) {
+          return new InstanceOf(convertExpression(instanceOfExpr.getExpr()), (ClassRef) typeRef);
+        } else {
+          // For non-class types, fall back to Object
+          return new InstanceOf(convertExpression(instanceOfExpr.getExpr()), OBJECT);
+        }
+      }
     } else if (expression instanceof ArrayAccessExpr) {
       ArrayAccessExpr arrayAccessExpr = (ArrayAccessExpr) expression;
       return new Index(convertExpression(arrayAccessExpr.getName()), convertExpression(arrayAccessExpr.getIndex()));

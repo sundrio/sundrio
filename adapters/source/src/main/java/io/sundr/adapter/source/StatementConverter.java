@@ -139,6 +139,14 @@ public class StatementConverter {
           .collect(Collectors.toList());
 
       return new MethodCall(methodName, null, Collections.emptyList(), arguments);
+    } else if (statement instanceof com.github.javaparser.ast.stmt.SynchronizedStmt) {
+      com.github.javaparser.ast.stmt.SynchronizedStmt syncStmt = (com.github.javaparser.ast.stmt.SynchronizedStmt) statement;
+
+      // Convert synchronized statement to our model
+      io.sundr.model.Expression lockExpression = ExpressionConverter.convertExpression(syncStmt.getExpr());
+      io.sundr.model.Statement body = new BlockStmtToBlock().apply(syncStmt.getBlock());
+
+      return new io.sundr.model.Synchronized(lockExpression, body);
     }
 
     throw new IllegalArgumentException("Statement of type " + statement.getClass().getName());
