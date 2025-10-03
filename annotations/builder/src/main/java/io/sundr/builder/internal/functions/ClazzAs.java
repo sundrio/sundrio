@@ -293,6 +293,7 @@ public class ClazzAs {
     private Method createDescendantBuilderMethod(Set<Property> allDescendants) {
       Map<ValueRef, Block> cases = new LinkedHashMap<>();
 
+      TypeRef typeParam = Types.T_REF;
       Set<String> seen = new HashSet<>();
       for (Property descendant : allDescendants) {
         ClassRef dunwraped = new ClassRefBuilder(
@@ -312,7 +313,7 @@ public class ClazzAs {
         // Create the return statement for this case
         Statement returnStatement = new Return(
             new Cast(
-                BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF),
+                BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam),
                 new Construct(builderRef, new Cast(dunwraped, Property.newProperty("item")))));
 
         cases.put(ValueRef.from(packageName + "." + classShortName), new Block(returnStatement));
@@ -323,14 +324,17 @@ public class ClazzAs {
           .expression(new MethodCall("getName", new MethodCall("getClass", Property.newProperty("item"))))
           .cases(cases)
           .defaultCase(
-              new Return(new Cast(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF),
+              new Return(new Cast(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam),
                   new MethodCall("builderOf", (Expression) null, Property.newProperty("item")))));
+
+      // Use the appropriate type parameter for the method
+      TypeParamDef methodTypeParam = Types.T;
 
       return new MethodBuilder().withNewModifiers().withProtected().withStatic()
           .endModifiers()
-          .withParameters(Types.T)
+          .withParameters(methodTypeParam)
           .addNewArgument().withName("item").withTypeRef(Types.OBJECT_REF).endArgument()
-          .withReturnType(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(Types.T_REF))
+          .withReturnType(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam))
           .withName("builder")
           .withNewBlock()
           .addToStatements(switchStatement)

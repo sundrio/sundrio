@@ -109,6 +109,15 @@ public class Descendants {
               addDescendents(property, result, origin, candidate, ref -> new ClassRefBuilder((ClassRef) baseType)
                   .withArguments(TypeAs.UNWRAP_MAP_KEY_OF.apply(baseType), ref).build());
             }
+          } else if (io.sundr.model.utils.Types.isOptional(baseType)) {
+            // Handle Optional<T> types - unwrap and check if the contained type is buildable
+            TypeRef unwrapped = TypeAs.UNWRAP_OPTIONAL_OF.apply(baseType);
+            if (unwrapped instanceof ClassRef) {
+              ClassRef candidate = (ClassRef) unwrapped;
+
+              addDescendents(property, result, origin, candidate,
+                  ref -> new ClassRefBuilder((ClassRef) baseType).withArguments(ref).build());
+            }
           } else if (baseType instanceof ClassRef) {
             ClassRef candidate = (ClassRef) baseType;
 
