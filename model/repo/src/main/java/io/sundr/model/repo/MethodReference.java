@@ -30,10 +30,7 @@ import io.sundr.model.Expression;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.MethodCall;
-import io.sundr.model.MethodCallBuilder;
-import io.sundr.model.MethodCallFluent;
 import io.sundr.model.Property;
-import io.sundr.model.PropertyRef;
 import io.sundr.model.TypeDef;
 
 /**
@@ -53,52 +50,6 @@ public class MethodReference {
    * Visitor that collects all MethodCall instances found during AST traversal.
    * This includes both direct method calls and method calls embedded within expressions.
    */
-  private static class MethodCallCollector implements Visitor<MethodCallFluent<?>> {
-    private final Set<MethodCall> methodCalls = new HashSet<>();
-
-    @Override
-    public void visit(MethodCallFluent<?> methodCallFluent) {
-      MethodCallBuilder builder = new MethodCallBuilder(methodCallFluent);
-      MethodCall methodCall = builder.build();
-      methodCalls.add(methodCall);
-
-      // Also traverse expressions within the method call for nested method calls
-      if (methodCall.getScope() != null) {
-        extractMethodCallsFromExpression(methodCall.getScope());
-      }
-
-      for (io.sundr.model.Expression arg : methodCall.getArguments()) {
-        extractMethodCallsFromExpression(arg);
-      }
-    }
-
-    /**
-     * Recursively extract method calls from expressions
-     */
-    private void extractMethodCallsFromExpression(io.sundr.model.Expression expression) {
-      if (expression instanceof MethodCall) {
-        MethodCall methodCall = (MethodCall) expression;
-        methodCalls.add(methodCall);
-
-        // Recursively process nested expressions
-        if (methodCall.getScope() != null) {
-          extractMethodCallsFromExpression(methodCall.getScope());
-        }
-        for (io.sundr.model.Expression arg : methodCall.getArguments()) {
-          extractMethodCallsFromExpression(arg);
-        }
-      } else if (expression instanceof PropertyRef) {
-        PropertyRef propertyRef = (PropertyRef) expression;
-        if (propertyRef.getScope() != null) {
-          extractMethodCallsFromExpression(propertyRef.getScope());
-        }
-      }
-    }
-
-    public Set<MethodCall> getMethodCalls() {
-      return methodCalls;
-    }
-  }
 
   public MethodReference(Method method, TypeDef owningType) {
     this.method = method;
