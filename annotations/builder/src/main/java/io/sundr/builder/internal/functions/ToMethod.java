@@ -35,7 +35,6 @@ import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstruc
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.model.Expression.call;
 import static io.sundr.model.Expression.cast;
-import static io.sundr.model.Expression.enclosed;
 import static io.sundr.model.utils.Collections.COLLECTION;
 import static io.sundr.model.utils.Collections.IS_COLLECTION;
 import static io.sundr.model.utils.Collections.IS_LIST;
@@ -286,7 +285,7 @@ class ToMethod {
 
       List<TypeParamDef> parameters = new ArrayList<>();
       if (property.getTypeRef() instanceof ClassRef) {
-        ClassRef baseType = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF)
+        ClassRef baseType = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF)
             .apply(property.getTypeRef());
         parameters.addAll(GetDefinition.of(baseType).getParameters());
       }
@@ -425,17 +424,31 @@ class ToMethod {
     String methodName = "with" + property.getNameCapitalized();
     String fieldName = property.getName();
     Expression sourceRef = property;
-    ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
 
-    Property b = Property.newProperty(builder, "b");
+    // Check for descendants
+    TreeSet<Property> descendants = new TreeSet<>(Comparator.comparing(Property::getName));
+    descendants.addAll(Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(property));
+
+    Property b;
     Block prepareBlock;
     if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
+      ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
+      b = Property.newProperty(builder, "b");
       prepareBlock = new Block(
           new Declare(b, Expression.createNew(builder, sourceRef)),
           Property.newProperty("_visitables").call("get", ValueRef.from(fieldName)).call("add", b),
           new This().property(property)
               .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.singletonList(b))));
+    } else if (!descendants.isEmpty()) {
+      TypeRef builderType = VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped);
+      b = Property.newProperty(builderType, "b");
+      prepareBlock = new Block(
+          new Declare(b, Expression.newCall("builder", sourceRef)),
+          Property.newProperty("_visitables").call("get", ValueRef.from(fieldName)).call("add", b),
+          new This().property(property)
+              .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.singletonList(b))));
     } else {
+      b = null;
       prepareBlock = new Block(new This().property(property)
           .assign(property.getAttribute(INIT_EXPRESSION_FUNCTION).apply(Collections.singletonList(sourceRef))));
     }
@@ -450,9 +463,11 @@ class ToMethod {
             .withStatements(
                 If.condition(property.isNull().or(property.call("isPresent").not()))
                     .then(new This().property(property).assign(Expression.call(property.getTypeRef(), "empty")))
-                    .orElse(isBuildable(unwrapped) && !isAbstract(unwrapped)
+                    .orElse((isBuildable(unwrapped) && !isAbstract(unwrapped)) || !descendants.isEmpty()
                         ? Block.wrap(
-                            new Declare(b, Expression.createNew(builder, property.call("get"))),
+                            new Declare(b, (isBuildable(unwrapped) && !isAbstract(unwrapped))
+                                ? Expression.createNew(BUILDER_REF.apply((ClassRef) unwrapped), property.call("get"))
+                                : Expression.newCall("builder", property.call("get"))),
                             Property.newProperty("_visitables").call("get", ValueRef.from(property.getName()))
                                 .call("add", b),
                             new This().property(property).assign(Expression.call(Optional.class, "of", b)))
@@ -539,15 +554,14 @@ class ToMethod {
               Expression.NULL)));
         }
       } else if (isOptional) {
-        statements.add(new Return(cast(property.getTypeRef(),
-            enclosed(
-                new Ternary(
-                    //Condition
-                    new This().property(property).notNull().and(new This().property(property).call("isPresent")),
-                    //Then
-                    call(OPTIONAL, "of", new This().property(property).call("get").call("build")),
-                    //Else
-                    call(OPTIONAL, "empty"))))));
+        statements.add(new Return(
+            new Ternary(
+                //Condition
+                new This().property(property).notNull(),
+                //Then
+                new This().property(property).call("map", Expression.lambda("v", Property.newProperty("v").call("build"))),
+                //Else
+                call(OPTIONAL, "empty"))));
       } else {
         statements.add(new Return(new Ternary(
             //Condition
@@ -561,6 +575,15 @@ class ToMethod {
       isNested = true;
       if (isList || isSet) {
         statements.add(new Return(Expression.newCall("build", property)));
+      } else if (isOptional) {
+        statements.add(new Return(
+            new Ternary(
+                //Condition
+                new This().property(property).notNull(),
+                //Then
+                new This().property(property).call("map", Expression.lambda("v", Property.newProperty("v").call("build"))),
+                //Else
+                call(OPTIONAL, "empty"))));
       } else {
         statements.add(new Return(new Ternary(
             //Condition
@@ -574,12 +597,24 @@ class ToMethod {
       statements.add(new Return(new This().property(property)));
     }
 
+    // Determine the return type - use wildcard for interfaces with descendants
+    TypeRef returnType = property.getTypeRef();
+    if (isNested && !descendants.isEmpty()) {
+      if (isOptional) {
+        // For build methods of Optional<InterfaceType> with descendants, keep original type
+        // to match constructor signature - no wildcard needed
+      } else if (isList || isSet) {
+        // For build methods of List<InterfaceType> with descendants, keep original type
+        // to match constructor signature - no wildcard needed
+      }
+    }
+
     Method getter = new MethodBuilder()
         .withComments(comments)
         .withAnnotations(annotations)
         .withNewModifiers().withPublic().endModifiers()
         .withName(isNested ? builderName : getterName)
-        .withReturnType(property.getTypeRef())
+        .withReturnType(returnType)
         .withArguments(new Property[] {})
         .withNewBlock()
         .withStatements(statements)
@@ -629,6 +664,8 @@ class ToMethod {
 
     TypeRef type = property.getTypeRef();
     Boolean isBuildable = isBuildable(unwrapped);
+    boolean isOptional = isOptional(property.getTypeRef()) || isOptionalDouble(property.getTypeRef())
+        || isOptionalInt(property.getTypeRef()) || isOptionalLong(property.getTypeRef());
     TypeRef targetType = isBuildable ? VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped) : UNWRAP_ARRAY_OF.apply(type);
 
     List<Statement> statements = new ArrayList<>();
@@ -663,7 +700,7 @@ class ToMethod {
 
     methods.add(getter);
 
-    if (isBuildable) {
+    if (isBuildable && !isOptional) {
 
       ClassRef builderRef = Types.isConcrete(unwrapped)
           ? TypeAs.BUILDER_REF.apply((ClassRef) unwrapped)
@@ -1246,7 +1283,7 @@ class ToMethod {
   });
 
   static final Function<Property, Method> WITH_NEW_NESTED = property -> {
-    ClassRef baseType = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF)
+    ClassRef baseType = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF)
         .apply(property.getTypeRef());
 
     TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
@@ -1524,7 +1561,7 @@ class ToMethod {
     if (!(property.getTypeRef() instanceof ClassRef)) {
       throw new IllegalStateException("Expected Nestable / Buildable type and found:" + property.getTypeRef());
     }
-    ClassRef unwrapped = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_OPTIONAL_OF, UNWRAP_OPTIONAL_OF)
+    ClassRef unwrapped = (ClassRef) combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF)
         .apply(property.getTypeRef());
 
     ClassRef builderRef = Types.isConcrete(unwrapped)

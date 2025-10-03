@@ -1,9 +1,11 @@
 package io.sundr.builder.internal.functions;
 
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
+import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_OPTIONAL_OF;
 import static io.sundr.model.utils.Collections.HASH_MAP;
 import static io.sundr.model.utils.Collections.LIST;
 import static io.sundr.model.utils.Collections.MAP;
+import static io.sundr.model.utils.Types.OPTIONAL;
 import static io.sundr.model.utils.Types.STRING_REF;
 import static org.junit.Assert.assertEquals;
 
@@ -23,6 +25,14 @@ public class TypeAsTest {
     DefinitionRepository.getRepository().register(MAP);
     DefinitionRepository.getRepository().register(LIST);
     DefinitionRepository.getRepository().register(HASH_MAP);
+    DefinitionRepository.getRepository().register(OPTIONAL);
+  }
+
+  @Test
+  public void shouldUnwrapOptional() {
+    ClassRef ref = OPTIONAL.toReference(STRING_REF);
+    TypeRef unwrapped = UNWRAP_OPTIONAL_OF.apply(ref);
+    assertEquals(unwrapped, STRING_REF);
   }
 
   @Test
