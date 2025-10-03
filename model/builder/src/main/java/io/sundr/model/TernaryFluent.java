@@ -4,7 +4,9 @@ import java.lang.Class;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Nested;
@@ -14,7 +16,7 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
+public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends BaseFluent<A> {
 
   private VisitableBuilder<? extends Expression, ?> alternative;
   private VisitableBuilder<? extends Expression, ?> condition;
@@ -41,104 +43,203 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "Multiply":
+      case "Multiply":
+
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
-      case "io.sundr.model." + "NewArray":
+
+      case "NewArray":
+
         return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
-      case "io.sundr.model." + "InstanceOf":
+
+      case "InstanceOf":
+
         return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
-      case "io.sundr.model." + "MethodCall":
+
+      case "MethodCall":
+
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
-      case "io.sundr.model." + "ClassRef":
+
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "Inverse":
+
+      case "Inverse":
+
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
-      case "io.sundr.model." + "Index":
+
+      case "Index":
+
         return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
-      case "io.sundr.model." + "GreaterThanOrEqual":
+
+      case "GreaterThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
-      case "io.sundr.model." + "BitwiseAnd":
+
+      case "BitwiseAnd":
+
         return (VisitableBuilder<T, ?>) new BitwiseAndBuilder((BitwiseAnd) item);
-      case "io.sundr.model." + "Minus":
+
+      case "Minus":
+
         return (VisitableBuilder<T, ?>) new MinusBuilder((Minus) item);
-      case "io.sundr.model." + "LogicalOr":
+
+      case "LogicalOr":
+
         return (VisitableBuilder<T, ?>) new LogicalOrBuilder((LogicalOr) item);
-      case "io.sundr.model." + "NotEquals":
+
+      case "NotEquals":
+
         return (VisitableBuilder<T, ?>) new NotEqualsBuilder((NotEquals) item);
-      case "io.sundr.model." + "Divide":
+
+      case "Divide":
+
         return (VisitableBuilder<T, ?>) new DivideBuilder((Divide) item);
-      case "io.sundr.model." + "LessThan":
+
+      case "LessThan":
+
         return (VisitableBuilder<T, ?>) new LessThanBuilder((LessThan) item);
-      case "io.sundr.model." + "BitwiseOr":
+
+      case "BitwiseOr":
+
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
-      case "io.sundr.model." + "PropertyRef":
+
+      case "PropertyRef":
+
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
-      case "io.sundr.model." + "RightShift":
+
+      case "RightShift":
+
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
-      case "io.sundr.model." + "Super":
+
+      case "Super":
+
         return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
-      case "io.sundr.model." + "GreaterThan":
+
+      case "GreaterThan":
+
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
-      case "io.sundr.model." + "Declare":
+
+      case "Declare":
+
         return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
-      case "io.sundr.model." + "Cast":
+
+      case "Cast":
+
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
-      case "io.sundr.model." + "Modulo":
+
+      case "Modulo":
+
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
-      case "io.sundr.model." + "DotClass":
+
+      case "DotClass":
+
         return (VisitableBuilder<T, ?>) new DotClassBuilder((DotClass) item);
-      case "io.sundr.model." + "ValueRef":
+
+      case "ValueRef":
+
         return (VisitableBuilder<T, ?>) new ValueRefBuilder((ValueRef) item);
-      case "io.sundr.model." + "LeftShift":
+
+      case "LeftShift":
+
         return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
-      case "io.sundr.model." + "Empty":
+
+      case "Empty":
+
         return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
-      case "io.sundr.model." + "Ternary":
+
+      case "Ternary":
+
         return (VisitableBuilder<T, ?>) new TernaryBuilder((Ternary) item);
-      case "io.sundr.model." + "BinaryExpression":
+
+      case "BinaryExpression":
+
         return (VisitableBuilder<T, ?>) new BinaryExpressionBuilder((BinaryExpression) item);
-      case "io.sundr.model." + "Equals":
+
+      case "Equals":
+
         return (VisitableBuilder<T, ?>) new EqualsBuilder((Equals) item);
-      case "io.sundr.model." + "Enclosed":
+
+      case "Enclosed":
+
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
-      case "io.sundr.model." + "PreDecrement":
+
+      case "PreDecrement":
+
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
-      case "io.sundr.model." + "PostDecrement":
+
+      case "PostDecrement":
+
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
-      case "io.sundr.model." + "Lambda":
+
+      case "Lambda":
+
         return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
-      case "io.sundr.model." + "Not":
+
+      case "Not":
+
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
-      case "io.sundr.model." + "Assign":
+
+      case "Assign":
+
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "This":
+
+      case "This":
+
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
-      case "io.sundr.model." + "Negative":
+
+      case "Negative":
+
         return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
-      case "io.sundr.model." + "LogicalAnd":
+
+      case "LogicalAnd":
+
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
-      case "io.sundr.model." + "PostIncrement":
+
+      case "PostIncrement":
+
         return (VisitableBuilder<T, ?>) new PostIncrementBuilder((PostIncrement) item);
-      case "io.sundr.model." + "RightUnsignedShift":
+
+      case "RightUnsignedShift":
+
         return (VisitableBuilder<T, ?>) new RightUnsignedShiftBuilder((RightUnsignedShift) item);
-      case "io.sundr.model." + "Plus":
+
+      case "Plus":
+
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
-      case "io.sundr.model." + "Construct":
+
+      case "Construct":
+
         return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-      case "io.sundr.model." + "Xor":
+
+      case "Xor":
+
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
-      case "io.sundr.model." + "PreIncrement":
+
+      case "PreIncrement":
+
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
-      case "io.sundr.model." + "Property":
+
+      case "Property":
+
         return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
-      case "io.sundr.model." + "LessThanOrEqual":
+
+      case "LessThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
-      case "io.sundr.model." + "ContextRef":
+
+      case "ContextRef":
+
         return (VisitableBuilder<T, ?>) new ContextRefBuilder((ContextRef) item);
-      case "io.sundr.model." + "Positive":
+
+      case "Positive":
+
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(Ternary instance) {
@@ -150,19 +251,25 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     TernaryFluent that = (TernaryFluent) o;
-    if (!java.util.Objects.equals(condition, that.condition))
+    if (!(Objects.equals(condition, that.condition))) {
       return false;
-    if (!java.util.Objects.equals(result, that.result))
+    }
+    if (!(Objects.equals(result, that.result))) {
       return false;
-    if (!java.util.Objects.equals(alternative, that.alternative))
+    }
+    if (!(Objects.equals(alternative, that.alternative))) {
       return false;
+    }
     return true;
   }
 
@@ -179,21 +286,23 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(condition, result, alternative, super.hashCode());
+    return Objects.hash(condition, result, alternative);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (condition != null) {
+    if (!(condition == null)) {
       sb.append("condition:");
-      sb.append(condition + ",");
+      sb.append(condition);
+      sb.append(",");
     }
-    if (result != null) {
+    if (!(result == null)) {
       sb.append("result:");
-      sb.append(result + ",");
+      sb.append(result);
+      sb.append(",");
     }
-    if (alternative != null) {
+    if (!(alternative == null)) {
       sb.append("alternative:");
       sb.append(alternative);
     }
@@ -282,7 +391,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseAndAlternative(Object left, Object right) {
-    return (A) withAlternative(new BitwiseAnd(left, right));
+    return (A) this.withAlternative(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndAlternativeNested<A> withNewBitwiseAndAlternativeLike(BitwiseAnd item) {
@@ -294,7 +403,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseAndCondition(Object left, Object right) {
-    return (A) withCondition(new BitwiseAnd(left, right));
+    return (A) this.withCondition(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndConditionNested<A> withNewBitwiseAndConditionLike(BitwiseAnd item) {
@@ -306,7 +415,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseAndResult(Object left, Object right) {
-    return (A) withResult(new BitwiseAnd(left, right));
+    return (A) this.withResult(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndResultNested<A> withNewBitwiseAndResultLike(BitwiseAnd item) {
@@ -318,7 +427,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseOrAlternative(Object left, Object right) {
-    return (A) withAlternative(new BitwiseOr(left, right));
+    return (A) this.withAlternative(new BitwiseOr(left, right));
   }
 
   public BitwiseOrAlternativeNested<A> withNewBitwiseOrAlternativeLike(BitwiseOr item) {
@@ -330,7 +439,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseOrCondition(Object left, Object right) {
-    return (A) withCondition(new BitwiseOr(left, right));
+    return (A) this.withCondition(new BitwiseOr(left, right));
   }
 
   public BitwiseOrConditionNested<A> withNewBitwiseOrConditionLike(BitwiseOr item) {
@@ -342,7 +451,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseOrResult(Object left, Object right) {
-    return (A) withResult(new BitwiseOr(left, right));
+    return (A) this.withResult(new BitwiseOr(left, right));
   }
 
   public BitwiseOrResultNested<A> withNewBitwiseOrResultLike(BitwiseOr item) {
@@ -426,7 +535,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewContextRefAlternative(String name) {
-    return (A) withAlternative(new ContextRef(name));
+    return (A) this.withAlternative(new ContextRef(name));
   }
 
   public ContextRefAlternativeNested<A> withNewContextRefAlternativeLike(ContextRef item) {
@@ -438,7 +547,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewContextRefCondition(String name) {
-    return (A) withCondition(new ContextRef(name));
+    return (A) this.withCondition(new ContextRef(name));
   }
 
   public ContextRefConditionNested<A> withNewContextRefConditionLike(ContextRef item) {
@@ -450,7 +559,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewContextRefResult(String name) {
-    return (A) withResult(new ContextRef(name));
+    return (A) this.withResult(new ContextRef(name));
   }
 
   public ContextRefResultNested<A> withNewContextRefResultLike(ContextRef item) {
@@ -462,11 +571,11 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDeclareAlternative(Class type, String name) {
-    return (A) withAlternative(new Declare(type, name));
+    return (A) this.withAlternative(new Declare(type, name));
   }
 
   public A withNewDeclareAlternative(Class type, String name, Object value) {
-    return (A) withAlternative(new Declare(type, name, value));
+    return (A) this.withAlternative(new Declare(type, name, value));
   }
 
   public DeclareAlternativeNested<A> withNewDeclareAlternativeLike(Declare item) {
@@ -478,11 +587,11 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDeclareCondition(Class type, String name) {
-    return (A) withCondition(new Declare(type, name));
+    return (A) this.withCondition(new Declare(type, name));
   }
 
   public A withNewDeclareCondition(Class type, String name, Object value) {
-    return (A) withCondition(new Declare(type, name, value));
+    return (A) this.withCondition(new Declare(type, name, value));
   }
 
   public DeclareConditionNested<A> withNewDeclareConditionLike(Declare item) {
@@ -494,11 +603,11 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDeclareResult(Class type, String name) {
-    return (A) withResult(new Declare(type, name));
+    return (A) this.withResult(new Declare(type, name));
   }
 
   public A withNewDeclareResult(Class type, String name, Object value) {
-    return (A) withResult(new Declare(type, name, value));
+    return (A) this.withResult(new Declare(type, name, value));
   }
 
   public DeclareResultNested<A> withNewDeclareResultLike(Declare item) {
@@ -510,7 +619,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDivideAlternative(Object left, Object right) {
-    return (A) withAlternative(new Divide(left, right));
+    return (A) this.withAlternative(new Divide(left, right));
   }
 
   public DivideAlternativeNested<A> withNewDivideAlternativeLike(Divide item) {
@@ -522,7 +631,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDivideCondition(Object left, Object right) {
-    return (A) withCondition(new Divide(left, right));
+    return (A) this.withCondition(new Divide(left, right));
   }
 
   public DivideConditionNested<A> withNewDivideConditionLike(Divide item) {
@@ -534,7 +643,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDivideResult(Object left, Object right) {
-    return (A) withResult(new Divide(left, right));
+    return (A) this.withResult(new Divide(left, right));
   }
 
   public DivideResultNested<A> withNewDivideResultLike(Divide item) {
@@ -618,7 +727,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewEqualsAlternative(Object left, Object right) {
-    return (A) withAlternative(new Equals(left, right));
+    return (A) this.withAlternative(new Equals(left, right));
   }
 
   public EqualsAlternativeNested<A> withNewEqualsAlternativeLike(Equals item) {
@@ -630,7 +739,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewEqualsCondition(Object left, Object right) {
-    return (A) withCondition(new Equals(left, right));
+    return (A) this.withCondition(new Equals(left, right));
   }
 
   public EqualsConditionNested<A> withNewEqualsConditionLike(Equals item) {
@@ -642,7 +751,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewEqualsResult(Object left, Object right) {
-    return (A) withResult(new Equals(left, right));
+    return (A) this.withResult(new Equals(left, right));
   }
 
   public EqualsResultNested<A> withNewEqualsResultLike(Equals item) {
@@ -654,7 +763,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanAlternative(Object left, Object right) {
-    return (A) withAlternative(new GreaterThan(left, right));
+    return (A) this.withAlternative(new GreaterThan(left, right));
   }
 
   public GreaterThanAlternativeNested<A> withNewGreaterThanAlternativeLike(GreaterThan item) {
@@ -666,7 +775,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanCondition(Object left, Object right) {
-    return (A) withCondition(new GreaterThan(left, right));
+    return (A) this.withCondition(new GreaterThan(left, right));
   }
 
   public GreaterThanConditionNested<A> withNewGreaterThanConditionLike(GreaterThan item) {
@@ -678,7 +787,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanOrEqualAlternative(Object left, Object right) {
-    return (A) withAlternative(new GreaterThanOrEqual(left, right));
+    return (A) this.withAlternative(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualAlternativeNested<A> withNewGreaterThanOrEqualAlternativeLike(GreaterThanOrEqual item) {
@@ -690,7 +799,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanOrEqualCondition(Object left, Object right) {
-    return (A) withCondition(new GreaterThanOrEqual(left, right));
+    return (A) this.withCondition(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualConditionNested<A> withNewGreaterThanOrEqualConditionLike(GreaterThanOrEqual item) {
@@ -702,7 +811,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanOrEqualResult(Object left, Object right) {
-    return (A) withResult(new GreaterThanOrEqual(left, right));
+    return (A) this.withResult(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualResultNested<A> withNewGreaterThanOrEqualResultLike(GreaterThanOrEqual item) {
@@ -714,7 +823,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanResult(Object left, Object right) {
-    return (A) withResult(new GreaterThan(left, right));
+    return (A) this.withResult(new GreaterThan(left, right));
   }
 
   public GreaterThanResultNested<A> withNewGreaterThanResultLike(GreaterThan item) {
@@ -822,7 +931,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLeftShiftAlternative(Object left, Object right) {
-    return (A) withAlternative(new LeftShift(left, right));
+    return (A) this.withAlternative(new LeftShift(left, right));
   }
 
   public LeftShiftAlternativeNested<A> withNewLeftShiftAlternativeLike(LeftShift item) {
@@ -834,7 +943,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLeftShiftCondition(Object left, Object right) {
-    return (A) withCondition(new LeftShift(left, right));
+    return (A) this.withCondition(new LeftShift(left, right));
   }
 
   public LeftShiftConditionNested<A> withNewLeftShiftConditionLike(LeftShift item) {
@@ -846,7 +955,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLeftShiftResult(Object left, Object right) {
-    return (A) withResult(new LeftShift(left, right));
+    return (A) this.withResult(new LeftShift(left, right));
   }
 
   public LeftShiftResultNested<A> withNewLeftShiftResultLike(LeftShift item) {
@@ -858,7 +967,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanAlternative(Object left, Object right) {
-    return (A) withAlternative(new LessThan(left, right));
+    return (A) this.withAlternative(new LessThan(left, right));
   }
 
   public LessThanAlternativeNested<A> withNewLessThanAlternativeLike(LessThan item) {
@@ -870,7 +979,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanCondition(Object left, Object right) {
-    return (A) withCondition(new LessThan(left, right));
+    return (A) this.withCondition(new LessThan(left, right));
   }
 
   public LessThanConditionNested<A> withNewLessThanConditionLike(LessThan item) {
@@ -882,7 +991,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanOrEqualAlternative(Object left, Object right) {
-    return (A) withAlternative(new LessThanOrEqual(left, right));
+    return (A) this.withAlternative(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualAlternativeNested<A> withNewLessThanOrEqualAlternativeLike(LessThanOrEqual item) {
@@ -894,7 +1003,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanOrEqualCondition(Object left, Object right) {
-    return (A) withCondition(new LessThanOrEqual(left, right));
+    return (A) this.withCondition(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualConditionNested<A> withNewLessThanOrEqualConditionLike(LessThanOrEqual item) {
@@ -906,7 +1015,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanOrEqualResult(Object left, Object right) {
-    return (A) withResult(new LessThanOrEqual(left, right));
+    return (A) this.withResult(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualResultNested<A> withNewLessThanOrEqualResultLike(LessThanOrEqual item) {
@@ -918,7 +1027,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanResult(Object left, Object right) {
-    return (A) withResult(new LessThan(left, right));
+    return (A) this.withResult(new LessThan(left, right));
   }
 
   public LessThanResultNested<A> withNewLessThanResultLike(LessThan item) {
@@ -930,7 +1039,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalAndAlternative(Object left, Object right) {
-    return (A) withAlternative(new LogicalAnd(left, right));
+    return (A) this.withAlternative(new LogicalAnd(left, right));
   }
 
   public LogicalAndAlternativeNested<A> withNewLogicalAndAlternativeLike(LogicalAnd item) {
@@ -942,7 +1051,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalAndCondition(Object left, Object right) {
-    return (A) withCondition(new LogicalAnd(left, right));
+    return (A) this.withCondition(new LogicalAnd(left, right));
   }
 
   public LogicalAndConditionNested<A> withNewLogicalAndConditionLike(LogicalAnd item) {
@@ -954,7 +1063,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalAndResult(Object left, Object right) {
-    return (A) withResult(new LogicalAnd(left, right));
+    return (A) this.withResult(new LogicalAnd(left, right));
   }
 
   public LogicalAndResultNested<A> withNewLogicalAndResultLike(LogicalAnd item) {
@@ -966,7 +1075,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalOrAlternative(Object left, Object right) {
-    return (A) withAlternative(new LogicalOr(left, right));
+    return (A) this.withAlternative(new LogicalOr(left, right));
   }
 
   public LogicalOrAlternativeNested<A> withNewLogicalOrAlternativeLike(LogicalOr item) {
@@ -978,7 +1087,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalOrCondition(Object left, Object right) {
-    return (A) withCondition(new LogicalOr(left, right));
+    return (A) this.withCondition(new LogicalOr(left, right));
   }
 
   public LogicalOrConditionNested<A> withNewLogicalOrConditionLike(LogicalOr item) {
@@ -990,7 +1099,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalOrResult(Object left, Object right) {
-    return (A) withResult(new LogicalOr(left, right));
+    return (A) this.withResult(new LogicalOr(left, right));
   }
 
   public LogicalOrResultNested<A> withNewLogicalOrResultLike(LogicalOr item) {
@@ -1026,7 +1135,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMinusAlternative(Object left, Object right) {
-    return (A) withAlternative(new Minus(left, right));
+    return (A) this.withAlternative(new Minus(left, right));
   }
 
   public MinusAlternativeNested<A> withNewMinusAlternativeLike(Minus item) {
@@ -1038,7 +1147,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMinusCondition(Object left, Object right) {
-    return (A) withCondition(new Minus(left, right));
+    return (A) this.withCondition(new Minus(left, right));
   }
 
   public MinusConditionNested<A> withNewMinusConditionLike(Minus item) {
@@ -1050,7 +1159,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMinusResult(Object left, Object right) {
-    return (A) withResult(new Minus(left, right));
+    return (A) this.withResult(new Minus(left, right));
   }
 
   public MinusResultNested<A> withNewMinusResultLike(Minus item) {
@@ -1062,7 +1171,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewModuloAlternative(Object left, Object right) {
-    return (A) withAlternative(new Modulo(left, right));
+    return (A) this.withAlternative(new Modulo(left, right));
   }
 
   public ModuloAlternativeNested<A> withNewModuloAlternativeLike(Modulo item) {
@@ -1074,7 +1183,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewModuloCondition(Object left, Object right) {
-    return (A) withCondition(new Modulo(left, right));
+    return (A) this.withCondition(new Modulo(left, right));
   }
 
   public ModuloConditionNested<A> withNewModuloConditionLike(Modulo item) {
@@ -1086,7 +1195,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewModuloResult(Object left, Object right) {
-    return (A) withResult(new Modulo(left, right));
+    return (A) this.withResult(new Modulo(left, right));
   }
 
   public ModuloResultNested<A> withNewModuloResultLike(Modulo item) {
@@ -1098,7 +1207,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMultiplyAlternative(Object left, Object right) {
-    return (A) withAlternative(new Multiply(left, right));
+    return (A) this.withAlternative(new Multiply(left, right));
   }
 
   public MultiplyAlternativeNested<A> withNewMultiplyAlternativeLike(Multiply item) {
@@ -1110,7 +1219,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMultiplyCondition(Object left, Object right) {
-    return (A) withCondition(new Multiply(left, right));
+    return (A) this.withCondition(new Multiply(left, right));
   }
 
   public MultiplyConditionNested<A> withNewMultiplyConditionLike(Multiply item) {
@@ -1122,7 +1231,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMultiplyResult(Object left, Object right) {
-    return (A) withResult(new Multiply(left, right));
+    return (A) this.withResult(new Multiply(left, right));
   }
 
   public MultiplyResultNested<A> withNewMultiplyResultLike(Multiply item) {
@@ -1158,7 +1267,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNewArrayAlternative(Class type, Integer[] sizes) {
-    return (A) withAlternative(new NewArray(type, sizes));
+    return (A) this.withAlternative(new NewArray(type, sizes));
   }
 
   public NewArrayAlternativeNested<A> withNewNewArrayAlternativeLike(NewArray item) {
@@ -1170,7 +1279,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNewArrayCondition(Class type, Integer[] sizes) {
-    return (A) withCondition(new NewArray(type, sizes));
+    return (A) this.withCondition(new NewArray(type, sizes));
   }
 
   public NewArrayConditionNested<A> withNewNewArrayConditionLike(NewArray item) {
@@ -1182,7 +1291,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNewArrayResult(Class type, Integer[] sizes) {
-    return (A) withResult(new NewArray(type, sizes));
+    return (A) this.withResult(new NewArray(type, sizes));
   }
 
   public NewArrayResultNested<A> withNewNewArrayResultLike(NewArray item) {
@@ -1210,7 +1319,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNotEqualsAlternative(Object left, Object right) {
-    return (A) withAlternative(new NotEquals(left, right));
+    return (A) this.withAlternative(new NotEquals(left, right));
   }
 
   public NotEqualsAlternativeNested<A> withNewNotEqualsAlternativeLike(NotEquals item) {
@@ -1222,7 +1331,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNotEqualsCondition(Object left, Object right) {
-    return (A) withCondition(new NotEquals(left, right));
+    return (A) this.withCondition(new NotEquals(left, right));
   }
 
   public NotEqualsConditionNested<A> withNewNotEqualsConditionLike(NotEquals item) {
@@ -1234,7 +1343,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNotEqualsResult(Object left, Object right) {
-    return (A) withResult(new NotEquals(left, right));
+    return (A) this.withResult(new NotEquals(left, right));
   }
 
   public NotEqualsResultNested<A> withNewNotEqualsResultLike(NotEquals item) {
@@ -1254,7 +1363,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewPlusAlternative(Object left, Object right) {
-    return (A) withAlternative(new Plus(left, right));
+    return (A) this.withAlternative(new Plus(left, right));
   }
 
   public PlusAlternativeNested<A> withNewPlusAlternativeLike(Plus item) {
@@ -1266,7 +1375,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewPlusCondition(Object left, Object right) {
-    return (A) withCondition(new Plus(left, right));
+    return (A) this.withCondition(new Plus(left, right));
   }
 
   public PlusConditionNested<A> withNewPlusConditionLike(Plus item) {
@@ -1278,7 +1387,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewPlusResult(Object left, Object right) {
-    return (A) withResult(new Plus(left, right));
+    return (A) this.withResult(new Plus(left, right));
   }
 
   public PlusResultNested<A> withNewPlusResultLike(Plus item) {
@@ -1458,7 +1567,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightShiftAlternative(Object left, Object right) {
-    return (A) withAlternative(new RightShift(left, right));
+    return (A) this.withAlternative(new RightShift(left, right));
   }
 
   public RightShiftAlternativeNested<A> withNewRightShiftAlternativeLike(RightShift item) {
@@ -1470,7 +1579,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightShiftCondition(Object left, Object right) {
-    return (A) withCondition(new RightShift(left, right));
+    return (A) this.withCondition(new RightShift(left, right));
   }
 
   public RightShiftConditionNested<A> withNewRightShiftConditionLike(RightShift item) {
@@ -1482,7 +1591,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightShiftResult(Object left, Object right) {
-    return (A) withResult(new RightShift(left, right));
+    return (A) this.withResult(new RightShift(left, right));
   }
 
   public RightShiftResultNested<A> withNewRightShiftResultLike(RightShift item) {
@@ -1494,7 +1603,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightUnsignedShiftAlternative(Object left, Object right) {
-    return (A) withAlternative(new RightUnsignedShift(left, right));
+    return (A) this.withAlternative(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftAlternativeNested<A> withNewRightUnsignedShiftAlternativeLike(RightUnsignedShift item) {
@@ -1506,7 +1615,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightUnsignedShiftCondition(Object left, Object right) {
-    return (A) withCondition(new RightUnsignedShift(left, right));
+    return (A) this.withCondition(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftConditionNested<A> withNewRightUnsignedShiftConditionLike(RightUnsignedShift item) {
@@ -1518,7 +1627,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightUnsignedShiftResult(Object left, Object right) {
-    return (A) withResult(new RightUnsignedShift(left, right));
+    return (A) this.withResult(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftResultNested<A> withNewRightUnsignedShiftResultLike(RightUnsignedShift item) {
@@ -1602,7 +1711,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewValueRefAlternative(Object value) {
-    return (A) withAlternative(new ValueRef(value));
+    return (A) this.withAlternative(new ValueRef(value));
   }
 
   public ValueRefAlternativeNested<A> withNewValueRefAlternativeLike(ValueRef item) {
@@ -1614,7 +1723,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewValueRefCondition(Object value) {
-    return (A) withCondition(new ValueRef(value));
+    return (A) this.withCondition(new ValueRef(value));
   }
 
   public ValueRefConditionNested<A> withNewValueRefConditionLike(ValueRef item) {
@@ -1626,7 +1735,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewValueRefResult(Object value) {
-    return (A) withResult(new ValueRef(value));
+    return (A) this.withResult(new ValueRef(value));
   }
 
   public ValueRefResultNested<A> withNewValueRefResultLike(ValueRef item) {
@@ -1638,7 +1747,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewXorAlternative(Object left, Object right) {
-    return (A) withAlternative(new Xor(left, right));
+    return (A) this.withAlternative(new Xor(left, right));
   }
 
   public XorAlternativeNested<A> withNewXorAlternativeLike(Xor item) {
@@ -1650,7 +1759,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewXorCondition(Object left, Object right) {
-    return (A) withCondition(new Xor(left, right));
+    return (A) this.withCondition(new Xor(left, right));
   }
 
   public XorConditionNested<A> withNewXorConditionLike(Xor item) {
@@ -1662,7 +1771,7 @@ public class TernaryFluent<A extends TernaryFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewXorResult(Object left, Object right) {
-    return (A) withResult(new Xor(left, right));
+    return (A) this.withResult(new Xor(left, right));
   }
 
   public XorResultNested<A> withNewXorResultLike(Xor item) {

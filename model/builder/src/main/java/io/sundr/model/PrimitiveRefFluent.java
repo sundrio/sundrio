@@ -2,13 +2,15 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 /**
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRefFluent<A> {
+public class PrimitiveRefFluent<A extends io.sundr.model.PrimitiveRefFluent<A>> extends TypeRefFluent<A> {
 
   private int dimensions;
   private String name;
@@ -29,17 +31,22 @@ public class PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRef
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     PrimitiveRefFluent that = (PrimitiveRefFluent) o;
-    if (!java.util.Objects.equals(name, that.name))
+    if (!(Objects.equals(name, that.name))) {
       return false;
-    if (dimensions != that.dimensions)
+    }
+    if (dimensions != that.dimensions) {
       return false;
+    }
     return true;
   }
 
@@ -60,15 +67,16 @@ public class PrimitiveRefFluent<A extends PrimitiveRefFluent<A>> extends TypeRef
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(name, dimensions, super.hashCode());
+    return Objects.hash(name, dimensions);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (name != null) {
+    if (!(name == null)) {
       sb.append("name:");
-      sb.append(name + ",");
+      sb.append(name);
+      sb.append(",");
     }
     sb.append("dimensions:");
     sb.append(dimensions);

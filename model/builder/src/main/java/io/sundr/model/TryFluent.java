@@ -2,10 +2,12 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -16,7 +18,7 @@ import io.sundr.builder.Nested;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
+public class TryFluent<A extends io.sundr.model.TryFluent<A>> extends BaseFluent<A> {
 
   private List<Try.Catch> catchBlocks = new ArrayList<Try.Catch>();
   private Optional<BlockBuilder> finallyBlock = Optional.empty();
@@ -31,7 +33,7 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
 
   public A addAllToCatchBlocks(Collection<Try.Catch> items) {
     if (this.catchBlocks == null) {
-      this.catchBlocks = new ArrayList<Try.Catch>();
+      this.catchBlocks = new ArrayList();
     }
     for (Try.Catch item : items) {
       this.catchBlocks.add(item);
@@ -41,7 +43,7 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
 
   public A addToCatchBlocks(Try.Catch... items) {
     if (this.catchBlocks == null) {
-      this.catchBlocks = new ArrayList<Try.Catch>();
+      this.catchBlocks = new ArrayList();
     }
     for (Try.Catch item : items) {
       this.catchBlocks.add(item);
@@ -51,16 +53,14 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
 
   public A addToCatchBlocks(int index, Try.Catch item) {
     if (this.catchBlocks == null) {
-      this.catchBlocks = new ArrayList<Try.Catch>();
+      this.catchBlocks = new ArrayList();
     }
     this.catchBlocks.add(index, item);
     return (A) this;
   }
 
   public Optional<Block> buildFinallyBlock() {
-    return (Optional<Block>) (this.finallyBlock != null && this.finallyBlock.isPresent()
-        ? Optional.of(this.finallyBlock.get().build())
-        : Optional.empty());
+    return this.finallyBlock != null ? this.finallyBlock.map(v -> v.build()) : Optional.empty();
   }
 
   public Block buildTryBlock() {
@@ -76,46 +76,52 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
   }
 
   public FinallyBlockNested<A> editFinallyBlock() {
-    return withNewFinallyBlockLike(
-        Optional.ofNullable(buildFinallyBlock()).flatMap(java.util.function.Function.identity()).orElse(null));
+    return this.withNewFinallyBlockLike(
+        Optional.ofNullable(this.buildFinallyBlock()).flatMap(java.util.function.Function.identity()).orElse(null));
   }
 
   public <T> FinallyBlockNested<?> editOrNewFinallyBlock() {
-    return withNewFinallyBlockLike(Optional.ofNullable(buildFinallyBlock()).flatMap(java.util.function.Function.identity())
-        .orElse(new BlockBuilder().build()));
+    return this.withNewFinallyBlockLike(Optional.ofNullable(this.buildFinallyBlock())
+        .flatMap(java.util.function.Function.identity()).orElse(new BlockBuilder().build()));
   }
 
   public FinallyBlockNested<A> editOrNewFinallyBlockLike(Block item) {
-    return withNewFinallyBlockLike(
-        Optional.ofNullable(buildFinallyBlock()).flatMap(java.util.function.Function.identity()).orElse(item));
+    return this.withNewFinallyBlockLike(
+        Optional.ofNullable(this.buildFinallyBlock()).flatMap(java.util.function.Function.identity()).orElse(item));
   }
 
   public TryBlockNested<A> editOrNewTryBlock() {
-    return withNewTryBlockLike(Optional.ofNullable(buildTryBlock()).orElse(new BlockBuilder().build()));
+    return this.withNewTryBlockLike(Optional.ofNullable(this.buildTryBlock()).orElse(new BlockBuilder().build()));
   }
 
   public TryBlockNested<A> editOrNewTryBlockLike(Block item) {
-    return withNewTryBlockLike(Optional.ofNullable(buildTryBlock()).orElse(item));
+    return this.withNewTryBlockLike(Optional.ofNullable(this.buildTryBlock()).orElse(item));
   }
 
   public TryBlockNested<A> editTryBlock() {
-    return withNewTryBlockLike(Optional.ofNullable(buildTryBlock()).orElse(null));
+    return this.withNewTryBlockLike(Optional.ofNullable(this.buildTryBlock()).orElse(null));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     TryFluent that = (TryFluent) o;
-    if (!java.util.Objects.equals(tryBlock, that.tryBlock))
+    if (!(Objects.equals(tryBlock, that.tryBlock))) {
       return false;
-    if (!java.util.Objects.equals(catchBlocks, that.catchBlocks))
+    }
+    if (!(Objects.equals(catchBlocks, that.catchBlocks))) {
       return false;
-    if (!java.util.Objects.equals(finallyBlock, that.finallyBlock))
+    }
+    if (!(Objects.equals(finallyBlock, that.finallyBlock))) {
       return false;
+    }
     return true;
   }
 
@@ -166,12 +172,13 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(tryBlock, catchBlocks, finallyBlock, super.hashCode());
+    return Objects.hash(tryBlock, catchBlocks, finallyBlock);
   }
 
   public A removeAllFromCatchBlocks(Collection<Try.Catch> items) {
-    if (this.catchBlocks == null)
+    if (this.catchBlocks == null) {
       return (A) this;
+    }
     for (Try.Catch item : items) {
       this.catchBlocks.remove(item);
     }
@@ -179,8 +186,9 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
   }
 
   public A removeFromCatchBlocks(Try.Catch... items) {
-    if (this.catchBlocks == null)
+    if (this.catchBlocks == null) {
       return (A) this;
+    }
     for (Try.Catch item : items) {
       this.catchBlocks.remove(item);
     }
@@ -189,7 +197,7 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
 
   public A setToCatchBlocks(int index, Try.Catch item) {
     if (this.catchBlocks == null) {
-      this.catchBlocks = new ArrayList<Try.Catch>();
+      this.catchBlocks = new ArrayList();
     }
     this.catchBlocks.set(index, item);
     return (A) this;
@@ -198,15 +206,17 @@ public class TryFluent<A extends TryFluent<A>> extends BaseFluent<A> {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (tryBlock != null) {
+    if (!(tryBlock == null)) {
       sb.append("tryBlock:");
-      sb.append(tryBlock + ",");
+      sb.append(tryBlock);
+      sb.append(",");
     }
-    if (catchBlocks != null && !catchBlocks.isEmpty()) {
+    if (!(catchBlocks == null) && !(catchBlocks.isEmpty())) {
       sb.append("catchBlocks:");
-      sb.append(catchBlocks + ",");
+      sb.append(catchBlocks);
+      sb.append(",");
     }
-    if (finallyBlock != null) {
+    if (!(finallyBlock == null)) {
       sb.append("finallyBlock:");
       sb.append(finallyBlock);
     }

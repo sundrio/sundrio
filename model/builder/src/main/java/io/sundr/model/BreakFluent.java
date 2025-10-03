@@ -2,7 +2,9 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 
@@ -10,7 +12,7 @@ import io.sundr.builder.BaseFluent;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class BreakFluent<A extends BreakFluent<A>> extends BaseFluent<A> {
+public class BreakFluent<A extends io.sundr.model.BreakFluent<A>> extends BaseFluent<A> {
 
   public BreakFluent() {
   }
@@ -20,24 +22,28 @@ public class BreakFluent<A extends BreakFluent<A>> extends BaseFluent<A> {
   }
 
   protected void copyInstance(Break instance) {
-    instance = (instance != null ? instance : new Break());
+    instance = instance != null ? instance : new Break();
     if (instance != null) {
+
     }
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     BreakFluent that = (BreakFluent) o;
     return true;
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(super.hashCode());
+    return Objects.hash();
   }
 
   public String toString() {

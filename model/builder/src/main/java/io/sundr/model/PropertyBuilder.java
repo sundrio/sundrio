@@ -26,7 +26,7 @@ public class PropertyBuilder extends PropertyFluent<PropertyBuilder> implements 
 
   public Property build() {
     Property buildable = new Property(fluent.buildModifiers(), fluent.getAttributes(), fluent.getComments(),
-        fluent.buildAnnotations(), fluent.buildTypeRef(), fluent.getName(), fluent.getInitialValue(), fluent.isEnumConstant(),
+        fluent.buildAnnotations(), fluent.buildTypeRef(), fluent.getName(), fluent.buildInitialValue(), fluent.isEnumConstant(),
         fluent.isSynthetic());
     return buildable;
   }

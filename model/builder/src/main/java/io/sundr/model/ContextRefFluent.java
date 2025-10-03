@@ -2,7 +2,9 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 
@@ -10,7 +12,7 @@ import io.sundr.builder.BaseFluent;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class ContextRefFluent<A extends ContextRefFluent<A>> extends BaseFluent<A> {
+public class ContextRefFluent<A extends io.sundr.model.ContextRefFluent<A>> extends BaseFluent<A> {
 
   private String name;
 
@@ -28,15 +30,19 @@ public class ContextRefFluent<A extends ContextRefFluent<A>> extends BaseFluent<
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     ContextRefFluent that = (ContextRefFluent) o;
-    if (!java.util.Objects.equals(name, that.name))
+    if (!(Objects.equals(name, that.name))) {
       return false;
+    }
     return true;
   }
 
@@ -49,13 +55,13 @@ public class ContextRefFluent<A extends ContextRefFluent<A>> extends BaseFluent<
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(name, super.hashCode());
+    return Objects.hash(name);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (name != null) {
+    if (!(name == null)) {
       sb.append("name:");
       sb.append(name);
     }

@@ -4,7 +4,9 @@ import java.lang.Class;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 import java.util.Optional;
 
 import io.sundr.builder.BaseFluent;
@@ -15,10 +17,10 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
+public class IfFluent<A extends io.sundr.model.IfFluent<A>> extends BaseFluent<A> {
 
   private VisitableBuilder<? extends Expression, ?> condition;
-  private Optional<Statement> elseStatement = Optional.empty();
+  private Optional<VisitableBuilder<? extends Statement, ?>> elseStatement = Optional.empty();
   private VisitableBuilder<? extends Statement, ?> statement;
 
   public IfFluent() {
@@ -32,144 +34,281 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return this.condition != null ? this.condition.build() : null;
   }
 
+  public Optional<Statement> buildElseStatement() {
+    return this.elseStatement != null ? this.elseStatement.map(v -> v.build()) : Optional.empty();
+  }
+
   public Statement buildStatement() {
     return this.statement != null ? this.statement.build() : null;
   }
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "Multiply":
+      case "Multiply":
+
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
-      case "io.sundr.model." + "NewArray":
+
+      case "NewArray":
+
         return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
-      case "io.sundr.model." + "InstanceOf":
+
+      case "InstanceOf":
+
         return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
-      case "io.sundr.model." + "MethodCall":
+
+      case "MethodCall":
+
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
-      case "io.sundr.model." + "ClassRef":
+
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "Inverse":
+
+      case "Inverse":
+
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
-      case "io.sundr.model." + "Index":
+
+      case "Index":
+
         return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
-      case "io.sundr.model." + "GreaterThanOrEqual":
+
+      case "GreaterThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
-      case "io.sundr.model." + "BitwiseAnd":
+
+      case "BitwiseAnd":
+
         return (VisitableBuilder<T, ?>) new BitwiseAndBuilder((BitwiseAnd) item);
-      case "io.sundr.model." + "Minus":
+
+      case "Minus":
+
         return (VisitableBuilder<T, ?>) new MinusBuilder((Minus) item);
-      case "io.sundr.model." + "LogicalOr":
+
+      case "LogicalOr":
+
         return (VisitableBuilder<T, ?>) new LogicalOrBuilder((LogicalOr) item);
-      case "io.sundr.model." + "NotEquals":
+
+      case "NotEquals":
+
         return (VisitableBuilder<T, ?>) new NotEqualsBuilder((NotEquals) item);
-      case "io.sundr.model." + "Divide":
+
+      case "Divide":
+
         return (VisitableBuilder<T, ?>) new DivideBuilder((Divide) item);
-      case "io.sundr.model." + "LessThan":
+
+      case "LessThan":
+
         return (VisitableBuilder<T, ?>) new LessThanBuilder((LessThan) item);
-      case "io.sundr.model." + "BitwiseOr":
+
+      case "BitwiseOr":
+
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
-      case "io.sundr.model." + "PropertyRef":
+
+      case "PropertyRef":
+
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
-      case "io.sundr.model." + "RightShift":
+
+      case "RightShift":
+
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
-      case "io.sundr.model." + "Super":
+
+      case "Super":
+
         return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
-      case "io.sundr.model." + "GreaterThan":
+
+      case "GreaterThan":
+
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
-      case "io.sundr.model." + "Declare":
+
+      case "Declare":
+
         return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
-      case "io.sundr.model." + "Cast":
+
+      case "Cast":
+
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
-      case "io.sundr.model." + "Modulo":
+
+      case "Modulo":
+
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
-      case "io.sundr.model." + "DotClass":
+
+      case "DotClass":
+
         return (VisitableBuilder<T, ?>) new DotClassBuilder((DotClass) item);
-      case "io.sundr.model." + "ValueRef":
+
+      case "ValueRef":
+
         return (VisitableBuilder<T, ?>) new ValueRefBuilder((ValueRef) item);
-      case "io.sundr.model." + "LeftShift":
+
+      case "LeftShift":
+
         return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
-      case "io.sundr.model." + "Empty":
+
+      case "Empty":
+
         return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
-      case "io.sundr.model." + "Ternary":
+
+      case "Ternary":
+
         return (VisitableBuilder<T, ?>) new TernaryBuilder((Ternary) item);
-      case "io.sundr.model." + "BinaryExpression":
+
+      case "BinaryExpression":
+
         return (VisitableBuilder<T, ?>) new BinaryExpressionBuilder((BinaryExpression) item);
-      case "io.sundr.model." + "Equals":
+
+      case "Equals":
+
         return (VisitableBuilder<T, ?>) new EqualsBuilder((Equals) item);
-      case "io.sundr.model." + "Enclosed":
+
+      case "Enclosed":
+
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
-      case "io.sundr.model." + "PreDecrement":
+
+      case "PreDecrement":
+
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
-      case "io.sundr.model." + "PostDecrement":
+
+      case "PostDecrement":
+
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
-      case "io.sundr.model." + "Lambda":
+
+      case "Lambda":
+
         return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
-      case "io.sundr.model." + "Not":
+
+      case "Not":
+
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
-      case "io.sundr.model." + "Assign":
+
+      case "Assign":
+
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "This":
+
+      case "This":
+
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
-      case "io.sundr.model." + "Negative":
+
+      case "Negative":
+
         return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
-      case "io.sundr.model." + "LogicalAnd":
+
+      case "LogicalAnd":
+
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
-      case "io.sundr.model." + "PostIncrement":
+
+      case "PostIncrement":
+
         return (VisitableBuilder<T, ?>) new PostIncrementBuilder((PostIncrement) item);
-      case "io.sundr.model." + "RightUnsignedShift":
+
+      case "RightUnsignedShift":
+
         return (VisitableBuilder<T, ?>) new RightUnsignedShiftBuilder((RightUnsignedShift) item);
-      case "io.sundr.model." + "Plus":
+
+      case "Plus":
+
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
-      case "io.sundr.model." + "Construct":
+
+      case "Construct":
+
         return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-      case "io.sundr.model." + "Xor":
+
+      case "Xor":
+
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
-      case "io.sundr.model." + "PreIncrement":
+
+      case "PreIncrement":
+
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
-      case "io.sundr.model." + "Property":
+
+      case "Property":
+
         return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
-      case "io.sundr.model." + "LessThanOrEqual":
+
+      case "LessThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
-      case "io.sundr.model." + "ContextRef":
+
+      case "ContextRef":
+
         return (VisitableBuilder<T, ?>) new ContextRefBuilder((ContextRef) item);
-      case "io.sundr.model." + "Positive":
+
+      case "Positive":
+
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
-      case "io.sundr.model." + "ReturnDslThisStep":
+
+      case "ReturnDslThisStep":
+
         return (VisitableBuilder<T, ?>) new ReturnDslThisStepBuilder((ReturnDslThisStep) item);
-      case "io.sundr.model." + "Try":
+
+      case "Try":
+
         return (VisitableBuilder<T, ?>) new TryBuilder((Try) item);
-      case "io.sundr.model." + "Switch":
+
+      case "Switch":
+
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
-      case "io.sundr.model." + "Synchronized":
+
+      case "Synchronized":
+
         return (VisitableBuilder<T, ?>) new SynchronizedBuilder((Synchronized) item);
-      case "io.sundr.model." + "Break":
+
+      case "Break":
+
         return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
-      case "io.sundr.model." + "While":
+
+      case "While":
+
         return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
-      case "io.sundr.model." + "Continue":
+
+      case "Continue":
+
         return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
-      case "io.sundr.model." + "Throw":
+
+      case "Throw":
+
         return (VisitableBuilder<T, ?>) new ThrowBuilder((Throw) item);
-      case "io.sundr.model." + "StringStatement":
+
+      case "StringStatement":
+
         return (VisitableBuilder<T, ?>) new StringStatementBuilder((StringStatement) item);
-      case "io.sundr.model." + "Do":
+
+      case "Do":
+
         return (VisitableBuilder<T, ?>) new DoBuilder((Do) item);
-      case "io.sundr.model." + "Foreach":
+
+      case "Foreach":
+
         return (VisitableBuilder<T, ?>) new ForeachBuilder((Foreach) item);
-      case "io.sundr.model." + "Block":
+
+      case "Block":
+
         return (VisitableBuilder<T, ?>) new BlockBuilder((Block) item);
-      case "io.sundr.model." + "ReturnDslVariableStep":
+
+      case "ReturnDslVariableStep":
+
         return (VisitableBuilder<T, ?>) new ReturnDslVariableStepBuilder((ReturnDslVariableStep) item);
-      case "io.sundr.model." + "If":
+
+      case "If":
+
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
-      case "io.sundr.model." + "Return":
+
+      case "Return":
+
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
-      case "io.sundr.model." + "IfDslThenStep":
+
+      case "IfDslThenStep":
+
         return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
-      case "io.sundr.model." + "For":
+
+      case "For":
+
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(If instance) {
@@ -181,24 +320,26 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     IfFluent that = (IfFluent) o;
-    if (!java.util.Objects.equals(condition, that.condition))
+    if (!(Objects.equals(condition, that.condition))) {
       return false;
-    if (!java.util.Objects.equals(statement, that.statement))
+    }
+    if (!(Objects.equals(statement, that.statement))) {
       return false;
-    if (!java.util.Objects.equals(elseStatement, that.elseStatement))
+    }
+    if (!(Objects.equals(elseStatement, that.elseStatement))) {
       return false;
+    }
     return true;
-  }
-
-  public Optional<Statement> getElseStatement() {
-    return this.elseStatement;
   }
 
   public boolean hasCondition() {
@@ -214,21 +355,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(condition, statement, elseStatement, super.hashCode());
+    return Objects.hash(condition, statement, elseStatement);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (condition != null) {
+    if (!(condition == null)) {
       sb.append("condition:");
-      sb.append(condition + ",");
+      sb.append(condition);
+      sb.append(",");
     }
-    if (statement != null) {
+    if (!(statement == null)) {
       sb.append("statement:");
-      sb.append(statement + ",");
+      sb.append(statement);
+      sb.append(",");
     }
-    if (elseStatement != null) {
+    if (!(elseStatement == null)) {
       sb.append("elseStatement:");
       sb.append(elseStatement);
     }
@@ -254,7 +397,9 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     if (elseStatement == null || !(elseStatement.isPresent())) {
       this.elseStatement = Optional.empty();
     } else {
-      this.elseStatement = elseStatement;
+      VisitableBuilder<? extends Statement, ?> b = builder(elseStatement.get());
+      _visitables.get("elseStatement").add(b);
+      this.elseStatement = Optional.of(b);
     }
     return (A) this;
   }
@@ -263,7 +408,9 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     if (elseStatement == null) {
       this.elseStatement = Optional.empty();
     } else {
-      this.elseStatement = Optional.of(elseStatement);
+      VisitableBuilder<? extends Statement, ?> b = builder(elseStatement);
+      _visitables.get("elseStatement").add(b);
+      this.elseStatement = Optional.of(b);
     }
     return (A) this;
   }
@@ -274,6 +421,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public AssignConditionNested<A> withNewAssignConditionLike(Assign item) {
     return new AssignConditionNested(item);
+  }
+
+  public AssignElseStatementNested<A> withNewAssignElseStatement() {
+    return new AssignElseStatementNested(null);
+  }
+
+  public AssignElseStatementNested<A> withNewAssignElseStatementLike(Assign item) {
+    return new AssignElseStatementNested(item);
   }
 
   public AssignStatementNested<A> withNewAssignStatement() {
@@ -292,6 +447,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new BinaryExpressionConditionNested(item);
   }
 
+  public BinaryExpressionElseStatementNested<A> withNewBinaryExpressionElseStatement() {
+    return new BinaryExpressionElseStatementNested(null);
+  }
+
+  public BinaryExpressionElseStatementNested<A> withNewBinaryExpressionElseStatementLike(BinaryExpression item) {
+    return new BinaryExpressionElseStatementNested(item);
+  }
+
   public BinaryExpressionStatementNested<A> withNewBinaryExpressionStatement() {
     return new BinaryExpressionStatementNested(null);
   }
@@ -305,11 +468,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseAndCondition(Object left, Object right) {
-    return (A) withCondition(new BitwiseAnd(left, right));
+    return (A) this.withCondition(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndConditionNested<A> withNewBitwiseAndConditionLike(BitwiseAnd item) {
     return new BitwiseAndConditionNested(item);
+  }
+
+  public BitwiseAndElseStatementNested<A> withNewBitwiseAndElseStatement() {
+    return new BitwiseAndElseStatementNested(null);
+  }
+
+  public A withNewBitwiseAndElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new BitwiseAnd(left, right));
+  }
+
+  public BitwiseAndElseStatementNested<A> withNewBitwiseAndElseStatementLike(BitwiseAnd item) {
+    return new BitwiseAndElseStatementNested(item);
   }
 
   public BitwiseAndStatementNested<A> withNewBitwiseAndStatement() {
@@ -317,7 +492,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseAndStatement(Object left, Object right) {
-    return (A) withStatement(new BitwiseAnd(left, right));
+    return (A) this.withStatement(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndStatementNested<A> withNewBitwiseAndStatementLike(BitwiseAnd item) {
@@ -329,11 +504,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseOrCondition(Object left, Object right) {
-    return (A) withCondition(new BitwiseOr(left, right));
+    return (A) this.withCondition(new BitwiseOr(left, right));
   }
 
   public BitwiseOrConditionNested<A> withNewBitwiseOrConditionLike(BitwiseOr item) {
     return new BitwiseOrConditionNested(item);
+  }
+
+  public BitwiseOrElseStatementNested<A> withNewBitwiseOrElseStatement() {
+    return new BitwiseOrElseStatementNested(null);
+  }
+
+  public A withNewBitwiseOrElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new BitwiseOr(left, right));
+  }
+
+  public BitwiseOrElseStatementNested<A> withNewBitwiseOrElseStatementLike(BitwiseOr item) {
+    return new BitwiseOrElseStatementNested(item);
   }
 
   public BitwiseOrStatementNested<A> withNewBitwiseOrStatement() {
@@ -341,11 +528,19 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseOrStatement(Object left, Object right) {
-    return (A) withStatement(new BitwiseOr(left, right));
+    return (A) this.withStatement(new BitwiseOr(left, right));
   }
 
   public BitwiseOrStatementNested<A> withNewBitwiseOrStatementLike(BitwiseOr item) {
     return new BitwiseOrStatementNested(item);
+  }
+
+  public BlockElseStatementNested<A> withNewBlockElseStatement() {
+    return new BlockElseStatementNested(null);
+  }
+
+  public BlockElseStatementNested<A> withNewBlockElseStatementLike(Block item) {
+    return new BlockElseStatementNested(item);
   }
 
   public BlockStatementNested<A> withNewBlockStatement() {
@@ -354,6 +549,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public BlockStatementNested<A> withNewBlockStatementLike(Block item) {
     return new BlockStatementNested(item);
+  }
+
+  public BreakElseStatementNested<A> withNewBreakElseStatement() {
+    return new BreakElseStatementNested(null);
+  }
+
+  public BreakElseStatementNested<A> withNewBreakElseStatementLike(Break item) {
+    return new BreakElseStatementNested(item);
   }
 
   public BreakStatementNested<A> withNewBreakStatement() {
@@ -388,6 +591,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new ConstructConditionNested(item);
   }
 
+  public ConstructElseStatementNested<A> withNewConstructElseStatement() {
+    return new ConstructElseStatementNested(null);
+  }
+
+  public ConstructElseStatementNested<A> withNewConstructElseStatementLike(Construct item) {
+    return new ConstructElseStatementNested(item);
+  }
+
   public ConstructStatementNested<A> withNewConstructStatement() {
     return new ConstructStatementNested(null);
   }
@@ -401,11 +612,19 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewContextRefCondition(String name) {
-    return (A) withCondition(new ContextRef(name));
+    return (A) this.withCondition(new ContextRef(name));
   }
 
   public ContextRefConditionNested<A> withNewContextRefConditionLike(ContextRef item) {
     return new ContextRefConditionNested(item);
+  }
+
+  public ContinueElseStatementNested<A> withNewContinueElseStatement() {
+    return new ContinueElseStatementNested(null);
+  }
+
+  public ContinueElseStatementNested<A> withNewContinueElseStatementLike(Continue item) {
+    return new ContinueElseStatementNested(item);
   }
 
   public ContinueStatementNested<A> withNewContinueStatement() {
@@ -421,15 +640,31 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDeclareCondition(Class type, String name) {
-    return (A) withCondition(new Declare(type, name));
+    return (A) this.withCondition(new Declare(type, name));
   }
 
   public A withNewDeclareCondition(Class type, String name, Object value) {
-    return (A) withCondition(new Declare(type, name, value));
+    return (A) this.withCondition(new Declare(type, name, value));
   }
 
   public DeclareConditionNested<A> withNewDeclareConditionLike(Declare item) {
     return new DeclareConditionNested(item);
+  }
+
+  public DeclareElseStatementNested<A> withNewDeclareElseStatement() {
+    return new DeclareElseStatementNested(null);
+  }
+
+  public A withNewDeclareElseStatement(Class type, String name) {
+    return (A) this.withElseStatement(new Declare(type, name));
+  }
+
+  public A withNewDeclareElseStatement(Class type, String name, Object value) {
+    return (A) this.withElseStatement(new Declare(type, name, value));
+  }
+
+  public DeclareElseStatementNested<A> withNewDeclareElseStatementLike(Declare item) {
+    return new DeclareElseStatementNested(item);
   }
 
   public DeclareStatementNested<A> withNewDeclareStatement() {
@@ -437,11 +672,11 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDeclareStatement(Class type, String name) {
-    return (A) withStatement(new Declare(type, name));
+    return (A) this.withStatement(new Declare(type, name));
   }
 
   public A withNewDeclareStatement(Class type, String name, Object value) {
-    return (A) withStatement(new Declare(type, name, value));
+    return (A) this.withStatement(new Declare(type, name, value));
   }
 
   public DeclareStatementNested<A> withNewDeclareStatementLike(Declare item) {
@@ -453,11 +688,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDivideCondition(Object left, Object right) {
-    return (A) withCondition(new Divide(left, right));
+    return (A) this.withCondition(new Divide(left, right));
   }
 
   public DivideConditionNested<A> withNewDivideConditionLike(Divide item) {
     return new DivideConditionNested(item);
+  }
+
+  public DivideElseStatementNested<A> withNewDivideElseStatement() {
+    return new DivideElseStatementNested(null);
+  }
+
+  public A withNewDivideElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new Divide(left, right));
+  }
+
+  public DivideElseStatementNested<A> withNewDivideElseStatementLike(Divide item) {
+    return new DivideElseStatementNested(item);
   }
 
   public DivideStatementNested<A> withNewDivideStatement() {
@@ -465,11 +712,19 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDivideStatement(Object left, Object right) {
-    return (A) withStatement(new Divide(left, right));
+    return (A) this.withStatement(new Divide(left, right));
   }
 
   public DivideStatementNested<A> withNewDivideStatementLike(Divide item) {
     return new DivideStatementNested(item);
+  }
+
+  public DoElseStatementNested<A> withNewDoElseStatement() {
+    return new DoElseStatementNested(null);
+  }
+
+  public DoElseStatementNested<A> withNewDoElseStatementLike(Do item) {
+    return new DoElseStatementNested(item);
   }
 
   public DoStatementNested<A> withNewDoStatement() {
@@ -496,6 +751,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new EmptyConditionNested(item);
   }
 
+  public EmptyElseStatementNested<A> withNewEmptyElseStatement() {
+    return new EmptyElseStatementNested(null);
+  }
+
+  public EmptyElseStatementNested<A> withNewEmptyElseStatementLike(Empty item) {
+    return new EmptyElseStatementNested(item);
+  }
+
   public EmptyStatementNested<A> withNewEmptyStatement() {
     return new EmptyStatementNested(null);
   }
@@ -517,11 +780,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewEqualsCondition(Object left, Object right) {
-    return (A) withCondition(new Equals(left, right));
+    return (A) this.withCondition(new Equals(left, right));
   }
 
   public EqualsConditionNested<A> withNewEqualsConditionLike(Equals item) {
     return new EqualsConditionNested(item);
+  }
+
+  public EqualsElseStatementNested<A> withNewEqualsElseStatement() {
+    return new EqualsElseStatementNested(null);
+  }
+
+  public A withNewEqualsElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new Equals(left, right));
+  }
+
+  public EqualsElseStatementNested<A> withNewEqualsElseStatementLike(Equals item) {
+    return new EqualsElseStatementNested(item);
   }
 
   public EqualsStatementNested<A> withNewEqualsStatement() {
@@ -529,11 +804,19 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewEqualsStatement(Object left, Object right) {
-    return (A) withStatement(new Equals(left, right));
+    return (A) this.withStatement(new Equals(left, right));
   }
 
   public EqualsStatementNested<A> withNewEqualsStatementLike(Equals item) {
     return new EqualsStatementNested(item);
+  }
+
+  public ForElseStatementNested<A> withNewForElseStatement() {
+    return new ForElseStatementNested(null);
+  }
+
+  public ForElseStatementNested<A> withNewForElseStatementLike(For item) {
+    return new ForElseStatementNested(item);
   }
 
   public ForStatementNested<A> withNewForStatement() {
@@ -542,6 +825,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public ForStatementNested<A> withNewForStatementLike(For item) {
     return new ForStatementNested(item);
+  }
+
+  public ForeachElseStatementNested<A> withNewForeachElseStatement() {
+    return new ForeachElseStatementNested(null);
+  }
+
+  public ForeachElseStatementNested<A> withNewForeachElseStatementLike(Foreach item) {
+    return new ForeachElseStatementNested(item);
   }
 
   public ForeachStatementNested<A> withNewForeachStatement() {
@@ -557,11 +848,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanCondition(Object left, Object right) {
-    return (A) withCondition(new GreaterThan(left, right));
+    return (A) this.withCondition(new GreaterThan(left, right));
   }
 
   public GreaterThanConditionNested<A> withNewGreaterThanConditionLike(GreaterThan item) {
     return new GreaterThanConditionNested(item);
+  }
+
+  public GreaterThanElseStatementNested<A> withNewGreaterThanElseStatement() {
+    return new GreaterThanElseStatementNested(null);
+  }
+
+  public A withNewGreaterThanElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new GreaterThan(left, right));
+  }
+
+  public GreaterThanElseStatementNested<A> withNewGreaterThanElseStatementLike(GreaterThan item) {
+    return new GreaterThanElseStatementNested(item);
   }
 
   public GreaterThanOrEqualConditionNested<A> withNewGreaterThanOrEqualCondition() {
@@ -569,11 +872,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanOrEqualCondition(Object left, Object right) {
-    return (A) withCondition(new GreaterThanOrEqual(left, right));
+    return (A) this.withCondition(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualConditionNested<A> withNewGreaterThanOrEqualConditionLike(GreaterThanOrEqual item) {
     return new GreaterThanOrEqualConditionNested(item);
+  }
+
+  public GreaterThanOrEqualElseStatementNested<A> withNewGreaterThanOrEqualElseStatement() {
+    return new GreaterThanOrEqualElseStatementNested(null);
+  }
+
+  public A withNewGreaterThanOrEqualElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new GreaterThanOrEqual(left, right));
+  }
+
+  public GreaterThanOrEqualElseStatementNested<A> withNewGreaterThanOrEqualElseStatementLike(GreaterThanOrEqual item) {
+    return new GreaterThanOrEqualElseStatementNested(item);
   }
 
   public GreaterThanOrEqualStatementNested<A> withNewGreaterThanOrEqualStatement() {
@@ -581,7 +896,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanOrEqualStatement(Object left, Object right) {
-    return (A) withStatement(new GreaterThanOrEqual(left, right));
+    return (A) this.withStatement(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualStatementNested<A> withNewGreaterThanOrEqualStatementLike(GreaterThanOrEqual item) {
@@ -593,11 +908,19 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanStatement(Object left, Object right) {
-    return (A) withStatement(new GreaterThan(left, right));
+    return (A) this.withStatement(new GreaterThan(left, right));
   }
 
   public GreaterThanStatementNested<A> withNewGreaterThanStatementLike(GreaterThan item) {
     return new GreaterThanStatementNested(item);
+  }
+
+  public IfDslThenStepElseStatementNested<A> withNewIfDslThenStepElseStatement() {
+    return new IfDslThenStepElseStatementNested(null);
+  }
+
+  public IfDslThenStepElseStatementNested<A> withNewIfDslThenStepElseStatementLike(IfDslThenStep item) {
+    return new IfDslThenStepElseStatementNested(item);
   }
 
   public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatement() {
@@ -606,6 +929,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public IfDslThenStepStatementNested<A> withNewIfDslThenStepStatementLike(IfDslThenStep item) {
     return new IfDslThenStepStatementNested(item);
+  }
+
+  public IfElseStatementNested<A> withNewIfElseStatement() {
+    return new IfElseStatementNested(null);
+  }
+
+  public IfElseStatementNested<A> withNewIfElseStatementLike(If item) {
+    return new IfElseStatementNested(item);
   }
 
   public IfStatementNested<A> withNewIfStatement() {
@@ -648,6 +979,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new LambdaConditionNested(item);
   }
 
+  public LambdaElseStatementNested<A> withNewLambdaElseStatement() {
+    return new LambdaElseStatementNested(null);
+  }
+
+  public LambdaElseStatementNested<A> withNewLambdaElseStatementLike(Lambda item) {
+    return new LambdaElseStatementNested(item);
+  }
+
   public LambdaStatementNested<A> withNewLambdaStatement() {
     return new LambdaStatementNested(null);
   }
@@ -661,11 +1000,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLeftShiftCondition(Object left, Object right) {
-    return (A) withCondition(new LeftShift(left, right));
+    return (A) this.withCondition(new LeftShift(left, right));
   }
 
   public LeftShiftConditionNested<A> withNewLeftShiftConditionLike(LeftShift item) {
     return new LeftShiftConditionNested(item);
+  }
+
+  public LeftShiftElseStatementNested<A> withNewLeftShiftElseStatement() {
+    return new LeftShiftElseStatementNested(null);
+  }
+
+  public A withNewLeftShiftElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new LeftShift(left, right));
+  }
+
+  public LeftShiftElseStatementNested<A> withNewLeftShiftElseStatementLike(LeftShift item) {
+    return new LeftShiftElseStatementNested(item);
   }
 
   public LeftShiftStatementNested<A> withNewLeftShiftStatement() {
@@ -673,7 +1024,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLeftShiftStatement(Object left, Object right) {
-    return (A) withStatement(new LeftShift(left, right));
+    return (A) this.withStatement(new LeftShift(left, right));
   }
 
   public LeftShiftStatementNested<A> withNewLeftShiftStatementLike(LeftShift item) {
@@ -685,11 +1036,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanCondition(Object left, Object right) {
-    return (A) withCondition(new LessThan(left, right));
+    return (A) this.withCondition(new LessThan(left, right));
   }
 
   public LessThanConditionNested<A> withNewLessThanConditionLike(LessThan item) {
     return new LessThanConditionNested(item);
+  }
+
+  public LessThanElseStatementNested<A> withNewLessThanElseStatement() {
+    return new LessThanElseStatementNested(null);
+  }
+
+  public A withNewLessThanElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new LessThan(left, right));
+  }
+
+  public LessThanElseStatementNested<A> withNewLessThanElseStatementLike(LessThan item) {
+    return new LessThanElseStatementNested(item);
   }
 
   public LessThanOrEqualConditionNested<A> withNewLessThanOrEqualCondition() {
@@ -697,11 +1060,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanOrEqualCondition(Object left, Object right) {
-    return (A) withCondition(new LessThanOrEqual(left, right));
+    return (A) this.withCondition(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualConditionNested<A> withNewLessThanOrEqualConditionLike(LessThanOrEqual item) {
     return new LessThanOrEqualConditionNested(item);
+  }
+
+  public LessThanOrEqualElseStatementNested<A> withNewLessThanOrEqualElseStatement() {
+    return new LessThanOrEqualElseStatementNested(null);
+  }
+
+  public A withNewLessThanOrEqualElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new LessThanOrEqual(left, right));
+  }
+
+  public LessThanOrEqualElseStatementNested<A> withNewLessThanOrEqualElseStatementLike(LessThanOrEqual item) {
+    return new LessThanOrEqualElseStatementNested(item);
   }
 
   public LessThanOrEqualStatementNested<A> withNewLessThanOrEqualStatement() {
@@ -709,7 +1084,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanOrEqualStatement(Object left, Object right) {
-    return (A) withStatement(new LessThanOrEqual(left, right));
+    return (A) this.withStatement(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualStatementNested<A> withNewLessThanOrEqualStatementLike(LessThanOrEqual item) {
@@ -721,7 +1096,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanStatement(Object left, Object right) {
-    return (A) withStatement(new LessThan(left, right));
+    return (A) this.withStatement(new LessThan(left, right));
   }
 
   public LessThanStatementNested<A> withNewLessThanStatementLike(LessThan item) {
@@ -733,11 +1108,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalAndCondition(Object left, Object right) {
-    return (A) withCondition(new LogicalAnd(left, right));
+    return (A) this.withCondition(new LogicalAnd(left, right));
   }
 
   public LogicalAndConditionNested<A> withNewLogicalAndConditionLike(LogicalAnd item) {
     return new LogicalAndConditionNested(item);
+  }
+
+  public LogicalAndElseStatementNested<A> withNewLogicalAndElseStatement() {
+    return new LogicalAndElseStatementNested(null);
+  }
+
+  public A withNewLogicalAndElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new LogicalAnd(left, right));
+  }
+
+  public LogicalAndElseStatementNested<A> withNewLogicalAndElseStatementLike(LogicalAnd item) {
+    return new LogicalAndElseStatementNested(item);
   }
 
   public LogicalAndStatementNested<A> withNewLogicalAndStatement() {
@@ -745,7 +1132,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalAndStatement(Object left, Object right) {
-    return (A) withStatement(new LogicalAnd(left, right));
+    return (A) this.withStatement(new LogicalAnd(left, right));
   }
 
   public LogicalAndStatementNested<A> withNewLogicalAndStatementLike(LogicalAnd item) {
@@ -757,11 +1144,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalOrCondition(Object left, Object right) {
-    return (A) withCondition(new LogicalOr(left, right));
+    return (A) this.withCondition(new LogicalOr(left, right));
   }
 
   public LogicalOrConditionNested<A> withNewLogicalOrConditionLike(LogicalOr item) {
     return new LogicalOrConditionNested(item);
+  }
+
+  public LogicalOrElseStatementNested<A> withNewLogicalOrElseStatement() {
+    return new LogicalOrElseStatementNested(null);
+  }
+
+  public A withNewLogicalOrElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new LogicalOr(left, right));
+  }
+
+  public LogicalOrElseStatementNested<A> withNewLogicalOrElseStatementLike(LogicalOr item) {
+    return new LogicalOrElseStatementNested(item);
   }
 
   public LogicalOrStatementNested<A> withNewLogicalOrStatement() {
@@ -769,7 +1168,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalOrStatement(Object left, Object right) {
-    return (A) withStatement(new LogicalOr(left, right));
+    return (A) this.withStatement(new LogicalOr(left, right));
   }
 
   public LogicalOrStatementNested<A> withNewLogicalOrStatementLike(LogicalOr item) {
@@ -782,6 +1181,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public MethodCallConditionNested<A> withNewMethodCallConditionLike(MethodCall item) {
     return new MethodCallConditionNested(item);
+  }
+
+  public MethodCallElseStatementNested<A> withNewMethodCallElseStatement() {
+    return new MethodCallElseStatementNested(null);
+  }
+
+  public MethodCallElseStatementNested<A> withNewMethodCallElseStatementLike(MethodCall item) {
+    return new MethodCallElseStatementNested(item);
   }
 
   public MethodCallStatementNested<A> withNewMethodCallStatement() {
@@ -797,11 +1204,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMinusCondition(Object left, Object right) {
-    return (A) withCondition(new Minus(left, right));
+    return (A) this.withCondition(new Minus(left, right));
   }
 
   public MinusConditionNested<A> withNewMinusConditionLike(Minus item) {
     return new MinusConditionNested(item);
+  }
+
+  public MinusElseStatementNested<A> withNewMinusElseStatement() {
+    return new MinusElseStatementNested(null);
+  }
+
+  public A withNewMinusElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new Minus(left, right));
+  }
+
+  public MinusElseStatementNested<A> withNewMinusElseStatementLike(Minus item) {
+    return new MinusElseStatementNested(item);
   }
 
   public MinusStatementNested<A> withNewMinusStatement() {
@@ -809,7 +1228,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMinusStatement(Object left, Object right) {
-    return (A) withStatement(new Minus(left, right));
+    return (A) this.withStatement(new Minus(left, right));
   }
 
   public MinusStatementNested<A> withNewMinusStatementLike(Minus item) {
@@ -821,11 +1240,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewModuloCondition(Object left, Object right) {
-    return (A) withCondition(new Modulo(left, right));
+    return (A) this.withCondition(new Modulo(left, right));
   }
 
   public ModuloConditionNested<A> withNewModuloConditionLike(Modulo item) {
     return new ModuloConditionNested(item);
+  }
+
+  public ModuloElseStatementNested<A> withNewModuloElseStatement() {
+    return new ModuloElseStatementNested(null);
+  }
+
+  public A withNewModuloElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new Modulo(left, right));
+  }
+
+  public ModuloElseStatementNested<A> withNewModuloElseStatementLike(Modulo item) {
+    return new ModuloElseStatementNested(item);
   }
 
   public ModuloStatementNested<A> withNewModuloStatement() {
@@ -833,7 +1264,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewModuloStatement(Object left, Object right) {
-    return (A) withStatement(new Modulo(left, right));
+    return (A) this.withStatement(new Modulo(left, right));
   }
 
   public ModuloStatementNested<A> withNewModuloStatementLike(Modulo item) {
@@ -845,11 +1276,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMultiplyCondition(Object left, Object right) {
-    return (A) withCondition(new Multiply(left, right));
+    return (A) this.withCondition(new Multiply(left, right));
   }
 
   public MultiplyConditionNested<A> withNewMultiplyConditionLike(Multiply item) {
     return new MultiplyConditionNested(item);
+  }
+
+  public MultiplyElseStatementNested<A> withNewMultiplyElseStatement() {
+    return new MultiplyElseStatementNested(null);
+  }
+
+  public A withNewMultiplyElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new Multiply(left, right));
+  }
+
+  public MultiplyElseStatementNested<A> withNewMultiplyElseStatementLike(Multiply item) {
+    return new MultiplyElseStatementNested(item);
   }
 
   public MultiplyStatementNested<A> withNewMultiplyStatement() {
@@ -857,7 +1300,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMultiplyStatement(Object left, Object right) {
-    return (A) withStatement(new Multiply(left, right));
+    return (A) this.withStatement(new Multiply(left, right));
   }
 
   public MultiplyStatementNested<A> withNewMultiplyStatementLike(Multiply item) {
@@ -877,7 +1320,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNewArrayCondition(Class type, Integer[] sizes) {
-    return (A) withCondition(new NewArray(type, sizes));
+    return (A) this.withCondition(new NewArray(type, sizes));
   }
 
   public NewArrayConditionNested<A> withNewNewArrayConditionLike(NewArray item) {
@@ -897,11 +1340,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNotEqualsCondition(Object left, Object right) {
-    return (A) withCondition(new NotEquals(left, right));
+    return (A) this.withCondition(new NotEquals(left, right));
   }
 
   public NotEqualsConditionNested<A> withNewNotEqualsConditionLike(NotEquals item) {
     return new NotEqualsConditionNested(item);
+  }
+
+  public NotEqualsElseStatementNested<A> withNewNotEqualsElseStatement() {
+    return new NotEqualsElseStatementNested(null);
+  }
+
+  public A withNewNotEqualsElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new NotEquals(left, right));
+  }
+
+  public NotEqualsElseStatementNested<A> withNewNotEqualsElseStatementLike(NotEquals item) {
+    return new NotEqualsElseStatementNested(item);
   }
 
   public NotEqualsStatementNested<A> withNewNotEqualsStatement() {
@@ -909,7 +1364,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNotEqualsStatement(Object left, Object right) {
-    return (A) withStatement(new NotEquals(left, right));
+    return (A) this.withStatement(new NotEquals(left, right));
   }
 
   public NotEqualsStatementNested<A> withNewNotEqualsStatementLike(NotEquals item) {
@@ -921,11 +1376,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewPlusCondition(Object left, Object right) {
-    return (A) withCondition(new Plus(left, right));
+    return (A) this.withCondition(new Plus(left, right));
   }
 
   public PlusConditionNested<A> withNewPlusConditionLike(Plus item) {
     return new PlusConditionNested(item);
+  }
+
+  public PlusElseStatementNested<A> withNewPlusElseStatement() {
+    return new PlusElseStatementNested(null);
+  }
+
+  public A withNewPlusElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new Plus(left, right));
+  }
+
+  public PlusElseStatementNested<A> withNewPlusElseStatementLike(Plus item) {
+    return new PlusElseStatementNested(item);
   }
 
   public PlusStatementNested<A> withNewPlusStatement() {
@@ -933,7 +1400,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewPlusStatement(Object left, Object right) {
-    return (A) withStatement(new Plus(left, right));
+    return (A) this.withStatement(new Plus(left, right));
   }
 
   public PlusStatementNested<A> withNewPlusStatementLike(Plus item) {
@@ -956,6 +1423,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new PostDecrementConditionNested(item);
   }
 
+  public PostDecrementElseStatementNested<A> withNewPostDecrementElseStatement() {
+    return new PostDecrementElseStatementNested(null);
+  }
+
+  public PostDecrementElseStatementNested<A> withNewPostDecrementElseStatementLike(PostDecrement item) {
+    return new PostDecrementElseStatementNested(item);
+  }
+
   public PostDecrementStatementNested<A> withNewPostDecrementStatement() {
     return new PostDecrementStatementNested(null);
   }
@@ -970,6 +1445,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public PostIncrementConditionNested<A> withNewPostIncrementConditionLike(PostIncrement item) {
     return new PostIncrementConditionNested(item);
+  }
+
+  public PostIncrementElseStatementNested<A> withNewPostIncrementElseStatement() {
+    return new PostIncrementElseStatementNested(null);
+  }
+
+  public PostIncrementElseStatementNested<A> withNewPostIncrementElseStatementLike(PostIncrement item) {
+    return new PostIncrementElseStatementNested(item);
   }
 
   public PostIncrementStatementNested<A> withNewPostIncrementStatement() {
@@ -988,6 +1471,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new PreDecrementConditionNested(item);
   }
 
+  public PreDecrementElseStatementNested<A> withNewPreDecrementElseStatement() {
+    return new PreDecrementElseStatementNested(null);
+  }
+
+  public PreDecrementElseStatementNested<A> withNewPreDecrementElseStatementLike(PreDecrement item) {
+    return new PreDecrementElseStatementNested(item);
+  }
+
   public PreDecrementStatementNested<A> withNewPreDecrementStatement() {
     return new PreDecrementStatementNested(null);
   }
@@ -1002,6 +1493,14 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   public PreIncrementConditionNested<A> withNewPreIncrementConditionLike(PreIncrement item) {
     return new PreIncrementConditionNested(item);
+  }
+
+  public PreIncrementElseStatementNested<A> withNewPreIncrementElseStatement() {
+    return new PreIncrementElseStatementNested(null);
+  }
+
+  public PreIncrementElseStatementNested<A> withNewPreIncrementElseStatementLike(PreIncrement item) {
+    return new PreIncrementElseStatementNested(item);
   }
 
   public PreIncrementStatementNested<A> withNewPreIncrementStatement() {
@@ -1028,12 +1527,28 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new PropertyRefConditionNested(item);
   }
 
+  public PropertyRefElseStatementNested<A> withNewPropertyRefElseStatement() {
+    return new PropertyRefElseStatementNested(null);
+  }
+
+  public PropertyRefElseStatementNested<A> withNewPropertyRefElseStatementLike(PropertyRef item) {
+    return new PropertyRefElseStatementNested(item);
+  }
+
   public PropertyRefStatementNested<A> withNewPropertyRefStatement() {
     return new PropertyRefStatementNested(null);
   }
 
   public PropertyRefStatementNested<A> withNewPropertyRefStatementLike(PropertyRef item) {
     return new PropertyRefStatementNested(item);
+  }
+
+  public ReturnDslThisStepElseStatementNested<A> withNewReturnDslThisStepElseStatement() {
+    return new ReturnDslThisStepElseStatementNested(null);
+  }
+
+  public ReturnDslThisStepElseStatementNested<A> withNewReturnDslThisStepElseStatementLike(ReturnDslThisStep item) {
+    return new ReturnDslThisStepElseStatementNested(item);
   }
 
   public ReturnDslThisStepStatementNested<A> withNewReturnDslThisStepStatement() {
@@ -1044,16 +1559,40 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new ReturnDslThisStepStatementNested(item);
   }
 
+  public ReturnDslVariableStepElseStatementNested<A> withNewReturnDslVariableStepElseStatement() {
+    return new ReturnDslVariableStepElseStatementNested(null);
+  }
+
+  public A withNewReturnDslVariableStepElseStatement(String name) {
+    return (A) this.withElseStatement(new ReturnDslVariableStep(name));
+  }
+
+  public ReturnDslVariableStepElseStatementNested<A> withNewReturnDslVariableStepElseStatementLike(ReturnDslVariableStep item) {
+    return new ReturnDslVariableStepElseStatementNested(item);
+  }
+
   public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatement() {
     return new ReturnDslVariableStepStatementNested(null);
   }
 
   public A withNewReturnDslVariableStepStatement(String name) {
-    return (A) withStatement(new ReturnDslVariableStep(name));
+    return (A) this.withStatement(new ReturnDslVariableStep(name));
   }
 
   public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
     return new ReturnDslVariableStepStatementNested(item);
+  }
+
+  public ReturnElseStatementNested<A> withNewReturnElseStatement() {
+    return new ReturnElseStatementNested(null);
+  }
+
+  public A withNewReturnElseStatement(Object object) {
+    return (A) this.withElseStatement(new Return(object));
+  }
+
+  public ReturnElseStatementNested<A> withNewReturnElseStatementLike(Return item) {
+    return new ReturnElseStatementNested(item);
   }
 
   public ReturnStatementNested<A> withNewReturnStatement() {
@@ -1061,7 +1600,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewReturnStatement(Object object) {
-    return (A) withStatement(new Return(object));
+    return (A) this.withStatement(new Return(object));
   }
 
   public ReturnStatementNested<A> withNewReturnStatementLike(Return item) {
@@ -1073,11 +1612,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightShiftCondition(Object left, Object right) {
-    return (A) withCondition(new RightShift(left, right));
+    return (A) this.withCondition(new RightShift(left, right));
   }
 
   public RightShiftConditionNested<A> withNewRightShiftConditionLike(RightShift item) {
     return new RightShiftConditionNested(item);
+  }
+
+  public RightShiftElseStatementNested<A> withNewRightShiftElseStatement() {
+    return new RightShiftElseStatementNested(null);
+  }
+
+  public A withNewRightShiftElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new RightShift(left, right));
+  }
+
+  public RightShiftElseStatementNested<A> withNewRightShiftElseStatementLike(RightShift item) {
+    return new RightShiftElseStatementNested(item);
   }
 
   public RightShiftStatementNested<A> withNewRightShiftStatement() {
@@ -1085,7 +1636,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightShiftStatement(Object left, Object right) {
-    return (A) withStatement(new RightShift(left, right));
+    return (A) this.withStatement(new RightShift(left, right));
   }
 
   public RightShiftStatementNested<A> withNewRightShiftStatementLike(RightShift item) {
@@ -1097,11 +1648,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightUnsignedShiftCondition(Object left, Object right) {
-    return (A) withCondition(new RightUnsignedShift(left, right));
+    return (A) this.withCondition(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftConditionNested<A> withNewRightUnsignedShiftConditionLike(RightUnsignedShift item) {
     return new RightUnsignedShiftConditionNested(item);
+  }
+
+  public RightUnsignedShiftElseStatementNested<A> withNewRightUnsignedShiftElseStatement() {
+    return new RightUnsignedShiftElseStatementNested(null);
+  }
+
+  public A withNewRightUnsignedShiftElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new RightUnsignedShift(left, right));
+  }
+
+  public RightUnsignedShiftElseStatementNested<A> withNewRightUnsignedShiftElseStatementLike(RightUnsignedShift item) {
+    return new RightUnsignedShiftElseStatementNested(item);
   }
 
   public RightUnsignedShiftStatementNested<A> withNewRightUnsignedShiftStatement() {
@@ -1109,7 +1672,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightUnsignedShiftStatement(Object left, Object right) {
-    return (A) withStatement(new RightUnsignedShift(left, right));
+    return (A) this.withStatement(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftStatementNested<A> withNewRightUnsignedShiftStatementLike(RightUnsignedShift item) {
@@ -1121,11 +1684,27 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewStringStatement(String data) {
-    return (A) withStatement(new StringStatement(data));
+    return (A) this.withStatement(new StringStatement(data));
   }
 
   public A withNewStringStatement(String data, Object[] parameters) {
-    return (A) withStatement(new StringStatement(data, parameters));
+    return (A) this.withStatement(new StringStatement(data, parameters));
+  }
+
+  public StringStatementElseNested<A> withNewStringStatementElse() {
+    return new StringStatementElseNested(null);
+  }
+
+  public A withNewStringStatementElse(String data) {
+    return (A) this.withElseStatement(new StringStatement(data));
+  }
+
+  public A withNewStringStatementElse(String data, Object[] parameters) {
+    return (A) this.withElseStatement(new StringStatement(data, parameters));
+  }
+
+  public StringStatementElseNested<A> withNewStringStatementElseLike(StringStatement item) {
+    return new StringStatementElseNested(item);
   }
 
   public StringStatementNested<A> withNewStringStatementLike(StringStatement item) {
@@ -1140,12 +1719,28 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new SuperConditionNested(item);
   }
 
+  public SwitchElseStatementNested<A> withNewSwitchElseStatement() {
+    return new SwitchElseStatementNested(null);
+  }
+
+  public SwitchElseStatementNested<A> withNewSwitchElseStatementLike(Switch item) {
+    return new SwitchElseStatementNested(item);
+  }
+
   public SwitchStatementNested<A> withNewSwitchStatement() {
     return new SwitchStatementNested(null);
   }
 
   public SwitchStatementNested<A> withNewSwitchStatementLike(Switch item) {
     return new SwitchStatementNested(item);
+  }
+
+  public SynchronizedElseStatementNested<A> withNewSynchronizedElseStatement() {
+    return new SynchronizedElseStatementNested(null);
+  }
+
+  public SynchronizedElseStatementNested<A> withNewSynchronizedElseStatementLike(Synchronized item) {
+    return new SynchronizedElseStatementNested(item);
   }
 
   public SynchronizedStatementNested<A> withNewSynchronizedStatement() {
@@ -1172,12 +1767,28 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     return new ThisConditionNested(item);
   }
 
+  public ThrowElseStatementNested<A> withNewThrowElseStatement() {
+    return new ThrowElseStatementNested(null);
+  }
+
+  public ThrowElseStatementNested<A> withNewThrowElseStatementLike(Throw item) {
+    return new ThrowElseStatementNested(item);
+  }
+
   public ThrowStatementNested<A> withNewThrowStatement() {
     return new ThrowStatementNested(null);
   }
 
   public ThrowStatementNested<A> withNewThrowStatementLike(Throw item) {
     return new ThrowStatementNested(item);
+  }
+
+  public TryElseStatementNested<A> withNewTryElseStatement() {
+    return new TryElseStatementNested(null);
+  }
+
+  public TryElseStatementNested<A> withNewTryElseStatementLike(Try item) {
+    return new TryElseStatementNested(item);
   }
 
   public TryStatementNested<A> withNewTryStatement() {
@@ -1193,11 +1804,19 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewValueRefCondition(Object value) {
-    return (A) withCondition(new ValueRef(value));
+    return (A) this.withCondition(new ValueRef(value));
   }
 
   public ValueRefConditionNested<A> withNewValueRefConditionLike(ValueRef item) {
     return new ValueRefConditionNested(item);
+  }
+
+  public WhileElseStatementNested<A> withNewWhileElseStatement() {
+    return new WhileElseStatementNested(null);
+  }
+
+  public WhileElseStatementNested<A> withNewWhileElseStatementLike(While item) {
+    return new WhileElseStatementNested(item);
   }
 
   public WhileStatementNested<A> withNewWhileStatement() {
@@ -1213,11 +1832,23 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewXorCondition(Object left, Object right) {
-    return (A) withCondition(new Xor(left, right));
+    return (A) this.withCondition(new Xor(left, right));
   }
 
   public XorConditionNested<A> withNewXorConditionLike(Xor item) {
     return new XorConditionNested(item);
+  }
+
+  public XorElseStatementNested<A> withNewXorElseStatement() {
+    return new XorElseStatementNested(null);
+  }
+
+  public A withNewXorElseStatement(Object left, Object right) {
+    return (A) this.withElseStatement(new Xor(left, right));
+  }
+
+  public XorElseStatementNested<A> withNewXorElseStatementLike(Xor item) {
+    return new XorElseStatementNested(item);
   }
 
   public XorStatementNested<A> withNewXorStatement() {
@@ -1225,7 +1856,7 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewXorStatement(Object left, Object right) {
-    return (A) withStatement(new Xor(left, right));
+    return (A) this.withStatement(new Xor(left, right));
   }
 
   public XorStatementNested<A> withNewXorStatementLike(Xor item) {
@@ -1259,6 +1890,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endAssignCondition() {
+      return and();
+    }
+
+  }
+
+  public class AssignElseStatementNested<N> extends AssignFluent<AssignElseStatementNested<N>> implements Nested<N> {
+
+    AssignBuilder builder;
+
+    AssignElseStatementNested(Assign item) {
+      this.builder = new AssignBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endAssignElseStatement() {
       return and();
     }
 
@@ -1301,6 +1950,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class BinaryExpressionElseStatementNested<N> extends BinaryExpressionFluent<BinaryExpressionElseStatementNested<N>>
+      implements Nested<N> {
+
+    BinaryExpressionBuilder builder;
+
+    BinaryExpressionElseStatementNested(BinaryExpression item) {
+      this.builder = new BinaryExpressionBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endBinaryExpressionElseStatement() {
+      return and();
+    }
+
+  }
+
   public class BinaryExpressionStatementNested<N> extends BinaryExpressionFluent<BinaryExpressionStatementNested<N>>
       implements Nested<N> {
 
@@ -1333,6 +2001,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endBitwiseAndCondition() {
+      return and();
+    }
+
+  }
+
+  public class BitwiseAndElseStatementNested<N> extends BitwiseAndFluent<BitwiseAndElseStatementNested<N>>
+      implements Nested<N> {
+
+    BitwiseAndBuilder builder;
+
+    BitwiseAndElseStatementNested(BitwiseAnd item) {
+      this.builder = new BitwiseAndBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endBitwiseAndElseStatement() {
       return and();
     }
 
@@ -1374,6 +2061,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class BitwiseOrElseStatementNested<N> extends BitwiseOrFluent<BitwiseOrElseStatementNested<N>> implements Nested<N> {
+
+    BitwiseOrBuilder builder;
+
+    BitwiseOrElseStatementNested(BitwiseOr item) {
+      this.builder = new BitwiseOrBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endBitwiseOrElseStatement() {
+      return and();
+    }
+
+  }
+
   public class BitwiseOrStatementNested<N> extends BitwiseOrFluent<BitwiseOrStatementNested<N>> implements Nested<N> {
 
     BitwiseOrBuilder builder;
@@ -1392,6 +2097,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class BlockElseStatementNested<N> extends BlockFluent<BlockElseStatementNested<N>> implements Nested<N> {
+
+    BlockBuilder builder;
+
+    BlockElseStatementNested(Block item) {
+      this.builder = new BlockBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endBlockElseStatement() {
+      return and();
+    }
+
+  }
+
   public class BlockStatementNested<N> extends BlockFluent<BlockStatementNested<N>> implements Nested<N> {
 
     BlockBuilder builder;
@@ -1405,6 +2128,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endBlockStatement() {
+      return and();
+    }
+
+  }
+
+  public class BreakElseStatementNested<N> extends BreakFluent<BreakElseStatementNested<N>> implements Nested<N> {
+
+    BreakBuilder builder;
+
+    BreakElseStatementNested(Break item) {
+      this.builder = new BreakBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endBreakElseStatement() {
       return and();
     }
 
@@ -1482,6 +2223,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class ConstructElseStatementNested<N> extends ConstructFluent<ConstructElseStatementNested<N>> implements Nested<N> {
+
+    ConstructBuilder builder;
+
+    ConstructElseStatementNested(Construct item) {
+      this.builder = new ConstructBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endConstructElseStatement() {
+      return and();
+    }
+
+  }
+
   public class ConstructStatementNested<N> extends ConstructFluent<ConstructStatementNested<N>> implements Nested<N> {
 
     ConstructBuilder builder;
@@ -1513,6 +2272,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endContextRefCondition() {
+      return and();
+    }
+
+  }
+
+  public class ContinueElseStatementNested<N> extends ContinueFluent<ContinueElseStatementNested<N>> implements Nested<N> {
+
+    ContinueBuilder builder;
+
+    ContinueElseStatementNested(Continue item) {
+      this.builder = new ContinueBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endContinueElseStatement() {
       return and();
     }
 
@@ -1554,6 +2331,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DeclareElseStatementNested<N> extends DeclareFluent<DeclareElseStatementNested<N>> implements Nested<N> {
+
+    DeclareBuilder builder;
+
+    DeclareElseStatementNested(Declare item) {
+      this.builder = new DeclareBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endDeclareElseStatement() {
+      return and();
+    }
+
+  }
+
   public class DeclareStatementNested<N> extends DeclareFluent<DeclareStatementNested<N>> implements Nested<N> {
 
     DeclareBuilder builder;
@@ -1590,6 +2385,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class DivideElseStatementNested<N> extends DivideFluent<DivideElseStatementNested<N>> implements Nested<N> {
+
+    DivideBuilder builder;
+
+    DivideElseStatementNested(Divide item) {
+      this.builder = new DivideBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endDivideElseStatement() {
+      return and();
+    }
+
+  }
+
   public class DivideStatementNested<N> extends DivideFluent<DivideStatementNested<N>> implements Nested<N> {
 
     DivideBuilder builder;
@@ -1603,6 +2416,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endDivideStatement() {
+      return and();
+    }
+
+  }
+
+  public class DoElseStatementNested<N> extends DoFluent<DoElseStatementNested<N>> implements Nested<N> {
+
+    DoBuilder builder;
+
+    DoElseStatementNested(Do item) {
+      this.builder = new DoBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endDoElseStatement() {
       return and();
     }
 
@@ -1662,6 +2493,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class EmptyElseStatementNested<N> extends EmptyFluent<EmptyElseStatementNested<N>> implements Nested<N> {
+
+    EmptyBuilder builder;
+
+    EmptyElseStatementNested(Empty item) {
+      this.builder = new EmptyBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endEmptyElseStatement() {
+      return and();
+    }
+
+  }
+
   public class EmptyStatementNested<N> extends EmptyFluent<EmptyStatementNested<N>> implements Nested<N> {
 
     EmptyBuilder builder;
@@ -1716,6 +2565,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class EqualsElseStatementNested<N> extends EqualsFluent<EqualsElseStatementNested<N>> implements Nested<N> {
+
+    EqualsBuilder builder;
+
+    EqualsElseStatementNested(Equals item) {
+      this.builder = new EqualsBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endEqualsElseStatement() {
+      return and();
+    }
+
+  }
+
   public class EqualsStatementNested<N> extends EqualsFluent<EqualsStatementNested<N>> implements Nested<N> {
 
     EqualsBuilder builder;
@@ -1734,6 +2601,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class ForElseStatementNested<N> extends ForFluent<ForElseStatementNested<N>> implements Nested<N> {
+
+    ForBuilder builder;
+
+    ForElseStatementNested(For item) {
+      this.builder = new ForBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endForElseStatement() {
+      return and();
+    }
+
+  }
+
   public class ForStatementNested<N> extends ForFluent<ForStatementNested<N>> implements Nested<N> {
 
     ForBuilder builder;
@@ -1747,6 +2632,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endForStatement() {
+      return and();
+    }
+
+  }
+
+  public class ForeachElseStatementNested<N> extends ForeachFluent<ForeachElseStatementNested<N>> implements Nested<N> {
+
+    ForeachBuilder builder;
+
+    ForeachElseStatementNested(Foreach item) {
+      this.builder = new ForeachBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endForeachElseStatement() {
       return and();
     }
 
@@ -1788,6 +2691,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class GreaterThanElseStatementNested<N> extends GreaterThanFluent<GreaterThanElseStatementNested<N>>
+      implements Nested<N> {
+
+    GreaterThanBuilder builder;
+
+    GreaterThanElseStatementNested(GreaterThan item) {
+      this.builder = new GreaterThanBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endGreaterThanElseStatement() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanOrEqualConditionNested<N> extends GreaterThanOrEqualFluent<GreaterThanOrEqualConditionNested<N>>
       implements Nested<N> {
 
@@ -1802,6 +2724,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endGreaterThanOrEqualCondition() {
+      return and();
+    }
+
+  }
+
+  public class GreaterThanOrEqualElseStatementNested<N>
+      extends GreaterThanOrEqualFluent<GreaterThanOrEqualElseStatementNested<N>> implements Nested<N> {
+
+    GreaterThanOrEqualBuilder builder;
+
+    GreaterThanOrEqualElseStatementNested(GreaterThanOrEqual item) {
+      this.builder = new GreaterThanOrEqualBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endGreaterThanOrEqualElseStatement() {
       return and();
     }
 
@@ -1844,6 +2785,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class IfDslThenStepElseStatementNested<N> extends IfDslThenStepFluent<IfDslThenStepElseStatementNested<N>>
+      implements Nested<N> {
+
+    IfDslThenStepBuilder builder;
+
+    IfDslThenStepElseStatementNested(IfDslThenStep item) {
+      this.builder = new IfDslThenStepBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endIfDslThenStepElseStatement() {
+      return and();
+    }
+
+  }
+
   public class IfDslThenStepStatementNested<N> extends IfDslThenStepFluent<IfDslThenStepStatementNested<N>>
       implements Nested<N> {
 
@@ -1858,6 +2818,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endIfDslThenStepStatement() {
+      return and();
+    }
+
+  }
+
+  public class IfElseStatementNested<N> extends IfFluent<IfElseStatementNested<N>> implements Nested<N> {
+
+    IfBuilder builder;
+
+    IfElseStatementNested(If item) {
+      this.builder = new IfBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endIfElseStatement() {
       return and();
     }
 
@@ -1953,6 +2931,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class LambdaElseStatementNested<N> extends LambdaFluent<LambdaElseStatementNested<N>> implements Nested<N> {
+
+    LambdaBuilder builder;
+
+    LambdaElseStatementNested(Lambda item) {
+      this.builder = new LambdaBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endLambdaElseStatement() {
+      return and();
+    }
+
+  }
+
   public class LambdaStatementNested<N> extends LambdaFluent<LambdaStatementNested<N>> implements Nested<N> {
 
     LambdaBuilder builder;
@@ -1984,6 +2980,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endLeftShiftCondition() {
+      return and();
+    }
+
+  }
+
+  public class LeftShiftElseStatementNested<N> extends LeftShiftFluent<LeftShiftElseStatementNested<N>> implements Nested<N> {
+
+    LeftShiftBuilder builder;
+
+    LeftShiftElseStatementNested(LeftShift item) {
+      this.builder = new LeftShiftBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endLeftShiftElseStatement() {
       return and();
     }
 
@@ -2025,6 +3039,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class LessThanElseStatementNested<N> extends LessThanFluent<LessThanElseStatementNested<N>> implements Nested<N> {
+
+    LessThanBuilder builder;
+
+    LessThanElseStatementNested(LessThan item) {
+      this.builder = new LessThanBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endLessThanElseStatement() {
+      return and();
+    }
+
+  }
+
   public class LessThanOrEqualConditionNested<N> extends LessThanOrEqualFluent<LessThanOrEqualConditionNested<N>>
       implements Nested<N> {
 
@@ -2039,6 +3071,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endLessThanOrEqualCondition() {
+      return and();
+    }
+
+  }
+
+  public class LessThanOrEqualElseStatementNested<N> extends LessThanOrEqualFluent<LessThanOrEqualElseStatementNested<N>>
+      implements Nested<N> {
+
+    LessThanOrEqualBuilder builder;
+
+    LessThanOrEqualElseStatementNested(LessThanOrEqual item) {
+      this.builder = new LessThanOrEqualBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endLessThanOrEqualElseStatement() {
       return and();
     }
 
@@ -2099,6 +3150,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class LogicalAndElseStatementNested<N> extends LogicalAndFluent<LogicalAndElseStatementNested<N>>
+      implements Nested<N> {
+
+    LogicalAndBuilder builder;
+
+    LogicalAndElseStatementNested(LogicalAnd item) {
+      this.builder = new LogicalAndBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endLogicalAndElseStatement() {
+      return and();
+    }
+
+  }
+
   public class LogicalAndStatementNested<N> extends LogicalAndFluent<LogicalAndStatementNested<N>> implements Nested<N> {
 
     LogicalAndBuilder builder;
@@ -2130,6 +3200,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endLogicalOrCondition() {
+      return and();
+    }
+
+  }
+
+  public class LogicalOrElseStatementNested<N> extends LogicalOrFluent<LogicalOrElseStatementNested<N>> implements Nested<N> {
+
+    LogicalOrBuilder builder;
+
+    LogicalOrElseStatementNested(LogicalOr item) {
+      this.builder = new LogicalOrBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endLogicalOrElseStatement() {
       return and();
     }
 
@@ -2171,6 +3259,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class MethodCallElseStatementNested<N> extends MethodCallFluent<MethodCallElseStatementNested<N>>
+      implements Nested<N> {
+
+    MethodCallBuilder builder;
+
+    MethodCallElseStatementNested(MethodCall item) {
+      this.builder = new MethodCallBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endMethodCallElseStatement() {
+      return and();
+    }
+
+  }
+
   public class MethodCallStatementNested<N> extends MethodCallFluent<MethodCallStatementNested<N>> implements Nested<N> {
 
     MethodCallBuilder builder;
@@ -2202,6 +3309,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endMinusCondition() {
+      return and();
+    }
+
+  }
+
+  public class MinusElseStatementNested<N> extends MinusFluent<MinusElseStatementNested<N>> implements Nested<N> {
+
+    MinusBuilder builder;
+
+    MinusElseStatementNested(Minus item) {
+      this.builder = new MinusBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endMinusElseStatement() {
       return and();
     }
 
@@ -2243,6 +3368,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class ModuloElseStatementNested<N> extends ModuloFluent<ModuloElseStatementNested<N>> implements Nested<N> {
+
+    ModuloBuilder builder;
+
+    ModuloElseStatementNested(Modulo item) {
+      this.builder = new ModuloBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endModuloElseStatement() {
+      return and();
+    }
+
+  }
+
   public class ModuloStatementNested<N> extends ModuloFluent<ModuloStatementNested<N>> implements Nested<N> {
 
     ModuloBuilder builder;
@@ -2274,6 +3417,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endMultiplyCondition() {
+      return and();
+    }
+
+  }
+
+  public class MultiplyElseStatementNested<N> extends MultiplyFluent<MultiplyElseStatementNested<N>> implements Nested<N> {
+
+    MultiplyBuilder builder;
+
+    MultiplyElseStatementNested(Multiply item) {
+      this.builder = new MultiplyBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endMultiplyElseStatement() {
       return and();
     }
 
@@ -2369,6 +3530,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class NotEqualsElseStatementNested<N> extends NotEqualsFluent<NotEqualsElseStatementNested<N>> implements Nested<N> {
+
+    NotEqualsBuilder builder;
+
+    NotEqualsElseStatementNested(NotEquals item) {
+      this.builder = new NotEqualsBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endNotEqualsElseStatement() {
+      return and();
+    }
+
+  }
+
   public class NotEqualsStatementNested<N> extends NotEqualsFluent<NotEqualsStatementNested<N>> implements Nested<N> {
 
     NotEqualsBuilder builder;
@@ -2400,6 +3579,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPlusCondition() {
+      return and();
+    }
+
+  }
+
+  public class PlusElseStatementNested<N> extends PlusFluent<PlusElseStatementNested<N>> implements Nested<N> {
+
+    PlusBuilder builder;
+
+    PlusElseStatementNested(Plus item) {
+      this.builder = new PlusBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endPlusElseStatement() {
       return and();
     }
 
@@ -2460,6 +3657,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class PostDecrementElseStatementNested<N> extends PostDecrementFluent<PostDecrementElseStatementNested<N>>
+      implements Nested<N> {
+
+    PostDecrementBuilder builder;
+
+    PostDecrementElseStatementNested(PostDecrement item) {
+      this.builder = new PostDecrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endPostDecrementElseStatement() {
+      return and();
+    }
+
+  }
+
   public class PostDecrementStatementNested<N> extends PostDecrementFluent<PostDecrementStatementNested<N>>
       implements Nested<N> {
 
@@ -2493,6 +3709,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPostIncrementCondition() {
+      return and();
+    }
+
+  }
+
+  public class PostIncrementElseStatementNested<N> extends PostIncrementFluent<PostIncrementElseStatementNested<N>>
+      implements Nested<N> {
+
+    PostIncrementBuilder builder;
+
+    PostIncrementElseStatementNested(PostIncrement item) {
+      this.builder = new PostIncrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endPostIncrementElseStatement() {
       return and();
     }
 
@@ -2535,6 +3770,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class PreDecrementElseStatementNested<N> extends PreDecrementFluent<PreDecrementElseStatementNested<N>>
+      implements Nested<N> {
+
+    PreDecrementBuilder builder;
+
+    PreDecrementElseStatementNested(PreDecrement item) {
+      this.builder = new PreDecrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endPreDecrementElseStatement() {
+      return and();
+    }
+
+  }
+
   public class PreDecrementStatementNested<N> extends PreDecrementFluent<PreDecrementStatementNested<N>> implements Nested<N> {
 
     PreDecrementBuilder builder;
@@ -2566,6 +3820,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPreIncrementCondition() {
+      return and();
+    }
+
+  }
+
+  public class PreIncrementElseStatementNested<N> extends PreIncrementFluent<PreIncrementElseStatementNested<N>>
+      implements Nested<N> {
+
+    PreIncrementBuilder builder;
+
+    PreIncrementElseStatementNested(PreIncrement item) {
+      this.builder = new PreIncrementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endPreIncrementElseStatement() {
       return and();
     }
 
@@ -2625,6 +3898,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class PropertyRefElseStatementNested<N> extends PropertyRefFluent<PropertyRefElseStatementNested<N>>
+      implements Nested<N> {
+
+    PropertyRefBuilder builder;
+
+    PropertyRefElseStatementNested(PropertyRef item) {
+      this.builder = new PropertyRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endPropertyRefElseStatement() {
+      return and();
+    }
+
+  }
+
   public class PropertyRefStatementNested<N> extends PropertyRefFluent<PropertyRefStatementNested<N>> implements Nested<N> {
 
     PropertyRefBuilder builder;
@@ -2638,6 +3930,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endPropertyRefStatement() {
+      return and();
+    }
+
+  }
+
+  public class ReturnDslThisStepElseStatementNested<N> extends ReturnDslThisStepFluent<ReturnDslThisStepElseStatementNested<N>>
+      implements Nested<N> {
+
+    ReturnDslThisStepBuilder builder;
+
+    ReturnDslThisStepElseStatementNested(ReturnDslThisStep item) {
+      this.builder = new ReturnDslThisStepBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endReturnDslThisStepElseStatement() {
       return and();
     }
 
@@ -2662,6 +3973,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class ReturnDslVariableStepElseStatementNested<N>
+      extends ReturnDslVariableStepFluent<ReturnDslVariableStepElseStatementNested<N>> implements Nested<N> {
+
+    ReturnDslVariableStepBuilder builder;
+
+    ReturnDslVariableStepElseStatementNested(ReturnDslVariableStep item) {
+      this.builder = new ReturnDslVariableStepBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endReturnDslVariableStepElseStatement() {
+      return and();
+    }
+
+  }
+
   public class ReturnDslVariableStepStatementNested<N>
       extends ReturnDslVariableStepFluent<ReturnDslVariableStepStatementNested<N>> implements Nested<N> {
 
@@ -2676,6 +4006,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endReturnDslVariableStepStatement() {
+      return and();
+    }
+
+  }
+
+  public class ReturnElseStatementNested<N> extends ReturnFluent<ReturnElseStatementNested<N>> implements Nested<N> {
+
+    ReturnBuilder builder;
+
+    ReturnElseStatementNested(Return item) {
+      this.builder = new ReturnBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endReturnElseStatement() {
       return and();
     }
 
@@ -2712,6 +4060,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightShiftCondition() {
+      return and();
+    }
+
+  }
+
+  public class RightShiftElseStatementNested<N> extends RightShiftFluent<RightShiftElseStatementNested<N>>
+      implements Nested<N> {
+
+    RightShiftBuilder builder;
+
+    RightShiftElseStatementNested(RightShift item) {
+      this.builder = new RightShiftBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endRightShiftElseStatement() {
       return and();
     }
 
@@ -2754,6 +4121,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class RightUnsignedShiftElseStatementNested<N>
+      extends RightUnsignedShiftFluent<RightUnsignedShiftElseStatementNested<N>> implements Nested<N> {
+
+    RightUnsignedShiftBuilder builder;
+
+    RightUnsignedShiftElseStatementNested(RightUnsignedShift item) {
+      this.builder = new RightUnsignedShiftBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endRightUnsignedShiftElseStatement() {
+      return and();
+    }
+
+  }
+
   public class RightUnsignedShiftStatementNested<N> extends RightUnsignedShiftFluent<RightUnsignedShiftStatementNested<N>>
       implements Nested<N> {
 
@@ -2768,6 +4154,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endRightUnsignedShiftStatement() {
+      return and();
+    }
+
+  }
+
+  public class StringStatementElseNested<N> extends StringStatementFluent<StringStatementElseNested<N>> implements Nested<N> {
+
+    StringStatementBuilder builder;
+
+    StringStatementElseNested(StringStatement item) {
+      this.builder = new StringStatementBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endStringStatementElse() {
       return and();
     }
 
@@ -2809,6 +4213,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class SwitchElseStatementNested<N> extends SwitchFluent<SwitchElseStatementNested<N>> implements Nested<N> {
+
+    SwitchBuilder builder;
+
+    SwitchElseStatementNested(Switch item) {
+      this.builder = new SwitchBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endSwitchElseStatement() {
+      return and();
+    }
+
+  }
+
   public class SwitchStatementNested<N> extends SwitchFluent<SwitchStatementNested<N>> implements Nested<N> {
 
     SwitchBuilder builder;
@@ -2822,6 +4244,25 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endSwitchStatement() {
+      return and();
+    }
+
+  }
+
+  public class SynchronizedElseStatementNested<N> extends SynchronizedFluent<SynchronizedElseStatementNested<N>>
+      implements Nested<N> {
+
+    SynchronizedBuilder builder;
+
+    SynchronizedElseStatementNested(Synchronized item) {
+      this.builder = new SynchronizedBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endSynchronizedElseStatement() {
       return and();
     }
 
@@ -2881,6 +4322,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class ThrowElseStatementNested<N> extends ThrowFluent<ThrowElseStatementNested<N>> implements Nested<N> {
+
+    ThrowBuilder builder;
+
+    ThrowElseStatementNested(Throw item) {
+      this.builder = new ThrowBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endThrowElseStatement() {
+      return and();
+    }
+
+  }
+
   public class ThrowStatementNested<N> extends ThrowFluent<ThrowStatementNested<N>> implements Nested<N> {
 
     ThrowBuilder builder;
@@ -2894,6 +4353,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endThrowStatement() {
+      return and();
+    }
+
+  }
+
+  public class TryElseStatementNested<N> extends TryFluent<TryElseStatementNested<N>> implements Nested<N> {
+
+    TryBuilder builder;
+
+    TryElseStatementNested(Try item) {
+      this.builder = new TryBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endTryElseStatement() {
       return and();
     }
 
@@ -2935,6 +4412,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
 
   }
 
+  public class WhileElseStatementNested<N> extends WhileFluent<WhileElseStatementNested<N>> implements Nested<N> {
+
+    WhileBuilder builder;
+
+    WhileElseStatementNested(While item) {
+      this.builder = new WhileBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endWhileElseStatement() {
+      return and();
+    }
+
+  }
+
   public class WhileStatementNested<N> extends WhileFluent<WhileStatementNested<N>> implements Nested<N> {
 
     WhileBuilder builder;
@@ -2966,6 +4461,24 @@ public class IfFluent<A extends IfFluent<A>> extends BaseFluent<A> {
     }
 
     public N endXorCondition() {
+      return and();
+    }
+
+  }
+
+  public class XorElseStatementNested<N> extends XorFluent<XorElseStatementNested<N>> implements Nested<N> {
+
+    XorBuilder builder;
+
+    XorElseStatementNested(Xor item) {
+      this.builder = new XorBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfFluent.this.withElseStatement(builder.build());
+    }
+
+    public N endXorElseStatement() {
       return and();
     }
 

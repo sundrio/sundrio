@@ -2,7 +2,10 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
+import java.util.Optional;
 
 import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Nested;
@@ -11,7 +14,7 @@ import io.sundr.builder.Nested;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class DotClassFluent<A extends DotClassFluent<A>> extends BaseFluent<A> {
+public class DotClassFluent<A extends io.sundr.model.DotClassFluent<A>> extends BaseFluent<A> {
 
   private ClassRefBuilder classRef;
 
@@ -33,27 +36,31 @@ public class DotClassFluent<A extends DotClassFluent<A>> extends BaseFluent<A> {
   }
 
   public ClassRefNested<A> editClassRef() {
-    return withNewClassRefLike(java.util.Optional.ofNullable(buildClassRef()).orElse(null));
+    return this.withNewClassRefLike(Optional.ofNullable(this.buildClassRef()).orElse(null));
   }
 
   public ClassRefNested<A> editOrNewClassRef() {
-    return withNewClassRefLike(java.util.Optional.ofNullable(buildClassRef()).orElse(new ClassRefBuilder().build()));
+    return this.withNewClassRefLike(Optional.ofNullable(this.buildClassRef()).orElse(new ClassRefBuilder().build()));
   }
 
   public ClassRefNested<A> editOrNewClassRefLike(ClassRef item) {
-    return withNewClassRefLike(java.util.Optional.ofNullable(buildClassRef()).orElse(item));
+    return this.withNewClassRefLike(Optional.ofNullable(this.buildClassRef()).orElse(item));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     DotClassFluent that = (DotClassFluent) o;
-    if (!java.util.Objects.equals(classRef, that.classRef))
+    if (!(Objects.equals(classRef, that.classRef))) {
       return false;
+    }
     return true;
   }
 
@@ -62,13 +69,13 @@ public class DotClassFluent<A extends DotClassFluent<A>> extends BaseFluent<A> {
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(classRef, super.hashCode());
+    return Objects.hash(classRef);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (classRef != null) {
+    if (!(classRef == null)) {
       sb.append("classRef:");
       sb.append(classRef);
     }

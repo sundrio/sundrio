@@ -2,7 +2,10 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
+import java.util.Optional;
 
 import io.sundr.builder.Nested;
 
@@ -10,7 +13,7 @@ import io.sundr.builder.Nested;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends AttributeSupportFluent<A> {
+public class ModifierSupportFluent<A extends io.sundr.model.ModifierSupportFluent<A>> extends AttributeSupportFluent<A> {
 
   private ModifiersBuilder modifiers;
 
@@ -33,27 +36,31 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
   }
 
   public ModifiersNested<A> editModifiers() {
-    return withNewModifiersLike(java.util.Optional.ofNullable(buildModifiers()).orElse(null));
+    return this.withNewModifiersLike(Optional.ofNullable(this.buildModifiers()).orElse(null));
   }
 
   public ModifiersNested<A> editOrNewModifiers() {
-    return withNewModifiersLike(java.util.Optional.ofNullable(buildModifiers()).orElse(new ModifiersBuilder().build()));
+    return this.withNewModifiersLike(Optional.ofNullable(this.buildModifiers()).orElse(new ModifiersBuilder().build()));
   }
 
   public ModifiersNested<A> editOrNewModifiersLike(Modifiers item) {
-    return withNewModifiersLike(java.util.Optional.ofNullable(buildModifiers()).orElse(item));
+    return this.withNewModifiersLike(Optional.ofNullable(this.buildModifiers()).orElse(item));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     ModifierSupportFluent that = (ModifierSupportFluent) o;
-    if (!java.util.Objects.equals(modifiers, that.modifiers))
+    if (!(Objects.equals(modifiers, that.modifiers))) {
       return false;
+    }
     return true;
   }
 
@@ -62,13 +69,13 @@ public class ModifierSupportFluent<A extends ModifierSupportFluent<A>> extends A
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(modifiers, super.hashCode());
+    return Objects.hash(modifiers);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (modifiers != null) {
+    if (!(modifiers == null)) {
       sb.append("modifiers:");
       sb.append(modifiers);
     }

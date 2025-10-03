@@ -4,11 +4,13 @@ import java.lang.Class;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
@@ -18,7 +20,7 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFluent<A> {
+public class MethodCallFluent<A extends io.sundr.model.MethodCallFluent<A>> extends WithScopeFluent<A> {
 
   private ArrayList<VisitableBuilder<? extends Expression, ?>> arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
   private String name;
@@ -33,7 +35,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addAllToArguments(Collection<Expression> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.arguments = new ArrayList();
     }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
@@ -45,7 +47,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addAllToParameters(Collection<TypeRef> items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.parameters = new ArrayList();
     }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
@@ -76,7 +78,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewBitwiseAndArgument(Object left, Object right) {
-    return (A) addToArguments(new BitwiseAnd(left, right));
+    return (A) this.addToArguments(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndArgumentsNested<A> addNewBitwiseAndArgumentLike(BitwiseAnd item) {
@@ -88,7 +90,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewBitwiseOrArgument(Object left, Object right) {
-    return (A) addToArguments(new BitwiseOr(left, right));
+    return (A) this.addToArguments(new BitwiseOr(left, right));
   }
 
   public BitwiseOrArgumentsNested<A> addNewBitwiseOrArgumentLike(BitwiseOr item) {
@@ -132,7 +134,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewContextRefArgument(String name) {
-    return (A) addToArguments(new ContextRef(name));
+    return (A) this.addToArguments(new ContextRef(name));
   }
 
   public ContextRefArgumentsNested<A> addNewContextRefArgumentLike(ContextRef item) {
@@ -144,11 +146,11 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewDeclareArgument(Class type, String name) {
-    return (A) addToArguments(new Declare(type, name));
+    return (A) this.addToArguments(new Declare(type, name));
   }
 
   public A addNewDeclareArgument(Class type, String name, Object value) {
-    return (A) addToArguments(new Declare(type, name, value));
+    return (A) this.addToArguments(new Declare(type, name, value));
   }
 
   public DeclareArgumentsNested<A> addNewDeclareArgumentLike(Declare item) {
@@ -160,7 +162,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewDivideArgument(Object left, Object right) {
-    return (A) addToArguments(new Divide(left, right));
+    return (A) this.addToArguments(new Divide(left, right));
   }
 
   public DivideArgumentsNested<A> addNewDivideArgumentLike(Divide item) {
@@ -196,7 +198,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewEqualsArgument(Object left, Object right) {
-    return (A) addToArguments(new Equals(left, right));
+    return (A) this.addToArguments(new Equals(left, right));
   }
 
   public EqualsArgumentsNested<A> addNewEqualsArgumentLike(Equals item) {
@@ -208,7 +210,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewGreaterThanArgument(Object left, Object right) {
-    return (A) addToArguments(new GreaterThan(left, right));
+    return (A) this.addToArguments(new GreaterThan(left, right));
   }
 
   public GreaterThanArgumentsNested<A> addNewGreaterThanArgumentLike(GreaterThan item) {
@@ -220,7 +222,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewGreaterThanOrEqualArgument(Object left, Object right) {
-    return (A) addToArguments(new GreaterThanOrEqual(left, right));
+    return (A) this.addToArguments(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualArgumentsNested<A> addNewGreaterThanOrEqualArgumentLike(GreaterThanOrEqual item) {
@@ -264,7 +266,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewLeftShiftArgument(Object left, Object right) {
-    return (A) addToArguments(new LeftShift(left, right));
+    return (A) this.addToArguments(new LeftShift(left, right));
   }
 
   public LeftShiftArgumentsNested<A> addNewLeftShiftArgumentLike(LeftShift item) {
@@ -276,7 +278,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewLessThanArgument(Object left, Object right) {
-    return (A) addToArguments(new LessThan(left, right));
+    return (A) this.addToArguments(new LessThan(left, right));
   }
 
   public LessThanArgumentsNested<A> addNewLessThanArgumentLike(LessThan item) {
@@ -288,7 +290,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewLessThanOrEqualArgument(Object left, Object right) {
-    return (A) addToArguments(new LessThanOrEqual(left, right));
+    return (A) this.addToArguments(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualArgumentsNested<A> addNewLessThanOrEqualArgumentLike(LessThanOrEqual item) {
@@ -300,7 +302,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewLogicalAndArgument(Object left, Object right) {
-    return (A) addToArguments(new LogicalAnd(left, right));
+    return (A) this.addToArguments(new LogicalAnd(left, right));
   }
 
   public LogicalAndArgumentsNested<A> addNewLogicalAndArgumentLike(LogicalAnd item) {
@@ -312,7 +314,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewLogicalOrArgument(Object left, Object right) {
-    return (A) addToArguments(new LogicalOr(left, right));
+    return (A) this.addToArguments(new LogicalOr(left, right));
   }
 
   public LogicalOrArgumentsNested<A> addNewLogicalOrArgumentLike(LogicalOr item) {
@@ -332,7 +334,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewMinusArgument(Object left, Object right) {
-    return (A) addToArguments(new Minus(left, right));
+    return (A) this.addToArguments(new Minus(left, right));
   }
 
   public MinusArgumentsNested<A> addNewMinusArgumentLike(Minus item) {
@@ -344,7 +346,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewModuloArgument(Object left, Object right) {
-    return (A) addToArguments(new Modulo(left, right));
+    return (A) this.addToArguments(new Modulo(left, right));
   }
 
   public ModuloArgumentsNested<A> addNewModuloArgumentLike(Modulo item) {
@@ -356,7 +358,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewMultiplyArgument(Object left, Object right) {
-    return (A) addToArguments(new Multiply(left, right));
+    return (A) this.addToArguments(new Multiply(left, right));
   }
 
   public MultiplyArgumentsNested<A> addNewMultiplyArgumentLike(Multiply item) {
@@ -376,7 +378,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewNewArrayArgument(Class type, Integer[] sizes) {
-    return (A) addToArguments(new NewArray(type, sizes));
+    return (A) this.addToArguments(new NewArray(type, sizes));
   }
 
   public NewArrayArgumentsNested<A> addNewNewArrayArgumentLike(NewArray item) {
@@ -396,7 +398,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewNotEqualsArgument(Object left, Object right) {
-    return (A) addToArguments(new NotEquals(left, right));
+    return (A) this.addToArguments(new NotEquals(left, right));
   }
 
   public NotEqualsArgumentsNested<A> addNewNotEqualsArgumentLike(NotEquals item) {
@@ -408,7 +410,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewPlusArgument(Object left, Object right) {
-    return (A) addToArguments(new Plus(left, right));
+    return (A) this.addToArguments(new Plus(left, right));
   }
 
   public PlusArgumentsNested<A> addNewPlusArgumentLike(Plus item) {
@@ -484,7 +486,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewRightShiftArgument(Object left, Object right) {
-    return (A) addToArguments(new RightShift(left, right));
+    return (A) this.addToArguments(new RightShift(left, right));
   }
 
   public RightShiftArgumentsNested<A> addNewRightShiftArgumentLike(RightShift item) {
@@ -496,7 +498,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewRightUnsignedShiftArgument(Object left, Object right) {
-    return (A) addToArguments(new RightUnsignedShift(left, right));
+    return (A) this.addToArguments(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftArgumentsNested<A> addNewRightUnsignedShiftArgumentLike(RightUnsignedShift item) {
@@ -540,7 +542,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewValueRefArgument(Object value) {
-    return (A) addToArguments(new ValueRef(value));
+    return (A) this.addToArguments(new ValueRef(value));
   }
 
   public ValueRefArgumentsNested<A> addNewValueRefArgumentLike(ValueRef item) {
@@ -568,7 +570,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A addNewXorArgument(Object left, Object right) {
-    return (A) addToArguments(new Xor(left, right));
+    return (A) this.addToArguments(new Xor(left, right));
   }
 
   public XorArgumentsNested<A> addNewXorArgumentLike(Xor item) {
@@ -577,7 +579,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToArguments(VisitableBuilder<? extends Expression, ?> builder) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.arguments = new ArrayList();
     }
     _visitables.get("arguments").add(builder);
     this.arguments.add(builder);
@@ -586,7 +588,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToArguments(Expression... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.arguments = new ArrayList();
     }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
@@ -598,7 +600,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToArguments(int index, VisitableBuilder<? extends Expression, ?> builder) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.arguments = new ArrayList();
     }
     if (index < 0 || index >= arguments.size()) {
       _visitables.get("arguments").add(builder);
@@ -612,7 +614,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToArguments(int index, Expression item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.arguments = new ArrayList();
     }
     VisitableBuilder<? extends Expression, ?> builder = builder(item);
     if (index < 0 || index >= arguments.size()) {
@@ -627,7 +629,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToParameters(VisitableBuilder<? extends TypeRef, ?> builder) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.parameters = new ArrayList();
     }
     _visitables.get("parameters").add(builder);
     this.parameters.add(builder);
@@ -636,7 +638,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToParameters(TypeRef... items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.parameters = new ArrayList();
     }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
@@ -648,7 +650,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToParameters(int index, VisitableBuilder<? extends TypeRef, ?> builder) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.parameters = new ArrayList();
     }
     if (index < 0 || index >= parameters.size()) {
       _visitables.get("parameters").add(builder);
@@ -662,7 +664,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A addToParameters(int index, TypeRef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.parameters = new ArrayList();
     }
     VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
     if (index < 0 || index >= parameters.size()) {
@@ -727,112 +729,219 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "ClassRef":
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "PrimitiveRef":
+
+      case "PrimitiveRef":
+
         return (VisitableBuilder<T, ?>) new PrimitiveRefBuilder((PrimitiveRef) item);
-      case "io.sundr.model." + "VoidRef":
+
+      case "VoidRef":
+
         return (VisitableBuilder<T, ?>) new VoidRefBuilder((VoidRef) item);
-      case "io.sundr.model." + "TypeParamRef":
+
+      case "TypeParamRef":
+
         return (VisitableBuilder<T, ?>) new TypeParamRefBuilder((TypeParamRef) item);
-      case "io.sundr.model." + "WildcardRef":
+
+      case "WildcardRef":
+
         return (VisitableBuilder<T, ?>) new WildcardRefBuilder((WildcardRef) item);
-      case "io.sundr.model." + "Multiply":
+
+      case "Multiply":
+
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
-      case "io.sundr.model." + "NewArray":
+
+      case "NewArray":
+
         return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
-      case "io.sundr.model." + "InstanceOf":
+
+      case "InstanceOf":
+
         return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
-      case "io.sundr.model." + "MethodCall":
+
+      case "MethodCall":
+
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
-      case "io.sundr.model." + "Inverse":
+
+      case "Inverse":
+
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
-      case "io.sundr.model." + "Index":
+
+      case "Index":
+
         return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
-      case "io.sundr.model." + "GreaterThanOrEqual":
+
+      case "GreaterThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
-      case "io.sundr.model." + "BitwiseAnd":
+
+      case "BitwiseAnd":
+
         return (VisitableBuilder<T, ?>) new BitwiseAndBuilder((BitwiseAnd) item);
-      case "io.sundr.model." + "Minus":
+
+      case "Minus":
+
         return (VisitableBuilder<T, ?>) new MinusBuilder((Minus) item);
-      case "io.sundr.model." + "LogicalOr":
+
+      case "LogicalOr":
+
         return (VisitableBuilder<T, ?>) new LogicalOrBuilder((LogicalOr) item);
-      case "io.sundr.model." + "NotEquals":
+
+      case "NotEquals":
+
         return (VisitableBuilder<T, ?>) new NotEqualsBuilder((NotEquals) item);
-      case "io.sundr.model." + "Divide":
+
+      case "Divide":
+
         return (VisitableBuilder<T, ?>) new DivideBuilder((Divide) item);
-      case "io.sundr.model." + "LessThan":
+
+      case "LessThan":
+
         return (VisitableBuilder<T, ?>) new LessThanBuilder((LessThan) item);
-      case "io.sundr.model." + "BitwiseOr":
+
+      case "BitwiseOr":
+
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
-      case "io.sundr.model." + "PropertyRef":
+
+      case "PropertyRef":
+
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
-      case "io.sundr.model." + "RightShift":
+
+      case "RightShift":
+
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
-      case "io.sundr.model." + "Super":
+
+      case "Super":
+
         return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
-      case "io.sundr.model." + "GreaterThan":
+
+      case "GreaterThan":
+
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
-      case "io.sundr.model." + "Declare":
+
+      case "Declare":
+
         return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
-      case "io.sundr.model." + "Cast":
+
+      case "Cast":
+
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
-      case "io.sundr.model." + "Modulo":
+
+      case "Modulo":
+
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
-      case "io.sundr.model." + "DotClass":
+
+      case "DotClass":
+
         return (VisitableBuilder<T, ?>) new DotClassBuilder((DotClass) item);
-      case "io.sundr.model." + "ValueRef":
+
+      case "ValueRef":
+
         return (VisitableBuilder<T, ?>) new ValueRefBuilder((ValueRef) item);
-      case "io.sundr.model." + "LeftShift":
+
+      case "LeftShift":
+
         return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
-      case "io.sundr.model." + "Empty":
+
+      case "Empty":
+
         return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
-      case "io.sundr.model." + "Ternary":
+
+      case "Ternary":
+
         return (VisitableBuilder<T, ?>) new TernaryBuilder((Ternary) item);
-      case "io.sundr.model." + "BinaryExpression":
+
+      case "BinaryExpression":
+
         return (VisitableBuilder<T, ?>) new BinaryExpressionBuilder((BinaryExpression) item);
-      case "io.sundr.model." + "Equals":
+
+      case "Equals":
+
         return (VisitableBuilder<T, ?>) new EqualsBuilder((Equals) item);
-      case "io.sundr.model." + "Enclosed":
+
+      case "Enclosed":
+
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
-      case "io.sundr.model." + "PreDecrement":
+
+      case "PreDecrement":
+
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
-      case "io.sundr.model." + "PostDecrement":
+
+      case "PostDecrement":
+
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
-      case "io.sundr.model." + "Lambda":
+
+      case "Lambda":
+
         return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
-      case "io.sundr.model." + "Not":
+
+      case "Not":
+
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
-      case "io.sundr.model." + "Assign":
+
+      case "Assign":
+
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "This":
+
+      case "This":
+
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
-      case "io.sundr.model." + "Negative":
+
+      case "Negative":
+
         return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
-      case "io.sundr.model." + "LogicalAnd":
+
+      case "LogicalAnd":
+
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
-      case "io.sundr.model." + "PostIncrement":
+
+      case "PostIncrement":
+
         return (VisitableBuilder<T, ?>) new PostIncrementBuilder((PostIncrement) item);
-      case "io.sundr.model." + "RightUnsignedShift":
+
+      case "RightUnsignedShift":
+
         return (VisitableBuilder<T, ?>) new RightUnsignedShiftBuilder((RightUnsignedShift) item);
-      case "io.sundr.model." + "Plus":
+
+      case "Plus":
+
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
-      case "io.sundr.model." + "Construct":
+
+      case "Construct":
+
         return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-      case "io.sundr.model." + "Xor":
+
+      case "Xor":
+
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
-      case "io.sundr.model." + "PreIncrement":
+
+      case "PreIncrement":
+
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
-      case "io.sundr.model." + "Property":
+
+      case "Property":
+
         return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
-      case "io.sundr.model." + "LessThanOrEqual":
+
+      case "LessThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
-      case "io.sundr.model." + "ContextRef":
+
+      case "ContextRef":
+
         return (VisitableBuilder<T, ?>) new ContextRefBuilder((ContextRef) item);
-      case "io.sundr.model." + "Positive":
+
+      case "Positive":
+
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(MethodCall instance) {
@@ -845,19 +954,25 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     MethodCallFluent that = (MethodCallFluent) o;
-    if (!java.util.Objects.equals(name, that.name))
+    if (!(Objects.equals(name, that.name))) {
       return false;
-    if (!java.util.Objects.equals(parameters, that.parameters))
+    }
+    if (!(Objects.equals(parameters, that.parameters))) {
       return false;
-    if (!java.util.Objects.equals(arguments, that.arguments))
+    }
+    if (!(Objects.equals(arguments, that.arguments))) {
       return false;
+    }
     return true;
   }
 
@@ -896,12 +1011,13 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(name, parameters, arguments, super.hashCode());
+    return Objects.hash(name, parameters, arguments);
   }
 
   public A removeAllFromArguments(Collection<Expression> items) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
       _visitables.get("arguments").remove(builder);
@@ -911,8 +1027,9 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A removeAllFromParameters(Collection<TypeRef> items) {
-    if (this.parameters == null)
+    if (this.parameters == null) {
       return (A) this;
+    }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
       _visitables.get("parameters").remove(builder);
@@ -922,16 +1039,18 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A removeFromArguments(VisitableBuilder<? extends Expression, ?> builder) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     _visitables.get("arguments").remove(builder);
     this.arguments.remove(builder);
     return (A) this;
   }
 
   public A removeFromArguments(Expression... items) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
       _visitables.get("arguments").remove(builder);
@@ -941,16 +1060,18 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A removeFromParameters(VisitableBuilder<? extends TypeRef, ?> builder) {
-    if (this.parameters == null)
+    if (this.parameters == null) {
       return (A) this;
+    }
     _visitables.get("parameters").remove(builder);
     this.parameters.remove(builder);
     return (A) this;
   }
 
   public A removeFromParameters(TypeRef... items) {
-    if (this.parameters == null)
+    if (this.parameters == null) {
       return (A) this;
+    }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
       _visitables.get("parameters").remove(builder);
@@ -960,10 +1081,11 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A removeMatchingFromArguments(Predicate<VisitableBuilder<? extends Expression, ?>> predicate) {
-    if (arguments == null)
+    if (arguments == null) {
       return (A) this;
-    final Iterator<VisitableBuilder<? extends Expression, ?>> each = arguments.iterator();
-    final List visitables = _visitables.get("arguments");
+    }
+    Iterator<VisitableBuilder<? extends Expression, ?>> each = arguments.iterator();
+    List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
       VisitableBuilder<? extends Expression, ?> builder = each.next();
       if (predicate.test(builder)) {
@@ -975,10 +1097,11 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   }
 
   public A removeMatchingFromParameters(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
-    if (parameters == null)
+    if (parameters == null) {
       return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = parameters.iterator();
-    final List visitables = _visitables.get("parameters");
+    }
+    Iterator<VisitableBuilder<? extends TypeRef, ?>> each = parameters.iterator();
+    List visitables = _visitables.get("parameters");
     while (each.hasNext()) {
       VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
@@ -1203,7 +1326,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A setToArguments(int index, Expression item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.arguments = new ArrayList();
     }
     VisitableBuilder<? extends Expression, ?> builder = builder(item);
     if (index < 0 || index >= arguments.size()) {
@@ -1218,7 +1341,7 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
 
   public A setToParameters(int index, TypeRef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.parameters = new ArrayList();
     }
     VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
     if (index < 0 || index >= parameters.size()) {
@@ -1234,15 +1357,17 @@ public class MethodCallFluent<A extends MethodCallFluent<A>> extends WithScopeFl
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (name != null) {
+    if (!(name == null)) {
       sb.append("name:");
-      sb.append(name + ",");
+      sb.append(name);
+      sb.append(",");
     }
-    if (parameters != null && !parameters.isEmpty()) {
+    if (!(parameters == null) && !(parameters.isEmpty())) {
       sb.append("parameters:");
-      sb.append(parameters + ",");
+      sb.append(parameters);
+      sb.append(",");
     }
-    if (arguments != null && !arguments.isEmpty()) {
+    if (!(arguments == null) && !(arguments.isEmpty())) {
       sb.append("arguments:");
       sb.append(arguments);
     }

@@ -2,7 +2,9 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 
@@ -10,7 +12,7 @@ import io.sundr.builder.BaseFluent;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A> {
+public class ModifiersFluent<A extends io.sundr.model.ModifiersFluent<A>> extends BaseFluent<A> {
 
   private boolean _abstract;
   private boolean _final;
@@ -30,7 +32,7 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
   }
 
   protected void copyInstance(Modifiers instance) {
-    instance = (instance != null ? instance : new Modifiers());
+    instance = instance != null ? instance : new Modifiers();
     if (instance != null) {
       this.withPrivate(instance.isPrivate());
       this.withProtected(instance.isProtected());
@@ -45,31 +47,43 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     ModifiersFluent that = (ModifiersFluent) o;
-    if (_private != that._private)
+    if (_private != that._private) {
       return false;
-    if (_protected != that._protected)
+    }
+    if (_protected != that._protected) {
       return false;
-    if (_public != that._public)
+    }
+    if (_public != that._public) {
       return false;
-    if (_abstract != that._abstract)
+    }
+    if (_abstract != that._abstract) {
       return false;
-    if (_final != that._final)
+    }
+    if (_final != that._final) {
       return false;
-    if (_native != that._native)
+    }
+    if (_native != that._native) {
       return false;
-    if (_static != that._static)
+    }
+    if (_static != that._static) {
       return false;
-    if (_synchronized != that._synchronized)
+    }
+    if (_synchronized != that._synchronized) {
       return false;
-    if (_transient != that._transient)
+    }
+    if (_transient != that._transient) {
       return false;
+    }
     return true;
   }
 
@@ -110,8 +124,7 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(_private, _protected, _public, _abstract, _final, _native, _static, _synchronized, _transient,
-        super.hashCode());
+    return Objects.hash(_private, _protected, _public, _abstract, _final, _native, _static, _synchronized, _transient);
   }
 
   public boolean isAbstract() {
@@ -154,21 +167,29 @@ public class ModifiersFluent<A extends ModifiersFluent<A>> extends BaseFluent<A>
     StringBuilder sb = new StringBuilder();
     sb.append("{");
     sb.append("_private:");
-    sb.append(_private + ",");
+    sb.append(_private);
+    sb.append(",");
     sb.append("_protected:");
-    sb.append(_protected + ",");
+    sb.append(_protected);
+    sb.append(",");
     sb.append("_public:");
-    sb.append(_public + ",");
+    sb.append(_public);
+    sb.append(",");
     sb.append("_abstract:");
-    sb.append(_abstract + ",");
+    sb.append(_abstract);
+    sb.append(",");
     sb.append("_final:");
-    sb.append(_final + ",");
+    sb.append(_final);
+    sb.append(",");
     sb.append("_native:");
-    sb.append(_native + ",");
+    sb.append(_native);
+    sb.append(",");
     sb.append("_static:");
-    sb.append(_static + ",");
+    sb.append(_static);
+    sb.append(",");
     sb.append("_synchronized:");
-    sb.append(_synchronized + ",");
+    sb.append(_synchronized);
+    sb.append(",");
     sb.append("_transient:");
     sb.append(_transient);
     sb.append("}");

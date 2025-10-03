@@ -2,9 +2,12 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import io.sundr.builder.Nested;
 
@@ -12,7 +15,7 @@ import io.sundr.builder.Nested;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends AttributeSupportFluent<A> {
+public class AnnotationRefFluent<A extends io.sundr.model.AnnotationRefFluent<A>> extends AttributeSupportFluent<A> {
 
   private ClassRefBuilder classRef;
   private Map<String, Object> parameters = new LinkedHashMap<String, Object>();
@@ -57,29 +60,34 @@ public class AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends Attri
   }
 
   public ClassRefNested<A> editClassRef() {
-    return withNewClassRefLike(java.util.Optional.ofNullable(buildClassRef()).orElse(null));
+    return this.withNewClassRefLike(Optional.ofNullable(this.buildClassRef()).orElse(null));
   }
 
   public ClassRefNested<A> editOrNewClassRef() {
-    return withNewClassRefLike(java.util.Optional.ofNullable(buildClassRef()).orElse(new ClassRefBuilder().build()));
+    return this.withNewClassRefLike(Optional.ofNullable(this.buildClassRef()).orElse(new ClassRefBuilder().build()));
   }
 
   public ClassRefNested<A> editOrNewClassRefLike(ClassRef item) {
-    return withNewClassRefLike(java.util.Optional.ofNullable(buildClassRef()).orElse(item));
+    return this.withNewClassRefLike(Optional.ofNullable(this.buildClassRef()).orElse(item));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     AnnotationRefFluent that = (AnnotationRefFluent) o;
-    if (!java.util.Objects.equals(classRef, that.classRef))
+    if (!(Objects.equals(classRef, that.classRef))) {
       return false;
-    if (!java.util.Objects.equals(parameters, that.parameters))
+    }
+    if (!(Objects.equals(parameters, that.parameters))) {
       return false;
+    }
     return true;
   }
 
@@ -96,7 +104,7 @@ public class AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends Attri
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(classRef, parameters, super.hashCode());
+    return Objects.hash(classRef, parameters);
   }
 
   public A removeFromParameters(String key) {
@@ -126,11 +134,12 @@ public class AnnotationRefFluent<A extends AnnotationRefFluent<A>> extends Attri
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (classRef != null) {
+    if (!(classRef == null)) {
       sb.append("classRef:");
-      sb.append(classRef + ",");
+      sb.append(classRef);
+      sb.append(",");
     }
-    if (parameters != null && !parameters.isEmpty()) {
+    if (!(parameters == null) && !(parameters.isEmpty())) {
       sb.append("parameters:");
       sb.append(parameters);
     }

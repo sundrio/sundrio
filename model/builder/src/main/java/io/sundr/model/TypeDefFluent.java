@@ -1,12 +1,15 @@
 package io.sundr.model;
 
 import java.lang.Object;
+import java.lang.RuntimeException;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
@@ -15,7 +18,7 @@ import io.sundr.builder.Nested;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFluent<A> {
+public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends ModifierSupportFluent<A> {
 
   private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
   private List<String> comments = new ArrayList<String>();
@@ -40,7 +43,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToAnnotations(Collection<AnnotationRef> items) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
@@ -52,7 +55,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToComments(Collection<String> items) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     for (String item : items) {
       this.comments.add(item);
@@ -62,7 +65,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToConstructors(Collection<Method> items) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new ArrayList();
     }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
@@ -74,7 +77,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToExtendsList(Collection<ClassRef> items) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -86,7 +89,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToImplementsList(Collection<ClassRef> items) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -98,7 +101,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToInnerTypes(Collection<TypeDef> items) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new ArrayList();
     }
     for (TypeDef item : items) {
       TypeDefBuilder builder = new TypeDefBuilder(item);
@@ -110,7 +113,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToMethods(Collection<Method> items) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new ArrayList();
     }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
@@ -122,7 +125,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToParameters(Collection<TypeParamDef> items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
@@ -134,7 +137,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addAllToProperties(Collection<Property> items) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new ArrayList();
     }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
@@ -181,7 +184,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A addNewInnerType(String fullyQualifiedName) {
-    return (A) addToInnerTypes(new TypeDef(fullyQualifiedName));
+    return (A) this.addToInnerTypes(new TypeDef(fullyQualifiedName));
   }
 
   public InnerTypesNested<A> addNewInnerTypeLike(TypeDef item) {
@@ -214,7 +217,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToAnnotations(AnnotationRef... items) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
@@ -226,7 +229,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToAnnotations(int index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     if (index < 0 || index >= annotations.size()) {
@@ -241,7 +244,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToComments(String... items) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     for (String item : items) {
       this.comments.add(item);
@@ -251,7 +254,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToComments(int index, String item) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     this.comments.add(index, item);
     return (A) this;
@@ -259,7 +262,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToConstructors(Method... items) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new ArrayList();
     }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
@@ -271,7 +274,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToConstructors(int index, Method item) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new ArrayList();
     }
     MethodBuilder builder = new MethodBuilder(item);
     if (index < 0 || index >= constructors.size()) {
@@ -286,7 +289,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToExtendsList(ClassRef... items) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -298,7 +301,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToExtendsList(int index, ClassRef item) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= extendsList.size()) {
@@ -313,7 +316,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToImplementsList(ClassRef... items) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -325,7 +328,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToImplementsList(int index, ClassRef item) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= implementsList.size()) {
@@ -340,7 +343,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToInnerTypes(TypeDef... items) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new ArrayList();
     }
     for (TypeDef item : items) {
       TypeDefBuilder builder = new TypeDefBuilder(item);
@@ -352,7 +355,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToInnerTypes(int index, TypeDef item) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new ArrayList();
     }
     TypeDefBuilder builder = new TypeDefBuilder(item);
     if (index < 0 || index >= innerTypes.size()) {
@@ -367,7 +370,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToMethods(Method... items) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new ArrayList();
     }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
@@ -379,7 +382,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToMethods(int index, Method item) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new ArrayList();
     }
     MethodBuilder builder = new MethodBuilder(item);
     if (index < 0 || index >= methods.size()) {
@@ -394,7 +397,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToParameters(TypeParamDef... items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
@@ -406,7 +409,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToParameters(int index, TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
     if (index < 0 || index >= parameters.size()) {
@@ -421,7 +424,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToProperties(Property... items) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new ArrayList();
     }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
@@ -433,7 +436,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A addToProperties(int index, Property item) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new ArrayList();
     }
     PropertyBuilder builder = new PropertyBuilder(item);
     if (index < 0 || index >= properties.size()) {
@@ -667,137 +670,158 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public AnnotationsNested<A> editAnnotation(int index) {
-    if (annotations.size() <= index)
-      throw new RuntimeException("Can't edit annotations. Index exceeds size.");
-    return setNewAnnotationLike(index, buildAnnotation(index));
+    if (annotations.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "annotations"));
+    }
+    return this.setNewAnnotationLike(index, this.buildAnnotation(index));
   }
 
   public ConstructorsNested<A> editConstructor(int index) {
-    if (constructors.size() <= index)
-      throw new RuntimeException("Can't edit constructors. Index exceeds size.");
-    return setNewConstructorLike(index, buildConstructor(index));
+    if (constructors.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "constructors"));
+    }
+    return this.setNewConstructorLike(index, this.buildConstructor(index));
   }
 
   public ExtendsListNested<A> editExtendsList(int index) {
-    if (extendsList.size() <= index)
-      throw new RuntimeException("Can't edit extendsList. Index exceeds size.");
-    return setNewExtendsListLike(index, buildExtendsList(index));
+    if (extendsList.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "extendsList"));
+    }
+    return this.setNewExtendsListLike(index, this.buildExtendsList(index));
   }
 
   public AnnotationsNested<A> editFirstAnnotation() {
-    if (annotations.size() == 0)
-      throw new RuntimeException("Can't edit first annotations. The list is empty.");
-    return setNewAnnotationLike(0, buildAnnotation(0));
+    if (annotations.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "annotations"));
+    }
+    return this.setNewAnnotationLike(0, this.buildAnnotation(0));
   }
 
   public ConstructorsNested<A> editFirstConstructor() {
-    if (constructors.size() == 0)
-      throw new RuntimeException("Can't edit first constructors. The list is empty.");
-    return setNewConstructorLike(0, buildConstructor(0));
+    if (constructors.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "constructors"));
+    }
+    return this.setNewConstructorLike(0, this.buildConstructor(0));
   }
 
   public ExtendsListNested<A> editFirstExtendsList() {
-    if (extendsList.size() == 0)
-      throw new RuntimeException("Can't edit first extendsList. The list is empty.");
-    return setNewExtendsListLike(0, buildExtendsList(0));
+    if (extendsList.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "extendsList"));
+    }
+    return this.setNewExtendsListLike(0, this.buildExtendsList(0));
   }
 
   public ImplementsListNested<A> editFirstImplementsList() {
-    if (implementsList.size() == 0)
-      throw new RuntimeException("Can't edit first implementsList. The list is empty.");
-    return setNewImplementsListLike(0, buildImplementsList(0));
+    if (implementsList.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "implementsList"));
+    }
+    return this.setNewImplementsListLike(0, this.buildImplementsList(0));
   }
 
   public InnerTypesNested<A> editFirstInnerType() {
-    if (innerTypes.size() == 0)
-      throw new RuntimeException("Can't edit first innerTypes. The list is empty.");
-    return setNewInnerTypeLike(0, buildInnerType(0));
+    if (innerTypes.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "innerTypes"));
+    }
+    return this.setNewInnerTypeLike(0, this.buildInnerType(0));
   }
 
   public MethodsNested<A> editFirstMethod() {
-    if (methods.size() == 0)
-      throw new RuntimeException("Can't edit first methods. The list is empty.");
-    return setNewMethodLike(0, buildMethod(0));
+    if (methods.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "methods"));
+    }
+    return this.setNewMethodLike(0, this.buildMethod(0));
   }
 
   public ParametersNested<A> editFirstParameter() {
-    if (parameters.size() == 0)
-      throw new RuntimeException("Can't edit first parameters. The list is empty.");
-    return setNewParameterLike(0, buildParameter(0));
+    if (parameters.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "parameters"));
+    }
+    return this.setNewParameterLike(0, this.buildParameter(0));
   }
 
   public PropertiesNested<A> editFirstProperty() {
-    if (properties.size() == 0)
-      throw new RuntimeException("Can't edit first properties. The list is empty.");
-    return setNewPropertyLike(0, buildProperty(0));
+    if (properties.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "properties"));
+    }
+    return this.setNewPropertyLike(0, this.buildProperty(0));
   }
 
   public ImplementsListNested<A> editImplementsList(int index) {
-    if (implementsList.size() <= index)
-      throw new RuntimeException("Can't edit implementsList. Index exceeds size.");
-    return setNewImplementsListLike(index, buildImplementsList(index));
+    if (implementsList.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "implementsList"));
+    }
+    return this.setNewImplementsListLike(index, this.buildImplementsList(index));
   }
 
   public InnerTypesNested<A> editInnerType(int index) {
-    if (innerTypes.size() <= index)
-      throw new RuntimeException("Can't edit innerTypes. Index exceeds size.");
-    return setNewInnerTypeLike(index, buildInnerType(index));
+    if (innerTypes.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "innerTypes"));
+    }
+    return this.setNewInnerTypeLike(index, this.buildInnerType(index));
   }
 
   public AnnotationsNested<A> editLastAnnotation() {
     int index = annotations.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last annotations. The list is empty.");
-    return setNewAnnotationLike(index, buildAnnotation(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "annotations"));
+    }
+    return this.setNewAnnotationLike(index, this.buildAnnotation(index));
   }
 
   public ConstructorsNested<A> editLastConstructor() {
     int index = constructors.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last constructors. The list is empty.");
-    return setNewConstructorLike(index, buildConstructor(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "constructors"));
+    }
+    return this.setNewConstructorLike(index, this.buildConstructor(index));
   }
 
   public ExtendsListNested<A> editLastExtendsList() {
     int index = extendsList.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last extendsList. The list is empty.");
-    return setNewExtendsListLike(index, buildExtendsList(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "extendsList"));
+    }
+    return this.setNewExtendsListLike(index, this.buildExtendsList(index));
   }
 
   public ImplementsListNested<A> editLastImplementsList() {
     int index = implementsList.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last implementsList. The list is empty.");
-    return setNewImplementsListLike(index, buildImplementsList(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "implementsList"));
+    }
+    return this.setNewImplementsListLike(index, this.buildImplementsList(index));
   }
 
   public InnerTypesNested<A> editLastInnerType() {
     int index = innerTypes.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last innerTypes. The list is empty.");
-    return setNewInnerTypeLike(index, buildInnerType(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "innerTypes"));
+    }
+    return this.setNewInnerTypeLike(index, this.buildInnerType(index));
   }
 
   public MethodsNested<A> editLastMethod() {
     int index = methods.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last methods. The list is empty.");
-    return setNewMethodLike(index, buildMethod(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "methods"));
+    }
+    return this.setNewMethodLike(index, this.buildMethod(index));
   }
 
   public ParametersNested<A> editLastParameter() {
     int index = parameters.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last parameters. The list is empty.");
-    return setNewParameterLike(index, buildParameter(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "parameters"));
+    }
+    return this.setNewParameterLike(index, this.buildParameter(index));
   }
 
   public PropertiesNested<A> editLastProperty() {
     int index = properties.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last properties. The list is empty.");
-    return setNewPropertyLike(index, buildProperty(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "properties"));
+    }
+    return this.setNewPropertyLike(index, this.buildProperty(index));
   }
 
   public AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
@@ -808,9 +832,10 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching annotations. No match found.");
-    return setNewAnnotationLike(index, buildAnnotation(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "annotations"));
+    }
+    return this.setNewAnnotationLike(index, this.buildAnnotation(index));
   }
 
   public ConstructorsNested<A> editMatchingConstructor(Predicate<MethodBuilder> predicate) {
@@ -821,9 +846,10 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching constructors. No match found.");
-    return setNewConstructorLike(index, buildConstructor(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "constructors"));
+    }
+    return this.setNewConstructorLike(index, this.buildConstructor(index));
   }
 
   public ExtendsListNested<A> editMatchingExtendsList(Predicate<ClassRefBuilder> predicate) {
@@ -834,9 +860,10 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching extendsList. No match found.");
-    return setNewExtendsListLike(index, buildExtendsList(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "extendsList"));
+    }
+    return this.setNewExtendsListLike(index, this.buildExtendsList(index));
   }
 
   public ImplementsListNested<A> editMatchingImplementsList(Predicate<ClassRefBuilder> predicate) {
@@ -847,9 +874,10 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching implementsList. No match found.");
-    return setNewImplementsListLike(index, buildImplementsList(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "implementsList"));
+    }
+    return this.setNewImplementsListLike(index, this.buildImplementsList(index));
   }
 
   public InnerTypesNested<A> editMatchingInnerType(Predicate<TypeDefBuilder> predicate) {
@@ -860,9 +888,10 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching innerTypes. No match found.");
-    return setNewInnerTypeLike(index, buildInnerType(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "innerTypes"));
+    }
+    return this.setNewInnerTypeLike(index, this.buildInnerType(index));
   }
 
   public MethodsNested<A> editMatchingMethod(Predicate<MethodBuilder> predicate) {
@@ -873,9 +902,10 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching methods. No match found.");
-    return setNewMethodLike(index, buildMethod(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "methods"));
+    }
+    return this.setNewMethodLike(index, this.buildMethod(index));
   }
 
   public ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
@@ -886,9 +916,10 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching parameters. No match found.");
-    return setNewParameterLike(index, buildParameter(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "parameters"));
+    }
+    return this.setNewParameterLike(index, this.buildParameter(index));
   }
 
   public PropertiesNested<A> editMatchingProperty(Predicate<PropertyBuilder> predicate) {
@@ -899,63 +930,83 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching properties. No match found.");
-    return setNewPropertyLike(index, buildProperty(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "properties"));
+    }
+    return this.setNewPropertyLike(index, this.buildProperty(index));
   }
 
   public MethodsNested<A> editMethod(int index) {
-    if (methods.size() <= index)
-      throw new RuntimeException("Can't edit methods. Index exceeds size.");
-    return setNewMethodLike(index, buildMethod(index));
+    if (methods.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "methods"));
+    }
+    return this.setNewMethodLike(index, this.buildMethod(index));
   }
 
   public ParametersNested<A> editParameter(int index) {
-    if (parameters.size() <= index)
-      throw new RuntimeException("Can't edit parameters. Index exceeds size.");
-    return setNewParameterLike(index, buildParameter(index));
+    if (parameters.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "parameters"));
+    }
+    return this.setNewParameterLike(index, this.buildParameter(index));
   }
 
   public PropertiesNested<A> editProperty(int index) {
-    if (properties.size() <= index)
-      throw new RuntimeException("Can't edit properties. Index exceeds size.");
-    return setNewPropertyLike(index, buildProperty(index));
+    if (properties.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "properties"));
+    }
+    return this.setNewPropertyLike(index, this.buildProperty(index));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     TypeDefFluent that = (TypeDefFluent) o;
-    if (!java.util.Objects.equals(kind, that.kind))
+    if (!(Objects.equals(kind, that.kind))) {
       return false;
-    if (!java.util.Objects.equals(packageName, that.packageName))
+    }
+    if (!(Objects.equals(packageName, that.packageName))) {
       return false;
-    if (!java.util.Objects.equals(name, that.name))
+    }
+    if (!(Objects.equals(name, that.name))) {
       return false;
-    if (!java.util.Objects.equals(comments, that.comments))
+    }
+    if (!(Objects.equals(comments, that.comments))) {
       return false;
-    if (!java.util.Objects.equals(annotations, that.annotations))
+    }
+    if (!(Objects.equals(annotations, that.annotations))) {
       return false;
-    if (!java.util.Objects.equals(extendsList, that.extendsList))
+    }
+    if (!(Objects.equals(extendsList, that.extendsList))) {
       return false;
-    if (!java.util.Objects.equals(implementsList, that.implementsList))
+    }
+    if (!(Objects.equals(implementsList, that.implementsList))) {
       return false;
-    if (!java.util.Objects.equals(parameters, that.parameters))
+    }
+    if (!(Objects.equals(parameters, that.parameters))) {
       return false;
-    if (!java.util.Objects.equals(properties, that.properties))
+    }
+    if (!(Objects.equals(properties, that.properties))) {
       return false;
-    if (!java.util.Objects.equals(constructors, that.constructors))
+    }
+    if (!(Objects.equals(constructors, that.constructors))) {
       return false;
-    if (!java.util.Objects.equals(methods, that.methods))
+    }
+    if (!(Objects.equals(methods, that.methods))) {
       return false;
-    if (!java.util.Objects.equals(outerTypeName, that.outerTypeName))
+    }
+    if (!(Objects.equals(outerTypeName, that.outerTypeName))) {
       return false;
-    if (!java.util.Objects.equals(innerTypes, that.innerTypes))
+    }
+    if (!(Objects.equals(innerTypes, that.innerTypes))) {
       return false;
+    }
     return true;
   }
 
@@ -1134,13 +1185,14 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(kind, packageName, name, comments, annotations, extendsList, implementsList, parameters,
-        properties, constructors, methods, outerTypeName, innerTypes, super.hashCode());
+    return Objects.hash(kind, packageName, name, comments, annotations, extendsList, implementsList, parameters, properties,
+        constructors, methods, outerTypeName, innerTypes);
   }
 
   public A removeAllFromAnnotations(Collection<AnnotationRef> items) {
-    if (this.annotations == null)
+    if (this.annotations == null) {
       return (A) this;
+    }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
@@ -1150,8 +1202,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromComments(Collection<String> items) {
-    if (this.comments == null)
+    if (this.comments == null) {
       return (A) this;
+    }
     for (String item : items) {
       this.comments.remove(item);
     }
@@ -1159,8 +1212,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromConstructors(Collection<Method> items) {
-    if (this.constructors == null)
+    if (this.constructors == null) {
       return (A) this;
+    }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
       _visitables.get("constructors").remove(builder);
@@ -1170,8 +1224,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromExtendsList(Collection<ClassRef> items) {
-    if (this.extendsList == null)
+    if (this.extendsList == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("extendsList").remove(builder);
@@ -1181,8 +1236,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromImplementsList(Collection<ClassRef> items) {
-    if (this.implementsList == null)
+    if (this.implementsList == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("implementsList").remove(builder);
@@ -1192,8 +1248,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromInnerTypes(Collection<TypeDef> items) {
-    if (this.innerTypes == null)
+    if (this.innerTypes == null) {
       return (A) this;
+    }
     for (TypeDef item : items) {
       TypeDefBuilder builder = new TypeDefBuilder(item);
       _visitables.get("innerTypes").remove(builder);
@@ -1203,8 +1260,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromMethods(Collection<Method> items) {
-    if (this.methods == null)
+    if (this.methods == null) {
       return (A) this;
+    }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
       _visitables.get("methods").remove(builder);
@@ -1214,8 +1272,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromParameters(Collection<TypeParamDef> items) {
-    if (this.parameters == null)
+    if (this.parameters == null) {
       return (A) this;
+    }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
@@ -1225,8 +1284,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeAllFromProperties(Collection<Property> items) {
-    if (this.properties == null)
+    if (this.properties == null) {
       return (A) this;
+    }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("properties").remove(builder);
@@ -1236,8 +1296,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromAnnotations(AnnotationRef... items) {
-    if (this.annotations == null)
+    if (this.annotations == null) {
       return (A) this;
+    }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
@@ -1247,8 +1308,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromComments(String... items) {
-    if (this.comments == null)
+    if (this.comments == null) {
       return (A) this;
+    }
     for (String item : items) {
       this.comments.remove(item);
     }
@@ -1256,8 +1318,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromConstructors(Method... items) {
-    if (this.constructors == null)
+    if (this.constructors == null) {
       return (A) this;
+    }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
       _visitables.get("constructors").remove(builder);
@@ -1267,8 +1330,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromExtendsList(ClassRef... items) {
-    if (this.extendsList == null)
+    if (this.extendsList == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("extendsList").remove(builder);
@@ -1278,8 +1342,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromImplementsList(ClassRef... items) {
-    if (this.implementsList == null)
+    if (this.implementsList == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("implementsList").remove(builder);
@@ -1289,8 +1354,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromInnerTypes(TypeDef... items) {
-    if (this.innerTypes == null)
+    if (this.innerTypes == null) {
       return (A) this;
+    }
     for (TypeDef item : items) {
       TypeDefBuilder builder = new TypeDefBuilder(item);
       _visitables.get("innerTypes").remove(builder);
@@ -1300,8 +1366,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromMethods(Method... items) {
-    if (this.methods == null)
+    if (this.methods == null) {
       return (A) this;
+    }
     for (Method item : items) {
       MethodBuilder builder = new MethodBuilder(item);
       _visitables.get("methods").remove(builder);
@@ -1311,8 +1378,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromParameters(TypeParamDef... items) {
-    if (this.parameters == null)
+    if (this.parameters == null) {
       return (A) this;
+    }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
@@ -1322,8 +1390,9 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeFromProperties(Property... items) {
-    if (this.properties == null)
+    if (this.properties == null) {
       return (A) this;
+    }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("properties").remove(builder);
@@ -1333,10 +1402,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate) {
-    if (annotations == null)
+    if (annotations == null) {
       return (A) this;
-    final Iterator<AnnotationRefBuilder> each = annotations.iterator();
-    final List visitables = _visitables.get("annotations");
+    }
+    Iterator<AnnotationRefBuilder> each = annotations.iterator();
+    List visitables = _visitables.get("annotations");
     while (each.hasNext()) {
       AnnotationRefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1348,10 +1418,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromConstructors(Predicate<MethodBuilder> predicate) {
-    if (constructors == null)
+    if (constructors == null) {
       return (A) this;
-    final Iterator<MethodBuilder> each = constructors.iterator();
-    final List visitables = _visitables.get("constructors");
+    }
+    Iterator<MethodBuilder> each = constructors.iterator();
+    List visitables = _visitables.get("constructors");
     while (each.hasNext()) {
       MethodBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1363,10 +1434,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromExtendsList(Predicate<ClassRefBuilder> predicate) {
-    if (extendsList == null)
+    if (extendsList == null) {
       return (A) this;
-    final Iterator<ClassRefBuilder> each = extendsList.iterator();
-    final List visitables = _visitables.get("extendsList");
+    }
+    Iterator<ClassRefBuilder> each = extendsList.iterator();
+    List visitables = _visitables.get("extendsList");
     while (each.hasNext()) {
       ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1378,10 +1450,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromImplementsList(Predicate<ClassRefBuilder> predicate) {
-    if (implementsList == null)
+    if (implementsList == null) {
       return (A) this;
-    final Iterator<ClassRefBuilder> each = implementsList.iterator();
-    final List visitables = _visitables.get("implementsList");
+    }
+    Iterator<ClassRefBuilder> each = implementsList.iterator();
+    List visitables = _visitables.get("implementsList");
     while (each.hasNext()) {
       ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1393,10 +1466,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromInnerTypes(Predicate<TypeDefBuilder> predicate) {
-    if (innerTypes == null)
+    if (innerTypes == null) {
       return (A) this;
-    final Iterator<TypeDefBuilder> each = innerTypes.iterator();
-    final List visitables = _visitables.get("innerTypes");
+    }
+    Iterator<TypeDefBuilder> each = innerTypes.iterator();
+    List visitables = _visitables.get("innerTypes");
     while (each.hasNext()) {
       TypeDefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1408,10 +1482,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromMethods(Predicate<MethodBuilder> predicate) {
-    if (methods == null)
+    if (methods == null) {
       return (A) this;
-    final Iterator<MethodBuilder> each = methods.iterator();
-    final List visitables = _visitables.get("methods");
+    }
+    Iterator<MethodBuilder> each = methods.iterator();
+    List visitables = _visitables.get("methods");
     while (each.hasNext()) {
       MethodBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1423,10 +1498,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromParameters(Predicate<TypeParamDefBuilder> predicate) {
-    if (parameters == null)
+    if (parameters == null) {
       return (A) this;
-    final Iterator<TypeParamDefBuilder> each = parameters.iterator();
-    final List visitables = _visitables.get("parameters");
+    }
+    Iterator<TypeParamDefBuilder> each = parameters.iterator();
+    List visitables = _visitables.get("parameters");
     while (each.hasNext()) {
       TypeParamDefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1438,10 +1514,11 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   }
 
   public A removeMatchingFromProperties(Predicate<PropertyBuilder> predicate) {
-    if (properties == null)
+    if (properties == null) {
       return (A) this;
-    final Iterator<PropertyBuilder> each = properties.iterator();
-    final List visitables = _visitables.get("properties");
+    }
+    Iterator<PropertyBuilder> each = properties.iterator();
+    List visitables = _visitables.get("properties");
     while (each.hasNext()) {
       PropertyBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -1486,7 +1563,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToAnnotations(int index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     if (index < 0 || index >= annotations.size()) {
@@ -1501,7 +1578,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToComments(int index, String item) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     this.comments.set(index, item);
     return (A) this;
@@ -1509,7 +1586,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToConstructors(int index, Method item) {
     if (this.constructors == null) {
-      this.constructors = new ArrayList<MethodBuilder>();
+      this.constructors = new ArrayList();
     }
     MethodBuilder builder = new MethodBuilder(item);
     if (index < 0 || index >= constructors.size()) {
@@ -1524,7 +1601,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToExtendsList(int index, ClassRef item) {
     if (this.extendsList == null) {
-      this.extendsList = new ArrayList<ClassRefBuilder>();
+      this.extendsList = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= extendsList.size()) {
@@ -1539,7 +1616,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToImplementsList(int index, ClassRef item) {
     if (this.implementsList == null) {
-      this.implementsList = new ArrayList<ClassRefBuilder>();
+      this.implementsList = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= implementsList.size()) {
@@ -1554,7 +1631,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToInnerTypes(int index, TypeDef item) {
     if (this.innerTypes == null) {
-      this.innerTypes = new ArrayList<TypeDefBuilder>();
+      this.innerTypes = new ArrayList();
     }
     TypeDefBuilder builder = new TypeDefBuilder(item);
     if (index < 0 || index >= innerTypes.size()) {
@@ -1569,7 +1646,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToMethods(int index, Method item) {
     if (this.methods == null) {
-      this.methods = new ArrayList<MethodBuilder>();
+      this.methods = new ArrayList();
     }
     MethodBuilder builder = new MethodBuilder(item);
     if (index < 0 || index >= methods.size()) {
@@ -1584,7 +1661,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToParameters(int index, TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
     if (index < 0 || index >= parameters.size()) {
@@ -1599,7 +1676,7 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
 
   public A setToProperties(int index, Property item) {
     if (this.properties == null) {
-      this.properties = new ArrayList<PropertyBuilder>();
+      this.properties = new ArrayList();
     }
     PropertyBuilder builder = new PropertyBuilder(item);
     if (index < 0 || index >= properties.size()) {
@@ -1615,55 +1692,67 @@ public class TypeDefFluent<A extends TypeDefFluent<A>> extends ModifierSupportFl
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (kind != null) {
+    if (!(kind == null)) {
       sb.append("kind:");
-      sb.append(kind + ",");
+      sb.append(kind);
+      sb.append(",");
     }
-    if (packageName != null) {
+    if (!(packageName == null)) {
       sb.append("packageName:");
-      sb.append(packageName + ",");
+      sb.append(packageName);
+      sb.append(",");
     }
-    if (name != null) {
+    if (!(name == null)) {
       sb.append("name:");
-      sb.append(name + ",");
+      sb.append(name);
+      sb.append(",");
     }
-    if (comments != null && !comments.isEmpty()) {
+    if (!(comments == null) && !(comments.isEmpty())) {
       sb.append("comments:");
-      sb.append(comments + ",");
+      sb.append(comments);
+      sb.append(",");
     }
-    if (annotations != null && !annotations.isEmpty()) {
+    if (!(annotations == null) && !(annotations.isEmpty())) {
       sb.append("annotations:");
-      sb.append(annotations + ",");
+      sb.append(annotations);
+      sb.append(",");
     }
-    if (extendsList != null && !extendsList.isEmpty()) {
+    if (!(extendsList == null) && !(extendsList.isEmpty())) {
       sb.append("extendsList:");
-      sb.append(extendsList + ",");
+      sb.append(extendsList);
+      sb.append(",");
     }
-    if (implementsList != null && !implementsList.isEmpty()) {
+    if (!(implementsList == null) && !(implementsList.isEmpty())) {
       sb.append("implementsList:");
-      sb.append(implementsList + ",");
+      sb.append(implementsList);
+      sb.append(",");
     }
-    if (parameters != null && !parameters.isEmpty()) {
+    if (!(parameters == null) && !(parameters.isEmpty())) {
       sb.append("parameters:");
-      sb.append(parameters + ",");
+      sb.append(parameters);
+      sb.append(",");
     }
-    if (properties != null && !properties.isEmpty()) {
+    if (!(properties == null) && !(properties.isEmpty())) {
       sb.append("properties:");
-      sb.append(properties + ",");
+      sb.append(properties);
+      sb.append(",");
     }
-    if (constructors != null && !constructors.isEmpty()) {
+    if (!(constructors == null) && !(constructors.isEmpty())) {
       sb.append("constructors:");
-      sb.append(constructors + ",");
+      sb.append(constructors);
+      sb.append(",");
     }
-    if (methods != null && !methods.isEmpty()) {
+    if (!(methods == null) && !(methods.isEmpty())) {
       sb.append("methods:");
-      sb.append(methods + ",");
+      sb.append(methods);
+      sb.append(",");
     }
-    if (outerTypeName != null) {
+    if (!(outerTypeName == null)) {
       sb.append("outerTypeName:");
-      sb.append(outerTypeName + ",");
+      sb.append(outerTypeName);
+      sb.append(",");
     }
-    if (innerTypes != null && !innerTypes.isEmpty()) {
+    if (!(innerTypes == null) && !(innerTypes.isEmpty())) {
       sb.append("innerTypes:");
       sb.append(innerTypes);
     }

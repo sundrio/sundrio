@@ -4,11 +4,13 @@ import java.lang.Class;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import io.sundr.builder.BaseFluent;
@@ -19,7 +21,7 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
+public class NewArrayFluent<A extends io.sundr.model.NewArrayFluent<A>> extends BaseFluent<A> {
 
   private ArrayList<VisitableBuilder<? extends Expression, ?>> expressions = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
   private VisitableBuilder<? extends TypeRef, ?> type;
@@ -33,7 +35,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   public A addAllToExpressions(Collection<Expression> items) {
     if (this.expressions == null) {
-      this.expressions = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.expressions = new ArrayList();
     }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
@@ -64,7 +66,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewBitwiseAndExpression(Object left, Object right) {
-    return (A) addToExpressions(new BitwiseAnd(left, right));
+    return (A) this.addToExpressions(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndExpressionsNested<A> addNewBitwiseAndExpressionLike(BitwiseAnd item) {
@@ -76,7 +78,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewBitwiseOrExpression(Object left, Object right) {
-    return (A) addToExpressions(new BitwiseOr(left, right));
+    return (A) this.addToExpressions(new BitwiseOr(left, right));
   }
 
   public BitwiseOrExpressionsNested<A> addNewBitwiseOrExpressionLike(BitwiseOr item) {
@@ -112,7 +114,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewContextRefExpression(String name) {
-    return (A) addToExpressions(new ContextRef(name));
+    return (A) this.addToExpressions(new ContextRef(name));
   }
 
   public ContextRefExpressionsNested<A> addNewContextRefExpressionLike(ContextRef item) {
@@ -124,11 +126,11 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewDeclareExpression(Class type, String name) {
-    return (A) addToExpressions(new Declare(type, name));
+    return (A) this.addToExpressions(new Declare(type, name));
   }
 
   public A addNewDeclareExpression(Class type, String name, Object value) {
-    return (A) addToExpressions(new Declare(type, name, value));
+    return (A) this.addToExpressions(new Declare(type, name, value));
   }
 
   public DeclareExpressionsNested<A> addNewDeclareExpressionLike(Declare item) {
@@ -140,7 +142,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewDivideExpression(Object left, Object right) {
-    return (A) addToExpressions(new Divide(left, right));
+    return (A) this.addToExpressions(new Divide(left, right));
   }
 
   public DivideExpressionsNested<A> addNewDivideExpressionLike(Divide item) {
@@ -176,7 +178,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewEqualsExpression(Object left, Object right) {
-    return (A) addToExpressions(new Equals(left, right));
+    return (A) this.addToExpressions(new Equals(left, right));
   }
 
   public EqualsExpressionsNested<A> addNewEqualsExpressionLike(Equals item) {
@@ -188,7 +190,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewGreaterThanExpression(Object left, Object right) {
-    return (A) addToExpressions(new GreaterThan(left, right));
+    return (A) this.addToExpressions(new GreaterThan(left, right));
   }
 
   public GreaterThanExpressionsNested<A> addNewGreaterThanExpressionLike(GreaterThan item) {
@@ -200,7 +202,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewGreaterThanOrEqualExpression(Object left, Object right) {
-    return (A) addToExpressions(new GreaterThanOrEqual(left, right));
+    return (A) this.addToExpressions(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualExpressionsNested<A> addNewGreaterThanOrEqualExpressionLike(GreaterThanOrEqual item) {
@@ -244,7 +246,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewLeftShiftExpression(Object left, Object right) {
-    return (A) addToExpressions(new LeftShift(left, right));
+    return (A) this.addToExpressions(new LeftShift(left, right));
   }
 
   public LeftShiftExpressionsNested<A> addNewLeftShiftExpressionLike(LeftShift item) {
@@ -256,7 +258,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewLessThanExpression(Object left, Object right) {
-    return (A) addToExpressions(new LessThan(left, right));
+    return (A) this.addToExpressions(new LessThan(left, right));
   }
 
   public LessThanExpressionsNested<A> addNewLessThanExpressionLike(LessThan item) {
@@ -268,7 +270,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewLessThanOrEqualExpression(Object left, Object right) {
-    return (A) addToExpressions(new LessThanOrEqual(left, right));
+    return (A) this.addToExpressions(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualExpressionsNested<A> addNewLessThanOrEqualExpressionLike(LessThanOrEqual item) {
@@ -280,7 +282,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewLogicalAndExpression(Object left, Object right) {
-    return (A) addToExpressions(new LogicalAnd(left, right));
+    return (A) this.addToExpressions(new LogicalAnd(left, right));
   }
 
   public LogicalAndExpressionsNested<A> addNewLogicalAndExpressionLike(LogicalAnd item) {
@@ -292,7 +294,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewLogicalOrExpression(Object left, Object right) {
-    return (A) addToExpressions(new LogicalOr(left, right));
+    return (A) this.addToExpressions(new LogicalOr(left, right));
   }
 
   public LogicalOrExpressionsNested<A> addNewLogicalOrExpressionLike(LogicalOr item) {
@@ -312,7 +314,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewMinusExpression(Object left, Object right) {
-    return (A) addToExpressions(new Minus(left, right));
+    return (A) this.addToExpressions(new Minus(left, right));
   }
 
   public MinusExpressionsNested<A> addNewMinusExpressionLike(Minus item) {
@@ -324,7 +326,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewModuloExpression(Object left, Object right) {
-    return (A) addToExpressions(new Modulo(left, right));
+    return (A) this.addToExpressions(new Modulo(left, right));
   }
 
   public ModuloExpressionsNested<A> addNewModuloExpressionLike(Modulo item) {
@@ -336,7 +338,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewMultiplyExpression(Object left, Object right) {
-    return (A) addToExpressions(new Multiply(left, right));
+    return (A) this.addToExpressions(new Multiply(left, right));
   }
 
   public MultiplyExpressionsNested<A> addNewMultiplyExpressionLike(Multiply item) {
@@ -356,7 +358,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewNewArrayExpression(Class type, Integer[] sizes) {
-    return (A) addToExpressions(new NewArray(type, sizes));
+    return (A) this.addToExpressions(new NewArray(type, sizes));
   }
 
   public NewArrayExpressionsNested<A> addNewNewArrayExpressionLike(NewArray item) {
@@ -368,7 +370,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewNotEqualsExpression(Object left, Object right) {
-    return (A) addToExpressions(new NotEquals(left, right));
+    return (A) this.addToExpressions(new NotEquals(left, right));
   }
 
   public NotEqualsExpressionsNested<A> addNewNotEqualsExpressionLike(NotEquals item) {
@@ -388,7 +390,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewPlusExpression(Object left, Object right) {
-    return (A) addToExpressions(new Plus(left, right));
+    return (A) this.addToExpressions(new Plus(left, right));
   }
 
   public PlusExpressionsNested<A> addNewPlusExpressionLike(Plus item) {
@@ -456,7 +458,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewRightShiftExpression(Object left, Object right) {
-    return (A) addToExpressions(new RightShift(left, right));
+    return (A) this.addToExpressions(new RightShift(left, right));
   }
 
   public RightShiftExpressionsNested<A> addNewRightShiftExpressionLike(RightShift item) {
@@ -468,7 +470,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewRightUnsignedShiftExpression(Object left, Object right) {
-    return (A) addToExpressions(new RightUnsignedShift(left, right));
+    return (A) this.addToExpressions(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftExpressionsNested<A> addNewRightUnsignedShiftExpressionLike(RightUnsignedShift item) {
@@ -504,7 +506,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewValueRefExpression(Object value) {
-    return (A) addToExpressions(new ValueRef(value));
+    return (A) this.addToExpressions(new ValueRef(value));
   }
 
   public ValueRefExpressionsNested<A> addNewValueRefExpressionLike(ValueRef item) {
@@ -516,7 +518,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A addNewXorExpression(Object left, Object right) {
-    return (A) addToExpressions(new Xor(left, right));
+    return (A) this.addToExpressions(new Xor(left, right));
   }
 
   public XorExpressionsNested<A> addNewXorExpressionLike(Xor item) {
@@ -525,7 +527,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   public A addToExpressions(VisitableBuilder<? extends Expression, ?> builder) {
     if (this.expressions == null) {
-      this.expressions = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.expressions = new ArrayList();
     }
     _visitables.get("expressions").add(builder);
     this.expressions.add(builder);
@@ -534,7 +536,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   public A addToExpressions(Expression... items) {
     if (this.expressions == null) {
-      this.expressions = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.expressions = new ArrayList();
     }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
@@ -546,7 +548,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   public A addToExpressions(int index, VisitableBuilder<? extends Expression, ?> builder) {
     if (this.expressions == null) {
-      this.expressions = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.expressions = new ArrayList();
     }
     if (index < 0 || index >= expressions.size()) {
       _visitables.get("expressions").add(builder);
@@ -560,7 +562,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   public A addToExpressions(int index, Expression item) {
     if (this.expressions == null) {
-      this.expressions = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.expressions = new ArrayList();
     }
     VisitableBuilder<? extends Expression, ?> builder = builder(item);
     if (index < 0 || index >= expressions.size()) {
@@ -604,112 +606,219 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "ClassRef":
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "PrimitiveRef":
+
+      case "PrimitiveRef":
+
         return (VisitableBuilder<T, ?>) new PrimitiveRefBuilder((PrimitiveRef) item);
-      case "io.sundr.model." + "VoidRef":
+
+      case "VoidRef":
+
         return (VisitableBuilder<T, ?>) new VoidRefBuilder((VoidRef) item);
-      case "io.sundr.model." + "TypeParamRef":
+
+      case "TypeParamRef":
+
         return (VisitableBuilder<T, ?>) new TypeParamRefBuilder((TypeParamRef) item);
-      case "io.sundr.model." + "WildcardRef":
+
+      case "WildcardRef":
+
         return (VisitableBuilder<T, ?>) new WildcardRefBuilder((WildcardRef) item);
-      case "io.sundr.model." + "Multiply":
+
+      case "Multiply":
+
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
-      case "io.sundr.model." + "NewArray":
+
+      case "NewArray":
+
         return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
-      case "io.sundr.model." + "InstanceOf":
+
+      case "InstanceOf":
+
         return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
-      case "io.sundr.model." + "MethodCall":
+
+      case "MethodCall":
+
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
-      case "io.sundr.model." + "Inverse":
+
+      case "Inverse":
+
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
-      case "io.sundr.model." + "Index":
+
+      case "Index":
+
         return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
-      case "io.sundr.model." + "GreaterThanOrEqual":
+
+      case "GreaterThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
-      case "io.sundr.model." + "BitwiseAnd":
+
+      case "BitwiseAnd":
+
         return (VisitableBuilder<T, ?>) new BitwiseAndBuilder((BitwiseAnd) item);
-      case "io.sundr.model." + "Minus":
+
+      case "Minus":
+
         return (VisitableBuilder<T, ?>) new MinusBuilder((Minus) item);
-      case "io.sundr.model." + "LogicalOr":
+
+      case "LogicalOr":
+
         return (VisitableBuilder<T, ?>) new LogicalOrBuilder((LogicalOr) item);
-      case "io.sundr.model." + "NotEquals":
+
+      case "NotEquals":
+
         return (VisitableBuilder<T, ?>) new NotEqualsBuilder((NotEquals) item);
-      case "io.sundr.model." + "Divide":
+
+      case "Divide":
+
         return (VisitableBuilder<T, ?>) new DivideBuilder((Divide) item);
-      case "io.sundr.model." + "LessThan":
+
+      case "LessThan":
+
         return (VisitableBuilder<T, ?>) new LessThanBuilder((LessThan) item);
-      case "io.sundr.model." + "BitwiseOr":
+
+      case "BitwiseOr":
+
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
-      case "io.sundr.model." + "PropertyRef":
+
+      case "PropertyRef":
+
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
-      case "io.sundr.model." + "RightShift":
+
+      case "RightShift":
+
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
-      case "io.sundr.model." + "Super":
+
+      case "Super":
+
         return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
-      case "io.sundr.model." + "GreaterThan":
+
+      case "GreaterThan":
+
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
-      case "io.sundr.model." + "Declare":
+
+      case "Declare":
+
         return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
-      case "io.sundr.model." + "Cast":
+
+      case "Cast":
+
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
-      case "io.sundr.model." + "Modulo":
+
+      case "Modulo":
+
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
-      case "io.sundr.model." + "DotClass":
+
+      case "DotClass":
+
         return (VisitableBuilder<T, ?>) new DotClassBuilder((DotClass) item);
-      case "io.sundr.model." + "ValueRef":
+
+      case "ValueRef":
+
         return (VisitableBuilder<T, ?>) new ValueRefBuilder((ValueRef) item);
-      case "io.sundr.model." + "LeftShift":
+
+      case "LeftShift":
+
         return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
-      case "io.sundr.model." + "Empty":
+
+      case "Empty":
+
         return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
-      case "io.sundr.model." + "Ternary":
+
+      case "Ternary":
+
         return (VisitableBuilder<T, ?>) new TernaryBuilder((Ternary) item);
-      case "io.sundr.model." + "BinaryExpression":
+
+      case "BinaryExpression":
+
         return (VisitableBuilder<T, ?>) new BinaryExpressionBuilder((BinaryExpression) item);
-      case "io.sundr.model." + "Equals":
+
+      case "Equals":
+
         return (VisitableBuilder<T, ?>) new EqualsBuilder((Equals) item);
-      case "io.sundr.model." + "Enclosed":
+
+      case "Enclosed":
+
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
-      case "io.sundr.model." + "PreDecrement":
+
+      case "PreDecrement":
+
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
-      case "io.sundr.model." + "PostDecrement":
+
+      case "PostDecrement":
+
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
-      case "io.sundr.model." + "Lambda":
+
+      case "Lambda":
+
         return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
-      case "io.sundr.model." + "Not":
+
+      case "Not":
+
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
-      case "io.sundr.model." + "Assign":
+
+      case "Assign":
+
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "This":
+
+      case "This":
+
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
-      case "io.sundr.model." + "Negative":
+
+      case "Negative":
+
         return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
-      case "io.sundr.model." + "LogicalAnd":
+
+      case "LogicalAnd":
+
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
-      case "io.sundr.model." + "PostIncrement":
+
+      case "PostIncrement":
+
         return (VisitableBuilder<T, ?>) new PostIncrementBuilder((PostIncrement) item);
-      case "io.sundr.model." + "RightUnsignedShift":
+
+      case "RightUnsignedShift":
+
         return (VisitableBuilder<T, ?>) new RightUnsignedShiftBuilder((RightUnsignedShift) item);
-      case "io.sundr.model." + "Plus":
+
+      case "Plus":
+
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
-      case "io.sundr.model." + "Construct":
+
+      case "Construct":
+
         return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-      case "io.sundr.model." + "Xor":
+
+      case "Xor":
+
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
-      case "io.sundr.model." + "PreIncrement":
+
+      case "PreIncrement":
+
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
-      case "io.sundr.model." + "Property":
+
+      case "Property":
+
         return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
-      case "io.sundr.model." + "LessThanOrEqual":
+
+      case "LessThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
-      case "io.sundr.model." + "ContextRef":
+
+      case "ContextRef":
+
         return (VisitableBuilder<T, ?>) new ContextRefBuilder((ContextRef) item);
-      case "io.sundr.model." + "Positive":
+
+      case "Positive":
+
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(NewArray instance) {
@@ -720,17 +829,22 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     NewArrayFluent that = (NewArrayFluent) o;
-    if (!java.util.Objects.equals(type, that.type))
+    if (!(Objects.equals(type, that.type))) {
       return false;
-    if (!java.util.Objects.equals(expressions, that.expressions))
+    }
+    if (!(Objects.equals(expressions, that.expressions))) {
       return false;
+    }
     return true;
   }
 
@@ -752,12 +866,13 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(type, expressions, super.hashCode());
+    return Objects.hash(type, expressions);
   }
 
   public A removeAllFromExpressions(Collection<Expression> items) {
-    if (this.expressions == null)
+    if (this.expressions == null) {
       return (A) this;
+    }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
       _visitables.get("expressions").remove(builder);
@@ -767,16 +882,18 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A removeFromExpressions(VisitableBuilder<? extends Expression, ?> builder) {
-    if (this.expressions == null)
+    if (this.expressions == null) {
       return (A) this;
+    }
     _visitables.get("expressions").remove(builder);
     this.expressions.remove(builder);
     return (A) this;
   }
 
   public A removeFromExpressions(Expression... items) {
-    if (this.expressions == null)
+    if (this.expressions == null) {
       return (A) this;
+    }
     for (Expression item : items) {
       VisitableBuilder<? extends Expression, ?> builder = builder(item);
       _visitables.get("expressions").remove(builder);
@@ -786,10 +903,11 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   }
 
   public A removeMatchingFromExpressions(Predicate<VisitableBuilder<? extends Expression, ?>> predicate) {
-    if (expressions == null)
+    if (expressions == null) {
       return (A) this;
-    final Iterator<VisitableBuilder<? extends Expression, ?>> each = expressions.iterator();
-    final List visitables = _visitables.get("expressions");
+    }
+    Iterator<VisitableBuilder<? extends Expression, ?>> each = expressions.iterator();
+    List visitables = _visitables.get("expressions");
     while (each.hasNext()) {
       VisitableBuilder<? extends Expression, ?> builder = each.next();
       if (predicate.test(builder)) {
@@ -994,7 +1112,7 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
 
   public A setToExpressions(int index, Expression item) {
     if (this.expressions == null) {
-      this.expressions = new ArrayList<VisitableBuilder<? extends Expression, ?>>();
+      this.expressions = new ArrayList();
     }
     VisitableBuilder<? extends Expression, ?> builder = builder(item);
     if (index < 0 || index >= expressions.size()) {
@@ -1010,11 +1128,12 @@ public class NewArrayFluent<A extends NewArrayFluent<A>> extends BaseFluent<A> {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (type != null) {
+    if (!(type == null)) {
       sb.append("type:");
-      sb.append(type + ",");
+      sb.append(type);
+      sb.append(",");
     }
-    if (expressions != null && !expressions.isEmpty()) {
+    if (!(expressions == null) && !(expressions.isEmpty())) {
       sb.append("expressions:");
       sb.append(expressions);
     }

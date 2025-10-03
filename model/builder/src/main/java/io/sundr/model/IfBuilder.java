@@ -25,7 +25,7 @@ public class IfBuilder extends IfFluent<IfBuilder> implements VisitableBuilder<I
   }
 
   public If build() {
-    If buildable = new If(fluent.buildCondition(), fluent.buildStatement(), fluent.getElseStatement());
+    If buildable = new If(fluent.buildCondition(), fluent.buildStatement(), fluent.buildElseStatement());
     return buildable;
   }
 
