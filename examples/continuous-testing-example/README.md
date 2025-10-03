@@ -1,6 +1,8 @@
-# Continuous Testing Example
+# Continuous Testing Example (EXPERIMENTAL)
 
-This example demonstrates the continuous testing functionality of the Sundrio Maven plugin.
+This example demonstrates the **experimental** continuous testing functionality of the Sundrio Maven plugin.
+
+> **Note**: This feature is experimental and was added primarily as a way to test the limits of the Sundrio model itself and to further push the barriers of what's possible with code analysis and intelligent test execution.
 
 ## What it does
 
@@ -78,6 +80,80 @@ If you modify the `Calculator.java` file, only `CalculatorTest` will be executed
 If you modify the `StringUtils.java` file, only `StringUtilsTest` will be executed.
 
 This provides much faster feedback during development compared to running the entire test suite on every change.
+
+## Example Output
+
+When running continuous testing, you'll see output like this:
+
+```
+Continuous Testing: Tracking 32 test methods
+[INFO] /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/main/java/io/sundr/FunctionFactory.java: Some input files use unchecked or unsafe operations.
+[INFO] /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/main/java/io/sundr/FunctionFactory.java: Recompile with -Xlint:unchecked for details.
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/test/resources
+[INFO] Recompiling the module because of changed dependency.
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 8 source files with javac [debug release 11] to target/test-classes
+[INFO] --- surefire:3.5.2:test (default-test) @ sundr-core ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junit4.JUnit4Provider
+[INFO] -------------------------------------------------------
+[INFO] -------------------------------------------------------
+[INFO] Running io.sundr.utils.MapsTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.069 s -- in io.sundr.utils.MapsTest
+[INFO] Results:
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.828 s
+[INFO] Finished at: 2025-10-03T17:46:15+03:00
+[INFO] ------------------------------------------------------------------------
+
+
+✅ Tests: 32 methods, 32 ✓ | Last run: 4 run, 4 ✓
+[Q]uit | [D]ependency tree | [R]estart | [H]elp
+```
+
+The interface shows:
+- **Tracking Status**: Total number of test methods being monitored
+- **Smart Execution**: Only 4 out of 32 tests were run (those affected by the change)
+- **Real-time Feedback**: Interactive status line with test results
+- **Controls**: Keyboard shortcuts for quit, dependency analysis, restart, and help
+
+### Dependency Tree Analysis
+
+Pressing `[D]` shows the dependency tree for troubleshooting and clarity:
+
+```
+🌳 Dependency Tree - From Last Changes to Affected Tests
+
+
+📁 Changes Types:
+  ✏️  Modified: io.sundr.utils.Maps
+    📋 Method changes: 1
+      └─ MODIFIED: public static java.lang.String extractKey(java.lang.String mapping) (implementation changed)
+
+🌳 Method Dependency Tree:
+
+  Maps.extractKey
+  \- Maps.create
+     +- MapsTest.shouldCreateMapWithOneElement
+     +- MapsTest.shouldCreateMapWithThreeElements
+     +- MapsTest.shouldCreateMapWithTwoElements
+     \- MapsTest.shouldCreateFromMapping
+
+📄 Affected Test Files:
+  └─ /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/test/java/io/sundr/utils/MapsTest.java
+
+
+Press any key to return to continuous testing...
+```
+
+This view helps understand:
+- **What Changed**: Which classes and methods were modified
+- **Impact Analysis**: How changes propagate through method dependencies
+- **Test Selection**: Why specific tests were chosen to run
+- **Dependency Chain**: The exact path from source changes to affected tests
 
 ## Limitations
 
