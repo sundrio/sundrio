@@ -7,7 +7,6 @@ import java.util.Set;
 import io.sundr.adapter.source.Project;
 import io.sundr.adapter.source.change.Change;
 import io.sundr.adapter.source.change.ChangeSet;
-import io.sundr.adapter.source.change.ChangeType;
 import io.sundr.builder.Visitor;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
@@ -100,25 +99,10 @@ public class ImpactAnalyzer {
 
         MethodReference rootMethodRef = new MethodReference(repositoryMethod, owningType);
 
-        // For removed or modified methods, find all methods that reference this method
-        if (methodChange.getChangeType() == ChangeType.REMOVED || methodChange.getChangeType() == ChangeType.MODIFIED) {
-          // Start building the tree with the changed method as root
-          dependencyTree.addDependency(rootMethodRef);
-          buildTransitiveDependencyTree(rootMethodRef, dependencyTree, new HashSet<>());
-        } else {
-          // For added methods, just add the root
-          dependencyTree.addDependency(rootMethodRef);
-        }
-
-        // For added or modified methods, use MethodReference.getMethodReferences() to get dependencies
-        if (methodChange.getChangeType() == ChangeType.ADDED || methodChange.getChangeType() == ChangeType.MODIFIED) {
-          Set<MethodReference> callees = MethodReference.getMethodReferences(changedMethod, repository);
-
-          // Build dependency tree: the changed method depends on its callees
-          for (MethodReference callee : callees) {
-            dependencyTree.addDependency(rootMethodRef, callee);
-          }
-        }
+        // For all method changes, build the dependency tree showing impact propagation
+        // Root is the changed method, children are methods that call it (callers)
+        dependencyTree.addDependency(rootMethodRef);
+        buildTransitiveDependencyTree(rootMethodRef, dependencyTree, new HashSet<>());
       }
     }
   }
@@ -159,7 +143,6 @@ public class ImpactAnalyzer {
 
     // Find direct callers of the target method using the new reverse lookup method
     Set<MethodReference> directCallers = MethodReference.getDirectMethodCallers(target, repository);
-
     for (MethodReference caller : directCallers) {
       // Add the caller as a child of the target (target impacts caller)
       dependencyTree.addDependency(target, caller);
