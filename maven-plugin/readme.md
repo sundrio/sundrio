@@ -1,6 +1,6 @@
 ## Sundrio: Maven Plugin.
 
-The sundrio maven plugin can be used to generate BOMs for multi-module projects.
+The sundrio maven plugin can be used to generate BOMs for multi-module projects and provides experimental continuous testing capabilities.
 
 
 ### Generating a BOM.
@@ -67,3 +67,35 @@ Here's an example:
             </boms>
         </configuration>
     </plugin>
+
+### Continuous Testing (EXPERIMENTAL)
+
+The `continuous-test` goal provides intelligent test execution based on file changes. This is an **experimental feature** that was added primarily as a way to test the limits of the Sundrio model itself and to further push the barriers of what's possible with code analysis.
+
+#### Features
+
+- **Smart Test Execution**: Only runs tests affected by source code changes
+- **Real-time File Watching**: Monitors source and test directories for changes
+- **Dependency Analysis**: Uses Sundrio's TypeDef model to map test dependencies
+
+#### Basic Usage
+
+```bash
+mvn io.sundr:sundr-maven-plugin:continuous-test
+```
+
+#### Configuration
+
+```xml
+<plugin>
+    <groupId>io.sundr</groupId>
+    <artifactId>sundr-maven-plugin</artifactId>
+    <version>${sundrio.version}</version>
+    <configuration>
+        <testIncludes>**/*Test.java,**/Test*.java,**/*Tests.java</testIncludes>
+        <testGoal>test</testGoal>
+    </configuration>
+</plugin>
+```
+
+**Note**: This feature is experimental and primarily serves as a demonstration of Sundrio's advanced code analysis capabilities. See the [continuous-testing-example](../examples/continuous-testing-example) for a complete working example.
