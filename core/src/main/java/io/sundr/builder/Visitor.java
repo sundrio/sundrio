@@ -21,15 +21,40 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+/**
+ * Interface for visiting objects of a specific type.
+ * Provides a visitor pattern implementation that can traverse and operate on objects.
+ * This interface supports both simple visiting and path-aware visiting.
+ *
+ * @param <T> the type of objects this visitor can visit
+ */
 @FunctionalInterface
 public interface Visitor<T> {
 
+  /**
+   * Visits the specified element.
+   *
+   * @param element the element to visit
+   */
   void visit(T element);
 
+  /**
+   * Visits the specified element with path information.
+   * By default, this delegates to the simple visit method.
+   *
+   * @param path the path to the element being visited
+   * @param element the element to visit
+   */
   default void visit(List<Entry<String, Object>> path, T element) {
     visit(element);
   }
 
+  /**
+   * Gets the type of objects this visitor can handle.
+   * Uses reflection to determine the generic type parameter.
+   *
+   * @return the class of objects this visitor handles, or null if not determinable
+   */
   default Class<T> getType() {
     List<Class> args = Visitors.getTypeArguments(Visitor.class, getClass());
     if (args == null || args.isEmpty()) {
@@ -58,6 +83,12 @@ public interface Visitor<T> {
     }
   }
 
+  /**
+   * Gets the requirement predicate for this visitor.
+   * The predicate determines whether this visitor should process a given path.
+   *
+   * @return a predicate that evaluates to true if this visitor should process the path
+   */
   default Predicate<List<Entry<String, Object>>> getRequirement() {
     return p -> true;
   }
@@ -91,6 +122,12 @@ public interface Visitor<T> {
     return false;
   }
 
+  /**
+   * Gets the processing order for this visitor.
+   * Visitors with lower order values are processed first.
+   *
+   * @return the order value, defaults to 0
+   */
   default int order() {
     return 0;
   }

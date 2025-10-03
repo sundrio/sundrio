@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 import org.fusesource.jansi.AnsiConsole;
 
 /**
- * TermFrame: Pin a header & footer; print safely in-between.
+ * TermFrame: Pin a header &amp; footer; print safely in-between.
  * - Dynamic resize (watches rows/cols; redraws frame).
  * - Every printed line is cleared first to avoid leftovers.
  * - Clear content region without touching header/footer.
@@ -93,12 +93,22 @@ public class TermFrame implements AutoCloseable {
         Key.ESC.getKeyCode(), null);
   }
 
-  /** Create a new TermFrame with default settings. */
+  /**
+   * Create a new TermFrame with default settings.
+   *
+   * @return a new TermFrame instance
+   */
   public static TermFrame newFrame() {
     return new TermFrame(() -> "", () -> "", null, null, null);
   }
 
-  /** Create a new TermFrame with header and footer suppliers. */
+  /**
+   * Create a new TermFrame with header and footer suppliers.
+   *
+   * @param headerSupplier supplier for header content
+   * @param footerSupplier supplier for footer content
+   * @return a new TermFrame instance
+   */
   public static TermFrame newFrame(Supplier<String> headerSupplier, Supplier<String> footerSupplier) {
     return new TermFrame(headerSupplier, footerSupplier, null, null, null);
   }
@@ -182,7 +192,11 @@ public class TermFrame implements AutoCloseable {
     }
   }
 
-  /** Print a scrolling line in the content area; always clears line first. */
+  /**
+   * Print a scrolling line in the content area; always clears line first.
+   *
+   * @param s the string to print
+   */
   public void println(String s) {
     synchronized (renderLock) {
       if (!started) {
@@ -220,7 +234,12 @@ public class TermFrame implements AutoCloseable {
     }
   }
 
-  /** Overwrite a specific content row (0-based) without scrolling; clears that line first. */
+  /**
+   * Overwrite a specific content row (0-based) without scrolling; clears that line first.
+   *
+   * @param rowOffset the row offset (0-based) within the content area
+   * @param s the string to print
+   */
   public void printAt(int rowOffset, String s) {
     synchronized (renderLock) {
       int absRow = contentTop + rowOffset;
@@ -233,41 +252,79 @@ public class TermFrame implements AutoCloseable {
     }
   }
 
-  /** Get the TermInput instance for reading key input */
+  /**
+   * Get the TermInput instance for reading key input.
+   *
+   * @return the TermInput instance
+   */
   public TermInput getTermInput() {
     return termInput;
   }
 
   // --- Key Binding System ---
 
-  /** Create a new TermFrame with a header supplier. */
+  /**
+   * Create a new TermFrame with a header supplier.
+   *
+   * @param headerSupplier supplier for header content
+   * @return a new TermFrame instance with the specified header
+   */
   public TermFrame withHeader(Supplier<String> headerSupplier) {
     return new TermFrame(headerSupplier, this.footerSupplier, null, null, this.termInput,
         this.keyBindings, this.helpKey, this.exitKey, this.keyListeners);
   }
 
-  /** Create a new TermFrame with a header string. */
+  /**
+   * Create a new TermFrame with a header string.
+   *
+   * @param header the header text to display
+   * @return a new TermFrame instance with the specified header
+   */
   public TermFrame withHeader(String header) {
     return withHeader(() -> header);
   }
 
-  /** Create a new TermFrame with a footer supplier. */
+  /**
+   * Create a new TermFrame with a footer supplier.
+   *
+   * @param footerSupplier supplier for dynamic footer content
+   * @return a new TermFrame instance with the specified footer supplier
+   */
   public TermFrame withFooter(Supplier<String> footerSupplier) {
     return new TermFrame(this.headerSupplier, footerSupplier, null, null, this.termInput,
         this.keyBindings, this.helpKey, this.exitKey, this.keyListeners);
   }
 
-  /** Create a new TermFrame with a footer string. */
+  /**
+   * Create a new TermFrame with a footer string.
+   *
+   * @param footer the footer text to display
+   * @return a new TermFrame instance with the specified footer
+   */
   public TermFrame withFooter(String footer) {
     return withFooter(() -> footer);
   }
 
-  /** Create a new TermFrame with a key binding. */
+  /**
+   * Create a new TermFrame with a key binding.
+   *
+   * @param key the key to bind
+   * @param description description of the key binding for help display
+   * @param action the action to execute when the key is pressed
+   * @return a new TermFrame instance with the specified key binding
+   */
   public TermFrame withKeyBinding(Key key, String description, Consumer<TermFrame> action) {
     return withKeyBinding(key.getKeyCode(), description, action);
   }
 
-  /** Create a new TermFrame with a key binding. */
+  /**
+   * Create a new TermFrame with a key binding.
+   *
+   * @param keyCode the key code to bind
+   * @param description description of the key binding for help display
+   * @param action the action to execute when the key is pressed
+   * @return a new TermFrame instance with the specified key binding
+   */
   public TermFrame withKeyBinding(int keyCode, String description, Consumer<TermFrame> action) {
     Map<Integer, KeyBinding> newBindings = new HashMap<>(this.keyBindings);
     newBindings.put(keyCode, new KeyBinding(keyCode, description, action));
@@ -275,25 +332,45 @@ public class TermFrame implements AutoCloseable {
         newBindings, this.helpKey, this.exitKey, this.keyListeners);
   }
 
-  /** Create a new TermFrame with an exit key. */
+  /**
+   * Create a new TermFrame with an exit key.
+   *
+   * @param exitKey the key that will trigger exit from the terminal frame
+   * @return a new TermFrame instance with the specified exit key
+   */
   public TermFrame withExitKey(Key exitKey) {
     return new TermFrame(this.headerSupplier, this.footerSupplier, null, null, this.termInput,
         this.keyBindings, this.helpKey, exitKey.getKeyCode(), this.keyListeners);
   }
 
-  /** Create a new TermFrame with a help key. */
+  /**
+   * Create a new TermFrame with a help key.
+   *
+   * @param helpKey the key that will trigger the help screen display
+   * @return a new TermFrame instance with the specified help key
+   */
   public TermFrame withHelpKey(Key helpKey) {
     return new TermFrame(this.headerSupplier, this.footerSupplier, null, null, this.termInput,
         this.keyBindings, helpKey.getKeyCode(), this.exitKey, this.keyListeners);
   }
 
-  /** Create a new TermFrame with a help key. */
+  /**
+   * Create a new TermFrame with a help key.
+   *
+   * @param keyCode the key code that will trigger the help screen display
+   * @return a new TermFrame instance with the specified help key
+   */
   public TermFrame withHelpKey(int keyCode) {
     return new TermFrame(this.headerSupplier, this.footerSupplier, null, null, this.termInput,
         this.keyBindings, keyCode, this.exitKey, this.keyListeners);
   }
 
-  /** Create a new TermFrame with an additional key listener. */
+  /**
+   * Create a new TermFrame with an additional key listener.
+   *
+   * @param listener the listener that will be notified of key events
+   * @return a new TermFrame instance with the specified key listener
+   */
   public TermFrame withKeyListener(BiConsumer<TermFrame, Integer> listener) {
     List<BiConsumer<TermFrame, Integer>> newListeners = new ArrayList<>(this.keyListeners);
     newListeners.add(listener);
@@ -304,6 +381,7 @@ public class TermFrame implements AutoCloseable {
   /**
    * Process a key press and execute bound actions.
    *
+   * @param keyCode the key code to process
    * @return true to continue, false to exit
    */
   public boolean processKey(int keyCode) {
@@ -421,6 +499,7 @@ public class TermFrame implements AutoCloseable {
    * This is useful for "press any key to continue" scenarios.
    *
    * @param callback called with (termFrame, keyCode) when any key is pressed
+   * @throws Exception if an error occurs while reading key input or if TermFrame is not started
    */
   public void waitForAnyKeyPress(BiConsumer<TermFrame, Integer> callback) throws Exception {
     if (!started || termInput == null) {
@@ -438,6 +517,8 @@ public class TermFrame implements AutoCloseable {
   /**
    * Run the main event loop, processing keys until exit.
    * This method handles the key reading and processing internally.
+   *
+   * @throws Exception if an error occurs while reading key input or if TermFrame is not started
    */
   public void run() throws Exception {
     if (!started) {
@@ -474,18 +555,39 @@ public class TermFrame implements AutoCloseable {
     }
   }
 
+  /**
+   * Get the height of the content area in rows.
+   *
+   * @return the number of rows available for content display
+   */
   public int contentHeight() {
     return contentBottom - contentTop + 1;
   }
 
+  /**
+   * Get the total number of rows in the terminal.
+   *
+   * @return the total number of terminal rows
+   */
   public int rows() {
     return rows;
   }
 
+  /**
+   * Get the total number of columns in the terminal.
+   *
+   * @return the total number of terminal columns
+   */
   public int cols() {
     return cols;
   }
 
+  /**
+   * Set the interval for watching terminal size changes.
+   *
+   * @param ms the watch interval in milliseconds (minimum 50ms)
+   * @return this TermFrame instance for method chaining
+   */
   public TermFrame watchIntervalMs(int ms) {
     this.watchIntervalMs = Math.max(50, ms);
     return this;
@@ -623,6 +725,11 @@ public class TermFrame implements AutoCloseable {
     return new int[] { rows, cols };
   }
 
+  /**
+   * Detect the number of rows in the terminal using system commands.
+   *
+   * @return an Optional containing the number of rows, or empty if detection fails
+   */
   public static Optional<Integer> detectRows() {
     Integer v = runInt("stty size < /dev/tty", 0); // "ROWS COLS"
     if (v != null && v > 0)
@@ -631,6 +738,11 @@ public class TermFrame implements AutoCloseable {
     return (v != null && v > 0) ? Optional.of(v) : Optional.empty();
   }
 
+  /**
+   * Detect the number of columns in the terminal using system commands.
+   *
+   * @return an Optional containing the number of columns, or empty if detection fails
+   */
   public static Optional<Integer> detectCols() {
     Integer v = runInt2("stty size < /dev/tty", 1); // second token = COLS
     if (v != null && v > 0)

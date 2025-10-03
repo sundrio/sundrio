@@ -14,6 +14,12 @@ public class JLineTermInput implements TermInput {
   private final Terminal terminal;
   private volatile boolean closed = false;
 
+  /**
+   * Creates a new JLineTermInput instance.
+   * Initializes the underlying JLine terminal with system defaults.
+   *
+   * @throws RuntimeException if terminal initialization fails
+   */
   public JLineTermInput() {
     try {
       this.terminal = TerminalBuilder.builder()

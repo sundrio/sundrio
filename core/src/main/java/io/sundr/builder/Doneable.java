@@ -16,7 +16,19 @@
 
 package io.sundr.builder;
 
+/**
+ * Interface for objects that can be "done" or completed.
+ * This is typically used in builder patterns to signal that the building process
+ * is complete and the final object should be returned.
+ *
+ * @param <T> the type of object that is produced when done
+ */
 public interface Doneable<T> {
 
+  /**
+   * Completes the building process and returns the final object.
+   *
+   * @return the completed object
+   */
   T done();
 }

@@ -3,18 +3,34 @@ package io.sundr.utils;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * Utility class for building and rendering dependency trees.
+ * Provides functionality to track dependencies between items and visualize them
+ * in a tree format with support for cycle detection.
+ */
 public final class Dependencies {
 
   private Dependencies() {
     // utility class, not instantiable
   }
 
-  /** Static factory: create a new dependency tree */
+  /**
+   * Creates a new dependency tree with default formatting.
+   *
+   * @param <T> the type of items in the dependency tree
+   * @return a new DependencyTree instance
+   */
   public static <T> DependencyTree<T> newTree() {
     return new DependencyTree<>();
   }
 
-  /** Static factory with custom formatter */
+  /**
+   * Creates a new dependency tree with a custom formatter.
+   *
+   * @param <T> the type of items in the dependency tree
+   * @param formatter function to convert items to string representation
+   * @return a new DependencyTree instance with the specified formatter
+   */
   public static <T> DependencyTree<T> newTree(Function<T, String> formatter) {
     return new DependencyTree<>(formatter);
   }
@@ -22,6 +38,12 @@ public final class Dependencies {
   // ======================================================
   // Inner class DependencyTree<T>
   // ======================================================
+  /**
+   * A dependency tree that tracks relationships between items and can render them
+   * in a visual tree format. Supports cycle detection and custom formatting.
+   *
+   * @param <T> the type of items in this dependency tree
+   */
   public static final class DependencyTree<T> {
     private final Map<T, LinkedHashSet<T>> graph = new LinkedHashMap<>();
     private final LinkedHashSet<T> allNodes = new LinkedHashSet<>();
@@ -42,7 +64,14 @@ public final class Dependencies {
       }
     }
 
-    /** Fluent API: add "item" with its direct dependencies. */
+    /**
+     * Adds an item with its direct dependencies to the tree.
+     *
+     * @param item the item to add
+     * @param dependencies the direct dependencies of the item
+     * @return this DependencyTree for method chaining
+     * @throws NullPointerException if item is null
+     */
     @SafeVarargs
     public final DependencyTree<T> addDependency(T item, T... dependencies) {
       Objects.requireNonNull(item, "item");
@@ -60,7 +89,12 @@ public final class Dependencies {
       return this;
     }
 
-    /** Set a custom formatter (optional). */
+    /**
+     * Sets a custom formatter for rendering items.
+     *
+     * @param formatter function to convert items to string representation
+     * @return this DependencyTree for method chaining
+     */
     public DependencyTree<T> withFormatter(Function<T, String> formatter) {
       this.formatter = (formatter != null) ? formatter : new Function<T, String>() {
         @Override
@@ -71,12 +105,21 @@ public final class Dependencies {
       return this;
     }
 
-    /** Get all nodes in the dependency tree. */
+    /**
+     * Gets all nodes in the dependency tree.
+     *
+     * @return a set containing all nodes that have been added to this tree
+     */
     public Set<T> getAllNodes() {
       return new LinkedHashSet<>(allNodes);
     }
 
-    /** Render the whole dependency tree/forest */
+    /**
+     * Renders the entire dependency tree as a formatted string.
+     * Shows all root nodes and their dependencies in tree format.
+     *
+     * @return a string representation of the dependency tree
+     */
     public String render() {
       List<T> roots = computeRoots();
       StringBuilder out = new StringBuilder();
@@ -108,7 +151,13 @@ public final class Dependencies {
       return out.toString();
     }
 
-    /** Render a subtree starting from the given root */
+    /**
+     * Renders a subtree starting from the specified root node.
+     *
+     * @param root the root node to start rendering from
+     * @return a string representation of the subtree
+     * @throws NullPointerException if root is null
+     */
     public String renderFrom(T root) {
       Objects.requireNonNull(root, "root");
       StringBuilder out = new StringBuilder();

@@ -75,7 +75,7 @@ import io.sundr.tui.TermFrame;
 
 /**
  * EXPERIMENTAL: Continuous testing mojo that watches for source changes and runs affected tests.
- * 
+ *
  * This feature was added primarily as a way to test the limits of the Sundrio model itself
  * and as a way to further push the barrier higher. It represents an experimental exploration
  * of how Sundrio's code analysis capabilities can be applied to intelligent test execution.

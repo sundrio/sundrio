@@ -21,11 +21,24 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+/**
+ * A visitor implementation that delegates all operations to another visitor.
+ * This class allows wrapping or proxying visitor behavior while maintaining
+ * the same visitor interface.
+ *
+ * @param <T> the type of objects this visitor can visit
+ */
 public class DelegatingVisitor<T> implements Visitor<T> {
 
   private final Class<T> type;
   private final Visitor<T> delegate;
 
+  /**
+   * Creates a new delegating visitor.
+   *
+   * @param type the type of objects this visitor handles
+   * @param delegate the visitor to delegate operations to
+   */
   DelegatingVisitor(Class<T> type, Visitor<T> delegate) {
     this.type = type;
     this.delegate = delegate;
