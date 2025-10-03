@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,6 +38,20 @@ import io.sundr.model.TypeDef;
 public class Sources {
 
   private static final String NO_TYPE_FOUND = "No type found in the stream.";
+
+  /**
+   * Read the first {@link TypeDef} instance from an {@link InputStream}.
+   *
+   * @param path the {@link Path}
+   * @return the first {@link TypeDef} instance, or throw an exception if none is found.
+   */
+  public static TypeDef readTypeDefFromPath(Path path, AdapterContext ctx) {
+    try (InputStream is = new FileInputStream(path.toFile())) {
+      return readTypeDefFromStream(is, ctx);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read file from path: " + path, e);
+    }
+  }
 
   /**
    * Read the first {@link TypeDef} instance from an {@link InputStream}.
