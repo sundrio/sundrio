@@ -4,7 +4,9 @@ import java.lang.Class;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Nested;
@@ -14,7 +16,7 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A> {
+public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extends BaseFluent<A> {
 
   private VisitableBuilder<? extends Expression, ?> scope;
 
@@ -31,104 +33,203 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "Multiply":
+      case "Multiply":
+
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
-      case "io.sundr.model." + "NewArray":
+
+      case "NewArray":
+
         return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
-      case "io.sundr.model." + "InstanceOf":
+
+      case "InstanceOf":
+
         return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
-      case "io.sundr.model." + "MethodCall":
+
+      case "MethodCall":
+
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
-      case "io.sundr.model." + "ClassRef":
+
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "Inverse":
+
+      case "Inverse":
+
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
-      case "io.sundr.model." + "Index":
+
+      case "Index":
+
         return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
-      case "io.sundr.model." + "GreaterThanOrEqual":
+
+      case "GreaterThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
-      case "io.sundr.model." + "BitwiseAnd":
+
+      case "BitwiseAnd":
+
         return (VisitableBuilder<T, ?>) new BitwiseAndBuilder((BitwiseAnd) item);
-      case "io.sundr.model." + "Minus":
+
+      case "Minus":
+
         return (VisitableBuilder<T, ?>) new MinusBuilder((Minus) item);
-      case "io.sundr.model." + "LogicalOr":
+
+      case "LogicalOr":
+
         return (VisitableBuilder<T, ?>) new LogicalOrBuilder((LogicalOr) item);
-      case "io.sundr.model." + "NotEquals":
+
+      case "NotEquals":
+
         return (VisitableBuilder<T, ?>) new NotEqualsBuilder((NotEquals) item);
-      case "io.sundr.model." + "Divide":
+
+      case "Divide":
+
         return (VisitableBuilder<T, ?>) new DivideBuilder((Divide) item);
-      case "io.sundr.model." + "LessThan":
+
+      case "LessThan":
+
         return (VisitableBuilder<T, ?>) new LessThanBuilder((LessThan) item);
-      case "io.sundr.model." + "BitwiseOr":
+
+      case "BitwiseOr":
+
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
-      case "io.sundr.model." + "PropertyRef":
+
+      case "PropertyRef":
+
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
-      case "io.sundr.model." + "RightShift":
+
+      case "RightShift":
+
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
-      case "io.sundr.model." + "Super":
+
+      case "Super":
+
         return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
-      case "io.sundr.model." + "GreaterThan":
+
+      case "GreaterThan":
+
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
-      case "io.sundr.model." + "Declare":
+
+      case "Declare":
+
         return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
-      case "io.sundr.model." + "Cast":
+
+      case "Cast":
+
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
-      case "io.sundr.model." + "Modulo":
+
+      case "Modulo":
+
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
-      case "io.sundr.model." + "DotClass":
+
+      case "DotClass":
+
         return (VisitableBuilder<T, ?>) new DotClassBuilder((DotClass) item);
-      case "io.sundr.model." + "ValueRef":
+
+      case "ValueRef":
+
         return (VisitableBuilder<T, ?>) new ValueRefBuilder((ValueRef) item);
-      case "io.sundr.model." + "LeftShift":
+
+      case "LeftShift":
+
         return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
-      case "io.sundr.model." + "Empty":
+
+      case "Empty":
+
         return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
-      case "io.sundr.model." + "Ternary":
+
+      case "Ternary":
+
         return (VisitableBuilder<T, ?>) new TernaryBuilder((Ternary) item);
-      case "io.sundr.model." + "BinaryExpression":
+
+      case "BinaryExpression":
+
         return (VisitableBuilder<T, ?>) new BinaryExpressionBuilder((BinaryExpression) item);
-      case "io.sundr.model." + "Equals":
+
+      case "Equals":
+
         return (VisitableBuilder<T, ?>) new EqualsBuilder((Equals) item);
-      case "io.sundr.model." + "Enclosed":
+
+      case "Enclosed":
+
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
-      case "io.sundr.model." + "PreDecrement":
+
+      case "PreDecrement":
+
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
-      case "io.sundr.model." + "PostDecrement":
+
+      case "PostDecrement":
+
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
-      case "io.sundr.model." + "Lambda":
+
+      case "Lambda":
+
         return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
-      case "io.sundr.model." + "Not":
+
+      case "Not":
+
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
-      case "io.sundr.model." + "Assign":
+
+      case "Assign":
+
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "This":
+
+      case "This":
+
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
-      case "io.sundr.model." + "Negative":
+
+      case "Negative":
+
         return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
-      case "io.sundr.model." + "LogicalAnd":
+
+      case "LogicalAnd":
+
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
-      case "io.sundr.model." + "PostIncrement":
+
+      case "PostIncrement":
+
         return (VisitableBuilder<T, ?>) new PostIncrementBuilder((PostIncrement) item);
-      case "io.sundr.model." + "RightUnsignedShift":
+
+      case "RightUnsignedShift":
+
         return (VisitableBuilder<T, ?>) new RightUnsignedShiftBuilder((RightUnsignedShift) item);
-      case "io.sundr.model." + "Plus":
+
+      case "Plus":
+
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
-      case "io.sundr.model." + "Construct":
+
+      case "Construct":
+
         return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-      case "io.sundr.model." + "Xor":
+
+      case "Xor":
+
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
-      case "io.sundr.model." + "PreIncrement":
+
+      case "PreIncrement":
+
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
-      case "io.sundr.model." + "Property":
+
+      case "Property":
+
         return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
-      case "io.sundr.model." + "LessThanOrEqual":
+
+      case "LessThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
-      case "io.sundr.model." + "ContextRef":
+
+      case "ContextRef":
+
         return (VisitableBuilder<T, ?>) new ContextRefBuilder((ContextRef) item);
-      case "io.sundr.model." + "Positive":
+
+      case "Positive":
+
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(WithScope instance) {
@@ -138,15 +239,19 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     WithScopeFluent that = (WithScopeFluent) o;
-    if (!java.util.Objects.equals(scope, that.scope))
+    if (!(Objects.equals(scope, that.scope))) {
       return false;
+    }
     return true;
   }
 
@@ -155,13 +260,13 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(scope, super.hashCode());
+    return Objects.hash(scope);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (scope != null) {
+    if (!(scope == null)) {
       sb.append("scope:");
       sb.append(scope);
     }
@@ -190,7 +295,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewBitwiseAndScope(Object left, Object right) {
-    return (A) withScope(new BitwiseAnd(left, right));
+    return (A) this.withScope(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndScopeNested<A> withNewBitwiseAndScopeLike(BitwiseAnd item) {
@@ -202,7 +307,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewBitwiseOrScope(Object left, Object right) {
-    return (A) withScope(new BitwiseOr(left, right));
+    return (A) this.withScope(new BitwiseOr(left, right));
   }
 
   public BitwiseOrScopeNested<A> withNewBitwiseOrScopeLike(BitwiseOr item) {
@@ -238,7 +343,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewContextRefScope(String name) {
-    return (A) withScope(new ContextRef(name));
+    return (A) this.withScope(new ContextRef(name));
   }
 
   public ContextRefScopeNested<A> withNewContextRefScopeLike(ContextRef item) {
@@ -250,11 +355,11 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewDeclareScope(Class type, String name) {
-    return (A) withScope(new Declare(type, name));
+    return (A) this.withScope(new Declare(type, name));
   }
 
   public A withNewDeclareScope(Class type, String name, Object value) {
-    return (A) withScope(new Declare(type, name, value));
+    return (A) this.withScope(new Declare(type, name, value));
   }
 
   public DeclareScopeNested<A> withNewDeclareScopeLike(Declare item) {
@@ -266,7 +371,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewDivideScope(Object left, Object right) {
-    return (A) withScope(new Divide(left, right));
+    return (A) this.withScope(new Divide(left, right));
   }
 
   public DivideScopeNested<A> withNewDivideScopeLike(Divide item) {
@@ -302,7 +407,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewEqualsScope(Object left, Object right) {
-    return (A) withScope(new Equals(left, right));
+    return (A) this.withScope(new Equals(left, right));
   }
 
   public EqualsScopeNested<A> withNewEqualsScopeLike(Equals item) {
@@ -314,7 +419,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewGreaterThanOrEqualScope(Object left, Object right) {
-    return (A) withScope(new GreaterThanOrEqual(left, right));
+    return (A) this.withScope(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualScopeNested<A> withNewGreaterThanOrEqualScopeLike(GreaterThanOrEqual item) {
@@ -326,7 +431,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewGreaterThanScope(Object left, Object right) {
-    return (A) withScope(new GreaterThan(left, right));
+    return (A) this.withScope(new GreaterThan(left, right));
   }
 
   public GreaterThanScopeNested<A> withNewGreaterThanScopeLike(GreaterThan item) {
@@ -370,7 +475,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewLeftShiftScope(Object left, Object right) {
-    return (A) withScope(new LeftShift(left, right));
+    return (A) this.withScope(new LeftShift(left, right));
   }
 
   public LeftShiftScopeNested<A> withNewLeftShiftScopeLike(LeftShift item) {
@@ -382,7 +487,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewLessThanOrEqualScope(Object left, Object right) {
-    return (A) withScope(new LessThanOrEqual(left, right));
+    return (A) this.withScope(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualScopeNested<A> withNewLessThanOrEqualScopeLike(LessThanOrEqual item) {
@@ -394,7 +499,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewLessThanScope(Object left, Object right) {
-    return (A) withScope(new LessThan(left, right));
+    return (A) this.withScope(new LessThan(left, right));
   }
 
   public LessThanScopeNested<A> withNewLessThanScopeLike(LessThan item) {
@@ -406,7 +511,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewLogicalAndScope(Object left, Object right) {
-    return (A) withScope(new LogicalAnd(left, right));
+    return (A) this.withScope(new LogicalAnd(left, right));
   }
 
   public LogicalAndScopeNested<A> withNewLogicalAndScopeLike(LogicalAnd item) {
@@ -418,7 +523,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewLogicalOrScope(Object left, Object right) {
-    return (A) withScope(new LogicalOr(left, right));
+    return (A) this.withScope(new LogicalOr(left, right));
   }
 
   public LogicalOrScopeNested<A> withNewLogicalOrScopeLike(LogicalOr item) {
@@ -438,7 +543,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewMinusScope(Object left, Object right) {
-    return (A) withScope(new Minus(left, right));
+    return (A) this.withScope(new Minus(left, right));
   }
 
   public MinusScopeNested<A> withNewMinusScopeLike(Minus item) {
@@ -450,7 +555,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewModuloScope(Object left, Object right) {
-    return (A) withScope(new Modulo(left, right));
+    return (A) this.withScope(new Modulo(left, right));
   }
 
   public ModuloScopeNested<A> withNewModuloScopeLike(Modulo item) {
@@ -462,7 +567,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewMultiplyScope(Object left, Object right) {
-    return (A) withScope(new Multiply(left, right));
+    return (A) this.withScope(new Multiply(left, right));
   }
 
   public MultiplyScopeNested<A> withNewMultiplyScopeLike(Multiply item) {
@@ -482,7 +587,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewNewArrayScope(Class type, Integer[] sizes) {
-    return (A) withScope(new NewArray(type, sizes));
+    return (A) this.withScope(new NewArray(type, sizes));
   }
 
   public NewArrayScopeNested<A> withNewNewArrayScopeLike(NewArray item) {
@@ -494,7 +599,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewNotEqualsScope(Object left, Object right) {
-    return (A) withScope(new NotEquals(left, right));
+    return (A) this.withScope(new NotEquals(left, right));
   }
 
   public NotEqualsScopeNested<A> withNewNotEqualsScopeLike(NotEquals item) {
@@ -514,7 +619,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewPlusScope(Object left, Object right) {
-    return (A) withScope(new Plus(left, right));
+    return (A) this.withScope(new Plus(left, right));
   }
 
   public PlusScopeNested<A> withNewPlusScopeLike(Plus item) {
@@ -582,7 +687,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewRightShiftScope(Object left, Object right) {
-    return (A) withScope(new RightShift(left, right));
+    return (A) this.withScope(new RightShift(left, right));
   }
 
   public RightShiftScopeNested<A> withNewRightShiftScopeLike(RightShift item) {
@@ -594,7 +699,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewRightUnsignedShiftScope(Object left, Object right) {
-    return (A) withScope(new RightUnsignedShift(left, right));
+    return (A) this.withScope(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftScopeNested<A> withNewRightUnsignedShiftScopeLike(RightUnsignedShift item) {
@@ -630,7 +735,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewValueRefScope(Object value) {
-    return (A) withScope(new ValueRef(value));
+    return (A) this.withScope(new ValueRef(value));
   }
 
   public ValueRefScopeNested<A> withNewValueRefScopeLike(ValueRef item) {
@@ -642,7 +747,7 @@ public class WithScopeFluent<A extends WithScopeFluent<A>> extends BaseFluent<A>
   }
 
   public A withNewXorScope(Object left, Object right) {
-    return (A) withScope(new Xor(left, right));
+    return (A) this.withScope(new Xor(left, right));
   }
 
   public XorScopeNested<A> withNewXorScopeLike(Xor item) {

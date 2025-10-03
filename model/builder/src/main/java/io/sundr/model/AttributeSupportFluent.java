@@ -2,9 +2,11 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 
@@ -12,7 +14,7 @@ import io.sundr.builder.BaseFluent;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends BaseFluent<A> {
+public class AttributeSupportFluent<A extends io.sundr.model.AttributeSupportFluent<A>> extends BaseFluent<A> {
 
   private Map<AttributeKey, Object> attributes = new LinkedHashMap<AttributeKey, Object>();
 
@@ -50,15 +52,19 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     AttributeSupportFluent that = (AttributeSupportFluent) o;
-    if (!java.util.Objects.equals(attributes, that.attributes))
+    if (!(Objects.equals(attributes, that.attributes))) {
       return false;
+    }
     return true;
   }
 
@@ -71,7 +77,7 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(attributes, super.hashCode());
+    return Objects.hash(attributes);
   }
 
   public A removeFromAttributes(AttributeKey key) {
@@ -101,7 +107,7 @@ public class AttributeSupportFluent<A extends AttributeSupportFluent<A>> extends
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (attributes != null && !attributes.isEmpty()) {
+    if (!(attributes == null) && !(attributes.isEmpty())) {
       sb.append("attributes:");
       sb.append(attributes);
     }

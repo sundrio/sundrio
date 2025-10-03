@@ -2,7 +2,9 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 
@@ -10,7 +12,7 @@ import io.sundr.builder.BaseFluent;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
+public class ValueRefFluent<A extends io.sundr.model.ValueRefFluent<A>> extends BaseFluent<A> {
 
   private Object value;
 
@@ -28,15 +30,19 @@ public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     ValueRefFluent that = (ValueRefFluent) o;
-    if (!java.util.Objects.equals(value, that.value))
+    if (!(Objects.equals(value, that.value))) {
       return false;
+    }
     return true;
   }
 
@@ -49,13 +55,13 @@ public class ValueRefFluent<A extends ValueRefFluent<A>> extends BaseFluent<A> {
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(value, super.hashCode());
+    return Objects.hash(value);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (value != null) {
+    if (!(value == null)) {
       sb.append("value:");
       sb.append(value);
     }

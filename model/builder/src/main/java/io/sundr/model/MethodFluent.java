@@ -1,12 +1,16 @@
 package io.sundr.model;
 
 import java.lang.Object;
+import java.lang.RuntimeException;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
@@ -16,7 +20,7 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFluent<A> {
+public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends ModifierSupportFluent<A> {
 
   private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
   private ArrayList<PropertyBuilder> arguments = new ArrayList<PropertyBuilder>();
@@ -38,7 +42,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addAllToAnnotations(Collection<AnnotationRef> items) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
@@ -50,7 +54,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addAllToArguments(Collection<Property> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<PropertyBuilder>();
+      this.arguments = new ArrayList();
     }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
@@ -62,7 +66,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addAllToComments(Collection<String> items) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     for (String item : items) {
       this.comments.add(item);
@@ -72,7 +76,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addAllToExceptions(Collection<ClassRef> items) {
     if (this.exceptions == null) {
-      this.exceptions = new ArrayList<ClassRefBuilder>();
+      this.exceptions = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -84,7 +88,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addAllToParameters(Collection<TypeParamDef> items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
@@ -128,7 +132,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToAnnotations(AnnotationRef... items) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
@@ -140,7 +144,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToAnnotations(int index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     if (index < 0 || index >= annotations.size()) {
@@ -155,7 +159,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToArguments(Property... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<PropertyBuilder>();
+      this.arguments = new ArrayList();
     }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
@@ -167,7 +171,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToArguments(int index, Property item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<PropertyBuilder>();
+      this.arguments = new ArrayList();
     }
     PropertyBuilder builder = new PropertyBuilder(item);
     if (index < 0 || index >= arguments.size()) {
@@ -182,7 +186,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToComments(String... items) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     for (String item : items) {
       this.comments.add(item);
@@ -192,7 +196,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToComments(int index, String item) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     this.comments.add(index, item);
     return (A) this;
@@ -200,7 +204,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToExceptions(ClassRef... items) {
     if (this.exceptions == null) {
-      this.exceptions = new ArrayList<ClassRefBuilder>();
+      this.exceptions = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -212,7 +216,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToExceptions(int index, ClassRef item) {
     if (this.exceptions == null) {
-      this.exceptions = new ArrayList<ClassRefBuilder>();
+      this.exceptions = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= exceptions.size()) {
@@ -227,7 +231,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToParameters(TypeParamDef... items) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
@@ -239,7 +243,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A addToParameters(int index, TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
     if (index < 0 || index >= parameters.size()) {
@@ -362,18 +366,31 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "ClassRef":
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "PrimitiveRef":
+
+      case "PrimitiveRef":
+
         return (VisitableBuilder<T, ?>) new PrimitiveRefBuilder((PrimitiveRef) item);
-      case "io.sundr.model." + "VoidRef":
+
+      case "VoidRef":
+
         return (VisitableBuilder<T, ?>) new VoidRefBuilder((VoidRef) item);
-      case "io.sundr.model." + "TypeParamRef":
+
+      case "TypeParamRef":
+
         return (VisitableBuilder<T, ?>) new TypeParamRefBuilder((TypeParamRef) item);
-      case "io.sundr.model." + "WildcardRef":
+
+      case "WildcardRef":
+
         return (VisitableBuilder<T, ?>) new WildcardRefBuilder((WildcardRef) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(Method instance) {
@@ -394,77 +411,88 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public AnnotationsNested<A> editAnnotation(int index) {
-    if (annotations.size() <= index)
-      throw new RuntimeException("Can't edit annotations. Index exceeds size.");
-    return setNewAnnotationLike(index, buildAnnotation(index));
+    if (annotations.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "annotations"));
+    }
+    return this.setNewAnnotationLike(index, this.buildAnnotation(index));
   }
 
   public ArgumentsNested<A> editArgument(int index) {
-    if (arguments.size() <= index)
-      throw new RuntimeException("Can't edit arguments. Index exceeds size.");
-    return setNewArgumentLike(index, buildArgument(index));
+    if (arguments.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "arguments"));
+    }
+    return this.setNewArgumentLike(index, this.buildArgument(index));
   }
 
   public BlockNested<A> editBlock() {
-    return withNewBlockLike(java.util.Optional.ofNullable(buildBlock()).orElse(null));
+    return this.withNewBlockLike(Optional.ofNullable(this.buildBlock()).orElse(null));
   }
 
   public ExceptionsNested<A> editException(int index) {
-    if (exceptions.size() <= index)
-      throw new RuntimeException("Can't edit exceptions. Index exceeds size.");
-    return setNewExceptionLike(index, buildException(index));
+    if (exceptions.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "exceptions"));
+    }
+    return this.setNewExceptionLike(index, this.buildException(index));
   }
 
   public AnnotationsNested<A> editFirstAnnotation() {
-    if (annotations.size() == 0)
-      throw new RuntimeException("Can't edit first annotations. The list is empty.");
-    return setNewAnnotationLike(0, buildAnnotation(0));
+    if (annotations.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "annotations"));
+    }
+    return this.setNewAnnotationLike(0, this.buildAnnotation(0));
   }
 
   public ArgumentsNested<A> editFirstArgument() {
-    if (arguments.size() == 0)
-      throw new RuntimeException("Can't edit first arguments. The list is empty.");
-    return setNewArgumentLike(0, buildArgument(0));
+    if (arguments.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "arguments"));
+    }
+    return this.setNewArgumentLike(0, this.buildArgument(0));
   }
 
   public ExceptionsNested<A> editFirstException() {
-    if (exceptions.size() == 0)
-      throw new RuntimeException("Can't edit first exceptions. The list is empty.");
-    return setNewExceptionLike(0, buildException(0));
+    if (exceptions.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "exceptions"));
+    }
+    return this.setNewExceptionLike(0, this.buildException(0));
   }
 
   public ParametersNested<A> editFirstParameter() {
-    if (parameters.size() == 0)
-      throw new RuntimeException("Can't edit first parameters. The list is empty.");
-    return setNewParameterLike(0, buildParameter(0));
+    if (parameters.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "parameters"));
+    }
+    return this.setNewParameterLike(0, this.buildParameter(0));
   }
 
   public AnnotationsNested<A> editLastAnnotation() {
     int index = annotations.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last annotations. The list is empty.");
-    return setNewAnnotationLike(index, buildAnnotation(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "annotations"));
+    }
+    return this.setNewAnnotationLike(index, this.buildAnnotation(index));
   }
 
   public ArgumentsNested<A> editLastArgument() {
     int index = arguments.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last arguments. The list is empty.");
-    return setNewArgumentLike(index, buildArgument(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "arguments"));
+    }
+    return this.setNewArgumentLike(index, this.buildArgument(index));
   }
 
   public ExceptionsNested<A> editLastException() {
     int index = exceptions.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last exceptions. The list is empty.");
-    return setNewExceptionLike(index, buildException(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "exceptions"));
+    }
+    return this.setNewExceptionLike(index, this.buildException(index));
   }
 
   public ParametersNested<A> editLastParameter() {
     int index = parameters.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last parameters. The list is empty.");
-    return setNewParameterLike(index, buildParameter(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "parameters"));
+    }
+    return this.setNewParameterLike(index, this.buildParameter(index));
   }
 
   public AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
@@ -475,9 +503,10 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching annotations. No match found.");
-    return setNewAnnotationLike(index, buildAnnotation(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "annotations"));
+    }
+    return this.setNewAnnotationLike(index, this.buildAnnotation(index));
   }
 
   public ArgumentsNested<A> editMatchingArgument(Predicate<PropertyBuilder> predicate) {
@@ -488,9 +517,10 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching arguments. No match found.");
-    return setNewArgumentLike(index, buildArgument(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "arguments"));
+    }
+    return this.setNewArgumentLike(index, this.buildArgument(index));
   }
 
   public ExceptionsNested<A> editMatchingException(Predicate<ClassRefBuilder> predicate) {
@@ -501,9 +531,10 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching exceptions. No match found.");
-    return setNewExceptionLike(index, buildException(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "exceptions"));
+    }
+    return this.setNewExceptionLike(index, this.buildException(index));
   }
 
   public ParametersNested<A> editMatchingParameter(Predicate<TypeParamDefBuilder> predicate) {
@@ -514,53 +545,68 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching parameters. No match found.");
-    return setNewParameterLike(index, buildParameter(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "parameters"));
+    }
+    return this.setNewParameterLike(index, this.buildParameter(index));
   }
 
   public BlockNested<A> editOrNewBlock() {
-    return withNewBlockLike(java.util.Optional.ofNullable(buildBlock()).orElse(new BlockBuilder().build()));
+    return this.withNewBlockLike(Optional.ofNullable(this.buildBlock()).orElse(new BlockBuilder().build()));
   }
 
   public BlockNested<A> editOrNewBlockLike(Block item) {
-    return withNewBlockLike(java.util.Optional.ofNullable(buildBlock()).orElse(item));
+    return this.withNewBlockLike(Optional.ofNullable(this.buildBlock()).orElse(item));
   }
 
   public ParametersNested<A> editParameter(int index) {
-    if (parameters.size() <= index)
-      throw new RuntimeException("Can't edit parameters. Index exceeds size.");
-    return setNewParameterLike(index, buildParameter(index));
+    if (parameters.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "parameters"));
+    }
+    return this.setNewParameterLike(index, this.buildParameter(index));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     MethodFluent that = (MethodFluent) o;
-    if (!java.util.Objects.equals(comments, that.comments))
+    if (!(Objects.equals(comments, that.comments))) {
       return false;
-    if (!java.util.Objects.equals(annotations, that.annotations))
+    }
+    if (!(Objects.equals(annotations, that.annotations))) {
       return false;
-    if (!java.util.Objects.equals(parameters, that.parameters))
+    }
+    if (!(Objects.equals(parameters, that.parameters))) {
       return false;
-    if (!java.util.Objects.equals(name, that.name))
+    }
+    if (!(Objects.equals(name, that.name))) {
       return false;
-    if (!java.util.Objects.equals(returnType, that.returnType))
+    }
+    if (!(Objects.equals(returnType, that.returnType))) {
       return false;
-    if (!java.util.Objects.equals(arguments, that.arguments))
+    }
+    if (!(Objects.equals(arguments, that.arguments))) {
       return false;
-    if (varArgPreferred != that.varArgPreferred)
+    }
+    if (varArgPreferred != that.varArgPreferred) {
       return false;
-    if (!java.util.Objects.equals(exceptions, that.exceptions))
+    }
+    if (!(Objects.equals(exceptions, that.exceptions))) {
       return false;
-    if (defaultMethod != that.defaultMethod)
+    }
+    if (defaultMethod != that.defaultMethod) {
       return false;
-    if (!java.util.Objects.equals(block, that.block))
+    }
+    if (!(Objects.equals(block, that.block))) {
       return false;
+    }
     return true;
   }
 
@@ -679,8 +725,8 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(comments, annotations, parameters, name, returnType, arguments, varArgPreferred, exceptions,
-        defaultMethod, block, super.hashCode());
+    return Objects.hash(comments, annotations, parameters, name, returnType, arguments, varArgPreferred, exceptions,
+        defaultMethod, block);
   }
 
   public boolean isDefaultMethod() {
@@ -692,8 +738,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeAllFromAnnotations(Collection<AnnotationRef> items) {
-    if (this.annotations == null)
+    if (this.annotations == null) {
       return (A) this;
+    }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
@@ -703,8 +750,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeAllFromArguments(Collection<Property> items) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("arguments").remove(builder);
@@ -714,8 +762,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeAllFromComments(Collection<String> items) {
-    if (this.comments == null)
+    if (this.comments == null) {
       return (A) this;
+    }
     for (String item : items) {
       this.comments.remove(item);
     }
@@ -723,8 +772,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeAllFromExceptions(Collection<ClassRef> items) {
-    if (this.exceptions == null)
+    if (this.exceptions == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("exceptions").remove(builder);
@@ -734,8 +784,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeAllFromParameters(Collection<TypeParamDef> items) {
-    if (this.parameters == null)
+    if (this.parameters == null) {
       return (A) this;
+    }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
@@ -745,8 +796,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeFromAnnotations(AnnotationRef... items) {
-    if (this.annotations == null)
+    if (this.annotations == null) {
       return (A) this;
+    }
     for (AnnotationRef item : items) {
       AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
       _visitables.get("annotations").remove(builder);
@@ -756,8 +808,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeFromArguments(Property... items) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     for (Property item : items) {
       PropertyBuilder builder = new PropertyBuilder(item);
       _visitables.get("arguments").remove(builder);
@@ -767,8 +820,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeFromComments(String... items) {
-    if (this.comments == null)
+    if (this.comments == null) {
       return (A) this;
+    }
     for (String item : items) {
       this.comments.remove(item);
     }
@@ -776,8 +830,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeFromExceptions(ClassRef... items) {
-    if (this.exceptions == null)
+    if (this.exceptions == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("exceptions").remove(builder);
@@ -787,8 +842,9 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeFromParameters(TypeParamDef... items) {
-    if (this.parameters == null)
+    if (this.parameters == null) {
       return (A) this;
+    }
     for (TypeParamDef item : items) {
       TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
       _visitables.get("parameters").remove(builder);
@@ -798,10 +854,11 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate) {
-    if (annotations == null)
+    if (annotations == null) {
       return (A) this;
-    final Iterator<AnnotationRefBuilder> each = annotations.iterator();
-    final List visitables = _visitables.get("annotations");
+    }
+    Iterator<AnnotationRefBuilder> each = annotations.iterator();
+    List visitables = _visitables.get("annotations");
     while (each.hasNext()) {
       AnnotationRefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -813,10 +870,11 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeMatchingFromArguments(Predicate<PropertyBuilder> predicate) {
-    if (arguments == null)
+    if (arguments == null) {
       return (A) this;
-    final Iterator<PropertyBuilder> each = arguments.iterator();
-    final List visitables = _visitables.get("arguments");
+    }
+    Iterator<PropertyBuilder> each = arguments.iterator();
+    List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
       PropertyBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -828,10 +886,11 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeMatchingFromExceptions(Predicate<ClassRefBuilder> predicate) {
-    if (exceptions == null)
+    if (exceptions == null) {
       return (A) this;
-    final Iterator<ClassRefBuilder> each = exceptions.iterator();
-    final List visitables = _visitables.get("exceptions");
+    }
+    Iterator<ClassRefBuilder> each = exceptions.iterator();
+    List visitables = _visitables.get("exceptions");
     while (each.hasNext()) {
       ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -843,10 +902,11 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   }
 
   public A removeMatchingFromParameters(Predicate<TypeParamDefBuilder> predicate) {
-    if (parameters == null)
+    if (parameters == null) {
       return (A) this;
-    final Iterator<TypeParamDefBuilder> each = parameters.iterator();
-    final List visitables = _visitables.get("parameters");
+    }
+    Iterator<TypeParamDefBuilder> each = parameters.iterator();
+    List visitables = _visitables.get("parameters");
     while (each.hasNext()) {
       TypeParamDefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -875,7 +935,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A setToAnnotations(int index, AnnotationRef item) {
     if (this.annotations == null) {
-      this.annotations = new ArrayList<AnnotationRefBuilder>();
+      this.annotations = new ArrayList();
     }
     AnnotationRefBuilder builder = new AnnotationRefBuilder(item);
     if (index < 0 || index >= annotations.size()) {
@@ -890,7 +950,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A setToArguments(int index, Property item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<PropertyBuilder>();
+      this.arguments = new ArrayList();
     }
     PropertyBuilder builder = new PropertyBuilder(item);
     if (index < 0 || index >= arguments.size()) {
@@ -905,7 +965,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A setToComments(int index, String item) {
     if (this.comments == null) {
-      this.comments = new ArrayList<String>();
+      this.comments = new ArrayList();
     }
     this.comments.set(index, item);
     return (A) this;
@@ -913,7 +973,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A setToExceptions(int index, ClassRef item) {
     if (this.exceptions == null) {
-      this.exceptions = new ArrayList<ClassRefBuilder>();
+      this.exceptions = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= exceptions.size()) {
@@ -928,7 +988,7 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
 
   public A setToParameters(int index, TypeParamDef item) {
     if (this.parameters == null) {
-      this.parameters = new ArrayList<TypeParamDefBuilder>();
+      this.parameters = new ArrayList();
     }
     TypeParamDefBuilder builder = new TypeParamDefBuilder(item);
     if (index < 0 || index >= parameters.size()) {
@@ -944,39 +1004,48 @@ public class MethodFluent<A extends MethodFluent<A>> extends ModifierSupportFlue
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (comments != null && !comments.isEmpty()) {
+    if (!(comments == null) && !(comments.isEmpty())) {
       sb.append("comments:");
-      sb.append(comments + ",");
+      sb.append(comments);
+      sb.append(",");
     }
-    if (annotations != null && !annotations.isEmpty()) {
+    if (!(annotations == null) && !(annotations.isEmpty())) {
       sb.append("annotations:");
-      sb.append(annotations + ",");
+      sb.append(annotations);
+      sb.append(",");
     }
-    if (parameters != null && !parameters.isEmpty()) {
+    if (!(parameters == null) && !(parameters.isEmpty())) {
       sb.append("parameters:");
-      sb.append(parameters + ",");
+      sb.append(parameters);
+      sb.append(",");
     }
-    if (name != null) {
+    if (!(name == null)) {
       sb.append("name:");
-      sb.append(name + ",");
+      sb.append(name);
+      sb.append(",");
     }
-    if (returnType != null) {
+    if (!(returnType == null)) {
       sb.append("returnType:");
-      sb.append(returnType + ",");
+      sb.append(returnType);
+      sb.append(",");
     }
-    if (arguments != null && !arguments.isEmpty()) {
+    if (!(arguments == null) && !(arguments.isEmpty())) {
       sb.append("arguments:");
-      sb.append(arguments + ",");
+      sb.append(arguments);
+      sb.append(",");
     }
     sb.append("varArgPreferred:");
-    sb.append(varArgPreferred + ",");
-    if (exceptions != null && !exceptions.isEmpty()) {
+    sb.append(varArgPreferred);
+    sb.append(",");
+    if (!(exceptions == null) && !(exceptions.isEmpty())) {
       sb.append("exceptions:");
-      sb.append(exceptions + ",");
+      sb.append(exceptions);
+      sb.append(",");
     }
     sb.append("defaultMethod:");
-    sb.append(defaultMethod + ",");
-    if (block != null) {
+    sb.append(defaultMethod);
+    sb.append(",");
+    if (!(block == null)) {
       sb.append("block:");
       sb.append(block);
     }

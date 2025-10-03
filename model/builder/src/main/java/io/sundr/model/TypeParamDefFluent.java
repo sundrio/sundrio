@@ -1,12 +1,15 @@
 package io.sundr.model;
 
 import java.lang.Object;
+import java.lang.RuntimeException;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
@@ -15,7 +18,7 @@ import io.sundr.builder.Nested;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends AttributeSupportFluent<A> {
+public class TypeParamDefFluent<A extends io.sundr.model.TypeParamDefFluent<A>> extends AttributeSupportFluent<A> {
 
   private ArrayList<ClassRefBuilder> bounds = new ArrayList<ClassRefBuilder>();
   private String name;
@@ -29,7 +32,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
 
   public A addAllToBounds(Collection<ClassRef> items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<ClassRefBuilder>();
+      this.bounds = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -49,7 +52,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
 
   public A addToBounds(ClassRef... items) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<ClassRefBuilder>();
+      this.bounds = new ArrayList();
     }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
@@ -61,7 +64,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
 
   public A addToBounds(int index, ClassRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<ClassRefBuilder>();
+      this.bounds = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= bounds.size()) {
@@ -108,22 +111,25 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public BoundsNested<A> editBound(int index) {
-    if (bounds.size() <= index)
-      throw new RuntimeException("Can't edit bounds. Index exceeds size.");
-    return setNewBoundLike(index, buildBound(index));
+    if (bounds.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "bounds"));
+    }
+    return this.setNewBoundLike(index, this.buildBound(index));
   }
 
   public BoundsNested<A> editFirstBound() {
-    if (bounds.size() == 0)
-      throw new RuntimeException("Can't edit first bounds. The list is empty.");
-    return setNewBoundLike(0, buildBound(0));
+    if (bounds.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "bounds"));
+    }
+    return this.setNewBoundLike(0, this.buildBound(0));
   }
 
   public BoundsNested<A> editLastBound() {
     int index = bounds.size() - 1;
-    if (index < 0)
-      throw new RuntimeException("Can't edit last bounds. The list is empty.");
-    return setNewBoundLike(index, buildBound(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "bounds"));
+    }
+    return this.setNewBoundLike(index, this.buildBound(index));
   }
 
   public BoundsNested<A> editMatchingBound(Predicate<ClassRefBuilder> predicate) {
@@ -134,23 +140,29 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
         break;
       }
     }
-    if (index < 0)
-      throw new RuntimeException("Can't edit matching bounds. No match found.");
-    return setNewBoundLike(index, buildBound(index));
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "bounds"));
+    }
+    return this.setNewBoundLike(index, this.buildBound(index));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     TypeParamDefFluent that = (TypeParamDefFluent) o;
-    if (!java.util.Objects.equals(name, that.name))
+    if (!(Objects.equals(name, that.name))) {
       return false;
-    if (!java.util.Objects.equals(bounds, that.bounds))
+    }
+    if (!(Objects.equals(bounds, that.bounds))) {
       return false;
+    }
     return true;
   }
 
@@ -176,12 +188,13 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(name, bounds, super.hashCode());
+    return Objects.hash(name, bounds);
   }
 
   public A removeAllFromBounds(Collection<ClassRef> items) {
-    if (this.bounds == null)
+    if (this.bounds == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("bounds").remove(builder);
@@ -191,8 +204,9 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public A removeFromBounds(ClassRef... items) {
-    if (this.bounds == null)
+    if (this.bounds == null) {
       return (A) this;
+    }
     for (ClassRef item : items) {
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("bounds").remove(builder);
@@ -202,10 +216,11 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   }
 
   public A removeMatchingFromBounds(Predicate<ClassRefBuilder> predicate) {
-    if (bounds == null)
+    if (bounds == null) {
       return (A) this;
-    final Iterator<ClassRefBuilder> each = bounds.iterator();
-    final List visitables = _visitables.get("bounds");
+    }
+    Iterator<ClassRefBuilder> each = bounds.iterator();
+    List visitables = _visitables.get("bounds");
     while (each.hasNext()) {
       ClassRefBuilder builder = each.next();
       if (predicate.test(builder)) {
@@ -222,7 +237,7 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
 
   public A setToBounds(int index, ClassRef item) {
     if (this.bounds == null) {
-      this.bounds = new ArrayList<ClassRefBuilder>();
+      this.bounds = new ArrayList();
     }
     ClassRefBuilder builder = new ClassRefBuilder(item);
     if (index < 0 || index >= bounds.size()) {
@@ -238,11 +253,12 @@ public class TypeParamDefFluent<A extends TypeParamDefFluent<A>> extends Attribu
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (name != null) {
+    if (!(name == null)) {
       sb.append("name:");
-      sb.append(name + ",");
+      sb.append(name);
+      sb.append(",");
     }
-    if (bounds != null && !bounds.isEmpty()) {
+    if (!(bounds == null) && !(bounds.isEmpty())) {
       sb.append("bounds:");
       sb.append(bounds);
     }

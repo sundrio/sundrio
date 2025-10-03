@@ -2,13 +2,15 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 /**
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class LeftShiftFluent<A extends LeftShiftFluent<A>> extends BinaryExpressionFluent<A> {
+public class LeftShiftFluent<A extends io.sundr.model.LeftShiftFluent<A>> extends BinaryExpressionFluent<A> {
 
   public LeftShiftFluent() {
   }
@@ -25,18 +27,21 @@ public class LeftShiftFluent<A extends LeftShiftFluent<A>> extends BinaryExpress
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     LeftShiftFluent that = (LeftShiftFluent) o;
     return true;
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(super.hashCode());
+    return Objects.hash();
   }
 
   public String toString() {

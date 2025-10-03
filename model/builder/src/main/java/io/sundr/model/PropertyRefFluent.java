@@ -2,7 +2,10 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
+import java.util.Optional;
 
 import io.sundr.builder.Nested;
 
@@ -10,7 +13,7 @@ import io.sundr.builder.Nested;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends WithScopeFluent<A> {
+public class PropertyRefFluent<A extends io.sundr.model.PropertyRefFluent<A>> extends WithScopeFluent<A> {
 
   private PropertyBuilder property;
 
@@ -33,27 +36,31 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends WithScope
   }
 
   public PropertyNested<A> editOrNewProperty() {
-    return withNewPropertyLike(java.util.Optional.ofNullable(buildProperty()).orElse(new PropertyBuilder().build()));
+    return this.withNewPropertyLike(Optional.ofNullable(this.buildProperty()).orElse(new PropertyBuilder().build()));
   }
 
   public PropertyNested<A> editOrNewPropertyLike(Property item) {
-    return withNewPropertyLike(java.util.Optional.ofNullable(buildProperty()).orElse(item));
+    return this.withNewPropertyLike(Optional.ofNullable(this.buildProperty()).orElse(item));
   }
 
   public PropertyNested<A> editProperty() {
-    return withNewPropertyLike(java.util.Optional.ofNullable(buildProperty()).orElse(null));
+    return this.withNewPropertyLike(Optional.ofNullable(this.buildProperty()).orElse(null));
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     PropertyRefFluent that = (PropertyRefFluent) o;
-    if (!java.util.Objects.equals(property, that.property))
+    if (!(Objects.equals(property, that.property))) {
       return false;
+    }
     return true;
   }
 
@@ -62,13 +69,13 @@ public class PropertyRefFluent<A extends PropertyRefFluent<A>> extends WithScope
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(property, super.hashCode());
+    return Objects.hash(property);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (property != null) {
+    if (!(property == null)) {
       sb.append("property:");
       sb.append(property);
     }

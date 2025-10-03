@@ -2,7 +2,9 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import io.sundr.builder.BaseFluent;
@@ -11,7 +13,7 @@ import io.sundr.builder.BaseFluent;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class StringStatementFluent<A extends StringStatementFluent<A>> extends BaseFluent<A> {
+public class StringStatementFluent<A extends io.sundr.model.StringStatementFluent<A>> extends BaseFluent<A> {
 
   private Supplier<String> supplier;
 
@@ -29,15 +31,19 @@ public class StringStatementFluent<A extends StringStatementFluent<A>> extends B
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     StringStatementFluent that = (StringStatementFluent) o;
-    if (!java.util.Objects.equals(supplier, that.supplier))
+    if (!(Objects.equals(supplier, that.supplier))) {
       return false;
+    }
     return true;
   }
 
@@ -50,13 +56,13 @@ public class StringStatementFluent<A extends StringStatementFluent<A>> extends B
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(supplier, super.hashCode());
+    return Objects.hash(supplier);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (supplier != null) {
+    if (!(supplier == null)) {
       sb.append("supplier:");
       sb.append(supplier);
     }

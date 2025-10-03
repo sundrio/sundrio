@@ -4,7 +4,9 @@ import java.lang.Class;
 import java.lang.Integer;
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
+import java.util.Objects;
 
 import io.sundr.builder.BaseFluent;
 import io.sundr.builder.Nested;
@@ -14,7 +16,7 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
+public class DoFluent<A extends io.sundr.model.DoFluent<A>> extends BaseFluent<A> {
 
   private VisitableBuilder<? extends Expression, ?> condition;
   private VisitableBuilder<? extends Statement, ?> statement;
@@ -36,138 +38,271 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "Multiply":
+      case "Multiply":
+
         return (VisitableBuilder<T, ?>) new MultiplyBuilder((Multiply) item);
-      case "io.sundr.model." + "NewArray":
+
+      case "NewArray":
+
         return (VisitableBuilder<T, ?>) new NewArrayBuilder((NewArray) item);
-      case "io.sundr.model." + "InstanceOf":
+
+      case "InstanceOf":
+
         return (VisitableBuilder<T, ?>) new InstanceOfBuilder((InstanceOf) item);
-      case "io.sundr.model." + "MethodCall":
+
+      case "MethodCall":
+
         return (VisitableBuilder<T, ?>) new MethodCallBuilder((MethodCall) item);
-      case "io.sundr.model." + "ClassRef":
+
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "Inverse":
+
+      case "Inverse":
+
         return (VisitableBuilder<T, ?>) new InverseBuilder((Inverse) item);
-      case "io.sundr.model." + "Index":
+
+      case "Index":
+
         return (VisitableBuilder<T, ?>) new IndexBuilder((Index) item);
-      case "io.sundr.model." + "GreaterThanOrEqual":
+
+      case "GreaterThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new GreaterThanOrEqualBuilder((GreaterThanOrEqual) item);
-      case "io.sundr.model." + "BitwiseAnd":
+
+      case "BitwiseAnd":
+
         return (VisitableBuilder<T, ?>) new BitwiseAndBuilder((BitwiseAnd) item);
-      case "io.sundr.model." + "Minus":
+
+      case "Minus":
+
         return (VisitableBuilder<T, ?>) new MinusBuilder((Minus) item);
-      case "io.sundr.model." + "LogicalOr":
+
+      case "LogicalOr":
+
         return (VisitableBuilder<T, ?>) new LogicalOrBuilder((LogicalOr) item);
-      case "io.sundr.model." + "NotEquals":
+
+      case "NotEquals":
+
         return (VisitableBuilder<T, ?>) new NotEqualsBuilder((NotEquals) item);
-      case "io.sundr.model." + "Divide":
+
+      case "Divide":
+
         return (VisitableBuilder<T, ?>) new DivideBuilder((Divide) item);
-      case "io.sundr.model." + "LessThan":
+
+      case "LessThan":
+
         return (VisitableBuilder<T, ?>) new LessThanBuilder((LessThan) item);
-      case "io.sundr.model." + "BitwiseOr":
+
+      case "BitwiseOr":
+
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
-      case "io.sundr.model." + "PropertyRef":
+
+      case "PropertyRef":
+
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
-      case "io.sundr.model." + "RightShift":
+
+      case "RightShift":
+
         return (VisitableBuilder<T, ?>) new RightShiftBuilder((RightShift) item);
-      case "io.sundr.model." + "Super":
+
+      case "Super":
+
         return (VisitableBuilder<T, ?>) new SuperBuilder((Super) item);
-      case "io.sundr.model." + "GreaterThan":
+
+      case "GreaterThan":
+
         return (VisitableBuilder<T, ?>) new GreaterThanBuilder((GreaterThan) item);
-      case "io.sundr.model." + "Declare":
+
+      case "Declare":
+
         return (VisitableBuilder<T, ?>) new DeclareBuilder((Declare) item);
-      case "io.sundr.model." + "Cast":
+
+      case "Cast":
+
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
-      case "io.sundr.model." + "Modulo":
+
+      case "Modulo":
+
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
-      case "io.sundr.model." + "DotClass":
+
+      case "DotClass":
+
         return (VisitableBuilder<T, ?>) new DotClassBuilder((DotClass) item);
-      case "io.sundr.model." + "ValueRef":
+
+      case "ValueRef":
+
         return (VisitableBuilder<T, ?>) new ValueRefBuilder((ValueRef) item);
-      case "io.sundr.model." + "LeftShift":
+
+      case "LeftShift":
+
         return (VisitableBuilder<T, ?>) new LeftShiftBuilder((LeftShift) item);
-      case "io.sundr.model." + "Empty":
+
+      case "Empty":
+
         return (VisitableBuilder<T, ?>) new EmptyBuilder((Empty) item);
-      case "io.sundr.model." + "Ternary":
+
+      case "Ternary":
+
         return (VisitableBuilder<T, ?>) new TernaryBuilder((Ternary) item);
-      case "io.sundr.model." + "BinaryExpression":
+
+      case "BinaryExpression":
+
         return (VisitableBuilder<T, ?>) new BinaryExpressionBuilder((BinaryExpression) item);
-      case "io.sundr.model." + "Equals":
+
+      case "Equals":
+
         return (VisitableBuilder<T, ?>) new EqualsBuilder((Equals) item);
-      case "io.sundr.model." + "Enclosed":
+
+      case "Enclosed":
+
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
-      case "io.sundr.model." + "PreDecrement":
+
+      case "PreDecrement":
+
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
-      case "io.sundr.model." + "PostDecrement":
+
+      case "PostDecrement":
+
         return (VisitableBuilder<T, ?>) new PostDecrementBuilder((PostDecrement) item);
-      case "io.sundr.model." + "Lambda":
+
+      case "Lambda":
+
         return (VisitableBuilder<T, ?>) new LambdaBuilder((Lambda) item);
-      case "io.sundr.model." + "Not":
+
+      case "Not":
+
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
-      case "io.sundr.model." + "Assign":
+
+      case "Assign":
+
         return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
-      case "io.sundr.model." + "This":
+
+      case "This":
+
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
-      case "io.sundr.model." + "Negative":
+
+      case "Negative":
+
         return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
-      case "io.sundr.model." + "LogicalAnd":
+
+      case "LogicalAnd":
+
         return (VisitableBuilder<T, ?>) new LogicalAndBuilder((LogicalAnd) item);
-      case "io.sundr.model." + "PostIncrement":
+
+      case "PostIncrement":
+
         return (VisitableBuilder<T, ?>) new PostIncrementBuilder((PostIncrement) item);
-      case "io.sundr.model." + "RightUnsignedShift":
+
+      case "RightUnsignedShift":
+
         return (VisitableBuilder<T, ?>) new RightUnsignedShiftBuilder((RightUnsignedShift) item);
-      case "io.sundr.model." + "Plus":
+
+      case "Plus":
+
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
-      case "io.sundr.model." + "Construct":
+
+      case "Construct":
+
         return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-      case "io.sundr.model." + "Xor":
+
+      case "Xor":
+
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
-      case "io.sundr.model." + "PreIncrement":
+
+      case "PreIncrement":
+
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
-      case "io.sundr.model." + "Property":
+
+      case "Property":
+
         return (VisitableBuilder<T, ?>) new PropertyBuilder((Property) item);
-      case "io.sundr.model." + "LessThanOrEqual":
+
+      case "LessThanOrEqual":
+
         return (VisitableBuilder<T, ?>) new LessThanOrEqualBuilder((LessThanOrEqual) item);
-      case "io.sundr.model." + "ContextRef":
+
+      case "ContextRef":
+
         return (VisitableBuilder<T, ?>) new ContextRefBuilder((ContextRef) item);
-      case "io.sundr.model." + "Positive":
+
+      case "Positive":
+
         return (VisitableBuilder<T, ?>) new PositiveBuilder((Positive) item);
-      case "io.sundr.model." + "ReturnDslThisStep":
+
+      case "ReturnDslThisStep":
+
         return (VisitableBuilder<T, ?>) new ReturnDslThisStepBuilder((ReturnDslThisStep) item);
-      case "io.sundr.model." + "Try":
+
+      case "Try":
+
         return (VisitableBuilder<T, ?>) new TryBuilder((Try) item);
-      case "io.sundr.model." + "Switch":
+
+      case "Switch":
+
         return (VisitableBuilder<T, ?>) new SwitchBuilder((Switch) item);
-      case "io.sundr.model." + "Synchronized":
+
+      case "Synchronized":
+
         return (VisitableBuilder<T, ?>) new SynchronizedBuilder((Synchronized) item);
-      case "io.sundr.model." + "Break":
+
+      case "Break":
+
         return (VisitableBuilder<T, ?>) new BreakBuilder((Break) item);
-      case "io.sundr.model." + "While":
+
+      case "While":
+
         return (VisitableBuilder<T, ?>) new WhileBuilder((While) item);
-      case "io.sundr.model." + "Continue":
+
+      case "Continue":
+
         return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
-      case "io.sundr.model." + "Throw":
+
+      case "Throw":
+
         return (VisitableBuilder<T, ?>) new ThrowBuilder((Throw) item);
-      case "io.sundr.model." + "StringStatement":
+
+      case "StringStatement":
+
         return (VisitableBuilder<T, ?>) new StringStatementBuilder((StringStatement) item);
-      case "io.sundr.model." + "Do":
+
+      case "Do":
+
         return (VisitableBuilder<T, ?>) new DoBuilder((Do) item);
-      case "io.sundr.model." + "Foreach":
+
+      case "Foreach":
+
         return (VisitableBuilder<T, ?>) new ForeachBuilder((Foreach) item);
-      case "io.sundr.model." + "Block":
+
+      case "Block":
+
         return (VisitableBuilder<T, ?>) new BlockBuilder((Block) item);
-      case "io.sundr.model." + "ReturnDslVariableStep":
+
+      case "ReturnDslVariableStep":
+
         return (VisitableBuilder<T, ?>) new ReturnDslVariableStepBuilder((ReturnDslVariableStep) item);
-      case "io.sundr.model." + "If":
+
+      case "If":
+
         return (VisitableBuilder<T, ?>) new IfBuilder((If) item);
-      case "io.sundr.model." + "Return":
+
+      case "Return":
+
         return (VisitableBuilder<T, ?>) new ReturnBuilder((Return) item);
-      case "io.sundr.model." + "IfDslThenStep":
+
+      case "IfDslThenStep":
+
         return (VisitableBuilder<T, ?>) new IfDslThenStepBuilder((IfDslThenStep) item);
-      case "io.sundr.model." + "For":
+
+      case "For":
+
         return (VisitableBuilder<T, ?>) new ForBuilder((For) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(Do instance) {
@@ -178,17 +313,22 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     DoFluent that = (DoFluent) o;
-    if (!java.util.Objects.equals(condition, that.condition))
+    if (!(Objects.equals(condition, that.condition))) {
       return false;
-    if (!java.util.Objects.equals(statement, that.statement))
+    }
+    if (!(Objects.equals(statement, that.statement))) {
       return false;
+    }
     return true;
   }
 
@@ -201,17 +341,18 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(condition, statement, super.hashCode());
+    return Objects.hash(condition, statement);
   }
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (condition != null) {
+    if (!(condition == null)) {
       sb.append("condition:");
-      sb.append(condition + ",");
+      sb.append(condition);
+      sb.append(",");
     }
-    if (statement != null) {
+    if (!(statement == null)) {
       sb.append("statement:");
       sb.append(statement);
     }
@@ -270,7 +411,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseAndCondition(Object left, Object right) {
-    return (A) withCondition(new BitwiseAnd(left, right));
+    return (A) this.withCondition(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndConditionNested<A> withNewBitwiseAndConditionLike(BitwiseAnd item) {
@@ -282,7 +423,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseAndStatement(Object left, Object right) {
-    return (A) withStatement(new BitwiseAnd(left, right));
+    return (A) this.withStatement(new BitwiseAnd(left, right));
   }
 
   public BitwiseAndStatementNested<A> withNewBitwiseAndStatementLike(BitwiseAnd item) {
@@ -294,7 +435,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseOrCondition(Object left, Object right) {
-    return (A) withCondition(new BitwiseOr(left, right));
+    return (A) this.withCondition(new BitwiseOr(left, right));
   }
 
   public BitwiseOrConditionNested<A> withNewBitwiseOrConditionLike(BitwiseOr item) {
@@ -306,7 +447,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewBitwiseOrStatement(Object left, Object right) {
-    return (A) withStatement(new BitwiseOr(left, right));
+    return (A) this.withStatement(new BitwiseOr(left, right));
   }
 
   public BitwiseOrStatementNested<A> withNewBitwiseOrStatementLike(BitwiseOr item) {
@@ -366,7 +507,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewContextRefCondition(String name) {
-    return (A) withCondition(new ContextRef(name));
+    return (A) this.withCondition(new ContextRef(name));
   }
 
   public ContextRefConditionNested<A> withNewContextRefConditionLike(ContextRef item) {
@@ -386,11 +527,11 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDeclareCondition(Class type, String name) {
-    return (A) withCondition(new Declare(type, name));
+    return (A) this.withCondition(new Declare(type, name));
   }
 
   public A withNewDeclareCondition(Class type, String name, Object value) {
-    return (A) withCondition(new Declare(type, name, value));
+    return (A) this.withCondition(new Declare(type, name, value));
   }
 
   public DeclareConditionNested<A> withNewDeclareConditionLike(Declare item) {
@@ -402,11 +543,11 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDeclareStatement(Class type, String name) {
-    return (A) withStatement(new Declare(type, name));
+    return (A) this.withStatement(new Declare(type, name));
   }
 
   public A withNewDeclareStatement(Class type, String name, Object value) {
-    return (A) withStatement(new Declare(type, name, value));
+    return (A) this.withStatement(new Declare(type, name, value));
   }
 
   public DeclareStatementNested<A> withNewDeclareStatementLike(Declare item) {
@@ -418,7 +559,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDivideCondition(Object left, Object right) {
-    return (A) withCondition(new Divide(left, right));
+    return (A) this.withCondition(new Divide(left, right));
   }
 
   public DivideConditionNested<A> withNewDivideConditionLike(Divide item) {
@@ -430,7 +571,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewDivideStatement(Object left, Object right) {
-    return (A) withStatement(new Divide(left, right));
+    return (A) this.withStatement(new Divide(left, right));
   }
 
   public DivideStatementNested<A> withNewDivideStatementLike(Divide item) {
@@ -482,7 +623,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewEqualsCondition(Object left, Object right) {
-    return (A) withCondition(new Equals(left, right));
+    return (A) this.withCondition(new Equals(left, right));
   }
 
   public EqualsConditionNested<A> withNewEqualsConditionLike(Equals item) {
@@ -494,7 +635,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewEqualsStatement(Object left, Object right) {
-    return (A) withStatement(new Equals(left, right));
+    return (A) this.withStatement(new Equals(left, right));
   }
 
   public EqualsStatementNested<A> withNewEqualsStatementLike(Equals item) {
@@ -522,7 +663,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanCondition(Object left, Object right) {
-    return (A) withCondition(new GreaterThan(left, right));
+    return (A) this.withCondition(new GreaterThan(left, right));
   }
 
   public GreaterThanConditionNested<A> withNewGreaterThanConditionLike(GreaterThan item) {
@@ -534,7 +675,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanOrEqualCondition(Object left, Object right) {
-    return (A) withCondition(new GreaterThanOrEqual(left, right));
+    return (A) this.withCondition(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualConditionNested<A> withNewGreaterThanOrEqualConditionLike(GreaterThanOrEqual item) {
@@ -546,7 +687,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanOrEqualStatement(Object left, Object right) {
-    return (A) withStatement(new GreaterThanOrEqual(left, right));
+    return (A) this.withStatement(new GreaterThanOrEqual(left, right));
   }
 
   public GreaterThanOrEqualStatementNested<A> withNewGreaterThanOrEqualStatementLike(GreaterThanOrEqual item) {
@@ -558,7 +699,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewGreaterThanStatement(Object left, Object right) {
-    return (A) withStatement(new GreaterThan(left, right));
+    return (A) this.withStatement(new GreaterThan(left, right));
   }
 
   public GreaterThanStatementNested<A> withNewGreaterThanStatementLike(GreaterThan item) {
@@ -626,7 +767,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLeftShiftCondition(Object left, Object right) {
-    return (A) withCondition(new LeftShift(left, right));
+    return (A) this.withCondition(new LeftShift(left, right));
   }
 
   public LeftShiftConditionNested<A> withNewLeftShiftConditionLike(LeftShift item) {
@@ -638,7 +779,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLeftShiftStatement(Object left, Object right) {
-    return (A) withStatement(new LeftShift(left, right));
+    return (A) this.withStatement(new LeftShift(left, right));
   }
 
   public LeftShiftStatementNested<A> withNewLeftShiftStatementLike(LeftShift item) {
@@ -650,7 +791,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanCondition(Object left, Object right) {
-    return (A) withCondition(new LessThan(left, right));
+    return (A) this.withCondition(new LessThan(left, right));
   }
 
   public LessThanConditionNested<A> withNewLessThanConditionLike(LessThan item) {
@@ -662,7 +803,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanOrEqualCondition(Object left, Object right) {
-    return (A) withCondition(new LessThanOrEqual(left, right));
+    return (A) this.withCondition(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualConditionNested<A> withNewLessThanOrEqualConditionLike(LessThanOrEqual item) {
@@ -674,7 +815,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanOrEqualStatement(Object left, Object right) {
-    return (A) withStatement(new LessThanOrEqual(left, right));
+    return (A) this.withStatement(new LessThanOrEqual(left, right));
   }
 
   public LessThanOrEqualStatementNested<A> withNewLessThanOrEqualStatementLike(LessThanOrEqual item) {
@@ -686,7 +827,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLessThanStatement(Object left, Object right) {
-    return (A) withStatement(new LessThan(left, right));
+    return (A) this.withStatement(new LessThan(left, right));
   }
 
   public LessThanStatementNested<A> withNewLessThanStatementLike(LessThan item) {
@@ -698,7 +839,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalAndCondition(Object left, Object right) {
-    return (A) withCondition(new LogicalAnd(left, right));
+    return (A) this.withCondition(new LogicalAnd(left, right));
   }
 
   public LogicalAndConditionNested<A> withNewLogicalAndConditionLike(LogicalAnd item) {
@@ -710,7 +851,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalAndStatement(Object left, Object right) {
-    return (A) withStatement(new LogicalAnd(left, right));
+    return (A) this.withStatement(new LogicalAnd(left, right));
   }
 
   public LogicalAndStatementNested<A> withNewLogicalAndStatementLike(LogicalAnd item) {
@@ -722,7 +863,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalOrCondition(Object left, Object right) {
-    return (A) withCondition(new LogicalOr(left, right));
+    return (A) this.withCondition(new LogicalOr(left, right));
   }
 
   public LogicalOrConditionNested<A> withNewLogicalOrConditionLike(LogicalOr item) {
@@ -734,7 +875,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewLogicalOrStatement(Object left, Object right) {
-    return (A) withStatement(new LogicalOr(left, right));
+    return (A) this.withStatement(new LogicalOr(left, right));
   }
 
   public LogicalOrStatementNested<A> withNewLogicalOrStatementLike(LogicalOr item) {
@@ -762,7 +903,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMinusCondition(Object left, Object right) {
-    return (A) withCondition(new Minus(left, right));
+    return (A) this.withCondition(new Minus(left, right));
   }
 
   public MinusConditionNested<A> withNewMinusConditionLike(Minus item) {
@@ -774,7 +915,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMinusStatement(Object left, Object right) {
-    return (A) withStatement(new Minus(left, right));
+    return (A) this.withStatement(new Minus(left, right));
   }
 
   public MinusStatementNested<A> withNewMinusStatementLike(Minus item) {
@@ -786,7 +927,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewModuloCondition(Object left, Object right) {
-    return (A) withCondition(new Modulo(left, right));
+    return (A) this.withCondition(new Modulo(left, right));
   }
 
   public ModuloConditionNested<A> withNewModuloConditionLike(Modulo item) {
@@ -798,7 +939,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewModuloStatement(Object left, Object right) {
-    return (A) withStatement(new Modulo(left, right));
+    return (A) this.withStatement(new Modulo(left, right));
   }
 
   public ModuloStatementNested<A> withNewModuloStatementLike(Modulo item) {
@@ -810,7 +951,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMultiplyCondition(Object left, Object right) {
-    return (A) withCondition(new Multiply(left, right));
+    return (A) this.withCondition(new Multiply(left, right));
   }
 
   public MultiplyConditionNested<A> withNewMultiplyConditionLike(Multiply item) {
@@ -822,7 +963,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewMultiplyStatement(Object left, Object right) {
-    return (A) withStatement(new Multiply(left, right));
+    return (A) this.withStatement(new Multiply(left, right));
   }
 
   public MultiplyStatementNested<A> withNewMultiplyStatementLike(Multiply item) {
@@ -842,7 +983,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNewArrayCondition(Class type, Integer[] sizes) {
-    return (A) withCondition(new NewArray(type, sizes));
+    return (A) this.withCondition(new NewArray(type, sizes));
   }
 
   public NewArrayConditionNested<A> withNewNewArrayConditionLike(NewArray item) {
@@ -862,7 +1003,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNotEqualsCondition(Object left, Object right) {
-    return (A) withCondition(new NotEquals(left, right));
+    return (A) this.withCondition(new NotEquals(left, right));
   }
 
   public NotEqualsConditionNested<A> withNewNotEqualsConditionLike(NotEquals item) {
@@ -874,7 +1015,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewNotEqualsStatement(Object left, Object right) {
-    return (A) withStatement(new NotEquals(left, right));
+    return (A) this.withStatement(new NotEquals(left, right));
   }
 
   public NotEqualsStatementNested<A> withNewNotEqualsStatementLike(NotEquals item) {
@@ -886,7 +1027,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewPlusCondition(Object left, Object right) {
-    return (A) withCondition(new Plus(left, right));
+    return (A) this.withCondition(new Plus(left, right));
   }
 
   public PlusConditionNested<A> withNewPlusConditionLike(Plus item) {
@@ -898,7 +1039,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewPlusStatement(Object left, Object right) {
-    return (A) withStatement(new Plus(left, right));
+    return (A) this.withStatement(new Plus(left, right));
   }
 
   public PlusStatementNested<A> withNewPlusStatementLike(Plus item) {
@@ -1014,7 +1155,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewReturnDslVariableStepStatement(String name) {
-    return (A) withStatement(new ReturnDslVariableStep(name));
+    return (A) this.withStatement(new ReturnDslVariableStep(name));
   }
 
   public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
@@ -1026,7 +1167,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewReturnStatement(Object object) {
-    return (A) withStatement(new Return(object));
+    return (A) this.withStatement(new Return(object));
   }
 
   public ReturnStatementNested<A> withNewReturnStatementLike(Return item) {
@@ -1038,7 +1179,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightShiftCondition(Object left, Object right) {
-    return (A) withCondition(new RightShift(left, right));
+    return (A) this.withCondition(new RightShift(left, right));
   }
 
   public RightShiftConditionNested<A> withNewRightShiftConditionLike(RightShift item) {
@@ -1050,7 +1191,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightShiftStatement(Object left, Object right) {
-    return (A) withStatement(new RightShift(left, right));
+    return (A) this.withStatement(new RightShift(left, right));
   }
 
   public RightShiftStatementNested<A> withNewRightShiftStatementLike(RightShift item) {
@@ -1062,7 +1203,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightUnsignedShiftCondition(Object left, Object right) {
-    return (A) withCondition(new RightUnsignedShift(left, right));
+    return (A) this.withCondition(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftConditionNested<A> withNewRightUnsignedShiftConditionLike(RightUnsignedShift item) {
@@ -1074,7 +1215,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewRightUnsignedShiftStatement(Object left, Object right) {
-    return (A) withStatement(new RightUnsignedShift(left, right));
+    return (A) this.withStatement(new RightUnsignedShift(left, right));
   }
 
   public RightUnsignedShiftStatementNested<A> withNewRightUnsignedShiftStatementLike(RightUnsignedShift item) {
@@ -1086,11 +1227,11 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewStringStatement(String data) {
-    return (A) withStatement(new StringStatement(data));
+    return (A) this.withStatement(new StringStatement(data));
   }
 
   public A withNewStringStatement(String data, Object[] parameters) {
-    return (A) withStatement(new StringStatement(data, parameters));
+    return (A) this.withStatement(new StringStatement(data, parameters));
   }
 
   public StringStatementNested<A> withNewStringStatementLike(StringStatement item) {
@@ -1158,7 +1299,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewValueRefCondition(Object value) {
-    return (A) withCondition(new ValueRef(value));
+    return (A) this.withCondition(new ValueRef(value));
   }
 
   public ValueRefConditionNested<A> withNewValueRefConditionLike(ValueRef item) {
@@ -1178,7 +1319,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewXorCondition(Object left, Object right) {
-    return (A) withCondition(new Xor(left, right));
+    return (A) this.withCondition(new Xor(left, right));
   }
 
   public XorConditionNested<A> withNewXorConditionLike(Xor item) {
@@ -1190,7 +1331,7 @@ public class DoFluent<A extends DoFluent<A>> extends BaseFluent<A> {
   }
 
   public A withNewXorStatement(Object left, Object right) {
-    return (A) withStatement(new Xor(left, right));
+    return (A) this.withStatement(new Xor(left, right));
   }
 
   public XorStatementNested<A> withNewXorStatementLike(Xor item) {

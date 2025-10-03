@@ -2,11 +2,13 @@ package io.sundr.model;
 
 import java.lang.Object;
 import java.lang.String;
+import java.lang.StringBuilder;
 import java.lang.SuppressWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Nested;
@@ -16,7 +18,7 @@ import io.sundr.builder.VisitableBuilder;
  * Generated
  */
 @SuppressWarnings("unchecked")
-public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A> {
+public class ClassRefFluent<A extends io.sundr.model.ClassRefFluent<A>> extends TypeRefFluent<A> {
 
   private ArrayList<VisitableBuilder<? extends TypeRef, ?>> arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
   private int dimensions;
@@ -31,7 +33,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
 
   public A addAllToArguments(Collection<TypeRef> items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList();
     }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
@@ -83,7 +85,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
 
   public A addToArguments(VisitableBuilder<? extends TypeRef, ?> builder) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList();
     }
     _visitables.get("arguments").add(builder);
     this.arguments.add(builder);
@@ -92,7 +94,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
 
   public A addToArguments(TypeRef... items) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList();
     }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
@@ -104,7 +106,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
 
   public A addToArguments(int index, VisitableBuilder<? extends TypeRef, ?> builder) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList();
     }
     if (index < 0 || index >= arguments.size()) {
       _visitables.get("arguments").add(builder);
@@ -118,7 +120,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
 
   public A addToArguments(int index, TypeRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList();
     }
     VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
     if (index < 0 || index >= arguments.size()) {
@@ -158,18 +160,31 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
 
   protected static <T> VisitableBuilder<T, ?> builder(Object item) {
     switch (item.getClass().getName()) {
-      case "io.sundr.model." + "ClassRef":
+      case "ClassRef":
+
         return (VisitableBuilder<T, ?>) new ClassRefBuilder((ClassRef) item);
-      case "io.sundr.model." + "PrimitiveRef":
+
+      case "PrimitiveRef":
+
         return (VisitableBuilder<T, ?>) new PrimitiveRefBuilder((PrimitiveRef) item);
-      case "io.sundr.model." + "VoidRef":
+
+      case "VoidRef":
+
         return (VisitableBuilder<T, ?>) new VoidRefBuilder((VoidRef) item);
-      case "io.sundr.model." + "TypeParamRef":
+
+      case "TypeParamRef":
+
         return (VisitableBuilder<T, ?>) new TypeParamRefBuilder((TypeParamRef) item);
-      case "io.sundr.model." + "WildcardRef":
+
+      case "WildcardRef":
+
         return (VisitableBuilder<T, ?>) new WildcardRefBuilder((WildcardRef) item);
+
+      default:
+
+        return (VisitableBuilder<T, ?>) builderOf(item);
+
     }
-    return (VisitableBuilder<T, ?>) builderOf(item);
   }
 
   protected void copyInstance(ClassRef instance) {
@@ -182,19 +197,25 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   }
 
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || this.getClass() != o.getClass()) {
       return false;
-    if (!super.equals(o))
+    }
+    if (!(super.equals(o))) {
       return false;
+    }
     ClassRefFluent that = (ClassRefFluent) o;
-    if (!java.util.Objects.equals(fullyQualifiedName, that.fullyQualifiedName))
+    if (!(Objects.equals(fullyQualifiedName, that.fullyQualifiedName))) {
       return false;
-    if (dimensions != that.dimensions)
+    }
+    if (dimensions != that.dimensions) {
       return false;
-    if (!java.util.Objects.equals(arguments, that.arguments))
+    }
+    if (!(Objects.equals(arguments, that.arguments))) {
       return false;
+    }
     return true;
   }
 
@@ -228,12 +249,13 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   }
 
   public int hashCode() {
-    return java.util.Objects.hash(fullyQualifiedName, dimensions, arguments, super.hashCode());
+    return Objects.hash(fullyQualifiedName, dimensions, arguments);
   }
 
   public A removeAllFromArguments(Collection<TypeRef> items) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
       _visitables.get("arguments").remove(builder);
@@ -243,16 +265,18 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   }
 
   public A removeFromArguments(VisitableBuilder<? extends TypeRef, ?> builder) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     _visitables.get("arguments").remove(builder);
     this.arguments.remove(builder);
     return (A) this;
   }
 
   public A removeFromArguments(TypeRef... items) {
-    if (this.arguments == null)
+    if (this.arguments == null) {
       return (A) this;
+    }
     for (TypeRef item : items) {
       VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
       _visitables.get("arguments").remove(builder);
@@ -262,10 +286,11 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   }
 
   public A removeMatchingFromArguments(Predicate<VisitableBuilder<? extends TypeRef, ?>> predicate) {
-    if (arguments == null)
+    if (arguments == null) {
       return (A) this;
-    final Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
-    final List visitables = _visitables.get("arguments");
+    }
+    Iterator<VisitableBuilder<? extends TypeRef, ?>> each = arguments.iterator();
+    List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
       VisitableBuilder<? extends TypeRef, ?> builder = each.next();
       if (predicate.test(builder)) {
@@ -298,7 +323,7 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
 
   public A setToArguments(int index, TypeRef item) {
     if (this.arguments == null) {
-      this.arguments = new ArrayList<VisitableBuilder<? extends TypeRef, ?>>();
+      this.arguments = new ArrayList();
     }
     VisitableBuilder<? extends TypeRef, ?> builder = builder(item);
     if (index < 0 || index >= arguments.size()) {
@@ -314,13 +339,15 @@ public class ClassRefFluent<A extends ClassRefFluent<A>> extends TypeRefFluent<A
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (fullyQualifiedName != null) {
+    if (!(fullyQualifiedName == null)) {
       sb.append("fullyQualifiedName:");
-      sb.append(fullyQualifiedName + ",");
+      sb.append(fullyQualifiedName);
+      sb.append(",");
     }
     sb.append("dimensions:");
-    sb.append(dimensions + ",");
-    if (arguments != null && !arguments.isEmpty()) {
+    sb.append(dimensions);
+    sb.append(",");
+    if (!(arguments == null) && !(arguments.isEmpty())) {
       sb.append("arguments:");
       sb.append(arguments);
     }
