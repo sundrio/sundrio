@@ -25,10 +25,29 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Base class that provides common functionality for fluent builders.
+ * This class serves as a foundation for implementing fluent interfaces with visitable support.
+ *
+ * @param <F> the fluent type
+ */
 public class BaseFluent<F> {
 
+  /**
+   * Map of visitable objects associated with this fluent instance.
+   */
   public final VisitableMap _visitables = new VisitableMap();
 
+  /**
+   * Creates a builder for the given item.
+   * First attempts to use the item's edit() method if it's Editable,
+   * otherwise tries to instantiate a corresponding Builder class.
+   *
+   * @param <T> the type of the item
+   * @param item the item to create a builder for
+   * @return a VisitableBuilder for the item
+   * @throws IllegalStateException if no builder can be created
+   */
   public static <T> VisitableBuilder<T, ?> builderOf(T item) {
     if (item instanceof Editable) {
       Object editor = ((Editable) item).edit();
@@ -52,18 +71,46 @@ public class BaseFluent<F> {
     }
   }
 
+  /**
+   * Builds a list of items from a list of builders.
+   *
+   * @param <T> the type of items to build
+   * @param list the list of builders to build from
+   * @return a list of built items, or null if the input list is null
+   */
   public static <T> List<T> build(List<? extends Builder<? extends T>> list) {
     return list == null ? null : list.stream().map(Builder::build).collect(Collectors.toList());
   }
 
+  /**
+   * Builds a set of items from a set of builders.
+   *
+   * @param <T> the type of items to build
+   * @param set the set of builders to build from
+   * @return a LinkedHashSet of built items, or null if the input set is null
+   */
   public static <T> Set<T> build(Set<? extends Builder<? extends T>> set) {
     return set == null ? null : new LinkedHashSet<T>(set.stream().map(Builder::build).collect(Collectors.toSet()));
   }
 
+  /**
+   * Aggregates multiple lists into a single list, filtering out null lists.
+   *
+   * @param <T> the type of list elements
+   * @param lists the lists to aggregate
+   * @return a new ArrayList containing all non-null lists
+   */
   public static <T> List<T> aggregate(List<? extends T>... lists) {
     return new ArrayList(Arrays.stream(lists).filter(Objects::nonNull).collect(Collectors.toList()));
   }
 
+  /**
+   * Aggregates multiple sets into a single set, filtering out null sets.
+   *
+   * @param <T> the type of set elements
+   * @param sets the sets to aggregate
+   * @return a new LinkedHashSet containing all non-null sets
+   */
   public static <T> Set<T> aggregate(Set<? extends T>... sets) {
     return new LinkedHashSet(Arrays.stream(sets).filter(Objects::nonNull).collect(Collectors.toSet()));
   }
@@ -87,6 +134,11 @@ public class BaseFluent<F> {
     return true;
   }
 
+  /**
+   * Gets the visitable map associated with this fluent instance.
+   *
+   * @return an Optional containing the VisitableMap
+   */
   public Optional<VisitableMap> getVisitableMap() {
     return Optional.of(_visitables);
   }

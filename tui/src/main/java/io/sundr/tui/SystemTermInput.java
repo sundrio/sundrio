@@ -16,6 +16,9 @@ public class SystemTermInput implements TermInput {
   private volatile boolean closed = false;
   private volatile Process sttyProcess = null;
 
+  /**
+   * Creates a new SystemTermInput instance using System.in as the input stream.
+   */
   public SystemTermInput() {
     this.inputStream = System.in;
   }
