@@ -21,7 +21,7 @@
     <parent>
         <groupId>io.sundr</groupId>
         <artifactId>sundr-pom</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>0.230.0</version>
     </parent>
 
     <artifactId>sundrio-tui</artifactId>

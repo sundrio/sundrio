@@ -20,13 +20,13 @@
     <parent>
         <artifactId>builder-examples-pom</artifactId>
         <groupId>io.sundr.examples</groupId>
-        <version>999-SNAPSHOT</version>
+        <version>0.230.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>io.sundr</groupId>
     <artifactId>builder-hello-world-example</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.230.0</version>
     <name>Sundrio :: Examples :: Builder :: Hello World</name>
 
     <properties>
