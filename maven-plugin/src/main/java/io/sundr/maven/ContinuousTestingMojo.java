@@ -1292,14 +1292,14 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
   private Set<String> findTestMethodsAffectedByImpact(ImpactAnalysisResult impact) {
     Set<String> affectedTestMethods = new HashSet<>();
 
+    // Extract test methods directly from the dependency tree instead of using legacy mappings
     Set<MethodReference> affectedMethodRefs = impact.getAffectedMethodReferences();
 
     for (MethodReference methodRef : affectedMethodRefs) {
-      String methodKey = methodRef.getOwningType().getFullyQualifiedName() + "." + methodRef.getMethod().getName();
-
-      Set<String> dependentTests = sourceMethodToTestMethods.get(methodKey);
-      if (dependentTests != null) {
-        affectedTestMethods.addAll(dependentTests);
+      // Check if this is a test method
+      if (isTestMethod(methodRef.getMethod())) {
+        String testMethodKey = methodRef.getOwningType().getFullyQualifiedName() + "." + methodRef.getMethod().getName();
+        affectedTestMethods.add(testMethodKey);
       }
     }
 
@@ -1309,31 +1309,19 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
   private Set<String> findTestsAffectedByImpact(ImpactAnalysisResult impact) {
     Set<String> affectedTests = new HashSet<>();
 
-    // Check which tests depend on the affected files
-    for (Path affectedFile : impact.getAffectedFiles()) {
-      String filePath = affectedFile.toString();
+    // Extract test files directly from the dependency tree instead of using legacy mappings
+    Set<MethodReference> affectedMethodRefs = impact.getAffectedMethodReferences();
 
-      for (Map.Entry<String, Set<String>> entry : testToSourceMapping.entrySet()) {
-        if (entry.getValue().contains(filePath)) {
-          affectedTests.add(entry.getKey());
-        }
+    for (MethodReference methodRef : affectedMethodRefs) {
+      // Check if this method belongs to a test class
+      if (isTestMethod(methodRef.getMethod())) {
+        TypeDef testType = methodRef.getOwningType();
+
+        // Find the test file for this type
+        sourceProject.testSources().find(testType.getFullyQualifiedName()).ifPresent(testPath -> {
+          affectedTests.add(testPath.toString());
+        });
       }
-    }
-
-    // Also check for direct dependencies on affected TypeDefs
-    for (TypeDef affectedType : impact.getAffectedTypeDefs()) {
-      String typeFQN = affectedType.getFullyQualifiedName();
-
-      // Find source file for this type
-      sourceProject.sources().find(typeFQN).ifPresent(sourcePath -> {
-        String sourceFile = sourcePath.toString();
-
-        for (Map.Entry<String, Set<String>> entry : testToSourceMapping.entrySet()) {
-          if (entry.getValue().contains(sourceFile)) {
-            affectedTests.add(entry.getKey());
-          }
-        }
-      });
     }
 
     return affectedTests;
