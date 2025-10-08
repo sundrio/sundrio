@@ -309,7 +309,8 @@ public class ExpressionConverter {
       if (!varDeclExpr.getVars().isEmpty()) {
         VariableDeclarator var = varDeclExpr.getVars().get(0);
         String varName = var.getId().getName();
-        Property prop = Property.newProperty(OBJECT, varName);
+        TypeRef typeRef = TYPEREF_ADAPTER.apply(varDeclExpr.getType());
+        Property prop = Property.newProperty(typeRef, varName);
 
         if (var.getInit() != null) {
           io.sundr.model.Expression initExpr = convertExpression(var.getInit());
