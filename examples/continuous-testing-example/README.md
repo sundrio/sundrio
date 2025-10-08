@@ -31,13 +31,6 @@ The `continuous-test` goal provides intelligent test execution based on file cha
         <testIncludes>**/*Test.java,**/Test*.java</testIncludes>
         <testGoal>test</testGoal>
     </configuration>
-    <executions>
-        <execution>
-            <goals>
-                <goal>continuous-test</goal>
-            </goals>
-        </execution>
-    </executions>
 </plugin>
 ```
 
@@ -86,67 +79,88 @@ This provides much faster feedback during development compared to running the en
 When running continuous testing, you'll see output like this:
 
 ```
-Continuous Testing: Tracking 32 test methods
-[INFO] /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/main/java/io/sundr/FunctionFactory.java: Some input files use unchecked or unsafe operations.
-[INFO] /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/main/java/io/sundr/FunctionFactory.java: Recompile with -Xlint:unchecked for details.
-[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/test/resources
-[INFO] Recompiling the module because of changed dependency.
-[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
-[INFO] Compiling 8 source files with javac [debug release 11] to target/test-classes
-[INFO] --- surefire:3.5.2:test (default-test) @ sundr-core ---
+Continuous Testing: Tracking 8 test methods
+[INFO] --- surefire:3.5.2:test (default-test) @ continuous-testing-example ---
 [INFO] Using auto detected provider org.apache.maven.surefire.junit4.JUnit4Provider
 [INFO] -------------------------------------------------------
 [INFO] -------------------------------------------------------
-[INFO] Running io.sundr.utils.MapsTest
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.069 s -- in io.sundr.utils.MapsTest
+[INFO] Running io.sundr.examples.StringUtilsTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in io.sundr.examples.StringUtilsTest
+[INFO] Running io.sundr.examples.CalculatorTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 s -- in io.sundr.examples.CalculatorTest
 [INFO] Results:
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  5.828 s
-[INFO] Finished at: 2025-10-03T17:46:15+03:00
+[INFO] Total time:  1.491 s
+[INFO] Finished at: 2025-10-08T10:26:58+03:00
 [INFO] ------------------------------------------------------------------------
 
 
-✅ Tests: 32 methods, 32 ✓ | Last run: 4 run, 4 ✓
+⏳ Tests: 8 methods, 8 ⏳ | Last run: 8 run, 8 ✓
 [Q]uit | [D]ependency tree | [R]estart | [H]elp
 ```
 
 The interface shows:
 - **Tracking Status**: Total number of test methods being monitored
-- **Smart Execution**: Only 4 out of 32 tests were run (those affected by the change)
 - **Real-time Feedback**: Interactive status line with test results
 - **Controls**: Keyboard shortcuts for quit, dependency analysis, restart, and help
+
+By performing a change in a source file, say `Calculator.java`, you'll see:
+
+```
+Continuous Testing: Tracking 8 test methods
+[INFO] Compiling 2 source files with javac [debug release 11] to target/test-classes
+[INFO] --- surefire:3.5.2:test (default-test) @ continuous-testing-example ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junit4.JUnit4Provider
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running io.sundr.examples.CalculatorTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.030 s -- in io.sundr.examples.CalculatorTest
+[INFO] Results:
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.887 s
+[INFO] Finished at: 2025-10-08T10:36:07+03:00
+[INFO] ------------------------------------------------------------------------
+
+
+✅ Tests: 8 methods, 8 ✓ | Last run: 1 run, 1 ✓
+[Q]uit | [D]ependency tree | [R]estart | [H]elp
+```
+
+The out now shows that only 1 test was run, the one affected by the change.
 
 ### Dependency Tree Analysis
 
 Pressing `[D]` shows the dependency tree for troubleshooting and clarity:
 
 ```
+Continuous Testing: Tracking 8 test methods
 🌳 Dependency Tree - From Last Changes to Affected Tests
 
 
 📁 Changes Types:
-  ✏️  Modified: io.sundr.utils.Maps
+  ✏️  Modified: io.sundr.examples.Calculator
     📋 Method changes: 1
-      └─ MODIFIED: public static java.lang.String extractKey(java.lang.String mapping) (implementation changed)
+      └─ MODIFIED: public Int add(Int a,Int b) (implementation changed)
 
 🌳 Method Dependency Tree:
 
-  Maps.extractKey
-  \- Maps.create
-     +- MapsTest.shouldCreateMapWithOneElement
-     +- MapsTest.shouldCreateMapWithThreeElements
-     +- MapsTest.shouldCreateMapWithTwoElements
-     \- MapsTest.shouldCreateFromMapping
+  Calculator.add
+  \- CalculatorTest.testAdd
 
-📄 Affected Test Files:
-  └─ /home/iocanel/workspace/src/github.com/sundrio/sundrio/core/src/test/java/io/sundr/utils/MapsTest.java
+🧪 Affected Test Methods:
+  └─ io.sundr.examples.CalculatorTest.testAdd
 
 
 Press any key to return to continuous testing...
+✅ Tests: 8 methods, 8 ✓ | Last run: 1 run, 1 ✓
+[Q]uit | [D]ependency tree | [R]estart | [H]elp
 ```
 
 This view helps understand:
@@ -157,7 +171,7 @@ This view helps understand:
 
 ## Limitations
 
-- Currently supports single module projects only
+- Currently, supports single module projects only
 - Requires Java source files (doesn't analyze bytecode dependencies)
 - File watching may not work properly in some containerized environments
 - Only analyzes direct type dependencies (not runtime or reflection-based dependencies)

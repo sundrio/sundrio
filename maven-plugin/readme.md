@@ -2,6 +2,9 @@
 
 The sundrio maven plugin can be used to generate BOMs for multi-module projects and provides experimental continuous testing capabilities.
 
+### Features
+* Generate BOMs for multi-module projects
+* Experimental continuous testing capabilities
 
 ### Generating a BOM.
 
