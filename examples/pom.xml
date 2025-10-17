@@ -34,6 +34,7 @@
         <module>continuous-testing-example</module>
         <module>crud</module>
         <module>curator-dsl</module>
+        <module>generator</module>
         <module>kubernetes-dsl</module>
         <module>kubernetes-swagger</module>
         <module>validation</module>
