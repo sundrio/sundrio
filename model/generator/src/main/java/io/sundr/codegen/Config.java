@@ -17,7 +17,7 @@
 
 package io.sundr.codegen;
 
-import io.sundr.builder.annotations.ExternalBuildables;
+import io.sundr.internal.builder.annotations.ExternalBuildables;
 
 @ExternalBuildables(skipExistingTypes = false, lazyCollectionInitEnabled = false, lazyMapInitEnabled = false, includeAbstractClasses = true, includeInterfaces = false, value = "io.sundr.model", excludes = {
     "io.sundr.model.AttributeKey",

@@ -19,8 +19,8 @@ package io.sundr.dsl.internal.type.functions;
 import java.util.function.Function;
 
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -75,8 +75,8 @@ public final class Merge {
         for (Method method : items[1].getMethods()) {
           builder = builder.addToMethods(method);
         }
-        for (Property property : items[1].getProperties()) {
-          builder = builder.addToProperties(property);
+        for (Field field : items[1].getFields()) {
+          builder = builder.addToFields(field);
         }
         return builder.build();
       } else {

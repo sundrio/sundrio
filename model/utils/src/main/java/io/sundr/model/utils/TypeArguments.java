@@ -28,8 +28,8 @@ import java.util.stream.Stream;
 
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -37,8 +37,8 @@ import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.functions.GetDefinition;
+import io.sundr.model.visitors.ApplyTypeParamMappingToField;
 import io.sundr.model.visitors.ApplyTypeParamMappingToMethod;
-import io.sundr.model.visitors.ApplyTypeParamMappingToProperty;
 import io.sundr.model.visitors.ApplyTypeParamMappingToTypeArguments;
 import io.sundr.utils.Predicates;
 
@@ -65,7 +65,7 @@ public class TypeArguments {
     final List<TypeDef> typeDefs = classRefs.stream().map(TypeArguments::applyGenericArguments).collect(Collectors.toList());
 
     // resolve properties
-    final List<Property> allProperties = applyToProperties(definition);
+    final List<Field> allProperties = applyToProperties(definition);
     final List<Method> allMethods = applyToMethods(definition);
     final List<Method> allConstructors = applyToConstructors(definition);
 
@@ -89,7 +89,7 @@ public class TypeArguments {
     // re-create TypeDef with all the needed information
     return new RichTypeDef(definition.getKind(), definition.getPackageName(),
         definition.getName(), definition.getComments(), definition.getAnnotations(), classRefs,
-        definition.getImplementsList(), definition.getParameters(), definition.getProperties(), allProperties,
+        definition.getImplementsList(), definition.getParameters(), definition.getFields(), allProperties,
         definition.getConstructors(), allConstructors, definition.getMethods(), allMethods, definition.getOuterTypeName(),
         definition.getInnerTypes().stream().map(i -> TypeArguments.apply(i)).collect(Collectors.toList()),
         definition.getModifiers(), definition.getAttributes());
@@ -156,18 +156,18 @@ public class TypeArguments {
     } else {
       return new TypeDefBuilder(definition)
           .accept(new ApplyTypeParamMappingToTypeArguments(mappings)) // existing type arguments must be handled before methods and properties
-          .accept(new ApplyTypeParamMappingToProperty(mappings, ORIGINAL_TYPE_PARAMETER),
+          .accept(new ApplyTypeParamMappingToField(mappings, ORIGINAL_TYPE_PARAMETER),
               new ApplyTypeParamMappingToMethod(mappings, ORIGINAL_TYPE_PARAMETER))
           .build();
     }
   }
 
-  private static List<Property> applyToProperties(TypeDef definition) {
+  private static List<Field> applyToProperties(TypeDef definition) {
     return Stream
-        .concat(definition.getProperties().stream(),
+        .concat(definition.getFields().stream(),
             definition.getExtendsList().stream().filter(INTERNAL_JDK.negate())
                 .flatMap(e -> applyToProperties(applyGenericArguments(e)).stream()))
-        .filter(Predicates.distinct(Property::withErasure)).collect(Collectors.toList());
+        .filter(Predicates.distinct(Field::withErasure)).collect(Collectors.toList());
   }
 
   private static List<Method> applyToMethods(TypeDef definition) {

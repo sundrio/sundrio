@@ -23,7 +23,7 @@ import io.sundr.builder.VisitableBuilder;
 public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends ModifierSupportFluent<A> {
 
   private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();
-  private ArrayList<PropertyBuilder> arguments = new ArrayList<PropertyBuilder>();
+  private ArrayList<ArgumentBuilder> arguments = new ArrayList<ArgumentBuilder>();
   private BlockBuilder block;
   private List<String> comments = new ArrayList<String>();
   private boolean defaultMethod;
@@ -52,12 +52,12 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A addAllToArguments(Collection<Property> items) {
+  public A addAllToArguments(Collection<Argument> items) {
     if (this.arguments == null) {
       this.arguments = new ArrayList();
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+    for (Argument item : items) {
+      ArgumentBuilder builder = new ArgumentBuilder(item);
       _visitables.get("arguments").add(builder);
       this.arguments.add(builder);
     }
@@ -110,7 +110,7 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return new ArgumentsNested(-1, null);
   }
 
-  public ArgumentsNested<A> addNewArgumentLike(Property item) {
+  public ArgumentsNested<A> addNewArgumentLike(Argument item) {
     return new ArgumentsNested(-1, item);
   }
 
@@ -157,23 +157,23 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A addToArguments(Property... items) {
+  public A addToArguments(Argument... items) {
     if (this.arguments == null) {
       this.arguments = new ArrayList();
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+    for (Argument item : items) {
+      ArgumentBuilder builder = new ArgumentBuilder(item);
       _visitables.get("arguments").add(builder);
       this.arguments.add(builder);
     }
     return (A) this;
   }
 
-  public A addToArguments(int index, Property item) {
+  public A addToArguments(int index, Argument item) {
     if (this.arguments == null) {
       this.arguments = new ArrayList();
     }
-    PropertyBuilder builder = new PropertyBuilder(item);
+    ArgumentBuilder builder = new ArgumentBuilder(item);
     if (index < 0 || index >= arguments.size()) {
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
@@ -264,11 +264,11 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return this.annotations != null ? build(annotations) : null;
   }
 
-  public Property buildArgument(int index) {
+  public Argument buildArgument(int index) {
     return this.arguments.get(index).build();
   }
 
-  public List<Property> buildArguments() {
+  public List<Argument> buildArguments() {
     return this.arguments != null ? build(arguments) : null;
   }
 
@@ -288,7 +288,7 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return this.annotations.get(0).build();
   }
 
-  public Property buildFirstArgument() {
+  public Argument buildFirstArgument() {
     return this.arguments.get(0).build();
   }
 
@@ -304,7 +304,7 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return this.annotations.get(annotations.size() - 1).build();
   }
 
-  public Property buildLastArgument() {
+  public Argument buildLastArgument() {
     return this.arguments.get(arguments.size() - 1).build();
   }
 
@@ -325,8 +325,8 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return null;
   }
 
-  public Property buildMatchingArgument(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : arguments) {
+  public Argument buildMatchingArgument(Predicate<ArgumentBuilder> predicate) {
+    for (ArgumentBuilder item : arguments) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -509,7 +509,7 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return this.setNewAnnotationLike(index, this.buildAnnotation(index));
   }
 
-  public ArgumentsNested<A> editMatchingArgument(Predicate<PropertyBuilder> predicate) {
+  public ArgumentsNested<A> editMatchingArgument(Predicate<ArgumentBuilder> predicate) {
     int index = -1;
     for (int i = 0; i < arguments.size(); i++) {
       if (predicate.test(arguments.get(i))) {
@@ -672,8 +672,8 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return false;
   }
 
-  public boolean hasMatchingArgument(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : arguments) {
+  public boolean hasMatchingArgument(Predicate<ArgumentBuilder> predicate) {
+    for (ArgumentBuilder item : arguments) {
       if (predicate.test(item)) {
         return true;
       }
@@ -749,12 +749,12 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A removeAllFromArguments(Collection<Property> items) {
+  public A removeAllFromArguments(Collection<Argument> items) {
     if (this.arguments == null) {
       return (A) this;
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+    for (Argument item : items) {
+      ArgumentBuilder builder = new ArgumentBuilder(item);
       _visitables.get("arguments").remove(builder);
       this.arguments.remove(builder);
     }
@@ -807,12 +807,12 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A removeFromArguments(Property... items) {
+  public A removeFromArguments(Argument... items) {
     if (this.arguments == null) {
       return (A) this;
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
+    for (Argument item : items) {
+      ArgumentBuilder builder = new ArgumentBuilder(item);
       _visitables.get("arguments").remove(builder);
       this.arguments.remove(builder);
     }
@@ -869,14 +869,14 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A removeMatchingFromArguments(Predicate<PropertyBuilder> predicate) {
+  public A removeMatchingFromArguments(Predicate<ArgumentBuilder> predicate) {
     if (arguments == null) {
       return (A) this;
     }
-    Iterator<PropertyBuilder> each = arguments.iterator();
+    Iterator<ArgumentBuilder> each = arguments.iterator();
     List visitables = _visitables.get("arguments");
     while (each.hasNext()) {
-      PropertyBuilder builder = each.next();
+      ArgumentBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -921,7 +921,7 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return new AnnotationsNested(index, item);
   }
 
-  public ArgumentsNested<A> setNewArgumentLike(int index, Property item) {
+  public ArgumentsNested<A> setNewArgumentLike(int index, Argument item) {
     return new ArgumentsNested(index, item);
   }
 
@@ -948,11 +948,11 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A setToArguments(int index, Property item) {
+  public A setToArguments(int index, Argument item) {
     if (this.arguments == null) {
       this.arguments = new ArrayList();
     }
-    PropertyBuilder builder = new PropertyBuilder(item);
+    ArgumentBuilder builder = new ArgumentBuilder(item);
     if (index < 0 || index >= arguments.size()) {
       _visitables.get("arguments").add(builder);
       arguments.add(builder);
@@ -1081,13 +1081,13 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A withArguments(List<Property> arguments) {
+  public A withArguments(List<Argument> arguments) {
     if (this.arguments != null) {
       this._visitables.get("arguments").clear();
     }
     if (arguments != null) {
       this.arguments = new ArrayList();
-      for (Property item : arguments) {
+      for (Argument item : arguments) {
         this.addToArguments(item);
       }
     } else {
@@ -1096,13 +1096,13 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
     return (A) this;
   }
 
-  public A withArguments(Property... arguments) {
+  public A withArguments(Argument... arguments) {
     if (this.arguments != null) {
       this.arguments.clear();
       _visitables.remove("arguments");
     }
     if (arguments != null) {
-      for (Property item : arguments) {
+      for (Argument item : arguments) {
         this.addToArguments(item);
       }
     }
@@ -1307,14 +1307,14 @@ public class MethodFluent<A extends io.sundr.model.MethodFluent<A>> extends Modi
 
   }
 
-  public class ArgumentsNested<N> extends PropertyFluent<ArgumentsNested<N>> implements Nested<N> {
+  public class ArgumentsNested<N> extends ArgumentFluent<ArgumentsNested<N>> implements Nested<N> {
 
-    PropertyBuilder builder;
+    ArgumentBuilder builder;
     int index;
 
-    ArgumentsNested(int index, Property item) {
+    ArgumentsNested(int index, Argument item) {
       this.index = index;
-      this.builder = new PropertyBuilder(this, item);
+      this.builder = new ArgumentBuilder(this, item);
     }
 
     public N and() {

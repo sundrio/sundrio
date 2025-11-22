@@ -1120,9 +1120,9 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
     typeDef.getImplementsList().forEach(ref -> dependencies.add(ref.getFullyQualifiedName()));
 
     // Extract from properties/fields
-    typeDef.getProperties().forEach(prop -> {
-      if (prop.getTypeRef() instanceof ClassRef) {
-        dependencies.add(((ClassRef) prop.getTypeRef()).getFullyQualifiedName());
+    typeDef.getFields().forEach(field -> {
+      if (field.getTypeRef() instanceof ClassRef) {
+        dependencies.add(((ClassRef) field.getTypeRef()).getFullyQualifiedName());
       }
     });
 
@@ -1269,8 +1269,8 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
       if (!changeSet.getMethodChanges().isEmpty()) {
         getLog().info("    📋 Method changes: " + changeSet.getMethodChanges().size());
       }
-      if (!changeSet.getPropertyChanges().isEmpty()) {
-        getLog().info("    🏷️  Property changes: " + changeSet.getPropertyChanges().size());
+      if (!changeSet.getFieldChanges().isEmpty()) {
+        getLog().info("    🏷️  Field changes: " + changeSet.getFieldChanges().size());
       }
     }
   }
@@ -2170,13 +2170,13 @@ public class ContinuousTestingMojo extends AbstractSundrioMojo {
             termFrame.println("      " + connector + " " + changeDesc);
           }
         }
-        if (!lastChangeSet.getPropertyChanges().isEmpty()) {
-          termFrame.println("    🏷️  Property changes: " + lastChangeSet.getPropertyChanges().size());
-          var propertyChanges = lastChangeSet.getPropertyChanges().toArray();
-          for (int i = 0; i < propertyChanges.length; i++) {
-            var propertyChange = propertyChanges[i];
-            String connector = (i == propertyChanges.length - 1) ? "└─" : "├─";
-            termFrame.println("      " + connector + " " + propertyChange.toString());
+        if (!lastChangeSet.getFieldChanges().isEmpty()) {
+          termFrame.println("    🏷️  Field changes: " + lastChangeSet.getFieldChanges().size());
+          var fieldChanges = lastChangeSet.getFieldChanges().toArray();
+          for (int i = 0; i < fieldChanges.length; i++) {
+            var fieldChange = fieldChanges[i];
+            String connector = (i == fieldChanges.length - 1) ? "└─" : "├─";
+            termFrame.println("      " + connector + " " + fieldChange.toString());
           }
         }
       }

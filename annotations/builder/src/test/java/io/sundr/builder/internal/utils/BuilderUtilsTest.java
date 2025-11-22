@@ -135,4 +135,21 @@ public class BuilderUtilsTest extends AbstractProcessorTest {
     assertTrue(map.containsKey(getClass().getName() + ".C"));
   }
 
+  @Test
+  public void testFindBuildableSuperClassRef() {
+    TypeDef a = Adapters.adaptType(A.class, context);
+    builderContext.getBuildableRepository().register(a);
+
+    ClassRef aRef = a.toInternalReference();
+    TypeDef subClassDef = new io.sundr.model.TypeDefBuilder()
+        .withKind(io.sundr.model.Kind.CLASS)
+        .withPackageName("test")
+        .withName("SubClass")
+        .withExtendsList(aRef)
+        .build();
+
+    ClassRef result = BuilderUtils.findBuildableSuperClassRef(subClassDef);
+    assertEquals(aRef, result);
+  }
+
 }

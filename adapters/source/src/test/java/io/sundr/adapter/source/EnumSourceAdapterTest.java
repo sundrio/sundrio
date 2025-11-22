@@ -50,8 +50,8 @@ public class EnumSourceAdapterTest {
 
     // Verify the enum has the expected structure
     assertTrue("Should have FUNCTION constant",
-        typeDef.getProperties().stream()
-            .anyMatch(p -> "FUNCTION".equals(p.getName())));
+        typeDef.getFields().stream()
+            .anyMatch(f -> "FUNCTION".equals(f.getName())));
 
     assertTrue("Should have apply method",
         typeDef.getMethods().stream()
@@ -77,8 +77,8 @@ public class EnumSourceAdapterTest {
 
     // Verify the enum has the expected structure
     assertTrue("Should have FUNCTION constant",
-        typeDef.getProperties().stream()
-            .anyMatch(p -> "FUNCTION".equals(p.getName())));
+        typeDef.getFields().stream()
+            .anyMatch(f -> "FUNCTION".equals(f.getName())));
 
     assertTrue("Should have apply method",
         typeDef.getMethods().stream()

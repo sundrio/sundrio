@@ -28,11 +28,10 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.For;
 import io.sundr.model.Foreach;
 import io.sundr.model.If;
+import io.sundr.model.LocalVariable;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.MethodCall;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Return;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -139,15 +138,12 @@ public class MethodReferenceTest {
         .endBlock()
         .build();
 
-    Property result = new PropertyBuilder()
-        .withName("result")
-        .withTypeRef(ClassRef.forClass(String.class))
-        .build();
+    LocalVariable result = LocalVariable.newLocalVariable(String.class, "result");
 
     Method assignmentMethod = new MethodBuilder()
         .withName("assignmentMethod")
         .withNewBlock()
-        .withStatements(new Assign(result.toReference(), new MethodCall("getValue", (io.sundr.model.Expression) null)))
+        .withStatements(new Assign(result, new MethodCall("getValue", (io.sundr.model.Expression) null)))
         .endBlock()
         .build();
 
@@ -352,17 +348,14 @@ public class MethodReferenceTest {
         .build();
 
     // Create a variable declaration property for the foreach loop variable
-    Property itemProperty = new PropertyBuilder()
-        .withName("item")
-        .withTypeRef(ClassRef.forClass(String.class))
-        .build();
+    LocalVariable item = LocalVariable.newLocalVariable(String.class, "item");
 
     // Create a method that uses a foreach loop with method calls in iterable expression and body
     Method foreachLoopMethod = new MethodBuilder()
         .withName("foreachLoopMethod")
         .withNewBlock()
         .withStatements(new Foreach(
-            itemProperty, // loop variable declaration
+            item, // loop variable declaration
             new MethodCall("getItems", (io.sundr.model.Expression) null), // iterable expression
             new MethodCall("processItem", (io.sundr.model.Expression) null) // body
         ))

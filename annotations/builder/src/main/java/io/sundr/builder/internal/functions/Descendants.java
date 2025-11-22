@@ -43,9 +43,9 @@ import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.functions.Assignable;
@@ -79,26 +79,26 @@ public class Descendants {
       });
 
   /**
-   * Find all buildable descendant equivalents of a property.
+   * Find all buildable descendant equivalents of a field.
    */
-  public static Function<Property, Set<Property>> PROPERTY_BUILDABLE_DESCENDANTS = FunctionFactory
-      .wrap(new Function<Property, Set<Property>>() {
+  public static Function<Field, Set<Field>> PROPERTY_BUILDABLE_DESCENDANTS = FunctionFactory
+      .wrap(new Function<Field, Set<Field>>() {
         @Override
-        public Set<Property> apply(Property property) {
-          Set<Property> result = new LinkedHashSet<Property>();
-          if (isNestingIgnored(property)) {
+        public Set<Field> apply(Field field) {
+          Set<Field> result = new LinkedHashSet<Field>();
+          if (isNestingIgnored(field)) {
             return result;
           }
 
-          TypeRef baseType = property.getTypeRef();
-          TypeDef origin = property.getAttribute(ORIGIN_TYPEDEF);
+          TypeRef baseType = field.getTypeRef();
+          TypeDef origin = field.getAttribute(ORIGIN_TYPEDEF);
 
           if (IS_COLLECTION.apply(baseType)) {
             TypeRef unwrapped = TypeAs.UNWRAP_COLLECTION_OF.apply(baseType);
             if (unwrapped instanceof ClassRef) {
               ClassRef candidate = (ClassRef) unwrapped;
 
-              addDescendents(property, result, origin, candidate,
+              addDescendents(field, result, origin, candidate,
                   ref -> new ClassRefBuilder((ClassRef) baseType).withArguments(ref).build());
             }
           } else if (IS_MAP.apply(baseType)) {
@@ -106,7 +106,7 @@ public class Descendants {
             if (unwrapped instanceof ClassRef) {
               ClassRef candidate = (ClassRef) unwrapped;
 
-              addDescendents(property, result, origin, candidate, ref -> new ClassRefBuilder((ClassRef) baseType)
+              addDescendents(field, result, origin, candidate, ref -> new ClassRefBuilder((ClassRef) baseType)
                   .withArguments(TypeAs.UNWRAP_MAP_KEY_OF.apply(baseType), ref).build());
             }
           } else if (io.sundr.model.utils.Types.isOptional(baseType)) {
@@ -115,18 +115,18 @@ public class Descendants {
             if (unwrapped instanceof ClassRef) {
               ClassRef candidate = (ClassRef) unwrapped;
 
-              addDescendents(property, result, origin, candidate,
+              addDescendents(field, result, origin, candidate,
                   ref -> new ClassRefBuilder((ClassRef) baseType).withArguments(ref).build());
             }
           } else if (baseType instanceof ClassRef) {
             ClassRef candidate = (ClassRef) baseType;
 
-            addDescendents(property, result, origin, candidate, Function.identity());
+            addDescendents(field, result, origin, candidate, Function.identity());
           }
           return result;
         }
 
-        private void addDescendents(Property property, Set<Property> result, TypeDef origin, ClassRef candidate,
+        private void addDescendents(Field field, Set<Field> result, TypeDef origin, ClassRef candidate,
             Function<ClassRef, ClassRef> typeFunction) {
           Map<String, Boolean> nameConflicts = new HashMap<>();
 
@@ -136,7 +136,7 @@ public class Descendants {
             ClassRef descendantRef = new ClassRefBuilder(descendant.toInternalReference())
                 .build();
 
-            if (isNestingFiltered(property, descendantRef)) {
+            if (isNestingFiltered(field, descendantRef)) {
               continue;
             } else if (origin != null && (origin.getName().equals(descendant.getName())
                 && !origin.getPackageName().equals(descendant.getPackageName()))) {
@@ -145,19 +145,19 @@ public class Descendants {
             }
 
             decendents.put(descendant, descendantRef);
-            String compactName = compact(deCapitalizeFirst(descendant.getName()), property.getNameCapitalized());
+            String compactName = compact(deCapitalizeFirst(descendant.getName()), field.getNameCapitalized());
             nameConflicts.merge(compactName, false, (b1, b2) -> true);
           }
 
           for (Map.Entry<TypeDef, ClassRef> entry : decendents.entrySet()) {
-            String propertyName = compact(deCapitalizeFirst(entry.getKey().getName()), property.getNameCapitalized());
+            String propertyName = compact(deCapitalizeFirst(entry.getKey().getName()), field.getNameCapitalized());
             if (nameConflicts.get(propertyName)) {
-              propertyName = deCapitalizeFirst(entry.getKey().getName()) + property.getNameCapitalized();
+              propertyName = deCapitalizeFirst(entry.getKey().getName()) + field.getNameCapitalized();
             }
-            result.add(new PropertyBuilder(property)
+            result.add(new FieldBuilder(field)
                 .withName(propertyName)
                 .withTypeRef(typeFunction.apply(entry.getValue()))
-                .addToAttributes(DESCENDANT_OF, property)
+                .addToAttributes(DESCENDANT_OF, field)
                 .addToAttributes(BUILDABLE_ENABLED, true)
                 .accept(new InitEnricher())
                 .build());
@@ -181,8 +181,8 @@ public class Descendants {
     return false;
   }
 
-  public static boolean isNestingIgnored(Property property) {
-    for (AnnotationRef ref : property.getAnnotations()) {
+  public static boolean isNestingIgnored(Field field) {
+    for (AnnotationRef ref : field.getAnnotations()) {
       if (ref.getClassRef().getFullyQualifiedName().equals(IgnoreDescendants.class.getName())) {
         return true;
       }
@@ -190,12 +190,12 @@ public class Descendants {
     return false;
   }
 
-  public static boolean isNestingFiltered(Property property, ClassRef classRef) {
-    for (AnnotationRef ref : property.getAnnotations()) {
+  public static boolean isNestingFiltered(Field field, ClassRef classRef) {
+    for (AnnotationRef ref : field.getAnnotations()) {
       if (ref.getClassRef().getFullyQualifiedName().equals(FilterDescendants.class.getName())) {
         Map<String, Object> parameters = ref.getParameters();
         Object value = parameters == null ? null : parameters.get(VALUE);
-        if (value instanceof String && property.getTypeRef() instanceof ClassRef) {
+        if (value instanceof String && field.getTypeRef() instanceof ClassRef) {
           Pattern p = Pattern.compile((String) value);
           if (p.matcher(classRef.getFullyQualifiedName()).matches()) {
             return false;

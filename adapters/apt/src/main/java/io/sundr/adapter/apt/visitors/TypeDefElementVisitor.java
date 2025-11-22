@@ -28,9 +28,9 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 
 import io.sundr.adapter.apt.AptContext;
+import io.sundr.model.Field;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -41,7 +41,7 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
 
   private final AptContext context;
   private final Function<TypeElement, TypeDef> typeAdapterFunction;
-  private final Function<VariableElement, Property> propertyAdapterFunction;
+  private final Function<VariableElement, Field> fieldAdapterFunction;
   private final Function<ExecutableElement, Method> methodAdapterFunction;
   private final Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction;
 
@@ -82,7 +82,7 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
   }
 
   public TypeDefBuilder visitVariable(VariableElement e, Void aVoid) {
-    return builder.addToProperties(propertyAdapterFunction.apply(e));
+    return builder.addToFields(fieldAdapterFunction.apply(e));
   }
 
   public TypeDefBuilder visitExecutable(ExecutableElement e, Void aVoid) {
@@ -98,12 +98,12 @@ public class TypeDefElementVisitor implements ElementVisitor<TypeDefBuilder, Voi
   }
 
   public TypeDefElementVisitor(AptContext context, Function<TypeElement, TypeDef> typeAdapterFunction,
-      Function<VariableElement, Property> propertyAdapterFunction,
+      Function<VariableElement, Field> fieldAdapterFunction,
       Function<ExecutableElement, Method> methodAdapterFunction,
       Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction) {
     this.context = context;
     this.typeAdapterFunction = typeAdapterFunction;
-    this.propertyAdapterFunction = propertyAdapterFunction;
+    this.fieldAdapterFunction = fieldAdapterFunction;
     this.methodAdapterFunction = methodAdapterFunction;
     this.typeParamAdapterFunction = typeParamAdapterFunction;
   }

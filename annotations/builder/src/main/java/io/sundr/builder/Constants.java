@@ -26,10 +26,14 @@ import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.Argument;
+import io.sundr.model.ArgumentBuilder;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Expression;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Property;
 import io.sundr.model.PropertyBuilder;
@@ -51,9 +55,9 @@ public class Constants {
 
   public static final AttributeKey<TypeParamRef> GENERIC_TYPE_REF = new AttributeKey<TypeParamRef>("GENERIC_TYPE_REF",
       TypeParamRef.class);
-  public static final AttributeKey<Property> DESCENDANT_OF = new AttributeKey<Property>("DESCENDANT_OF", Property.class);
+  public static final AttributeKey<Field> DESCENDANT_OF = new AttributeKey<Field>("DESCENDANT_OF", Field.class);
 
-  public static final AttributeKey<Set<Property>> DESCENDANTS = new AttributeKey<Set<Property>>("DESCENDANTS", Set.class);
+  public static final AttributeKey<Set<Field>> DESCENDANTS = new AttributeKey<Set<Field>>("DESCENDANTS", Set.class);
 
   public static final AttributeKey<Set<TypeDef>> ADDITIONAL_BUILDABLES = new AttributeKey<Set<TypeDef>>("ADDITIONAL_BUILDERS",
       Set.class);
@@ -104,6 +108,14 @@ public class Constants {
   public static final ClassRef COLLECTORS = new ClassRefBuilder().withFullyQualifiedName(Collectors.class.getName()).build();
 
   public static final Property INDEX = new PropertyBuilder().withName("index")
+      .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_INT_REF)
+      .build();
+
+  public static final Argument INDEX_ARGUMENT = new ArgumentBuilder().withName("index")
+      .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_INT_REF)
+      .build();
+
+  public static final Field INDEX_FIELD = new FieldBuilder().withName("index")
       .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_INT_REF)
       .build();
 

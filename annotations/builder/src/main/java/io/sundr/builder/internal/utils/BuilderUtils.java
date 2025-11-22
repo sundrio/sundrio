@@ -68,17 +68,19 @@ import io.sundr.builder.internal.functions.ToConstructExpression;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.Argument;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.If;
+import io.sundr.model.LocalVariable;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
-import io.sundr.model.Nameable;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Return;
 import io.sundr.model.Statement;
 import io.sundr.model.Super;
@@ -91,7 +93,9 @@ import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeParamRefBuilder;
 import io.sundr.model.TypeRef;
 import io.sundr.model.ValueRef;
+import io.sundr.model.Variable;
 import io.sundr.model.WildcardRef;
+import io.sundr.model.WithFullyQualifiedName;
 import io.sundr.model.functions.Assignable;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
@@ -184,9 +188,9 @@ public class BuilderUtils {
         .count() > 0;
   }
 
-  public static boolean isOrHasBuildableDescendants(Property property) {
-    return isBuildable(property.getTypeRef())
-        || (property.hasAttribute(DESCENDANTS) && !property.getAttribute(DESCENDANTS).isEmpty());
+  public static boolean isOrHasBuildableDescendants(Field field) {
+    return isBuildable(field.getTypeRef())
+        || (field.hasAttribute(DESCENDANTS) && !field.getAttribute(DESCENDANTS).isEmpty());
   }
 
   /**
@@ -271,21 +275,21 @@ public class BuilderUtils {
    * @param property The argument.
    * @return True if matching argument if found.
    */
-  public static boolean methodHasArgument(Method method, Property property) {
-    for (Property candidate : method.getArguments()) {
-      if (candidate.getName().equals(property.getName()) && candidate.getTypeRef().equals(property.getTypeRef())) {
+  public static boolean methodHasArgument(Method method, Variable<?> variable) {
+    for (Argument candidate : method.getArguments()) {
+      if (candidate.getName().equals(variable.getName()) && candidate.getTypeRef().equals(variable.getTypeRef())) {
         return true;
       }
     }
     return false;
   }
 
-  public static boolean hasBuildableConstructorWithArgument(TypeDef clazz, Property property) {
+  public static boolean hasBuildableConstructorWithArgument(TypeDef clazz, Variable<?> variable) {
     Method constructor = findBuildableConstructor(clazz);
     if (constructor == null) {
       return false;
     } else {
-      return methodHasArgument(constructor, property);
+      return methodHasArgument(constructor, variable);
     }
 
   }
@@ -326,9 +330,9 @@ public class BuilderUtils {
     return false;
   }
 
-  public static Set<Method> getInlineableConstructors(Property property) {
+  public static Set<Method> getInlineableConstructors(Field field) {
     Set<Method> result = new HashSet<Method>();
-    TypeRef typeRef = property.getTypeRef();
+    TypeRef typeRef = field.getTypeRef();
     TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF)
         .apply(typeRef);
 
@@ -346,7 +350,7 @@ public class BuilderUtils {
         return result;
       }
       //We only want to inline non java types
-      String pkg = Nameable.getPackageName(((ClassRef) unwrapped).getFullyQualifiedName());
+      String pkg = WithFullyQualifiedName.getPackageName(((ClassRef) unwrapped).getFullyQualifiedName());
       if (!Stream.of(NON_INLINABLE_PACKAGES).filter(s -> pkg.startsWith(s)).findAny().isPresent()) {
         for (Method candidate : GetDefinition.of((ClassRef) unwrapped).getConstructors()) {
           if (isInlineable(candidate)) {
@@ -373,7 +377,7 @@ public class BuilderUtils {
       return false;
     }
 
-    for (Property argument : method.getArguments()) {
+    for (Argument argument : method.getArguments()) {
       if (!(argument.getTypeRef() instanceof ClassRef)) {
         continue;
       }
@@ -527,8 +531,8 @@ public class BuilderUtils {
     for (TypeParamDef paramDef : clazz.getParameters()) {
       result.add(paramDef.getName());
     }
-    for (Property property : clazz.getProperties()) {
-      result.addAll(allGenericsOf(property));
+    for (Field field : clazz.getFields()) {
+      result.addAll(allGenericsOf(field));
     }
 
     for (Method method : clazz.getMethods()) {
@@ -550,14 +554,14 @@ public class BuilderUtils {
     return result;
   }
 
-  public static Collection<String> allGenericsOf(Property property) {
-    return allGenericsOf(property.getTypeRef());
+  public static Collection<String> allGenericsOf(Variable<?> variable) {
+    return allGenericsOf(variable.getTypeRef());
   }
 
   public static Collection<String> allGenericsOf(Method method) {
     Set<String> result = new HashSet<String>(allGenericsOf(method.getReturnType()));
-    for (Property property : method.getArguments()) {
-      result.addAll(allGenericsOf(property));
+    for (Argument argument : method.getArguments()) {
+      result.addAll(allGenericsOf(argument));
 
     }
     return result;
@@ -570,30 +574,30 @@ public class BuilderUtils {
    * Create a qualified name for the given property - if it is not a descendant, then just the capitalized
    * name will be used.
    *
-   * @param property The property.
+   * @param field The property.
    * @param typeRef The type reference.
    * @param originType The origin type.
    * @return The qualified property name.
    */
-  public static String qualifyPropertyName(Property property, TypeRef typeRef, TypeDef originType) {
-    return qualifyPropertyName(property, typeRef, originType, false);
+  public static String qualifyPropertyName(Field field, TypeRef typeRef, TypeDef originType) {
+    return qualifyPropertyName(field, typeRef, originType, false);
   }
 
   /**
    * Create a qualified name for the given property. If useSingular is true the root property name will be changed
    * to the singular form.
    *
-   * @param property The property.
+   * @param field The property.
    * @param typeRef The type reference.
    * @param originType The origin type.
    *        param useSingular Flag to use singular form
    * @return The qualified property name.
    */
-  public static String qualifyPropertyName(Property property, TypeRef typeRef, TypeDef originType, boolean useSingular) {
-    return (property.hasAttribute(Constants.DESCENDANT_OF) ? BuilderUtils.fullyQualifiedNameDiff(typeRef, originType) : "")
+  public static String qualifyPropertyName(Field field, TypeRef typeRef, TypeDef originType, boolean useSingular) {
+    return (field.hasAttribute(Constants.DESCENDANT_OF) ? BuilderUtils.fullyQualifiedNameDiff(typeRef, originType) : "")
         + (useSingular
-            ? Singularize.FUNCTION.apply(property.getNameCapitalized())
-            : property.getNameCapitalized());
+            ? Singularize.FUNCTION.apply(field.getNameCapitalized())
+            : field.getNameCapitalized());
   }
 
   public static String fullyQualifiedNameDiff(TypeRef typeRef, TypeDef originType) {
@@ -636,8 +640,8 @@ public class BuilderUtils {
     return "";
   }
 
-  public static Property arrayAsList(Property property) {
-    TypeRef typeRef = property.getTypeRef();
+  public static Field arrayAsList(Field field) {
+    TypeRef typeRef = field.getTypeRef();
     TypeRef unwrapped = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
     ClassRef listRef = Collections.ARRAY_LIST.toReference(BOXED_OF.apply(unwrapped));
 
@@ -653,10 +657,10 @@ public class BuilderUtils {
           .endConstructor()
           .build();
 
-      return new PropertyBuilder(property).withTypeRef(Collections.LIST.toReference(BOXED_OF.apply(unwrapped)))
+      return new FieldBuilder(field).withTypeRef(Collections.LIST.toReference(BOXED_OF.apply(unwrapped)))
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
           .addToAttributes(INIT,
-              property.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && property.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED)
+              field.hasAttribute(LAZY_COLLECTIONS_INIT_ENABLED) && field.getAttribute(LAZY_COLLECTIONS_INIT_ENABLED)
                   ? null
                   : " new " + listRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(listDef, BOXED_OF.apply(unwrapped)))
@@ -664,13 +668,13 @@ public class BuilderUtils {
           .build();
     }
 
-    return new PropertyBuilder(property)
+    return new FieldBuilder(field)
         .withTypeRef(TypeAs.ARRAY_AS_LIST.apply(TypeAs.BOXED_OF.apply(unwrapped)))
         .build();
   }
 
-  public static Property buildableField(Property property) {
-    TypeRef typeRef = property.getTypeRef();
+  public static Field buildableField(Field field) {
+    TypeRef typeRef = field.getTypeRef();
     ClassRef targetType = (ClassRef) TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF).apply(typeRef);
 
     boolean isArray = Types.isArray(typeRef);
@@ -705,7 +709,7 @@ public class BuilderUtils {
           .endConstructor()
           .build();
 
-      return new PropertyBuilder(property).withTypeRef(listRef)
+      return new FieldBuilder(field).withTypeRef(listRef)
           .addToAttributes(LAZY_INIT, " new " + listRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(listDef, targetType))
           .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(listDef, targetType))
@@ -727,7 +731,7 @@ public class BuilderUtils {
           .endConstructor()
           .build();
 
-      return new PropertyBuilder(property).withTypeRef(setRef)
+      return new FieldBuilder(field).withTypeRef(setRef)
           .addToAttributes(LAZY_INIT, " new " + setRef + "()")
           .addToAttributes(INIT_FUNCTION, new Construct(setDef, targetType))
           .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(setDef, targetType))
@@ -736,40 +740,40 @@ public class BuilderUtils {
 
     if (isOptionalLong) {
       ClassRef optionalRef = Optionals.OPTIONAL_LONG.toReference(builderType);
-      return new PropertyBuilder(property).withTypeRef(optionalRef)
+      return new FieldBuilder(field).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalLong.empty()")
           .build();
     }
 
     if (isOptionalDouble) {
       ClassRef optionalRef = Optionals.OPTIONAL_DOUBLE.toReference(builderType);
-      return new PropertyBuilder(property).withTypeRef(optionalRef)
+      return new FieldBuilder(field).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalDouble.empty()")
           .build();
     }
 
     if (Types.isOptionalInt(targetType)) {
       ClassRef optionalRef = Optionals.OPTIONAL_INT.toReference(builderType);
-      return new PropertyBuilder(property).withTypeRef(optionalRef)
+      return new FieldBuilder(field).withTypeRef(optionalRef)
           .addToAttributes(INIT, " OptionalInt.empty()")
           .build();
     }
 
     if (isOptional) {
       ClassRef optionalRef = Optionals.OPTIONAL.toReference(builderType);
-      return new PropertyBuilder(property).withTypeRef(optionalRef)
+      return new FieldBuilder(field).withTypeRef(optionalRef)
           .addToAttributes(INIT, " Optional.empty()")
           .build();
     }
 
     if (Types.isConcrete(builderType) && BuilderUtils.hasDefaultConstructor(builderType)
-        && property.hasAttribute(DEFAULT_VALUE)) {
-      return new PropertyBuilder(property).withTypeRef(builderType)
+        && field.hasAttribute(DEFAULT_VALUE)) {
+      return new FieldBuilder(field).withTypeRef(builderType)
           .addToAttributes(INIT, "new " + builderType + "()")
           .build();
     }
 
-    return new PropertyBuilder(property).withTypeRef(builderType)
+    return new FieldBuilder(field).withTypeRef(builderType)
         .removeFromAttributes(INIT)
         .build();
   }
@@ -777,8 +781,8 @@ public class BuilderUtils {
   public static void populateEnclosedBuildables(TypeDef typeDef, Map<String, ClassRef> result) {
     Map<String, ClassRef> buildables = new HashMap<>();
 
-    buildables.putAll(Types.allProperties(typeDef).stream()
-        .map(Property::getTypeRef)
+    buildables.putAll(Types.allFields(typeDef).stream()
+        .map(Field::getTypeRef)
         .filter(t -> t instanceof ClassRef)
         .map(t -> (ClassRef) t)
         .map(TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF))
@@ -809,27 +813,27 @@ public class BuilderUtils {
     return result;
   }
 
-  public static List<Statement> toString(String name, Collection<Property> properties) {
+  public static List<Statement> toString(String name, Collection<Field> fields) {
     List<Statement> statements = new ArrayList<>();
     statements.add(Declare.newInstance("sb", StringBuilder.class));
-    statements.add(Property.newProperty("sb").call("append", ValueRef.from("{")));
-    Iterator<Property> iter = properties.iterator();
+    statements.add(Field.newField("sb").call("append", ValueRef.from("{")));
+    Iterator<Field> iter = fields.iterator();
     while (iter.hasNext()) {
       statements.addAll(ifNotNullToStringStatements(iter.next(), iter.hasNext()));
     }
-    statements.add(Property.newProperty("sb").call("append", ValueRef.from("}")));
+    statements.add(Field.newField("sb").call("append", ValueRef.from("}")));
     statements.add(Return.variable("sb").call("toString"));
     return statements;
   }
 
-  public static List<Statement> ifNotNullToStringStatements(Property property, boolean hasNext) {
+  public static List<Statement> ifNotNullToStringStatements(Field field, boolean hasNext) {
     List<Statement> statements = new ArrayList<>();
-    String propertyName = property.getName();
-    Property propertyRef = Property.newProperty(propertyName);
-    Property sbRef = Property.newProperty("sb");
+    String propertyName = field.getName();
+    Field propertyRef = Field.newField(propertyName);
+    LocalVariable sbRef = LocalVariable.newLocalVariable(StringBuilder.class, "sb");
 
     // Primitives should be displayed no matter what.
-    if (property.getTypeRef() instanceof PrimitiveRef) {
+    if (field.getTypeRef() instanceof PrimitiveRef) {
       statements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
       statements.add(sbRef.call("append", propertyRef));
       if (hasNext) {
@@ -839,7 +843,7 @@ public class BuilderUtils {
     }
 
     // Collections and Maps need null and empty checks
-    if (Collections.isCollection(property.getTypeRef()) || Types.isMap(property.getTypeRef())) {
+    if (Collections.isCollection(field.getTypeRef()) || Types.isMap(field.getTypeRef())) {
       List<Statement> thenStatements = new ArrayList<>();
       thenStatements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
       thenStatements.add(sbRef.call("append", propertyRef));
@@ -880,10 +884,10 @@ public class BuilderUtils {
         property.getName(), property.getName(), suffix);
   }
 
-  public static List<Statement> toHashCode(Collection<Property> properties) {
+  public static List<Statement> toHashCode(Collection<Field> fields) {
     List<Statement> statements = new ArrayList<>();
     List<Expression> arguments = new ArrayList<>();
-    for (Property property : properties) {
+    for (Field property : fields) {
       arguments.add(property);
     }
     statements.add(new Return(
@@ -891,31 +895,31 @@ public class BuilderUtils {
     return statements;
   }
 
-  public static List<Statement> toEquals(Nameable nameable, Collection<Property> properties) {
+  public static List<Statement> toEquals(WithFullyQualifiedName WithFullyQualifiedName, Collection<Field> fields) {
     List<Statement> statements = new ArrayList<>();
 
-    String name = nameable.getName();
+    String name = WithFullyQualifiedName.getName();
     ClassRef type = ClassRef.forName(name);
-    Property o = Property.newProperty("o");
+    LocalVariable o = LocalVariable.newLocalVariable("o");
+    LocalVariable that = LocalVariable.newLocalVariable(type, "that");
 
     statements.add(If.eq(new This(), o).then(Return.True()));
     statements.add(If.isNull(o)
         .or(new This().call("getClass").ne(o.call("getClass")))
         .then(Return.False()));
 
-    statements.add(If.not(new Super().call("equals", o))
-        .then(Return.False()));
+    statements.add(If.not(new Super().call("equals", o)).then(Return.False()));
     statements.add(Declare.cast("that", type, o));
 
-    for (Property property : properties) {
-      String propertyName = property.getName();
-      TypeRef propertyType = property.getTypeRef();
+    for (Field field : fields) {
+      String fieldName = field.getName();
+      TypeRef propertyType = field.getTypeRef();
       if (Types.isPrimitive(propertyType)) {
-        statements.add(If.ne(Property.newProperty(propertyName), Property.newProperty("that").property(propertyName))
+        statements.add(If.ne(field, that.property(fieldName))
             .then(Return.False()));
       } else {
-        statements.add(If.not(ClassRef.forClass(java.util.Objects.class).call("equals", Property.newProperty(propertyName),
-            Property.newProperty("that").property(propertyName))).then(Return.False()));
+        statements.add(If.not(ClassRef.forClass(java.util.Objects.class).call("equals", field, that.property(fieldName)))
+            .then(Return.False()));
       }
     }
 

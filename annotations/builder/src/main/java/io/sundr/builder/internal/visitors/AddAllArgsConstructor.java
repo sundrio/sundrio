@@ -6,9 +6,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import io.sundr.builder.Visitor;
+import io.sundr.model.Argument;
 import io.sundr.model.AttributeKey;
+import io.sundr.model.Field;
 import io.sundr.model.Kind;
-import io.sundr.model.Property;
 import io.sundr.model.Statement;
 import io.sundr.model.This;
 import io.sundr.model.TypeDefFluent;
@@ -48,11 +49,12 @@ public class AddAllArgsConstructor implements Visitor<TypeDefFluent<?>> {
       return;
     }
 
-    List<Property> arguments = def.buildProperties().stream().filter(p -> !p.isStatic() && !isFinalWithValue(p))
+    List<Argument> arguments = def.buildFields().stream().filter(p -> !p.isStatic() && !isFinalWithValue(p))
+        .map(Field::asArgument)
         .collect(Collectors.toList());
     List<Statement> setValues = new ArrayList<>();
-    for (Property a : arguments) {
-      setValues.add(new io.sundr.model.Assign(This.ref(a), a));
+    for (Argument a : arguments) {
+      setValues.add(new io.sundr.model.Assign(This.ref(a.asField()), a));
     }
 
     def.addNewConstructor()
@@ -63,7 +65,7 @@ public class AddAllArgsConstructor implements Visitor<TypeDefFluent<?>> {
         .endConstructor();
   }
 
-  private static boolean isFinalWithValue(Property p) {
+  private static boolean isFinalWithValue(Field p) {
     return p.isFinal() && p.hasAttribute(DEFAULT_VALUE);
   }
 }

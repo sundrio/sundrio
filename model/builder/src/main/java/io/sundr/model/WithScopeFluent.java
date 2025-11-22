@@ -93,6 +93,10 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -116,6 +120,10 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -153,6 +161,10 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -169,17 +181,17 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -197,17 +209,21 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -272,6 +288,14 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  public ArgumentScopeNested<A> withNewArgumentScope() {
+    return new ArgumentScopeNested(null);
+  }
+
+  public ArgumentScopeNested<A> withNewArgumentScopeLike(Argument item) {
+    return new ArgumentScopeNested(item);
   }
 
   public AssignScopeNested<A> withNewAssignScope() {
@@ -414,6 +438,22 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
     return new EqualsScopeNested(item);
   }
 
+  public FieldRefScopeNested<A> withNewFieldRefScope() {
+    return new FieldRefScopeNested(null);
+  }
+
+  public FieldRefScopeNested<A> withNewFieldRefScopeLike(FieldRef item) {
+    return new FieldRefScopeNested(item);
+  }
+
+  public FieldScopeNested<A> withNewFieldScope() {
+    return new FieldScopeNested(null);
+  }
+
+  public FieldScopeNested<A> withNewFieldScopeLike(Field item) {
+    return new FieldScopeNested(item);
+  }
+
   public GreaterThanOrEqualScopeNested<A> withNewGreaterThanOrEqualScope() {
     return new GreaterThanOrEqualScopeNested(null);
   }
@@ -504,6 +544,14 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
 
   public LessThanScopeNested<A> withNewLessThanScopeLike(LessThan item) {
     return new LessThanScopeNested(item);
+  }
+
+  public LocalVariableScopeNested<A> withNewLocalVariableScope() {
+    return new LocalVariableScopeNested(null);
+  }
+
+  public LocalVariableScopeNested<A> withNewLocalVariableScopeLike(LocalVariable item) {
+    return new LocalVariableScopeNested(item);
   }
 
   public LogicalAndScopeNested<A> withNewLogicalAndScope() {
@@ -768,6 +816,24 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
     }
   }
 
+  public class ArgumentScopeNested<N> extends ArgumentFluent<ArgumentScopeNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentScopeNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WithScopeFluent.this.withScope(builder.build());
+    }
+
+    public N endArgumentScope() {
+      return and();
+    }
+
+  }
+
   public class AssignScopeNested<N> extends AssignFluent<AssignScopeNested<N>> implements Nested<N> {
 
     AssignBuilder builder;
@@ -1021,6 +1087,42 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
 
   }
 
+  public class FieldRefScopeNested<N> extends FieldRefFluent<FieldRefScopeNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefScopeNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WithScopeFluent.this.withScope(builder.build());
+    }
+
+    public N endFieldRefScope() {
+      return and();
+    }
+
+  }
+
+  public class FieldScopeNested<N> extends FieldFluent<FieldScopeNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldScopeNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WithScopeFluent.this.withScope(builder.build());
+    }
+
+    public N endFieldScope() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanOrEqualScopeNested<N> extends GreaterThanOrEqualFluent<GreaterThanOrEqualScopeNested<N>>
       implements Nested<N> {
 
@@ -1179,6 +1281,24 @@ public class WithScopeFluent<A extends io.sundr.model.WithScopeFluent<A>> extend
     }
 
     public N endLessThanScope() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableScopeNested<N> extends LocalVariableFluent<LocalVariableScopeNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableScopeNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WithScopeFluent.this.withScope(builder.build());
+    }
+
+    public N endLocalVariableScope() {
       return and();
     }
 

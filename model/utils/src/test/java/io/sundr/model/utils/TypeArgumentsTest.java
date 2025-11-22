@@ -36,9 +36,9 @@ import org.junit.Test;
 import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Field;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -104,8 +104,8 @@ public class TypeArgumentsTest {
     System.out.println(typeDef.render());
     System.out.println(richDef.render());
 
-    Map<String, Property> propertiesByName = richDef.getAllProperties().stream()
-        .collect(Collectors.toMap(Property::getName, Function.identity()));
+    Map<String, Field> propertiesByName = richDef.getAllFields().stream()
+        .collect(Collectors.toMap(Field::getName, Function.identity()));
     assertEquals(4, propertiesByName.size());
     assertEquals("E subValue", propertiesByName.get("subValue").render());
     assertEquals("java.util.List<E> subValues", propertiesByName.get("subValues").render());
@@ -137,8 +137,8 @@ public class TypeArgumentsTest {
 
     System.out.println(richDef.render());
 
-    Map<String, Property> propertiesByName = richDef.getAllProperties().stream()
-        .collect(Collectors.toMap(Property::getName, Function.identity()));
+    Map<String, Field> propertiesByName = richDef.getAllFields().stream()
+        .collect(Collectors.toMap(Field::getName, Function.identity()));
     assertEquals(4, propertiesByName.size());
     assertEquals("java.lang.String subValue", propertiesByName.get("subValue").render());
     assertEquals("java.util.List<java.lang.String> subValues", propertiesByName.get("subValues").render());
@@ -171,7 +171,7 @@ public class TypeArgumentsTest {
     return new Visitor<TypeDefBuilder>() {
       @Override
       public void visit(TypeDefBuilder typeDef) {
-        typeDef.addNewProperty().withName(name).withTypeRef(type).endProperty()
+        typeDef.addNewField().withName(name).withTypeRef(type).endField()
 
             .addNewMethod().withName("get" + Strings.capitalizeFirst(name)).withReturnType(type).endMethod()
 

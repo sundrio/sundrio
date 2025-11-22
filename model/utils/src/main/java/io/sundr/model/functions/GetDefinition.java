@@ -23,9 +23,9 @@ import java.util.function.Function;
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.TypeLookup;
 import io.sundr.model.ClassRef;
-import io.sundr.model.Nameable;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.WithFullyQualifiedName;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class GetDefinition implements Function<ClassRef, TypeDef> {
@@ -45,9 +45,9 @@ public class GetDefinition implements Function<ClassRef, TypeDef> {
     String fullyQualifiedName = t.getFullyQualifiedName();
     return Optional.ofNullable(DefinitionRepository.getRepository().getDefinition(fullyQualifiedName))
         .orElseGet(() -> TypeLookup.lookup(fullyQualifiedName, AdapterContext.getContext()).orElseGet(() -> {
-          String packageName = Nameable.getPackageName(fullyQualifiedName);
-          String className = Nameable.getClassName(fullyQualifiedName);
-          String outerTypeName = Nameable.getOuterTypeName(fullyQualifiedName);
+          String packageName = WithFullyQualifiedName.getPackageName(fullyQualifiedName);
+          String className = WithFullyQualifiedName.getClassName(fullyQualifiedName);
+          String outerTypeName = WithFullyQualifiedName.getOuterTypeName(fullyQualifiedName);
 
           return new TypeDefBuilder()
               .withName(className)

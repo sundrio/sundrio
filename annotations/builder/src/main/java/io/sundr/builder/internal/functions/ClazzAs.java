@@ -47,6 +47,7 @@ import io.sundr.builder.internal.visitors.AddNoArgWithMethod;
 import io.sundr.builder.internal.visitors.InitEnricher;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.Argument;
 import io.sundr.model.Assign;
 import io.sundr.model.Block;
 import io.sundr.model.Cast;
@@ -55,13 +56,14 @@ import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Construct;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.If;
+import io.sundr.model.LocalVariable;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.MethodCall;
 import io.sundr.model.Modifiers;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Return;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.Statement;
@@ -89,8 +91,8 @@ public class ClazzAs {
       BuilderContext ctx = BuilderContextManager.getContext();
       List<Method> constructors = new ArrayList<Method>();
       List<Method> allMethods = new ArrayList<Method>();
-      List<TypeDef> nestedClazzes = new ArrayList<TypeDef>();
-      final List<Property> properties = new ArrayList<Property>();
+      List<TypeDef> nestedClazzes = new ArrayList<>();
+      final List<Field> fields = new ArrayList<>();
 
       ClassRef itemRef = item.toInternalReference();
       ClassRef fluentRef = TypeAs.FLUENT_A_REF.apply(itemRef);
@@ -120,7 +122,7 @@ public class ClazzAs {
 
       Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(item.toInternalReference()).withName("instance").and().withNewBlock()
-          .addToStatements(new MethodCall("copyInstance", new This(), Property.newProperty("instance"))).endBlock().build();
+          .addToStatements(new MethodCall("copyInstance", new This(), Argument.newArgument("instance"))).endBlock().build();
 
       Method copyInstance = new MethodBuilder().withName("copyInstance")
           .withNewModifiers().withProtected().endModifiers()
@@ -132,9 +134,9 @@ public class ClazzAs {
       constructors.add(emptyConstructor);
       constructors.add(instanceConstructor);
 
-      Set<Property> allDescendants = new LinkedHashSet<>();
+      Set<Field> allDescendants = new LinkedHashSet<>();
 
-      item.getAllProperties().stream().filter(isPropertyApplicable(item)).forEach(property -> {
+      item.getAllFields().stream().filter(isFieldApplicable(item)).forEach(property -> {
         final TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
             .apply(property.getTypeRef());
 
@@ -151,19 +153,19 @@ public class ClazzAs {
         boolean isOptional = Types.isOptional(property.getTypeRef()) || Types.isOptionalInt(property.getTypeRef())
             || Types.isOptionalDouble(property.getTypeRef()) || Types.isOptionalLong(property.getTypeRef());
 
-        Property toAdd = new PropertyBuilder(property)
+        Field toAdd = new FieldBuilder(property)
             .withNewModifiers().withPrivate().endModifiers()
             .addToAttributes(ORIGIN_TYPEDEF, item)
             .addToAttributes(OUTER_TYPE, fluent)
             .addToAttributes(GENERIC_TYPE_REF, nextParameter.toReference())
             .withComments().withAnnotations().build();
 
-        Set<Property> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
+        Set<Field> descendants = Descendants.PROPERTY_BUILDABLE_DESCENDANTS.apply(toAdd);
         allDescendants.addAll(descendants);
-        toAdd = new PropertyBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
+        toAdd = new FieldBuilder(toAdd).addToAttributes(DESCENDANTS, descendants).accept(new InitEnricher()).build();
         List<Method> methods = new ArrayList<Method>();
         if (isArray) {
-          Property asList = arrayAsList(toAdd);
+          Field asList = arrayAsList(toAdd);
           methods.add(ToMethod.WITH_ARRAY.apply(toAdd));
           methods.addAll(ToMethod.GETTER_ARRAY.apply(toAdd));
           methods.addAll(ToMethod.ADD_TO_COLLECTION.apply(asList));
@@ -180,7 +182,7 @@ public class ClazzAs {
             methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(toAdd));
             nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
           } else if (!descendants.isEmpty()) {
-            for (Property descendant : descendants) {
+            for (Field descendant : descendants) {
               methods.addAll(ToMethod.ADD_NEW_VALUE_TO_MAP.apply(descendant));
               nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(descendant));
             }
@@ -202,7 +204,7 @@ public class ClazzAs {
         methods.add(ToMethod.HAS.apply(toAdd));
         methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(toAdd));
         if (isMap) {
-          properties.add(toAdd);
+          fields.add(toAdd);
         } else if (isBuildable) {
           if (!isAbstract) {
             methods.add(ToMethod.WITH_NEW_NESTED.apply(toAdd));
@@ -217,12 +219,12 @@ public class ClazzAs {
             }
             nestedClazzes.add(PropertyAs.NESTED_CLASS.apply(toAdd));
           }
-          properties.add(buildableField(toAdd));
+          fields.add(buildableField(toAdd));
         } else if (descendants.isEmpty()) {
-          properties.add(toAdd);
+          fields.add(toAdd);
         } else if (!descendants.isEmpty()) {
-          properties.add(buildableField(toAdd));
-          for (Property descendant : descendants) {
+          fields.add(buildableField(toAdd));
+          for (Field descendant : descendants) {
             methods.add(ToMethod.WITH_NEW_NESTED.apply(descendant));
             methods.add(ToMethod.WITH_NEW_LIKE_NESTED.apply(descendant));
             methods.addAll(ToMethod.WITH_NESTED_INLINE.apply(descendant));
@@ -232,7 +234,7 @@ public class ClazzAs {
             }
           }
         } else {
-          properties.add(buildableField(toAdd));
+          fields.add(buildableField(toAdd));
         }
         for (Method m : methods) {
           if (deprecated && !m.getAnnotations().stream().anyMatch(Constants.DEPRECATED_ANNOTATION::equals)) {
@@ -250,19 +252,19 @@ public class ClazzAs {
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(Types.PRIMITIVE_BOOLEAN_REF).addNewArgument().withName("o")
           .withTypeRef(Types.OBJECT.toReference()).endArgument().withName("equals").withNewBlock()
-          .withStatements(BuilderUtils.toEquals(fluent, properties)).endBlock()
+          .withStatements(BuilderUtils.toEquals(fluent, fields)).endBlock()
           .build();
 
       Method hashCode = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(io.sundr.model.utils.Types.PRIMITIVE_INT_REF).withName("hashCode").withNewBlock()
-          .withStatements(BuilderUtils.toHashCode(properties)).endBlock()
+          .withStatements(BuilderUtils.toHashCode(fields)).endBlock()
           .build();
 
       Method toString = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .withReturnType(io.sundr.model.utils.Types.STRING_REF).withName("toString").withNewBlock()
-          .withStatements(BuilderUtils.toString(fluent.getName(), properties)).endBlock()
+          .withStatements(BuilderUtils.toString(fluent.getName(), fields)).endBlock()
           .build();
 
       allMethods.add(equals);
@@ -285,17 +287,17 @@ public class ClazzAs {
                       new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
                           .addToParameters("value", "unchecked").build())
                   .withConstructors(constructors)
-                  .withProperties(properties).withInnerTypes(nestedClazzes).withMethods(allMethods)
+                  .withFields(fields).withInnerTypes(nestedClazzes).withMethods(allMethods)
                   .accept(new AddNoArgWithMethod())
                   .build());
     }
 
-    private Method createDescendantBuilderMethod(Set<Property> allDescendants) {
+    private Method createDescendantBuilderMethod(Set<Field> allDescendants) {
       Map<ValueRef, Block> cases = new LinkedHashMap<>();
 
       TypeRef typeParam = Types.T_REF;
       Set<String> seen = new HashSet<>();
-      for (Property descendant : allDescendants) {
+      for (Field descendant : allDescendants) {
         ClassRef dunwraped = new ClassRefBuilder(
             (ClassRef) TypeAs.combine(TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_OPTIONAL_OF)
                 .apply(descendant.getTypeRef()))
@@ -311,21 +313,23 @@ public class ClazzAs {
         ClassRef builderRef = TypeAs.BUILDER_REF.apply(dunwraped);
 
         // Create the return statement for this case
+        LocalVariable item = LocalVariable.newLocalVariable("item");
         Statement returnStatement = new Return(
             new Cast(
                 BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam),
-                new Construct(builderRef, new Cast(dunwraped, Property.newProperty("item")))));
+                new Construct(builderRef, new Cast(dunwraped, item))));
 
         cases.put(ValueRef.from(packageName + "." + classShortName), new Block(returnStatement));
       }
 
       // Create the switch statement with cases and default case
+      LocalVariable item = LocalVariable.newLocalVariable("item");
       Switch switchStatement = Switch
-          .expression(new MethodCall("getName", new MethodCall("getClass", Property.newProperty("item"))))
+          .expression(new MethodCall("getName", new MethodCall("getClass", item)))
           .cases(cases)
           .defaultCase(
               new Return(new Cast(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam),
-                  new MethodCall("builderOf", (Expression) null, Property.newProperty("item")))));
+                  new MethodCall("builderOf", (Expression) null, item))));
 
       // Use the appropriate type parameter for the method
       TypeParamDef methodTypeParam = Types.T;
@@ -362,9 +366,9 @@ public class ClazzAs {
       List<Method> constructors = new ArrayList<Method>();
       List<Method> basicConstructors = new ArrayList<Method>();
       List<Method> methods = new ArrayList<Method>();
-      final List<Property> fields = new ArrayList<Property>();
+      final List<Field> fields = new ArrayList<Field>();
 
-      Property fluentProperty = new PropertyBuilder().withTypeRef(fluent).withName("fluent").build();
+      Field fluentProperty = new FieldBuilder().withTypeRef(fluent).withName("fluent").build();
 
       fields.add(fluentProperty);
 
@@ -379,23 +383,24 @@ public class ClazzAs {
       Method fluentConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock()
           .addToStatements(hasDefaultConstructor(item)
-              ? This.call(Property.newProperty("fluent"), new Construct(item.toInternalReference()))
-              : new Assign(This.ref("fluent"), Property.newProperty("fluent")))
+              ? This.call(LocalVariable.newLocalVariable("fluent"), new Construct(item.toInternalReference()))
+              : new Assign(This.ref("fluent"), LocalVariable.newLocalVariable("fluent")))
           .endBlock().build();
 
       Method instanceAndFluentCosntructor = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(itemRef)
           .withName("instance").and().withNewBlock()
-          .addToStatements(new Assign(This.ref("fluent"), Property.newProperty("fluent")))
-          .addToStatements(new MethodCall("copyInstance", Property.newProperty("fluent"), Property.newProperty("instance")))
+          .addToStatements(new Assign(This.ref("fluent"), LocalVariable.newLocalVariable("fluent")))
+          .addToStatements(new MethodCall("copyInstance", LocalVariable.newLocalVariable("fluent"),
+              LocalVariable.newLocalVariable("instance")))
           .endBlock()
           .build();
 
       Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(itemRef).withName("instance").and().withNewBlock()
           .addToStatements(new Assign(This.ref("fluent"), new This()))
-          .addToStatements(new MethodCall("copyInstance", new This(), Property.newProperty("instance"))).endBlock()
+          .addToStatements(new MethodCall("copyInstance", new This(), LocalVariable.newLocalVariable("instance"))).endBlock()
           .build();
 
       basicConstructors.add(emptyConstructor);
@@ -440,7 +445,7 @@ public class ClazzAs {
       //
 
       if (validationEnabled) {
-        Property validationEnabledProperty = new PropertyBuilder().withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF)
+        Field validationEnabledProperty = new FieldBuilder().withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF)
             .withName("validationEnabled").build();
 
         fields.add(validationEnabledProperty);
@@ -448,24 +453,26 @@ public class ClazzAs {
         basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
             .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
             .addToStatements(This.call(c.getArguments()))
-            .addToStatements(new Assign(This.ref("validationEnabled"), Property.newProperty("validationEnabled"))).endBlock()
+            .addToStatements(new Assign(This.ref("validationEnabled"), LocalVariable.newLocalVariable("validationEnabled")))
+            .endBlock()
             .build())
             .forEach(constructors::add);
 
         ClassRef validatorRef = new ClassRefBuilder().withFullyQualifiedName("javax.validation.Validator").build();
 
-        Property validatorProperty = new PropertyBuilder().withName("validator").withTypeRef(validatorRef).build();
+        Field validatorProperty = new FieldBuilder().withName("validator").withTypeRef(validatorRef).build();
 
         fields.add(validatorProperty);
 
         BuilderContext context = BuilderContextManager.getContext();
         if (context.isExternalvalidatorSupported()) {
+          LocalVariable validator = LocalVariable.newLocalVariable("validator");
           basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
               .withTypeRef(validatorRef).withName("validator").and().withNewBlock()
               .addToStatements(This.call(c.getArguments()))
-              .addToStatements(new Assign(This.ref("validator"), Property.newProperty("validator")))
+              .addToStatements(new Assign(This.ref("validator"), validator))
               .addToStatements(
-                  new Assign(This.ref("validationEnabled"), Property.newProperty("validator").notNull()))
+                  new Assign(This.ref("validationEnabled"), validator.notNull()))
               .endBlock().build())
               .forEach(constructors::add);
 
@@ -474,7 +481,7 @@ public class ClazzAs {
               .withName("usingValidator")
               .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
               .withNewBlock()
-              .addToStatements(Return.newInstance(builderRef, new This(), Property.newProperty("validator")))
+              .addToStatements(Return.newInstance(builderRef, new This(), LocalVariable.newLocalVariable("validator")))
               .endBlock()
               .build();
 
@@ -501,7 +508,7 @@ public class ClazzAs {
               .withExtendsList(fluentImplRef)
               .withImplementsList(visitableBuilderRef)
               .withNewModifiers().withPublic().endModifiers()
-              .withProperties(fields)
+              .withFields(fields)
               .withConstructors(constructors)
               .withMethods(methods).build());
     }
@@ -568,11 +575,11 @@ public class ClazzAs {
 
     //We may use a reference to fluent or we may use directly "this". So we need to check.
     if (fluent != null && !fluent.isEmpty()) {
-      statements.add(new Assign(This.ref("fluent"), Property.newProperty(fluent)));
+      statements.add(new Assign(This.ref("fluent"), LocalVariable.newLocalVariable(fluent)));
     }
 
     if (!isAbstract(clazz.toReference()) && hasDefaultConstructor(clazz)) {
-      Property instance = Property.newProperty("instance");
+      LocalVariable instance = LocalVariable.newLocalVariable("instance");
       statements.add(new Assign(
           instance,
           new Ternary(
@@ -581,34 +588,35 @@ public class ClazzAs {
               new Construct(ClassRef.forName(clazz.getFullyQualifiedName())))));
     }
 
-    Property instance = Property.newProperty("instance");
+    LocalVariable instance = LocalVariable.newLocalVariable("instance");
     List<Statement> ifStatements = new ArrayList<>();
 
     Set<String> constructorProperties = new HashSet<>();
-    for (Property property : constructor.getArguments()) {
-      Optional<Method> getter = Getter.findOptional(instanceType, property);
+    for (Argument arg : constructor.getArguments()) {
+      Field field = Field.newField(arg.getTypeRef(), arg.getName());
+      Optional<Method> getter = Getter.findOptional(instanceType, field);
       getter.ifPresent(g -> {
-        constructorProperties.add(property.getNameCapitalized());
-        Expression targetRef = ref.equals("this") ? new This() : Property.newProperty(ref);
+        constructorProperties.add(field.getNameCapitalized());
+        Expression targetRef = ref.equals("this") ? new This() : LocalVariable.newLocalVariable(ref);
         Expression getterCall = new MethodCall(g.getName(), instance);
 
         // Add cast if needed
-        Expression finalExpression = property.getTypeRef() instanceof TypeParamRef ? new Cast(property.getTypeRef(), getterCall)
+        Expression finalExpression = field.getTypeRef() instanceof TypeParamRef ? new Cast(field.getTypeRef(), getterCall)
             : getterCall;
 
-        ifStatements.add(new MethodCall("with" + property.getNameCapitalized(), targetRef, finalExpression));
+        ifStatements.add(new MethodCall("with" + field.getNameCapitalized(), targetRef, finalExpression));
       });
     }
 
-    Predicate<Property> propertyFilter = isPropertyApplicable(clazz, false);
-    clazz.getAllProperties().stream()
+    Predicate<Field> propertyFilter = isFieldApplicable(clazz, false);
+    clazz.getAllFields().stream()
         .filter(propertyFilter)
         .filter(p -> !constructorProperties.contains(p.getNameCapitalized()))
         .filter(p -> Setter.hasOrInherits(clazz, p))
         .forEach(property -> {
           Optional<Method> optionalGetter = Getter.findOptional(instanceType, property);
           if (optionalGetter.isPresent()) {
-            Expression targetRef = ref.equals("this") ? new This() : Property.newProperty(ref);
+            Expression targetRef = ref.equals("this") ? new This() : LocalVariable.newLocalVariable(ref);
             Expression getterCall = new MethodCall(optionalGetter.get().getName(), instance);
             ifStatements.add(new MethodCall("with" + property.getNameCapitalized(), targetRef, getterCall));
           }
@@ -624,18 +632,19 @@ public class ClazzAs {
 
     // Build constructor arguments
     List<Expression> constructorArgs = new ArrayList<>();
-    Property fluent = Property.newProperty("fluent");
-    for (Property arg : constructor.getArguments()) {
-      constructorArgs.add(new MethodCall(ToMethod.getterOrBuildMethodName(arg), fluent));
+    LocalVariable fluent = LocalVariable.newLocalVariable("fluent");
+    for (Argument arg : constructor.getArguments()) {
+      constructorArgs
+          .add(new MethodCall(ToMethod.getterOrBuildMethodName(Field.newField(arg.getTypeRef(), arg.getName())), fluent));
     }
 
-    Property buildable = Property.newProperty("buildable");
+    LocalVariable buildable = LocalVariable.newLocalVariable("buildable");
     statements.add(new Declare(
-        Property.newProperty(instanceType.toInternalReference(), "buildable"),
+        LocalVariable.newLocalVariable(instanceType.toInternalReference(), "buildable"),
         new Construct(instanceType.toReference(), constructorArgs)));
 
-    Predicate<Property> propertyFilter = isPropertyApplicable(item, false);
-    item.getAllProperties().stream()
+    Predicate<Field> propertyFilter = isFieldApplicable(item, false);
+    item.getAllFields().stream()
         .filter(propertyFilter)
         .filter(p -> Setter.hasOrInherits(item, p))
         .filter(p -> !constructor.getArguments().stream().anyMatch(a -> a.getName().equals(p.getName()))) //Exclude fields that are set via constructor!
@@ -650,12 +659,12 @@ public class ClazzAs {
     BuilderContext context = BuilderContextManager.getContext();
     final boolean validationEnabled = item.hasAttribute(VALIDATION_ENABLED) ? item.getAttribute(VALIDATION_ENABLED) : false;
     if (validationEnabled) {
-      Property validationEnabledProp = Property.newProperty("validationEnabled");
+      Expression validationEnabledProp = This.ref("validationEnabled");
       ClassRef validationUtils = ClassRef.forName(context.getBuilderPackage() + ".ValidationUtils");
 
       if (context.isExternalvalidatorSupported()) {
         statements.add(If.condition(validationEnabledProp)
-            .then(new MethodCall("validate", validationUtils, buildable, Property.newProperty("validator")))
+            .then(new MethodCall("validate", validationUtils, buildable, This.ref("validator")))
             .end());
       } else {
         statements.add(If.condition(validationEnabledProp)
@@ -681,36 +690,36 @@ public class ClazzAs {
         .withNewBlock()
         .addToStatements(Super.call(
             constructor.getArguments().stream()
-                .map(arg -> Property.newProperty(arg.getName()))
+                .map(arg -> (Expression) LocalVariable.newLocalVariable(arg.getName()))
                 .toArray(Expression[]::new)))
         .endBlock()
         .build();
   }
 
-  private static Predicate<Property> isPropertyApplicable(RichTypeDef item) {
-    return isPropertyApplicable(item, true);
+  private static Predicate<Field> isFieldApplicable(RichTypeDef item) {
+    return isFieldApplicable(item, true);
   }
 
-  private static Predicate<Property> isPropertyApplicable(RichTypeDef item, boolean excludeBuildableSuperClassFields) {
+  private static Predicate<Field> isFieldApplicable(RichTypeDef item, boolean excludeBuildableSuperClassFields) {
     final Set<String> propertiesToIgnore = item.hasAttribute(IGNORE_PROPERTIES)
         ? new HashSet<>(Arrays.asList(item.getAttribute(IGNORE_PROPERTIES)))
         : new HashSet<>();
 
-    final Map<String, Property> itemProperties = item.getProperties().stream()
-        .collect(Collectors.toMap(Property::getName, p -> p));
-    return property -> {
-      if (property.isStatic()) {
+    final Map<String, Field> itemProperties = item.getFields().stream()
+        .collect(Collectors.toMap(Field::getName, p -> p));
+    return field -> {
+      if (field.isStatic()) {
         return false;
       }
-      if (propertiesToIgnore.contains(property.getName())) {
+      if (propertiesToIgnore.contains(field.getName())) {
         return false;
       }
-      if (!hasBuildableConstructorWithArgument(item, property) && !Setter.hasOrInherits(item, property)) {
+      if (!hasBuildableConstructorWithArgument(item, field) && !Setter.hasOrInherits(item, field)) {
         return false;
       }
 
-      boolean isInherited = !itemProperties.containsKey(property.getName());
-      boolean isGeneric = property.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
+      boolean isInherited = !itemProperties.containsKey(field.getName());
+      boolean isGeneric = field.hasAttribute(TypeArguments.ORIGINAL_TYPE_PARAMETER);
       boolean hasBuildableSuperClass = item.getExtendsList().stream().anyMatch(s -> isBuildable(s));
 
       // We should skip fields that originate from buildable superclasses, unless they are generic.

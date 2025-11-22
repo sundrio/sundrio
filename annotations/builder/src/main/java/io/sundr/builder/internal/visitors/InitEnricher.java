@@ -44,9 +44,9 @@ import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Expression;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
@@ -55,10 +55,10 @@ import io.sundr.model.utils.Collections;
 import io.sundr.model.utils.Optionals;
 import io.sundr.model.utils.Types;
 
-public class InitEnricher implements Visitor<PropertyBuilder> {
+public class InitEnricher implements Visitor<FieldBuilder> {
 
   @Override
-  public void visit(PropertyBuilder builder) {
+  public void visit(FieldBuilder builder) {
     TypeRef typeRef = builder.buildTypeRef();
     TypeRef unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF)
         .apply(typeRef);
@@ -69,7 +69,7 @@ public class InitEnricher implements Visitor<PropertyBuilder> {
       return;
     }
 
-    Property parent = (Property) builder.getAttributes().get(DESCENDANT_OF);
+    Field parent = (Field) builder.getAttributes().get(DESCENDANT_OF);
     if (parent != null) {
       typeRef = parent.getTypeRef();
       unwrapped = TypeAs.combine(TypeAs.UNWRAP_ARRAY_OF, TypeAs.UNWRAP_COLLECTION_OF, TypeAs.UNWRAP_OPTIONAL_OF).apply(typeRef);

@@ -19,7 +19,7 @@ public class ChangeDetectorTest {
     assertFalse("Should have no changes", changes.hasChanges());
     assertEquals("Should have zero total changes", 0, changes.getTotalChanges());
     assertTrue("Method changes should be empty", changes.getMethodChanges().isEmpty());
-    assertTrue("Property changes should be empty", changes.getPropertyChanges().isEmpty());
+    assertTrue("Field changes should be empty", changes.getFieldChanges().isEmpty());
   }
 
   @Test
@@ -32,7 +32,7 @@ public class ChangeDetectorTest {
     assertTrue("Should have changes", changes.hasChanges());
     assertEquals("Should have one change", 1, changes.getTotalChanges());
     assertEquals("Should have one method change", 1, changes.getMethodChanges().size());
-    assertTrue("Should have no property changes", changes.getPropertyChanges().isEmpty());
+    assertTrue("Should have no field changes", changes.getFieldChanges().isEmpty());
 
     Change<Method> methodChange = changes.getMethodChanges().iterator().next();
     assertEquals("Should be ADDED change", ChangeType.ADDED, methodChange.getChangeType());
@@ -87,14 +87,14 @@ public class ChangeDetectorTest {
 
     assertTrue("Should have changes", changes.hasChanges());
     assertEquals("Should have one change", 1, changes.getTotalChanges());
-    assertEquals("Should have one property change", 1, changes.getPropertyChanges().size());
+    assertEquals("Should have one field change", 1, changes.getFieldChanges().size());
     assertTrue("Should have no method changes", changes.getMethodChanges().isEmpty());
 
-    Change<Property> propertyChange = changes.getPropertyChanges().iterator().next();
-    assertEquals("Should be ADDED change", ChangeType.ADDED, propertyChange.getChangeType());
-    assertNull("Old element should be null", propertyChange.getOldElement());
-    assertNotNull("New element should not be null", propertyChange.getNewElement());
-    assertEquals("Property name should be 'newProperty'", "newProperty", propertyChange.getNewElement().getName());
+    Change<Field> fieldChange = changes.getFieldChanges().iterator().next();
+    assertEquals("Should be ADDED change", ChangeType.ADDED, fieldChange.getChangeType());
+    assertNull("Old element should be null", fieldChange.getOldElement());
+    assertNotNull("New element should not be null", fieldChange.getNewElement());
+    assertEquals("Property name should be 'newField'", "newField", fieldChange.getNewElement().getName());
   }
 
   @Test
@@ -106,13 +106,13 @@ public class ChangeDetectorTest {
 
     assertTrue("Should have changes", changes.hasChanges());
     assertEquals("Should have one change", 1, changes.getTotalChanges());
-    assertEquals("Should have one property change", 1, changes.getPropertyChanges().size());
+    assertEquals("Should have one field change", 1, changes.getFieldChanges().size());
 
-    Change<Property> propertyChange = changes.getPropertyChanges().iterator().next();
-    assertEquals("Should be REMOVED change", ChangeType.REMOVED, propertyChange.getChangeType());
-    assertNotNull("Old element should not be null", propertyChange.getOldElement());
-    assertNull("New element should be null", propertyChange.getNewElement());
-    assertEquals("Property name should be 'newProperty'", "newProperty", propertyChange.getOldElement().getName());
+    Change<Field> fieldChange = changes.getFieldChanges().iterator().next();
+    assertEquals("Should be REMOVED change", ChangeType.REMOVED, fieldChange.getChangeType());
+    assertNotNull("Old element should not be null", fieldChange.getOldElement());
+    assertNull("New element should be null", fieldChange.getNewElement());
+    assertEquals("Property name should be 'newField'", "newField", fieldChange.getOldElement().getName());
   }
 
   @Test
@@ -125,7 +125,7 @@ public class ChangeDetectorTest {
     assertTrue("Should have changes", changes.hasChanges());
     assertTrue("Should have multiple changes", changes.getTotalChanges() > 1);
     assertFalse("Should have method changes", changes.getMethodChanges().isEmpty());
-    assertFalse("Should have property changes", changes.getPropertyChanges().isEmpty());
+    assertFalse("Should have field changes", changes.getFieldChanges().isEmpty());
   }
 
   @Test
@@ -190,8 +190,8 @@ public class ChangeDetectorTest {
         .endBlock()
         .build();
 
-    Property existingProperty = new PropertyBuilder()
-        .withName("existingProperty")
+    Field existingField = new FieldBuilder()
+        .withName("existingField")
         .withTypeRef(ClassRef.forClass(String.class))
         .build();
 
@@ -199,7 +199,7 @@ public class ChangeDetectorTest {
         .withName("TestClass")
         .withPackageName("com.example")
         .withMethods(existingMethod)
-        .withProperties(existingProperty)
+        .withFields(existingField)
         .build();
   }
 
@@ -228,8 +228,8 @@ public class ChangeDetectorTest {
         .endBlock()
         .build();
 
-    Property existingProperty = new PropertyBuilder()
-        .withName("existingProperty")
+    Field existingField = new FieldBuilder()
+        .withName("existingField")
         .withTypeRef(ClassRef.forClass(String.class))
         .build();
 
@@ -237,20 +237,20 @@ public class ChangeDetectorTest {
         .withName("TestClass")
         .withPackageName("com.example")
         .withMethods(modifiedMethod)
-        .withProperties(existingProperty)
+        .withFields(existingField)
         .build();
   }
 
   private TypeDef createTypeDefWithAddedProperty() {
     TypeDef base = createSimpleTypeDef();
 
-    Property newProperty = new PropertyBuilder()
-        .withName("newProperty")
+    Field newField = new FieldBuilder()
+        .withName("newField")
         .withTypeRef(ClassRef.forClass(Integer.class))
         .build();
 
     return new TypeDefBuilder(base)
-        .addToProperties(newProperty)
+        .addToFields(newField)
         .build();
   }
 
@@ -266,14 +266,14 @@ public class ChangeDetectorTest {
         .endBlock()
         .build();
 
-    Property newProperty = new PropertyBuilder()
+    Field newField = new FieldBuilder()
         .withName("anotherProperty")
         .withTypeRef(ClassRef.forClass(Double.class))
         .build();
 
     return new TypeDefBuilder(base)
         .addToMethods(newMethod)
-        .addToProperties(newProperty)
+        .addToFields(newField)
         .build();
   }
 }

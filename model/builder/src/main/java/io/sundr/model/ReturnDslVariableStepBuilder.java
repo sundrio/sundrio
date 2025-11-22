@@ -26,7 +26,7 @@ public class ReturnDslVariableStepBuilder extends ReturnDslVariableStepFluent<Re
   }
 
   public ReturnDslVariableStep build() {
-    ReturnDslVariableStep buildable = new ReturnDslVariableStep(fluent.getName());
+    ReturnDslVariableStep buildable = new ReturnDslVariableStep(fluent.buildVariable());
     return buildable;
   }
 

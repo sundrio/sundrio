@@ -98,6 +98,10 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -121,6 +125,10 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -158,6 +166,10 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -174,17 +186,17 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -202,17 +214,21 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -304,6 +320,22 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
       this.left = builder;
       return (A) this;
     }
+  }
+
+  public ArgumentLeftNested<A> withNewArgumentLeft() {
+    return new ArgumentLeftNested(null);
+  }
+
+  public ArgumentLeftNested<A> withNewArgumentLeftLike(Argument item) {
+    return new ArgumentLeftNested(item);
+  }
+
+  public ArgumentRightNested<A> withNewArgumentRight() {
+    return new ArgumentRightNested(null);
+  }
+
+  public ArgumentRightNested<A> withNewArgumentRightLike(Argument item) {
+    return new ArgumentRightNested(item);
   }
 
   public AssignLeftNested<A> withNewAssignLeft() {
@@ -586,6 +618,38 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
     return new EqualsRightNested(item);
   }
 
+  public FieldLeftNested<A> withNewFieldLeft() {
+    return new FieldLeftNested(null);
+  }
+
+  public FieldLeftNested<A> withNewFieldLeftLike(Field item) {
+    return new FieldLeftNested(item);
+  }
+
+  public FieldRefLeftNested<A> withNewFieldRefLeft() {
+    return new FieldRefLeftNested(null);
+  }
+
+  public FieldRefLeftNested<A> withNewFieldRefLeftLike(FieldRef item) {
+    return new FieldRefLeftNested(item);
+  }
+
+  public FieldRefRightNested<A> withNewFieldRefRight() {
+    return new FieldRefRightNested(null);
+  }
+
+  public FieldRefRightNested<A> withNewFieldRefRightLike(FieldRef item) {
+    return new FieldRefRightNested(item);
+  }
+
+  public FieldRightNested<A> withNewFieldRight() {
+    return new FieldRightNested(null);
+  }
+
+  public FieldRightNested<A> withNewFieldRightLike(Field item) {
+    return new FieldRightNested(item);
+  }
+
   public GreaterThanLeftNested<A> withNewGreaterThanLeft() {
     return new GreaterThanLeftNested(null);
   }
@@ -768,6 +832,22 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
 
   public LessThanRightNested<A> withNewLessThanRightLike(LessThan item) {
     return new LessThanRightNested(item);
+  }
+
+  public LocalVariableLeftNested<A> withNewLocalVariableLeft() {
+    return new LocalVariableLeftNested(null);
+  }
+
+  public LocalVariableLeftNested<A> withNewLocalVariableLeftLike(LocalVariable item) {
+    return new LocalVariableLeftNested(item);
+  }
+
+  public LocalVariableRightNested<A> withNewLocalVariableRight() {
+    return new LocalVariableRightNested(null);
+  }
+
+  public LocalVariableRightNested<A> withNewLocalVariableRightLike(LocalVariable item) {
+    return new LocalVariableRightNested(item);
   }
 
   public LogicalAndLeftNested<A> withNewLogicalAndLeft() {
@@ -1280,6 +1360,42 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
     }
   }
 
+  public class ArgumentLeftNested<N> extends ArgumentFluent<ArgumentLeftNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentLeftNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endArgumentLeft() {
+      return and();
+    }
+
+  }
+
+  public class ArgumentRightNested<N> extends ArgumentFluent<ArgumentRightNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentRightNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endArgumentRight() {
+      return and();
+    }
+
+  }
+
   public class AssignLeftNested<N> extends AssignFluent<AssignLeftNested<N>> implements Nested<N> {
 
     AssignBuilder builder;
@@ -1786,6 +1902,78 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
 
   }
 
+  public class FieldLeftNested<N> extends FieldFluent<FieldLeftNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldLeftNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endFieldLeft() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefLeftNested<N> extends FieldRefFluent<FieldRefLeftNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefLeftNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endFieldRefLeft() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefRightNested<N> extends FieldRefFluent<FieldRefRightNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefRightNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endFieldRefRight() {
+      return and();
+    }
+
+  }
+
+  public class FieldRightNested<N> extends FieldFluent<FieldRightNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldRightNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endFieldRight() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanLeftNested<N> extends GreaterThanFluent<GreaterThanLeftNested<N>> implements Nested<N> {
 
     GreaterThanBuilder builder;
@@ -2107,6 +2295,42 @@ public class BinaryExpressionFluent<A extends io.sundr.model.BinaryExpressionFlu
     }
 
     public N endLessThanRight() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableLeftNested<N> extends LocalVariableFluent<LocalVariableLeftNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableLeftNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withLeft(builder.build());
+    }
+
+    public N endLocalVariableLeft() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableRightNested<N> extends LocalVariableFluent<LocalVariableRightNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableRightNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BinaryExpressionFluent.this.withRight(builder.build());
+    }
+
+    public N endLocalVariableRight() {
       return and();
     }
 

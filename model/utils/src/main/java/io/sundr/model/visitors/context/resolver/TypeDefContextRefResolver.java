@@ -1,6 +1,6 @@
 package io.sundr.model.visitors.context.resolver;
 
-import static io.sundr.model.utils.Resolvers.createResolutionMap;
+import static io.sundr.model.utils.Resolvers.*;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ public class TypeDefContextRefResolver implements Visitor<TypeDefFluent<?>> {
   public void visit(TypeDefFluent<?> fluent) {
     if (fluent instanceof Visitable<?>) {
       Visitable<?> visitable = (Visitable<?>) fluent;
-      Map<String, Expression> resolutionMap = createResolutionMap(fluent.buildProperties());
+      Map<String, Expression> resolutionMap = createResolutionMapFromFields(fluent.buildFields());
       visitable.accept(new LocalVariableResolver(resolutionMap));
 
       visitable.accept(new MethodArgumentsResolver(resolutionMap));

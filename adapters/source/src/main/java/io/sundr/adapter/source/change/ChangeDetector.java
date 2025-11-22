@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.utils.Sources;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
 
@@ -23,9 +23,9 @@ public class ChangeDetector {
    */
   public static ChangeSet compare(TypeDef oldTypeDef, TypeDef newTypeDef) {
     Set<Change<Method>> methodChanges = compareMethodsAsSets(oldTypeDef, newTypeDef);
-    Set<Change<Property>> propertyChanges = comparePropertiesAsSets(oldTypeDef, newTypeDef);
+    Set<Change<Field>> fieldChanges = comparePropertiesAsSets(oldTypeDef, newTypeDef);
 
-    return new ChangeSet(oldTypeDef, newTypeDef, methodChanges, propertyChanges);
+    return new ChangeSet(oldTypeDef, newTypeDef, methodChanges, fieldChanges);
   }
 
   /**
@@ -98,38 +98,38 @@ public class ChangeDetector {
     return changes;
   }
 
-  private static Set<Change<Property>> comparePropertiesAsSets(TypeDef oldTypeDef, TypeDef newTypeDef) {
-    Set<Change<Property>> changes = new HashSet<>();
+  private static Set<Change<Field>> comparePropertiesAsSets(TypeDef oldTypeDef, TypeDef newTypeDef) {
+    Set<Change<Field>> changes = new HashSet<>();
 
     // Handle null TypeDefs
-    Map<String, Property> oldProperties = oldTypeDef != null ? oldTypeDef.getProperties().stream()
-        .collect(Collectors.toMap(Property::getName, property -> property)) : Collections.emptyMap();
+    Map<String, Field> oldFields = oldTypeDef != null ? oldTypeDef.getFields().stream()
+        .collect(Collectors.toMap(Field::getName, field -> field)) : Collections.emptyMap();
 
-    Map<String, Property> newProperties = newTypeDef != null ? newTypeDef.getProperties().stream()
-        .collect(Collectors.toMap(Property::getName, property -> property)) : Collections.emptyMap();
+    Map<String, Field> newFields = newTypeDef != null ? newTypeDef.getFields().stream()
+        .collect(Collectors.toMap(Field::getName, field -> field)) : Collections.emptyMap();
 
-    // Find added properties
-    for (Map.Entry<String, Property> entry : newProperties.entrySet()) {
-      if (!oldProperties.containsKey(entry.getKey())) {
+    // Find added fields
+    for (Map.Entry<String, Field> entry : newFields.entrySet()) {
+      if (!oldFields.containsKey(entry.getKey())) {
         changes.add(Change.added(entry.getValue()));
       }
     }
 
-    // Find removed properties
-    for (Map.Entry<String, Property> entry : oldProperties.entrySet()) {
-      if (!newProperties.containsKey(entry.getKey())) {
+    // Find removed fields
+    for (Map.Entry<String, Field> entry : oldFields.entrySet()) {
+      if (!newFields.containsKey(entry.getKey())) {
         changes.add(Change.removed(entry.getValue()));
       }
     }
 
-    // Find modified properties
-    for (Map.Entry<String, Property> entry : oldProperties.entrySet()) {
+    // Find modified fields
+    for (Map.Entry<String, Field> entry : oldFields.entrySet()) {
       String name = entry.getKey();
-      Property oldProperty = entry.getValue();
-      Property newProperty = newProperties.get(name);
+      Field oldField = entry.getValue();
+      Field newField = newFields.get(name);
 
-      if (newProperty != null && !propertiesEqual(oldProperty, newProperty)) {
-        changes.add(Change.modified(oldProperty, newProperty));
+      if (newField != null && !fieldsEqual(oldField, newField)) {
+        changes.add(Change.modified(oldField, newField));
       }
     }
 
@@ -170,12 +170,12 @@ public class ChangeDetector {
     return true;
   }
 
-  private static boolean propertiesEqual(Property prop1, Property prop2) {
-    if (!Objects.equals(prop1.getTypeRef(), prop2.getTypeRef())) {
+  private static boolean fieldsEqual(Field field1, Field field2) {
+    if (!Objects.equals(field1.getTypeRef(), field2.getTypeRef())) {
       return false;
     }
 
-    if (!Objects.equals(prop1.getModifiers(), prop2.getModifiers())) {
+    if (!Objects.equals(field1.getModifiers(), field2.getModifiers())) {
       return false;
     }
 

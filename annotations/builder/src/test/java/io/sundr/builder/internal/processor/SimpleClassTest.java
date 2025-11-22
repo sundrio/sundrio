@@ -61,6 +61,7 @@ public class SimpleClassTest extends AbstractProcessorTest {
 
     ClassRef superClass = fluent.getExtendsList().iterator().next();
     assertEquals("BaseFluent", superClass.getName());
+    System.out.println("Source:" + fluent.render());
     assertEquals(1, superClass.getArguments().size());
     assertEquals("A", superClass.getArguments().iterator().next().toString());
   }

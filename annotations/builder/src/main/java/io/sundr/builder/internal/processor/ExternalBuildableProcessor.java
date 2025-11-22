@@ -47,12 +47,12 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.ExternalBuildables;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.checks.DuplicatePropertyCheck;
+import io.sundr.builder.internal.checks.DuplicateFieldCheck;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.api.CodeGenerator;
 import io.sundr.codegen.apt.TypeDefAptOutput;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 
@@ -117,9 +117,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
                 && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());
 
             TypeDef b = new TypeDefBuilder(original)
-                .accept(new DuplicatePropertyCheck(), new Visitor<PropertyBuilder>() {
+                .accept(new DuplicateFieldCheck(), new Visitor<FieldBuilder>() {
                   @Override
-                  public void visit(PropertyBuilder builder) {
+                  public void visit(FieldBuilder builder) {
                     if (isBuildable) {
                       builder.addToAttributes(EXTERNAL_BUILDABLE, generated);
                       builder.addToAttributes(EDITABLE_ENABLED, generated.editableEnabled());
@@ -168,9 +168,9 @@ public class ExternalBuildableProcessor extends AbstractBuilderProcessor {
               && isIncluded(fqcn, generated.includes()) && !isExcluded(fqcn, generated.excludes());
 
           TypeDef r = new TypeDefBuilder(original)
-              .accept(new DuplicatePropertyCheck(), new Visitor<PropertyBuilder>() {
+              .accept(new DuplicateFieldCheck(), new Visitor<FieldBuilder>() {
                 @Override
-                public void visit(PropertyBuilder builder) {
+                public void visit(FieldBuilder builder) {
                   if (isBuildable) {
                     builder.addToAttributes(EXTERNAL_BUILDABLE, generated);
                     builder.addToAttributes(EDITABLE_ENABLED, generated.editableEnabled());

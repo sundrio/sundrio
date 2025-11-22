@@ -28,9 +28,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import io.sundr.SundrException;
+import io.sundr.model.Argument;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.utils.Strings;
 
 public class Parsers {
@@ -56,7 +56,7 @@ public class Parsers {
     }
   }
 
-  public static String parseMethodBody(String content, String name, List<Property> arguments) {
+  public static String parseMethodBody(String content, String name, List<Argument> arguments) {
     try {
       return parseMethodBody(content, Pattern.compile(createMethodSignatureRegex(name, arguments)));
     } catch (IllegalStateException e) {
@@ -97,7 +97,7 @@ public class Parsers {
     return createMethodSignatureRegex(nameOrType, method.getArguments());
   }
 
-  public static String createMethodSignatureRegex(String name, List<Property> arguments) {
+  public static String createMethodSignatureRegex(String name, List<Argument> arguments) {
     StringBuilder sb = new StringBuilder();
     sb.append(Pattern.quote(name));
     sb.append("\\s*");

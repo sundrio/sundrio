@@ -111,7 +111,7 @@ public class TypeAs {
         .withImplementsList(
             BuilderContextManager.getContext().getEditableInterface().toReference(BUILDER_REF.apply(item.toReference())))
         .withInnerTypes()
-        .withProperties()
+        .withFields()
         .withMethods()
         .withConstructors()
         .build();

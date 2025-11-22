@@ -25,8 +25,8 @@ import io.sundr.adapter.source.analysis.ImpactAnalyzer;
 import io.sundr.adapter.source.change.ChangeDetector;
 import io.sundr.adapter.source.change.ChangeSet;
 import io.sundr.adapter.source.utils.Sources;
-import io.sundr.model.Nameable;
 import io.sundr.model.TypeDef;
+import io.sundr.model.WithFullyQualifiedName;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.utils.Patterns;
 
@@ -398,14 +398,14 @@ public class Project {
     }
 
     /**
-     * Finds a specific class by Nameable within the filtered set.
+     * Finds a specific class by WithFullyQualifiedName within the filtered set.
      * Only searches within the files that match the current include/exclude criteria.
      *
-     * @param nameable the Nameable to search for
+     * @param WithFullyQualifiedName the WithFullyQualifiedName to search for
      * @return an optional path to the class file, empty if not found in the filtered set
      */
-    public Optional<Path> find(Nameable nameable) {
-      return find(nameable.getFullyQualifiedName());
+    public Optional<Path> find(WithFullyQualifiedName WithFullyQualifiedName) {
+      return find(WithFullyQualifiedName.getFullyQualifiedName());
     }
 
     /**

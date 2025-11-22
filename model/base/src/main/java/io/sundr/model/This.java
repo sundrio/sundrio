@@ -4,12 +4,12 @@ import java.util.List;
 
 public class This implements Expression {
 
-  public static PropertyRef ref(String name) {
-    return new PropertyRef(name, new This());
+  public static FieldRef ref(String name) {
+    return new FieldRef(name, new This());
   }
 
-  public static PropertyRef ref(Property property) {
-    return new PropertyRef(property, new This());
+  public static FieldRef ref(Field field) {
+    return new FieldRef(field, new This());
   }
 
   public static MethodCall call(Expression... arguments) {

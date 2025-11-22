@@ -27,7 +27,7 @@ public class TypeDefBuilder extends TypeDefFluent<TypeDefBuilder> implements Vis
   public TypeDef build() {
     TypeDef buildable = new TypeDef(fluent.getKind(), fluent.getPackageName(), fluent.getName(), fluent.getComments(),
         fluent.buildAnnotations(), fluent.buildExtendsList(), fluent.buildImplementsList(), fluent.buildParameters(),
-        fluent.buildProperties(), fluent.buildConstructors(), fluent.buildMethods(), fluent.getOuterTypeName(),
+        fluent.buildFields(), fluent.buildConstructors(), fluent.buildMethods(), fluent.getOuterTypeName(),
         fluent.buildInnerTypes(), fluent.buildModifiers(), fluent.getAttributes());
     return buildable;
   }

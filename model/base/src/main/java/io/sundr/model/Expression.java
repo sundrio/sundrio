@@ -278,11 +278,11 @@ public interface Expression extends Renderable, WithReferences {
     return new NewArray(type, sizes);
   }
 
-  public static Lambda lambda(Property parameter, Statement statement) {
+  public static Lambda lambda(WithName parameter, Statement statement) {
     return new Lambda(parameter.getName(), statement);
   }
 
-  public static Lambda lambda(Property parameter, Expression expression) {
+  public static Lambda lambda(WithName parameter, Expression expression) {
     return new Lambda(parameter.getName(), expression);
   }
 

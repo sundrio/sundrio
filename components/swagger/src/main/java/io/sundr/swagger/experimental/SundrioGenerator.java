@@ -26,9 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.swagger.codegen.ClientOptInput;
@@ -107,7 +107,7 @@ public class SundrioGenerator implements Generator {
 
     ClassRef superClass = null;
     List<ClassRef> interfaces = new ArrayList<>();
-    List<Property> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>();
     List<Method> methods = new ArrayList<>();
 
     if (model instanceof ComposedModel) {
@@ -129,7 +129,7 @@ public class SundrioGenerator implements Generator {
             .withName(className)
             .withImplementsList(interfaces)
             .withExtendsList(superClass)
-            .withProperties(fields)
+            .withFields(fields)
             .withMethods(methods)
             .build();
       }

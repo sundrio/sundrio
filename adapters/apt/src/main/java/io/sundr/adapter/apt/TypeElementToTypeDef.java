@@ -43,10 +43,10 @@ import javax.lang.model.util.ElementFilter;
 import io.sundr.SundrException;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.Modifiers;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -66,19 +66,19 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
 
   private final AptContext context;
   private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
-  private final Function<VariableElement, Property> propertyAdapterFunction;
+  private final Function<VariableElement, Field> fieldAdapterFunction;
   private final Function<ExecutableElement, Method> methodAdapterFunction;
   private final Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction;
   private final Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction;
 
   public TypeElementToTypeDef(AptContext context, Function<TypeMirror, TypeRef> referenceAdapterFunction,
-      Function<VariableElement, Property> propertyAdapterFunction,
+      Function<VariableElement, Field> fieldAdapterFunction,
       Function<ExecutableElement, Method> methodAdapterFunction,
       Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction,
       Function<TypeParameterElement, TypeParamDef> typeParamAdapterFunction) {
     this.context = context;
     this.referenceAdapterFunction = referenceAdapterFunction;
-    this.propertyAdapterFunction = propertyAdapterFunction;
+    this.fieldAdapterFunction = fieldAdapterFunction;
     this.methodAdapterFunction = methodAdapterFunction;
     this.annotationAdapterFunction = annotationAdapterFunction;
     this.typeParamAdapterFunction = typeParamAdapterFunction;
@@ -198,7 +198,7 @@ public class TypeElementToTypeDef implements Function<TypeElement, TypeDef> {
 
     // Populate Fields
     for (VariableElement variableElement : ElementFilter.fieldsIn(classElement.getEnclosedElements())) {
-      builder.addToProperties(propertyAdapterFunction.apply(variableElement));
+      builder.addToFields(fieldAdapterFunction.apply(variableElement));
     }
 
     Set<ExecutableElement> allMethods = new LinkedHashSet<ExecutableElement>();

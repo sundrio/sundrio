@@ -27,9 +27,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -46,10 +46,10 @@ public class BindDefinitionTest {
       .withName("Target")
       .withParameters(T)
       // private T type;
-      .addNewProperty()
+      .addNewField()
       .withName("type")
       .withTypeRef(T.toReference())
-      .endProperty()
+      .endField()
       // public T getType();
       .addNewMethod()
       .withNewModifiers().withPublic().endModifiers()
@@ -70,7 +70,7 @@ public class BindDefinitionTest {
     TypeDef bound = BindDefinition.of(target.toReference(string));
     assertNotNull(bound);
     assertTrue(bound.getParameters().isEmpty());
-    Optional<Property> type = bound.getProperties().stream().filter(p -> "type".equals(p.getName())).findFirst();
+    Optional<Field> type = bound.getFields().stream().filter(p -> "type".equals(p.getName())).findFirst();
     assertTrue(type.isPresent());
     type.ifPresent(p -> {
       assertEquals(string, p.getTypeRef());

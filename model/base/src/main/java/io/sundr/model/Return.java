@@ -50,12 +50,12 @@ public class Return implements Statement {
     return new Return(new Cast(castTo, new This()));
   }
 
-  public static ReturnDslVariableStep variable(Property property) {
-    return new ReturnDslVariableStep(property);
+  public static ReturnDslVariableStep variable(Variable<?> variable) {
+    return new ReturnDslVariableStep(variable);
   }
 
   public static ReturnDslVariableStep variable(String variableName) {
-    return new ReturnDslVariableStep(variableName);
+    return new ReturnDslVariableStep(LocalVariable.newLocalVariable(variableName));
   }
 
   public static Return call(String method, Expression... arguments) {

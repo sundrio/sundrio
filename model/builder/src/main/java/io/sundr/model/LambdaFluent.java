@@ -149,6 +149,10 @@ public class LambdaFluent<A extends io.sundr.model.LambdaFluent<A>> extends Base
 
         return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
 
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
+
       case "Modulo":
 
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
@@ -233,13 +237,13 @@ public class LambdaFluent<A extends io.sundr.model.LambdaFluent<A>> extends Base
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
+
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
 
       case "PreIncrement":
 
@@ -509,6 +513,14 @@ public class LambdaFluent<A extends io.sundr.model.LambdaFluent<A>> extends Base
     return new EqualsStatementNested(item);
   }
 
+  public FieldRefStatementNested<A> withNewFieldRefStatement() {
+    return new FieldRefStatementNested(null);
+  }
+
+  public FieldRefStatementNested<A> withNewFieldRefStatementLike(FieldRef item) {
+    return new FieldRefStatementNested(item);
+  }
+
   public ForStatementNested<A> withNewForStatement() {
     return new ForStatementNested(null);
   }
@@ -751,10 +763,6 @@ public class LambdaFluent<A extends io.sundr.model.LambdaFluent<A>> extends Base
 
   public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatement() {
     return new ReturnDslVariableStepStatementNested(null);
-  }
-
-  public A withNewReturnDslVariableStepStatement(String name) {
-    return (A) this.withStatement(new ReturnDslVariableStep(name));
   }
 
   public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
@@ -1134,6 +1142,24 @@ public class LambdaFluent<A extends io.sundr.model.LambdaFluent<A>> extends Base
     }
 
     public N endEqualsStatement() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefStatementNested<N> extends FieldRefFluent<FieldRefStatementNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefStatementNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) LambdaFluent.this.withStatement(builder.build());
+    }
+
+    public N endFieldRefStatement() {
       return and();
     }
 

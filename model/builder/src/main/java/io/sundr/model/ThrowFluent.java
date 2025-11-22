@@ -93,6 +93,10 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -116,6 +120,10 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -153,6 +161,10 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -169,17 +181,17 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -197,17 +209,21 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -286,6 +302,14 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
       this.exception = builder;
       return (A) this;
     }
+  }
+
+  public ArgumentExceptionNested<A> withNewArgumentException() {
+    return new ArgumentExceptionNested(null);
+  }
+
+  public ArgumentExceptionNested<A> withNewArgumentExceptionLike(Argument item) {
+    return new ArgumentExceptionNested(item);
   }
 
   public AssignExceptionNested<A> withNewAssignException() {
@@ -428,6 +452,22 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
     return new EqualsExceptionNested(item);
   }
 
+  public FieldExceptionNested<A> withNewFieldException() {
+    return new FieldExceptionNested(null);
+  }
+
+  public FieldExceptionNested<A> withNewFieldExceptionLike(Field item) {
+    return new FieldExceptionNested(item);
+  }
+
+  public FieldRefExceptionNested<A> withNewFieldRefException() {
+    return new FieldRefExceptionNested(null);
+  }
+
+  public FieldRefExceptionNested<A> withNewFieldRefExceptionLike(FieldRef item) {
+    return new FieldRefExceptionNested(item);
+  }
+
   public GreaterThanExceptionNested<A> withNewGreaterThanException() {
     return new GreaterThanExceptionNested(null);
   }
@@ -518,6 +558,14 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
 
   public LessThanOrEqualExceptionNested<A> withNewLessThanOrEqualExceptionLike(LessThanOrEqual item) {
     return new LessThanOrEqualExceptionNested(item);
+  }
+
+  public LocalVariableExceptionNested<A> withNewLocalVariableException() {
+    return new LocalVariableExceptionNested(null);
+  }
+
+  public LocalVariableExceptionNested<A> withNewLocalVariableExceptionLike(LocalVariable item) {
+    return new LocalVariableExceptionNested(item);
   }
 
   public LogicalAndExceptionNested<A> withNewLogicalAndException() {
@@ -766,6 +814,24 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
 
   public XorExceptionNested<A> withNewXorExceptionLike(Xor item) {
     return new XorExceptionNested(item);
+  }
+
+  public class ArgumentExceptionNested<N> extends ArgumentFluent<ArgumentExceptionNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentExceptionNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ThrowFluent.this.withException(builder.build());
+    }
+
+    public N endArgumentException() {
+      return and();
+    }
+
   }
 
   public class AssignExceptionNested<N> extends AssignFluent<AssignExceptionNested<N>> implements Nested<N> {
@@ -1021,6 +1087,42 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
 
   }
 
+  public class FieldExceptionNested<N> extends FieldFluent<FieldExceptionNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldExceptionNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ThrowFluent.this.withException(builder.build());
+    }
+
+    public N endFieldException() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefExceptionNested<N> extends FieldRefFluent<FieldRefExceptionNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefExceptionNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ThrowFluent.this.withException(builder.build());
+    }
+
+    public N endFieldRefException() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanExceptionNested<N> extends GreaterThanFluent<GreaterThanExceptionNested<N>> implements Nested<N> {
 
     GreaterThanBuilder builder;
@@ -1180,6 +1282,25 @@ public class ThrowFluent<A extends io.sundr.model.ThrowFluent<A>> extends BaseFl
     }
 
     public N endLessThanOrEqualException() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableExceptionNested<N> extends LocalVariableFluent<LocalVariableExceptionNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableExceptionNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ThrowFluent.this.withException(builder.build());
+    }
+
+    public N endLocalVariableException() {
       return and();
     }
 

@@ -25,7 +25,7 @@ import io.sundr.builder.VisitableBuilder;
 @SuppressWarnings("unchecked")
 public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends BaseFluent<A> {
 
-  private ArrayList<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
+  private ArrayList<LocalVariableBuilder> localVariables = new ArrayList<LocalVariableBuilder>();
   private Optional<VisitableBuilder<? extends Expression, ?>> value = Optional.empty();
 
   public DeclareFluent() {
@@ -35,76 +35,76 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     this.copyInstance(instance);
   }
 
-  public A addAllToProperties(Collection<Property> items) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
+  public A addAllToLocalVariables(Collection<LocalVariable> items) {
+    if (this.localVariables == null) {
+      this.localVariables = new ArrayList();
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").add(builder);
-      this.properties.add(builder);
-    }
-    return (A) this;
-  }
-
-  public PropertiesNested<A> addNewProperty() {
-    return new PropertiesNested(-1, null);
-  }
-
-  public PropertiesNested<A> addNewPropertyLike(Property item) {
-    return new PropertiesNested(-1, item);
-  }
-
-  public A addToProperties(Property... items) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
-    }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").add(builder);
-      this.properties.add(builder);
+    for (LocalVariable item : items) {
+      LocalVariableBuilder builder = new LocalVariableBuilder(item);
+      _visitables.get("localVariables").add(builder);
+      this.localVariables.add(builder);
     }
     return (A) this;
   }
 
-  public A addToProperties(int index, Property item) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
+  public LocalVariablesNested<A> addNewLocalVariable() {
+    return new LocalVariablesNested(-1, null);
+  }
+
+  public LocalVariablesNested<A> addNewLocalVariableLike(LocalVariable item) {
+    return new LocalVariablesNested(-1, item);
+  }
+
+  public A addToLocalVariables(LocalVariable... items) {
+    if (this.localVariables == null) {
+      this.localVariables = new ArrayList();
     }
-    PropertyBuilder builder = new PropertyBuilder(item);
-    if (index < 0 || index >= properties.size()) {
-      _visitables.get("properties").add(builder);
-      properties.add(builder);
+    for (LocalVariable item : items) {
+      LocalVariableBuilder builder = new LocalVariableBuilder(item);
+      _visitables.get("localVariables").add(builder);
+      this.localVariables.add(builder);
+    }
+    return (A) this;
+  }
+
+  public A addToLocalVariables(int index, LocalVariable item) {
+    if (this.localVariables == null) {
+      this.localVariables = new ArrayList();
+    }
+    LocalVariableBuilder builder = new LocalVariableBuilder(item);
+    if (index < 0 || index >= localVariables.size()) {
+      _visitables.get("localVariables").add(builder);
+      localVariables.add(builder);
     } else {
-      _visitables.get("properties").add(builder);
-      properties.add(index, builder);
+      _visitables.get("localVariables").add(builder);
+      localVariables.add(index, builder);
     }
     return (A) this;
   }
 
-  public Property buildFirstProperty() {
-    return this.properties.get(0).build();
+  public LocalVariable buildFirstLocalVariable() {
+    return this.localVariables.get(0).build();
   }
 
-  public Property buildLastProperty() {
-    return this.properties.get(properties.size() - 1).build();
+  public LocalVariable buildLastLocalVariable() {
+    return this.localVariables.get(localVariables.size() - 1).build();
   }
 
-  public Property buildMatchingProperty(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : properties) {
+  public LocalVariable buildLocalVariable(int index) {
+    return this.localVariables.get(index).build();
+  }
+
+  public List<LocalVariable> buildLocalVariables() {
+    return this.localVariables != null ? build(localVariables) : null;
+  }
+
+  public LocalVariable buildMatchingLocalVariable(Predicate<LocalVariableBuilder> predicate) {
+    for (LocalVariableBuilder item : localVariables) {
       if (predicate.test(item)) {
         return item.build();
       }
     }
     return null;
-  }
-
-  public List<Property> buildProperties() {
-    return this.properties != null ? build(properties) : null;
-  }
-
-  public Property buildProperty(int index) {
-    return this.properties.get(index).build();
   }
 
   public Optional<Expression> buildValue() {
@@ -173,6 +173,10 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -196,6 +200,10 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -233,6 +241,10 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -249,17 +261,17 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -277,17 +289,21 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -314,45 +330,45 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
 
   protected void copyInstance(Declare instance) {
     if (instance != null) {
-      this.withProperties(instance.getProperties());
+      this.withLocalVariables(instance.getLocalVariables());
       this.withValue(instance.getValue());
     }
   }
 
-  public PropertiesNested<A> editFirstProperty() {
-    if (properties.size() == 0) {
-      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "properties"));
+  public LocalVariablesNested<A> editFirstLocalVariable() {
+    if (localVariables.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "localVariables"));
     }
-    return this.setNewPropertyLike(0, this.buildProperty(0));
+    return this.setNewLocalVariableLike(0, this.buildLocalVariable(0));
   }
 
-  public PropertiesNested<A> editLastProperty() {
-    int index = properties.size() - 1;
+  public LocalVariablesNested<A> editLastLocalVariable() {
+    int index = localVariables.size() - 1;
     if (index < 0) {
-      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "properties"));
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "localVariables"));
     }
-    return this.setNewPropertyLike(index, this.buildProperty(index));
+    return this.setNewLocalVariableLike(index, this.buildLocalVariable(index));
   }
 
-  public PropertiesNested<A> editMatchingProperty(Predicate<PropertyBuilder> predicate) {
+  public LocalVariablesNested<A> editLocalVariable(int index) {
+    if (localVariables.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "localVariables"));
+    }
+    return this.setNewLocalVariableLike(index, this.buildLocalVariable(index));
+  }
+
+  public LocalVariablesNested<A> editMatchingLocalVariable(Predicate<LocalVariableBuilder> predicate) {
     int index = -1;
-    for (int i = 0; i < properties.size(); i++) {
-      if (predicate.test(properties.get(i))) {
+    for (int i = 0; i < localVariables.size(); i++) {
+      if (predicate.test(localVariables.get(i))) {
         index = i;
         break;
       }
     }
     if (index < 0) {
-      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "properties"));
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "localVariables"));
     }
-    return this.setNewPropertyLike(index, this.buildProperty(index));
-  }
-
-  public PropertiesNested<A> editProperty(int index) {
-    if (properties.size() <= index) {
-      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "properties"));
-    }
-    return this.setNewPropertyLike(index, this.buildProperty(index));
+    return this.setNewLocalVariableLike(index, this.buildLocalVariable(index));
   }
 
   public boolean equals(Object o) {
@@ -366,7 +382,7 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
       return false;
     }
     DeclareFluent that = (DeclareFluent) o;
-    if (!(Objects.equals(properties, that.properties))) {
+    if (!(Objects.equals(localVariables, that.localVariables))) {
       return false;
     }
     if (!(Objects.equals(value, that.value))) {
@@ -375,8 +391,12 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     return true;
   }
 
-  public boolean hasMatchingProperty(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : properties) {
+  public boolean hasLocalVariables() {
+    return this.localVariables != null && !(this.localVariables.isEmpty());
+  }
+
+  public boolean hasMatchingLocalVariable(Predicate<LocalVariableBuilder> predicate) {
+    for (LocalVariableBuilder item : localVariables) {
       if (predicate.test(item)) {
         return true;
       }
@@ -384,50 +404,46 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     return false;
   }
 
-  public boolean hasProperties() {
-    return this.properties != null && !(this.properties.isEmpty());
-  }
-
   public boolean hasValue() {
     return this.value != null && this.value.isPresent();
   }
 
   public int hashCode() {
-    return Objects.hash(properties, value);
+    return Objects.hash(localVariables, value);
   }
 
-  public A removeAllFromProperties(Collection<Property> items) {
-    if (this.properties == null) {
+  public A removeAllFromLocalVariables(Collection<LocalVariable> items) {
+    if (this.localVariables == null) {
       return (A) this;
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").remove(builder);
-      this.properties.remove(builder);
+    for (LocalVariable item : items) {
+      LocalVariableBuilder builder = new LocalVariableBuilder(item);
+      _visitables.get("localVariables").remove(builder);
+      this.localVariables.remove(builder);
     }
     return (A) this;
   }
 
-  public A removeFromProperties(Property... items) {
-    if (this.properties == null) {
+  public A removeFromLocalVariables(LocalVariable... items) {
+    if (this.localVariables == null) {
       return (A) this;
     }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").remove(builder);
-      this.properties.remove(builder);
+    for (LocalVariable item : items) {
+      LocalVariableBuilder builder = new LocalVariableBuilder(item);
+      _visitables.get("localVariables").remove(builder);
+      this.localVariables.remove(builder);
     }
     return (A) this;
   }
 
-  public A removeMatchingFromProperties(Predicate<PropertyBuilder> predicate) {
-    if (properties == null) {
+  public A removeMatchingFromLocalVariables(Predicate<LocalVariableBuilder> predicate) {
+    if (localVariables == null) {
       return (A) this;
     }
-    Iterator<PropertyBuilder> each = properties.iterator();
-    List visitables = _visitables.get("properties");
+    Iterator<LocalVariableBuilder> each = localVariables.iterator();
+    List visitables = _visitables.get("localVariables");
     while (each.hasNext()) {
-      PropertyBuilder builder = each.next();
+      LocalVariableBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -436,21 +452,21 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     return (A) this;
   }
 
-  public PropertiesNested<A> setNewPropertyLike(int index, Property item) {
-    return new PropertiesNested(index, item);
+  public LocalVariablesNested<A> setNewLocalVariableLike(int index, LocalVariable item) {
+    return new LocalVariablesNested(index, item);
   }
 
-  public A setToProperties(int index, Property item) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
+  public A setToLocalVariables(int index, LocalVariable item) {
+    if (this.localVariables == null) {
+      this.localVariables = new ArrayList();
     }
-    PropertyBuilder builder = new PropertyBuilder(item);
-    if (index < 0 || index >= properties.size()) {
-      _visitables.get("properties").add(builder);
-      properties.add(builder);
+    LocalVariableBuilder builder = new LocalVariableBuilder(item);
+    if (index < 0 || index >= localVariables.size()) {
+      _visitables.get("localVariables").add(builder);
+      localVariables.add(builder);
     } else {
-      _visitables.get("properties").add(builder);
-      properties.set(index, builder);
+      _visitables.get("localVariables").add(builder);
+      localVariables.set(index, builder);
     }
     return (A) this;
   }
@@ -458,9 +474,9 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
-    if (!(properties == null) && !(properties.isEmpty())) {
-      sb.append("properties:");
-      sb.append(properties);
+    if (!(localVariables == null) && !(localVariables.isEmpty())) {
+      sb.append("localVariables:");
+      sb.append(localVariables);
       sb.append(",");
     }
     if (!(value == null)) {
@@ -469,6 +485,42 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  public A withLocalVariables(List<LocalVariable> localVariables) {
+    if (this.localVariables != null) {
+      this._visitables.get("localVariables").clear();
+    }
+    if (localVariables != null) {
+      this.localVariables = new ArrayList();
+      for (LocalVariable item : localVariables) {
+        this.addToLocalVariables(item);
+      }
+    } else {
+      this.localVariables = null;
+    }
+    return (A) this;
+  }
+
+  public A withLocalVariables(LocalVariable... localVariables) {
+    if (this.localVariables != null) {
+      this.localVariables.clear();
+      _visitables.remove("localVariables");
+    }
+    if (localVariables != null) {
+      for (LocalVariable item : localVariables) {
+        this.addToLocalVariables(item);
+      }
+    }
+    return (A) this;
+  }
+
+  public ArgumentValueNested<A> withNewArgumentValue() {
+    return new ArgumentValueNested(null);
+  }
+
+  public ArgumentValueNested<A> withNewArgumentValueLike(Argument item) {
+    return new ArgumentValueNested(item);
   }
 
   public AssignValueNested<A> withNewAssignValue() {
@@ -611,6 +663,22 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     return new EqualsValueNested(item);
   }
 
+  public FieldRefValueNested<A> withNewFieldRefValue() {
+    return new FieldRefValueNested(null);
+  }
+
+  public FieldRefValueNested<A> withNewFieldRefValueLike(FieldRef item) {
+    return new FieldRefValueNested(item);
+  }
+
+  public FieldValueNested<A> withNewFieldValue() {
+    return new FieldValueNested(null);
+  }
+
+  public FieldValueNested<A> withNewFieldValueLike(Field item) {
+    return new FieldValueNested(item);
+  }
+
   public GreaterThanOrEqualValueNested<A> withNewGreaterThanOrEqualValue() {
     return new GreaterThanOrEqualValueNested(null);
   }
@@ -701,6 +769,14 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
 
   public LessThanValueNested<A> withNewLessThanValueLike(LessThan item) {
     return new LessThanValueNested(item);
+  }
+
+  public LocalVariableValueNested<A> withNewLocalVariableValue() {
+    return new LocalVariableValueNested(null);
+  }
+
+  public LocalVariableValueNested<A> withNewLocalVariableValueLike(LocalVariable item) {
+    return new LocalVariableValueNested(item);
   }
 
   public LogicalAndValueNested<A> withNewLogicalAndValue() {
@@ -951,34 +1027,6 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     return new XorValueNested(item);
   }
 
-  public A withProperties(List<Property> properties) {
-    if (this.properties != null) {
-      this._visitables.get("properties").clear();
-    }
-    if (properties != null) {
-      this.properties = new ArrayList();
-      for (Property item : properties) {
-        this.addToProperties(item);
-      }
-    } else {
-      this.properties = null;
-    }
-    return (A) this;
-  }
-
-  public A withProperties(Property... properties) {
-    if (this.properties != null) {
-      this.properties.clear();
-      _visitables.remove("properties");
-    }
-    if (properties != null) {
-      for (Property item : properties) {
-        this.addToProperties(item);
-      }
-    }
-    return (A) this;
-  }
-
   public A withValue(Optional<Expression> value) {
     if (value == null || !(value.isPresent())) {
       this.value = Optional.empty();
@@ -999,6 +1047,24 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
       this.value = Optional.of(b);
     }
     return (A) this;
+  }
+
+  public class ArgumentValueNested<N> extends ArgumentFluent<ArgumentValueNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentValueNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) DeclareFluent.this.withValue(builder.build());
+    }
+
+    public N endArgumentValue() {
+      return and();
+    }
+
   }
 
   public class AssignValueNested<N> extends AssignFluent<AssignValueNested<N>> implements Nested<N> {
@@ -1254,6 +1320,42 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
 
   }
 
+  public class FieldRefValueNested<N> extends FieldRefFluent<FieldRefValueNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefValueNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) DeclareFluent.this.withValue(builder.build());
+    }
+
+    public N endFieldRefValue() {
+      return and();
+    }
+
+  }
+
+  public class FieldValueNested<N> extends FieldFluent<FieldValueNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldValueNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) DeclareFluent.this.withValue(builder.build());
+    }
+
+    public N endFieldValue() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanOrEqualValueNested<N> extends GreaterThanOrEqualFluent<GreaterThanOrEqualValueNested<N>>
       implements Nested<N> {
 
@@ -1412,6 +1514,44 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     }
 
     public N endLessThanValue() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableValueNested<N> extends LocalVariableFluent<LocalVariableValueNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableValueNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) DeclareFluent.this.withValue(builder.build());
+    }
+
+    public N endLocalVariableValue() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariablesNested<N> extends LocalVariableFluent<LocalVariablesNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+    int index;
+
+    LocalVariablesNested(int index, LocalVariable item) {
+      this.index = index;
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) DeclareFluent.this.setToLocalVariables(index, builder.build());
+    }
+
+    public N endLocalVariable() {
       return and();
     }
 
@@ -1700,26 +1840,6 @@ public class DeclareFluent<A extends io.sundr.model.DeclareFluent<A>> extends Ba
     }
 
     public N endPreIncrementValue() {
-      return and();
-    }
-
-  }
-
-  public class PropertiesNested<N> extends PropertyFluent<PropertiesNested<N>> implements Nested<N> {
-
-    PropertyBuilder builder;
-    int index;
-
-    PropertiesNested(int index, Property item) {
-      this.index = index;
-      this.builder = new PropertyBuilder(this, item);
-    }
-
-    public N and() {
-      return (N) DeclareFluent.this.setToProperties(index, builder.build());
-    }
-
-    public N endProperty() {
       return and();
     }
 

@@ -17,6 +17,8 @@
 package io.sundr.builder.internal.functions;
 
 import static io.sundr.builder.Constants.INDEX;
+import static io.sundr.builder.Constants.INDEX_ARGUMENT;
+import static io.sundr.builder.Constants.INDEX_FIELD;
 import static io.sundr.builder.Constants.OUTER_TYPE;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_ARRAY_OF;
 import static io.sundr.builder.internal.functions.TypeAs.UNWRAP_COLLECTION_OF;
@@ -36,15 +38,17 @@ import javax.lang.model.element.Modifier;
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.utils.BuilderUtils;
+import io.sundr.model.Argument;
 import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Modifiers;
 import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.Statement;
 import io.sundr.model.This;
 import io.sundr.model.TypeDef;
@@ -59,9 +63,9 @@ public final class PropertyAs {
   private PropertyAs() {
   }
 
-  public static final Function<Property, TypeDef> NESTED_CLASS = new Function<Property, TypeDef>() {
+  public static final Function<Field, TypeDef> NESTED_CLASS = new Function<Field, TypeDef>() {
 
-    public TypeDef apply(Property item) {
+    public TypeDef apply(Field item) {
       boolean isArray = Types.isArray(item.getTypeRef());
       boolean isList = Types.isList(item.getTypeRef());
       boolean isMap = Types.isMap(item.getTypeRef());
@@ -84,31 +88,30 @@ public final class PropertyAs {
         nestedMethods.add(ToMethod.AND.apply(item));
         nestedMethods.add(ToMethod.END.apply(item));
 
-        List<Property> properties = new ArrayList<Property>();
-        List<Method> constructors = new ArrayList<Method>();
-        List<Statement> statementsWithItem = new ArrayList<Statement>();
+        List<Field> fields = new ArrayList<>();
+        List<Method> constructors = new ArrayList<>();
+        List<Statement> statementsWithItem = new ArrayList<>();
 
-        properties.add(new PropertyBuilder()
+        fields.add(new FieldBuilder()
             .withName("builder")
             .withTypeRef(builderType).build());
 
-        List<Property> argumentsWithItem = new ArrayList<Property>();
+        List<Argument> argumentsWithItem = new ArrayList<>();
 
         if (isArray || isList) {
-          argumentsWithItem.add(INDEX);
-          properties.add(INDEX);
-          statementsWithItem.add(new Assign(This.ref(INDEX), INDEX));
+          argumentsWithItem.add(INDEX_ARGUMENT);
+          fields.add(INDEX_FIELD);
+          statementsWithItem.add(new Assign(This.ref(INDEX_FIELD), INDEX));
         }
         if (isMap) {
           TypeRef keyType = UNWRAP_MAP_KEY_OF.apply(item.getTypeRef());
-          Property keyProperty = new PropertyBuilder().withName("key").withTypeRef(keyType).build();
-          Statement keyStatement = new Assign(This.ref(keyProperty), keyProperty);
-          argumentsWithItem.add(keyProperty);
-          properties.add(keyProperty);
+          Field keyField = new FieldBuilder().withName("key").withTypeRef(keyType).build();
+          Statement keyStatement = new Assign(This.ref(keyField), keyField);
+          argumentsWithItem.add(keyField.asArgument());
+          fields.add(keyField);
           statementsWithItem.add(keyStatement);
         }
-        argumentsWithItem.add(new PropertyBuilder().withName("item").withTypeRef(unwrapped).build());
-
+        argumentsWithItem.add(Argument.newArgument(unwrapped, "item"));
         statementsWithItem
             .add(new Assign(This.ref("builder"),
                 new io.sundr.model.Construct(builderType, new This(), Property.newProperty("item"))));
@@ -131,7 +134,7 @@ public final class PropertyAs {
             .withExtendsList(nestedType.getExtendsList())
             .withImplementsList(nestedType.getImplementsList())
             .withAnnotations()
-            .withProperties(properties)
+            .withFields(fields)
             .withMethods(nestedMethods)
             .withConstructors(constructors)
             .build();
@@ -140,8 +143,8 @@ public final class PropertyAs {
     }
   };
 
-  public static final Function<Property, TypeDef> NESTED_CLASS_TYPE = new Function<Property, TypeDef>() {
-    public TypeDef apply(Property item) {
+  public static final Function<Field, TypeDef> NESTED_CLASS_TYPE = new Function<Field, TypeDef>() {
+    public TypeDef apply(Field item) {
       TypeDef shallowNestedType = SHALLOW_NESTED_TYPE.apply(item);
       ClassRef outerClass = item.getAttribute(OUTER_TYPE);
 
@@ -191,8 +194,8 @@ public final class PropertyAs {
 
   };
 
-  public static final Function<Property, TypeDef> SHALLOW_NESTED_TYPE = new Function<Property, TypeDef>() {
-    public TypeDef apply(Property property) {
+  public static final Function<Field, TypeDef> SHALLOW_NESTED_TYPE = new Function<Field, TypeDef>() {
+    public TypeDef apply(Field property) {
       TypeDef originTypeDef = property.getAttribute(Constants.ORIGIN_TYPEDEF);
 
       TypeRef typeRef = TypeAs.combine(UNWRAP_COLLECTION_OF, UNWRAP_ARRAY_OF, UNWRAP_OPTIONAL_OF, UNWRAP_MAP_VALUE_OF)

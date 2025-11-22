@@ -22,6 +22,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import io.sundr.model.*;
+import io.sundr.model.Field;
 import io.sundr.model.functions.GetDefinition;
 import io.sundr.model.repo.DefinitionRepository;
 import io.sundr.utils.Patterns;
@@ -530,11 +531,11 @@ public final class Types {
    * @param property The property name.
    * @return True if method is found, false otherwise.
    */
-  public static boolean hasProperty(TypeDef typeDef, String property) {
+  public static boolean hasField(TypeDef typeDef, String name) {
     return unrollHierarchy(typeDef)
         .stream()
-        .flatMap(h -> h.getProperties().stream())
-        .filter(p -> property.equals(p.getName()))
+        .flatMap(h -> h.getFields().stream())
+        .filter(p -> name.equals(p.getName()))
         .findAny()
         .isPresent();
   }
@@ -545,10 +546,10 @@ public final class Types {
    * @param typeDef The type.
    * @return A list with all properties.
    */
-  public static List<Property> allProperties(TypeDef typeDef) {
+  public static List<Field> allFields(TypeDef typeDef) {
     return unrollHierarchy(typeDef)
         .stream()
-        .flatMap(h -> h.getProperties().stream())
+        .flatMap(h -> h.getFields().stream())
         .collect(Collectors.toList());
   }
 

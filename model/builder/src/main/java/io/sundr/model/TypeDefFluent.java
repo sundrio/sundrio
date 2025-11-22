@@ -24,6 +24,7 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
   private List<String> comments = new ArrayList<String>();
   private ArrayList<MethodBuilder> constructors = new ArrayList<MethodBuilder>();
   private ArrayList<ClassRefBuilder> extendsList = new ArrayList<ClassRefBuilder>();
+  private ArrayList<FieldBuilder> fields = new ArrayList<FieldBuilder>();
   private ArrayList<ClassRefBuilder> implementsList = new ArrayList<ClassRefBuilder>();
   private ArrayList<TypeDefBuilder> innerTypes = new ArrayList<TypeDefBuilder>();
   private Kind kind;
@@ -32,7 +33,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
   private String outerTypeName;
   private String packageName;
   private ArrayList<TypeParamDefBuilder> parameters = new ArrayList<TypeParamDefBuilder>();
-  private ArrayList<PropertyBuilder> properties = new ArrayList<PropertyBuilder>();
 
   public TypeDefFluent() {
   }
@@ -87,6 +87,18 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
+  public A addAllToFields(Collection<Field> items) {
+    if (this.fields == null) {
+      this.fields = new ArrayList();
+    }
+    for (Field item : items) {
+      FieldBuilder builder = new FieldBuilder(item);
+      _visitables.get("fields").add(builder);
+      this.fields.add(builder);
+    }
+    return (A) this;
+  }
+
   public A addAllToImplementsList(Collection<ClassRef> items) {
     if (this.implementsList == null) {
       this.implementsList = new ArrayList();
@@ -135,18 +147,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
-  public A addAllToProperties(Collection<Property> items) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
-    }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").add(builder);
-      this.properties.add(builder);
-    }
-    return (A) this;
-  }
-
   public AnnotationsNested<A> addNewAnnotation() {
     return new AnnotationsNested(-1, null);
   }
@@ -169,6 +169,14 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public ExtendsListNested<A> addNewExtendsListLike(ClassRef item) {
     return new ExtendsListNested(-1, item);
+  }
+
+  public FieldsNested<A> addNewField() {
+    return new FieldsNested(-1, null);
+  }
+
+  public FieldsNested<A> addNewFieldLike(Field item) {
+    return new FieldsNested(-1, item);
   }
 
   public ImplementsListNested<A> addNewImplementsList() {
@@ -205,14 +213,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public ParametersNested<A> addNewParameterLike(TypeParamDef item) {
     return new ParametersNested(-1, item);
-  }
-
-  public PropertiesNested<A> addNewProperty() {
-    return new PropertiesNested(-1, null);
-  }
-
-  public PropertiesNested<A> addNewPropertyLike(Property item) {
-    return new PropertiesNested(-1, item);
   }
 
   public A addToAnnotations(AnnotationRef... items) {
@@ -310,6 +310,33 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     } else {
       _visitables.get("extendsList").add(builder);
       extendsList.add(index, builder);
+    }
+    return (A) this;
+  }
+
+  public A addToFields(Field... items) {
+    if (this.fields == null) {
+      this.fields = new ArrayList();
+    }
+    for (Field item : items) {
+      FieldBuilder builder = new FieldBuilder(item);
+      _visitables.get("fields").add(builder);
+      this.fields.add(builder);
+    }
+    return (A) this;
+  }
+
+  public A addToFields(int index, Field item) {
+    if (this.fields == null) {
+      this.fields = new ArrayList();
+    }
+    FieldBuilder builder = new FieldBuilder(item);
+    if (index < 0 || index >= fields.size()) {
+      _visitables.get("fields").add(builder);
+      fields.add(builder);
+    } else {
+      _visitables.get("fields").add(builder);
+      fields.add(index, builder);
     }
     return (A) this;
   }
@@ -422,33 +449,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
-  public A addToProperties(Property... items) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
-    }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").add(builder);
-      this.properties.add(builder);
-    }
-    return (A) this;
-  }
-
-  public A addToProperties(int index, Property item) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
-    }
-    PropertyBuilder builder = new PropertyBuilder(item);
-    if (index < 0 || index >= properties.size()) {
-      _visitables.get("properties").add(builder);
-      properties.add(builder);
-    } else {
-      _visitables.get("properties").add(builder);
-      properties.add(index, builder);
-    }
-    return (A) this;
-  }
-
   public AnnotationRef buildAnnotation(int index) {
     return this.annotations.get(index).build();
   }
@@ -473,6 +473,14 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.extendsList.get(index).build();
   }
 
+  public Field buildField(int index) {
+    return this.fields.get(index).build();
+  }
+
+  public List<Field> buildFields() {
+    return this.fields != null ? build(fields) : null;
+  }
+
   public AnnotationRef buildFirstAnnotation() {
     return this.annotations.get(0).build();
   }
@@ -483,6 +491,10 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public ClassRef buildFirstExtendsList() {
     return this.extendsList.get(0).build();
+  }
+
+  public Field buildFirstField() {
+    return this.fields.get(0).build();
   }
 
   public ClassRef buildFirstImplementsList() {
@@ -499,10 +511,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public TypeParamDef buildFirstParameter() {
     return this.parameters.get(0).build();
-  }
-
-  public Property buildFirstProperty() {
-    return this.properties.get(0).build();
   }
 
   public List<ClassRef> buildImplementsList() {
@@ -533,6 +541,10 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.extendsList.get(extendsList.size() - 1).build();
   }
 
+  public Field buildLastField() {
+    return this.fields.get(fields.size() - 1).build();
+  }
+
   public ClassRef buildLastImplementsList() {
     return this.implementsList.get(implementsList.size() - 1).build();
   }
@@ -547,10 +559,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public TypeParamDef buildLastParameter() {
     return this.parameters.get(parameters.size() - 1).build();
-  }
-
-  public Property buildLastProperty() {
-    return this.properties.get(properties.size() - 1).build();
   }
 
   public AnnotationRef buildMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
@@ -573,6 +581,15 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public ClassRef buildMatchingExtendsList(Predicate<ClassRefBuilder> predicate) {
     for (ClassRefBuilder item : extendsList) {
+      if (predicate.test(item)) {
+        return item.build();
+      }
+    }
+    return null;
+  }
+
+  public Field buildMatchingField(Predicate<FieldBuilder> predicate) {
+    for (FieldBuilder item : fields) {
       if (predicate.test(item)) {
         return item.build();
       }
@@ -616,15 +633,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return null;
   }
 
-  public Property buildMatchingProperty(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : properties) {
-      if (predicate.test(item)) {
-        return item.build();
-      }
-    }
-    return null;
-  }
-
   public Method buildMethod(int index) {
     return this.methods.get(index).build();
   }
@@ -641,14 +649,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.parameters != null ? build(parameters) : null;
   }
 
-  public List<Property> buildProperties() {
-    return this.properties != null ? build(properties) : null;
-  }
-
-  public Property buildProperty(int index) {
-    return this.properties.get(index).build();
-  }
-
   protected void copyInstance(TypeDef instance) {
     if (instance != null) {
       this.withKind(instance.getKind());
@@ -659,7 +659,7 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       this.withExtendsList(instance.getExtendsList());
       this.withImplementsList(instance.getImplementsList());
       this.withParameters(instance.getParameters());
-      this.withProperties(instance.getProperties());
+      this.withFields(instance.getFields());
       this.withConstructors(instance.getConstructors());
       this.withMethods(instance.getMethods());
       this.withOuterTypeName(instance.getOuterTypeName());
@@ -690,6 +690,13 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.setNewExtendsListLike(index, this.buildExtendsList(index));
   }
 
+  public FieldsNested<A> editField(int index) {
+    if (fields.size() <= index) {
+      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "fields"));
+    }
+    return this.setNewFieldLike(index, this.buildField(index));
+  }
+
   public AnnotationsNested<A> editFirstAnnotation() {
     if (annotations.size() == 0) {
       throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "annotations"));
@@ -709,6 +716,13 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "extendsList"));
     }
     return this.setNewExtendsListLike(0, this.buildExtendsList(0));
+  }
+
+  public FieldsNested<A> editFirstField() {
+    if (fields.size() == 0) {
+      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "fields"));
+    }
+    return this.setNewFieldLike(0, this.buildField(0));
   }
 
   public ImplementsListNested<A> editFirstImplementsList() {
@@ -737,13 +751,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "parameters"));
     }
     return this.setNewParameterLike(0, this.buildParameter(0));
-  }
-
-  public PropertiesNested<A> editFirstProperty() {
-    if (properties.size() == 0) {
-      throw new RuntimeException(String.format("Can't edit first %s. The list is empty.", "properties"));
-    }
-    return this.setNewPropertyLike(0, this.buildProperty(0));
   }
 
   public ImplementsListNested<A> editImplementsList(int index) {
@@ -784,6 +791,14 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.setNewExtendsListLike(index, this.buildExtendsList(index));
   }
 
+  public FieldsNested<A> editLastField() {
+    int index = fields.size() - 1;
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "fields"));
+    }
+    return this.setNewFieldLike(index, this.buildField(index));
+  }
+
   public ImplementsListNested<A> editLastImplementsList() {
     int index = implementsList.size() - 1;
     if (index < 0) {
@@ -814,14 +829,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "parameters"));
     }
     return this.setNewParameterLike(index, this.buildParameter(index));
-  }
-
-  public PropertiesNested<A> editLastProperty() {
-    int index = properties.size() - 1;
-    if (index < 0) {
-      throw new RuntimeException(String.format("Can't edit last %s. The list is empty.", "properties"));
-    }
-    return this.setNewPropertyLike(index, this.buildProperty(index));
   }
 
   public AnnotationsNested<A> editMatchingAnnotation(Predicate<AnnotationRefBuilder> predicate) {
@@ -864,6 +871,20 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "extendsList"));
     }
     return this.setNewExtendsListLike(index, this.buildExtendsList(index));
+  }
+
+  public FieldsNested<A> editMatchingField(Predicate<FieldBuilder> predicate) {
+    int index = -1;
+    for (int i = 0; i < fields.size(); i++) {
+      if (predicate.test(fields.get(i))) {
+        index = i;
+        break;
+      }
+    }
+    if (index < 0) {
+      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "fields"));
+    }
+    return this.setNewFieldLike(index, this.buildField(index));
   }
 
   public ImplementsListNested<A> editMatchingImplementsList(Predicate<ClassRefBuilder> predicate) {
@@ -922,20 +943,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.setNewParameterLike(index, this.buildParameter(index));
   }
 
-  public PropertiesNested<A> editMatchingProperty(Predicate<PropertyBuilder> predicate) {
-    int index = -1;
-    for (int i = 0; i < properties.size(); i++) {
-      if (predicate.test(properties.get(i))) {
-        index = i;
-        break;
-      }
-    }
-    if (index < 0) {
-      throw new RuntimeException(String.format("Can't edit matching %s. No match found.", "properties"));
-    }
-    return this.setNewPropertyLike(index, this.buildProperty(index));
-  }
-
   public MethodsNested<A> editMethod(int index) {
     if (methods.size() <= index) {
       throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "methods"));
@@ -948,13 +955,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "parameters"));
     }
     return this.setNewParameterLike(index, this.buildParameter(index));
-  }
-
-  public PropertiesNested<A> editProperty(int index) {
-    if (properties.size() <= index) {
-      throw new RuntimeException(String.format("Can't edit %s. Index exceeds size.", "properties"));
-    }
-    return this.setNewPropertyLike(index, this.buildProperty(index));
   }
 
   public boolean equals(Object o) {
@@ -992,7 +992,7 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     if (!(Objects.equals(parameters, that.parameters))) {
       return false;
     }
-    if (!(Objects.equals(properties, that.properties))) {
+    if (!(Objects.equals(fields, that.fields))) {
       return false;
     }
     if (!(Objects.equals(constructors, that.constructors))) {
@@ -1067,6 +1067,10 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.extendsList != null && !(this.extendsList.isEmpty());
   }
 
+  public boolean hasFields() {
+    return this.fields != null && !(this.fields.isEmpty());
+  }
+
   public boolean hasImplementsList() {
     return this.implementsList != null && !(this.implementsList.isEmpty());
   }
@@ -1115,6 +1119,15 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return false;
   }
 
+  public boolean hasMatchingField(Predicate<FieldBuilder> predicate) {
+    for (FieldBuilder item : fields) {
+      if (predicate.test(item)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean hasMatchingImplementsList(Predicate<ClassRefBuilder> predicate) {
     for (ClassRefBuilder item : implementsList) {
       if (predicate.test(item)) {
@@ -1151,15 +1164,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return false;
   }
 
-  public boolean hasMatchingProperty(Predicate<PropertyBuilder> predicate) {
-    for (PropertyBuilder item : properties) {
-      if (predicate.test(item)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public boolean hasMethods() {
     return this.methods != null && !(this.methods.isEmpty());
   }
@@ -1180,12 +1184,8 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return this.parameters != null && !(this.parameters.isEmpty());
   }
 
-  public boolean hasProperties() {
-    return this.properties != null && !(this.properties.isEmpty());
-  }
-
   public int hashCode() {
-    return Objects.hash(kind, packageName, name, comments, annotations, extendsList, implementsList, parameters, properties,
+    return Objects.hash(kind, packageName, name, comments, annotations, extendsList, implementsList, parameters, fields,
         constructors, methods, outerTypeName, innerTypes);
   }
 
@@ -1231,6 +1231,18 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("extendsList").remove(builder);
       this.extendsList.remove(builder);
+    }
+    return (A) this;
+  }
+
+  public A removeAllFromFields(Collection<Field> items) {
+    if (this.fields == null) {
+      return (A) this;
+    }
+    for (Field item : items) {
+      FieldBuilder builder = new FieldBuilder(item);
+      _visitables.get("fields").remove(builder);
+      this.fields.remove(builder);
     }
     return (A) this;
   }
@@ -1283,18 +1295,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
-  public A removeAllFromProperties(Collection<Property> items) {
-    if (this.properties == null) {
-      return (A) this;
-    }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").remove(builder);
-      this.properties.remove(builder);
-    }
-    return (A) this;
-  }
-
   public A removeFromAnnotations(AnnotationRef... items) {
     if (this.annotations == null) {
       return (A) this;
@@ -1337,6 +1337,18 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       ClassRefBuilder builder = new ClassRefBuilder(item);
       _visitables.get("extendsList").remove(builder);
       this.extendsList.remove(builder);
+    }
+    return (A) this;
+  }
+
+  public A removeFromFields(Field... items) {
+    if (this.fields == null) {
+      return (A) this;
+    }
+    for (Field item : items) {
+      FieldBuilder builder = new FieldBuilder(item);
+      _visitables.get("fields").remove(builder);
+      this.fields.remove(builder);
     }
     return (A) this;
   }
@@ -1389,18 +1401,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
-  public A removeFromProperties(Property... items) {
-    if (this.properties == null) {
-      return (A) this;
-    }
-    for (Property item : items) {
-      PropertyBuilder builder = new PropertyBuilder(item);
-      _visitables.get("properties").remove(builder);
-      this.properties.remove(builder);
-    }
-    return (A) this;
-  }
-
   public A removeMatchingFromAnnotations(Predicate<AnnotationRefBuilder> predicate) {
     if (annotations == null) {
       return (A) this;
@@ -1441,6 +1441,22 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     List visitables = _visitables.get("extendsList");
     while (each.hasNext()) {
       ClassRefBuilder builder = each.next();
+      if (predicate.test(builder)) {
+        visitables.remove(builder);
+        each.remove();
+      }
+    }
+    return (A) this;
+  }
+
+  public A removeMatchingFromFields(Predicate<FieldBuilder> predicate) {
+    if (fields == null) {
+      return (A) this;
+    }
+    Iterator<FieldBuilder> each = fields.iterator();
+    List visitables = _visitables.get("fields");
+    while (each.hasNext()) {
+      FieldBuilder builder = each.next();
       if (predicate.test(builder)) {
         visitables.remove(builder);
         each.remove();
@@ -1513,22 +1529,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
-  public A removeMatchingFromProperties(Predicate<PropertyBuilder> predicate) {
-    if (properties == null) {
-      return (A) this;
-    }
-    Iterator<PropertyBuilder> each = properties.iterator();
-    List visitables = _visitables.get("properties");
-    while (each.hasNext()) {
-      PropertyBuilder builder = each.next();
-      if (predicate.test(builder)) {
-        visitables.remove(builder);
-        each.remove();
-      }
-    }
-    return (A) this;
-  }
-
   public AnnotationsNested<A> setNewAnnotationLike(int index, AnnotationRef item) {
     return new AnnotationsNested(index, item);
   }
@@ -1539,6 +1539,10 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public ExtendsListNested<A> setNewExtendsListLike(int index, ClassRef item) {
     return new ExtendsListNested(index, item);
+  }
+
+  public FieldsNested<A> setNewFieldLike(int index, Field item) {
+    return new FieldsNested(index, item);
   }
 
   public ImplementsListNested<A> setNewImplementsListLike(int index, ClassRef item) {
@@ -1555,10 +1559,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
 
   public ParametersNested<A> setNewParameterLike(int index, TypeParamDef item) {
     return new ParametersNested(index, item);
-  }
-
-  public PropertiesNested<A> setNewPropertyLike(int index, Property item) {
-    return new PropertiesNested(index, item);
   }
 
   public A setToAnnotations(int index, AnnotationRef item) {
@@ -1610,6 +1610,21 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     } else {
       _visitables.get("extendsList").add(builder);
       extendsList.set(index, builder);
+    }
+    return (A) this;
+  }
+
+  public A setToFields(int index, Field item) {
+    if (this.fields == null) {
+      this.fields = new ArrayList();
+    }
+    FieldBuilder builder = new FieldBuilder(item);
+    if (index < 0 || index >= fields.size()) {
+      _visitables.get("fields").add(builder);
+      fields.add(builder);
+    } else {
+      _visitables.get("fields").add(builder);
+      fields.set(index, builder);
     }
     return (A) this;
   }
@@ -1674,21 +1689,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
-  public A setToProperties(int index, Property item) {
-    if (this.properties == null) {
-      this.properties = new ArrayList();
-    }
-    PropertyBuilder builder = new PropertyBuilder(item);
-    if (index < 0 || index >= properties.size()) {
-      _visitables.get("properties").add(builder);
-      properties.add(builder);
-    } else {
-      _visitables.get("properties").add(builder);
-      properties.set(index, builder);
-    }
-    return (A) this;
-  }
-
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("{");
@@ -1732,9 +1732,9 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
       sb.append(parameters);
       sb.append(",");
     }
-    if (!(properties == null) && !(properties.isEmpty())) {
-      sb.append("properties:");
-      sb.append(properties);
+    if (!(fields == null) && !(fields.isEmpty())) {
+      sb.append("fields:");
+      sb.append(fields);
       sb.append(",");
     }
     if (!(constructors == null) && !(constructors.isEmpty())) {
@@ -1864,6 +1864,34 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     if (extendsList != null) {
       for (ClassRef item : extendsList) {
         this.addToExtendsList(item);
+      }
+    }
+    return (A) this;
+  }
+
+  public A withFields(List<Field> fields) {
+    if (this.fields != null) {
+      this._visitables.get("fields").clear();
+    }
+    if (fields != null) {
+      this.fields = new ArrayList();
+      for (Field item : fields) {
+        this.addToFields(item);
+      }
+    } else {
+      this.fields = null;
+    }
+    return (A) this;
+  }
+
+  public A withFields(Field... fields) {
+    if (this.fields != null) {
+      this.fields.clear();
+      _visitables.remove("fields");
+    }
+    if (fields != null) {
+      for (Field item : fields) {
+        this.addToFields(item);
       }
     }
     return (A) this;
@@ -2001,34 +2029,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     return (A) this;
   }
 
-  public A withProperties(List<Property> properties) {
-    if (this.properties != null) {
-      this._visitables.get("properties").clear();
-    }
-    if (properties != null) {
-      this.properties = new ArrayList();
-      for (Property item : properties) {
-        this.addToProperties(item);
-      }
-    } else {
-      this.properties = null;
-    }
-    return (A) this;
-  }
-
-  public A withProperties(Property... properties) {
-    if (this.properties != null) {
-      this.properties.clear();
-      _visitables.remove("properties");
-    }
-    if (properties != null) {
-      for (Property item : properties) {
-        this.addToProperties(item);
-      }
-    }
-    return (A) this;
-  }
-
   public class AnnotationsNested<N> extends AnnotationRefFluent<AnnotationsNested<N>> implements Nested<N> {
 
     AnnotationRefBuilder builder;
@@ -2084,6 +2084,26 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     }
 
     public N endExtendsList() {
+      return and();
+    }
+
+  }
+
+  public class FieldsNested<N> extends FieldFluent<FieldsNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+    int index;
+
+    FieldsNested(int index, Field item) {
+      this.index = index;
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TypeDefFluent.this.setToFields(index, builder.build());
+    }
+
+    public N endField() {
       return and();
     }
 
@@ -2164,26 +2184,6 @@ public class TypeDefFluent<A extends io.sundr.model.TypeDefFluent<A>> extends Mo
     }
 
     public N endParameter() {
-      return and();
-    }
-
-  }
-
-  public class PropertiesNested<N> extends PropertyFluent<PropertiesNested<N>> implements Nested<N> {
-
-    PropertyBuilder builder;
-    int index;
-
-    PropertiesNested(int index, Property item) {
-      this.index = index;
-      this.builder = new PropertyBuilder(this, item);
-    }
-
-    public N and() {
-      return (N) TypeDefFluent.this.setToProperties(index, builder.build());
-    }
-
-    public N endProperty() {
       return and();
     }
 

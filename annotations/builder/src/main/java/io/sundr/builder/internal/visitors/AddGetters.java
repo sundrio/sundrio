@@ -3,8 +3,8 @@ package io.sundr.builder.internal.visitors;
 import java.util.function.Predicate;
 
 import io.sundr.builder.Visitor;
+import io.sundr.model.Field;
 import io.sundr.model.Kind;
-import io.sundr.model.Property;
 import io.sundr.model.Return;
 import io.sundr.model.This;
 import io.sundr.model.TypeDefFluent;
@@ -32,7 +32,7 @@ public class AddGetters implements Visitor<TypeDefFluent<?>> {
       return;
     }
 
-    for (Property p : def.buildProperties()) {
+    for (Field p : def.buildFields()) {
       String setterName = "get" + p.getNameCapitalized();
       if (def.hasMatchingMethod(m -> m.getName().equals(setterName))) {
         continue;

@@ -8,9 +8,9 @@ import io.sundr.adapter.source.Project;
 import io.sundr.adapter.source.change.Change;
 import io.sundr.adapter.source.change.ChangeSet;
 import io.sundr.builder.Visitor;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
-import io.sundr.model.Property;
 import io.sundr.model.PropertyRef;
 import io.sundr.model.PropertyRefFluent;
 import io.sundr.model.Super;
@@ -64,11 +64,11 @@ public class ImpactAnalyzer {
     // Analyze method changes and build dependency tree
     analyzeMethodChangesWithDependencyTree(changeSet, dependencyTree);
 
-    // Analyze property changes
-    Set<MethodReference> propertyImpacts = analyzePropertyChanges(changeSet);
-    // Add property impacts to dependency tree
-    for (MethodReference propertyImpact : propertyImpacts) {
-      dependencyTree.addDependency(propertyImpact);
+    // Analyze field changes
+    Set<MethodReference> fieldImpacts = analyzeFieldChanges(changeSet);
+    // Add field impacts to dependency tree
+    for (MethodReference fieldImpact : fieldImpacts) {
+      dependencyTree.addDependency(fieldImpact);
     }
 
     // Infer TypeDefs and Paths from MethodReferences in dependency tree
@@ -113,16 +113,16 @@ public class ImpactAnalyzer {
     return tempTree.getAllNodes();
   }
 
-  private Set<MethodReference> analyzePropertyChanges(ChangeSet changeSet) {
+  private Set<MethodReference> analyzeFieldChanges(ChangeSet changeSet) {
     Set<MethodReference> affectedMethodReferences = new HashSet<>();
 
-    for (Change<Property> propertyChange : changeSet.getPropertyChanges()) {
-      Property changedProperty = propertyChange.getElement();
+    for (Change<Field> fieldChange : changeSet.getFieldChanges()) {
+      Field changedField = fieldChange.getElement();
 
-      if (changedProperty != null) {
-        // Find all methods that access this property
-        Set<MethodReference> propertyAccessors = findMethodsAccessingProperty(changedProperty);
-        affectedMethodReferences.addAll(propertyAccessors);
+      if (changedField != null) {
+        // Find all methods that access this field
+        Set<MethodReference> fieldAccessors = findMethodsAccessingField(changedField);
+        affectedMethodReferences.addAll(fieldAccessors);
       }
     }
 
@@ -161,14 +161,14 @@ public class ImpactAnalyzer {
     }
   }
 
-  private Set<MethodReference> findMethodsAccessingProperty(Property property) {
+  private Set<MethodReference> findMethodsAccessingField(Field field) {
     Set<MethodReference> accessors = new HashSet<>();
-    String propertyName = property.getName();
+    String fieldName = field.getName();
 
-    // Use visitor pattern to find actual property accesses with 'this' or 'super' scope
+    // Use visitor pattern to find actual field accesses with 'this' or 'super' scope
     for (TypeDef typeDef : repository.getDefinitions()) {
       for (Method method : typeDef.getMethods()) {
-        if (methodAccessesProperty(method, propertyName)) {
+        if (methodAccessesProperty(method, fieldName)) {
           MethodReference methodRef = new MethodReference(method, typeDef);
           accessors.add(methodRef);
         }

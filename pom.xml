@@ -53,7 +53,7 @@
     <properties>
         <format.skip>false</format.skip>
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
 
         <maven.version>3.6.3</maven.version>
         <maven.invoker.version>3.3.0</maven.invoker.version>

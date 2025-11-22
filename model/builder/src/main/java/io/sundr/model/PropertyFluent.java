@@ -225,6 +225,10 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -248,6 +252,10 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -285,6 +293,10 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -301,17 +313,17 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -329,17 +341,21 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -749,6 +765,14 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
     return (A) this;
   }
 
+  public ArgumentInitialValueNested<A> withNewArgumentInitialValue() {
+    return new ArgumentInitialValueNested(null);
+  }
+
+  public ArgumentInitialValueNested<A> withNewArgumentInitialValueLike(Argument item) {
+    return new ArgumentInitialValueNested(item);
+  }
+
   public AssignInitialValueNested<A> withNewAssignInitialValue() {
     return new AssignInitialValueNested(null);
   }
@@ -897,6 +921,22 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
     return new EqualsInitialValueNested(item);
   }
 
+  public FieldInitialValueNested<A> withNewFieldInitialValue() {
+    return new FieldInitialValueNested(null);
+  }
+
+  public FieldInitialValueNested<A> withNewFieldInitialValueLike(Field item) {
+    return new FieldInitialValueNested(item);
+  }
+
+  public FieldRefInitialValueNested<A> withNewFieldRefInitialValue() {
+    return new FieldRefInitialValueNested(null);
+  }
+
+  public FieldRefInitialValueNested<A> withNewFieldRefInitialValueLike(FieldRef item) {
+    return new FieldRefInitialValueNested(item);
+  }
+
   public GreaterThanInitialValueNested<A> withNewGreaterThanInitialValue() {
     return new GreaterThanInitialValueNested(null);
   }
@@ -987,6 +1027,14 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
 
   public LessThanOrEqualInitialValueNested<A> withNewLessThanOrEqualInitialValueLike(LessThanOrEqual item) {
     return new LessThanOrEqualInitialValueNested(item);
+  }
+
+  public LocalVariableInitialValueNested<A> withNewLocalVariableInitialValue() {
+    return new LocalVariableInitialValueNested(null);
+  }
+
+  public LocalVariableInitialValueNested<A> withNewLocalVariableInitialValueLike(LocalVariable item) {
+    return new LocalVariableInitialValueNested(item);
   }
 
   public LogicalAndInitialValueNested<A> withNewLogicalAndInitialValue() {
@@ -1312,6 +1360,24 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
 
   }
 
+  public class ArgumentInitialValueNested<N> extends ArgumentFluent<ArgumentInitialValueNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentInitialValueNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) PropertyFluent.this.withInitialValue(builder.build());
+    }
+
+    public N endArgumentInitialValue() {
+      return and();
+    }
+
+  }
+
   public class AssignInitialValueNested<N> extends AssignFluent<AssignInitialValueNested<N>> implements Nested<N> {
 
     AssignBuilder builder;
@@ -1583,6 +1649,42 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
 
   }
 
+  public class FieldInitialValueNested<N> extends FieldFluent<FieldInitialValueNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldInitialValueNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) PropertyFluent.this.withInitialValue(builder.build());
+    }
+
+    public N endFieldInitialValue() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefInitialValueNested<N> extends FieldRefFluent<FieldRefInitialValueNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefInitialValueNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) PropertyFluent.this.withInitialValue(builder.build());
+    }
+
+    public N endFieldRefInitialValue() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanInitialValueNested<N> extends GreaterThanFluent<GreaterThanInitialValueNested<N>>
       implements Nested<N> {
 
@@ -1743,6 +1845,25 @@ public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends 
     }
 
     public N endLessThanOrEqualInitialValue() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableInitialValueNested<N> extends LocalVariableFluent<LocalVariableInitialValueNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableInitialValueNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) PropertyFluent.this.withInitialValue(builder.build());
+    }
+
+    public N endLocalVariableInitialValue() {
       return and();
     }
 

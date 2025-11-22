@@ -98,6 +98,10 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -121,6 +125,10 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -158,6 +166,10 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -174,17 +186,17 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -202,17 +214,21 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -386,6 +402,14 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
       this.lockExpression = builder;
       return (A) this;
     }
+  }
+
+  public ArgumentLockExpressionNested<A> withNewArgumentLockExpression() {
+    return new ArgumentLockExpressionNested(null);
+  }
+
+  public ArgumentLockExpressionNested<A> withNewArgumentLockExpressionLike(Argument item) {
+    return new ArgumentLockExpressionNested(item);
   }
 
   public AssignBodyNested<A> withNewAssignBody() {
@@ -656,6 +680,30 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
     return new EqualsLockExpressionNested(item);
   }
 
+  public FieldLockExpressionNested<A> withNewFieldLockExpression() {
+    return new FieldLockExpressionNested(null);
+  }
+
+  public FieldLockExpressionNested<A> withNewFieldLockExpressionLike(Field item) {
+    return new FieldLockExpressionNested(item);
+  }
+
+  public FieldRefBodyNested<A> withNewFieldRefBody() {
+    return new FieldRefBodyNested(null);
+  }
+
+  public FieldRefBodyNested<A> withNewFieldRefBodyLike(FieldRef item) {
+    return new FieldRefBodyNested(item);
+  }
+
+  public FieldRefLockExpressionNested<A> withNewFieldRefLockExpression() {
+    return new FieldRefLockExpressionNested(null);
+  }
+
+  public FieldRefLockExpressionNested<A> withNewFieldRefLockExpressionLike(FieldRef item) {
+    return new FieldRefLockExpressionNested(item);
+  }
+
   public ForBodyNested<A> withNewForBody() {
     return new ForBodyNested(null);
   }
@@ -846,6 +894,14 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
 
   public LessThanOrEqualLockExpressionNested<A> withNewLessThanOrEqualLockExpressionLike(LessThanOrEqual item) {
     return new LessThanOrEqualLockExpressionNested(item);
+  }
+
+  public LocalVariableLockExpressionNested<A> withNewLocalVariableLockExpression() {
+    return new LocalVariableLockExpressionNested(null);
+  }
+
+  public LocalVariableLockExpressionNested<A> withNewLocalVariableLockExpressionLike(LocalVariable item) {
+    return new LocalVariableLockExpressionNested(item);
   }
 
   public LogicalAndBodyNested<A> withNewLogicalAndBody() {
@@ -1180,10 +1236,6 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
     return new ReturnDslVariableStepBodyNested(null);
   }
 
-  public A withNewReturnDslVariableStepBody(String name) {
-    return (A) this.withBody(new ReturnDslVariableStep(name));
-  }
-
   public ReturnDslVariableStepBodyNested<A> withNewReturnDslVariableStepBodyLike(ReturnDslVariableStep item) {
     return new ReturnDslVariableStepBodyNested(item);
   }
@@ -1350,6 +1402,24 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
 
   public XorLockExpressionNested<A> withNewXorLockExpressionLike(Xor item) {
     return new XorLockExpressionNested(item);
+  }
+
+  public class ArgumentLockExpressionNested<N> extends ArgumentFluent<ArgumentLockExpressionNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentLockExpressionNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
+    }
+
+    public N endArgumentLockExpression() {
+      return and();
+    }
+
   }
 
   public class AssignBodyNested<N> extends AssignFluent<AssignBodyNested<N>> implements Nested<N> {
@@ -1842,6 +1912,60 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
 
   }
 
+  public class FieldLockExpressionNested<N> extends FieldFluent<FieldLockExpressionNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldLockExpressionNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
+    }
+
+    public N endFieldLockExpression() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefBodyNested<N> extends FieldRefFluent<FieldRefBodyNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefBodyNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) SynchronizedFluent.this.withBody(builder.build());
+    }
+
+    public N endFieldRefBody() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefLockExpressionNested<N> extends FieldRefFluent<FieldRefLockExpressionNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefLockExpressionNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
+    }
+
+    public N endFieldRefLockExpression() {
+      return and();
+    }
+
+  }
+
   public class ForBodyNested<N> extends ForFluent<ForBodyNested<N>> implements Nested<N> {
 
     ForBuilder builder;
@@ -2184,6 +2308,25 @@ public class SynchronizedFluent<A extends io.sundr.model.SynchronizedFluent<A>> 
     }
 
     public N endLessThanOrEqualLockExpression() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableLockExpressionNested<N> extends LocalVariableFluent<LocalVariableLockExpressionNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableLockExpressionNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) SynchronizedFluent.this.withLockExpression(builder.build());
+    }
+
+    public N endLocalVariableLockExpression() {
       return and();
     }
 

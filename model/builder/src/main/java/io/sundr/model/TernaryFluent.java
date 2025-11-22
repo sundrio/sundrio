@@ -103,6 +103,10 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -126,6 +130,10 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -163,6 +171,10 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -179,17 +191,17 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -207,17 +219,21 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -336,6 +352,30 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
       this.condition = builder;
       return (A) this;
     }
+  }
+
+  public ArgumentAlternativeNested<A> withNewArgumentAlternative() {
+    return new ArgumentAlternativeNested(null);
+  }
+
+  public ArgumentAlternativeNested<A> withNewArgumentAlternativeLike(Argument item) {
+    return new ArgumentAlternativeNested(item);
+  }
+
+  public ArgumentConditionNested<A> withNewArgumentCondition() {
+    return new ArgumentConditionNested(null);
+  }
+
+  public ArgumentConditionNested<A> withNewArgumentConditionLike(Argument item) {
+    return new ArgumentConditionNested(item);
+  }
+
+  public ArgumentResultNested<A> withNewArgumentResult() {
+    return new ArgumentResultNested(null);
+  }
+
+  public ArgumentResultNested<A> withNewArgumentResultLike(Argument item) {
+    return new ArgumentResultNested(item);
   }
 
   public AssignAlternativeNested<A> withNewAssignAlternative() {
@@ -758,6 +798,54 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
     return new EqualsResultNested(item);
   }
 
+  public FieldAlternativeNested<A> withNewFieldAlternative() {
+    return new FieldAlternativeNested(null);
+  }
+
+  public FieldAlternativeNested<A> withNewFieldAlternativeLike(Field item) {
+    return new FieldAlternativeNested(item);
+  }
+
+  public FieldConditionNested<A> withNewFieldCondition() {
+    return new FieldConditionNested(null);
+  }
+
+  public FieldConditionNested<A> withNewFieldConditionLike(Field item) {
+    return new FieldConditionNested(item);
+  }
+
+  public FieldRefAlternativeNested<A> withNewFieldRefAlternative() {
+    return new FieldRefAlternativeNested(null);
+  }
+
+  public FieldRefAlternativeNested<A> withNewFieldRefAlternativeLike(FieldRef item) {
+    return new FieldRefAlternativeNested(item);
+  }
+
+  public FieldRefConditionNested<A> withNewFieldRefCondition() {
+    return new FieldRefConditionNested(null);
+  }
+
+  public FieldRefConditionNested<A> withNewFieldRefConditionLike(FieldRef item) {
+    return new FieldRefConditionNested(item);
+  }
+
+  public FieldRefResultNested<A> withNewFieldRefResult() {
+    return new FieldRefResultNested(null);
+  }
+
+  public FieldRefResultNested<A> withNewFieldRefResultLike(FieldRef item) {
+    return new FieldRefResultNested(item);
+  }
+
+  public FieldResultNested<A> withNewFieldResult() {
+    return new FieldResultNested(null);
+  }
+
+  public FieldResultNested<A> withNewFieldResultLike(Field item) {
+    return new FieldResultNested(item);
+  }
+
   public GreaterThanAlternativeNested<A> withNewGreaterThanAlternative() {
     return new GreaterThanAlternativeNested(null);
   }
@@ -1032,6 +1120,30 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
 
   public LessThanResultNested<A> withNewLessThanResultLike(LessThan item) {
     return new LessThanResultNested(item);
+  }
+
+  public LocalVariableAlternativeNested<A> withNewLocalVariableAlternative() {
+    return new LocalVariableAlternativeNested(null);
+  }
+
+  public LocalVariableAlternativeNested<A> withNewLocalVariableAlternativeLike(LocalVariable item) {
+    return new LocalVariableAlternativeNested(item);
+  }
+
+  public LocalVariableConditionNested<A> withNewLocalVariableCondition() {
+    return new LocalVariableConditionNested(null);
+  }
+
+  public LocalVariableConditionNested<A> withNewLocalVariableConditionLike(LocalVariable item) {
+    return new LocalVariableConditionNested(item);
+  }
+
+  public LocalVariableResultNested<A> withNewLocalVariableResult() {
+    return new LocalVariableResultNested(null);
+  }
+
+  public LocalVariableResultNested<A> withNewLocalVariableResultLike(LocalVariable item) {
+    return new LocalVariableResultNested(item);
   }
 
   public LogicalAndAlternativeNested<A> withNewLogicalAndAlternative() {
@@ -1790,6 +1902,60 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
       this.result = builder;
       return (A) this;
     }
+  }
+
+  public class ArgumentAlternativeNested<N> extends ArgumentFluent<ArgumentAlternativeNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentAlternativeNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endArgumentAlternative() {
+      return and();
+    }
+
+  }
+
+  public class ArgumentConditionNested<N> extends ArgumentFluent<ArgumentConditionNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentConditionNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endArgumentCondition() {
+      return and();
+    }
+
+  }
+
+  public class ArgumentResultNested<N> extends ArgumentFluent<ArgumentResultNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentResultNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endArgumentResult() {
+      return and();
+    }
+
   }
 
   public class AssignAlternativeNested<N> extends AssignFluent<AssignAlternativeNested<N>> implements Nested<N> {
@@ -2551,6 +2717,114 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
 
   }
 
+  public class FieldAlternativeNested<N> extends FieldFluent<FieldAlternativeNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldAlternativeNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endFieldAlternative() {
+      return and();
+    }
+
+  }
+
+  public class FieldConditionNested<N> extends FieldFluent<FieldConditionNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldConditionNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endFieldCondition() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefAlternativeNested<N> extends FieldRefFluent<FieldRefAlternativeNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefAlternativeNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endFieldRefAlternative() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefConditionNested<N> extends FieldRefFluent<FieldRefConditionNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefConditionNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endFieldRefCondition() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefResultNested<N> extends FieldRefFluent<FieldRefResultNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefResultNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endFieldRefResult() {
+      return and();
+    }
+
+  }
+
+  public class FieldResultNested<N> extends FieldFluent<FieldResultNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldResultNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endFieldResult() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanAlternativeNested<N> extends GreaterThanFluent<GreaterThanAlternativeNested<N>> implements Nested<N> {
 
     GreaterThanBuilder builder;
@@ -3038,6 +3312,62 @@ public class TernaryFluent<A extends io.sundr.model.TernaryFluent<A>> extends Ba
     }
 
     public N endLessThanResult() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableAlternativeNested<N> extends LocalVariableFluent<LocalVariableAlternativeNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableAlternativeNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withAlternative(builder.build());
+    }
+
+    public N endLocalVariableAlternative() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableConditionNested<N> extends LocalVariableFluent<LocalVariableConditionNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableConditionNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withCondition(builder.build());
+    }
+
+    public N endLocalVariableCondition() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableResultNested<N> extends LocalVariableFluent<LocalVariableResultNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableResultNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) TernaryFluent.this.withResult(builder.build());
+    }
+
+    public N endLocalVariableResult() {
       return and();
     }
 

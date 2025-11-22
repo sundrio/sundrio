@@ -29,6 +29,7 @@ import com.github.javaparser.ast.stmt.ThrowStmt;
 import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 
+import io.sundr.model.Argument;
 import io.sundr.model.Block;
 import io.sundr.model.Break;
 import io.sundr.model.Continue;
@@ -117,7 +118,9 @@ public class StatementConverter {
 
       List<Try.Catch> catchBlocks = new ArrayList<>();
       for (CatchClause catchClause : tryStmt.getCatchs()) {
-        Property parameter = convertParameter(catchClause.getParam());
+        Argument argument = convertParameter(catchClause.getParam());
+        // Convert Argument to Property for compatibility with Try.Catch
+        Property parameter = Property.newProperty(argument.getTypeRef(), argument.getName());
         Block catchBlock = new BlockStmtToBlock().apply(catchClause.getCatchBlock());
         catchBlocks.add(new Try.Catch(parameter, catchBlock));
       }

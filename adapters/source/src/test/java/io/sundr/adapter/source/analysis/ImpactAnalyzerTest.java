@@ -14,10 +14,10 @@ import io.sundr.adapter.source.Project;
 import io.sundr.adapter.source.change.Change;
 import io.sundr.adapter.source.change.ChangeSet;
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
@@ -86,13 +86,13 @@ public class ImpactAnalyzerTest {
     TypeDef oldTypeDef = createSampleTypeDef("com.example.TestClass");
     TypeDef newTypeDef = createSampleTypeDef("com.example.TestClass");
 
-    Property addedProperty = new PropertyBuilder()
+    Field addedField = new FieldBuilder()
         .withName("newProperty")
         .withTypeRef(ClassRef.forClass(String.class))
         .build();
 
-    Set<Change<Property>> propertyChanges = Set.of(Change.added(addedProperty));
-    ChangeSet changeSet = new ChangeSet(oldTypeDef, newTypeDef, Set.of(), propertyChanges);
+    Set<Change<Field>> fieldChanges = Set.of(Change.added(addedField));
+    ChangeSet changeSet = new ChangeSet(oldTypeDef, newTypeDef, Set.of(), fieldChanges);
 
     ImpactAnalysisResult result = analyzer.analyze(changeSet);
 

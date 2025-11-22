@@ -2,12 +2,12 @@ package io.sundr.model;
 
 public class ReturnDslThisStep implements Statement {
 
-  public Return ref(String propertyName) {
-    return new Return(new This().ref(propertyName));
+  public Return ref(String fieldName) {
+    return new Return(new This().ref(fieldName));
   }
 
-  public Return ref(Property property) {
-    return new Return(new This().ref(property));
+  public Return ref(Field field) {
+    return new Return(new This().ref(field));
   }
 
   public Return call(String methodName, Expression... arguments) {

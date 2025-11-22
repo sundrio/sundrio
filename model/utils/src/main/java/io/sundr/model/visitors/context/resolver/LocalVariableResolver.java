@@ -1,6 +1,6 @@
 package io.sundr.model.visitors.context.resolver;
 
-import static io.sundr.model.utils.Resolvers.createResolutionMap;
+import static io.sundr.model.utils.Resolvers.createResolutionMapFromLocalVariables;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +28,7 @@ public class LocalVariableResolver implements Visitor<BlockFluent<?>> {
     for (Statement statement : statements) {
       if (statement instanceof Declare) {
         Declare declare = (Declare) statement;
-        resolutionWithLocalVariablesMap.putAll(createResolutionMap(declare.getProperties()));
+        resolutionWithLocalVariablesMap.putAll(createResolutionMapFromLocalVariables(declare.getLocalVariables()));
       }
     }
 

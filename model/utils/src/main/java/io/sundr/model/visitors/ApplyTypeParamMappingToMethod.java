@@ -55,6 +55,7 @@ public class ApplyTypeParamMappingToMethod implements Visitor<MethodFluent<?>> {
 
   @Override
   public void visit(MethodFluent<?> method) {
+    // Handle return type
     TypeRef typeRef = method.buildReturnType();
     if (typeRef instanceof TypeParamRef) {
       TypeParamRef typeParamRef = (TypeParamRef) typeRef;
@@ -73,6 +74,14 @@ public class ApplyTypeParamMappingToMethod implements Visitor<MethodFluent<?>> {
         method.withReturnType(new ClassRefBuilder(classRef).withArguments(mappedArguments).build());
         attributeKey.ifPresent(k -> method.addToAttributes(k, classRef));
       }
+    }
+
+    // Handle method arguments - iterate through all arguments and apply type parameter mapping
+    ApplyTypeParamMappingToArgument argumentMapper = new ApplyTypeParamMappingToArgument(mappings, attributeKey);
+    for (int i = 0; i < method.buildArguments().size(); i++) {
+      var argumentEditor = method.editArgument(i);
+      argumentMapper.visit(argumentEditor);
+      argumentEditor.endArgument();
     }
   }
 }

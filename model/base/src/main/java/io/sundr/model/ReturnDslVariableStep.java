@@ -2,39 +2,41 @@ package io.sundr.model;
 
 public class ReturnDslVariableStep implements Statement {
 
-  private final String name;
+  private final Variable<?> variable;
 
-  public ReturnDslVariableStep(String name) {
-    if (name == null || name.isEmpty()) {
-      throw new IllegalArgumentException("Variable name cannot be null or empty");
-    }
-    this.name = name;
-  }
+  /*
+   * public ReturnDslVariableStep(String name) {
+   * if (name == null || name.isEmpty()) {
+   * throw new IllegalArgumentException("Variable name cannot be null or empty");
+   * }
+   * this.name = name;
+   * }
+   */
 
-  public ReturnDslVariableStep(Property property) {
-    if (property == null) {
+  public ReturnDslVariableStep(Variable<?> variable) {
+    if (variable == null) {
       throw new IllegalArgumentException("Property cannot be null");
     }
-    if (property.getName() == null || property.getName().isEmpty()) {
+    if (variable.getName() == null || variable.getName().isEmpty()) {
       throw new IllegalArgumentException("Property name cannot be null or empty");
     }
-    this.name = property.getName();
+    this.variable = variable;
   }
 
   public Return call(String method, Expression... arguments) {
-    return new Return(Property.newProperty(name).call(method, arguments));
+    return new Return(variable.call(method, arguments));
   }
 
   public Return call(String method) {
-    return new Return(Property.newProperty(name).call(method));
+    return new Return(variable.call(method));
   }
 
-  String getName() {
-    return name;
+  public Variable<?> getVariable() {
+    return variable;
   }
 
   @Override
   public String render() {
-    return "return " + name + SEMICOLN;
+    return "return " + variable.getName() + SEMICOLN;
   }
 }

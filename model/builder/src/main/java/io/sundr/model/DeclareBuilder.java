@@ -25,7 +25,7 @@ public class DeclareBuilder extends DeclareFluent<DeclareBuilder> implements Vis
   }
 
   public Declare build() {
-    Declare buildable = new Declare(fluent.buildProperties(), fluent.buildValue());
+    Declare buildable = new Declare(fluent.buildLocalVariables(), fluent.buildValue());
     return buildable;
   }
 

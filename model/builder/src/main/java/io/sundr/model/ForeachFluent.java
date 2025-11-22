@@ -104,6 +104,10 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -127,6 +131,10 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -164,6 +172,10 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -180,17 +192,17 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -208,17 +220,21 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -429,6 +445,14 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
       this.expression = builder;
       return (A) this;
     }
+  }
+
+  public ArgumentExpressionNested<A> withNewArgumentExpression() {
+    return new ArgumentExpressionNested(null);
+  }
+
+  public ArgumentExpressionNested<A> withNewArgumentExpressionLike(Argument item) {
+    return new ArgumentExpressionNested(item);
   }
 
   public AssignBodyNested<A> withNewAssignBody() {
@@ -715,6 +739,30 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
     return new EqualsExpressionNested(item);
   }
 
+  public FieldExpressionNested<A> withNewFieldExpression() {
+    return new FieldExpressionNested(null);
+  }
+
+  public FieldExpressionNested<A> withNewFieldExpressionLike(Field item) {
+    return new FieldExpressionNested(item);
+  }
+
+  public FieldRefBodyNested<A> withNewFieldRefBody() {
+    return new FieldRefBodyNested(null);
+  }
+
+  public FieldRefBodyNested<A> withNewFieldRefBodyLike(FieldRef item) {
+    return new FieldRefBodyNested(item);
+  }
+
+  public FieldRefExpressionNested<A> withNewFieldRefExpression() {
+    return new FieldRefExpressionNested(null);
+  }
+
+  public FieldRefExpressionNested<A> withNewFieldRefExpressionLike(FieldRef item) {
+    return new FieldRefExpressionNested(item);
+  }
+
   public ForBodyNested<A> withNewForBody() {
     return new ForBodyNested(null);
   }
@@ -905,6 +953,14 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
 
   public LessThanOrEqualExpressionNested<A> withNewLessThanOrEqualExpressionLike(LessThanOrEqual item) {
     return new LessThanOrEqualExpressionNested(item);
+  }
+
+  public LocalVariableExpressionNested<A> withNewLocalVariableExpression() {
+    return new LocalVariableExpressionNested(null);
+  }
+
+  public LocalVariableExpressionNested<A> withNewLocalVariableExpressionLike(LocalVariable item) {
+    return new LocalVariableExpressionNested(item);
   }
 
   public LogicalAndBodyNested<A> withNewLogicalAndBody() {
@@ -1239,10 +1295,6 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
     return new ReturnDslVariableStepBodyNested(null);
   }
 
-  public A withNewReturnDslVariableStepBody(String name) {
-    return (A) this.withBody(new ReturnDslVariableStep(name));
-  }
-
   public ReturnDslVariableStepBodyNested<A> withNewReturnDslVariableStepBodyLike(ReturnDslVariableStep item) {
     return new ReturnDslVariableStepBodyNested(item);
   }
@@ -1409,6 +1461,24 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
 
   public XorExpressionNested<A> withNewXorExpressionLike(Xor item) {
     return new XorExpressionNested(item);
+  }
+
+  public class ArgumentExpressionNested<N> extends ArgumentFluent<ArgumentExpressionNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentExpressionNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endArgumentExpression() {
+      return and();
+    }
+
   }
 
   public class AssignBodyNested<N> extends AssignFluent<AssignBodyNested<N>> implements Nested<N> {
@@ -1916,6 +1986,60 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
 
   }
 
+  public class FieldExpressionNested<N> extends FieldFluent<FieldExpressionNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldExpressionNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endFieldExpression() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefBodyNested<N> extends FieldRefFluent<FieldRefBodyNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefBodyNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForeachFluent.this.withBody(builder.build());
+    }
+
+    public N endFieldRefBody() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefExpressionNested<N> extends FieldRefFluent<FieldRefExpressionNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefExpressionNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endFieldRefExpression() {
+      return and();
+    }
+
+  }
+
   public class ForBodyNested<N> extends ForFluent<ForBodyNested<N>> implements Nested<N> {
 
     ForBuilder builder;
@@ -2256,6 +2380,25 @@ public class ForeachFluent<A extends io.sundr.model.ForeachFluent<A>> extends Ba
     }
 
     public N endLessThanOrEqualExpression() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableExpressionNested<N> extends LocalVariableFluent<LocalVariableExpressionNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableExpressionNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForeachFluent.this.withExpression(builder.build());
+    }
+
+    public N endLocalVariableExpression() {
       return and();
     }
 

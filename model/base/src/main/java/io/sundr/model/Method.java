@@ -35,14 +35,14 @@ public class Method extends ModifierSupport implements Renderable, WithReference
   private final List<TypeParamDef> parameters;
   private final String name;
   private final TypeRef returnType;
-  private final List<Property> arguments;
+  private final List<Argument> arguments;
   private final boolean varArgPreferred;
   private final List<ClassRef> exceptions;
   private final boolean defaultMethod;
   private final Block block;
 
   public Method(List<String> comments, List<AnnotationRef> annotations, List<TypeParamDef> parameters, String name,
-      TypeRef returnType, List<Property> arguments, boolean varArgPreferred, List<ClassRef> exceptions, boolean defaultMethod,
+      TypeRef returnType, List<Argument> arguments, boolean varArgPreferred, List<ClassRef> exceptions, boolean defaultMethod,
       Block block, Modifiers modifiers, Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
     this.comments = comments != null ? comments : Collections.<String> emptyList();
@@ -58,12 +58,12 @@ public class Method extends ModifierSupport implements Renderable, WithReference
   }
 
   // For testing
-  public static Method newMethod(String name, TypeRef returnType, boolean varArgPrefered, Property... arguments) {
+  public static Method newMethod(String name, TypeRef returnType, boolean varArgPrefered, Argument... arguments) {
     return new Method(Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), name, returnType,
         Arrays.asList(arguments), varArgPrefered, Collections.emptyList(), false, null, Modifiers.create(), new HashMap<>());
   }
 
-  public static Method newMethod(String name, TypeRef returnType, Property... arguments) {
+  public static Method newMethod(String name, TypeRef returnType, Argument... arguments) {
     return newMethod(name, returnType, false, arguments);
   }
 
@@ -91,7 +91,7 @@ public class Method extends ModifierSupport implements Renderable, WithReference
     return returnType;
   }
 
-  public List<Property> getArguments() {
+  public List<Argument> getArguments() {
     return arguments;
   }
 
@@ -110,7 +110,7 @@ public class Method extends ModifierSupport implements Renderable, WithReference
   @Override
   public Method withErasure() {
     return new Method(comments, annotations, parameters, name, returnType,
-        arguments.stream().map(Property::withErasure).collect(Collectors.toList()), varArgPreferred, exceptions, defaultMethod,
+        arguments.stream().map(Argument::withErasure).collect(Collectors.toList()), varArgPreferred, exceptions, defaultMethod,
         block, modifiers, getAttributes());
   }
 
@@ -131,7 +131,7 @@ public class Method extends ModifierSupport implements Renderable, WithReference
         if (i > 0) {
           erasure.append(",");
         }
-        Property arg = arguments.get(i);
+        Argument arg = arguments.get(i);
         // Use erased type (handles TypeParamRef -> Object conversion) with standardized parameter names
         TypeRef erasedType = arg.getTypeRef() instanceof TypeParamRef ? ((TypeParamRef) arg.getTypeRef()).withErasure()
             : arg.getTypeRef();
@@ -155,7 +155,7 @@ public class Method extends ModifierSupport implements Renderable, WithReference
       refs.addAll(classRef.getReferences());
     }
 
-    for (Property argument : arguments) {
+    for (Argument argument : arguments) {
       refs.addAll(argument.getReferences());
     }
 
@@ -243,7 +243,7 @@ public class Method extends ModifierSupport implements Renderable, WithReference
     StringBuilder sb = new StringBuilder();
     sb.append(name);
     sb.append(OP);
-    sb.append(arguments.stream().map(a -> (String) a.withoutModiers().render()).collect(Collectors.joining(COMA)));
+    sb.append(arguments.stream().map(a -> (String) a.render()).collect(Collectors.joining(COMA)));
     sb.append(CP);
     return sb.toString();
   }
@@ -277,17 +277,17 @@ public class Method extends ModifierSupport implements Renderable, WithReference
     } else {
       //This is a constructor
       String fqcn = ((ClassRef) returnType).getFullyQualifiedName();
-      String className = Nameable.getClassName(fqcn);
+      String className = WithFullyQualifiedName.getClassName(fqcn);
       sb.append(className);
     }
 
     sb.append(OP);
     if (!varArgPreferred) {
-      sb.append(arguments.stream().map(a -> (String) a.withoutModiers().render())
+      sb.append(arguments.stream().map(a -> (String) a.render())
           .collect(Collectors.joining(COMA)));
     } else if (!arguments.isEmpty()) {
-      List<Property> args = arguments.subList(0, arguments.size() - 1);
-      Property varArg = arguments.get(arguments.size() - 1);
+      List<Argument> args = arguments.subList(0, arguments.size() - 1);
+      Argument varArg = arguments.get(arguments.size() - 1);
       sb.append(args.stream().map(a -> a.render()).collect(Collectors.joining(COMA)));
       if (!args.isEmpty()) {
         sb.append(COMA);
@@ -369,11 +369,11 @@ public class Method extends ModifierSupport implements Renderable, WithReference
 
     sb.append(OP);
     if (!varArgPreferred) {
-      sb.append(arguments.stream().map(a -> (String) a.withoutModiers().toString())
+      sb.append(arguments.stream().map(a -> (String) a.toString())
           .collect(Collectors.joining(COMA)));
     } else if (!arguments.isEmpty()) {
-      List<Property> args = arguments.subList(0, arguments.size() - 1);
-      Property varArg = arguments.get(arguments.size() - 1);
+      List<Argument> args = arguments.subList(0, arguments.size() - 1);
+      Argument varArg = arguments.get(arguments.size() - 1);
       sb.append(args.stream().map(Object::toString).collect(Collectors.joining(COMA)));
       if (!args.isEmpty()) {
         sb.append(COMA);

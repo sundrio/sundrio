@@ -64,7 +64,7 @@ public class ProjectWatchLogicTest {
       ChangeSet changeSet = receivedChanges.get(0);
       System.out.println("ChangeSet has changes: " + changeSet.hasChanges());
       System.out.println("Method changes: " + changeSet.getMethodChanges().size());
-      System.out.println("Property changes: " + changeSet.getPropertyChanges().size());
+      System.out.println("Field changes: " + changeSet.getFieldChanges().size());
     }
 
     // Verify results

@@ -173,6 +173,14 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
     return new EqualsStatementsNested(-1, item);
   }
 
+  public FieldRefStatementsNested<A> addNewFieldRefStatement() {
+    return new FieldRefStatementsNested(-1, null);
+  }
+
+  public FieldRefStatementsNested<A> addNewFieldRefStatementLike(FieldRef item) {
+    return new FieldRefStatementsNested(-1, item);
+  }
+
   public ForStatementsNested<A> addNewForStatement() {
     return new ForStatementsNested(-1, null);
   }
@@ -415,10 +423,6 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
 
   public ReturnDslVariableStepStatementsNested<A> addNewReturnDslVariableStepStatement() {
     return new ReturnDslVariableStepStatementsNested(-1, null);
-  }
-
-  public A addNewReturnDslVariableStepStatement(String name) {
-    return (A) this.addToStatements(new ReturnDslVariableStep(name));
   }
 
   public ReturnDslVariableStepStatementsNested<A> addNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
@@ -670,6 +674,10 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -693,6 +701,10 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -730,6 +742,10 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -746,17 +762,17 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -774,17 +790,21 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -1026,6 +1046,10 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
     return new EqualsStatementsNested(index, item);
   }
 
+  public FieldRefStatementsNested<A> setNewFieldRefStatementLike(int index, FieldRef item) {
+    return new FieldRefStatementsNested(index, item);
+  }
+
   public ForStatementsNested<A> setNewForStatementLike(int index, For item) {
     return new ForStatementsNested(index, item);
   }
@@ -1212,6 +1236,14 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
     }
   }
 
+  public ArgumentConditionNested<A> withNewArgumentCondition() {
+    return new ArgumentConditionNested(null);
+  }
+
+  public ArgumentConditionNested<A> withNewArgumentConditionLike(Argument item) {
+    return new ArgumentConditionNested(item);
+  }
+
   public AssignConditionNested<A> withNewAssignCondition() {
     return new AssignConditionNested(null);
   }
@@ -1352,6 +1384,22 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
     return new EqualsConditionNested(item);
   }
 
+  public FieldConditionNested<A> withNewFieldCondition() {
+    return new FieldConditionNested(null);
+  }
+
+  public FieldConditionNested<A> withNewFieldConditionLike(Field item) {
+    return new FieldConditionNested(item);
+  }
+
+  public FieldRefConditionNested<A> withNewFieldRefCondition() {
+    return new FieldRefConditionNested(null);
+  }
+
+  public FieldRefConditionNested<A> withNewFieldRefConditionLike(FieldRef item) {
+    return new FieldRefConditionNested(item);
+  }
+
   public GreaterThanConditionNested<A> withNewGreaterThanCondition() {
     return new GreaterThanConditionNested(null);
   }
@@ -1442,6 +1490,14 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
 
   public LessThanOrEqualConditionNested<A> withNewLessThanOrEqualConditionLike(LessThanOrEqual item) {
     return new LessThanOrEqualConditionNested(item);
+  }
+
+  public LocalVariableConditionNested<A> withNewLocalVariableCondition() {
+    return new LocalVariableConditionNested(null);
+  }
+
+  public LocalVariableConditionNested<A> withNewLocalVariableConditionLike(LocalVariable item) {
+    return new LocalVariableConditionNested(item);
   }
 
   public LogicalAndConditionNested<A> withNewLogicalAndCondition() {
@@ -1715,6 +1771,24 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
       }
     }
     return (A) this;
+  }
+
+  public class ArgumentConditionNested<N> extends ArgumentFluent<ArgumentConditionNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentConditionNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfDslThenStepFluent.this.withCondition(builder.build());
+    }
+
+    public N endArgumentCondition() {
+      return and();
+    }
+
   }
 
   public class AssignConditionNested<N> extends AssignFluent<AssignConditionNested<N>> implements Nested<N> {
@@ -2231,6 +2305,62 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
 
   }
 
+  public class FieldConditionNested<N> extends FieldFluent<FieldConditionNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldConditionNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfDslThenStepFluent.this.withCondition(builder.build());
+    }
+
+    public N endFieldCondition() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefConditionNested<N> extends FieldRefFluent<FieldRefConditionNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefConditionNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfDslThenStepFluent.this.withCondition(builder.build());
+    }
+
+    public N endFieldRefCondition() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefStatementsNested<N> extends FieldRefFluent<FieldRefStatementsNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+    int index;
+
+    FieldRefStatementsNested(int index, FieldRef item) {
+      this.index = index;
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfDslThenStepFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endFieldRefStatement() {
+      return and();
+    }
+
+  }
+
   public class ForStatementsNested<N> extends ForFluent<ForStatementsNested<N>> implements Nested<N> {
 
     ForBuilder builder;
@@ -2593,6 +2723,25 @@ public class IfDslThenStepFluent<A extends io.sundr.model.IfDslThenStepFluent<A>
     }
 
     public N endLessThanStatement() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableConditionNested<N> extends LocalVariableFluent<LocalVariableConditionNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableConditionNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) IfDslThenStepFluent.this.withCondition(builder.build());
+    }
+
+    public N endLocalVariableCondition() {
       return and();
     }
 

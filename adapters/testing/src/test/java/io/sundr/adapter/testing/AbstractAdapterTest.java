@@ -45,9 +45,9 @@ import io.sundr.adapter.testing.person.Address;
 import io.sundr.adapter.testing.person.Person;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
 import io.sundr.model.PrimitiveRef;
-import io.sundr.model.Property;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
@@ -75,8 +75,8 @@ public abstract class AbstractAdapterTest<T> {
     TypeDef typeDef = Adapters.adaptType(input, getContext());
     assertNotNull(typeDef);
     assertEquals("ClassWithArray", typeDef.getName());
-    assertEquals(1, typeDef.getProperties().size());
-    TypeRef typeRef = typeDef.getProperties().iterator().next().getTypeRef();
+    assertEquals(1, typeDef.getFields().size());
+    TypeRef typeRef = typeDef.getFields().iterator().next().getTypeRef();
 
     assertTrue(typeRef instanceof ClassRef);
     assertEquals(1, ((ClassRef) typeRef).getDimensions());
@@ -89,8 +89,8 @@ public abstract class AbstractAdapterTest<T> {
 
     assertNotNull(typeDef);
     assertEquals("ClassWithPrimitiveArray", typeDef.getName());
-    assertEquals(1, typeDef.getProperties().size());
-    TypeRef typeRef = typeDef.getProperties().iterator().next().getTypeRef();
+    assertEquals(1, typeDef.getFields().size());
+    TypeRef typeRef = typeDef.getFields().iterator().next().getTypeRef();
 
     assertTrue(typeRef instanceof PrimitiveRef);
     assertEquals(1, ((PrimitiveRef) typeRef).getDimensions());
@@ -103,7 +103,7 @@ public abstract class AbstractAdapterTest<T> {
     assertNotNull(typeDef);
 
     assertEquals("ClassWithParam", typeDef.getName());
-    assertEquals(1, typeDef.getProperties().size());
+    assertEquals(1, typeDef.getFields().size());
     assertEquals(1, typeDef.getParameters().size());
 
     assertEquals("T", typeDef.getParameters().get(0).getName());
@@ -117,7 +117,7 @@ public abstract class AbstractAdapterTest<T> {
     assertNotNull(typeDef);
 
     assertEquals("ClassWithSelfRefParam", typeDef.getName());
-    assertEquals(1, typeDef.getProperties().size());
+    assertEquals(1, typeDef.getFields().size());
     assertEquals(1, typeDef.getParameters().size());
 
     assertEquals("T", typeDef.getParameters().get(0).getName());
@@ -143,8 +143,8 @@ public abstract class AbstractAdapterTest<T> {
   public void testClassWithAnnotationParams() {
     T input = getInput(ClassWithAnnotation.class);
     TypeDef typeDef = Adapters.adaptType(input, getContext());
-    final List<Property> properties = typeDef.getProperties();
-    final Property foo = properties.stream().filter(p -> p.getName().equals("foo")).findFirst()
+    final List<Field> properties = typeDef.getFields();
+    final Field foo = properties.stream().filter(p -> p.getName().equals("foo")).findFirst()
         .orElseThrow(RuntimeException::new);
 
     List<AnnotationRef> annotations = foo.getAnnotations();
@@ -192,8 +192,8 @@ public abstract class AbstractAdapterTest<T> {
     assertTrue(personType.isPresent());
     personType.ifPresent(p -> {
       assertEquals(Person.class.getName() + ".Type", p.getFullyQualifiedName());
-      Set<String> properties = GetDefinition.of(p).getProperties().stream()
-          .filter(prop -> prop.isEnumConstant() && !prop.isSynthetic()).map(Property::getName).collect(Collectors.toSet());
+      Set<String> properties = GetDefinition.of(p).getFields().stream()
+          .filter(prop -> prop.isEnumConstant() && !prop.isSynthetic()).map(Field::getName).collect(Collectors.toSet());
       assertEquals(8, properties.size());
       assertTrue(properties.contains("O_MINUS"));
     });
@@ -204,13 +204,13 @@ public abstract class AbstractAdapterTest<T> {
       ClassRef address = (ClassRef) l.getArguments().get(0);
       TypeDef addressDef = GetDefinition.of(address);
       Optional<ClassRef> addressType = findClassRef(addressDef, "type");
-      assertFalse(addressDef.getProperties().isEmpty());
+      assertFalse(addressDef.getFields().isEmpty());
 
       assertTrue(addressType.isPresent());
       addressType.ifPresent(a -> {
         assertEquals(Address.class.getName() + ".Type", a.getFullyQualifiedName());
-        Set<String> properties = GetDefinition.of(a).getProperties().stream()
-            .filter(prop -> prop.isEnumConstant() && !prop.isSynthetic()).map(Property::getName)
+        Set<String> properties = GetDefinition.of(a).getFields().stream()
+            .filter(prop -> prop.isEnumConstant() && !prop.isSynthetic()).map(Field::getName)
             .collect(Collectors.toSet());
         assertEquals(2, properties.size());
         assertTrue(properties.contains("WORK"));
@@ -235,12 +235,12 @@ public abstract class AbstractAdapterTest<T> {
         .anyMatch(m -> m.getName().equals("get") && m.getReturnType().equals(Types.STRING_REF)));
 
     //properties
-    assertFalse(stringList.getProperties().stream().anyMatch(m -> m.getName().equals("elementData")));
-    assertTrue(stringList.getAllProperties().stream().anyMatch(m -> m.getName().equals("elementData")));
+    assertFalse(stringList.getFields().stream().anyMatch(m -> m.getName().equals("elementData")));
+    assertTrue(stringList.getAllFields().stream().anyMatch(m -> m.getName().equals("elementData")));
   }
 
   public static Optional<ClassRef> findClassRef(TypeDef def, String propertyName) {
-    return def.getProperties().stream().filter(p -> propertyName.equals(p.getName()))
+    return def.getFields().stream().filter(p -> propertyName.equals(p.getName()))
         .filter(p -> p.getTypeRef() instanceof ClassRef).map(p -> (ClassRef) p.getTypeRef()).findFirst();
   }
 }

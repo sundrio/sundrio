@@ -42,12 +42,12 @@ import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Buildable;
 import io.sundr.builder.internal.BuilderContext;
 import io.sundr.builder.internal.BuilderContextManager;
-import io.sundr.builder.internal.checks.DuplicatePropertyCheck;
+import io.sundr.builder.internal.checks.DuplicateFieldCheck;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.builder.internal.visitors.lombok.AddLombokAllArgsConstructor;
 import io.sundr.builder.internal.visitors.lombok.AddLombokGetters;
 import io.sundr.builder.internal.visitors.lombok.AddLombokSetters;
-import io.sundr.model.PropertyBuilder;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
@@ -80,10 +80,10 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
             .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
             .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
             .accept(new AddLombokAllArgsConstructor(), new AddLombokGetters(), new AddLombokSetters(),
-                new DuplicatePropertyCheck(),
-                new Visitor<PropertyBuilder>() {
+                new DuplicateFieldCheck(),
+                new Visitor<FieldBuilder>() {
                   @Override
-                  public void visit(PropertyBuilder builder) {
+                  public void visit(FieldBuilder builder) {
                     builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
                     builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
                   }
@@ -100,9 +100,9 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
               .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
               .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
               .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
-              .accept(new DuplicatePropertyCheck(), new Visitor<PropertyBuilder>() {
+              .accept(new DuplicateFieldCheck(), new Visitor<FieldBuilder>() {
                 @Override
-                public void visit(PropertyBuilder builder) {
+                public void visit(FieldBuilder builder) {
                   builder.addToAttributes(LAZY_COLLECTIONS_INIT_ENABLED, buildable.lazyCollectionInitEnabled());
                   builder.addToAttributes(LAZY_MAP_INIT_ENABLED, buildable.lazyMapInitEnabled());
                 }

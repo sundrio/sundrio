@@ -24,13 +24,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.sundr.builder.Visitor;
+import io.sundr.model.Argument;
 import io.sundr.model.Block;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Expression;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.MethodCall;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 
 /**
@@ -206,7 +206,7 @@ public class MethodReference {
    * @return set of MethodReference objects for matching methods
    */
   private static Set<MethodReference> findMethodsBySignature(TypeDef typeDef, String methodName,
-      List<Property> parameterTypes) {
+      List<Argument> parameterTypes) {
     // Create a target method with the given signature for erasure comparison
     Method targetMethod = new MethodBuilder()
         .withName(methodName)

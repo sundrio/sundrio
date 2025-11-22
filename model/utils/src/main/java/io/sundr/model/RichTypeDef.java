@@ -22,14 +22,14 @@ import java.util.Map;
 
 public class RichTypeDef extends TypeDef {
 
-  private final List<Property> allProperties;
+  private final List<Field> allProperties;
   private final List<Method> allConstructors;
   private final List<Method> allMethods;
 
   public RichTypeDef(Kind kind, String packageName, String name, List<String> comments, List<AnnotationRef> annotations,
       List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters,
-      List<Property> properties,
-      List<Property> allProperties,
+      List<Field> properties,
+      List<Field> allProperties,
       List<Method> constructors,
       List<Method> allConstructors,
       List<Method> methods,
@@ -43,7 +43,7 @@ public class RichTypeDef extends TypeDef {
     this.allMethods = allMethods;
   }
 
-  public List<Property> getAllProperties() {
+  public List<Field> getAllFields() {
     return allProperties;
   }
 

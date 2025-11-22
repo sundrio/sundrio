@@ -22,9 +22,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.sundr.SundrException;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
-import io.sundr.model.Property;
 import io.sundr.model.Return;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.This;
@@ -40,43 +40,43 @@ public class Getter {
   public static final VoidRef VOID = new VoidRef();
 
   /**
-   * Find the getter of the specified property in the type.
+   * Find the getter of the specified field in the type.
    *
    * @param clazz The class.
-   * @param property The property.
+   * @param field The field.
    * @return The getter method if found. Throws exception if no getter is matched.
    */
-  public static Method find(TypeDef clazz, Property property) {
-    return find(clazz, property, false);
+  public static Method find(TypeDef clazz, Field field) {
+    return find(clazz, field, false);
   }
 
-  public static Optional<Method> findOptional(TypeDef clazz, Property property) {
+  public static Optional<Method> findOptional(TypeDef clazz, Field field) {
     try {
-      return Optional.of(find(clazz, property, false));
+      return Optional.of(find(clazz, field, false));
     } catch (SundrException e) {
       return Optional.empty();
     }
   }
 
   /**
-   * Find the getter of the specified property in the type.
+   * Find the getter of the specified field in the type.
    *
    * @param clazz The class.
-   * @param property The property.
+   * @param field The field.
    * @param acceptPrefixless Flag to accept prefixless getters.
    * @return The getter method if found. Throws exception if no getter is matched.
    */
-  public static Method find(TypeDef clazz, Property property, boolean acceptPrefixless) {
+  public static Method find(TypeDef clazz, Field field, boolean acceptPrefixless) {
     RichTypeDef richType = clazz instanceof RichTypeDef ? (RichTypeDef) clazz : TypeArguments.apply(clazz);
     //1st pass strict
     for (Method method : richType.getAllMethods()) {
-      if ((Record.is(clazz) && isApplicable(method, property, true, true)) || (isApplicable(method, property, true, false))) {
+      if ((Record.is(clazz) && isApplicable(method, field, true, true)) || (isApplicable(method, field, true, false))) {
         return method;
       }
     }
     //2nd pass relaxed
     for (Method method : richType.getAllMethods()) {
-      if (isApplicable(method, property, false, false)) {
+      if (isApplicable(method, field, false, false)) {
         return method;
       }
     }
@@ -84,13 +84,13 @@ public class Getter {
     //3nd pass more relaxed
     if (acceptPrefixless) {
       for (Method method : richType.getAllMethods()) {
-        if (isApplicable(method, property, false, true)) {
+        if (isApplicable(method, field, false, true)) {
           return method;
         }
       }
     }
     throw new SundrException(
-        "No getter found for property: [" + property.toString() + "] on class: " + clazz.getFullyQualifiedName()
+        "No getter found for field: [" + field.toString() + "] on class: " + clazz.getFullyQualifiedName()
             + ", getters found: ["
             + richType.getAllMethods().stream().filter(Getter::is).map(m -> m.getReturnType() + " " + m.getName())
                 .collect(Collectors.joining(","))
@@ -153,20 +153,20 @@ public class Getter {
     return false;
   }
 
-  private static boolean isApplicable(Method method, Property property) {
-    return isApplicable(method, property, false, false);
+  private static boolean isApplicable(Method method, Field field) {
+    return isApplicable(method, field, false, false);
   }
 
   /**
-   * Returns true if method is a getter of property.
+   * Returns true if method is a getter of field.
    * In strict mode it will not strip non-alphanumeric characters.
    */
-  private static boolean isApplicable(Method method, Property property, boolean strict, boolean acceptPrefixless) {
-    if (!Assignable.isAssignable(method.getReturnType()).from(property.getTypeRef())) {
+  private static boolean isApplicable(Method method, Field field, boolean strict, boolean acceptPrefixless) {
+    if (!Assignable.isAssignable(method.getReturnType()).from(field.getTypeRef())) {
       return false;
     }
 
-    String capitalized = capitalizeFirst(property.getName());
+    String capitalized = capitalizeFirst(field.getName());
     if (method.getName().endsWith(GET_PREFIX + capitalized)) {
       return true;
     }
@@ -179,30 +179,30 @@ public class Getter {
       return true;
     }
 
-    if (acceptPrefixless && method.getName().endsWith(property.getName())) {
+    if (acceptPrefixless && method.getName().endsWith(field.getName())) {
       return true;
     }
 
     if (!strict) {
-      if (method.getName().endsWith(GET_PREFIX + property.getNameCapitalized())) {
+      if (method.getName().endsWith(GET_PREFIX + field.getNameCapitalized())) {
         return true;
       }
 
-      if (method.getName().endsWith(IS_PREFIX + property.getNameCapitalized())) {
+      if (method.getName().endsWith(IS_PREFIX + field.getNameCapitalized())) {
         return true;
       }
 
       //Some frameworks/tools consider valid getters cases like: get$ref() (e.g. jsonschema2pojo).
-      if (method.getName().endsWith(GET_PREFIX + property.getName()) && !Character.isAlphabetic(property.getName().charAt(0))) {
+      if (method.getName().endsWith(GET_PREFIX + field.getName()) && !Character.isAlphabetic(field.getName().charAt(0))) {
         return true;
       }
 
-      if (method.getName().endsWith(IS_PREFIX + property.getName()) && !Character.isAlphabetic(property.getName().charAt(0))) {
+      if (method.getName().endsWith(IS_PREFIX + field.getName()) && !Character.isAlphabetic(field.getName().charAt(0))) {
         return true;
       }
 
-      if (method.getName().endsWith(SHOULD_PREFIX + property.getName())
-          && !Character.isAlphabetic(property.getName().charAt(0))) {
+      if (method.getName().endsWith(SHOULD_PREFIX + field.getName())
+          && !Character.isAlphabetic(field.getName().charAt(0))) {
         return true;
       }
 
@@ -210,33 +210,33 @@ public class Getter {
     return false;
   }
 
-  public static final Method forProperty(Property property) {
+  public static final Method forField(Field field) {
     return new MethodBuilder()
-        .withName(name(property))
-        .withReturnType(property.getTypeRef())
+        .withName(name(field))
+        .withReturnType(field.getTypeRef())
         .withNewBlock()
-        .addToStatements(Return.This().ref(property))
+        .addToStatements(Return.This().ref(field))
         .endBlock()
         .build();
   }
 
   /**
-   * Return the getter name for the specified {@link Property}.
+   * Return the getter name for the specified {@link Field}.
    *
-   * @param property The property.
+   * @param field The field.
    * @return The name.
    */
-  public static String name(Property property) {
-    return prefix(property) + property.getNameCapitalized();
+  public static String name(Field field) {
+    return prefix(field) + field.getNameCapitalized();
   }
 
   /**
-   * Return the property name for the specified getter {@link Method method}.
+   * Return the field name for the specified getter {@link Method method}.
    *
    * @param method The method.
    * @return The name.
    */
-  public static String propertyName(Method method) {
+  public static String fieldName(Method method) {
     if (!is(method)) {
       throw new IllegalArgumentException("Method: " + method + " is not a real getter.");
     }
@@ -259,13 +259,13 @@ public class Getter {
   }
 
   /**
-   * Return the property name for the specified getter {@link Method method}.
+   * Return the field name for the specified getter {@link Method method}.
    * This method will not check if the method is an actual getter and will return the method name if not.
    *
    * @param method The method.
    * @return The name, or the method name if method is not a typical getter..
    */
-  public static String propertyNameSafe(Method method) {
+  public static String fieldNameSafe(Method method) {
     String name = method.getName();
 
     if (name.startsWith(GET_PREFIX)) {
@@ -282,7 +282,7 @@ public class Getter {
     return name.substring(0, 1).toLowerCase() + name.substring(1);
   }
 
-  public static String prefix(Property property) {
-    return Types.isPrimitive(property.getTypeRef()) && Types.isBoolean(property.getTypeRef()) ? IS_PREFIX : GET_PREFIX;
+  public static String prefix(Field field) {
+    return Types.isPrimitive(field.getTypeRef()) && Types.isBoolean(field.getTypeRef()) ? IS_PREFIX : GET_PREFIX;
   }
 }

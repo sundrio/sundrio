@@ -40,17 +40,18 @@ import java.util.stream.Stream;
 import io.sundr.FunctionFactory;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.Argument;
+import io.sundr.model.ArgumentBuilder;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Modifiers;
 import io.sundr.model.PrimitiveRefBuilder;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -169,7 +170,7 @@ public class ClassTo {
       Kind kind = KIND.apply(item);
       List<ClassRef> extendsList = new ArrayList<>();
       List<ClassRef> implementsList = new ArrayList<>();
-      List<Property> properties = new ArrayList<>();
+      List<io.sundr.model.Field> fields = new ArrayList<>();
       List<Method> methods = new ArrayList<>();
       List<Method> constructors = new ArrayList<>();
       List<TypeParamDef> parameters = new ArrayList<>();
@@ -191,7 +192,7 @@ public class ClassTo {
 
       constructors.addAll(getConstructors(item, references));
       methods.addAll(getMethods(item, references));
-      properties.addAll(getProperties(item, references));
+      fields.addAll(getFields(item, references));
 
       for (TypeVariable typeVariable : item.getTypeParameters()) {
         List<ClassRef> bounds = new ArrayList<>();
@@ -218,7 +219,7 @@ public class ClassTo {
           .withParameters(parameters)
           .withConstructors(constructors)
           .withMethods(methods)
-          .withProperties(properties)
+          .withFields(fields)
           .withExtendsList(extendsList)
           .withImplementsList(implementsList)
           .build());
@@ -261,8 +262,8 @@ public class ClassTo {
     }
   });
 
-  private static Set<Property> getProperties(Class item, Set<Class> references) {
-    Set<Property> properties = new HashSet<Property>();
+  private static Set<io.sundr.model.Field> getFields(Class item, Set<Class> references) {
+    Set<io.sundr.model.Field> fields = new HashSet<>();
     for (Field field : item.getDeclaredFields()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
       processAnnotatedElement(field, annotationRefs);
@@ -279,7 +280,7 @@ public class ClassTo {
             .collect(Collectors.toList()));
       }
 
-      properties.add(new PropertyBuilder()
+      fields.add(new FieldBuilder()
           .withName(field.getName())
           .withModifiers(Modifiers.from(field.getModifiers()))
           .withEnumConstant(field.isEnumConstant())
@@ -288,7 +289,7 @@ public class ClassTo {
           .withTypeRef(TYPEREF.apply(field.getGenericType()))
           .build());
     }
-    return properties;
+    return fields;
   }
 
   private static void processAnnotatedElement(AnnotatedElement field, List<AnnotationRef> annotationRefs) {
@@ -319,8 +320,8 @@ public class ClassTo {
     for (java.lang.reflect.Constructor constructor : item.getDeclaredConstructors()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
       List<ClassRef> exceptionRefs = new ArrayList<>();
-      List<Property> arguments = new ArrayList<Property>();
-      List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+      List<Argument> arguments = new ArrayList<>();
+      List<TypeParamDef> parameters = new ArrayList<>();
       processMethod(references, constructor, annotationRefs, exceptionRefs, arguments, parameters);
 
       constructors.add(new MethodBuilder()
@@ -341,8 +342,8 @@ public class ClassTo {
     for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
       List<AnnotationRef> annotationRefs = new ArrayList<>();
       List<ClassRef> exceptionRefs = new ArrayList<>();
-      List<Property> arguments = new ArrayList<Property>();
-      List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+      List<Argument> arguments = new ArrayList<>();
+      List<TypeParamDef> parameters = new ArrayList<>();
       processMethod(references, method, annotationRefs, exceptionRefs, arguments, parameters);
 
       Map<AttributeKey, Object> attributes = new HashMap<>();
@@ -367,7 +368,7 @@ public class ClassTo {
   }
 
   private static void processMethod(Set<Class> references, java.lang.reflect.Executable method,
-      List<AnnotationRef> annotationRefs, List<ClassRef> exceptionRefs, List<Property> arguments,
+      List<AnnotationRef> annotationRefs, List<ClassRef> exceptionRefs, List<Argument> arguments,
       List<TypeParamDef> parameters) {
     processAnnotatedElement(method, annotationRefs);
 
@@ -377,7 +378,7 @@ public class ClassTo {
 
     for (int i = 1; i <= method.getGenericParameterTypes().length; i++) {
       Type argumentType = method.getGenericParameterTypes()[i - 1];
-      arguments.add(new PropertyBuilder()
+      arguments.add(new ArgumentBuilder()
           .withName(ARGUMENT_PREFIX + i)
           .withTypeRef(TYPEREF.apply(argumentType))
           .build());

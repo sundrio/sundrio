@@ -59,6 +59,14 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
     return (A) this;
   }
 
+  public ArgumentArgumentsNested<A> addNewArgumentArgument() {
+    return new ArgumentArgumentsNested(-1, null);
+  }
+
+  public ArgumentArgumentsNested<A> addNewArgumentArgumentLike(Argument item) {
+    return new ArgumentArgumentsNested(-1, item);
+  }
+
   public AssignArgumentsNested<A> addNewAssignArgument() {
     return new AssignArgumentsNested(-1, null);
   }
@@ -207,6 +215,22 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
     return new EqualsArgumentsNested(-1, item);
   }
 
+  public FieldArgumentsNested<A> addNewFieldArgument() {
+    return new FieldArgumentsNested(-1, null);
+  }
+
+  public FieldArgumentsNested<A> addNewFieldArgumentLike(Field item) {
+    return new FieldArgumentsNested(-1, item);
+  }
+
+  public FieldRefArgumentsNested<A> addNewFieldRefArgument() {
+    return new FieldRefArgumentsNested(-1, null);
+  }
+
+  public FieldRefArgumentsNested<A> addNewFieldRefArgumentLike(FieldRef item) {
+    return new FieldRefArgumentsNested(-1, item);
+  }
+
   public GreaterThanArgumentsNested<A> addNewGreaterThanArgument() {
     return new GreaterThanArgumentsNested(-1, null);
   }
@@ -297,6 +321,14 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
 
   public LessThanOrEqualArgumentsNested<A> addNewLessThanOrEqualArgumentLike(LessThanOrEqual item) {
     return new LessThanOrEqualArgumentsNested(-1, item);
+  }
+
+  public LocalVariableArgumentsNested<A> addNewLocalVariableArgument() {
+    return new LocalVariableArgumentsNested(-1, null);
+  }
+
+  public LocalVariableArgumentsNested<A> addNewLocalVariableArgumentLike(LocalVariable item) {
+    return new LocalVariableArgumentsNested(-1, item);
   }
 
   public LogicalAndArgumentsNested<A> addNewLogicalAndArgument() {
@@ -811,6 +843,10 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -834,6 +870,10 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -871,6 +911,10 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -887,17 +931,17 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -915,17 +959,21 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -1125,6 +1173,10 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
     return (A) this;
   }
 
+  public ArgumentArgumentsNested<A> setNewArgumentArgumentLike(int index, Argument item) {
+    return new ArgumentArgumentsNested(index, item);
+  }
+
   public AssignArgumentsNested<A> setNewAssignArgumentLike(int index, Assign item) {
     return new AssignArgumentsNested(index, item);
   }
@@ -1185,6 +1237,14 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
     return new EqualsArgumentsNested(index, item);
   }
 
+  public FieldArgumentsNested<A> setNewFieldArgumentLike(int index, Field item) {
+    return new FieldArgumentsNested(index, item);
+  }
+
+  public FieldRefArgumentsNested<A> setNewFieldRefArgumentLike(int index, FieldRef item) {
+    return new FieldRefArgumentsNested(index, item);
+  }
+
   public GreaterThanArgumentsNested<A> setNewGreaterThanArgumentLike(int index, GreaterThan item) {
     return new GreaterThanArgumentsNested(index, item);
   }
@@ -1219,6 +1279,10 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
 
   public LessThanOrEqualArgumentsNested<A> setNewLessThanOrEqualArgumentLike(int index, LessThanOrEqual item) {
     return new LessThanOrEqualArgumentsNested(index, item);
+  }
+
+  public LocalVariableArgumentsNested<A> setNewLocalVariableArgumentLike(int index, LocalVariable item) {
+    return new LocalVariableArgumentsNested(index, item);
   }
 
   public LogicalAndArgumentsNested<A> setNewLogicalAndArgumentLike(int index, LogicalAnd item) {
@@ -1456,6 +1520,26 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
       this._visitables.get("type").remove(this.type);
     }
     return (A) this;
+  }
+
+  public class ArgumentArgumentsNested<N> extends ArgumentFluent<ArgumentArgumentsNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+    int index;
+
+    ArgumentArgumentsNested(int index, Argument item) {
+      this.index = index;
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endArgumentArgument() {
+      return and();
+    }
+
   }
 
   public class AssignArgumentsNested<N> extends AssignFluent<AssignArgumentsNested<N>> implements Nested<N> {
@@ -1759,6 +1843,46 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
 
   }
 
+  public class FieldArgumentsNested<N> extends FieldFluent<FieldArgumentsNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+    int index;
+
+    FieldArgumentsNested(int index, Field item) {
+      this.index = index;
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endFieldArgument() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefArgumentsNested<N> extends FieldRefFluent<FieldRefArgumentsNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+    int index;
+
+    FieldRefArgumentsNested(int index, FieldRef item) {
+      this.index = index;
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endFieldRefArgument() {
+      return and();
+    }
+
+  }
+
   public class GreaterThanArgumentsNested<N> extends GreaterThanFluent<GreaterThanArgumentsNested<N>> implements Nested<N> {
 
     GreaterThanBuilder builder;
@@ -1936,6 +2060,27 @@ public class ConstructFluent<A extends io.sundr.model.ConstructFluent<A>> extend
     }
 
     public N endLessThanOrEqualArgument() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableArgumentsNested<N> extends LocalVariableFluent<LocalVariableArgumentsNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+    int index;
+
+    LocalVariableArgumentsNested(int index, LocalVariable item) {
+      this.index = index;
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ConstructFluent.this.setToArguments(index, builder.build());
+    }
+
+    public N endLocalVariableArgument() {
       return and();
     }
 

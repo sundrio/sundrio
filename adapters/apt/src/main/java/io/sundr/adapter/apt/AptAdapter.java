@@ -28,6 +28,8 @@ import javax.lang.model.type.TypeMirror;
 import io.sundr.adapter.api.Adapter;
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.Argument;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
@@ -40,6 +42,8 @@ public class AptAdapter implements Adapter<TypeElement, TypeMirror, VariableElem
   private final Function<TypeElement, TypeDef> typeAdapterFunction;
   private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
   private final Function<VariableElement, Property> propertyAdapterFunction;
+  private final Function<VariableElement, Field> fieldAdapterFunction;
+  private final Function<VariableElement, Argument> argumentAdapterFunction;
   private final Function<ExecutableElement, Method> methodAdapterFunction;
 
   private final Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction;
@@ -52,9 +56,13 @@ public class AptAdapter implements Adapter<TypeElement, TypeMirror, VariableElem
     this.typeParamAdapterFunction = new TypePrameterElementToTypeParamDef(this.context, referenceAdapterFunction);
     this.propertyAdapterFunction = new VariableElementToProperty(this.context, referenceAdapterFunction,
         annotationAdapterFunction);
-    this.methodAdapterFunction = new ExecutableElementToMethod(this.context, referenceAdapterFunction, propertyAdapterFunction,
+    this.fieldAdapterFunction = new VariableElementToField(this.context, referenceAdapterFunction,
         annotationAdapterFunction);
-    this.typeAdapterFunction = new TypeElementToTypeDef(this.context, referenceAdapterFunction, propertyAdapterFunction,
+    this.argumentAdapterFunction = new VariableElementToArgument(this.context, referenceAdapterFunction,
+        annotationAdapterFunction);
+    this.methodAdapterFunction = new ExecutableElementToMethod(this.context, referenceAdapterFunction, argumentAdapterFunction,
+        annotationAdapterFunction);
+    this.typeAdapterFunction = new TypeElementToTypeDef(this.context, referenceAdapterFunction, fieldAdapterFunction,
         methodAdapterFunction, annotationAdapterFunction, typeParamAdapterFunction);
   }
 
@@ -68,6 +76,14 @@ public class AptAdapter implements Adapter<TypeElement, TypeMirror, VariableElem
 
   public Function<VariableElement, Property> getPropertyAdapterFunction() {
     return propertyAdapterFunction;
+  }
+
+  public Function<VariableElement, Field> getFieldAdapterFunction() {
+    return fieldAdapterFunction;
+  }
+
+  public Function<VariableElement, Argument> getArgumentAdapterFunction() {
+    return argumentAdapterFunction;
   }
 
   public Function<ExecutableElement, Method> getMethodAdapterFunction() {

@@ -47,16 +47,18 @@ import com.github.javaparser.ast.type.Type;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.Argument;
+import io.sundr.model.ArgumentBuilder;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
 import io.sundr.model.Block;
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Modifiers;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -93,7 +95,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
 
       List<ClassRef> extendsList = new ArrayList<ClassRef>();
       List<ClassRef> implementsList = new ArrayList<ClassRef>();
-      List<Property> properties = new ArrayList<Property>();
+      List<Field> fields = new ArrayList<Field>();
       List<Method> methods = new ArrayList<Method>();
       List<Method> constructors = new ArrayList<Method>();
       List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
@@ -126,7 +128,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               fieldAnnotations.add(ANNOTATIONREF.apply(annotationExpressions));
             }
 
-            properties.add(new PropertyBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
+            fields.add(new FieldBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
                 .withAnnotations(fieldAnnotations)
                 .withModifiers(Modifiers.from(fieldDeclaration.getModifiers()))
                 .addToAttributes(Attributeable.INIT, var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
@@ -134,7 +136,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           }
         } else if (bodyDeclaration instanceof MethodDeclaration) {
           MethodDeclaration methodDeclaration = (MethodDeclaration) bodyDeclaration;
-          List<Property> arguments = new ArrayList<Property>();
+          List<Argument> arguments = new ArrayList<Argument>();
           List<ClassRef> exceptions = new ArrayList<ClassRef>();
           List<AnnotationRef> methodAnnotations = new ArrayList<AnnotationRef>();
           for (AnnotationExpr annotationExpr : methodDeclaration.getAnnotations()) {
@@ -161,8 +163,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
             }
 
-            arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
-                .withModifiers(Modifiers.from(parameter.getModifiers())).withAnnotations(paramAnnotations).build());
+            arguments.add(new ArgumentBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+                .withAnnotations(paramAnnotations).build());
           }
 
           List<TypeParamDef> typeParamDefs = new ArrayList<TypeParamDef>();
@@ -179,7 +181,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
 
         } else if (bodyDeclaration instanceof ConstructorDeclaration) {
           ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
-          List<Property> arguments = new ArrayList<Property>();
+          List<Argument> arguments = new ArrayList<Argument>();
           List<ClassRef> exceptions = new ArrayList<ClassRef>();
           List<AnnotationRef> ctorAnnotations = new ArrayList<AnnotationRef>();
           Boolean preferVarArg = false;
@@ -203,8 +205,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
             }
 
-            arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
-                .withModifiers(Modifiers.from(parameter.getModifiers())).withAnnotations(ctorParamAnnotations).build());
+            arguments.add(new ArgumentBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+                .withAnnotations(ctorParamAnnotations).build());
           }
           constructors.add(new MethodBuilder().withModifiers(Modifiers.from(constructorDeclaration.getModifiers()))
               .withVarArgPreferred(preferVarArg).withExceptions(exceptions)
@@ -216,7 +218,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
       return context.getDefinitionRepository()
           .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
               .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters).withExtendsList(extendsList)
-              .withImplementsList(implementsList).withProperties(properties).withMethods(methods)
+              .withImplementsList(implementsList).withFields(fields).withMethods(methods)
               .withConstructors(constructors).withAnnotations(annotations)
               .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
               .accept(new TypeDefContextRefResolver()).build());
@@ -260,7 +262,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
 
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
       List<ClassRef> implementsList = new ArrayList<ClassRef>();
-      List<Property> properties = new ArrayList<Property>();
+      List<Field> fields = new ArrayList<Field>();
       List<Method> methods = new ArrayList<Method>();
       List<Method> constructors = new ArrayList<Method>();
       List<AnnotationRef> annotations = new ArrayList<AnnotationRef>();
@@ -283,7 +285,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
         // Create a property for each enum constant
         String enumTypeName = PACKAGENAME.apply(type) + "." + decl.getName();
         ClassRef enumType = new ClassRef(enumTypeName, 0, new ArrayList<>(), new HashMap<>());
-        properties.add(new PropertyBuilder().withName(enumConstant.getName())
+        fields.add(new FieldBuilder().withName(enumConstant.getName())
             .withTypeRef(enumType)
             .withAnnotations(enumAnnotations)
             .build());
@@ -302,14 +304,14 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               fieldAnnotations.add(ANNOTATIONREF.apply(annotationExpressions));
             }
 
-            properties.add(new PropertyBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
+            fields.add(new FieldBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
                 .withAnnotations(fieldAnnotations)
                 .withModifiers(Modifiers.from(fieldDeclaration.getModifiers()))
                 .build());
           }
         } else if (bodyDeclaration instanceof MethodDeclaration) {
           MethodDeclaration methodDeclaration = (MethodDeclaration) bodyDeclaration;
-          List<Property> arguments = new ArrayList<Property>();
+          List<Argument> arguments = new ArrayList<Argument>();
           List<ClassRef> exceptions = new ArrayList<ClassRef>();
           List<AnnotationRef> methodAnnotations = new ArrayList<AnnotationRef>();
 
@@ -338,8 +340,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
             }
 
-            arguments.add(new PropertyBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
-                .withModifiers(Modifiers.from(parameter.getModifiers())).withAnnotations(paramAnnotations).build());
+            arguments.add(new ArgumentBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+                .withAnnotations(paramAnnotations).build());
           }
 
           List<TypeParamDef> typeParamDefs = new ArrayList<TypeParamDef>();
@@ -359,7 +361,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
       return context.getDefinitionRepository()
           .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
               .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters)
-              .withImplementsList(implementsList).withProperties(properties).withMethods(methods)
+              .withImplementsList(implementsList).withFields(fields).withMethods(methods)
               .withConstructors(constructors).withAnnotations(annotations)
               .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
               .accept(new TypeDefContextRefResolver()).build());

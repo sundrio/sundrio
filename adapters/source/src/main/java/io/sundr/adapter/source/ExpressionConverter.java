@@ -37,6 +37,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 
 import io.sundr.adapter.api.AdapterContext;
+import io.sundr.model.Argument;
 import io.sundr.model.Assign;
 import io.sundr.model.BitwiseAnd;
 import io.sundr.model.BitwiseOr;
@@ -57,6 +58,7 @@ import io.sundr.model.Lambda;
 import io.sundr.model.LeftShift;
 import io.sundr.model.LessThan;
 import io.sundr.model.LessThanOrEqual;
+import io.sundr.model.LocalVariable;
 import io.sundr.model.LogicalAnd;
 import io.sundr.model.LogicalOr;
 import io.sundr.model.MethodCall;
@@ -72,7 +74,6 @@ import io.sundr.model.PostDecrement;
 import io.sundr.model.PostIncrement;
 import io.sundr.model.PreDecrement;
 import io.sundr.model.PreIncrement;
-import io.sundr.model.Property;
 import io.sundr.model.PropertyRef;
 import io.sundr.model.Return;
 import io.sundr.model.RightShift;
@@ -96,9 +97,9 @@ public class ExpressionConverter {
     TypeToTypeRef typeAdapter = new TypeToTypeRef(classOrInterfaceToTypeRef);
     TypeRef typeRef = typeAdapter.apply(expr.getType());
 
-    List<Property> properties = expr.getVars().stream()
+    List<LocalVariable> variables = expr.getVars().stream()
         .map(v -> v.getId().getName())
-        .map(n -> Property.newProperty(typeRef, n))
+        .map(n -> LocalVariable.newLocalVariable(typeRef, n))
         .collect(Collectors.toList());
 
     // Handle initialization if present
@@ -107,16 +108,16 @@ public class ExpressionConverter {
       initValue = Optional.of(convertExpression(expr.getVars().get(0).getInit()));
     }
 
-    return new Declare(properties, initValue);
+    return new Declare(variables, initValue);
   }
 
-  public static Property convertParameter(Parameter parameter) {
+  public static Argument convertParameter(Parameter parameter) {
     // Create adapters following the same pattern as TypeDeclarationToTypeDef
     ClassOrInterfaceToTypeRef classOrInterfaceToTypeRef = new ClassOrInterfaceToTypeRef();
     TypeToTypeRef typeAdapter = new TypeToTypeRef(classOrInterfaceToTypeRef);
     TypeRef typeRef = typeAdapter.apply(parameter.getType());
 
-    return Property.newProperty(typeRef, parameter.getId().getName());
+    return Argument.newArgument(typeRef, parameter.getId().getName());
   }
 
   public static io.sundr.model.Expression convertExpression(Expression expression) {
@@ -310,13 +311,13 @@ public class ExpressionConverter {
         VariableDeclarator var = varDeclExpr.getVars().get(0);
         String varName = var.getId().getName();
         TypeRef typeRef = TYPEREF_ADAPTER.apply(varDeclExpr.getType());
-        Property prop = Property.newProperty(typeRef, varName);
+        LocalVariable variable = LocalVariable.newLocalVariable(typeRef, varName);
 
         if (var.getInit() != null) {
           io.sundr.model.Expression initExpr = convertExpression(var.getInit());
-          return new Declare(prop, initExpr);
+          return new Declare(variable, initExpr);
         } else {
-          return new Declare(prop);
+          return new Declare(variable);
         }
       }
       return null;

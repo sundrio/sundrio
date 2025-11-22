@@ -16,13 +16,13 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.Argument;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Modifiers;
-import io.sundr.model.Property;
 import io.sundr.model.TypeRef;
 import io.sundr.utils.Strings;
 
@@ -32,15 +32,15 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
 
   private final AptContext context;
   private final Function<TypeMirror, TypeRef> referenceAdapterFunction;
-  private final Function<VariableElement, Property> propertyAdapterFunction;
+  private final Function<VariableElement, Argument> argumentAdapterFunction;
   private final Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction;
 
   public ExecutableElementToMethod(AptContext context, Function<TypeMirror, TypeRef> referenceAdapterFunction,
-      Function<VariableElement, Property> propertyAdapterFunction,
+      Function<VariableElement, Argument> argumentAdapterFunction,
       Function<AnnotationMirror, AnnotationRef> annotationAdapterFunction) {
     this.context = context;
     this.referenceAdapterFunction = referenceAdapterFunction;
-    this.propertyAdapterFunction = propertyAdapterFunction;
+    this.argumentAdapterFunction = argumentAdapterFunction;
     this.annotationAdapterFunction = annotationAdapterFunction;
   }
 
@@ -146,7 +146,7 @@ public class ExecutableElementToMethod implements Function<ExecutableElement, Me
 
     // Populate constructor parameters
     for (VariableElement variableElement : executableElement.getParameters()) {
-      methodBuilder = methodBuilder.addToArguments(propertyAdapterFunction.apply(variableElement));
+      methodBuilder = methodBuilder.addToArguments(argumentAdapterFunction.apply(variableElement));
     }
     List<ClassRef> exceptionRefs = new ArrayList<ClassRef>();
     for (TypeMirror thrownType : executableElement.getThrownTypes()) {

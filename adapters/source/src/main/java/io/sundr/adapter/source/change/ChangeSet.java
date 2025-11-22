@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.sundr.model.Field;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.TypeDef;
 
 /**
@@ -16,15 +16,15 @@ public class ChangeSet {
   private final TypeDef oldTypeDef;
   private final TypeDef newTypeDef;
   private final Set<Change<Method>> methodChanges;
-  private final Set<Change<Property>> propertyChanges;
+  private final Set<Change<Field>> fieldChanges;
 
   public ChangeSet(TypeDef oldTypeDef, TypeDef newTypeDef,
       Set<Change<Method>> methodChanges,
-      Set<Change<Property>> propertyChanges) {
+      Set<Change<Field>> fieldChanges) {
     this.oldTypeDef = oldTypeDef;
     this.newTypeDef = newTypeDef;
     this.methodChanges = methodChanges != null ? new HashSet<>(methodChanges) : new HashSet<>();
-    this.propertyChanges = propertyChanges != null ? new HashSet<>(propertyChanges) : new HashSet<>();
+    this.fieldChanges = fieldChanges != null ? new HashSet<>(fieldChanges) : new HashSet<>();
   }
 
   public TypeDef getOldTypeDef() {
@@ -39,22 +39,22 @@ public class ChangeSet {
     return Collections.unmodifiableSet(methodChanges);
   }
 
-  public Set<Change<Property>> getPropertyChanges() {
-    return Collections.unmodifiableSet(propertyChanges);
+  public Set<Change<Field>> getFieldChanges() {
+    return Collections.unmodifiableSet(fieldChanges);
   }
 
   /**
    * Returns true if any changes were detected.
    */
   public boolean hasChanges() {
-    return !methodChanges.isEmpty() || !propertyChanges.isEmpty();
+    return !methodChanges.isEmpty() || !fieldChanges.isEmpty();
   }
 
   /**
    * Returns the total number of changes.
    */
   public int getTotalChanges() {
-    return methodChanges.size() + propertyChanges.size();
+    return methodChanges.size() + fieldChanges.size();
   }
 
   @Override
@@ -68,9 +68,9 @@ public class ChangeSet {
       methodChanges.forEach(change -> sb.append("    ").append(change).append("\n"));
     }
 
-    if (!propertyChanges.isEmpty()) {
-      sb.append("  Property Changes (").append(propertyChanges.size()).append("):\n");
-      propertyChanges.forEach(change -> sb.append("    ").append(change).append("\n"));
+    if (!fieldChanges.isEmpty()) {
+      sb.append("  Field Changes (").append(fieldChanges.size()).append("):\n");
+      fieldChanges.forEach(change -> sb.append("    ").append(change).append("\n"));
     }
 
     if (!hasChanges()) {

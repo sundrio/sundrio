@@ -39,14 +39,15 @@ import io.sundr.builder.internal.BuilderContextManager;
 import io.sundr.builder.internal.functions.ClazzAs;
 import io.sundr.builder.internal.utils.BuilderUtils;
 import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
+import io.sundr.model.*;
 import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Expression;
+import io.sundr.model.Field;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.This;
 import io.sundr.model.TypeDef;
@@ -108,19 +109,19 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
     final TypeDef shallowInlineType = new TypeDefBuilder(builderType)
         .withName(inlineableName)
         .withImplementsList(inlineTypeRef)
-        .withProperties()
+        .withFields()
         .withMethods()
         .withConstructors().build();
 
     TypeRef functionType = Constants.FUNCTION.toReference(type.toInternalReference(), returnType.toInternalReference());
 
-    Property builderProperty = new PropertyBuilder()
+    Field builderProperty = new FieldBuilder()
         .withTypeRef(builderType.toInternalReference())
         .withName(BUILDER)
         .withNewModifiers().withPrivate().withFinal().endModifiers()
         .build();
 
-    Property functionProperty = new PropertyBuilder()
+    Field functionProperty = new FieldBuilder()
         .withTypeRef(functionType)
         .withName(FUNCTION)
         .withNewModifiers().withPrivate().withFinal().endModifiers()
@@ -166,8 +167,8 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .build());
 
     if (type.equals(returnType)) {
-      Property item = Property.newProperty(type.toInternalReference(), ITEM);
-      Property a = Property.newProperty(ClassRef.OBJECT, "a");
+      Argument item = Argument.newArgument(type.toInternalReference(), ITEM);
+      LocalVariable a = LocalVariable.newLocalVariable(ClassRef.OBJECT, "a");
 
       constructors.add(new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
@@ -176,10 +177,10 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
           .withArguments(item)
           .withNewBlock()
           .addToStatements(
-              Expression.newCall("super", item.toReference()),
+              Expression.newCall("super", item),
               new Assign(new This().property("builder"),
-                  Expression.createNew(builderType.toInternalReference(), new This(), item.toReference())),
-              new Assign(new This().property("function"), Expression.lambda(a, (Expression) a.toReference())))
+                  Expression.createNew(builderType.toInternalReference(), new This(), item)),
+              new Assign(new This().property("function"), Expression.lambda(a, a)))
           .endBlock()
           .build());
     }
@@ -188,7 +189,7 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         .withAnnotations()
         .withNewModifiers().withPublic().endModifiers()
         .withConstructors(constructors)
-        .addToProperties(builderProperty, functionProperty)
+        .addToFields(builderProperty, functionProperty)
         .addToMethods(inlineMethod)
         .accept(new Visitor<ClassRefBuilder>() {
           @Override

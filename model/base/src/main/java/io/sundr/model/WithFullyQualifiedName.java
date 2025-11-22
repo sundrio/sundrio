@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public interface Nameable extends Node {
+public interface WithFullyQualifiedName extends Node, WithName {
 
   String PACKAGE_SEPARATOR_REGEX = "\\.";
   Predicate<String> IS_UPPER_CASE = w -> Character.isUpperCase(w.charAt(0));

@@ -89,8 +89,9 @@ public class For implements Statement {
   // DSL
   //
 
-  public static DslInit init(Property prop, Object expression) {
-    return new DslInit(Arrays.asList(new Declare(prop, expression)));
+  public static DslInit init(Variable<?> prop, Object expression) {
+    LocalVariable localVar = LocalVariable.newLocalVariable(prop.getTypeRef(), prop.getName());
+    return new DslInit(Arrays.asList(new Declare(localVar, expression)));
   }
 
   public static DslInit init(Expression... init) {

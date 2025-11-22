@@ -39,15 +39,16 @@ import java.util.stream.Stream;
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.AnnotationRef;
 import io.sundr.model.AnnotationRefBuilder;
+import io.sundr.model.Argument;
+import io.sundr.model.ArgumentBuilder;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
 import io.sundr.model.ClassRef;
+import io.sundr.model.FieldBuilder;
 import io.sundr.model.Kind;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Modifiers;
-import io.sundr.model.Property;
-import io.sundr.model.PropertyBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeParamDef;
@@ -85,7 +86,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     Kind kind = classToKind.apply(item);
     List<ClassRef> extendsList = new ArrayList<>();
     List<ClassRef> implementsList = new ArrayList<>();
-    List<Property> properties = new ArrayList<>();
+    List<io.sundr.model.Field> fields = new ArrayList<>();
     List<Method> methods = new ArrayList<>();
     List<Method> constructors = new ArrayList<>();
     List<TypeParamDef> parameters = new ArrayList<>();
@@ -109,7 +110,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
 
     constructors.addAll(getConstructors(item, references));
     methods.addAll(getMethods(item, references));
-    properties.addAll(getProperties(item, references));
+    fields.addAll(getFields(item, references));
     annotationRefs.addAll(getAnnotations(item));
 
     for (TypeVariable typeVariable : item.getTypeParameters()) {
@@ -137,7 +138,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
         .withParameters(parameters)
         .withConstructors(constructors)
         .withMethods(methods)
-        .withProperties(properties)
+        .withFields(fields)
         .withExtendsList(extendsList)
         .withImplementsList(implementsList)
         .withAnnotations(annotationRefs)
@@ -162,8 +163,8 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     return annotationRefs;
   }
 
-  private Set<Property> getProperties(Class item, Set<Class> references) {
-    Set<Property> properties = new HashSet<Property>();
+  private Set<io.sundr.model.Field> getFields(Class item, Set<Class> references) {
+    Set<io.sundr.model.Field> fields = new HashSet<>();
     for (Field field : item.getDeclaredFields()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
       processAnnotatedElement(field, annotationRefs);
@@ -179,7 +180,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
             .filter(c -> !item.equals(c))
             .collect(Collectors.toList()));
       }
-      properties.add(new PropertyBuilder()
+      fields.add(new FieldBuilder()
           .withName(field.getName())
           .withModifiers(Modifiers.from(field.getModifiers()))
           .withEnumConstant(field.isEnumConstant())
@@ -188,7 +189,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
           .withTypeRef(typeToTypeRef.apply(field.getGenericType()))
           .build());
     }
-    return properties;
+    return fields;
   }
 
   private Set<Method> getConstructors(Class item, Set<Class> references) {
@@ -196,7 +197,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     for (java.lang.reflect.Constructor constructor : item.getDeclaredConstructors()) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
       List<ClassRef> exceptionRefs = new ArrayList<>();
-      List<Property> arguments = new ArrayList<Property>();
+      List<Argument> arguments = new ArrayList<>();
       List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
       processMethod(references, constructor, annotationRefs, exceptionRefs, arguments, parameters);
 
@@ -218,8 +219,8 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
       List<AnnotationRef> annotationRefs = new ArrayList<>();
       List<ClassRef> exceptionRefs = new ArrayList<>();
-      List<Property> arguments = new ArrayList<Property>();
-      List<TypeParamDef> parameters = new ArrayList<TypeParamDef>();
+      List<Argument> arguments = new ArrayList<>();
+      List<TypeParamDef> parameters = new ArrayList<>();
       processMethod(references, method, annotationRefs, exceptionRefs, arguments, parameters);
 
       Map<AttributeKey, Object> attributes = new HashMap<>();
@@ -267,7 +268,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
   }
 
   private void processMethod(Set<Class> references, java.lang.reflect.Executable method,
-      List<AnnotationRef> annotationRefs, List<ClassRef> exceptionRefs, List<Property> arguments,
+      List<AnnotationRef> annotationRefs, List<ClassRef> exceptionRefs, List<Argument> arguments,
       List<TypeParamDef> parameters) {
     processAnnotatedElement(method, annotationRefs);
 
@@ -277,7 +278,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
 
     for (int i = 1; i <= method.getGenericParameterTypes().length; i++) {
       Type argumentType = method.getGenericParameterTypes()[i - 1];
-      arguments.add(new PropertyBuilder()
+      arguments.add(new ArgumentBuilder()
           .withName(ARGUMENT_PREFIX + i)
           .withTypeRef(typeToTypeRef.apply(argumentType))
           .build());

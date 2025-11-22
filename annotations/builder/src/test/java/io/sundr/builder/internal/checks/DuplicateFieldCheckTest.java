@@ -8,9 +8,9 @@ import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.utils.Types;
 
 /**
- * DublicatePropertyCheckTest
+ * DublicateFieldCheckTest
  */
-public class DuplicatePropertyCheckTest {
+public class DuplicateFieldCheckTest {
 
   @Test(expected = IllegalStateException.class)
   public void shouldThrowException() {
@@ -18,15 +18,15 @@ public class DuplicatePropertyCheckTest {
         .withPackageName("my.pkg")
         .withName("SomeClass")
         .withKind(Kind.CLASS)
-        .addNewProperty()
-        .withName("myProperty")
+        .addNewField()
+        .withName("myField")
         .withTypeRef(Types.STRING_REF)
-        .endProperty()
-        .addNewProperty()
-        .withName("my_property")
+        .endField()
+        .addNewField()
+        .withName("my_field")
         .withTypeRef(Types.STRING_REF)
-        .endProperty()
-        .accept(new DuplicatePropertyCheck())
+        .endField()
+        .accept(new DuplicateFieldCheck())
         .build();
   }
 
@@ -36,15 +36,15 @@ public class DuplicatePropertyCheckTest {
         .withPackageName("my.pkg")
         .withName("SomeEnum")
         .withKind(Kind.ENUM)
-        .addNewProperty()
-        .withName("myProperty")
+        .addNewField()
+        .withName("myField")
         .withTypeRef(Types.STRING_REF)
-        .endProperty()
-        .addNewProperty()
-        .withName("my_property")
+        .endField()
+        .addNewField()
+        .withName("my_field")
         .withTypeRef(Types.STRING_REF)
-        .endProperty()
-        .accept(new DuplicatePropertyCheck())
+        .endField()
+        .accept(new DuplicateFieldCheck())
         .build();
   }
 }

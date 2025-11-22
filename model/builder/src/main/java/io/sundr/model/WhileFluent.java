@@ -98,6 +98,10 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -121,6 +125,10 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -158,6 +166,10 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -174,17 +186,17 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -202,17 +214,21 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -372,6 +388,14 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
       this.condition = builder;
       return (A) this;
     }
+  }
+
+  public ArgumentConditionNested<A> withNewArgumentCondition() {
+    return new ArgumentConditionNested(null);
+  }
+
+  public ArgumentConditionNested<A> withNewArgumentConditionLike(Argument item) {
+    return new ArgumentConditionNested(item);
   }
 
   public AssignConditionNested<A> withNewAssignCondition() {
@@ -642,6 +666,30 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
     return new EqualsStatementNested(item);
   }
 
+  public FieldConditionNested<A> withNewFieldCondition() {
+    return new FieldConditionNested(null);
+  }
+
+  public FieldConditionNested<A> withNewFieldConditionLike(Field item) {
+    return new FieldConditionNested(item);
+  }
+
+  public FieldRefConditionNested<A> withNewFieldRefCondition() {
+    return new FieldRefConditionNested(null);
+  }
+
+  public FieldRefConditionNested<A> withNewFieldRefConditionLike(FieldRef item) {
+    return new FieldRefConditionNested(item);
+  }
+
+  public FieldRefStatementNested<A> withNewFieldRefStatement() {
+    return new FieldRefStatementNested(null);
+  }
+
+  public FieldRefStatementNested<A> withNewFieldRefStatementLike(FieldRef item) {
+    return new FieldRefStatementNested(item);
+  }
+
   public ForStatementNested<A> withNewForStatement() {
     return new ForStatementNested(null);
   }
@@ -832,6 +880,14 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
 
   public LessThanStatementNested<A> withNewLessThanStatementLike(LessThan item) {
     return new LessThanStatementNested(item);
+  }
+
+  public LocalVariableConditionNested<A> withNewLocalVariableCondition() {
+    return new LocalVariableConditionNested(null);
+  }
+
+  public LocalVariableConditionNested<A> withNewLocalVariableConditionLike(LocalVariable item) {
+    return new LocalVariableConditionNested(item);
   }
 
   public LogicalAndConditionNested<A> withNewLogicalAndCondition() {
@@ -1154,10 +1210,6 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
     return new ReturnDslVariableStepStatementNested(null);
   }
 
-  public A withNewReturnDslVariableStepStatement(String name) {
-    return (A) this.withStatement(new ReturnDslVariableStep(name));
-  }
-
   public ReturnDslVariableStepStatementNested<A> withNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
     return new ReturnDslVariableStepStatementNested(item);
   }
@@ -1350,6 +1402,24 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
       this.statement = builder;
       return (A) this;
     }
+  }
+
+  public class ArgumentConditionNested<N> extends ArgumentFluent<ArgumentConditionNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentConditionNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WhileFluent.this.withCondition(builder.build());
+    }
+
+    public N endArgumentCondition() {
+      return and();
+    }
+
   }
 
   public class AssignConditionNested<N> extends AssignFluent<AssignConditionNested<N>> implements Nested<N> {
@@ -1840,6 +1910,60 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
 
   }
 
+  public class FieldConditionNested<N> extends FieldFluent<FieldConditionNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldConditionNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WhileFluent.this.withCondition(builder.build());
+    }
+
+    public N endFieldCondition() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefConditionNested<N> extends FieldRefFluent<FieldRefConditionNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefConditionNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WhileFluent.this.withCondition(builder.build());
+    }
+
+    public N endFieldRefCondition() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefStatementNested<N> extends FieldRefFluent<FieldRefStatementNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefStatementNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WhileFluent.this.withStatement(builder.build());
+    }
+
+    public N endFieldRefStatement() {
+      return and();
+    }
+
+  }
+
   public class ForStatementNested<N> extends ForFluent<ForStatementNested<N>> implements Nested<N> {
 
     ForBuilder builder;
@@ -2182,6 +2306,25 @@ public class WhileFluent<A extends io.sundr.model.WhileFluent<A>> extends BaseFl
     }
 
     public N endLessThanStatement() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableConditionNested<N> extends LocalVariableFluent<LocalVariableConditionNested<N>>
+      implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableConditionNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) WhileFluent.this.withCondition(builder.build());
+    }
+
+    public N endLocalVariableCondition() {
       return and();
     }
 

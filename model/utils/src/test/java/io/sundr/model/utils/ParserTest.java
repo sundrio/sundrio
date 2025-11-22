@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
+import io.sundr.model.Argument;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.TypeRef;
 import io.sundr.model.VoidRef;
 import io.sundr.utils.Strings;
@@ -54,7 +54,7 @@ public class ParserTest {
   @Test
   public void shouldParseMethodWithSingleArgument() {
     String content = Strings.loadResourceQuietly("SimpleClass.java");
-    Method m = Method.newMethod("newLine", (TypeRef) new VoidRef(), Property.newProperty(Types.PRIMITIVE_INT_REF, "times"));
+    Method m = Method.newMethod("newLine", (TypeRef) new VoidRef(), Argument.newArgument(Types.PRIMITIVE_INT_REF, "times"));
     String body = Parsers.parseMethodBody(content, m);
     assertNotNull(body);
     assertTrue(body.contains("for (int i=0; i < times; i++)"));
@@ -63,8 +63,8 @@ public class ParserTest {
   @Test
   public void shouldParseMethodWithMultipleArguments() {
     String content = Strings.loadResourceQuietly("SimpleClass.java");
-    Method m = Method.newMethod("times", (TypeRef) new VoidRef(), Property.newProperty(Types.PRIMITIVE_INT_REF, "times"),
-        Property.newProperty(Types.STRING_REF, "str"));
+    Method m = Method.newMethod("times", (TypeRef) new VoidRef(), Argument.newArgument(Types.PRIMITIVE_INT_REF, "times"),
+        Argument.newArgument(Types.STRING_REF, "str"));
     String body = Parsers.parseMethodBody(content, m);
     assertNotNull(body);
     assertTrue(body.contains("for (int i=0; i < times; i++)"));
@@ -74,8 +74,8 @@ public class ParserTest {
   @Test
   public void shouldParseMethodWithMultipleArgumentsAndVarArg() {
     String content = Strings.loadResourceQuietly("SimpleClass.java");
-    Method m = Method.newMethod("timesV", (TypeRef) new VoidRef(), true, Property.newProperty(Types.PRIMITIVE_INT_REF, "times"),
-        Property.newProperty(Types.STRING_REF, "str"));
+    Method m = Method.newMethod("timesV", (TypeRef) new VoidRef(), true, Argument.newArgument(Types.PRIMITIVE_INT_REF, "times"),
+        Argument.newArgument(Types.STRING_REF, "str"));
     String body = Parsers.parseMethodBody(content, m);
     assertNotNull(body);
     assertTrue(body.contains("for (int i=0; i < times; i++)"));

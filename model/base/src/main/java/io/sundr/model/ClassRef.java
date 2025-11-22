@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ClassRef extends TypeRef implements Nameable, Expression, Mappable<ClassRef> {
+public class ClassRef extends TypeRef implements WithFullyQualifiedName, Expression, Mappable<ClassRef> {
 
   public static final String UNKNOWN = "<unknown>";
   public static final String BRACKETS = "[]";
@@ -96,7 +96,7 @@ public class ClassRef extends TypeRef implements Nameable, Expression, Mappable<
 
   @Override
   public String getName() {
-    return Nameable.getClassName(fullyQualifiedName);
+    return WithFullyQualifiedName.getClassName(fullyQualifiedName);
   }
 
   @Override

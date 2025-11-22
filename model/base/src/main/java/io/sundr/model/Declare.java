@@ -9,41 +9,41 @@ import java.util.stream.Collectors;
 
 public class Declare implements ExpressionOrStatement {
 
-  private final List<Property> properties;
+  private final List<LocalVariable> localVariables;
   private final Optional<Expression> value;
 
-  public Declare(List<Property> properties, Optional<Expression> value) {
-    this.properties = properties;
+  public Declare(List<LocalVariable> localVariables, Optional<Expression> value) {
+    this.localVariables = localVariables;
     this.value = value;
   }
 
   //
   // Auxliliary constructors
   //
-  public Declare(Property property, Expression expression) {
-    this(Arrays.asList(property), Optional.of(expression));
+  public Declare(Variable<?> variable, Expression expression) {
+    this(Arrays.asList(variable.asLocalVariable()), Optional.of(expression));
   }
 
-  public Declare(Property property, Object value, Object... rest) {
-    this(Arrays.asList(property), Optional.of(ValueRef.from(value, rest)));
+  public Declare(Variable<?> variable, Object value, Object... rest) {
+    this(Arrays.asList(variable.asLocalVariable()), Optional.of(ValueRef.from(value, rest)));
   }
 
-  public Declare(Property property, Property valueProperty) {
-    this(Arrays.asList(property), Optional.of(valueProperty));
+  public Declare(Variable<?> variable, Variable<?> valueVariable) {
+    this(Arrays.asList(variable.asLocalVariable()), Optional.of(valueVariable));
   }
 
-  public Declare(Property property) {
-    this.properties = Arrays.asList(property);
+  public Declare(Variable<?> variable) {
+    this.localVariables = Arrays.asList(variable.asLocalVariable());
     this.value = Optional.empty();
   }
 
   public Declare(Class type, String name) {
-    this.properties = Arrays.asList(Property.newProperty(ClassRef.forName(type.getName()), name));
+    this.localVariables = Arrays.asList(LocalVariable.newLocalVariable(ClassRef.forClass(type), name));
     this.value = Optional.empty();
   }
 
   public Declare(Class type, String name, Object value) {
-    this.properties = Arrays.asList(Property.newProperty(ClassRef.forClass(type), name));
+    this.localVariables = Arrays.asList(LocalVariable.newLocalVariable(ClassRef.forClass(type), name));
     this.value = Optional.of(ValueRef.from(value));
   }
 
@@ -52,30 +52,30 @@ public class Declare implements ExpressionOrStatement {
   //
   public static Declare newInstance(String name, Class type, Expression... arguments) {
     if (arguments.length == 0) {
-      return new Declare(Property.newProperty(ClassRef.forClass(type), name), new Construct(type));
+      return new Declare(LocalVariable.newLocalVariable(ClassRef.forClass(type), name), new Construct(type));
     } else if (arguments.length == 1) {
-      return new Declare(Property.newProperty(ClassRef.forClass(type), name), new Construct(type, arguments[0]));
+      return new Declare(LocalVariable.newLocalVariable(ClassRef.forClass(type), name), new Construct(type, arguments[0]));
     } else {
-      return new Declare(Property.newProperty(ClassRef.forClass(type), name), new Construct(type, arguments));
+      return new Declare(LocalVariable.newLocalVariable(ClassRef.forClass(type), name), new Construct(type, arguments));
     }
   }
 
   public static Declare newInstance(String name, ClassRef type, Expression... arguments) {
     if (arguments.length == 0) {
-      return new Declare(Property.newProperty(type, name), new Construct(type));
+      return new Declare(LocalVariable.newLocalVariable(type, name), new Construct(type));
     } else if (arguments.length == 1) {
-      return new Declare(Property.newProperty(type, name), new Construct(type, arguments[0]));
+      return new Declare(LocalVariable.newLocalVariable(type, name), new Construct(type, arguments[0]));
     } else {
-      return new Declare(Property.newProperty(type, name), new Construct(type, arguments));
+      return new Declare(LocalVariable.newLocalVariable(type, name), new Construct(type, arguments));
     }
   }
 
   public static Declare cast(String name, ClassRef type, Expression target) {
-    return new Declare(Property.newProperty(type, name), new Cast(type, target));
+    return new Declare(LocalVariable.newLocalVariable(type, name), new Cast(type, target));
   }
 
-  public List<Property> getProperties() {
-    return properties;
+  public List<LocalVariable> getLocalVariables() {
+    return localVariables;
   }
 
   public Optional<Expression> getValue() {
@@ -85,8 +85,8 @@ public class Declare implements ExpressionOrStatement {
   @Override
   public Set<ClassRef> getReferences() {
     Set<ClassRef> refs = new HashSet<>();
-    for (Property property : properties) {
-      refs.addAll(property.getReferences());
+    for (LocalVariable localVariable : localVariables) {
+      refs.addAll(localVariable.getReferences());
     }
     value.ifPresent(v -> refs.addAll(v.getReferences()));
     return refs;
@@ -100,10 +100,10 @@ public class Declare implements ExpressionOrStatement {
   @Override
   public String renderExpression() {
     StringBuilder sb = new StringBuilder();
-    TypeRef typeRef = properties.get(0).getTypeRef();
+    TypeRef typeRef = localVariables.get(0).getTypeRef();
     sb.append(typeRef.render());
     sb.append(SPACE);
-    sb.append(properties.stream().map(Property::getName).collect(Collectors.joining(", ")));
+    sb.append(localVariables.stream().map(LocalVariable::getName).collect(Collectors.joining(", ")));
     sb.append(value.map(v -> " = " + v.renderExpression()).orElse(""));
     return sb.toString();
   }

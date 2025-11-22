@@ -15,12 +15,14 @@ public class Foreach implements Statement {
     this.body = body;
   }
 
-  public Foreach(Property declarationProperty, Expression expression, Statement body) {
-    this(new Declare(declarationProperty), expression, body);
+  public Foreach(Variable<?> declarationProperty, Expression expression, Statement body) {
+    this(new Declare(LocalVariable.newLocalVariable(declarationProperty.getTypeRef(), declarationProperty.getName())),
+        expression, body);
   }
 
-  public Foreach(Property declarationProperty, Property expressionProperty, Statement body) {
-    this(new Declare(declarationProperty), expressionProperty, body);
+  public Foreach(Variable<?> declarationProperty, Variable<?> expressionProperty, Statement body) {
+    this(new Declare(LocalVariable.newLocalVariable(declarationProperty.getTypeRef(), declarationProperty.getName())),
+        expressionProperty, body);
   }
 
   public Declare getDeclare() {

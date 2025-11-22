@@ -30,7 +30,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class TypeDef extends ModifierSupport implements Renderable, Nameable, Annotatable, Commentable, Mappable<TypeDef> {
+public class TypeDef extends ModifierSupport
+    implements Renderable, WithFullyQualifiedName, Annotatable, Commentable, Mappable<TypeDef> {
 
   public static TypeDef OBJECT = new TypeDef(JAVA_LANG_OBJECT);
   public static TypeDef ENUM = new TypeDef(JAVA_LANG_ENUM);
@@ -48,14 +49,14 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   private final List<ClassRef> implementsList;
   private final List<TypeParamDef> parameters;
 
-  private final List<Property> properties;
+  private final List<Field> fields;
   private final List<Method> constructors;
   private final List<Method> methods;
   private final String outerTypeName;
   private final List<TypeDef> innerTypes;
 
   public TypeDef(Kind kind, String packageName, String name, List<String> comments, List<AnnotationRef> annotations,
-      List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Property> properties,
+      List<ClassRef> extendsList, List<ClassRef> implementsList, List<TypeParamDef> parameters, List<Field> fields,
       List<Method> constructors, List<Method> methods, String outerTypeName, List<TypeDef> innerTypes, Modifiers modifiers,
       Map<AttributeKey, Object> attributes) {
     super(modifiers, attributes);
@@ -67,7 +68,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     this.extendsList = extendsList;
     this.implementsList = implementsList;
     this.parameters = parameters;
-    this.properties = properties;
+    this.fields = fields;
     this.methods = methods;
     this.outerTypeName = outerTypeName;
     //Adapters should be added last as the depend on previous values
@@ -78,18 +79,18 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   protected TypeDef(String fullyQualifiedName) {
     super(Modifiers.from(Modifier.PUBLIC), Collections.emptyMap());
     this.kind = Kind.CLASS;
-    this.name = Nameable.getClassName(fullyQualifiedName);
-    this.packageName = Nameable.getPackageName(fullyQualifiedName);
+    this.name = WithFullyQualifiedName.getClassName(fullyQualifiedName);
+    this.packageName = WithFullyQualifiedName.getPackageName(fullyQualifiedName);
     this.comments = Collections.emptyList();
     this.annotations = Collections.emptyList();
     this.extendsList = Collections.emptyList();
     this.implementsList = Collections.emptyList();
     this.parameters = Collections.emptyList();
-    this.properties = Collections.emptyList();
+    this.fields = Collections.emptyList();
     this.constructors = Collections.emptyList();
     this.methods = Collections.emptyList();
     this.innerTypes = Collections.emptyList();
-    this.outerTypeName = Nameable.getOuterTypeName(fullyQualifiedName);
+    this.outerTypeName = WithFullyQualifiedName.getOuterTypeName(fullyQualifiedName);
   }
 
   public static TypeDef forName(String fullyQualifiedName) {
@@ -122,7 +123,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
       } else {
         updated.add(new TypeDef(typeDef.getKind(), outer.getPackageName(), typeDef.getName(), typeDef.getComments(),
             typeDef.getAnnotations(), typeDef.getExtendsList(), typeDef.getImplementsList(), typeDef.getParameters(),
-            typeDef.getProperties(), typeDef.getConstructors(), typeDef.getMethods(), outer.getFullyQualifiedName(),
+            typeDef.getFields(), typeDef.getConstructors(), typeDef.getMethods(), outer.getFullyQualifiedName(),
             typeDef.getInnerTypes(), typeDef.getModifiers(), typeDef.getAttributes()));
       }
     }
@@ -184,8 +185,8 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     return parameters;
   }
 
-  public List<Property> getProperties() {
-    return properties;
+  public List<Field> getFields() {
+    return fields;
   }
 
   public List<Method> getConstructors() {
@@ -284,7 +285,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
   }
 
   /**
-   * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, properties
+   * Creates a {@link ClassRef} for internal use inside the scope of the type (methods, fields
    * etc). It uses as arguments the same 'letters' as the parameters definition.
    *
    * @return a {@link ClassRef} for the currnet type, using the type parameter names as as arguments.
@@ -370,8 +371,8 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
       refs.addAll(e.getReferences());
     }
 
-    for (Property property : properties) {
-      refs.addAll(property.getReferences());
+    for (Field field : fields) {
+      refs.addAll(field.getReferences());
     }
 
     for (Method method : constructors) {
@@ -465,15 +466,15 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
     hasNewline = true;
 
     StringBuilder pb = new StringBuilder();
-    // Sort properties alphabetically by name
-    List<Property> sortedProperties = new ArrayList<>(properties);
-    Collections.sort(sortedProperties, Comparator.comparing(Property::getName));
-    for (Property field : sortedProperties) {
+    // Sort fields alphabetically by name
+    List<Field> sortedFields = new ArrayList<>(fields);
+    Collections.sort(sortedFields, Comparator.comparing(Field::getName));
+    for (Field field : sortedFields) {
       pb.append(field.renderComments());
       pb.append(field.renderAnnotations());
       pb.append(field.render());
       if (field.getAttribute(INIT) != null) {
-        pb.append(" = ").append(field.getDefaultValue());
+        pb.append(" = ").append(field.getAttribute(INIT));
       }
       pb.append(SEMICOLN).append(NEWLINE);
       hasNewline = false;
@@ -539,7 +540,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
         .comparing(Method::getName, Comparator.nullsLast(String::compareTo))
         .thenComparingInt(m -> m.getArguments().size())
         .thenComparing(m -> m.getArguments().stream()
-            .map(Property::getName)
+            .map(Argument::getName)
             .collect(Collectors.joining(",")));
   }
 
@@ -560,7 +561,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
       }
       // If the class is imported, replace with simple name (without package and outer class if applicable)
       else if (importsSection.contains("import " + fullyQualifiedName + ";")) {
-        String simpleName = Nameable.getInnerTypeName(ref.getName());
+        String simpleName = WithFullyQualifiedName.getInnerTypeName(ref.getName());
         content = content.replaceAll(Pattern.quote(fullyQualifiedName) + "(?![a-zA-Z0-9])", simpleName);
       }
     }
@@ -585,7 +586,7 @@ public class TypeDef extends ModifierSupport implements Renderable, Nameable, An
           continue;
         }
 
-        String simpleName = Nameable.getInnerTypeName(fullyQualifiedName);
+        String simpleName = WithFullyQualifiedName.getInnerTypeName(fullyQualifiedName);
         content = content.replaceAll(Pattern.quote(fullyQualifiedName) + "(?![a-zA-Z0-9])", simpleName);
       }
     }

@@ -171,6 +171,14 @@ public class BlockFluent<A extends io.sundr.model.BlockFluent<A>> extends BaseFl
     return new EqualsStatementsNested(-1, item);
   }
 
+  public FieldRefStatementsNested<A> addNewFieldRefStatement() {
+    return new FieldRefStatementsNested(-1, null);
+  }
+
+  public FieldRefStatementsNested<A> addNewFieldRefStatementLike(FieldRef item) {
+    return new FieldRefStatementsNested(-1, item);
+  }
+
   public ForStatementsNested<A> addNewForStatement() {
     return new ForStatementsNested(-1, null);
   }
@@ -413,10 +421,6 @@ public class BlockFluent<A extends io.sundr.model.BlockFluent<A>> extends BaseFl
 
   public ReturnDslVariableStepStatementsNested<A> addNewReturnDslVariableStepStatement() {
     return new ReturnDslVariableStepStatementsNested(-1, null);
-  }
-
-  public A addNewReturnDslVariableStepStatement(String name) {
-    return (A) this.addToStatements(new ReturnDslVariableStep(name));
   }
 
   public ReturnDslVariableStepStatementsNested<A> addNewReturnDslVariableStepStatementLike(ReturnDslVariableStep item) {
@@ -688,6 +692,10 @@ public class BlockFluent<A extends io.sundr.model.BlockFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new ContinueBuilder((Continue) item);
 
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
+
       case "Modulo":
 
         return (VisitableBuilder<T, ?>) new ModuloBuilder((Modulo) item);
@@ -772,13 +780,13 @@ public class BlockFluent<A extends io.sundr.model.BlockFluent<A>> extends BaseFl
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
+
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
 
       case "PreIncrement":
 
@@ -942,6 +950,10 @@ public class BlockFluent<A extends io.sundr.model.BlockFluent<A>> extends BaseFl
 
   public EqualsStatementsNested<A> setNewEqualsStatementLike(int index, Equals item) {
     return new EqualsStatementsNested(index, item);
+  }
+
+  public FieldRefStatementsNested<A> setNewFieldRefStatementLike(int index, FieldRef item) {
+    return new FieldRefStatementsNested(index, item);
   }
 
   public ForStatementsNested<A> setNewForStatementLike(int index, For item) {
@@ -1392,6 +1404,26 @@ public class BlockFluent<A extends io.sundr.model.BlockFluent<A>> extends BaseFl
     }
 
     public N endEqualsStatement() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefStatementsNested<N> extends FieldRefFluent<FieldRefStatementsNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+    int index;
+
+    FieldRefStatementsNested(int index, FieldRef item) {
+      this.index = index;
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) BlockFluent.this.setToStatements(index, builder.build());
+    }
+
+    public N endFieldRefStatement() {
       return and();
     }
 

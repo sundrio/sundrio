@@ -14,6 +14,7 @@ import io.sundr.adapter.source.Project;
 import io.sundr.adapter.source.change.Change;
 import io.sundr.adapter.source.change.ChangeSet;
 import io.sundr.model.ClassRef;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Property;
@@ -89,30 +90,30 @@ public class ImpactAnalysisIntegrationTest {
   }
 
   @Test
-  public void testPropertyChangeImpactAnalysis() {
+  public void testFieldChangeImpactAnalysis() {
     TypeDef oldTypeDef = new TypeDefBuilder()
         .withPackageName("com.example")
         .withName("Person")
-        .addNewProperty()
+        .addNewField()
         .withName("name")
         .withTypeRef(ClassRef.forClass(String.class))
-        .endProperty()
+        .endField()
         .build();
 
     TypeDef newTypeDef = new TypeDefBuilder(oldTypeDef)
-        .editProperty(0)
+        .editField(0)
         .withTypeRef(ClassRef.forClass(Object.class)) // Changed type
-        .endProperty()
+        .endField()
         .build();
 
-    Property oldProperty = oldTypeDef.getProperties().get(0);
-    Property newProperty = newTypeDef.getProperties().get(0);
+    Field oldField = oldTypeDef.getFields().get(0);
+    Field newField = newTypeDef.getFields().get(0);
 
     ChangeSet changeSet = new ChangeSet(
         oldTypeDef,
         newTypeDef,
         Set.of(),
-        Set.of(Change.modified(oldProperty, newProperty)));
+        Set.of(Change.modified(oldField, newField)));
 
     ImpactAnalysisResult result = analyzer.analyze(changeSet);
 

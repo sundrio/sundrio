@@ -59,6 +59,22 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     return (A) this;
   }
 
+  public ArgumentInitNested<A> addNewArgumentInit() {
+    return new ArgumentInitNested(-1, null);
+  }
+
+  public ArgumentInitNested<A> addNewArgumentInitLike(Argument item) {
+    return new ArgumentInitNested(-1, item);
+  }
+
+  public ArgumentUpdateNested<A> addNewArgumentUpdate() {
+    return new ArgumentUpdateNested(-1, null);
+  }
+
+  public ArgumentUpdateNested<A> addNewArgumentUpdateLike(Argument item) {
+    return new ArgumentUpdateNested(-1, item);
+  }
+
   public AssignInitNested<A> addNewAssignInit() {
     return new AssignInitNested(-1, null);
   }
@@ -339,6 +355,38 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     return new EqualsUpdateNested(-1, item);
   }
 
+  public FieldInitNested<A> addNewFieldInit() {
+    return new FieldInitNested(-1, null);
+  }
+
+  public FieldInitNested<A> addNewFieldInitLike(Field item) {
+    return new FieldInitNested(-1, item);
+  }
+
+  public FieldRefInitNested<A> addNewFieldRefInit() {
+    return new FieldRefInitNested(-1, null);
+  }
+
+  public FieldRefInitNested<A> addNewFieldRefInitLike(FieldRef item) {
+    return new FieldRefInitNested(-1, item);
+  }
+
+  public FieldRefUpdateNested<A> addNewFieldRefUpdate() {
+    return new FieldRefUpdateNested(-1, null);
+  }
+
+  public FieldRefUpdateNested<A> addNewFieldRefUpdateLike(FieldRef item) {
+    return new FieldRefUpdateNested(-1, item);
+  }
+
+  public FieldUpdateNested<A> addNewFieldUpdate() {
+    return new FieldUpdateNested(-1, null);
+  }
+
+  public FieldUpdateNested<A> addNewFieldUpdateLike(Field item) {
+    return new FieldUpdateNested(-1, item);
+  }
+
   public GreaterThanInitNested<A> addNewGreaterThanInit() {
     return new GreaterThanInitNested(-1, null);
   }
@@ -521,6 +569,22 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
   public LessThanUpdateNested<A> addNewLessThanUpdateLike(LessThan item) {
     return new LessThanUpdateNested(-1, item);
+  }
+
+  public LocalVariableInitNested<A> addNewLocalVariableInit() {
+    return new LocalVariableInitNested(-1, null);
+  }
+
+  public LocalVariableInitNested<A> addNewLocalVariableInitLike(LocalVariable item) {
+    return new LocalVariableInitNested(-1, item);
+  }
+
+  public LocalVariableUpdateNested<A> addNewLocalVariableUpdate() {
+    return new LocalVariableUpdateNested(-1, null);
+  }
+
+  public LocalVariableUpdateNested<A> addNewLocalVariableUpdateLike(LocalVariable item) {
+    return new LocalVariableUpdateNested(-1, item);
   }
 
   public LogicalAndInitNested<A> addNewLogicalAndInit() {
@@ -1239,6 +1303,10 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
         return (VisitableBuilder<T, ?>) new BitwiseOrBuilder((BitwiseOr) item);
 
+      case "LocalVariable":
+
+        return (VisitableBuilder<T, ?>) new LocalVariableBuilder((LocalVariable) item);
+
       case "PropertyRef":
 
         return (VisitableBuilder<T, ?>) new PropertyRefBuilder((PropertyRef) item);
@@ -1262,6 +1330,10 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
       case "Cast":
 
         return (VisitableBuilder<T, ?>) new CastBuilder((Cast) item);
+
+      case "FieldRef":
+
+        return (VisitableBuilder<T, ?>) new FieldRefBuilder((FieldRef) item);
 
       case "Modulo":
 
@@ -1299,6 +1371,10 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
         return (VisitableBuilder<T, ?>) new EnclosedBuilder((Enclosed) item);
 
+      case "Argument":
+
+        return (VisitableBuilder<T, ?>) new ArgumentBuilder((Argument) item);
+
       case "PreDecrement":
 
         return (VisitableBuilder<T, ?>) new PreDecrementBuilder((PreDecrement) item);
@@ -1315,17 +1391,17 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
         return (VisitableBuilder<T, ?>) new NotBuilder((Not) item);
 
-      case "Assign":
+      case "Negative":
 
-        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
+        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
 
       case "This":
 
         return (VisitableBuilder<T, ?>) new ThisBuilder((This) item);
 
-      case "Negative":
+      case "Assign":
 
-        return (VisitableBuilder<T, ?>) new NegativeBuilder((Negative) item);
+        return (VisitableBuilder<T, ?>) new AssignBuilder((Assign) item);
 
       case "LogicalAnd":
 
@@ -1343,17 +1419,21 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
         return (VisitableBuilder<T, ?>) new PlusBuilder((Plus) item);
 
-      case "Construct":
-
-        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
-
       case "Xor":
 
         return (VisitableBuilder<T, ?>) new XorBuilder((Xor) item);
 
+      case "Construct":
+
+        return (VisitableBuilder<T, ?>) new ConstructBuilder((Construct) item);
+
       case "PreIncrement":
 
         return (VisitableBuilder<T, ?>) new PreIncrementBuilder((PreIncrement) item);
+
+      case "Field":
+
+        return (VisitableBuilder<T, ?>) new FieldBuilder((Field) item);
 
       case "Property":
 
@@ -1617,6 +1697,14 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     return (A) this;
   }
 
+  public ArgumentInitNested<A> setNewArgumentInitLike(int index, Argument item) {
+    return new ArgumentInitNested(index, item);
+  }
+
+  public ArgumentUpdateNested<A> setNewArgumentUpdateLike(int index, Argument item) {
+    return new ArgumentUpdateNested(index, item);
+  }
+
   public AssignInitNested<A> setNewAssignInitLike(int index, Assign item) {
     return new AssignInitNested(index, item);
   }
@@ -1729,6 +1817,22 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     return new EqualsUpdateNested(index, item);
   }
 
+  public FieldInitNested<A> setNewFieldInitLike(int index, Field item) {
+    return new FieldInitNested(index, item);
+  }
+
+  public FieldRefInitNested<A> setNewFieldRefInitLike(int index, FieldRef item) {
+    return new FieldRefInitNested(index, item);
+  }
+
+  public FieldRefUpdateNested<A> setNewFieldRefUpdateLike(int index, FieldRef item) {
+    return new FieldRefUpdateNested(index, item);
+  }
+
+  public FieldUpdateNested<A> setNewFieldUpdateLike(int index, Field item) {
+    return new FieldUpdateNested(index, item);
+  }
+
   public GreaterThanInitNested<A> setNewGreaterThanInitLike(int index, GreaterThan item) {
     return new GreaterThanInitNested(index, item);
   }
@@ -1799,6 +1903,14 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
   public LessThanUpdateNested<A> setNewLessThanUpdateLike(int index, LessThan item) {
     return new LessThanUpdateNested(index, item);
+  }
+
+  public LocalVariableInitNested<A> setNewLocalVariableInitLike(int index, LocalVariable item) {
+    return new LocalVariableInitNested(index, item);
+  }
+
+  public LocalVariableUpdateNested<A> setNewLocalVariableUpdateLike(int index, LocalVariable item) {
+    return new LocalVariableUpdateNested(index, item);
   }
 
   public LogicalAndInitNested<A> setNewLogicalAndInitLike(int index, LogicalAnd item) {
@@ -2110,6 +2222,14 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     return (A) this;
   }
 
+  public ArgumentCompareNested<A> withNewArgumentCompare() {
+    return new ArgumentCompareNested(null);
+  }
+
+  public ArgumentCompareNested<A> withNewArgumentCompareLike(Argument item) {
+    return new ArgumentCompareNested(item);
+  }
+
   public AssignBodyNested<A> withNewAssignBody() {
     return new AssignBodyNested(null);
   }
@@ -2378,6 +2498,30 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     return new EqualsCompareNested(item);
   }
 
+  public FieldCompareNested<A> withNewFieldCompare() {
+    return new FieldCompareNested(null);
+  }
+
+  public FieldCompareNested<A> withNewFieldCompareLike(Field item) {
+    return new FieldCompareNested(item);
+  }
+
+  public FieldRefBodyNested<A> withNewFieldRefBody() {
+    return new FieldRefBodyNested(null);
+  }
+
+  public FieldRefBodyNested<A> withNewFieldRefBodyLike(FieldRef item) {
+    return new FieldRefBodyNested(item);
+  }
+
+  public FieldRefCompareNested<A> withNewFieldRefCompare() {
+    return new FieldRefCompareNested(null);
+  }
+
+  public FieldRefCompareNested<A> withNewFieldRefCompareLike(FieldRef item) {
+    return new FieldRefCompareNested(item);
+  }
+
   public ForBodyNested<A> withNewForBody() {
     return new ForBodyNested(null);
   }
@@ -2568,6 +2712,14 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
   public LessThanOrEqualCompareNested<A> withNewLessThanOrEqualCompareLike(LessThanOrEqual item) {
     return new LessThanOrEqualCompareNested(item);
+  }
+
+  public LocalVariableCompareNested<A> withNewLocalVariableCompare() {
+    return new LocalVariableCompareNested(null);
+  }
+
+  public LocalVariableCompareNested<A> withNewLocalVariableCompareLike(LocalVariable item) {
+    return new LocalVariableCompareNested(item);
   }
 
   public LogicalAndBodyNested<A> withNewLogicalAndBody() {
@@ -2902,10 +3054,6 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     return new ReturnDslVariableStepBodyNested(null);
   }
 
-  public A withNewReturnDslVariableStepBody(String name) {
-    return (A) this.withBody(new ReturnDslVariableStep(name));
-  }
-
   public ReturnDslVariableStepBodyNested<A> withNewReturnDslVariableStepBodyLike(ReturnDslVariableStep item) {
     return new ReturnDslVariableStepBodyNested(item);
   }
@@ -3097,6 +3245,64 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
       }
     }
     return (A) this;
+  }
+
+  public class ArgumentCompareNested<N> extends ArgumentFluent<ArgumentCompareNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+
+    ArgumentCompareNested(Argument item) {
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.withCompare(builder.build());
+    }
+
+    public N endArgumentCompare() {
+      return and();
+    }
+
+  }
+
+  public class ArgumentInitNested<N> extends ArgumentFluent<ArgumentInitNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+    int index;
+
+    ArgumentInitNested(int index, Argument item) {
+      this.index = index;
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToInit(index, builder.build());
+    }
+
+    public N endArgumentInit() {
+      return and();
+    }
+
+  }
+
+  public class ArgumentUpdateNested<N> extends ArgumentFluent<ArgumentUpdateNested<N>> implements Nested<N> {
+
+    ArgumentBuilder builder;
+    int index;
+
+    ArgumentUpdateNested(int index, Argument item) {
+      this.index = index;
+      this.builder = new ArgumentBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToUpdate(index, builder.build());
+    }
+
+    public N endArgumentUpdate() {
+      return and();
+    }
+
   }
 
   public class AssignBodyNested<N> extends AssignFluent<AssignBodyNested<N>> implements Nested<N> {
@@ -4149,6 +4355,140 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
 
   }
 
+  public class FieldCompareNested<N> extends FieldFluent<FieldCompareNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+
+    FieldCompareNested(Field item) {
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.withCompare(builder.build());
+    }
+
+    public N endFieldCompare() {
+      return and();
+    }
+
+  }
+
+  public class FieldInitNested<N> extends FieldFluent<FieldInitNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+    int index;
+
+    FieldInitNested(int index, Field item) {
+      this.index = index;
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToInit(index, builder.build());
+    }
+
+    public N endFieldInit() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefBodyNested<N> extends FieldRefFluent<FieldRefBodyNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefBodyNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.withBody(builder.build());
+    }
+
+    public N endFieldRefBody() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefCompareNested<N> extends FieldRefFluent<FieldRefCompareNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+
+    FieldRefCompareNested(FieldRef item) {
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.withCompare(builder.build());
+    }
+
+    public N endFieldRefCompare() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefInitNested<N> extends FieldRefFluent<FieldRefInitNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+    int index;
+
+    FieldRefInitNested(int index, FieldRef item) {
+      this.index = index;
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToInit(index, builder.build());
+    }
+
+    public N endFieldRefInit() {
+      return and();
+    }
+
+  }
+
+  public class FieldRefUpdateNested<N> extends FieldRefFluent<FieldRefUpdateNested<N>> implements Nested<N> {
+
+    FieldRefBuilder builder;
+    int index;
+
+    FieldRefUpdateNested(int index, FieldRef item) {
+      this.index = index;
+      this.builder = new FieldRefBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToUpdate(index, builder.build());
+    }
+
+    public N endFieldRefUpdate() {
+      return and();
+    }
+
+  }
+
+  public class FieldUpdateNested<N> extends FieldFluent<FieldUpdateNested<N>> implements Nested<N> {
+
+    FieldBuilder builder;
+    int index;
+
+    FieldUpdateNested(int index, Field item) {
+      this.index = index;
+      this.builder = new FieldBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToUpdate(index, builder.build());
+    }
+
+    public N endFieldUpdate() {
+      return and();
+    }
+
+  }
+
   public class ForBodyNested<N> extends ForFluent<ForBodyNested<N>> implements Nested<N> {
 
     ForBuilder builder;
@@ -4852,6 +5192,64 @@ public class ForFluent<A extends io.sundr.model.ForFluent<A>> extends BaseFluent
     }
 
     public N endLessThanUpdate() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableCompareNested<N> extends LocalVariableFluent<LocalVariableCompareNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+
+    LocalVariableCompareNested(LocalVariable item) {
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.withCompare(builder.build());
+    }
+
+    public N endLocalVariableCompare() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableInitNested<N> extends LocalVariableFluent<LocalVariableInitNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+    int index;
+
+    LocalVariableInitNested(int index, LocalVariable item) {
+      this.index = index;
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToInit(index, builder.build());
+    }
+
+    public N endLocalVariableInit() {
+      return and();
+    }
+
+  }
+
+  public class LocalVariableUpdateNested<N> extends LocalVariableFluent<LocalVariableUpdateNested<N>> implements Nested<N> {
+
+    LocalVariableBuilder builder;
+    int index;
+
+    LocalVariableUpdateNested(int index, LocalVariable item) {
+      this.index = index;
+      this.builder = new LocalVariableBuilder(this, item);
+    }
+
+    public N and() {
+      return (N) ForFluent.this.setToUpdate(index, builder.build());
+    }
+
+    public N endLocalVariableUpdate() {
       return and();
     }
 

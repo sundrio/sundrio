@@ -23,22 +23,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.sundr.SundrException;
+import io.sundr.model.Field;
 import io.sundr.model.Method;
-import io.sundr.model.Property;
 import io.sundr.model.RichTypeDef;
 import io.sundr.model.TypeDef;
+import io.sundr.model.Variable;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class Setter {
 
   /**
-   * Find the setter of the specified property in the type.
+   * Find the setter of the specified field in the type.
    *
    * @param type The class.
-   * @param property The property.
+   * @param field The field.
    * @return The setter method if found. Throws exception if no setter is matched.
    */
-  public static Method find(TypeDef type, Property property) {
+  public static Method find(TypeDef type, Field field) {
     TypeDef current = type;
     while (current != null && !current.equals(TypeDef.OBJECT)) {
       // Sort methods by method name length.
@@ -49,13 +50,13 @@ public class Setter {
 
       //1st pass strict
       for (Method method : sortedMethods) {
-        if (isApplicable(method, property, true)) {
+        if (isApplicable(method, field, true)) {
           return method;
         }
       }
       //2nd pass relaxed
       for (Method method : sortedMethods) {
-        if (isApplicable(method, property, false)) {
+        if (isApplicable(method, field, false)) {
           return method;
         }
       }
@@ -67,17 +68,17 @@ public class Setter {
       current = DefinitionRepository.getRepository().getDefinition(fqn);
     }
     throw new SundrException(
-        "No setter found for property: " + property.getName() + " on class: " + type.getFullyQualifiedName());
+        "No setter found for field: " + field.getName() + " on class: " + type.getFullyQualifiedName());
   }
 
   /**
-   * Find the setter of the specified property in the rich type.
+   * Find the setter of the specified field in the rich type.
    *
    * @param richType The class.
-   * @param property The property.
+   * @param field The field.
    * @return The setter method if found. Throws exception if no setter is matched.
    */
-  public static Method find(RichTypeDef richType, Property property) {
+  public static Method find(RichTypeDef richType, Field field) {
     // Sort methods by method name length.
     List<Method> sortedMethods = richType.getAllMethods()
         .stream()
@@ -86,72 +87,72 @@ public class Setter {
 
     //1st pass strict
     for (Method method : sortedMethods) {
-      if (isApplicable(method, property, true)) {
+      if (isApplicable(method, field, true)) {
         return method;
       }
     }
     //2nd pass relaxed
     for (Method method : sortedMethods) {
-      if (isApplicable(method, property, false)) {
+      if (isApplicable(method, field, false)) {
         return method;
       }
     }
     throw new SundrException(
-        "No setter found for property: " + property.getName() + " on class: " + richType.getFullyQualifiedName());
+        "No setter found for field: " + field.getName() + " on class: " + richType.getFullyQualifiedName());
   }
 
-  public static boolean has(TypeDef clazz, Property property) {
+  public static boolean has(TypeDef clazz, Field field) {
     for (Method method : clazz.getMethods()) {
-      if (isApplicable(method, property)) {
+      if (isApplicable(method, field)) {
         return true;
       }
     }
     return false;
   }
 
-  public static boolean isApplicable(Method method, Property property) {
-    return isApplicable(method, property, false);
+  public static boolean isApplicable(Method method, Variable<?> argument) {
+    return isApplicable(method, argument, false);
   }
 
   /**
-   * Returns true if method is a setter of property.
+   * Returns true if method is a setter of field.
    * In strict mode it will not strip non-alphanumeric characters.
    */
-  private static boolean isApplicable(Method method, Property property, boolean strict) {
+  private static boolean isApplicable(Method method, Variable<?> argument, boolean strict) {
     if (method.getArguments().size() != 1) {
       return false;
     }
 
-    if (!method.getArguments().get(0).getTypeRef().equals(property.getTypeRef())) {
+    if (!method.getArguments().get(0).getTypeRef().equals(argument.getTypeRef())) {
       return false;
     }
 
-    String capitalized = capitalizeFirst(property.getName());
+    String capitalized = capitalizeFirst(argument.getName());
     if (method.getName().endsWith("set" + capitalized)) {
       return true;
     }
 
-    if (!strict && method.getName().endsWith("set" + property.getNameCapitalized())) {
+    if (!strict && method.getName().endsWith("set" + argument.getNameCapitalized())) {
       return true;
     }
     return false;
   }
 
-  public static boolean hasOrInherits(RichTypeDef clazz, Property property) {
+  public static boolean hasOrInherits(RichTypeDef clazz, Field field) {
     for (Method method : clazz.getAllMethods()) {
-      if (isApplicable(method, property)) {
+      if (isApplicable(method, field)) {
         return true;
       }
     }
     return false;
   }
 
-  public static boolean hasOrInherits(TypeDef clazz, Property property) {
+  public static boolean hasOrInherits(TypeDef clazz, Field field) {
     TypeDef current = clazz;
     //Iterate parent objects and check for properties with setters but not ctor arguments.
     while (current != null && !current.equals(TypeDef.OBJECT)) {
       for (Method method : current.getMethods()) {
-        if (isApplicable(method, property)) {
+        if (isApplicable(method, field)) {
           return true;
         }
       }
