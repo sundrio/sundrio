@@ -27,7 +27,6 @@ import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.Return;
 import io.sundr.model.RichTypeDef;
-import io.sundr.model.This;
 import io.sundr.model.TypeDef;
 import io.sundr.model.VoidRef;
 import io.sundr.model.functions.Assignable;
@@ -39,20 +38,9 @@ public class Getter {
   public static final String SHOULD_PREFIX = "should";
   public static final VoidRef VOID = new VoidRef();
 
-  /**
-   * Find the getter of the specified field in the type.
-   *
-   * @param clazz The class.
-   * @param field The field.
-   * @return The getter method if found. Throws exception if no getter is matched.
-   */
-  public static Method find(TypeDef clazz, Field field) {
-    return find(clazz, field, false);
-  }
-
   public static Optional<Method> findOptional(TypeDef clazz, Field field) {
     try {
-      return Optional.of(find(clazz, field, false));
+      return Optional.of(find(clazz, field));
     } catch (SundrException e) {
       return Optional.empty();
     }
@@ -63,32 +51,48 @@ public class Getter {
    *
    * @param clazz The class.
    * @param field The field.
-   * @param acceptPrefixless Flag to accept prefixless getters.
    * @return The getter method if found. Throws exception if no getter is matched.
    */
-  public static Method find(TypeDef clazz, Field field, boolean acceptPrefixless) {
+  public static Method find(TypeDef clazz, Field field) {
     RichTypeDef richType = clazz instanceof RichTypeDef ? (RichTypeDef) clazz : TypeArguments.apply(clazz);
     //1st pass strict
-    for (Method method : richType.getAllMethods()) {
-      if ((Record.is(clazz) && isApplicable(method, field, true, true)) || (isApplicable(method, field, true, false))) {
-        return method;
-      }
-    }
-    //2nd pass relaxed
-    for (Method method : richType.getAllMethods()) {
-      if (isApplicable(method, field, false, false)) {
-        return method;
-      }
-    }
+    boolean acceptPrefixless = Record.is(clazz);
 
-    //3nd pass more relaxed
-    if (acceptPrefixless) {
-      for (Method method : richType.getAllMethods()) {
-        if (isApplicable(method, field, false, true)) {
+    String capitalized = capitalizeFirst(field.getName());
+    String fullyCapitalized = field.getNameCapitalized();
+    boolean nonAlpha = !Character.isAlphabetic(field.getName().charAt(0));
+    String[] prefixes = new String[] { GET_PREFIX, IS_PREFIX, SHOULD_PREFIX };
+
+    for (Method method : richType.getAllMethods()) {
+      if (!Assignable.isAssignable(method.getReturnType()).from(field.getTypeRef())) {
+        continue;
+      }
+
+      if (acceptPrefixless) {
+        if (method.getName().equals(field.getName())) {
           return method;
+        }
+        continue;
+      }
+      boolean possibleMatch = false;
+      if (method.getName().endsWith(capitalized)) {
+        possibleMatch = true;
+      } else if (method.getName().endsWith(fullyCapitalized)) {
+        possibleMatch = true;
+      } else if (nonAlpha && method.getName().endsWith(field.getName())) {
+        //Some frameworks/tools consider valid getters cases like: get$ref() (e.g. jsonschema2pojo).
+        possibleMatch = true;
+      }
+      if (possibleMatch) {
+        for (int i = 0; i < prefixes.length; i++) {
+          if (method.getName().startsWith(prefixes[i])
+              && method.getName().length() == prefixes[i].length() + field.getName().length()) {
+            return method;
+          }
         }
       }
     }
+
     throw new SundrException(
         "No getter found for field: [" + field.toString() + "] on class: " + clazz.getFullyQualifiedName()
             + ", getters found: ["
@@ -149,63 +153,6 @@ public class Getter {
 
     if (method.getName().startsWith(SHOULD_PREFIX) && Types.isBoolean(method.getReturnType())) {
       return length > SHOULD_PREFIX.length();
-    }
-    return false;
-  }
-
-  private static boolean isApplicable(Method method, Field field) {
-    return isApplicable(method, field, false, false);
-  }
-
-  /**
-   * Returns true if method is a getter of field.
-   * In strict mode it will not strip non-alphanumeric characters.
-   */
-  private static boolean isApplicable(Method method, Field field, boolean strict, boolean acceptPrefixless) {
-    if (!Assignable.isAssignable(method.getReturnType()).from(field.getTypeRef())) {
-      return false;
-    }
-
-    String capitalized = capitalizeFirst(field.getName());
-    if (method.getName().endsWith(GET_PREFIX + capitalized)) {
-      return true;
-    }
-
-    if (method.getName().endsWith(IS_PREFIX + capitalized)) {
-      return true;
-    }
-
-    if (method.getName().endsWith(SHOULD_PREFIX + capitalized)) {
-      return true;
-    }
-
-    if (acceptPrefixless && method.getName().endsWith(field.getName())) {
-      return true;
-    }
-
-    if (!strict) {
-      if (method.getName().endsWith(GET_PREFIX + field.getNameCapitalized())) {
-        return true;
-      }
-
-      if (method.getName().endsWith(IS_PREFIX + field.getNameCapitalized())) {
-        return true;
-      }
-
-      //Some frameworks/tools consider valid getters cases like: get$ref() (e.g. jsonschema2pojo).
-      if (method.getName().endsWith(GET_PREFIX + field.getName()) && !Character.isAlphabetic(field.getName().charAt(0))) {
-        return true;
-      }
-
-      if (method.getName().endsWith(IS_PREFIX + field.getName()) && !Character.isAlphabetic(field.getName().charAt(0))) {
-        return true;
-      }
-
-      if (method.getName().endsWith(SHOULD_PREFIX + field.getName())
-          && !Character.isAlphabetic(field.getName().charAt(0))) {
-        return true;
-      }
-
     }
     return false;
   }

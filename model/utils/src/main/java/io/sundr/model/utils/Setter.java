@@ -128,11 +128,11 @@ public class Setter {
     }
 
     String capitalized = capitalizeFirst(argument.getName());
-    if (method.getName().endsWith("set" + capitalized)) {
+    if (method.getName().equals("set" + capitalized)) {
       return true;
     }
 
-    if (!strict && method.getName().endsWith("set" + argument.getNameCapitalized())) {
+    if (!strict && method.getName().equals("set" + argument.getNameCapitalized())) {
       return true;
     }
     return false;
