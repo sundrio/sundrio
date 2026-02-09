@@ -19,10 +19,11 @@ package io.sundr.adapter.source;
 
 import java.util.function.Function;
 
+import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 
@@ -50,13 +51,11 @@ public class TypeToTypeRef implements Function<Type, TypeRef> {
       return new VoidRef();
     } else if (type instanceof WildcardType) {
       return new WildcardRef();
-    } else if (type instanceof ReferenceType) {
-      ReferenceType referenceType = (ReferenceType) type;
-      int dimensions = referenceType.getArrayCount();
-      TypeRef typeRef = apply(referenceType.getType());
-      if (dimensions == 0) {
-        return typeRef;
-      } else if (typeRef instanceof ClassRef) {
+    } else if (type instanceof ArrayType) {
+      ArrayType arrayType = (ArrayType) type;
+      int dimensions = arrayType.getArrayLevel();
+      TypeRef typeRef = apply(arrayType.getElementType());
+      if (typeRef instanceof ClassRef) {
         return new ClassRefBuilder((ClassRef) typeRef).withDimensions(dimensions).build();
       } else if (typeRef instanceof PrimitiveRef) {
         return new PrimitiveRefBuilder((PrimitiveRef) typeRef).withDimensions(dimensions).build();
@@ -68,6 +67,9 @@ public class TypeToTypeRef implements Function<Type, TypeRef> {
       return new PrimitiveRefBuilder().withName(primitiveType.getType().name()).build();
     } else if (type instanceof ClassOrInterfaceType) {
       return classOrInterfaceToTypeRef.apply((ClassOrInterfaceType) type);
+    } else if (type instanceof VarType) {
+      // var keyword - we can't infer the type without full type resolution, use Object
+      return ClassRef.OBJECT;
     }
     throw new IllegalArgumentException("Can't handle type:[" + type + "].");
   }

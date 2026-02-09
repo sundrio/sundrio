@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.body.VariableDeclaratorId;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
@@ -95,17 +95,17 @@ public class ExpressionConverter {
     // Create adapters following the same pattern as TypeDeclarationToTypeDef
     ClassOrInterfaceToTypeRef classOrInterfaceToTypeRef = new ClassOrInterfaceToTypeRef();
     TypeToTypeRef typeAdapter = new TypeToTypeRef(classOrInterfaceToTypeRef);
-    TypeRef typeRef = typeAdapter.apply(expr.getType());
+    TypeRef typeRef = typeAdapter.apply(expr.getCommonType());
 
-    List<LocalVariable> variables = expr.getVars().stream()
-        .map(v -> v.getId().getName())
+    List<LocalVariable> variables = expr.getVariables().stream()
+        .map(v -> v.getNameAsString())
         .map(n -> LocalVariable.newLocalVariable(typeRef, n))
         .collect(Collectors.toList());
 
     // Handle initialization if present
     Optional<io.sundr.model.Expression> initValue = Optional.empty();
-    if (!expr.getVars().isEmpty() && expr.getVars().get(0).getInit() != null) {
-      initValue = Optional.of(convertExpression(expr.getVars().get(0).getInit()));
+    if (!expr.getVariables().isEmpty() && expr.getVariables().get(0).getInitializer().isPresent()) {
+      initValue = Optional.of(convertExpression(expr.getVariables().get(0).getInitializer().get()));
     }
 
     return new Declare(variables, initValue);
@@ -117,7 +117,7 @@ public class ExpressionConverter {
     TypeToTypeRef typeAdapter = new TypeToTypeRef(classOrInterfaceToTypeRef);
     TypeRef typeRef = typeAdapter.apply(parameter.getType());
 
-    return Argument.newArgument(typeRef, parameter.getId().getName());
+    return Argument.newArgument(typeRef, parameter.getNameAsString());
   }
 
   public static io.sundr.model.Expression convertExpression(Expression expression) {
@@ -127,22 +127,22 @@ public class ExpressionConverter {
     } else if (expression instanceof UnaryExpr) {
       UnaryExpr unaryExpr = (UnaryExpr) expression;
       switch (unaryExpr.getOperator()) {
-        case positive:
-          return new Positive(convertExpression(unaryExpr.getExpr()));
-        case negative:
-          return new Negative(convertExpression(unaryExpr.getExpr()));
-        case preIncrement:
-          return new PreIncrement(convertExpression(unaryExpr.getExpr()));
-        case preDecrement:
-          return new PreDecrement(convertExpression(unaryExpr.getExpr()));
-        case posIncrement:
-          return new PostIncrement(convertExpression(unaryExpr.getExpr()));
-        case posDecrement:
-          return new PostDecrement(convertExpression(unaryExpr.getExpr()));
-        case not:
-          return new Not(convertExpression(unaryExpr.getExpr()));
-        case inverse:
-          return new Inverse(convertExpression(unaryExpr.getExpr()));
+        case PLUS:
+          return new Positive(convertExpression(unaryExpr.getExpression()));
+        case MINUS:
+          return new Negative(convertExpression(unaryExpr.getExpression()));
+        case PREFIX_INCREMENT:
+          return new PreIncrement(convertExpression(unaryExpr.getExpression()));
+        case PREFIX_DECREMENT:
+          return new PreDecrement(convertExpression(unaryExpr.getExpression()));
+        case POSTFIX_INCREMENT:
+          return new PostIncrement(convertExpression(unaryExpr.getExpression()));
+        case POSTFIX_DECREMENT:
+          return new PostDecrement(convertExpression(unaryExpr.getExpression()));
+        case LOGICAL_COMPLEMENT:
+          return new Not(convertExpression(unaryExpr.getExpression()));
+        case BITWISE_COMPLEMENT:
+          return new Inverse(convertExpression(unaryExpr.getExpression()));
       }
     } else if (expression instanceof BinaryExpr) {
       BinaryExpr binaryExpr = (BinaryExpr) expression;
@@ -155,50 +155,50 @@ public class ExpressionConverter {
       }
 
       switch (binaryExpr.getOperator()) {
-        case plus:
+        case PLUS:
           return new Plus(left, right);
-        case minus:
+        case MINUS:
           return new Minus(left, right);
-        case and:
+        case AND:
           return new LogicalAnd(left, right);
-        case or:
+        case OR:
           return new LogicalOr(left, right);
-        case binOr:
+        case BINARY_OR:
           return new BitwiseOr(left, right);
-        case binAnd:
+        case BINARY_AND:
           return new BitwiseAnd(left, right);
-        case xor:
+        case XOR:
           return new Xor(left, right);
-        case equals:
+        case EQUALS:
           return new Equals(left, right);
-        case notEquals:
+        case NOT_EQUALS:
           return new NotEquals(left, right);
-        case greater:
+        case GREATER:
           return new GreaterThan(left, right);
-        case greaterEquals:
+        case GREATER_EQUALS:
           return new GreaterThanOrEqual(left, right);
-        case less:
+        case LESS:
           return new LessThan(left, right);
-        case lessEquals:
+        case LESS_EQUALS:
           return new LessThanOrEqual(left, right);
-        case times:
+        case MULTIPLY:
           return new Multiply(left, right);
-        case divide:
+        case DIVIDE:
           return new Divide(left, right);
-        case remainder:
+        case REMAINDER:
           return new Modulo(left, right);
-        case rSignedShift:
+        case SIGNED_RIGHT_SHIFT:
           return new RightShift(left, right);
-        case rUnsignedShift:
+        case UNSIGNED_RIGHT_SHIFT:
           return new RightUnsignedShift(left, right);
-        case lShift:
+        case LEFT_SHIFT:
           return new LeftShift(left, right);
       }
       // If we get here, there's an unhandled binary operator
       return null;
     } else if (expression instanceof NameExpr) {
       NameExpr nameExpr = (NameExpr) expression;
-      return new ContextRef(nameExpr.getName());
+      return new ContextRef(nameExpr.getNameAsString());
     } else if (expression instanceof StringLiteralExpr) {
       StringLiteralExpr stringLiteralExpr = (StringLiteralExpr) expression;
       return new ValueRef(stringLiteralExpr.getValue());
@@ -223,29 +223,29 @@ public class ExpressionConverter {
       ClassRef classRef = (ClassRef) SOURCE_ADAPTER.getReferenceAdapterFunction().apply(objectCreationExpr.getType());
       List<TypeRef> parameters = new ArrayList<>();
       List<io.sundr.model.Expression> arguments = new ArrayList<>();
-      for (Type type : objectCreationExpr.getTypeArgs()) {
+      for (Type type : objectCreationExpr.getTypeArguments().orElse(new NodeList<>())) {
         if (type instanceof ClassOrInterfaceType) {
           parameters.add(SOURCE_ADAPTER.getReferenceAdapterFunction().apply((ClassOrInterfaceType) type));
         }
       }
-      for (Expression argument : objectCreationExpr.getArgs()) {
+      for (Expression argument : objectCreationExpr.getArguments()) {
         arguments.add(convertExpression(argument));
       }
       return new Construct(classRef, parameters, arguments);
     } else if (expression instanceof MethodCallExpr) {
       MethodCallExpr methodCallExpr = (MethodCallExpr) expression;
-      String methodName = methodCallExpr.getName();
+      String methodName = methodCallExpr.getNameAsString();
       List<TypeRef> parameters = new ArrayList<>();
       List<io.sundr.model.Expression> arguments = new ArrayList<>();
-      for (Type type : methodCallExpr.getTypeArgs()) {
+      for (Type type : methodCallExpr.getTypeArguments().orElse(new NodeList<>())) {
         if (type instanceof ClassOrInterfaceType) {
           parameters.add(SOURCE_ADAPTER.getReferenceAdapterFunction().apply((ClassOrInterfaceType) type));
         }
       }
-      for (Expression argument : methodCallExpr.getArgs()) {
+      for (Expression argument : methodCallExpr.getArguments()) {
         arguments.add(convertExpression(argument));
       }
-      io.sundr.model.Expression scope = methodCallExpr.getScope() != null ? convertExpression(methodCallExpr.getScope()) : null;
+      io.sundr.model.Expression scope = methodCallExpr.getScope().map(ExpressionConverter::convertExpression).orElse(null);
       return new MethodCall(methodName, scope, parameters, arguments);
     } else if (expression instanceof LambdaExpr) {
       LambdaExpr lambdaExpr = (LambdaExpr) expression;
@@ -263,7 +263,7 @@ public class ExpressionConverter {
         bodyStatement = StatementConverter.convertStatement(lambdaBody);
       }
 
-      return new Lambda(lambdaExpr.getParameters().stream().map(Parameter::getId).map(VariableDeclaratorId::getName)
+      return new Lambda(lambdaExpr.getParameters().stream().map(Parameter::getNameAsString)
           .collect(Collectors.toList()), bodyStatement);
     } else if (expression instanceof EnclosedExpr) {
       EnclosedExpr enclosedExpr = (EnclosedExpr) expression;
@@ -272,17 +272,17 @@ public class ExpressionConverter {
       InstanceOfExpr instanceOfExpr = (InstanceOfExpr) expression;
       com.github.javaparser.ast.type.Type type = instanceOfExpr.getType();
       if (type instanceof com.github.javaparser.ast.type.ClassOrInterfaceType) {
-        return new InstanceOf(convertExpression(instanceOfExpr.getExpr()),
+        return new InstanceOf(convertExpression(instanceOfExpr.getExpression()),
             (ClassRef) SOURCE_ADAPTER.getReferenceAdapterFunction()
                 .apply((com.github.javaparser.ast.type.ClassOrInterfaceType) type));
       } else {
         // Handle other reference types by converting to TypeRef first
         TypeRef typeRef = TYPEREF_ADAPTER.apply(type);
         if (typeRef instanceof ClassRef) {
-          return new InstanceOf(convertExpression(instanceOfExpr.getExpr()), (ClassRef) typeRef);
+          return new InstanceOf(convertExpression(instanceOfExpr.getExpression()), (ClassRef) typeRef);
         } else {
           // For non-class types, fall back to Object
-          return new InstanceOf(convertExpression(instanceOfExpr.getExpr()), OBJECT);
+          return new InstanceOf(convertExpression(instanceOfExpr.getExpression()), OBJECT);
         }
       }
     } else if (expression instanceof ArrayAccessExpr) {
@@ -307,14 +307,14 @@ public class ExpressionConverter {
       VariableDeclarationExpr varDeclExpr = (VariableDeclarationExpr) expression;
       // For variable declarations in expression context, we create a simple declaration
       // without trying to resolve the full type, to avoid context issues
-      if (!varDeclExpr.getVars().isEmpty()) {
-        VariableDeclarator var = varDeclExpr.getVars().get(0);
-        String varName = var.getId().getName();
-        TypeRef typeRef = TYPEREF_ADAPTER.apply(varDeclExpr.getType());
+      if (!varDeclExpr.getVariables().isEmpty()) {
+        VariableDeclarator var = varDeclExpr.getVariables().get(0);
+        String varName = var.getNameAsString();
+        TypeRef typeRef = TYPEREF_ADAPTER.apply(varDeclExpr.getCommonType());
         LocalVariable variable = LocalVariable.newLocalVariable(typeRef, varName);
 
-        if (var.getInit() != null) {
-          io.sundr.model.Expression initExpr = convertExpression(var.getInit());
+        if (var.getInitializer().isPresent()) {
+          io.sundr.model.Expression initExpr = convertExpression(var.getInitializer().get());
           return new Declare(variable, initExpr);
         } else {
           return new Declare(variable);
@@ -323,7 +323,7 @@ public class ExpressionConverter {
       return null;
     } else if (expression instanceof FieldAccessExpr) {
       FieldAccessExpr fieldAccessExpr = (FieldAccessExpr) expression;
-      String fieldName = fieldAccessExpr.getFieldExpr().getName();
+      String fieldName = fieldAccessExpr.getNameAsString();
       io.sundr.model.Expression scope = convertExpression(fieldAccessExpr.getScope());
       return new PropertyRef(fieldName, scope);
     } else if (expression instanceof TypeExpr) {
@@ -342,7 +342,7 @@ public class ExpressionConverter {
     } else if (expression instanceof CastExpr) {
       CastExpr castExpr = (CastExpr) expression;
       TypeRef targetType = TYPEREF_ADAPTER.apply(castExpr.getType());
-      io.sundr.model.Expression expr = convertExpression(castExpr.getExpr());
+      io.sundr.model.Expression expr = convertExpression(castExpr.getExpression());
       return new Cast(targetType, expr);
     }
     return null;

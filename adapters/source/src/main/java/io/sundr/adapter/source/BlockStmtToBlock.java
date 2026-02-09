@@ -32,7 +32,8 @@ public class BlockStmtToBlock implements Function<BlockStmt, Block> {
 
   @Override
   public Block apply(BlockStmt block) {
-    List<Statement> statements = block != null && block.getStmts() != null ? block.getStmts() : Collections.emptyList();
+    List<Statement> statements = block != null && block.getStatements() != null ? block.getStatements()
+        : Collections.emptyList();
     List<io.sundr.model.Statement> converted = new ArrayList<>();
     for (Statement statement : statements) {
       converted.add(StatementConverter.convertStatement(statement));

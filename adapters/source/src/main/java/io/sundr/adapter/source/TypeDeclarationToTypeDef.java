@@ -25,8 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.TypeParameter;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.AnnotationMemberDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
@@ -44,6 +45,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.TypeParameter;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.model.AnnotationRef;
@@ -108,11 +110,11 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
         parameters.add(typeParameterToTypeParamDef.apply(typeParameter));
       }
 
-      for (ClassOrInterfaceType classOrInterfaceType : decl.getExtends()) {
+      for (ClassOrInterfaceType classOrInterfaceType : decl.getExtendedTypes()) {
         extendsList.add((ClassRef) classOrInterfaceToTypeRef.apply(classOrInterfaceType));
       }
 
-      for (ClassOrInterfaceType classOrInterfaceType : decl.getImplements()) {
+      for (ClassOrInterfaceType classOrInterfaceType : decl.getImplementedTypes()) {
         implementsList.add((ClassRef) classOrInterfaceToTypeRef.apply(classOrInterfaceType));
       }
 
@@ -120,7 +122,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
         if (bodyDeclaration instanceof FieldDeclaration) {
           FieldDeclaration fieldDeclaration = (FieldDeclaration) bodyDeclaration;
           for (VariableDeclarator var : fieldDeclaration.getVariables()) {
-            TypeRef fieldDeclRef = typeToTypeRef.apply(fieldDeclaration.getType());
+            TypeRef fieldDeclRef = typeToTypeRef.apply(var.getType());
             TypeRef typeRef = checkAgainstTypeParamRef(fieldDeclRef, parameters);
 
             List<AnnotationRef> fieldAnnotations = new ArrayList<AnnotationRef>();
@@ -128,10 +130,10 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               fieldAnnotations.add(ANNOTATIONREF.apply(annotationExpressions));
             }
 
-            fields.add(new FieldBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
+            fields.add(new FieldBuilder().withName(var.getNameAsString()).withTypeRef(typeRef)
                 .withAnnotations(fieldAnnotations)
-                .withModifiers(Modifiers.from(fieldDeclaration.getModifiers()))
-                .addToAttributes(Attributeable.INIT, var.getInit() != null ? var.getInit().toStringWithoutComments() : null)
+                .withModifiers(Modifiers.from(convertModifiers(fieldDeclaration.getModifiers())))
+                .addToAttributes(Attributeable.INIT, var.getInitializer().map(e -> e.toString()).orElse(null))
                 .build());
           }
         } else if (bodyDeclaration instanceof MethodDeclaration) {
@@ -142,8 +144,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           for (AnnotationExpr annotationExpr : methodDeclaration.getAnnotations()) {
             methodAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
           }
-          for (ReferenceType referenceType : methodDeclaration.getThrows()) {
-            TypeRef exceptionRef = typeToTypeRef.apply(referenceType.getType());
+          for (ReferenceType referenceType : methodDeclaration.getThrownExceptions()) {
+            TypeRef exceptionRef = typeToTypeRef.apply(referenceType);
             if (exceptionRef instanceof ClassRef) {
               exceptions.add((ClassRef) exceptionRef);
             }
@@ -163,7 +165,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
             }
 
-            arguments.add(new ArgumentBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+            arguments.add(new ArgumentBuilder().withName(parameter.getNameAsString()).withTypeRef(typeRef)
                 .withAnnotations(paramAnnotations).build());
           }
 
@@ -173,11 +175,12 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           }
 
           TypeRef returnType = checkAgainstTypeParamRef(typeToTypeRef.apply(methodDeclaration.getType()), parameters);
-          methods.add(new MethodBuilder().withName(methodDeclaration.getName())
-              .withDefaultMethod(methodDeclaration.isDefault()).withModifiers(Modifiers.from(methodDeclaration.getModifiers()))
+          methods.add(new MethodBuilder().withName(methodDeclaration.getNameAsString())
+              .withDefaultMethod(methodDeclaration.isDefault())
+              .withModifiers(Modifiers.from(convertModifiers(methodDeclaration.getModifiers())))
               .withParameters(typeParamDefs).withVarArgPreferred(preferVarArg).withReturnType(returnType)
               .withExceptions(exceptions).withArguments(arguments).withAnnotations(methodAnnotations)
-              .withBlock(BLOCK.apply(methodDeclaration.getBody())).build());
+              .withBlock(methodDeclaration.getBody().map(BLOCK).orElse(null)).build());
 
         } else if (bodyDeclaration instanceof ConstructorDeclaration) {
           ConstructorDeclaration constructorDeclaration = (ConstructorDeclaration) bodyDeclaration;
@@ -189,8 +192,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           for (AnnotationExpr annotationExpr : constructorDeclaration.getAnnotations()) {
             ctorAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
           }
-          for (ReferenceType referenceType : constructorDeclaration.getThrows()) {
-            TypeRef exceptionRef = typeToTypeRef.apply(referenceType.getType());
+          for (ReferenceType referenceType : constructorDeclaration.getThrownExceptions()) {
+            TypeRef exceptionRef = typeToTypeRef.apply(referenceType);
             exceptions.add((ClassRef) exceptionRef);
           }
           for (Parameter parameter : constructorDeclaration.getParameters()) {
@@ -205,23 +208,26 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
             }
 
-            arguments.add(new ArgumentBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+            arguments.add(new ArgumentBuilder().withName(parameter.getNameAsString()).withTypeRef(typeRef)
                 .withAnnotations(ctorParamAnnotations).build());
           }
-          constructors.add(new MethodBuilder().withModifiers(Modifiers.from(constructorDeclaration.getModifiers()))
-              .withVarArgPreferred(preferVarArg).withExceptions(exceptions)
-              .withArguments(arguments).withAnnotations(ctorAnnotations)
-              .withBlock(BLOCK.apply(constructorDeclaration.getBlock())).build());
+          constructors
+              .add(new MethodBuilder().withModifiers(Modifiers.from(convertModifiers(constructorDeclaration.getModifiers())))
+                  .withVarArgPreferred(preferVarArg).withExceptions(exceptions)
+                  .withArguments(arguments).withAnnotations(ctorAnnotations)
+                  .withBlock(BLOCK.apply(constructorDeclaration.getBody())).build());
         }
       }
 
       return context.getDefinitionRepository()
-          .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
-              .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters).withExtendsList(extendsList)
-              .withImplementsList(implementsList).withFields(fields).withMethods(methods)
-              .withConstructors(constructors).withAnnotations(annotations)
-              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
-              .accept(new TypeDefContextRefResolver()).build());
+          .register(
+              new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getNameAsString())
+                  .withModifiers(Modifiers.from(convertModifiers(type.getModifiers()))).withParameters(parameters)
+                  .withExtendsList(extendsList)
+                  .withImplementsList(implementsList).withFields(fields).withMethods(methods)
+                  .withConstructors(constructors).withAnnotations(annotations)
+                  .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
+                  .accept(new TypeDefContextRefResolver()).build());
     }
 
     if (type instanceof AnnotationDeclaration) {
@@ -233,12 +239,12 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
         if (bodyDeclaration instanceof AnnotationMemberDeclaration) {
           Map<AttributeKey, Object> attributes = new HashMap<>();
           AnnotationMemberDeclaration annotationMemberDeclaration = (AnnotationMemberDeclaration) bodyDeclaration;
-          if (annotationMemberDeclaration.getDefaultValue() != null) {
-            attributes.put(Attributeable.DEFAULT_VALUE, annotationMemberDeclaration.getDefaultValue().toString());
-          }
+          annotationMemberDeclaration.getDefaultValue()
+              .ifPresent(v -> attributes.put(Attributeable.DEFAULT_VALUE, v.toString()));
           TypeRef returnType = typeToTypeRef.apply(annotationMemberDeclaration.getType());
-          methods.add(new MethodBuilder().withName(annotationMemberDeclaration.getName())
-              .withModifiers(Modifiers.from(annotationMemberDeclaration.getModifiers())).withReturnType(returnType)
+          methods.add(new MethodBuilder().withName(annotationMemberDeclaration.getNameAsString())
+              .withModifiers(Modifiers.from(convertModifiers(annotationMemberDeclaration.getModifiers())))
+              .withReturnType(returnType)
               .withAttributes(attributes)
               .build());
         }
@@ -250,10 +256,12 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
       }
 
       return context.getDefinitionRepository()
-          .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
-              .withModifiers(Modifiers.from(type.getModifiers())).withMethods(methods).withAnnotations(annotations)
-              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
-              .accept(new TypeDefContextRefResolver()).build());
+          .register(
+              new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getNameAsString())
+                  .withModifiers(Modifiers.from(convertModifiers(type.getModifiers()))).withMethods(methods)
+                  .withAnnotations(annotations)
+                  .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
+                  .accept(new TypeDefContextRefResolver()).build());
     }
 
     if (type instanceof EnumDeclaration) {
@@ -271,7 +279,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
         annotations.add(ANNOTATIONREF.apply(annotationExpr));
       }
 
-      for (ClassOrInterfaceType classOrInterfaceType : decl.getImplements()) {
+      for (ClassOrInterfaceType classOrInterfaceType : decl.getImplementedTypes()) {
         implementsList.add((ClassRef) classOrInterfaceToTypeRef.apply(classOrInterfaceType));
       }
 
@@ -283,9 +291,9 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
         }
 
         // Create a property for each enum constant
-        String enumTypeName = PACKAGENAME.apply(type) + "." + decl.getName();
+        String enumTypeName = PACKAGENAME.apply(type) + "." + decl.getNameAsString();
         ClassRef enumType = new ClassRef(enumTypeName, 0, new ArrayList<>(), new HashMap<>());
-        fields.add(new FieldBuilder().withName(enumConstant.getName())
+        fields.add(new FieldBuilder().withName(enumConstant.getNameAsString())
             .withTypeRef(enumType)
             .withAnnotations(enumAnnotations)
             .build());
@@ -296,7 +304,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
         if (bodyDeclaration instanceof FieldDeclaration) {
           FieldDeclaration fieldDeclaration = (FieldDeclaration) bodyDeclaration;
           for (VariableDeclarator var : fieldDeclaration.getVariables()) {
-            TypeRef fieldDeclRef = typeToTypeRef.apply(fieldDeclaration.getType());
+            TypeRef fieldDeclRef = typeToTypeRef.apply(var.getType());
             TypeRef typeRef = checkAgainstTypeParamRef(fieldDeclRef, parameters);
 
             List<AnnotationRef> fieldAnnotations = new ArrayList<AnnotationRef>();
@@ -304,9 +312,9 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               fieldAnnotations.add(ANNOTATIONREF.apply(annotationExpressions));
             }
 
-            fields.add(new FieldBuilder().withName(var.getId().getName()).withTypeRef(typeRef)
+            fields.add(new FieldBuilder().withName(var.getNameAsString()).withTypeRef(typeRef)
                 .withAnnotations(fieldAnnotations)
-                .withModifiers(Modifiers.from(fieldDeclaration.getModifiers()))
+                .withModifiers(Modifiers.from(convertModifiers(fieldDeclaration.getModifiers())))
                 .build());
           }
         } else if (bodyDeclaration instanceof MethodDeclaration) {
@@ -319,8 +327,8 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
             methodAnnotations.add(ANNOTATIONREF.apply(annotationExpr));
           }
 
-          for (ReferenceType referenceType : methodDeclaration.getThrows()) {
-            TypeRef exceptionRef = typeToTypeRef.apply(referenceType.getType());
+          for (ReferenceType referenceType : methodDeclaration.getThrownExceptions()) {
+            TypeRef exceptionRef = typeToTypeRef.apply(referenceType);
             if (exceptionRef instanceof ClassRef) {
               exceptions.add((ClassRef) exceptionRef);
             }
@@ -340,7 +348,7 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
               typeRef = typeRef.withDimensions(typeRef.getDimensions() + 1);
             }
 
-            arguments.add(new ArgumentBuilder().withName(parameter.getId().getName()).withTypeRef(typeRef)
+            arguments.add(new ArgumentBuilder().withName(parameter.getNameAsString()).withTypeRef(typeRef)
                 .withAnnotations(paramAnnotations).build());
           }
 
@@ -350,8 +358,9 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
           }
 
           TypeRef returnType = checkAgainstTypeParamRef(typeToTypeRef.apply(methodDeclaration.getType()), parameters);
-          methods.add(new MethodBuilder().withName(methodDeclaration.getName())
-              .withDefaultMethod(methodDeclaration.isDefault()).withModifiers(Modifiers.from(methodDeclaration.getModifiers()))
+          methods.add(new MethodBuilder().withName(methodDeclaration.getNameAsString())
+              .withDefaultMethod(methodDeclaration.isDefault())
+              .withModifiers(Modifiers.from(convertModifiers(methodDeclaration.getModifiers())))
               .withParameters(typeParamDefs).withVarArgPreferred(preferVarArg).withReturnType(returnType)
               .withExceptions(exceptions).withArguments(arguments).withAnnotations(methodAnnotations)
               .build()); // No method body to avoid converter dependency issues
@@ -359,12 +368,13 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
       }
 
       return context.getDefinitionRepository()
-          .register(new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getName())
-              .withModifiers(Modifiers.from(type.getModifiers())).withParameters(parameters)
-              .withImplementsList(implementsList).withFields(fields).withMethods(methods)
-              .withConstructors(constructors).withAnnotations(annotations)
-              .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
-              .accept(new TypeDefContextRefResolver()).build());
+          .register(
+              new TypeDefBuilder().withKind(kind).withPackageName(PACKAGENAME.apply(type)).withName(decl.getNameAsString())
+                  .withModifiers(Modifiers.from(convertModifiers(type.getModifiers()))).withParameters(parameters)
+                  .withImplementsList(implementsList).withFields(fields).withMethods(methods)
+                  .withConstructors(constructors).withAnnotations(annotations)
+                  .addToAttributes(TypeDef.ALSO_IMPORT, IMPORTS.apply(type))
+                  .accept(new TypeDefContextRefResolver()).build());
     }
     throw new IllegalArgumentException("Unsupported TypeDeclaration:[" + type + "].");
   }
@@ -377,5 +387,49 @@ public class TypeDeclarationToTypeDef implements Function<TypeDeclaration, TypeD
       return parameterDef.toReference();
     }
     return typeRef;
+  }
+
+  private static int convertModifiers(NodeList<Modifier> modifiers) {
+    int result = 0;
+    for (Modifier modifier : modifiers) {
+      switch (modifier.getKeyword()) {
+        case PUBLIC:
+          result |= java.lang.reflect.Modifier.PUBLIC;
+          break;
+        case PRIVATE:
+          result |= java.lang.reflect.Modifier.PRIVATE;
+          break;
+        case PROTECTED:
+          result |= java.lang.reflect.Modifier.PROTECTED;
+          break;
+        case STATIC:
+          result |= java.lang.reflect.Modifier.STATIC;
+          break;
+        case FINAL:
+          result |= java.lang.reflect.Modifier.FINAL;
+          break;
+        case ABSTRACT:
+          result |= java.lang.reflect.Modifier.ABSTRACT;
+          break;
+        case SYNCHRONIZED:
+          result |= java.lang.reflect.Modifier.SYNCHRONIZED;
+          break;
+        case NATIVE:
+          result |= java.lang.reflect.Modifier.NATIVE;
+          break;
+        case TRANSIENT:
+          result |= java.lang.reflect.Modifier.TRANSIENT;
+          break;
+        case VOLATILE:
+          result |= java.lang.reflect.Modifier.VOLATILE;
+          break;
+        case STRICTFP:
+          result |= java.lang.reflect.Modifier.STRICT;
+          break;
+        default:
+          break;
+      }
+    }
+    return result;
   }
 }

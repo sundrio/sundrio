@@ -20,8 +20,8 @@ package io.sundr.adapter.source;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.github.javaparser.ast.TypeParameter;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.TypeParameter;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeParamDef;
@@ -38,7 +38,7 @@ public class TypeParameterToTypeParamDef implements Function<TypeParameter, Type
 
   @Override
   public TypeParamDef apply(TypeParameter typeParameter) {
-    return new TypeParamDefBuilder().withName(typeParameter.getName()).withBounds(typeParameter.getTypeBound().stream()
+    return new TypeParamDefBuilder().withName(typeParameter.getNameAsString()).withBounds(typeParameter.getTypeBound().stream()
         .map(b -> (ClassRef) classOrInterfaceToTypeRef.apply(b)).collect(Collectors.toList())).build();
   }
 }

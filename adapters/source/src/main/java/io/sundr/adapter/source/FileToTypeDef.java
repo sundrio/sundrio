@@ -21,7 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.function.Function;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
@@ -44,7 +44,7 @@ public class FileToTypeDef implements Function<File, TypeDef> {
   @Override
   public TypeDef apply(File file) {
     try (FileInputStream is = new FileInputStream(file)) {
-      CompilationUnit cu = JavaParser.parse(is);
+      CompilationUnit cu = StaticJavaParser.parse(is);
       TypeDeclaration typeDeclaration = cu.getTypes().get(0);
       return typeDeclarationToTypeDef.apply(typeDeclaration);
     } catch (Exception e) {

@@ -21,11 +21,11 @@ import java.util.function.Function;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.NamedNode;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.expr.QualifiedNameExpr;
+import com.github.javaparser.ast.expr.Name;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
 public class NodeToPackage implements Function<Node, String> {
 
@@ -35,32 +35,29 @@ public class NodeToPackage implements Function<Node, String> {
   @Override
   public String apply(Node node) {
     String name = null;
-    if (node instanceof NamedNode) {
-      name = ((NamedNode) node).getName();
-    }
-
-    if (node instanceof AnnotationExpr) {
-      name = ((AnnotationExpr) node).getName().getName();
+    if (node instanceof TypeDeclaration) {
+      name = ((TypeDeclaration<?>) node).getNameAsString();
+    } else if (node instanceof AnnotationExpr) {
+      name = ((AnnotationExpr) node).getNameAsString();
+    } else if (node instanceof ClassOrInterfaceType) {
+      name = ((ClassOrInterfaceType) node).getNameAsString();
     }
 
     Node current = node;
     while (!(current instanceof CompilationUnit)) {
-      current = current.getParentNode();
+      current = current.getParentNode().orElse(null);
+      if (current == null) {
+        return "";
+      }
     }
 
     CompilationUnit compilationUnit = (CompilationUnit) current;
 
     for (ImportDeclaration importDecl : compilationUnit.getImports()) {
-      NameExpr importExpr = importDecl.getName();
-      if (importExpr instanceof QualifiedNameExpr) {
-        QualifiedNameExpr qualifiedNameExpr = (QualifiedNameExpr) importExpr;
-        String className = qualifiedNameExpr.getName();
-        if (name.equals(className)) {
-          return qualifiedNameExpr.getQualifier().toString();
-        }
-      } else if (importDecl.getName().getName().endsWith(SEPARATOR + name)) {
-        String importName = importDecl.getName().getName();
-        return importName.substring(0, importName.length() - name.length() - 1);
+      Name importName = importDecl.getName();
+      String className = importName.getIdentifier();
+      if (name != null && name.equals(className)) {
+        return importName.getQualifier().map(Name::asString).orElse("");
       }
     }
 
@@ -68,7 +65,7 @@ public class NodeToPackage implements Function<Node, String> {
       Class.forName(JAVA_LANG + "." + name);
       return JAVA_LANG;
     } catch (ClassNotFoundException ex) {
-      return compilationUnit.getPackage().getPackageName();
+      return compilationUnit.getPackageDeclaration().map(p -> p.getNameAsString()).orElse("");
     }
   }
 }
