@@ -27,14 +27,14 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import io.sundr.adapter.api.TypeLookup;
 import io.sundr.adapter.source.utils.Sources;
 
-public class TypeDeclarationLookup implements TypeLookup<TypeDeclaration> {
+public class TypeDeclarationLookup implements TypeLookup<TypeDeclaration<?>> {
 
   @Override
-  public Optional<TypeDeclaration> forName(String fullyQualifiedName) {
+  public Optional<TypeDeclaration<?>> forName(String fullyQualifiedName) {
     //1. Lookup resources
     String resourceName = fullyQualifiedName.replace(".", File.separator) + ".java";
     try {
-      Optional<TypeDeclaration> typeDeclaration = Sources.readTypesFromResource(resourceName).stream().findFirst();
+      Optional<TypeDeclaration<?>> typeDeclaration = Sources.readTypesFromResource(resourceName).stream().findFirst();
       if (typeDeclaration.isPresent()) {
         return typeDeclaration;
       }

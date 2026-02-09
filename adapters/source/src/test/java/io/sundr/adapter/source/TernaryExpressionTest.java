@@ -7,11 +7,9 @@ package io.sundr.adapter.source;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.StringReader;
-
 import org.junit.Test;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.ConditionalExpr;
@@ -30,10 +28,10 @@ public class TernaryExpressionTest {
         "  }" +
         "}";
 
-    CompilationUnit cu = JavaParser.parse(new StringReader(javaCode));
+    CompilationUnit cu = StaticJavaParser.parse(javaCode);
     MethodDeclaration method = (MethodDeclaration) cu.getTypes().get(0).getMembers().get(0);
-    ReturnStmt returnStmt = (ReturnStmt) method.getBody().getStmts().get(0);
-    ConditionalExpr conditionalExpr = (ConditionalExpr) returnStmt.getExpr();
+    ReturnStmt returnStmt = (ReturnStmt) method.getBody().get().getStatements().get(0);
+    ConditionalExpr conditionalExpr = (ConditionalExpr) returnStmt.getExpression().get();
 
     // Convert the ternary expression
     Expression converted = ExpressionConverter.convertExpression(conditionalExpr);

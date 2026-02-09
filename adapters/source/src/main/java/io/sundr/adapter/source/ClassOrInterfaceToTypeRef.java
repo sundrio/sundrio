@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.WildcardType;
 
@@ -51,17 +51,17 @@ public class ClassOrInterfaceToTypeRef implements Function<ClassOrInterfaceType,
   @Override
   public TypeRef apply(ClassOrInterfaceType classOrInterfaceType) {
     String boundPackage = PACKAGENAME.apply(classOrInterfaceType);
-    String boundName = classOrInterfaceType.getName();
+    String boundName = classOrInterfaceType.getNameAsString();
 
     List<TypeRef> arguments = new ArrayList<TypeRef>();
-    for (Type arg : classOrInterfaceType.getTypeArgs()) {
-      if (arg instanceof ReferenceType) {
-        // TODO: Need to check if this is valid for all cases...
-        ReferenceType referenceType = (ReferenceType) arg;
-        Type type = referenceType.getType();
-        int dimensions = referenceType.getArrayCount();
-        if (type instanceof ClassOrInterfaceType) {
-          TypeRef intermediateRef = apply((ClassOrInterfaceType) type);
+    List<Type> typeArgs = classOrInterfaceType.getTypeArguments().map(ArrayList::new).orElse(new ArrayList<>());
+    for (Type arg : typeArgs) {
+      if (arg instanceof ArrayType) {
+        ArrayType arrayType = (ArrayType) arg;
+        Type elementType = arrayType.getElementType();
+        int dimensions = arrayType.getArrayLevel();
+        if (elementType instanceof ClassOrInterfaceType) {
+          TypeRef intermediateRef = apply((ClassOrInterfaceType) elementType);
           if (intermediateRef instanceof ClassRef) {
             arguments.add(new ClassRefBuilder((ClassRef) intermediateRef).withDimensions(dimensions).build());
           } else if (intermediateRef instanceof TypeParamRef) {
@@ -70,16 +70,18 @@ public class ClassOrInterfaceToTypeRef implements Function<ClassOrInterfaceType,
             throw new IllegalStateException("Expected class or type param reference");
           }
         } else {
-          String name = referenceType.toString();
+          String name = arrayType.toString();
           arguments.add(new TypeParamRefBuilder().withName(name).withDimensions(dimensions).build());
         }
+      } else if (arg instanceof ClassOrInterfaceType) {
+        arguments.add(apply((ClassOrInterfaceType) arg));
       } else if (arg instanceof WildcardType) {
         WildcardType wildcardType = (WildcardType) arg;
-        if (wildcardType.getExtends() != null) {
-          TypeRef bound = typeToTypeRef.apply(wildcardType.getExtends());
+        if (wildcardType.getExtendedType().isPresent()) {
+          TypeRef bound = typeToTypeRef.apply(wildcardType.getExtendedType().get());
           arguments.add(new WildcardRefBuilder().addToBounds(bound).build());
-        } else if (wildcardType.getSuper() != null) {
-          TypeRef bound = typeToTypeRef.apply(wildcardType.getSuper());
+        } else if (wildcardType.getSuperType().isPresent()) {
+          TypeRef bound = typeToTypeRef.apply(wildcardType.getSuperType().get());
           arguments.add(new WildcardRefBuilder().addToBounds(bound).withBoundKind(WildcardRef.BoundKind.SUPER).build());
         } else {
           arguments.add(new WildcardRef());
@@ -87,7 +89,7 @@ public class ClassOrInterfaceToTypeRef implements Function<ClassOrInterfaceType,
       }
     }
 
-    if (classOrInterfaceType.getParentNode() == classOrInterfaceType) {
+    if (classOrInterfaceType.getParentNode().orElse(null) == classOrInterfaceType) {
       return new TypeParamRefBuilder().withName(boundName).build();
     }
 
@@ -98,7 +100,7 @@ public class ClassOrInterfaceToTypeRef implements Function<ClassOrInterfaceType,
     // return arguments.isEmpty()
     // ? new ClassRefBuilder().withDefinition(knownDefinition).build()
     // : knownDefinition.toReference(arguments);
-    if (classOrInterfaceType.getTypeArgs().isEmpty() && boundName.length() == 1) {
+    if (!classOrInterfaceType.getTypeArguments().isPresent() && boundName.length() == 1) {
       // We are doing our best here to distinguish between class refs and type
       // parameter refs.
       return new TypeParamRefBuilder().withName(boundName).build();

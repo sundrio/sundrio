@@ -19,8 +19,8 @@ import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.EmptyStmt;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -57,25 +57,25 @@ public class StatementConverter {
       IfStmt ifStmt = (IfStmt) statement;
       return If.condition(convertExpression(ifStmt.getCondition()))
           .then(convertStatement(ifStmt.getThenStmt()))
-          .orElse(convertStatement(ifStmt.getElseStmt()));
+          .orElse(convertStatement(ifStmt.getElseStmt().orElse(null)));
     } else if (statement instanceof WhileStmt) {
       WhileStmt whileStmt = (WhileStmt) statement;
       return While.condition(convertExpression(whileStmt.getCondition()))
           .body(convertStatement(whileStmt.getBody()));
     } else if (statement instanceof ForStmt) {
       ForStmt forStmt = (ForStmt) statement;
-      List<io.sundr.model.Expression> initExpressions = forStmt.getInit().stream()
+      List<io.sundr.model.Expression> initExpressions = forStmt.getInitialization().stream()
           .map(ExpressionConverter::convertExpression)
           .collect(Collectors.toList());
       List<io.sundr.model.Expression> updateExpressions = forStmt.getUpdate().stream()
           .map(ExpressionConverter::convertExpression)
           .collect(Collectors.toList());
       return For.init(initExpressions)
-          .compare(convertExpression(forStmt.getCompare()))
+          .compare(forStmt.getCompare().map(ExpressionConverter::convertExpression).orElse(null))
           .update(updateExpressions)
           .body(convertStatement(forStmt.getBody()));
-    } else if (statement instanceof ForeachStmt) {
-      ForeachStmt foreachStmt = (ForeachStmt) statement;
+    } else if (statement instanceof ForEachStmt) {
+      ForEachStmt foreachStmt = (ForEachStmt) statement;
       return new Foreach(convertVarDeclaration(foreachStmt.getVariable()), convertExpression(foreachStmt.getIterable()),
           convertStatement(foreachStmt.getBody()));
     } else if (statement instanceof DoStmt) {
@@ -87,12 +87,12 @@ public class StatementConverter {
       return new Continue();
     } else if (statement instanceof ReturnStmt) {
       ReturnStmt returnStmt = (ReturnStmt) statement;
-      return returnStmt.getExpr() != null
-          ? new Return(convertExpression(returnStmt.getExpr()))
+      return returnStmt.getExpression().isPresent()
+          ? new Return(convertExpression(returnStmt.getExpression().get()))
           : Return.Nothing();
     } else if (statement instanceof ThrowStmt) {
       ThrowStmt throwStmt = (ThrowStmt) statement;
-      return new Throw(convertExpression(throwStmt.getExpr()));
+      return new Throw(convertExpression(throwStmt.getExpression()));
     } else if (statement instanceof BlockStmt) {
       return new BlockStmtToBlock().apply((BlockStmt) statement);
     } else if (statement instanceof ExpressionStmt) {
@@ -110,23 +110,25 @@ public class StatementConverter {
 
       // Handle try-with-resources
       List<io.sundr.model.Statement> resources = new ArrayList<>();
-      for (VariableDeclarationExpr resource : tryStmt.getResources()) {
-        resources.add(convertVarDeclaration(resource));
+      for (com.github.javaparser.ast.expr.Expression resource : tryStmt.getResources()) {
+        if (resource instanceof VariableDeclarationExpr) {
+          resources.add(convertVarDeclaration((VariableDeclarationExpr) resource));
+        }
       }
 
       Block tryBlock = new BlockStmtToBlock().apply(tryStmt.getTryBlock());
 
       List<Try.Catch> catchBlocks = new ArrayList<>();
-      for (CatchClause catchClause : tryStmt.getCatchs()) {
-        Argument argument = convertParameter(catchClause.getParam());
+      for (CatchClause catchClause : tryStmt.getCatchClauses()) {
+        Argument argument = convertParameter(catchClause.getParameter());
         // Convert Argument to Property for compatibility with Try.Catch
         Property parameter = Property.newProperty(argument.getTypeRef(), argument.getName());
-        Block catchBlock = new BlockStmtToBlock().apply(catchClause.getCatchBlock());
+        Block catchBlock = new BlockStmtToBlock().apply(catchClause.getBody());
         catchBlocks.add(new Try.Catch(parameter, catchBlock));
       }
 
-      Optional<Block> finallyBlock = tryStmt.getFinallyBlock() != null
-          ? Optional.of(new BlockStmtToBlock().apply(tryStmt.getFinallyBlock()))
+      Optional<Block> finallyBlock = tryStmt.getFinallyBlock().isPresent()
+          ? Optional.of(new BlockStmtToBlock().apply(tryStmt.getFinallyBlock().get()))
           : Optional.empty();
 
       return new Try(resources, tryBlock, catchBlocks, finallyBlock);
@@ -137,7 +139,7 @@ public class StatementConverter {
       String methodName = explicitStmt.isThis() ? "this" : "super";
 
       // Convert arguments
-      List<io.sundr.model.Expression> arguments = explicitStmt.getArgs().stream()
+      List<io.sundr.model.Expression> arguments = explicitStmt.getArguments().stream()
           .map(ExpressionConverter::convertExpression)
           .collect(Collectors.toList());
 
@@ -146,8 +148,8 @@ public class StatementConverter {
       com.github.javaparser.ast.stmt.SynchronizedStmt syncStmt = (com.github.javaparser.ast.stmt.SynchronizedStmt) statement;
 
       // Convert synchronized statement to our model
-      io.sundr.model.Expression lockExpression = ExpressionConverter.convertExpression(syncStmt.getExpr());
-      io.sundr.model.Statement body = new BlockStmtToBlock().apply(syncStmt.getBlock());
+      io.sundr.model.Expression lockExpression = ExpressionConverter.convertExpression(syncStmt.getExpression());
+      io.sundr.model.Statement body = new BlockStmtToBlock().apply(syncStmt.getBody());
 
       return new io.sundr.model.Synchronized(lockExpression, body);
     }

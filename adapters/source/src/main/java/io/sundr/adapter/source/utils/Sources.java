@@ -23,11 +23,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.github.javaparser.JavaParser;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
 
@@ -80,9 +81,9 @@ public class Sources {
    * @param is the {@link InputStream}
    * @return a {@link List} of {@link TypeDeclaration} instances.
    */
-  public static List<TypeDeclaration> readTypesFromStream(InputStream is) {
+  public static List<TypeDeclaration<?>> readTypesFromStream(InputStream is) {
     CompilationUnit cu = Sources.FROM_INPUTSTREAM_TO_COMPILATIONUNIT.apply(is);
-    return cu.getTypes();
+    return new ArrayList<>(cu.getTypes());
   }
 
   /**
@@ -91,7 +92,7 @@ public class Sources {
    * @param is the {@link InputStream}
    * @return the {@link TypeDeclaration} instance.
    */
-  public static TypeDeclaration readTypeFromStream(InputStream is) {
+  public static TypeDeclaration<?> readTypeFromStream(InputStream is) {
     return readTypesFromStream(is).stream().findFirst().orElseThrow(() -> new IllegalStateException(NO_TYPE_FOUND));
   }
 
@@ -101,9 +102,9 @@ public class Sources {
    * @param resourceName the {@link InputStream}
    * @return a {@link List} of {@link TypeDeclaration} instances.
    */
-  public static List<TypeDeclaration> readTypesFromResource(String resourceName) {
+  public static List<TypeDeclaration<?>> readTypesFromResource(String resourceName) {
     CompilationUnit cu = Sources.FROM_CLASSPATH_TO_COMPILATIONUNIT.apply(resourceName);
-    return cu.getTypes();
+    return new ArrayList<>(cu.getTypes());
   }
 
   /**
@@ -112,7 +113,7 @@ public class Sources {
    * @param resourceName the {@link InputStream}
    * @return the {@link TypeDeclaration} instance.
    */
-  public static TypeDeclaration readTypeFromResource(String resourceName) {
+  public static TypeDeclaration<?> readTypeFromResource(String resourceName) {
     return readTypesFromResource(resourceName).stream().findFirst().orElseThrow(() -> new IllegalStateException(NO_TYPE_FOUND));
   }
 
@@ -141,7 +142,7 @@ public class Sources {
 
   private static final Function<File, CompilationUnit> FROM_FILE_TO_COMPILATIONUNIT = file -> {
     try (FileInputStream fis = new FileInputStream(file)) {
-      return JavaParser.parse(fis);
+      return StaticJavaParser.parse(fis);
     } catch (Exception ex) {
       throw new RuntimeException("Failed to load file: [" + file.getAbsolutePath() + "] from file system.");
     }
@@ -149,7 +150,7 @@ public class Sources {
 
   private static final Function<String, CompilationUnit> FROM_CLASSPATH_TO_COMPILATIONUNIT = resource -> {
     try (InputStream is = Sources.class.getClassLoader().getResourceAsStream(resource)) {
-      return JavaParser.parse(is);
+      return StaticJavaParser.parse(is);
     } catch (Exception ex) {
       throw new RuntimeException("Failed to load resource: [" + resource + "] from classpath.");
     }
@@ -157,7 +158,7 @@ public class Sources {
 
   private static final Function<InputStream, CompilationUnit> FROM_INPUTSTREAM_TO_COMPILATIONUNIT = is -> {
     try {
-      return JavaParser.parse(is);
+      return StaticJavaParser.parse(is);
     } catch (Exception ex) {
       throw new RuntimeException("Failed to parse stream.", ex);
     } finally {

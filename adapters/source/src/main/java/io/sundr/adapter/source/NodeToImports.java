@@ -23,10 +23,9 @@ import java.util.function.Function;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.NamedNode;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.expr.QualifiedNameExpr;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.expr.Name;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -38,25 +37,19 @@ public class NodeToImports implements Function<Node, Set<ClassRef>> {
   @Override
   public Set<ClassRef> apply(Node node) {
     Set<ClassRef> imports = new LinkedHashSet<ClassRef>();
-    if (node instanceof NamedNode) {
-      String name = ((NamedNode) node).getName();
+    if (node instanceof TypeDeclaration) {
       Node current = node;
       while (!(current instanceof CompilationUnit)) {
-        current = current.getParentNode();
+        current = current.getParentNode().orElse(null);
+        if (current == null) {
+          return imports;
+        }
       }
       CompilationUnit compilationUnit = (CompilationUnit) current;
       for (ImportDeclaration importDecl : compilationUnit.getImports()) {
-        String className = null;
-        String packageName = null;
-        NameExpr importExpr = importDecl.getName();
-        if (importExpr instanceof QualifiedNameExpr) {
-          QualifiedNameExpr qualifiedNameExpr = (QualifiedNameExpr) importExpr;
-          className = qualifiedNameExpr.getName();
-          packageName = qualifiedNameExpr.getQualifier().toString();
-        } else if (importDecl.getName().getName().endsWith(SEPARATOR + name)) {
-          String importName = importDecl.getName().getName();
-          packageName = importName.substring(0, importName.length() - name.length() - 1);
-        }
+        Name importName = importDecl.getName();
+        String className = importName.getIdentifier();
+        String packageName = importName.getQualifier().map(Name::asString).orElse("");
         if (className != null && !className.isEmpty()) {
           imports.add(new ClassRefBuilder().withFullyQualifiedName(packageName + "." + className).build());
         }

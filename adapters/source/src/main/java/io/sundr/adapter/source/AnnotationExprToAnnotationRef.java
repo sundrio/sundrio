@@ -36,7 +36,7 @@ public class AnnotationExprToAnnotationRef implements Function<AnnotationExpr, A
 
   @Override
   public AnnotationRef apply(AnnotationExpr annotation) {
-    String name = annotation.getName().getName();
+    String name = annotation.getNameAsString();
     String packageName = PACKAGENAME.apply(annotation);
     Map<String, Object> parameters = new HashMap<>();
 
@@ -49,7 +49,7 @@ public class AnnotationExprToAnnotationRef implements Function<AnnotationExpr, A
       NormalAnnotationExpr normal = (NormalAnnotationExpr) annotation;
       for (MemberValuePair pair : normal.getPairs()) {
         String key = pair.getName().toString();
-        Object value = pair.getData();
+        Object value = pair.getValue().toString();
         parameters.put(key, value);
       }
     }
