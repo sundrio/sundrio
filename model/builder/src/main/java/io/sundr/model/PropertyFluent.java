@@ -20,8 +20,11 @@ import io.sundr.builder.VisitableBuilder;
 
 /**
  * Generated
+ *
+ * @deprecated This class has been replaced by {@link FieldFluent}, {@link ArgumentFluent}, and {@link LocalVariableFluent}.
  */
 @SuppressWarnings("unchecked")
+@Deprecated
 public class PropertyFluent<A extends io.sundr.model.PropertyFluent<A>> extends ModifierSupportFluent<A> {
 
   private ArrayList<AnnotationRefBuilder> annotations = new ArrayList<AnnotationRefBuilder>();

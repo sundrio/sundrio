@@ -27,6 +27,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * @deprecated This class has been replaced by {@link Field}, {@link Argument}, and {@link LocalVariable}.
+ */
+@Deprecated
 public class Property extends ModifierSupport implements Expression, Commentable, Annotatable, Erasable<Property> {
 
   private final List<String> comments;
