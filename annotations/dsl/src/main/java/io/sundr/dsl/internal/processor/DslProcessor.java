@@ -67,6 +67,7 @@ public class DslProcessor extends AbstractCodeGeneratingProcessor {
       for (Element element : env.getElementsAnnotatedWith(annotation)) {
         if (element instanceof TypeElement) {
           Generics.clear();
+          context.getNodeRepository().clear();
           TypeElement typeElement = (TypeElement) element;
           InterfaceName interfaceName = element.getAnnotation(InterfaceName.class);
           String targetInterface = interfaceName.value();
@@ -88,7 +89,8 @@ public class DslProcessor extends AbstractCodeGeneratingProcessor {
 
           for (Node<TypeDef> root : graph) {
             Node<TypeDef> uncyclic = Nodes.TO_UNCYCLIC.apply(root);
-            Node<TypeDef> unwrapped = Nodes.TO_UNWRAPPED.apply(NodeContext.builder().withItem(uncyclic.getItem()).build());
+            Node<TypeDef> unwrapped = Nodes.TO_UNWRAPPED
+                .apply(NodeContext.builder().withItem(uncyclic.getItem()).withAll(genericAndScopeInterfaces).build());
             TypeDef current = unwrapped.getItem();
 
             //If there are not transitions don't generate root interface.
