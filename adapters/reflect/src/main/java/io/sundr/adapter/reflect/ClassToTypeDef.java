@@ -130,7 +130,7 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     String outerFQCN = item.getDeclaringClass() != null ? item.getDeclaringClass().getName() : null;
     TypeDef result = context.getDefinitionRepository().register(new TypeDefBuilder()
         .withKind(kind)
-        .withInnerTypes(Arrays.stream(item.getDeclaredClasses()).map(i -> apply(i)).collect(Collectors.toList()))
+        .withInnerTypes(getDeclaredClasses(item))
         .withOuterTypeName(outerFQCN)
         .withName(item.getSimpleName())
         .withPackageName(item.getPackage() != null ? item.getPackage().getName() : null)
@@ -157,6 +157,35 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     return result;
   }
 
+  /**
+   * Get declared classes (nested types) with proper exception handling for JDK 9+ module system.
+   * 
+   * @param item The class to introspect
+   * @return List of nested type definitions, or empty list if reflection access is denied
+   */
+  private List<TypeDef> getDeclaredClasses(Class item) {
+    try {
+      return Arrays.stream(item.getDeclaredClasses()).map(i -> apply(i)).collect(Collectors.toList());
+    } catch (Exception e) {
+      // In JDK 9+, InaccessibleObjectException can be thrown when accessing classes from JAR files
+      // even with --add-opens flags, especially in JDK 25+
+      String exceptionType = e.getClass().getSimpleName();
+      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
+        System.err.println("Warning: Cannot introspect nested types of " + item.getName() + 
+                          " due to module access restrictions (" + exceptionType + "). " +
+                          "This may result in incomplete builder generation. " +
+                          "Consider using --add-opens flags or moving classes to the same module.");
+      } else {
+        // Rethrow unexpected exceptions
+        if (e instanceof RuntimeException) {
+          throw (RuntimeException) e;
+        }
+        throw new RuntimeException("Failed to introspect nested types of " + item.getName(), e);
+      }
+      return new ArrayList<>();
+    }
+  }
+
   private List<AnnotationRef> getAnnotations(Class item) {
     List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
     processAnnotatedElement(item, annotationRefs);
@@ -165,7 +194,25 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
 
   private Set<io.sundr.model.Field> getFields(Class item, Set<Class> references) {
     Set<io.sundr.model.Field> fields = new HashSet<>();
-    for (Field field : item.getDeclaredFields()) {
+    Field[] declaredFields;
+    try {
+      declaredFields = item.getDeclaredFields();
+    } catch (Exception e) {
+      // In JDK 9+, InaccessibleObjectException can be thrown when accessing fields from JAR files
+      String exceptionType = e.getClass().getSimpleName();
+      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
+        System.err.println("Warning: Cannot introspect fields of " + item.getName() + 
+                          " due to module access restrictions (" + exceptionType + ").");
+        return fields; // Return empty set
+      }
+      // Rethrow unexpected exceptions
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException) e;
+      }
+      throw new RuntimeException("Failed to introspect fields of " + item.getName(), e);
+    }
+    
+    for (Field field : declaredFields) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
       processAnnotatedElement(field, annotationRefs);
 
@@ -194,7 +241,25 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
 
   private Set<Method> getConstructors(Class item, Set<Class> references) {
     Set<Method> constructors = new HashSet<Method>();
-    for (java.lang.reflect.Constructor constructor : item.getDeclaredConstructors()) {
+    java.lang.reflect.Constructor[] declaredConstructors;
+    try {
+      declaredConstructors = item.getDeclaredConstructors();
+    } catch (Exception e) {
+      // In JDK 9+, InaccessibleObjectException can be thrown when accessing constructors from JAR files
+      String exceptionType = e.getClass().getSimpleName();
+      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
+        System.err.println("Warning: Cannot introspect constructors of " + item.getName() + 
+                          " due to module access restrictions (" + exceptionType + ").");
+        return constructors; // Return empty set
+      }
+      // Rethrow unexpected exceptions
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException) e;
+      }
+      throw new RuntimeException("Failed to introspect constructors of " + item.getName(), e);
+    }
+    
+    for (java.lang.reflect.Constructor constructor : declaredConstructors) {
       List<AnnotationRef> annotationRefs = new ArrayList<AnnotationRef>();
       List<ClassRef> exceptionRefs = new ArrayList<>();
       List<Argument> arguments = new ArrayList<>();
@@ -216,7 +281,25 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
 
   private Set<Method> getMethods(Class item, Set<Class> references) {
     Set<Method> methods = new HashSet<Method>();
-    for (java.lang.reflect.Method method : item.getDeclaredMethods()) {
+    java.lang.reflect.Method[] declaredMethods;
+    try {
+      declaredMethods = item.getDeclaredMethods();
+    } catch (Exception e) {
+      // In JDK 9+, InaccessibleObjectException can be thrown when accessing methods from JAR files
+      String exceptionType = e.getClass().getSimpleName();
+      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
+        System.err.println("Warning: Cannot introspect methods of " + item.getName() + 
+                          " due to module access restrictions (" + exceptionType + ").");
+        return methods; // Return empty set
+      }
+      // Rethrow unexpected exceptions
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException) e;
+      }
+      throw new RuntimeException("Failed to introspect methods of " + item.getName(), e);
+    }
+    
+    for (java.lang.reflect.Method method : declaredMethods) {
       List<AnnotationRef> annotationRefs = new ArrayList<>();
       List<ClassRef> exceptionRefs = new ArrayList<>();
       List<Argument> arguments = new ArrayList<>();
