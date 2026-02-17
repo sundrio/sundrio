@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [17,21,23]
+        java: [17,21,23,25]
         profile: [normal, with-swagger]
     steps:
       - name: Checkout
