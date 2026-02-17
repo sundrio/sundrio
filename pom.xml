@@ -101,7 +101,7 @@
         <!-- Testing Version -->
         <compile-testing.version>0.23.0</compile-testing.version>
         <compile-testing-extension.version>1.0.2</compile-testing-extension.version>
-        <junit-jupiter.version>5.11.4</junit-jupiter.version>
+        <junit-jupiter.version>6.0.2</junit-jupiter.version>
         <hamcrest.version>3.0</hamcrest.version>
         
         <!--maven.javadoc.failOnError>false</maven.javadoc.failOnError-->
