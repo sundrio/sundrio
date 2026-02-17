@@ -20,6 +20,7 @@ package io.sundr.adapter.reflect;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -166,22 +167,13 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
   private List<TypeDef> getDeclaredClasses(Class item) {
     try {
       return Arrays.stream(item.getDeclaredClasses()).map(i -> apply(i)).collect(Collectors.toList());
-    } catch (Exception e) {
+    } catch (InaccessibleObjectException | SecurityException e) {
       // In JDK 9+, InaccessibleObjectException can be thrown when accessing classes from JAR files
       // even with --add-opens flags, especially in JDK 25+
-      String exceptionType = e.getClass().getSimpleName();
-      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
-        System.err.println("Warning: Cannot introspect nested types of " + item.getName() + 
-                          " due to module access restrictions (" + exceptionType + "). " +
-                          "This may result in incomplete builder generation. " +
-                          "Consider using --add-opens flags or moving classes to the same module.");
-      } else {
-        // Rethrow unexpected exceptions
-        if (e instanceof RuntimeException) {
-          throw (RuntimeException) e;
-        }
-        throw new RuntimeException("Failed to introspect nested types of " + item.getName(), e);
-      }
+      System.err.println("Warning: Cannot introspect nested types of " + item.getName() + 
+                        " due to module access restrictions (" + e.getClass().getSimpleName() + "). " +
+                        "This may result in incomplete builder generation. " +
+                        "Consider using --add-opens flags or moving classes to the same module.");
       return new ArrayList<>();
     }
   }
@@ -197,21 +189,13 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     Field[] declaredFields;
     try {
       declaredFields = item.getDeclaredFields();
-    } catch (Exception e) {
+    } catch (InaccessibleObjectException | SecurityException e) {
       // In JDK 9+, InaccessibleObjectException can be thrown when accessing fields from JAR files
-      String exceptionType = e.getClass().getSimpleName();
-      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
-        System.err.println("Warning: Cannot introspect fields of " + item.getName() + 
-                          " due to module access restrictions (" + exceptionType + "). " +
-                          "This will prevent discovery of nested types from field declarations. " +
-                          "Consider using --add-opens flags for the module containing this class.");
-        return fields; // Return empty set
-      }
-      // Rethrow unexpected exceptions
-      if (e instanceof RuntimeException) {
-        throw (RuntimeException) e;
-      }
-      throw new RuntimeException("Failed to introspect fields of " + item.getName(), e);
+      System.err.println("Warning: Cannot introspect fields of " + item.getName() + 
+                        " due to module access restrictions (" + e.getClass().getSimpleName() + "). " +
+                        "This will prevent discovery of nested types from field declarations. " +
+                        "Consider using --add-opens flags for the module containing this class.");
+      return fields; // Return empty set
     }
     
     for (Field field : declaredFields) {
@@ -246,19 +230,11 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     java.lang.reflect.Constructor[] declaredConstructors;
     try {
       declaredConstructors = item.getDeclaredConstructors();
-    } catch (Exception e) {
+    } catch (InaccessibleObjectException | SecurityException e) {
       // In JDK 9+, InaccessibleObjectException can be thrown when accessing constructors from JAR files
-      String exceptionType = e.getClass().getSimpleName();
-      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
-        System.err.println("Warning: Cannot introspect constructors of " + item.getName() + 
-                          " due to module access restrictions (" + exceptionType + ").");
-        return constructors; // Return empty set
-      }
-      // Rethrow unexpected exceptions
-      if (e instanceof RuntimeException) {
-        throw (RuntimeException) e;
-      }
-      throw new RuntimeException("Failed to introspect constructors of " + item.getName(), e);
+      System.err.println("Warning: Cannot introspect constructors of " + item.getName() + 
+                        " due to module access restrictions (" + e.getClass().getSimpleName() + ").");
+      return constructors; // Return empty set
     }
     
     for (java.lang.reflect.Constructor constructor : declaredConstructors) {
@@ -286,19 +262,11 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
     java.lang.reflect.Method[] declaredMethods;
     try {
       declaredMethods = item.getDeclaredMethods();
-    } catch (Exception e) {
+    } catch (InaccessibleObjectException | SecurityException e) {
       // In JDK 9+, InaccessibleObjectException can be thrown when accessing methods from JAR files
-      String exceptionType = e.getClass().getSimpleName();
-      if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
-        System.err.println("Warning: Cannot introspect methods of " + item.getName() + 
-                          " due to module access restrictions (" + exceptionType + ").");
-        return methods; // Return empty set
-      }
-      // Rethrow unexpected exceptions
-      if (e instanceof RuntimeException) {
-        throw (RuntimeException) e;
-      }
-      throw new RuntimeException("Failed to introspect methods of " + item.getName(), e);
+      System.err.println("Warning: Cannot introspect methods of " + item.getName() + 
+                        " due to module access restrictions (" + e.getClass().getSimpleName() + ").");
+      return methods; // Return empty set
     }
     
     for (java.lang.reflect.Method method : declaredMethods) {
