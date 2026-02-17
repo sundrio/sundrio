@@ -202,7 +202,9 @@ public class ClassToTypeDef implements Function<Class, TypeDef> {
       String exceptionType = e.getClass().getSimpleName();
       if ("InaccessibleObjectException".equals(exceptionType) || e instanceof SecurityException) {
         System.err.println("Warning: Cannot introspect fields of " + item.getName() + 
-                          " due to module access restrictions (" + exceptionType + ").");
+                          " due to module access restrictions (" + exceptionType + "). " +
+                          "This will prevent discovery of nested types from field declarations. " +
+                          "Consider using --add-opens flags for the module containing this class.");
         return fields; // Return empty set
       }
       // Rethrow unexpected exceptions
