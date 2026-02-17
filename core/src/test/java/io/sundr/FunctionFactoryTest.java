@@ -16,10 +16,11 @@
 
 package io.sundr;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.function.Function;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class FunctionFactoryTest {
 
@@ -37,9 +38,9 @@ public class FunctionFactoryTest {
   public void testCachingWithOverflowProtection() {
     String expectedResult = "RRRRRRRRRRoverflow";
     String result = TEST_FUNCTION.apply("");
-    Assert.assertEquals(expectedResult, result);
+    assertEquals(expectedResult, result);
 
     result = TEST_FUNCTION.apply("");
-    Assert.assertEquals(expectedResult, result);
+    assertEquals(expectedResult, result);
   }
 }

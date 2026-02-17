@@ -16,7 +16,7 @@
 
 package io.sundr.builder.internal.functions;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.builder.Constants;
 import io.sundr.builder.internal.processor.AbstractProcessorTest;

@@ -1,8 +1,8 @@
 package io.sundr.adapter.source.change;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.*;
 
@@ -16,10 +16,10 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(typeDef1, typeDef2);
 
-    assertFalse("Should have no changes", changes.hasChanges());
-    assertEquals("Should have zero total changes", 0, changes.getTotalChanges());
-    assertTrue("Method changes should be empty", changes.getMethodChanges().isEmpty());
-    assertTrue("Field changes should be empty", changes.getFieldChanges().isEmpty());
+    assertFalse(changes.hasChanges(), "Should have no changes");
+    assertEquals(0, changes.getTotalChanges(), "Should have zero total changes");
+    assertTrue(changes.getMethodChanges().isEmpty(), "Method changes should be empty");
+    assertTrue(changes.getFieldChanges().isEmpty(), "Field changes should be empty");
   }
 
   @Test
@@ -29,16 +29,16 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(oldTypeDef, newTypeDef);
 
-    assertTrue("Should have changes", changes.hasChanges());
-    assertEquals("Should have one change", 1, changes.getTotalChanges());
-    assertEquals("Should have one method change", 1, changes.getMethodChanges().size());
-    assertTrue("Should have no field changes", changes.getFieldChanges().isEmpty());
+    assertTrue(changes.hasChanges(), "Should have changes");
+    assertEquals(1, changes.getTotalChanges(), "Should have one change");
+    assertEquals(1, changes.getMethodChanges().size(), "Should have one method change");
+    assertTrue(changes.getFieldChanges().isEmpty(), "Should have no field changes");
 
     Change<Method> methodChange = changes.getMethodChanges().iterator().next();
-    assertEquals("Should be ADDED change", ChangeType.ADDED, methodChange.getChangeType());
-    assertNull("Old element should be null", methodChange.getOldElement());
-    assertNotNull("New element should not be null", methodChange.getNewElement());
-    assertEquals("Method name should be 'newMethod'", "newMethod", methodChange.getNewElement().getName());
+    assertEquals(ChangeType.ADDED, methodChange.getChangeType(), "Should be ADDED change");
+    assertNull(methodChange.getOldElement(), "Old element should be null");
+    assertNotNull(methodChange.getNewElement(), "New element should not be null");
+    assertEquals("newMethod", methodChange.getNewElement().getName(), "Method name should be 'newMethod'");
   }
 
   @Test
@@ -48,15 +48,15 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(oldTypeDef, newTypeDef);
 
-    assertTrue("Should have changes", changes.hasChanges());
-    assertEquals("Should have one change", 1, changes.getTotalChanges());
-    assertEquals("Should have one method change", 1, changes.getMethodChanges().size());
+    assertTrue(changes.hasChanges(), "Should have changes");
+    assertEquals(1, changes.getTotalChanges(), "Should have one change");
+    assertEquals(1, changes.getMethodChanges().size(), "Should have one method change");
 
     Change<Method> methodChange = changes.getMethodChanges().iterator().next();
-    assertEquals("Should be REMOVED change", ChangeType.REMOVED, methodChange.getChangeType());
-    assertNotNull("Old element should not be null", methodChange.getOldElement());
-    assertNull("New element should be null", methodChange.getNewElement());
-    assertEquals("Method name should be 'newMethod'", "newMethod", methodChange.getOldElement().getName());
+    assertEquals(ChangeType.REMOVED, methodChange.getChangeType(), "Should be REMOVED change");
+    assertNotNull(methodChange.getOldElement(), "Old element should not be null");
+    assertNull(methodChange.getNewElement(), "New element should be null");
+    assertEquals("newMethod", methodChange.getOldElement().getName(), "Method name should be 'newMethod'");
   }
 
   @Test
@@ -66,16 +66,16 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(oldTypeDef, newTypeDef);
 
-    assertTrue("Should have changes", changes.hasChanges());
-    assertEquals("Should have one change", 1, changes.getTotalChanges());
-    assertEquals("Should have one method change", 1, changes.getMethodChanges().size());
+    assertTrue(changes.hasChanges(), "Should have changes");
+    assertEquals(1, changes.getTotalChanges(), "Should have one change");
+    assertEquals(1, changes.getMethodChanges().size(), "Should have one method change");
 
     Change<Method> methodChange = changes.getMethodChanges().iterator().next();
-    assertEquals("Should be MODIFIED change", ChangeType.MODIFIED, methodChange.getChangeType());
-    assertNotNull("Old element should not be null", methodChange.getOldElement());
-    assertNotNull("New element should not be null", methodChange.getNewElement());
-    assertEquals("Method names should be same",
-        methodChange.getOldElement().getName(), methodChange.getNewElement().getName());
+    assertEquals(ChangeType.MODIFIED, methodChange.getChangeType(), "Should be MODIFIED change");
+    assertNotNull(methodChange.getOldElement(), "Old element should not be null");
+    assertNotNull(methodChange.getNewElement(), "New element should not be null");
+    assertEquals(methodChange.getOldElement().getName(), methodChange.getNewElement().getName(),
+        "Method names should be same");
   }
 
   @Test
@@ -85,16 +85,16 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(oldTypeDef, newTypeDef);
 
-    assertTrue("Should have changes", changes.hasChanges());
-    assertEquals("Should have one change", 1, changes.getTotalChanges());
-    assertEquals("Should have one field change", 1, changes.getFieldChanges().size());
-    assertTrue("Should have no method changes", changes.getMethodChanges().isEmpty());
+    assertTrue(changes.hasChanges(), "Should have changes");
+    assertEquals(1, changes.getTotalChanges(), "Should have one change");
+    assertEquals(1, changes.getFieldChanges().size(), "Should have one field change");
+    assertTrue(changes.getMethodChanges().isEmpty(), "Should have no method changes");
 
     Change<Field> fieldChange = changes.getFieldChanges().iterator().next();
-    assertEquals("Should be ADDED change", ChangeType.ADDED, fieldChange.getChangeType());
-    assertNull("Old element should be null", fieldChange.getOldElement());
-    assertNotNull("New element should not be null", fieldChange.getNewElement());
-    assertEquals("Property name should be 'newField'", "newField", fieldChange.getNewElement().getName());
+    assertEquals(ChangeType.ADDED, fieldChange.getChangeType(), "Should be ADDED change");
+    assertNull(fieldChange.getOldElement(), "Old element should be null");
+    assertNotNull(fieldChange.getNewElement(), "New element should not be null");
+    assertEquals("newField", fieldChange.getNewElement().getName(), "Property name should be 'newField'");
   }
 
   @Test
@@ -104,15 +104,15 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(oldTypeDef, newTypeDef);
 
-    assertTrue("Should have changes", changes.hasChanges());
-    assertEquals("Should have one change", 1, changes.getTotalChanges());
-    assertEquals("Should have one field change", 1, changes.getFieldChanges().size());
+    assertTrue(changes.hasChanges(), "Should have changes");
+    assertEquals(1, changes.getTotalChanges(), "Should have one change");
+    assertEquals(1, changes.getFieldChanges().size(), "Should have one field change");
 
     Change<Field> fieldChange = changes.getFieldChanges().iterator().next();
-    assertEquals("Should be REMOVED change", ChangeType.REMOVED, fieldChange.getChangeType());
-    assertNotNull("Old element should not be null", fieldChange.getOldElement());
-    assertNull("New element should be null", fieldChange.getNewElement());
-    assertEquals("Property name should be 'newField'", "newField", fieldChange.getOldElement().getName());
+    assertEquals(ChangeType.REMOVED, fieldChange.getChangeType(), "Should be REMOVED change");
+    assertNotNull(fieldChange.getOldElement(), "Old element should not be null");
+    assertNull(fieldChange.getNewElement(), "New element should be null");
+    assertEquals("newField", fieldChange.getOldElement().getName(), "Property name should be 'newField'");
   }
 
   @Test
@@ -122,10 +122,10 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(oldTypeDef, newTypeDef);
 
-    assertTrue("Should have changes", changes.hasChanges());
-    assertTrue("Should have multiple changes", changes.getTotalChanges() > 1);
-    assertFalse("Should have method changes", changes.getMethodChanges().isEmpty());
-    assertFalse("Should have field changes", changes.getFieldChanges().isEmpty());
+    assertTrue(changes.hasChanges(), "Should have changes");
+    assertTrue(changes.getTotalChanges() > 1, "Should have multiple changes");
+    assertFalse(changes.getMethodChanges().isEmpty(), "Should have method changes");
+    assertFalse(changes.getFieldChanges().isEmpty(), "Should have field changes");
   }
 
   @Test
@@ -136,10 +136,10 @@ public class ChangeDetectorTest {
     ChangeSet changes = ChangeDetector.compare(oldTypeDef, newTypeDef);
 
     String output = changes.toString();
-    assertNotNull("String output should not be null", output);
-    assertTrue("Should contain class name", output.contains("TestClass"));
-    assertTrue("Should contain 'Method Changes'", output.contains("Method Changes"));
-    assertTrue("Should contain change count", output.contains("(1)"));
+    assertNotNull(output, "String output should not be null");
+    assertTrue(output.contains("TestClass"), "Should contain class name");
+    assertTrue(output.contains("Method Changes"), "Should contain 'Method Changes'");
+    assertTrue(output.contains("(1)"), "Should contain change count");
   }
 
   @Test
@@ -175,8 +175,8 @@ public class ChangeDetectorTest {
 
     ChangeSet changes = ChangeDetector.compare(typeDef1, typeDef2);
 
-    assertFalse("Should have no changes despite potential formatting differences", changes.hasChanges());
-    assertEquals("Should have zero total changes", 0, changes.getTotalChanges());
+    assertFalse(changes.hasChanges(), "Should have no changes despite potential formatting differences");
+    assertEquals(0, changes.getTotalChanges(), "Should have zero total changes");
   }
 
   // Helper methods to create test TypeDefs

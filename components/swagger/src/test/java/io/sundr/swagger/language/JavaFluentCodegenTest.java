@@ -16,11 +16,11 @@
 
 package io.sundr.swagger.language;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
-@Ignore
+@Disabled
 public class JavaFluentCodegenTest {
 
   /*

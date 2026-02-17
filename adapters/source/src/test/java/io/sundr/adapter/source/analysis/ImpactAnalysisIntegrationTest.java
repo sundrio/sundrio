@@ -1,14 +1,14 @@
 package io.sundr.adapter.source.analysis;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.source.Project;
 import io.sundr.adapter.source.change.Change;
@@ -30,7 +30,7 @@ public class ImpactAnalysisIntegrationTest {
   private ImpactAnalyzer analyzer;
   private DefinitionRepository repository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     // Use current project for testing
     project = Project.getProject();

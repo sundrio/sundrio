@@ -17,7 +17,7 @@
 
 package io.sunder.examples.arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.examples.arrays.Person;
 import io.sundr.examples.arrays.PersonBuilder;

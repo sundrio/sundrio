@@ -1,8 +1,8 @@
 package io.sundr.examples;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CalculatorTest {
 
@@ -37,9 +37,9 @@ public class CalculatorTest {
     assertEquals(0.5, calculator.divide(1, 2), 0.001);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testDivideByZero() {
     Calculator calculator = new Calculator();
-    calculator.divide(5, 0);
+    assertThrows(IllegalArgumentException.class, () -> calculator.divide(5, 0));
   }
 }

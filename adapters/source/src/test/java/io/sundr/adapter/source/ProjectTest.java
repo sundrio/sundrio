@@ -1,9 +1,9 @@
 package io.sundr.adapter.source;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ProjectTest {
 
@@ -42,29 +42,29 @@ public class ProjectTest {
   @Test
   public void shouldListJavaSourceFiles() {
     List<Path> sourceFiles = project.listJavaSourceFiles();
-    assertFalse("Source files list should not be empty", sourceFiles.isEmpty());
+    assertFalse(sourceFiles.isEmpty(), "Source files list should not be empty");
 
     boolean foundProjectClass = sourceFiles.stream()
         .anyMatch(path -> path.toString().endsWith("Project.java"));
-    assertTrue("Should find Project.java in source files", foundProjectClass);
+    assertTrue(foundProjectClass, "Should find Project.java in source files");
 
     boolean allJavaFiles = sourceFiles.stream()
         .allMatch(path -> path.toString().endsWith(".java"));
-    assertTrue("All files should be .java files", allJavaFiles);
+    assertTrue(allJavaFiles, "All files should be .java files");
   }
 
   @Test
   public void shouldListJavaTestFiles() {
     List<Path> testFiles = project.listJavaTestFiles();
-    assertFalse("Test files list should not be empty", testFiles.isEmpty());
+    assertFalse(testFiles.isEmpty(), "Test files list should not be empty");
 
     boolean foundProjectTestClass = testFiles.stream()
         .anyMatch(path -> path.toString().endsWith("ProjectTest.java"));
-    assertTrue("Should find ProjectTest.java in test files", foundProjectTestClass);
+    assertTrue(foundProjectTestClass, "Should find ProjectTest.java in test files");
 
     boolean allJavaFiles = testFiles.stream()
         .allMatch(path -> path.toString().endsWith(".java"));
-    assertTrue("All files should be .java files", allJavaFiles);
+    assertTrue(allJavaFiles, "All files should be .java files");
   }
 
   @Test
@@ -73,39 +73,39 @@ public class ProjectTest {
     List<Path> sourceFiles = project.listJavaSourceFiles();
     List<Path> testFiles = project.listJavaTestFiles();
 
-    assertFalse("All files list should not be empty", allFiles.isEmpty());
+    assertFalse(allFiles.isEmpty(), "All files list should not be empty");
 
     int expectedSize = sourceFiles.size() + testFiles.size();
-    assertTrue("All files should contain both source and test files",
-        allFiles.size() >= expectedSize);
+    assertTrue(allFiles.size() >= expectedSize,
+        "All files should contain both source and test files");
 
     boolean foundProjectClass = allFiles.stream()
         .anyMatch(path -> path.toString().endsWith("Project.java"));
-    assertTrue("Should find Project.java in all files", foundProjectClass);
+    assertTrue(foundProjectClass, "Should find Project.java in all files");
 
     boolean foundProjectTestClass = allFiles.stream()
         .anyMatch(path -> path.toString().endsWith("ProjectTest.java"));
-    assertTrue("Should find ProjectTest.java in all files", foundProjectTestClass);
+    assertTrue(foundProjectTestClass, "Should find ProjectTest.java in all files");
 
     boolean allJavaFiles = allFiles.stream()
         .allMatch(path -> path.toString().endsWith(".java"));
-    assertTrue("All files should be .java files", allJavaFiles);
+    assertTrue(allJavaFiles, "All files should be .java files");
   }
 
   @Test
   public void shouldCreateProjectWithFactory() {
     Project defaultProject = Project.getProject();
-    assertNotNull("Default project should not be null", defaultProject);
-    assertNotNull("Default project should have module root", defaultProject.getModuleRoot());
+    assertNotNull(defaultProject, "Default project should not be null");
+    assertNotNull(defaultProject.getModuleRoot(), "Default project should have module root");
   }
 
   @Test
   public void shouldCreateProjectWithCustomRoot() {
     Path customRoot = Paths.get(System.getProperty("user.dir"));
     Project customProject = Project.getProject(customRoot);
-    assertNotNull("Custom project should not be null", customProject);
-    assertEquals("Custom project should use provided root",
-        customRoot.toFile(), customProject.getModuleRoot());
+    assertNotNull(customProject, "Custom project should not be null");
+    assertEquals(customRoot.toFile(), customProject.getModuleRoot(),
+        "Custom project should use provided root");
   }
 
   // =================================================================
@@ -118,13 +118,13 @@ public class ProjectTest {
     List<Path> sourcesViaFluent = project.sources().list();
     List<Path> sourcesViaDirect = project.listJavaSourceFiles();
 
-    assertEquals("Fluent API should return same files as direct method",
-        sourcesViaDirect.size(), sourcesViaFluent.size());
+    assertEquals(sourcesViaDirect.size(), sourcesViaFluent.size(),
+        "Fluent API should return same files as direct method");
 
     Set<Path> directSet = sourcesViaDirect.stream().collect(Collectors.toSet());
     Set<Path> fluentSet = sourcesViaFluent.stream().collect(Collectors.toSet());
 
-    assertEquals("Fluent API should return same files as direct method", directSet, fluentSet);
+    assertEquals(directSet, fluentSet, "Fluent API should return same files as direct method");
   }
 
   @Test
@@ -133,13 +133,13 @@ public class ProjectTest {
     List<Path> testSourcesViaFluent = project.testSources().list();
     List<Path> testSourcesViaDirect = project.listJavaTestFiles();
 
-    assertEquals("Fluent API should return same test files as direct method",
-        testSourcesViaDirect.size(), testSourcesViaFluent.size());
+    assertEquals(testSourcesViaDirect.size(), testSourcesViaFluent.size(),
+        "Fluent API should return same test files as direct method");
 
     Set<Path> directSet = testSourcesViaDirect.stream().collect(Collectors.toSet());
     Set<Path> fluentSet = testSourcesViaFluent.stream().collect(Collectors.toSet());
 
-    assertEquals("Fluent API should return same test files as direct method", directSet, fluentSet);
+    assertEquals(directSet, fluentSet, "Fluent API should return same test files as direct method");
   }
 
   @Test
@@ -148,13 +148,13 @@ public class ProjectTest {
     List<Path> allSourcesViaFluent = project.allSources().list();
     List<Path> allSourcesViaDirect = project.listJavaFiles();
 
-    assertEquals("Fluent API should return same all files as direct method",
-        allSourcesViaDirect.size(), allSourcesViaFluent.size());
+    assertEquals(allSourcesViaDirect.size(), allSourcesViaFluent.size(),
+        "Fluent API should return same all files as direct method");
 
     Set<Path> directSet = allSourcesViaDirect.stream().collect(Collectors.toSet());
     Set<Path> fluentSet = allSourcesViaFluent.stream().collect(Collectors.toSet());
 
-    assertEquals("Fluent API should return same all files as direct method", directSet, fluentSet);
+    assertEquals(directSet, fluentSet, "Fluent API should return same all files as direct method");
   }
 
   @Test
@@ -167,8 +167,8 @@ public class ProjectTest {
     // All returned files should match the patterns
     for (Path file : testFiles) {
       String fileName = file.getFileName().toString();
-      assertTrue("File " + fileName + " should match test patterns",
-          fileName.endsWith("Test.java") || fileName.endsWith("Tests.java"));
+      assertTrue(fileName.endsWith("Test.java") || fileName.endsWith("Tests.java"),
+          "File " + fileName + " should match test patterns");
     }
   }
 
@@ -182,8 +182,8 @@ public class ProjectTest {
     // None of the returned files should match the excluded patterns
     for (Path file : nonTestFiles) {
       String fileName = file.getFileName().toString();
-      assertTrue("File " + fileName + " should not match excluded test patterns",
-          !fileName.endsWith("Test.java") && !fileName.endsWith("Tests.java"));
+      assertTrue(!fileName.endsWith("Test.java") && !fileName.endsWith("Tests.java"),
+          "File " + fileName + " should not match excluded test patterns");
     }
   }
 
@@ -198,9 +198,9 @@ public class ProjectTest {
     // All returned files should be Java files but not test files
     for (Path file : filteredFiles) {
       String fileName = file.getFileName().toString();
-      assertTrue("File " + fileName + " should be Java file", fileName.endsWith(".java"));
-      assertTrue("File " + fileName + " should not be test file",
-          !fileName.endsWith("Test.java") && !fileName.endsWith("Tests.java"));
+      assertTrue(fileName.endsWith(".java"), "File " + fileName + " should be Java file");
+      assertTrue(!fileName.endsWith("Test.java") && !fileName.endsWith("Tests.java"),
+          "File " + fileName + " should not be test file");
     }
   }
 
@@ -218,8 +218,8 @@ public class ProjectTest {
         .list();
 
     // Just verify the chaining works (results are lists)
-    assertTrue("Sources chaining should work", result1 != null);
-    assertTrue("Test sources chaining should work", result2 != null);
+    assertTrue(result1 != null, "Sources chaining should work");
+    assertTrue(result2 != null, "Test sources chaining should work");
   }
 
   @Test
@@ -232,8 +232,8 @@ public class ProjectTest {
     // All results should end with Test.java
     for (Path file : globResults) {
       String fileName = file.getFileName().toString();
-      assertTrue("File " + fileName + " should match glob pattern",
-          fileName.endsWith("Test.java"));
+      assertTrue(fileName.endsWith("Test.java"),
+          "File " + fileName + " should match glob pattern");
     }
   }
 
@@ -256,9 +256,9 @@ public class ProjectTest {
     List<Path> direct = project.listJavaSourceFiles();
 
     // All should return the same as the direct method
-    assertEquals("Empty include should return all files", direct.size(), withEmptyInclude.size());
-    assertEquals("Empty exclude should return all files", direct.size(), withEmptyExclude.size());
-    assertEquals("Both empty should return all files", direct.size(), withBothEmpty.size());
+    assertEquals(direct.size(), withEmptyInclude.size(), "Empty include should return all files");
+    assertEquals(direct.size(), withEmptyExclude.size(), "Empty exclude should return all files");
+    assertEquals(direct.size(), withBothEmpty.size(), "Both empty should return all files");
   }
 
   @Test
@@ -275,8 +275,8 @@ public class ProjectTest {
     List<Path> direct = project.listJavaSourceFiles();
 
     // All should return the same as the direct method
-    assertEquals("Null include should return all files", direct.size(), withNullInclude.size());
-    assertEquals("Null exclude should return all files", direct.size(), withNullExclude.size());
+    assertEquals(direct.size(), withNullInclude.size(), "Null include should return all files");
+    assertEquals(direct.size(), withNullExclude.size(), "Null exclude should return all files");
   }
 
   @Test
@@ -300,14 +300,14 @@ public class ProjectTest {
         .list();
 
     // Verify results make sense
-    assertTrue("Should find some test files", !allTestFiles.isEmpty());
-    assertTrue("Should find some non-generated sources", !nonGeneratedSources.isEmpty());
-    assertTrue("Should find some clean sources", !cleanSources.isEmpty());
+    assertTrue(!allTestFiles.isEmpty(), "Should find some test files");
+    assertTrue(!nonGeneratedSources.isEmpty(), "Should find some non-generated sources");
+    assertTrue(!cleanSources.isEmpty(), "Should find some clean sources");
 
     // Clean sources should have fewer files than all sources
     List<Path> allSources = project.allSources().list();
-    assertTrue("Clean sources should be subset of all sources",
-        cleanSources.size() <= allSources.size());
+    assertTrue(cleanSources.size() <= allSources.size(),
+        "Clean sources should be subset of all sources");
   }
 
   // =================================================================
@@ -318,13 +318,13 @@ public class ProjectTest {
   public void testFindWithoutFilters() {
     // Test finding classes in unfiltered sets
     Optional<Path> projectClass = project.sources().find("io.sundr.adapter.source.Project");
-    assertTrue("Should find Project class in sources", projectClass.isPresent());
+    assertTrue(projectClass.isPresent(), "Should find Project class in sources");
 
     Optional<Path> projectTestClass = project.testSources().find("io.sundr.adapter.source.ProjectTest");
-    assertTrue("Should find ProjectTest class in test sources", projectTestClass.isPresent());
+    assertTrue(projectTestClass.isPresent(), "Should find ProjectTest class in test sources");
 
     Optional<Path> projectClassInAll = project.allSources().find("io.sundr.adapter.source.Project");
-    assertTrue("Should find Project class in all sources", projectClassInAll.isPresent());
+    assertTrue(projectClassInAll.isPresent(), "Should find Project class in all sources");
   }
 
   @Test
@@ -333,13 +333,13 @@ public class ProjectTest {
     Optional<Path> projectClass = project.sources()
         .including("*Project.java")
         .find("io.sundr.adapter.source.Project");
-    assertTrue("Should find Project class when it matches include pattern", projectClass.isPresent());
+    assertTrue(projectClass.isPresent(), "Should find Project class when it matches include pattern");
 
     // Test not finding classes when they don't match include patterns
     Optional<Path> projectClassExcluded = project.sources()
         .including("*Test.java")
         .find("io.sundr.adapter.source.Project");
-    assertFalse("Should not find Project class when it doesn't match include pattern", projectClassExcluded.isPresent());
+    assertFalse(projectClassExcluded.isPresent(), "Should not find Project class when it doesn't match include pattern");
   }
 
   @Test
@@ -348,13 +348,13 @@ public class ProjectTest {
     Optional<Path> projectTestExcluded = project.testSources()
         .excluding("*Test.java")
         .find("io.sundr.adapter.source.ProjectTest");
-    assertFalse("Should not find ProjectTest when it matches exclude pattern", projectTestExcluded.isPresent());
+    assertFalse(projectTestExcluded.isPresent(), "Should not find ProjectTest when it matches exclude pattern");
 
     // Test finding classes when they don't match exclude patterns
     Optional<Path> projectClass = project.sources()
         .excluding("*Test.java")
         .find("io.sundr.adapter.source.Project");
-    assertTrue("Should find Project class when it doesn't match exclude pattern", projectClass.isPresent());
+    assertTrue(projectClass.isPresent(), "Should find Project class when it doesn't match exclude pattern");
   }
 
   @Test
@@ -364,45 +364,45 @@ public class ProjectTest {
         .including("*.java")
         .excluding("*Test.java")
         .find("io.sundr.adapter.source.Project");
-    assertTrue("Should find Project class with combined filters", result.isPresent());
+    assertTrue(result.isPresent(), "Should find Project class with combined filters");
 
     Optional<Path> excludedResult = project.allSources()
         .including("*.java")
         .excluding("*Test.java")
         .find("io.sundr.adapter.source.ProjectTest");
-    assertFalse("Should not find ProjectTest with exclude filter", excludedResult.isPresent());
+    assertFalse(excludedResult.isPresent(), "Should not find ProjectTest with exclude filter");
   }
 
   @Test
   public void testFindBySimpleClassName() {
     // Test finding by simple class name (no package)
     Optional<Path> result = project.sources().find("Project");
-    assertTrue("Should find class by simple name", result.isPresent());
+    assertTrue(result.isPresent(), "Should find class by simple name");
 
     String resultPath = result.get().toString();
-    assertTrue("Found path should end with Project.java", resultPath.endsWith("Project.java"));
+    assertTrue(resultPath.endsWith("Project.java"), "Found path should end with Project.java");
   }
 
   @Test
   public void testFindNonExistentClass() {
     // Test finding classes that don't exist
     Optional<Path> nonExistent = project.allSources().find("com.example.NonExistentClass");
-    assertFalse("Should not find non-existent class", nonExistent.isPresent());
+    assertFalse(nonExistent.isPresent(), "Should not find non-existent class");
   }
 
   @Test
   public void testFindWithNullAndEmptyInput() {
     // Test null input
     Optional<Path> nullResult = project.sources().find((String) null);
-    assertFalse("Should return empty for null input", nullResult.isPresent());
+    assertFalse(nullResult.isPresent(), "Should return empty for null input");
 
     // Test empty input
     Optional<Path> emptyResult = project.sources().find("");
-    assertFalse("Should return empty for empty input", emptyResult.isPresent());
+    assertFalse(emptyResult.isPresent(), "Should return empty for empty input");
 
     // Test whitespace input
     Optional<Path> whitespaceResult = project.sources().find("   ");
-    assertFalse("Should return empty for whitespace input", whitespaceResult.isPresent());
+    assertFalse(whitespaceResult.isPresent(), "Should return empty for whitespace input");
   }
 
   @Test
@@ -413,22 +413,22 @@ public class ProjectTest {
     Optional<Path> projectInSources = project.sources().find("io.sundr.adapter.source.Project");
     Optional<Path> projectInTests = project.testSources().find("io.sundr.adapter.source.Project");
 
-    assertTrue("Project should be found in sources", projectInSources.isPresent());
-    assertFalse("Project should not be found in test sources", projectInTests.isPresent());
+    assertTrue(projectInSources.isPresent(), "Project should be found in sources");
+    assertFalse(projectInTests.isPresent(), "Project should not be found in test sources");
 
     // ProjectTest should only be found in test sources, not sources
     Optional<Path> testInSources = project.sources().find("io.sundr.adapter.source.ProjectTest");
     Optional<Path> testInTests = project.testSources().find("io.sundr.adapter.source.ProjectTest");
 
-    assertFalse("ProjectTest should not be found in sources", testInSources.isPresent());
-    assertTrue("ProjectTest should be found in test sources", testInTests.isPresent());
+    assertFalse(testInSources.isPresent(), "ProjectTest should not be found in sources");
+    assertTrue(testInTests.isPresent(), "ProjectTest should be found in test sources");
 
     // Both should be found in all sources
     Optional<Path> projectInAll = project.allSources().find("io.sundr.adapter.source.Project");
     Optional<Path> testInAll = project.allSources().find("io.sundr.adapter.source.ProjectTest");
 
-    assertTrue("Project should be found in all sources", projectInAll.isPresent());
-    assertTrue("ProjectTest should be found in all sources", testInAll.isPresent());
+    assertTrue(projectInAll.isPresent(), "Project should be found in all sources");
+    assertTrue(testInAll.isPresent(), "ProjectTest should be found in all sources");
   }
 
   @Test
@@ -439,18 +439,18 @@ public class ProjectTest {
     Optional<Path> specificTest = project.testSources()
         .including("*Test.java")
         .find("io.sundr.adapter.source.ProjectTest");
-    assertTrue("Should find specific test class", specificTest.isPresent());
+    assertTrue(specificTest.isPresent(), "Should find specific test class");
 
     // Find a source class while excluding generated files
     Optional<Path> sourceClass = project.sources()
         .excluding("*Generated.java", "*Fluent.java", "*Builder.java")
         .find("io.sundr.adapter.source.Project");
-    assertTrue("Should find source class while excluding generated", sourceClass.isPresent());
+    assertTrue(sourceClass.isPresent(), "Should find source class while excluding generated");
 
     // Try to find a class that would be excluded
     Optional<Path> excludedClass = project.testSources()
         .excluding("*Test.java")
         .find("io.sundr.adapter.source.ProjectTest");
-    assertFalse("Should not find excluded test class", excludedClass.isPresent());
+    assertFalse(excludedClass.isPresent(), "Should not find excluded test class");
   }
 }

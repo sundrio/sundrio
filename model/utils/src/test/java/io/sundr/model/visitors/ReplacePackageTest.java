@@ -16,9 +16,9 @@
 
 package io.sundr.model.visitors;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;

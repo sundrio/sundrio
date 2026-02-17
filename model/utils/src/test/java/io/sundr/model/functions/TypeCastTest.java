@@ -17,14 +17,14 @@
 
 package io.sundr.model.functions;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -41,7 +41,7 @@ public class TypeCastTest {
   public static final ClassRef STRING_INT_HASHMAP_REF = Collections.HASH_MAP.toReference(Types.STRING_REF, Types.INT_REF);
   public static final ClassRef INT_DOUBLE_MAP_REF = Collections.MAP.toReference(Types.INT_REF, Types.DOUBLE_REF);
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     DefinitionRepository.getRepository().register(Collections.MAP);
     DefinitionRepository.getRepository().register(Collections.LIST);

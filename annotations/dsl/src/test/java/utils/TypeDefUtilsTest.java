@@ -21,7 +21,11 @@ import static io.sundr.dsl.internal.Constants.ORIGINAL_RETURN_TYPE;
 import static io.sundr.dsl.internal.Constants.TRANSPARENT_REF;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.executableToInterface;
 import static io.sundr.dsl.internal.utils.TypeDefUtils.isVoid;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,15 +36,10 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-
-import com.google.testing.compile.CompilationRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.dsl.internal.processor.DslContext;
@@ -51,10 +50,10 @@ import io.sundr.dsl.internal.utils.TypeDefUtils;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.repo.DefinitionRepository;
+import net.serverpeon.testing.compile.CompilationExtension;
 
+@ExtendWith(CompilationExtension.class)
 public class TypeDefUtilsTest {
-
-  public @Rule CompilationRule rule = new CompilationRule();
 
   private Elements elements;
   private Types types;
@@ -65,17 +64,16 @@ public class TypeDefUtilsTest {
   private final TypeDef INTEGER = new TypeDefBuilder().withPackageName("java.lang").withName("Integer").build();
   private final TypeDef LONG = new TypeDefBuilder().withPackageName("java.lang").withName("Long").build();
 
-  @BeforeClass
+  @BeforeAll
   public static void setupClass() {
     String version = System.getProperty("java.specification.version");
-    Assume.assumeTrue(version.trim().startsWith("11"));
-
+    assumeTrue(version.trim().startsWith("11"));
   }
 
-  @Before
-  public void setup() {
-    elements = rule.getElements();
-    types = rule.getTypes();
+  @BeforeEach
+  public void setup(Elements elements, Types types) {
+    this.elements = elements;
+    this.types = types;
     context = AptContext.create(elements, types, DefinitionRepository.getRepository());
     dslContext = DslContextManager.create(elements, types);
   }
@@ -88,20 +86,18 @@ public class TypeDefUtilsTest {
     ExecutableElement terminal = !isVoid(methods.get(0)) ? methods.get(0) : methods.get(1);
 
     TypeDef simpleClazz = TypeDefUtils.executableToInterface(dslContext, simple);
-    Assert.assertThat(simpleClazz.getName(), CoreMatchers.equalTo("MethodAInterface"));
-    Assert.assertThat(simpleClazz.getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
-    Assert.assertThat(simpleClazz.getParameters().size(), CoreMatchers.is(1));
-    Assert.assertThat(simpleClazz.getExtendsList().size(), CoreMatchers.is(0));
-    //Assert.assertThat((ClassRef) simpleClazz.getAttributes().get(ORIGINAL_RETURN_TYPE), TypeNamed.typeNamed("T"));
-    Assert.assertFalse((Boolean) simpleClazz.getAttributes().get(IS_TERMINAL));
+    assertEquals("MethodAInterface", simpleClazz.getName());
+    assertEquals(getClass().getPackage().getName(), simpleClazz.getPackageName());
+    assertEquals(1, simpleClazz.getParameters().size());
+    assertEquals(0, simpleClazz.getExtendsList().size());
+    assertFalse((Boolean) simpleClazz.getAttributes().get(IS_TERMINAL));
 
     TypeDef terminalClazz = TypeDefUtils.executableToInterface(dslContext, terminal);
-    Assert.assertThat(terminalClazz.getName(), CoreMatchers.equalTo("MethodBInterface"));
-    Assert.assertThat(terminalClazz.getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
-    Assert.assertThat(terminalClazz.getParameters().size(), CoreMatchers.is(1));
-    Assert.assertThat(terminalClazz.getExtendsList().size(), CoreMatchers.is(0));
-    //Assert.assertThat((ClassRef) terminalClazz.getAttributes().get(ORIGINAL_RETURN_TYPE), TypeNamed.typeNamed("T"));
-    Assert.assertTrue((Boolean) terminalClazz.getAttributes().get(IS_TERMINAL));
+    assertEquals("MethodBInterface", terminalClazz.getName());
+    assertEquals(getClass().getPackage().getName(), terminalClazz.getPackageName());
+    assertEquals(1, terminalClazz.getParameters().size());
+    assertEquals(0, terminalClazz.getExtendsList().size());
+    assertTrue((Boolean) terminalClazz.getAttributes().get(IS_TERMINAL));
   }
 
   @Test
@@ -113,20 +109,18 @@ public class TypeDefUtilsTest {
     TypeDef simpleClazz = TypeDefUtils.executableToInterface(dslContext, simple);
     TypeDef teminalClazz = TypeDefUtils.executableToInterface(dslContext, terminal);
     TypeDef combined = Combine.TYPEDEFS.apply(Arrays.asList(simpleClazz, teminalClazz));
-    Assert.assertNotNull(combined);
+    assertNotNull(combined);
 
     String T = Generics.MAP.apply(TRANSPARENT_REF).getName();
-    Assert.assertThat(combined.getName(), CoreMatchers.equalTo("MethodABInterface"));
-    Assert.assertThat(combined.getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
-    //Assert.assertThat(combined.getParameters().size(), CoreMatchers.is(1));
-    //Assert.assertThat(combined.getParameters().get(0).getName(), CoreMatchers.equalTo(T));
-    Assert.assertThat(combined.getExtendsList().size(), CoreMatchers.is(2));
-    Assert.assertTrue(combined.getExtendsList().stream()
+    assertEquals("MethodABInterface", combined.getName());
+    assertEquals(getClass().getPackage().getName(), combined.getPackageName());
+    assertEquals(2, combined.getExtendsList().size());
+    assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
         .filter(s -> s.equals("utils.MethodAInterface<" + T + ">"))
         .findAny().isPresent());
 
-    Assert.assertTrue(combined.getExtendsList().stream()
+    assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
         .filter(s -> s.equals("utils.MethodBInterface<" + T + ">"))
         .findAny().isPresent());
@@ -142,24 +136,22 @@ public class TypeDefUtilsTest {
     TypeDef leftClazz = executableToInterface(dslContext, left);
     TypeDef rightClazz = executableToInterface(dslContext, right);
     TypeDef combined = Combine.TYPEDEFS.apply(Arrays.asList(leftClazz, rightClazz));
-    Assert.assertNotNull(combined);
+    assertNotNull(combined);
 
-    Assert.assertThat(combined.getName(), CoreMatchers.equalTo("MethodABInterface"));
-    Assert.assertThat(combined.getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
-    //Assert.assertThat(combined.getParameters().size(), CoreMatchers.is(1));
-    //Assert.assertThat(combined.getParameters().get(0).getName(), CoreMatchers.equalTo("T"));
-    Assert.assertThat(combined.getExtendsList().size(), CoreMatchers.is(2));
-    Assert.assertTrue(combined.getExtendsList().stream()
+    assertEquals("MethodABInterface", combined.getName());
+    assertEquals(getClass().getPackage().getName(), combined.getPackageName());
+    assertEquals(2, combined.getExtendsList().size());
+    assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
         .filter(s -> s.equals("utils.MethodAInterface<T>"))
         .findAny().isPresent());
 
-    Assert.assertTrue(combined.getExtendsList().stream()
+    assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
         .filter(s -> s.equals("utils.MethodBInterface<T>"))
         .findAny().isPresent());
 
-    assertEquals(combined.getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT_REF);
+    assertEquals(TRANSPARENT_REF, combined.getAttributes().get(ORIGINAL_RETURN_TYPE));
   }
 
   @Test
@@ -171,24 +163,23 @@ public class TypeDefUtilsTest {
     TypeDef leftClazz = executableToInterface(dslContext, left);
     TypeDef rightClazz = executableToInterface(dslContext, right);
     TypeDef combined = Combine.TYPEDEFS.apply(Arrays.asList(leftClazz, rightClazz));
-    Assert.assertNotNull(combined);
+    assertNotNull(combined);
 
-    Assert.assertThat(combined.getName(), CoreMatchers.equalTo("MethodABInterface"));
-    Assert.assertThat(combined.getPackageName(), CoreMatchers.equalTo(getClass().getPackage().getName()));
-    //Assert.assertThat(combined.getParameters().size(), CoreMatchers.is(1));
-    Assert.assertThat(combined.getExtendsList().size(), CoreMatchers.is(2));
+    assertEquals("MethodABInterface", combined.getName());
+    assertEquals(getClass().getPackage().getName(), combined.getPackageName());
+    assertEquals(2, combined.getExtendsList().size());
 
-    Assert.assertTrue(combined.getExtendsList().stream()
+    assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
         .filter(s -> s.equals("utils.MethodAInterface<T>"))
         .findAny().isPresent());
 
-    Assert.assertTrue(combined.getExtendsList().stream()
+    assertTrue(combined.getExtendsList().stream()
         .map(Object::toString)
         .filter(s -> s.equals("utils.MethodBInterface<T>"))
         .findAny().isPresent());
 
-    assertEquals(combined.getAttributes().get(ORIGINAL_RETURN_TYPE), TRANSPARENT_REF);
+    assertEquals(TRANSPARENT_REF, combined.getAttributes().get(ORIGINAL_RETURN_TYPE));
   }
 
 }

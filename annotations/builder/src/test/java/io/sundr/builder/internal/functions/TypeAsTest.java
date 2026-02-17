@@ -7,10 +7,10 @@ import static io.sundr.model.utils.Collections.LIST;
 import static io.sundr.model.utils.Collections.MAP;
 import static io.sundr.model.utils.Types.OPTIONAL;
 import static io.sundr.model.utils.Types.STRING_REF;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.TypeParamRefBuilder;
@@ -20,7 +20,7 @@ import io.sundr.model.utils.Optionals;
 
 public class TypeAsTest {
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     DefinitionRepository.getRepository().register(MAP);
     DefinitionRepository.getRepository().register(LIST);

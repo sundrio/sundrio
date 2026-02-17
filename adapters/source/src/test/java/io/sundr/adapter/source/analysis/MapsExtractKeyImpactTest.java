@@ -1,14 +1,14 @@
 package io.sundr.adapter.source.analysis;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.Project;
@@ -29,7 +29,7 @@ public class MapsExtractKeyImpactTest {
   private Project coreProject;
   private DefinitionRepository repository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     Project project = Project.getProject();
     coreProject = Project.getProject(project.getModuleRoot().toPath().getParent().getParent().resolve("core"));
@@ -51,29 +51,29 @@ public class MapsExtractKeyImpactTest {
   public void testRealMapsExtractKeyImpact() {
     // Find the actual Maps source file
     Optional<Path> mapsPath = coreProject.allSources().find("io.sundr.utils.Maps");
-    assertTrue("Maps class should be found in core project", mapsPath.isPresent());
+    assertTrue(mapsPath.isPresent(), "Maps class should be found in core project");
 
     // Find the actual MapsTest source file
     Optional<Path> mapsTestPath = coreProject.allSources().find("io.sundr.utils.MapsTest");
-    assertTrue("MapsTest class should be found in core project", mapsTestPath.isPresent());
+    assertTrue(mapsTestPath.isPresent(), "MapsTest class should be found in core project");
 
     System.out.println("Maps source file: " + mapsPath.get());
     System.out.println("MapsTest source file: " + mapsTestPath.get());
 
     // Get the Maps TypeDef from repository
     TypeDef mapsTypeDef = repository.getDefinition("io.sundr.utils.Maps");
-    assertNotNull("Maps TypeDef should be found in repository", mapsTypeDef);
+    assertNotNull(mapsTypeDef, "Maps TypeDef should be found in repository");
 
     // Get the MapsTest TypeDef from repository
     TypeDef mapsTestTypeDef = repository.getDefinition("io.sundr.utils.MapsTest");
-    assertNotNull("MapsTest TypeDef should be found in repository", mapsTestTypeDef);
+    assertNotNull(mapsTestTypeDef, "MapsTest TypeDef should be found in repository");
 
     // Find the extractKey method
     Method extractKeyMethod = mapsTypeDef.getMethods().stream()
         .filter(m -> "extractKey".equals(m.getName()))
         .findFirst()
         .orElse(null);
-    assertNotNull("extractKey method should be found", extractKeyMethod);
+    assertNotNull(extractKeyMethod, "extractKey method should be found");
 
     System.out.println("Found extractKey method: " + extractKeyMethod.getName());
 
@@ -88,8 +88,8 @@ public class MapsExtractKeyImpactTest {
     // Perform impact analysis
     ImpactAnalysisResult result = analyzer.analyze(changeSet);
 
-    assertNotNull("Impact analysis result should not be null", result);
-    assertTrue("Should have impact detected", result.hasAnyImpact());
+    assertNotNull(result, "Impact analysis result should not be null");
+    assertTrue(result.hasAnyImpact(), "Should have impact detected");
 
     // Print the dependency tree
     String dependencyTree = result.getDependencyTreeVisualization();
@@ -109,7 +109,7 @@ public class MapsExtractKeyImpactTest {
 
     // Check if the dependency tree shows the correct semantics:
     // Root should be Maps.extractKey
-    assertTrue("Dependency tree should contain Maps.extractKey", dependencyTree.contains("Maps.extractKey"));
+    assertTrue(dependencyTree.contains("Maps.extractKey"), "Dependency tree should contain Maps.extractKey");
 
     // Look for Maps.create method as a child (since it calls extractKey)
     boolean hasCreateMethod = result.getAffectedMethodReferences().stream()
@@ -134,7 +134,7 @@ public class MapsExtractKeyImpactTest {
     } else {
       System.out.println("❌ No MapsTest methods found in impact analysis");
     }
-    assertTrue("Should have MapsTest methods affected", hasTestMethods);
+    assertTrue(hasTestMethods, "Should have MapsTest methods affected");
 
     // Specifically look for shouldCreateFromMapping test (which should call Maps.create)
     boolean hasShouldCreateFromMappingTest = result.getAffectedMethodReferences().stream()
@@ -145,13 +145,14 @@ public class MapsExtractKeyImpactTest {
     } else {
       System.out.println("❌ shouldCreateFromMapping test method NOT found");
     }
-    assertTrue("shouldCreateFromMapping test should be affected", hasShouldCreateFromMappingTest);
+    assertTrue(hasShouldCreateFromMappingTest, "shouldCreateFromMapping test should be affected");
 
     // Print impact summary
     System.out.println("\nImpact Summary: " + result.getSummary());
 
     // The test passes if we have any impact and the tree contains the expected root
-    assertTrue("Dependency tree should start with Maps.extractKey as root", dependencyTree.startsWith("Maps.extractKey"));
+    assertTrue(dependencyTree.startsWith("Maps.extractKey"),
+        "Dependency tree should start with Maps.extractKey as root");
   }
 
   @Test
@@ -194,7 +195,7 @@ public class MapsExtractKeyImpactTest {
     if (lines.length > 0) {
       String rootLine = lines[0].trim();
       System.out.println("Root line: " + rootLine);
-      assertTrue("Root should be Maps.extractKey", rootLine.contains("Maps.extractKey"));
+      assertTrue(rootLine.contains("Maps.extractKey"), "Root should be Maps.extractKey");
 
       // Verify children are methods that call extractKey (not methods that extractKey calls)
       System.out.println("\nAnalyzing tree structure:");

@@ -16,16 +16,15 @@
 
 package io.sundr.model.utils;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TypesTest {
 
   @Test
   public void isBoolean() {
-    Assert.assertTrue(Types.isBoolean(Types.BOOLEAN_REF));
-    Assert.assertTrue(Types.isBoolean(Types.PRIMITIVE_BOOLEAN_REF));
+    assertTrue(Types.isBoolean(Types.BOOLEAN_REF));
+    assertTrue(Types.isBoolean(Types.PRIMITIVE_BOOLEAN_REF));
   }
 }

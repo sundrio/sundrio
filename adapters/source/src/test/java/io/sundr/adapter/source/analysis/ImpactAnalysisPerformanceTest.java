@@ -1,13 +1,13 @@
 package io.sundr.adapter.source.analysis;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.source.Project;
 import io.sundr.adapter.source.change.Change;
@@ -25,7 +25,7 @@ public class ImpactAnalysisPerformanceTest {
   private Project project;
   private ImpactAnalyzer analyzer;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     project = Project.getProject();
     analyzer = new ImpactAnalyzer(project, DefinitionRepository.getRepository());
@@ -79,13 +79,13 @@ public class ImpactAnalysisPerformanceTest {
 
     // Assertions
     assertNotNull(result);
-    assertTrue("Analysis should complete within reasonable time (< 5 seconds)", duration < 5000);
+    assertTrue(duration < 5000, "Analysis should complete within reasonable time (< 5 seconds)");
 
     // Check metadata if available
     if (result.getAnalysisMetadata().containsKey("analysis_duration_ms")) {
       String durationStr = result.getAnalysisMetadata().get("analysis_duration_ms");
       long analysisDuration = Long.parseLong(durationStr);
-      assertTrue("Internal analysis duration should be reasonable", analysisDuration < 1000);
+      assertTrue(analysisDuration < 1000, "Internal analysis duration should be reasonable");
     }
 
     System.out.println("Analysis of 50-method class took: " + duration + "ms");
@@ -116,7 +116,7 @@ public class ImpactAnalysisPerformanceTest {
     long duration = System.currentTimeMillis() - startTime;
 
     assertNotNull(result);
-    assertTrue("Multiple changes should be analyzed efficiently", duration < 2000);
+    assertTrue(duration < 2000, "Multiple changes should be analyzed efficiently");
 
     System.out.println("Analysis of 10 method additions took: " + duration + "ms");
   }

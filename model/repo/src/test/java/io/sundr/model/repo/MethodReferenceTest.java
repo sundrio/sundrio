@@ -16,12 +16,12 @@
 
 package io.sundr.model.repo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Set;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
@@ -47,7 +47,7 @@ public class MethodReferenceTest {
         .build();
 
     Set<MethodReference> references = MethodReference.getMethodReferences(empty, repository);
-    assertTrue("Should return empty set for method without calls", references.isEmpty());
+    assertTrue(references.isEmpty(), "Should return empty set for method without calls");
   }
 
   @Test
@@ -60,7 +60,7 @@ public class MethodReferenceTest {
         .build();
 
     Set<MethodReference> references = MethodReference.getMethodReferences(getter, repository);
-    assertTrue("Should return empty set for method without calls", references.isEmpty());
+    assertTrue(references.isEmpty(), "Should return empty set for method without calls");
   }
 
   @Test
@@ -87,12 +87,12 @@ public class MethodReferenceTest {
     repository.register(def);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(caller, repository);
-    assertEquals("Should return local method call", 1, references.size());
+    assertEquals(1, references.size(), "Should return local method call");
 
     // Verify that the found method reference is correct
     MethodReference foundReference = references.iterator().next();
-    assertEquals("Should find the local method", "method", foundReference.getMethod().getName());
-    assertEquals("Should find the correct owning type", "MyType", foundReference.getOwningType().getName());
+    assertEquals("method", foundReference.getMethod().getName(), "Should find the local method");
+    assertEquals("MyType", foundReference.getOwningType().getName(), "Should find the correct owning type");
   }
 
   @Test
@@ -120,12 +120,12 @@ public class MethodReferenceTest {
     repository.register(def);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(conditionalMethod, repository);
-    assertEquals("Should return method call from if condition", 1, references.size());
+    assertEquals(1, references.size(), "Should return method call from if condition");
 
     // Verify that the found method reference is correct
     MethodReference foundReference = references.iterator().next();
-    assertEquals("Should find the condition method", "isValid", foundReference.getMethod().getName());
-    assertEquals("Should find the correct owning type", "MyType", foundReference.getOwningType().getName());
+    assertEquals("isValid", foundReference.getMethod().getName(), "Should find the condition method");
+    assertEquals("MyType", foundReference.getOwningType().getName(), "Should find the correct owning type");
   }
 
   @Test
@@ -155,12 +155,12 @@ public class MethodReferenceTest {
     repository.register(def);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(assignmentMethod, repository);
-    assertEquals("Should return method call from assignment", 1, references.size());
+    assertEquals(1, references.size(), "Should return method call from assignment");
 
     // Verify that the found method reference is correct
     MethodReference foundReference = references.iterator().next();
-    assertEquals("Should find the getValue method", "getValue", foundReference.getMethod().getName());
-    assertEquals("Should find the correct owning type", "MyType", foundReference.getOwningType().getName());
+    assertEquals("getValue", foundReference.getMethod().getName(), "Should find the getValue method");
+    assertEquals("MyType", foundReference.getOwningType().getName(), "Should find the correct owning type");
   }
 
   @Test
@@ -198,12 +198,12 @@ public class MethodReferenceTest {
     repository.register(childClass);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(childMethod, repository);
-    assertEquals("Should return superclass method call", 1, references.size());
+    assertEquals(1, references.size(), "Should return superclass method call");
 
     // Verify that the found method reference is correct
     MethodReference foundReference = references.iterator().next();
-    assertEquals("Should find the parent method", "parentMethod", foundReference.getMethod().getName());
-    assertEquals("Should find the correct owning type", "ParentClass", foundReference.getOwningType().getName());
+    assertEquals("parentMethod", foundReference.getMethod().getName(), "Should find the parent method");
+    assertEquals("ParentClass", foundReference.getOwningType().getName(), "Should find the correct owning type");
   }
 
   @Test
@@ -240,19 +240,19 @@ public class MethodReferenceTest {
     repository.register(def);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(methodA, repository);
-    assertEquals("Should return both direct and transitive dependencies", 2, references.size());
+    assertEquals(2, references.size(), "Should return both direct and transitive dependencies");
 
     // Verify that both methodB and methodC are found
     Set<String> foundMethodNames = references.stream()
         .map(ref -> ref.getMethod().getName())
         .collect(java.util.stream.Collectors.toSet());
 
-    assertTrue("Should find methodB", foundMethodNames.contains("methodB"));
-    assertTrue("Should find methodC", foundMethodNames.contains("methodC"));
+    assertTrue(foundMethodNames.contains("methodB"), "Should find methodB");
+    assertTrue(foundMethodNames.contains("methodC"), "Should find methodC");
 
     // Verify that all method references have the correct owning type
     for (MethodReference ref : references) {
-      assertEquals("Should find the correct owning type", "TransitiveTestClass", ref.getOwningType().getName());
+      assertEquals("TransitiveTestClass", ref.getOwningType().getName(), "Should find the correct owning type");
     }
   }
 
@@ -311,21 +311,21 @@ public class MethodReferenceTest {
     repository.register(def);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(forLoopMethod, repository);
-    assertEquals("Should return all method calls from for loop", 4, references.size());
+    assertEquals(4, references.size(), "Should return all method calls from for loop");
 
     // Verify that all expected methods are found
     Set<String> foundMethodNames = references.stream()
         .map(ref -> ref.getMethod().getName())
         .collect(java.util.stream.Collectors.toSet());
 
-    assertTrue("Should find getStart method", foundMethodNames.contains("getStart"));
-    assertTrue("Should find getEnd method", foundMethodNames.contains("getEnd"));
-    assertTrue("Should find increment method", foundMethodNames.contains("increment"));
-    assertTrue("Should find processItem method", foundMethodNames.contains("processItem"));
+    assertTrue(foundMethodNames.contains("getStart"), "Should find getStart method");
+    assertTrue(foundMethodNames.contains("getEnd"), "Should find getEnd method");
+    assertTrue(foundMethodNames.contains("increment"), "Should find increment method");
+    assertTrue(foundMethodNames.contains("processItem"), "Should find processItem method");
 
     // Verify that all method references have the correct owning type
     for (MethodReference ref : references) {
-      assertEquals("Should find the correct owning type", "ForTestClass", ref.getOwningType().getName());
+      assertEquals("ForTestClass", ref.getOwningType().getName(), "Should find the correct owning type");
     }
   }
 
@@ -370,19 +370,19 @@ public class MethodReferenceTest {
     repository.register(def);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(foreachLoopMethod, repository);
-    assertEquals("Should return all method calls from foreach loop", 2, references.size());
+    assertEquals(2, references.size(), "Should return all method calls from foreach loop");
 
     // Verify that all expected methods are found
     Set<String> foundMethodNames = references.stream()
         .map(ref -> ref.getMethod().getName())
         .collect(java.util.stream.Collectors.toSet());
 
-    assertTrue("Should find getItems method", foundMethodNames.contains("getItems"));
-    assertTrue("Should find processItem method", foundMethodNames.contains("processItem"));
+    assertTrue(foundMethodNames.contains("getItems"), "Should find getItems method");
+    assertTrue(foundMethodNames.contains("processItem"), "Should find processItem method");
 
     // Verify that all method references have the correct owning type
     for (MethodReference ref : references) {
-      assertEquals("Should find the correct owning type", "ForeachTestClass", ref.getOwningType().getName());
+      assertEquals("ForeachTestClass", ref.getOwningType().getName(), "Should find the correct owning type");
     }
   }
 
@@ -433,7 +433,7 @@ public class MethodReferenceTest {
     repository.register(typeC);
 
     Set<MethodReference> references = MethodReference.getMethodReferences(methodA, repository);
-    assertEquals("Should return transitive dependencies across multiple types", 2, references.size());
+    assertEquals(2, references.size(), "Should return transitive dependencies across multiple types");
 
     // Verify that both methodB and methodC are found with correct owning types
     boolean foundMethodB = false;
@@ -442,14 +442,14 @@ public class MethodReferenceTest {
     for (MethodReference ref : references) {
       if ("methodB".equals(ref.getMethod().getName())) {
         foundMethodB = true;
-        assertEquals("methodB should be owned by TypeB", "TypeB", ref.getOwningType().getName());
+        assertEquals("TypeB", ref.getOwningType().getName(), "methodB should be owned by TypeB");
       } else if ("methodC".equals(ref.getMethod().getName())) {
         foundMethodC = true;
-        assertEquals("methodC should be owned by TypeC", "TypeC", ref.getOwningType().getName());
+        assertEquals("TypeC", ref.getOwningType().getName(), "methodC should be owned by TypeC");
       }
     }
 
-    assertTrue("Should find methodB from TypeB", foundMethodB);
-    assertTrue("Should find methodC from TypeC", foundMethodC);
+    assertTrue(foundMethodB, "Should find methodB from TypeB");
+    assertTrue(foundMethodC, "Should find methodC from TypeC");
   }
 }

@@ -1,9 +1,10 @@
 package io.sundr.builder.internal.checks;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.Kind;
-import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.utils.Types;
 
@@ -12,9 +13,9 @@ import io.sundr.model.utils.Types;
  */
 public class DuplicateFieldCheckTest {
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void shouldThrowException() {
-    TypeDef def = new TypeDefBuilder()
+    assertThrows(IllegalStateException.class, () -> new TypeDefBuilder()
         .withPackageName("my.pkg")
         .withName("SomeClass")
         .withKind(Kind.CLASS)
@@ -27,7 +28,7 @@ public class DuplicateFieldCheckTest {
         .withTypeRef(Types.STRING_REF)
         .endField()
         .accept(new DuplicateFieldCheck())
-        .build();
+        .build());
   }
 
   @Test

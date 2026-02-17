@@ -17,14 +17,14 @@
 
 package io.sundr.model.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.Field;
@@ -60,7 +60,7 @@ public class BindDefinitionTest {
 
   ClassRef string = ClassRef.forName(String.class.getName());
 
-  @Before
+  @BeforeEach
   public void setUp() {
     DefinitionRepository.getRepository().register(target);
   }

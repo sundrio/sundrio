@@ -16,11 +16,13 @@
 
 package io.sundr.examples.validation;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AddressValidationTest {
 
@@ -31,19 +33,19 @@ public class AddressValidationTest {
     Address address = new DefaultAddressBuilder().build();
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptNullStreetViaConstructor() {
-    Address address = new DefaultAddressBuilder(true).build();
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder(true).build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptNullStreetViaUsingValidation() {
-    Address address = new DefaultAddressBuilder().usingValidation().build();
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder().usingValidation().build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptNullStreetViaUsingValidator() {
-    Address address = new DefaultAddressBuilder().usingValidator(validator).build();
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder().usingValidator(validator).build());
   }
 
   @Test
@@ -51,19 +53,22 @@ public class AddressValidationTest {
     Address address = new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).build();
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptZeroNumberViaConstructor() {
-    Address address = new DefaultAddressBuilder(true).withStreet("Sesame").withNumber(0).build();
+    assertThrows(ConstraintViolationException.class,
+        () -> new DefaultAddressBuilder(true).withStreet("Sesame").withNumber(0).build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptZeroNumberViaUsingValidation() {
-    Address address = new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidation().build();
+    assertThrows(ConstraintViolationException.class,
+        () -> new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidation().build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shoulNotdAcceptZeroNumberViaUsingValidator() {
-    Address address = new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidator(validator).build();
+    assertThrows(ConstraintViolationException.class,
+        () -> new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidator(validator).build());
   }
 
   @Test
@@ -74,30 +79,30 @@ public class AddressValidationTest {
         .build();
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptAlphanumericZipCodeViaConstructor() {
-    Address address = new DefaultAddressBuilder(true).withStreet("Sesame")
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder(true).withStreet("Sesame")
         .withNumber(1)
         .withZipCode("abcd")
-        .build();
+        .build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptAlphanumericZipCodeViaUsingValidation() {
-    Address address = new DefaultAddressBuilder().withStreet("Sesame")
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder().withStreet("Sesame")
         .withNumber(1)
         .withZipCode("abcd")
         .usingValidation()
-        .build();
+        .build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptAlphanumericZipCodeViaUsingValidator() {
-    Address address = new DefaultAddressBuilder().withStreet("Sesame")
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder().withStreet("Sesame")
         .withNumber(1)
         .withZipCode("abcd")
         .usingValidator(validator)
-        .build();
+        .build());
   }
 
   @Test
@@ -108,30 +113,30 @@ public class AddressValidationTest {
         .build();
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptLongZipCodeViaConstructor() {
-    Address address = new DefaultAddressBuilder(true).withStreet("Sesame")
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder(true).withStreet("Sesame")
         .withNumber(1)
         .withZipCode("1234567")
-        .build();
+        .build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptLongZipCodeViaUsingValidation() {
-    Address address = new DefaultAddressBuilder(true).withStreet("Sesame")
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder(true).withStreet("Sesame")
         .withNumber(1)
         .withZipCode("1234567")
         .usingValidation()
-        .build();
+        .build());
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void shouldNotAcceptLongZipCodeViaUsingValidator() {
-    Address address = new DefaultAddressBuilder(true).withStreet("Sesame")
+    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder(true).withStreet("Sesame")
         .withNumber(1)
         .withZipCode("1234567")
         .usingValidator(validator)
-        .build();
+        .build());
   }
 
 }

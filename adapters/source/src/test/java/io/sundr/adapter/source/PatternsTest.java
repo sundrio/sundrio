@@ -4,14 +4,14 @@
 
 package io.sundr.adapter.source;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
@@ -26,11 +26,11 @@ public class PatternsTest {
     // Find the Patterns.java file in the core module
     Optional<Path> patternsPath = coreProject.allSources().find("io.sundr.utils.Patterns");
 
-    assertTrue("Should find Patterns.java", patternsPath.isPresent());
+    assertTrue(patternsPath.isPresent(), "Should find Patterns.java");
 
     // Parse the TypeDef from the file - should now work without null condition error
     TypeDef typeDef = coreProject.parse(patternsPath.get());
-    assertNotNull("TypeDef should be created", typeDef);
+    assertNotNull(typeDef, "TypeDef should be created");
     assertEquals("Patterns", typeDef.getName());
     assertEquals(Kind.CLASS, typeDef.getKind());
     assertEquals("io.sundr.utils", typeDef.getPackageName());

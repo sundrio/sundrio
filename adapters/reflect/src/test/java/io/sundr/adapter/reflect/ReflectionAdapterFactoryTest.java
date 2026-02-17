@@ -17,14 +17,14 @@
 
 package io.sundr.adapter.reflect;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.Adapter;
 import io.sundr.adapter.api.AdapterContext;

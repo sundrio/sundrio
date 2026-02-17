@@ -22,9 +22,9 @@ import static io.sundr.model.utils.Collections.K;
 import static io.sundr.model.utils.Collections.V;
 import static io.sundr.model.utils.Types.INT_REF;
 import static io.sundr.model.utils.Types.STRING_REF;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -110,7 +110,7 @@ public class CollectionsTest {
       .withExtendsList(HASH_MAP.toReference(K.toReference(), LIST.toReference(V.toReference())))
       .build();
 
-  @Before
+  @BeforeEach
   public void setUp() {
     DefinitionRepository.getRepository().register(COLLECTION);
     DefinitionRepository.getRepository().register(LIST);

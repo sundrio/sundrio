@@ -16,8 +16,8 @@
 
 package io.sundr.examples.kubernetes;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.examples.kubernetes.domain.Pod;
 import io.sundr.examples.kubernetes.domain.ReplicationController;
@@ -27,7 +27,7 @@ public class KubernetesDslTest {
 
   private Kubernetes kubernetes = null;
 
-  @Ignore
+  @Disabled
   @Test
   public void testPodDSL() {
 
@@ -43,7 +43,7 @@ public class KubernetesDslTest {
     //kubernetes.pod().inNamespace("namespace").delete();
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void testServiceDSL() {
     kubernetes.service().inNamespace("default")
@@ -59,7 +59,7 @@ public class KubernetesDslTest {
     //kubernetes.service().inNamespace("namespace").delete();
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void testReplicationControllerDSL() {
     kubernetes.replicationController().inNamespace("default").list();

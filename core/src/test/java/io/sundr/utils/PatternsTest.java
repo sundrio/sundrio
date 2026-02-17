@@ -17,12 +17,12 @@
 
 package io.sundr.utils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PatternsTest {
 
@@ -49,22 +49,22 @@ public class PatternsTest {
   @Test
   public void testGlobPatternDetection() {
     // Should detect as glob patterns
-    assertTrue("*.java should be detected as glob", Patterns.isGlobPattern("*.java"));
-    assertTrue("**/*Test.java should be detected as glob", Patterns.isGlobPattern("**/*Test.java"));
-    assertTrue("Test*.java should be detected as glob", Patterns.isGlobPattern("Test*.java"));
-    assertTrue("**/Test?.java should be detected as glob", Patterns.isGlobPattern("**/Test?.java"));
-    assertTrue("src/main/**/*.xml should be detected as glob", Patterns.isGlobPattern("src/main/**/*.xml"));
+    assertTrue(Patterns.isGlobPattern("*.java"), "*.java should be detected as glob");
+    assertTrue(Patterns.isGlobPattern("**/*Test.java"), "**/*Test.java should be detected as glob");
+    assertTrue(Patterns.isGlobPattern("Test*.java"), "Test*.java should be detected as glob");
+    assertTrue(Patterns.isGlobPattern("**/Test?.java"), "**/Test?.java should be detected as glob");
+    assertTrue(Patterns.isGlobPattern("src/main/**/*.xml"), "src/main/**/*.xml should be detected as glob");
 
     // Should detect as regex patterns
-    assertFalse(".*Test should be detected as regex", Patterns.isGlobPattern(".*Test"));
-    assertFalse("Test[0-9]+ should be detected as regex", Patterns.isGlobPattern("Test[0-9]+"));
-    assertFalse("^io\\.sundr\\..* should be detected as regex", Patterns.isGlobPattern("^io\\.sundr\\..*"));
-    assertFalse("(Test|Spec).* should be detected as regex", Patterns.isGlobPattern("(Test|Spec).*"));
-    assertFalse("Test{1,3} should be detected as regex", Patterns.isGlobPattern("Test{1,3}"));
+    assertFalse(Patterns.isGlobPattern(".*Test"), ".*Test should be detected as regex");
+    assertFalse(Patterns.isGlobPattern("Test[0-9]+"), "Test[0-9]+ should be detected as regex");
+    assertFalse(Patterns.isGlobPattern("^io\\.sundr\\..*"), "^io\\.sundr\\..* should be detected as regex");
+    assertFalse(Patterns.isGlobPattern("(Test|Spec).*"), "(Test|Spec).* should be detected as regex");
+    assertFalse(Patterns.isGlobPattern("Test{1,3}"), "Test{1,3} should be detected as regex");
 
     // Edge cases - should default to regex for backward compatibility
-    assertFalse("plain string should default to regex", Patterns.isGlobPattern("Test"));
-    assertFalse("string with dots should default to regex", Patterns.isGlobPattern("io.sundr.Test"));
+    assertFalse(Patterns.isGlobPattern("Test"), "plain string should default to regex");
+    assertFalse(Patterns.isGlobPattern("io.sundr.Test"), "string with dots should default to regex");
   }
 
   @Test
@@ -113,18 +113,18 @@ public class PatternsTest {
   @Test
   public void testAutoPatternDetectionWithMatching() {
     // Glob patterns should work automatically
-    assertTrue("Should match glob pattern", Patterns.matchesPattern("Test.java", "*.java"));
-    assertTrue("Should match glob pattern", Patterns.matchesPattern("MyTest.java", "*Test.java"));
-    assertTrue("Should match directory traversal", Patterns.matchesPattern("src/test/java/MyTest.java", "**/*Test.java"));
+    assertTrue(Patterns.matchesPattern("Test.java", "*.java"), "Should match glob pattern");
+    assertTrue(Patterns.matchesPattern("MyTest.java", "*Test.java"), "Should match glob pattern");
+    assertTrue(Patterns.matchesPattern("src/test/java/MyTest.java", "**/*Test.java"), "Should match directory traversal");
 
     // Regex patterns should still work
-    assertTrue("Should match regex pattern", Patterns.matchesPattern("TestClass", ".*Test.*"));
-    assertTrue("Should match regex pattern", Patterns.matchesPattern("io.sundr.model.TypeDefFluent", ".*Fluent"));
-    assertTrue("Should match regex character class", Patterns.matchesPattern("Test123", "Test[0-9]+"));
+    assertTrue(Patterns.matchesPattern("TestClass", ".*Test.*"), "Should match regex pattern");
+    assertTrue(Patterns.matchesPattern("io.sundr.model.TypeDefFluent", ".*Fluent"), "Should match regex pattern");
+    assertTrue(Patterns.matchesPattern("Test123", "Test[0-9]+"), "Should match regex character class");
 
     // Mixed scenarios through isIncluded/isExcluded
-    assertTrue("Should handle mixed patterns", Patterns.isIncluded("MyTest.java", "*.java", ".*Test.*"));
-    assertTrue("Should handle mixed patterns", Patterns.isExcluded("TestUtils.java", "*Test.java", ".*Utils.*"));
+    assertTrue(Patterns.isIncluded("MyTest.java", "*.java", ".*Test.*"), "Should handle mixed patterns");
+    assertTrue(Patterns.isExcluded("TestUtils.java", "*Test.java", ".*Utils.*"), "Should handle mixed patterns");
   }
 
   @Test
@@ -143,18 +143,18 @@ public class PatternsTest {
   @Test
   public void testFluentApiRegex() {
     // Test explicit regex matching
-    assertTrue("Should match regex pattern", Patterns.regex().matches("TestClass", ".*Test.*"));
-    assertTrue("Should match regex character class", Patterns.regex().matches("Test123", "Test[0-9]+"));
-    assertTrue("Should match regex anchors", Patterns.regex().matches("start-middle-end", "^start.*end$"));
-    assertFalse("Should not match when pattern doesn't match", Patterns.regex().matches("Utils", ".*Test.*"));
+    assertTrue(Patterns.regex().matches("TestClass", ".*Test.*"), "Should match regex pattern");
+    assertTrue(Patterns.regex().matches("Test123", "Test[0-9]+"), "Should match regex character class");
+    assertTrue(Patterns.regex().matches("start-middle-end", "^start.*end$"), "Should match regex anchors");
+    assertFalse(Patterns.regex().matches("Utils", ".*Test.*"), "Should not match when pattern doesn't match");
 
     // Test regex isIncluded
-    assertTrue("Should be included by regex", Patterns.regex().isIncluded("TestClass", ".*Test.*", ".*Utils.*"));
-    assertFalse("Should not be included by regex", Patterns.regex().isIncluded("Something", ".*Test.*", ".*Utils.*"));
+    assertTrue(Patterns.regex().isIncluded("TestClass", ".*Test.*", ".*Utils.*"), "Should be included by regex");
+    assertFalse(Patterns.regex().isIncluded("Something", ".*Test.*", ".*Utils.*"), "Should not be included by regex");
 
     // Test regex isExcluded
-    assertTrue("Should be excluded by regex", Patterns.regex().isExcluded("TestClass", ".*Test.*"));
-    assertFalse("Should not be excluded by regex", Patterns.regex().isExcluded("Something", ".*Test.*"));
+    assertTrue(Patterns.regex().isExcluded("TestClass", ".*Test.*"), "Should be excluded by regex");
+    assertFalse(Patterns.regex().isExcluded("Something", ".*Test.*"), "Should not be excluded by regex");
 
     // Test that glob patterns are treated as literal regex (should throw exception)
     try {
@@ -162,43 +162,43 @@ public class PatternsTest {
       fail("Should throw PatternSyntaxException for invalid regex");
     } catch (java.util.regex.PatternSyntaxException e) {
       // Expected - glob patterns are invalid regex
-      assertTrue("Should contain error about dangling meta character",
-          e.getMessage().contains("Dangling meta character"));
+      assertTrue(e.getMessage().contains("Dangling meta character"),
+          "Should contain error about dangling meta character");
     }
   }
 
   @Test
   public void testFluentApiGlob() {
     // Test explicit glob matching
-    assertTrue("Should match glob pattern", Patterns.glob().matches("Test.java", "*.java"));
-    assertTrue("Should match glob with directory traversal",
-        Patterns.glob().matches("src/test/java/MyTest.java", "**/*Test.java"));
-    assertTrue("Should match glob wildcard", Patterns.glob().matches("TestUtils.java", "Test*.java"));
-    assertFalse("Should not match when pattern doesn't match", Patterns.glob().matches("Test.xml", "*.java"));
+    assertTrue(Patterns.glob().matches("Test.java", "*.java"), "Should match glob pattern");
+    assertTrue(Patterns.glob().matches("src/test/java/MyTest.java", "**/*Test.java"),
+        "Should match glob with directory traversal");
+    assertTrue(Patterns.glob().matches("TestUtils.java", "Test*.java"), "Should match glob wildcard");
+    assertFalse(Patterns.glob().matches("Test.xml", "*.java"), "Should not match when pattern doesn't match");
 
     // Test glob isIncluded
-    assertTrue("Should be included by glob", Patterns.glob().isIncluded("Test.java", "*.java", "*.xml"));
-    assertFalse("Should not be included by glob", Patterns.glob().isIncluded("Test.txt", "*.java", "*.xml"));
+    assertTrue(Patterns.glob().isIncluded("Test.java", "*.java", "*.xml"), "Should be included by glob");
+    assertFalse(Patterns.glob().isIncluded("Test.txt", "*.java", "*.xml"), "Should not be included by glob");
 
     // Test glob isExcluded
-    assertTrue("Should be excluded by glob", Patterns.glob().isExcluded("MyTest.java", "*Test.java"));
-    assertFalse("Should not be excluded by glob", Patterns.glob().isExcluded("Utils.java", "*Test.java"));
+    assertTrue(Patterns.glob().isExcluded("MyTest.java", "*Test.java"), "Should be excluded by glob");
+    assertFalse(Patterns.glob().isExcluded("Utils.java", "*Test.java"), "Should not be excluded by glob");
 
     // Test that regex patterns are treated as literal globs (should fail for regex-specific syntax)
-    assertFalse("Regex pattern should fail as glob", Patterns.glob().matches("TestClass", ".*Test.*"));
+    assertFalse(Patterns.glob().matches("TestClass", ".*Test.*"), "Regex pattern should fail as glob");
   }
 
   @Test
   public void testFluentApiAuto() {
     // Test auto-detection (should behave same as static methods)
-    assertTrue("Should auto-detect glob", Patterns.auto().matches("Test.java", "*.java"));
-    assertTrue("Should auto-detect regex", Patterns.auto().matches("TestClass", ".*Test.*"));
-    assertTrue("Should auto-detect directory traversal glob",
-        Patterns.auto().matches("src/test/java/MyTest.java", "**/*Test.java"));
+    assertTrue(Patterns.auto().matches("Test.java", "*.java"), "Should auto-detect glob");
+    assertTrue(Patterns.auto().matches("TestClass", ".*Test.*"), "Should auto-detect regex");
+    assertTrue(Patterns.auto().matches("src/test/java/MyTest.java", "**/*Test.java"),
+        "Should auto-detect directory traversal glob");
 
     // Test auto isIncluded/isExcluded
-    assertTrue("Should auto-detect mixed patterns", Patterns.auto().isIncluded("Test.java", "*.java", ".*Test.*"));
-    assertTrue("Should auto-detect mixed patterns", Patterns.auto().isExcluded("TestUtils.java", "*Test.java", ".*Utils.*"));
+    assertTrue(Patterns.auto().isIncluded("Test.java", "*.java", ".*Test.*"), "Should auto-detect mixed patterns");
+    assertTrue(Patterns.auto().isExcluded("TestUtils.java", "*Test.java", ".*Utils.*"), "Should auto-detect mixed patterns");
   }
 
   @Test
@@ -206,22 +206,22 @@ public class PatternsTest {
     // Example usage scenarios
 
     // Force regex when pattern might be ambiguous
-    assertTrue("Force regex for complex pattern",
-        Patterns.regex().matches("test123", "test[0-9]+"));
+    assertTrue(Patterns.regex().matches("test123", "test[0-9]+"),
+        "Force regex for complex pattern");
 
     // Force glob for file patterns
-    assertTrue("Force glob for file patterns",
-        Patterns.glob().matches("MyTest.java", "*Test.java"));
+    assertTrue(Patterns.glob().matches("MyTest.java", "*Test.java"),
+        "Force glob for file patterns");
 
     // Auto-detection for mixed scenarios
-    assertTrue("Auto-detect in mixed scenario",
-        Patterns.auto().isIncluded("TestUtils.java", "*.java", ".*Test.*", "**/*Utils*"));
+    assertTrue(Patterns.auto().isIncluded("TestUtils.java", "*.java", ".*Test.*", "**/*Utils*"),
+        "Auto-detect in mixed scenario");
 
     // Explicit type selection for performance-critical code
-    assertTrue("Explicit glob for performance",
-        Patterns.glob().isIncluded("test.txt", "*.txt", "*.log", "*.xml"));
+    assertTrue(Patterns.glob().isIncluded("test.txt", "*.txt", "*.log", "*.xml"),
+        "Explicit glob for performance");
 
-    assertTrue("Explicit regex for performance",
-        Patterns.regex().isIncluded("TestClass", ".*Test.*", ".*Utils.*", ".*Service.*"));
+    assertTrue(Patterns.regex().isIncluded("TestClass", ".*Test.*", ".*Utils.*", ".*Service.*"),
+        "Explicit regex for performance");
   }
 }

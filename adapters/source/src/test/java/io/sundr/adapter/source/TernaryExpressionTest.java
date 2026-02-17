@@ -4,10 +4,10 @@
 
 package io.sundr.adapter.source;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -37,18 +37,18 @@ public class TernaryExpressionTest {
     Expression converted = ExpressionConverter.convertExpression(conditionalExpr);
 
     // Verify it's converted to a Ternary
-    assertNotNull("Ternary expression should be converted", converted);
-    assertTrue("Should be a Ternary instance", converted instanceof Ternary);
+    assertNotNull(converted, "Ternary expression should be converted");
+    assertTrue(converted instanceof Ternary, "Should be a Ternary instance");
 
     Ternary ternary = (Ternary) converted;
-    assertNotNull("Condition should not be null", ternary.getCondition());
-    assertNotNull("Result should not be null", ternary.getResult());
-    assertNotNull("Alternative should not be null", ternary.getAlternative());
+    assertNotNull(ternary.getCondition(), "Condition should not be null");
+    assertNotNull(ternary.getResult(), "Result should not be null");
+    assertNotNull(ternary.getAlternative(), "Alternative should not be null");
 
     // Verify rendering works without NullPointerException
     String rendered = ternary.render();
-    assertNotNull("Rendered string should not be null", rendered);
-    assertTrue("Should contain ternary operator", rendered.contains(" ? "));
-    assertTrue("Should contain colon", rendered.contains(" : "));
+    assertNotNull(rendered, "Rendered string should not be null");
+    assertTrue(rendered.contains(" ? "), "Should contain ternary operator");
+    assertTrue(rendered.contains(" : "), "Should contain colon");
   }
 }

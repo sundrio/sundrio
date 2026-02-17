@@ -1,13 +1,13 @@
 package io.sundr.adapter.source.utils;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.Project;
@@ -28,7 +28,7 @@ public class MethodCallCollectorTest {
   private DefinitionRepository repository;
   private AdapterContext context;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     Project project = Project.getProject();
     coreProject = Project.getProject(project.getModuleRoot().toPath().getParent().getParent().resolve("core"));
@@ -55,19 +55,19 @@ public class MethodCallCollectorTest {
   public void testMethodCallCollectorOnMapsTestClass() {
     // Get the MapsTest TypeDef
     TypeDef mapsTestTypeDef = repository.getDefinition("io.sundr.utils.MapsTest");
-    assertNotNull("MapsTest should be found in repository", mapsTestTypeDef);
+    assertNotNull(mapsTestTypeDef, "MapsTest should be found in repository");
 
     // Test the shouldCreateFromMapping method specifically
     Method shouldCreateFromMappingMethod = mapsTestTypeDef.getMethods().stream()
         .filter(m -> "shouldCreateFromMapping".equals(m.getName()))
         .findFirst()
         .orElse(null);
-    assertNotNull("shouldCreateFromMapping method should exist", shouldCreateFromMappingMethod);
+    assertNotNull(shouldCreateFromMappingMethod, "shouldCreateFromMapping method should exist");
 
     System.out.println("Testing MethodCallCollector on shouldCreateFromMapping method");
 
     // Check the method has a block
-    assertNotNull("Method should have a block", shouldCreateFromMappingMethod.getBlock());
+    assertNotNull(shouldCreateFromMappingMethod.getBlock(), "Method should have a block");
     System.out.println("Method block has " + shouldCreateFromMappingMethod.getBlock().getStatements().size() + " statements");
 
     // Print each statement for debugging
@@ -104,21 +104,21 @@ public class MethodCallCollectorTest {
       System.out.println("Expected to find a call to 'create' method with 'Maps' scope");
     }
 
-    assertTrue("Should find Maps.create method call", foundMapsCreate);
+    assertTrue(foundMapsCreate, "Should find Maps.create method call");
   }
 
   @Test
   public void testMethodCallCollectorOnSimpleMethod() {
     // Test on a method that definitely should have method calls
     TypeDef mapsTypeDef = repository.getDefinition("io.sundr.utils.Maps");
-    assertNotNull("Maps class should be found", mapsTypeDef);
+    assertNotNull(mapsTypeDef, "Maps class should be found");
 
     // Test the create(String) method which calls extractKey and extractValue
     Method createMethod = mapsTypeDef.getMethods().stream()
         .filter(m -> "create".equals(m.getName()) && m.getArguments().size() == 1)
         .findFirst()
         .orElse(null);
-    assertNotNull("create(String) method should exist", createMethod);
+    assertNotNull(createMethod, "create(String) method should exist");
 
     System.out.println("\nTesting MethodCallCollector on Maps.create(String) method");
 

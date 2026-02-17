@@ -21,17 +21,17 @@ import static io.sundr.model.utils.Collections.COLLECTION;
 import static io.sundr.model.utils.Collections.SET;
 import static io.sundr.model.utils.Types.STRING;
 import static io.sundr.model.utils.Types.STRING_REF;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.repo.DefinitionRepository;
 
 public class UnwrapTest {
 
-  @Before
+  @BeforeEach
   public void setUp() {
     DefinitionRepository.getRepository().register(SET);
     DefinitionRepository.getRepository().register(COLLECTION);

@@ -17,8 +17,8 @@
 
 package io.sundr.adapter.apt;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 
@@ -29,29 +29,27 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
-import com.google.testing.compile.CompilationRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import io.sundr.adapter.api.Adapter;
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
 import io.sundr.model.TypeDef;
 import io.sundr.model.repo.DefinitionRepository;
+import net.serverpeon.testing.compile.CompilationExtension;
 
+@ExtendWith(CompilationExtension.class)
 public class AptAdapterFactoryTest {
-
-  public @Rule CompilationRule rule = new CompilationRule();
 
   private Elements elements;
   private Types types;
 
-  @Before
-  public void setup() {
-    elements = rule.getElements();
-    types = rule.getTypes();
+  @BeforeEach
+  public void setup(Elements elements, Types types) {
+    this.elements = elements;
+    this.types = types;
   }
 
   private Optional<Adapter<TypeElement, TypeMirror, VariableElement, ExecutableElement>> createAdapter() {

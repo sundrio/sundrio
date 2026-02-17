@@ -17,14 +17,14 @@
 
 package io.sundr.adapter.source;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
@@ -39,7 +39,7 @@ public class EnumSourceAdapterTest {
     // Find the Singularize enum in the core module
     Optional<Path> singularizePath = coreProject.allSources().find("io.sundr.functions.Singularize");
 
-    assertTrue("Should find Singularize.java", singularizePath.isPresent());
+    assertTrue(singularizePath.isPresent(), "Should find Singularize.java");
 
     // Parse the TypeDef from the file - should now work with enum support
     TypeDef typeDef = coreProject.parse(singularizePath.get());
@@ -49,13 +49,13 @@ public class EnumSourceAdapterTest {
     assertEquals("io.sundr.functions", typeDef.getPackageName());
 
     // Verify the enum has the expected structure
-    assertTrue("Should have FUNCTION constant",
-        typeDef.getFields().stream()
-            .anyMatch(f -> "FUNCTION".equals(f.getName())));
+    assertTrue(typeDef.getFields().stream()
+        .anyMatch(f -> "FUNCTION".equals(f.getName())),
+        "Should have FUNCTION constant");
 
-    assertTrue("Should have apply method",
-        typeDef.getMethods().stream()
-            .anyMatch(m -> "apply".equals(m.getName())));
+    assertTrue(typeDef.getMethods().stream()
+        .anyMatch(m -> "apply".equals(m.getName())),
+        "Should have apply method");
   }
 
   @Test
@@ -66,7 +66,7 @@ public class EnumSourceAdapterTest {
     // Find the Pluralize enum in the core module
     Optional<Path> pluralizePath = coreProject.allSources().find("io.sundr.functions.Pluralize");
 
-    assertTrue("Should find Pluralize.java", pluralizePath.isPresent());
+    assertTrue(pluralizePath.isPresent(), "Should find Pluralize.java");
 
     // Parse the TypeDef from the file - should now work with enum support
     TypeDef typeDef = coreProject.parse(pluralizePath.get());
@@ -76,16 +76,16 @@ public class EnumSourceAdapterTest {
     assertEquals("io.sundr.functions", typeDef.getPackageName());
 
     // Verify the enum has the expected structure
-    assertTrue("Should have FUNCTION constant",
-        typeDef.getFields().stream()
-            .anyMatch(f -> "FUNCTION".equals(f.getName())));
+    assertTrue(typeDef.getFields().stream()
+        .anyMatch(f -> "FUNCTION".equals(f.getName())),
+        "Should have FUNCTION constant");
 
-    assertTrue("Should have apply method",
-        typeDef.getMethods().stream()
-            .anyMatch(m -> "apply".equals(m.getName())));
+    assertTrue(typeDef.getMethods().stream()
+        .anyMatch(m -> "apply".equals(m.getName())),
+        "Should have apply method");
 
-    assertTrue("Should have isAlreadyPlural method",
-        typeDef.getMethods().stream()
-            .anyMatch(m -> "isAlreadyPlural".equals(m.getName())));
+    assertTrue(typeDef.getMethods().stream()
+        .anyMatch(m -> "isAlreadyPlural".equals(m.getName())),
+        "Should have isAlreadyPlural method");
   }
 }
