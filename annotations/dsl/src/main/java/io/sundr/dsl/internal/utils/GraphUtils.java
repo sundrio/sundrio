@@ -76,6 +76,9 @@ public final class GraphUtils {
     } else if (multiple && lastIndex > 0 && lastIndex < path.size() - 1) {
       //We only accept repetition of the last element. Other wise we can end up in infinite loops
       return false;
+    } else if (multiple && lastIndex == path.size() - 1) {
+      //Prevent infinite repetition: if @Multiple item is already at the end, don't add it again
+      return false;
     }
     return filter.apply(path);
   }

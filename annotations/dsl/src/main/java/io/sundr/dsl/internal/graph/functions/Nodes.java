@@ -34,10 +34,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.dsl.internal.graph.Node;
@@ -74,8 +78,31 @@ public class Nodes {
     }
   };
 
+  private static final int MAX_TREE_DEPTH = 1000;
+  private static final Map<String, Node<TypeDef>> treeCache = new ConcurrentHashMap<>();
+
+  private static String cacheKey(NodeContext context) {
+    String visitedNames = context.getVisited().stream()
+        .map(TypeDef::getName)
+        .sorted()
+        .collect(Collectors.joining(","));
+    return context.getItem().getName() + "|" + visitedNames;
+  }
+
   public static final Function<NodeContext, Node<TypeDef>> TO_TREE = new Function<NodeContext, Node<TypeDef>>() {
     public Node<TypeDef> apply(NodeContext context) {
+      String key = cacheKey(context);
+      Node<TypeDef> cached = treeCache.get(key);
+      if (cached != null) {
+        return cached;
+      }
+
+      int depth = context.getPath().size();
+      if (depth > MAX_TREE_DEPTH) {
+        throw new IllegalStateException("DSL tree depth exceeded " + MAX_TREE_DEPTH + ". Path: " +
+            context.getPath().stream().map(t -> t.getName()).collect(Collectors.joining(" -> ")));
+      }
+
       Set<Node<TypeDef>> nextVertices = new LinkedHashSet<Node<TypeDef>>();
 
       //visited and path are the same only in the first iteration. see bellow:
@@ -94,7 +121,10 @@ public class Nodes {
           nextVertices.add(subGraph);
         }
       }
-      return DslContextManager.getContext().getNodeRepository().getOrCreateNode(context.getItem(), nextVertices);
+      Node<TypeDef> result = DslContextManager.getContext().getNodeRepository().getOrCreateNode(context.getItem(),
+          nextVertices);
+      treeCache.put(key, result);
+      return result;
     }
   };
 
@@ -320,14 +350,22 @@ public class Nodes {
   private static class CandidateComparator implements Comparator<TypeDef> {
 
     private final NodeContext nodeContext;
+    private final Map<TypeDef, Set<TypeDef>> nextCache = new HashMap<TypeDef, Set<TypeDef>>();
 
     private CandidateComparator(NodeContext nodeContext) {
       this.nodeContext = nodeContext;
     }
 
+    private Set<TypeDef> getNextFor(TypeDef candidate) {
+      if (!nextCache.containsKey(candidate)) {
+        nextCache.put(candidate, TO_NEXT.apply(nodeContext.contextOfChild(candidate).addToVisited(candidate).build()));
+      }
+      return nextCache.get(candidate);
+    }
+
     public int compare(TypeDef left, TypeDef right) {
-      Set<TypeDef> leftSet = TO_NEXT.apply(nodeContext.contextOfChild(left).addToVisited(left).build());
-      Set<TypeDef> rightSet = TO_NEXT.apply(nodeContext.contextOfChild(right).addToVisited(right).build());
+      Set<TypeDef> leftSet = getNextFor(left);
+      Set<TypeDef> rightSet = getNextFor(right);
       if (leftSet.contains(right) && rightSet.contains(left)) {
         return 0;
       } else if (leftSet.contains(right)) {
