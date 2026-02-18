@@ -16,8 +16,11 @@
 
 package io.sundr.examples.shapes;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 import io.sundr.builder.Visitor;
 
@@ -37,8 +40,8 @@ public class TriangleTest {
         })
         .build();
 
-    Assert.assertFalse(canvas.getShapes().isEmpty());
-    Assert.assertEquals(canvas.getShapes().get(0).getX(), 10);
+    assertFalse(canvas.getShapes().isEmpty());
+    assertEquals(10, canvas.getShapes().get(0).getX());
 
     //Now let's 'revert' the change so that we can remove the item.
     //Reverting is needed in this case so that equals() on Triagnle returns true.
@@ -51,14 +54,14 @@ public class TriangleTest {
         })
         .build();
 
-    Assert.assertFalse(canvas.getShapes().isEmpty());
-    Assert.assertEquals(canvas.getShapes().get(0).getX(), 0);
+    assertFalse(canvas.getShapes().isEmpty());
+    assertEquals(0, canvas.getShapes().get(0).getX());
 
     canvas = new CanvasBuilder(canvas)
         .removeFromShapes(triangle)
         .build();
 
-    Assert.assertTrue(canvas.getShapes().isEmpty());
+    assertTrue(canvas.getShapes().isEmpty());
   }
 
   @Test
@@ -75,14 +78,14 @@ public class TriangleTest {
         })
         .build();
 
-    Assert.assertFalse(canvas.getShapes().isEmpty());
-    Assert.assertEquals(canvas.getShapes().get(0).getX(), 10);
+    assertFalse(canvas.getShapes().isEmpty());
+    assertEquals(10, canvas.getShapes().get(0).getX());
 
     //Note: The visitor is actually mutating the original triangle builder instance. So no need to revert the change.
     canvas = new CanvasBuilder(canvas)
         .removeFromShapes(triangle)
         .build();
 
-    Assert.assertTrue(canvas.getShapes().isEmpty());
+    assertTrue(canvas.getShapes().isEmpty());
   }
 }

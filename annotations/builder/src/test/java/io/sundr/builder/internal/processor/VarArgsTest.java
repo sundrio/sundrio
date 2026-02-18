@@ -16,10 +16,10 @@
 
 package io.sundr.builder.internal.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.utils.Sources;
@@ -76,10 +76,10 @@ public class VarArgsTest extends AbstractProcessorTest {
       System.out.println("  " + method.getName() + "(" + method.getArguments() + ")");
     }
 
-    assertTrue("Should have withItems method for buildable var-args", hasItemsMethod);
-    assertTrue("Should have addToItems method for buildable var-args", hasAddToItemsMethod);
-    assertTrue("Should have removeFromItems method for buildable var-args", hasRemoveFromItemsMethod);
-    assertTrue("Should have buildItems method for buildable var-args", hasBuildItemsMethod);
+    assertTrue(hasItemsMethod, "Should have withItems method for buildable var-args");
+    assertTrue(hasAddToItemsMethod, "Should have addToItems method for buildable var-args");
+    assertTrue(hasRemoveFromItemsMethod, "Should have removeFromItems method for buildable var-args");
+    assertTrue(hasBuildItemsMethod, "Should have buildItems method for buildable var-args");
   }
 
   @Test
@@ -99,6 +99,6 @@ public class VarArgsTest extends AbstractProcessorTest {
       }
     }
 
-    assertTrue("Should have build method", hasBuildMethod);
+    assertTrue(hasBuildMethod, "Should have build method");
   }
 }

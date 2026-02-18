@@ -16,11 +16,11 @@
 
 package io.sundr.model.functions;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
@@ -56,7 +56,7 @@ public class AssignableTest {
 
   ClassRef arrayListRef = arrayList.toReference();
 
-  @Before
+  @BeforeEach
   public void init() {
     DefinitionRepository.getRepository().register(collection);
     DefinitionRepository.getRepository().register(list);

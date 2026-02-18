@@ -29,7 +29,6 @@
     <name>Sundrio :: Examples :: Builder :: Hello Lombok</name>
 
     <properties>
-        <junit.version>4.13.1</junit.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
     </properties>
 
@@ -68,9 +67,13 @@
             <version>${project.version}</version>
         </dependency>
              <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
                 <scope>test</scope>
             </dependency>
        

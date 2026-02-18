@@ -22,10 +22,8 @@ import java.util.concurrent.Callable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
-import org.junit.Before;
-import org.junit.Rule;
-
-import com.google.testing.compile.CompilationRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.annotations.Inline;
@@ -35,20 +33,20 @@ import io.sundr.model.Method;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeRef;
 import io.sundr.model.repo.DefinitionRepository;
+import net.serverpeon.testing.compile.CompilationExtension;
 
+@ExtendWith(CompilationExtension.class)
 public class AbstractProcessorTest {
-
-  public @Rule CompilationRule rule = new CompilationRule();
 
   private Elements elements;
   private Types types;
   private AptContext context;
   protected BuilderContext builderContext;
 
-  @Before
-  public void setup() {
-    elements = rule.getElements();
-    types = rule.getTypes();
+  @BeforeEach
+  public void setup(Elements elements, Types types) {
+    this.elements = elements;
+    this.types = types;
     context = AptContext.create(elements, types, DefinitionRepository.getRepository());
     builderContext = BuilderContextManager.create(elements, types);
   }

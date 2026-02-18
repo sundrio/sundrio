@@ -16,11 +16,11 @@
 
 package io.sundr.examples.dto;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test that demonstrates the DTO generation functionality.
@@ -36,11 +36,11 @@ public class DtoGenerationTest {
   public void testUserDtoGenerated() throws Exception {
     // Verify that UserDto class was generated
     Class<?> userDtoClass = Class.forName("io.sundr.examples.dto.model.UserDto");
-    assertNotNull("UserDto class should be generated", userDtoClass);
+    assertNotNull(userDtoClass, "UserDto class should be generated");
 
     // Create an instance to verify it's instantiable
     Object userDto = userDtoClass.newInstance();
-    assertNotNull("UserDto should be instantiable", userDto);
+    assertNotNull(userDto, "UserDto should be instantiable");
   }
 
   @Test
@@ -49,19 +49,19 @@ public class DtoGenerationTest {
 
     // Check that basic fields are present
     Field idField = userDtoClass.getDeclaredField("id");
-    assertEquals("ID field should be Long", Long.class, idField.getType());
+    assertEquals(Long.class, idField.getType(), "ID field should be Long");
 
     Field firstNameField = userDtoClass.getDeclaredField("firstName");
-    assertEquals("firstName field should be String", String.class, firstNameField.getType());
+    assertEquals(String.class, firstNameField.getType(), "firstName field should be String");
 
     Field lastNameField = userDtoClass.getDeclaredField("lastName");
-    assertEquals("lastName field should be String", String.class, lastNameField.getType());
+    assertEquals(String.class, lastNameField.getType(), "lastName field should be String");
 
     Field emailField = userDtoClass.getDeclaredField("email");
-    assertEquals("email field should be String", String.class, emailField.getType());
+    assertEquals(String.class, emailField.getType(), "email field should be String");
 
     Field ageField = userDtoClass.getDeclaredField("age");
-    assertEquals("age field should be int", int.class, ageField.getType());
+    assertEquals(int.class, ageField.getType(), "age field should be int");
   }
 
   @Test
@@ -70,7 +70,7 @@ public class DtoGenerationTest {
 
     // Verify that Department entity reference is replaced with departmentId
     Field departmentIdField = userDtoClass.getDeclaredField("departmentId");
-    assertEquals("departmentId field should be Long", Long.class, departmentIdField.getType());
+    assertEquals(Long.class, departmentIdField.getType(), "departmentId field should be Long");
 
     // Verify that original department field doesn't exist
     try {
@@ -86,13 +86,13 @@ public class DtoGenerationTest {
     Class<?> userDtoClass = Class.forName("io.sundr.examples.dto.model.UserDto");
 
     // Verify class-level annotations are removed
-    assertEquals("DTO class should have no annotations", 0, userDtoClass.getAnnotations().length);
+    assertEquals(0, userDtoClass.getAnnotations().length, "DTO class should have no annotations");
 
     // Verify field annotations are removed
     Field emailField = userDtoClass.getDeclaredField("email");
-    assertEquals("email field should have no annotations", 0, emailField.getAnnotations().length);
+    assertEquals(0, emailField.getAnnotations().length, "email field should have no annotations");
 
     Field firstNameField = userDtoClass.getDeclaredField("firstName");
-    assertEquals("firstName field should have no annotations", 0, firstNameField.getAnnotations().length);
+    assertEquals(0, firstNameField.getAnnotations().length, "firstName field should have no annotations");
   }
 }

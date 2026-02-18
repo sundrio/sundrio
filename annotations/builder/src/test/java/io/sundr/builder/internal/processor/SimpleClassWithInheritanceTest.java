@@ -16,13 +16,13 @@
 
 package io.sundr.builder.internal.processor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
 import java.util.Iterator;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.utils.Sources;
@@ -43,7 +43,7 @@ public class SimpleClassWithInheritanceTest extends AbstractProcessorTest {
   RichTypeDef simpleClassWithDateDef = TypeArguments
       .apply(Sources.readTypeDefFromResource("SimpleClassWithDate.java", context));
 
-  @Before
+  @BeforeEach
   public void setUp() {
     builderContext.getBuildableRepository().register(simpleClassDef);
   }

@@ -1,6 +1,6 @@
 package io.sundr.adapter.source;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,9 +13,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.source.change.ChangeSet;
 import io.sundr.model.*;
@@ -31,7 +31,7 @@ public class ProjectWatchLogicTest {
   private Consumer<ChangeSet> changeConsumer;
   private ScheduledExecutorService scheduler;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     project = new TestableProject();
     receivedChanges = new ArrayList<>();
@@ -39,7 +39,7 @@ public class ProjectWatchLogicTest {
     scheduler = Executors.newScheduledThreadPool(1);
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     if (scheduler != null) {
       scheduler.shutdown();
@@ -68,10 +68,10 @@ public class ProjectWatchLogicTest {
     }
 
     // Verify results
-    assertEquals("Should have received one change", 1, receivedChanges.size());
+    assertEquals(1, receivedChanges.size(), "Should have received one change");
     ChangeSet changeSet = receivedChanges.get(0);
-    assertTrue("Should have changes", changeSet.hasChanges());
-    assertTrue("Previous states should contain the new file", previousStates.containsKey(testPath));
+    assertTrue(changeSet.hasChanges(), "Should have changes");
+    assertTrue(previousStates.containsKey(testPath), "Previous states should contain the new file");
   }
 
   @Test
@@ -90,10 +90,10 @@ public class ProjectWatchLogicTest {
     project.processModifyEvent(testPath, previousStates, changeConsumer);
 
     // Verify results
-    assertEquals("Should have received one change", 1, receivedChanges.size());
+    assertEquals(1, receivedChanges.size(), "Should have received one change");
     ChangeSet changeSet = receivedChanges.get(0);
-    assertTrue("Should have changes", changeSet.hasChanges());
-    assertEquals("Previous states should be updated", newTypeDef, previousStates.get(testPath));
+    assertTrue(changeSet.hasChanges(), "Should have changes");
+    assertEquals(newTypeDef, previousStates.get(testPath), "Previous states should be updated");
   }
 
   @Test
@@ -111,8 +111,8 @@ public class ProjectWatchLogicTest {
     project.processModifyEvent(testPath, previousStates, changeConsumer);
 
     // Verify no change was reported (since there were no actual changes)
-    assertEquals("Should not have received any changes", 0, receivedChanges.size());
-    assertEquals("Previous states should be updated", typeDef, previousStates.get(testPath));
+    assertEquals(0, receivedChanges.size(), "Should not have received any changes");
+    assertEquals(typeDef, previousStates.get(testPath), "Previous states should be updated");
   }
 
   @Test
@@ -127,10 +127,10 @@ public class ProjectWatchLogicTest {
     project.processDeleteEvent(testPath, previousStates, changeConsumer);
 
     // Verify results
-    assertEquals("Should have received one change", 1, receivedChanges.size());
+    assertEquals(1, receivedChanges.size(), "Should have received one change");
     ChangeSet changeSet = receivedChanges.get(0);
-    assertTrue("Should have changes", changeSet.hasChanges());
-    assertFalse("Previous states should not contain deleted file", previousStates.containsKey(testPath));
+    assertTrue(changeSet.hasChanges(), "Should have changes");
+    assertFalse(previousStates.containsKey(testPath), "Previous states should not contain deleted file");
   }
 
   @Test
@@ -142,7 +142,7 @@ public class ProjectWatchLogicTest {
     project.processDeleteEvent(testPath, previousStates, changeConsumer);
 
     // Verify no change was reported
-    assertEquals("Should not have received any changes", 0, receivedChanges.size());
+    assertEquals(0, receivedChanges.size(), "Should not have received any changes");
   }
 
   @Test
@@ -163,18 +163,18 @@ public class ProjectWatchLogicTest {
         previousStates, pendingEvents, scheduler, changeConsumer);
 
     // Verify DELETE event is buffered
-    assertTrue("Should have a pending event", pendingEvents.containsKey(testPath));
-    assertEquals("Should not have received any changes yet", 0, receivedChanges.size());
+    assertTrue(pendingEvents.containsKey(testPath), "Should have a pending event");
+    assertEquals(0, receivedChanges.size(), "Should not have received any changes yet");
 
     // Simulate immediate CREATE event (atomic replace pattern)
     project.handleFileEventWithBuffering(testPath, StandardWatchEventKinds.ENTRY_CREATE,
         previousStates, pendingEvents, scheduler, changeConsumer);
 
     // Verify the DELETE was cancelled and CREATE was processed as MODIFY
-    assertFalse("Should not have pending events", pendingEvents.containsKey(testPath));
-    assertEquals("Should have received one change", 1, receivedChanges.size());
+    assertFalse(pendingEvents.containsKey(testPath), "Should not have pending events");
+    assertEquals(1, receivedChanges.size(), "Should have received one change");
     ChangeSet changeSet = receivedChanges.get(0);
-    assertTrue("Should have changes", changeSet.hasChanges());
+    assertTrue(changeSet.hasChanges(), "Should have changes");
   }
 
   @Test
@@ -193,9 +193,9 @@ public class ProjectWatchLogicTest {
         previousStates, pendingEvents, scheduler, changeConsumer);
 
     // Verify CREATE event is processed immediately
-    assertFalse("Should not have pending events", pendingEvents.containsKey(testPath));
-    assertEquals("Should have received one change", 1, receivedChanges.size());
-    assertTrue("Previous states should contain the new file", previousStates.containsKey(testPath));
+    assertFalse(pendingEvents.containsKey(testPath), "Should not have pending events");
+    assertEquals(1, receivedChanges.size(), "Should have received one change");
+    assertTrue(previousStates.containsKey(testPath), "Previous states should contain the new file");
   }
 
   @Test
@@ -215,16 +215,16 @@ public class ProjectWatchLogicTest {
     project.handleFileEventWithBuffering(testPath, StandardWatchEventKinds.ENTRY_DELETE,
         previousStates, pendingEvents, scheduler, changeConsumer);
 
-    assertTrue("Should have a pending DELETE event", pendingEvents.containsKey(testPath));
-    assertEquals("Should not have received any changes yet", 0, receivedChanges.size());
+    assertTrue(pendingEvents.containsKey(testPath), "Should have a pending DELETE event");
+    assertEquals(0, receivedChanges.size(), "Should not have received any changes yet");
 
     // Then simulate a MODIFY event
     project.handleFileEventWithBuffering(testPath, StandardWatchEventKinds.ENTRY_MODIFY,
         previousStates, pendingEvents, scheduler, changeConsumer);
 
     // Verify the pending DELETE was cancelled and MODIFY was processed
-    assertFalse("Should not have pending events", pendingEvents.containsKey(testPath));
-    assertEquals("Should have received one change", 1, receivedChanges.size());
+    assertFalse(pendingEvents.containsKey(testPath), "Should not have pending events");
+    assertEquals(1, receivedChanges.size(), "Should have received one change");
   }
 
   // Helper method to create test TypeDefs

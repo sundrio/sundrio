@@ -16,8 +16,8 @@
 
 package io.sundr.builder.internal.processor;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.utils.Sources;
@@ -35,7 +35,7 @@ public class SimpleAnnotationTest extends AbstractProcessorTest {
   public void testPojo() {
     System.out.println(simpleClassDef);
     TypeDef pojo = new ToPojo().apply(TypeArguments.apply(simpleClassDef));
-    Assert.assertNotNull(pojo);
+    Assertions.assertNotNull(pojo);
   }
 
 }

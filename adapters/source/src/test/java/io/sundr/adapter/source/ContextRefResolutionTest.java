@@ -1,10 +1,10 @@
 package io.sundr.adapter.source;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.source.utils.Sources;
@@ -27,11 +27,11 @@ public class ContextRefResolutionTest {
         .filter(m -> "testMethod".equals(m.getName()))
         .findFirst();
 
-    assertTrue("testMethod should exist", testMethod.isPresent());
+    assertTrue(testMethod.isPresent(), "testMethod should exist");
 
     UnresolvedContextRefLocator locator = UnresolvedContextRefLocator.forType(typeDef);
-    assertFalse("All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs(),
-        locator.hasUnresolvedContextRefs());
+    assertFalse(locator.hasUnresolvedContextRefs(),
+        "All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs());
   }
 
   @Test
@@ -42,11 +42,11 @@ public class ContextRefResolutionTest {
         .filter(m -> "testMethod".equals(m.getName()))
         .findFirst();
 
-    assertTrue("testMethod should exist", testMethod.isPresent());
+    assertTrue(testMethod.isPresent(), "testMethod should exist");
 
     UnresolvedContextRefLocator locator = UnresolvedContextRefLocator.forType(typeDef);
-    assertFalse("All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs(),
-        locator.hasUnresolvedContextRefs());
+    assertFalse(locator.hasUnresolvedContextRefs(),
+        "All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs());
 
   }
 
@@ -58,10 +58,10 @@ public class ContextRefResolutionTest {
         .filter(m -> "testMethod".equals(m.getName()))
         .findFirst();
 
-    assertTrue("testMethod should exist", testMethod.isPresent());
+    assertTrue(testMethod.isPresent(), "testMethod should exist");
     UnresolvedContextRefLocator locator = UnresolvedContextRefLocator.forType(typeDef);
-    assertFalse("All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs(),
-        locator.hasUnresolvedContextRefs());
+    assertFalse(locator.hasUnresolvedContextRefs(),
+        "All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs());
 
   }
 
@@ -73,10 +73,10 @@ public class ContextRefResolutionTest {
         .filter(m -> "testMethod".equals(m.getName()))
         .findFirst();
 
-    assertTrue("testMethod should exist", testMethod.isPresent());
+    assertTrue(testMethod.isPresent(), "testMethod should exist");
     UnresolvedContextRefLocator locator = UnresolvedContextRefLocator.forType(typeDef);
-    assertFalse("All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs(),
-        locator.hasUnresolvedContextRefs());
+    assertFalse(locator.hasUnresolvedContextRefs(),
+        "All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs());
   }
 
   @Test
@@ -87,11 +87,11 @@ public class ContextRefResolutionTest {
         .filter(m -> "testMethod".equals(m.getName()))
         .findFirst();
 
-    assertTrue("testMethod should exist", testMethod.isPresent());
+    assertTrue(testMethod.isPresent(), "testMethod should exist");
 
     UnresolvedContextRefLocator locator = UnresolvedContextRefLocator.forType(typeDef);
-    assertFalse("All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs(),
-        locator.hasUnresolvedContextRefs());
+    assertFalse(locator.hasUnresolvedContextRefs(),
+        "All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs());
   }
 
   @Test
@@ -102,10 +102,10 @@ public class ContextRefResolutionTest {
         .filter(m -> "testMethod".equals(m.getName()))
         .findFirst();
 
-    assertTrue("testMethod should exist", testMethod.isPresent());
+    assertTrue(testMethod.isPresent(), "testMethod should exist");
     UnresolvedContextRefLocator locator = UnresolvedContextRefLocator.forType(typeDef);
-    assertFalse("All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs(),
-        locator.hasUnresolvedContextRefs());
+    assertFalse(locator.hasUnresolvedContextRefs(),
+        "All ContextRef objects should be resolved, but found: " + locator.getUnresolvedContextRefs());
   }
 
   private TypeDef parseTypeDefFromResource(String resourceName) {

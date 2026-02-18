@@ -1,15 +1,15 @@
 package io.sundr.adapter.source;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for Project watch functionality.
@@ -21,7 +21,7 @@ public class ProjectWatchIntegrationTest {
   private Path srcMainJava;
   private Project project;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     // Create temporary directory structure
     tempDir = Files.createTempDirectory("project-watch-integration-test");
@@ -33,7 +33,7 @@ public class ProjectWatchIntegrationTest {
     project = new Project(tempDir.toFile());
   }
 
-  @After
+  @AfterEach
   public void tearDown() throws Exception {
     // Clean up temporary directory
     if (tempDir != null) {
@@ -44,14 +44,14 @@ public class ProjectWatchIntegrationTest {
   @Test
   public void testWatchMethodExists() {
     // Test that the watch method with ChangeSet consumer exists and returns CompletableFuture
-    assertNotNull("Project should have sources() method", project.sources());
+    assertNotNull(project.sources(), "Project should have sources() method");
 
     // Test that we can call watch without it throwing
     try {
       var watchFuture = project.sources().watch(changeSet -> {
         // Do nothing - just testing the API exists
       });
-      assertNotNull("Watch should return CompletableFuture", watchFuture);
+      assertNotNull(watchFuture, "Watch should return CompletableFuture");
       watchFuture.cancel(true);
     } catch (Exception e) {
       fail("Watch method should exist and be callable: " + e.getMessage());
@@ -68,7 +68,7 @@ public class ProjectWatchIntegrationTest {
           .watch(changeSet -> {
             // Do nothing - just testing the API exists
           });
-      assertNotNull("Watch with filtering should return CompletableFuture", watchFuture);
+      assertNotNull(watchFuture, "Watch with filtering should return CompletableFuture");
       watchFuture.cancel(true);
     } catch (Exception e) {
       fail("Watch method with filtering should work: " + e.getMessage());
@@ -86,9 +86,9 @@ public class ProjectWatchIntegrationTest {
       var allSourcesWatch = project.allSources().watch(changeSet -> {
       });
 
-      assertNotNull("Sources watch should work", sourcesWatch);
-      assertNotNull("Test sources watch should work", testSourcesWatch);
-      assertNotNull("All sources watch should work", allSourcesWatch);
+      assertNotNull(sourcesWatch, "Sources watch should work");
+      assertNotNull(testSourcesWatch, "Test sources watch should work");
+      assertNotNull(allSourcesWatch, "All sources watch should work");
 
       sourcesWatch.cancel(true);
       testSourcesWatch.cancel(true);
@@ -104,13 +104,13 @@ public class ProjectWatchIntegrationTest {
     var watchFuture = project.sources().watch(changeSet -> {
     });
 
-    assertFalse("Future should not be cancelled initially", watchFuture.isCancelled());
-    assertFalse("Future should not be done initially", watchFuture.isDone());
+    assertFalse(watchFuture.isCancelled(), "Future should not be cancelled initially");
+    assertFalse(watchFuture.isDone(), "Future should not be done initially");
 
     boolean cancelled = watchFuture.cancel(true);
-    assertTrue("Future should be cancellable", cancelled);
-    assertTrue("Future should be cancelled after cancel()", watchFuture.isCancelled());
-    assertTrue("Future should be done after cancel()", watchFuture.isDone());
+    assertTrue(cancelled, "Future should be cancellable");
+    assertTrue(watchFuture.isCancelled(), "Future should be cancelled after cancel()");
+    assertTrue(watchFuture.isDone(), "Future should be done after cancel()");
   }
 
   @Test
@@ -123,9 +123,9 @@ public class ProjectWatchIntegrationTest {
     var watcher3 = project.allSources().including("*.java").watch(changeSet -> {
     });
 
-    assertNotNull("First watcher should be created", watcher1);
-    assertNotNull("Second watcher should be created", watcher2);
-    assertNotNull("Third watcher should be created", watcher3);
+    assertNotNull(watcher1, "First watcher should be created");
+    assertNotNull(watcher2, "Second watcher should be created");
+    assertNotNull(watcher3, "Third watcher should be created");
 
     // Clean up
     watcher1.cancel(true);
@@ -145,7 +145,7 @@ public class ProjectWatchIntegrationTest {
     long duration = endTime - startTime;
 
     // Watch should return almost immediately (within 100ms is very generous)
-    assertTrue("Watch should not block caller, took " + duration + "ms", duration < 100);
+    assertTrue(duration < 100, "Watch should not block caller, took " + duration + "ms");
 
     watchFuture.cancel(true);
   }
@@ -153,15 +153,15 @@ public class ProjectWatchIntegrationTest {
   @Test
   public void testProjectDirectoryStructure() {
     // Verify our test setup creates the expected structure
-    assertTrue("Temp directory should exist", Files.exists(tempDir));
-    assertTrue("src/main/java should exist", Files.exists(srcMainJava));
-    assertTrue("src/main/java should be directory", Files.isDirectory(srcMainJava));
+    assertTrue(Files.exists(tempDir), "Temp directory should exist");
+    assertTrue(Files.exists(srcMainJava), "src/main/java should exist");
+    assertTrue(Files.isDirectory(srcMainJava), "src/main/java should be directory");
 
     // Verify project recognizes the structure
     List<Path> sources = project.sources().list();
-    assertNotNull("Sources list should not be null", sources);
+    assertNotNull(sources, "Sources list should not be null");
     // Empty initially, which is expected
-    assertTrue("Sources should be empty initially", sources.isEmpty());
+    assertTrue(sources.isEmpty(), "Sources should be empty initially");
   }
 
   // Helper method to recursively delete directory

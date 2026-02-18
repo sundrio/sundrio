@@ -16,9 +16,12 @@
 
 package io.sundr.examples.shapes;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,8 +30,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.builder.PathAwareTypedVisitor;
 import io.sundr.builder.Visitor;
@@ -68,26 +70,26 @@ public class ShapesTest {
   @Test
   public void testCircleBuilder() {
     Circle circle = new CircleBuilder<Integer>().withX(0).withY(0).withRadius(10).build();
-    Assert.assertEquals(0, circle.getX());
-    Assert.assertEquals(0, circle.getY());
-    Assert.assertEquals(10, circle.getRadius());
+    assertEquals(0, circle.getX());
+    assertEquals(0, circle.getY());
+    assertEquals(10, circle.getRadius());
 
   }
 
   @Test
   public void testCircleEdit() {
     EditableCircle<Integer> circle = new CircleBuilder<Integer>().withX(0).withY(0).withRadius(10).build();
-    Assert.assertEquals(0, circle.getX());
-    Assert.assertEquals(0, circle.getY());
-    Assert.assertEquals(10, (int) circle.getRadius());
+    assertEquals(0, circle.getX());
+    assertEquals(0, circle.getY());
+    assertEquals(10, (int) circle.getRadius());
     Circle circle2 = circle.edit().build();
-    Assert.assertEquals(0, circle2.getX());
-    Assert.assertEquals(0, circle2.getY());
-    Assert.assertEquals(10, circle2.getRadius());
+    assertEquals(0, circle2.getX());
+    assertEquals(0, circle2.getY());
+    assertEquals(10, circle2.getRadius());
     Circle circle3 = circle.edit().withX(1).withY(1).withRadius(20).build();
-    Assert.assertEquals(1, circle3.getX());
-    Assert.assertEquals(1, circle3.getY());
-    Assert.assertEquals(20, circle3.getRadius());
+    assertEquals(1, circle3.getX());
+    assertEquals(1, circle3.getY());
+    assertEquals(20, circle3.getRadius());
   }
 
   @Test
@@ -102,7 +104,7 @@ public class ShapesTest {
         .build();
 
     canvas = new CanvasBuilder(canvas).accept(CircleBuilder.class, b -> b.withRadius(100 + (int) b.getRadius())).build();
-    Assert.assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
+    assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
   }
 
   @Test
@@ -123,7 +125,7 @@ public class ShapesTest {
       }
     }).build();
 
-    Assert.assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
+    assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
   }
 
   @Test
@@ -150,7 +152,7 @@ public class ShapesTest {
       }
     }).build();
 
-    Assert.assertEquals(10, ((Circle) canvas.getShapes().get(0)).getRadius());
+    assertEquals(10, ((Circle) canvas.getShapes().get(0)).getRadius());
 
     //Add a visitor that is not going to be filtered out.
     canvas = new CanvasBuilder(canvas).accept(new PathAwareTypedVisitor<CircleBuilder<Integer>, CanvasBuilder>() {
@@ -165,7 +167,7 @@ public class ShapesTest {
       }
     }).build();
 
-    Assert.assertEquals(210, ((Circle) canvas.getShapes().get(0)).getRadius());
+    assertEquals(210, ((Circle) canvas.getShapes().get(0)).getRadius());
 
   }
 
@@ -185,7 +187,7 @@ public class ShapesTest {
     Canvas canvas = canvasBuilder.build();
 
     canvas = new CanvasBuilder(canvas).accept(CircleBuilder.class, b -> b.withRadius(100 + (int) b.getRadius())).build();
-    Assert.assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
+    assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
   }
 
   @Test
@@ -210,7 +212,7 @@ public class ShapesTest {
       }
     }).build();
 
-    Assert.assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
+    assertEquals(110, ((Circle) canvas.getShapes().get(0)).getRadius());
   }
 
   @Test
@@ -238,7 +240,7 @@ public class ShapesTest {
       }
     }).build();
 
-    Assert.assertEquals(1, canvas.getShapes().size());
+    assertEquals(1, canvas.getShapes().size());
 
   }
 
@@ -277,9 +279,9 @@ public class ShapesTest {
         .build();
 
     Circle circle = (Circle) canvas.getShapes().get(0);
-    Assert.assertNull(circle.getNotes()); //This field is added to ignore properties.
+    assertNull(circle.getNotes()); //This field is added to ignore properties.
     Square square = (Square) canvas.getShapes().get(1);
-    Assert.assertEquals(Optional.of("square1"), square.getNotes());
+    assertEquals(Optional.of("square1"), square.getNotes());
   }
 
   @Test
@@ -292,9 +294,9 @@ public class ShapesTest {
         .withHeight(30)
         .endSquareShape();
 
-    Assert.assertTrue(builder.hasShapes());
+    assertTrue(builder.hasShapes());
     builder.withShapes();
-    Assert.assertFalse(builder.hasShapes());
+    assertFalse(builder.hasShapes());
   }
 
   @Test
@@ -310,16 +312,16 @@ public class ShapesTest {
         .withX(70).withY(80).withNotes("v2Square")
         .and().build();
 
-    Assert.assertNotNull(canvas.getNamedShapes());
-    Assert.assertEquals("Should contain 4 named shapes.", 4, canvas.getNamedShapes().size());
-    Assert.assertTrue(canvas.getNamedShapes().containsKey("v1Circle"));
-    Assert.assertTrue(canvas.getNamedShapes().get("v1Circle") instanceof Circle);
-    Assert.assertEquals(10, canvas.getNamedShapes().get("v1Circle").getX());
-    Assert.assertEquals(20, canvas.getNamedShapes().get("v1Circle").getY());
-    Assert.assertTrue(canvas.getNamedShapes().containsKey("v2Circle"));
-    Assert.assertTrue(canvas.getNamedShapes().get("v2Circle") instanceof io.sundr.examples.shapes.v2.Circle);
-    Assert.assertEquals(30, canvas.getNamedShapes().get("v2Circle").getX());
-    Assert.assertEquals(40, canvas.getNamedShapes().get("v2Circle").getY());
+    assertNotNull(canvas.getNamedShapes());
+    assertEquals(4, canvas.getNamedShapes().size(), "Should contain 4 named shapes.");
+    assertTrue(canvas.getNamedShapes().containsKey("v1Circle"));
+    assertTrue(canvas.getNamedShapes().get("v1Circle") instanceof Circle);
+    assertEquals(10, canvas.getNamedShapes().get("v1Circle").getX());
+    assertEquals(20, canvas.getNamedShapes().get("v1Circle").getY());
+    assertTrue(canvas.getNamedShapes().containsKey("v2Circle"));
+    assertTrue(canvas.getNamedShapes().get("v2Circle") instanceof io.sundr.examples.shapes.v2.Circle);
+    assertEquals(30, canvas.getNamedShapes().get("v2Circle").getX());
+    assertEquals(40, canvas.getNamedShapes().get("v2Circle").getY());
   }
 
   @Test
@@ -330,18 +332,18 @@ public class ShapesTest {
         .withX(5)
         .and().build();
 
-    Assert.assertNotNull(modifiedCanvas.getNamedShapes());
-    Assert.assertEquals("Should contain only one shape.", 1, modifiedCanvas.getNamedShapes().size());
-    Assert.assertTrue(modifiedCanvas.getNamedShapes().containsKey("testShape"));
-    Assert.assertEquals(5, modifiedCanvas.getNamedShapes().get("testShape").getX());
-    Assert.assertEquals(2, modifiedCanvas.getNamedShapes().get("testShape").getY());
+    assertNotNull(modifiedCanvas.getNamedShapes());
+    assertEquals(1, modifiedCanvas.getNamedShapes().size(), "Should contain only one shape.");
+    assertTrue(modifiedCanvas.getNamedShapes().containsKey("testShape"));
+    assertEquals(5, modifiedCanvas.getNamedShapes().get("testShape").getX());
+    assertEquals(2, modifiedCanvas.getNamedShapes().get("testShape").getY());
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testExceptionOnWrongInstanceType() {
     Canvas canvas = new Canvas(null, Collections.singletonMap("testShape", new Square(1, 2, 3)), null, null, null, null);
-    new CanvasBuilder(canvas)
-        .editOrAddValueInCircleNamedShapes("testShape").and().build();
+    assertThrows(RuntimeException.class, () -> new CanvasBuilder(canvas)
+        .editOrAddValueInCircleNamedShapes("testShape").and().build());
   }
 
   @Test
@@ -349,25 +351,25 @@ public class ShapesTest {
     Canvas canvas = new CanvasBuilder(new CanvasBuilder().withNewSquareCanvasShape(1, 1, 1).build())
         .withCanvasShape(null).build();
 
-    Assert.assertNull(canvas.getCanvasShape());
+    assertNull(canvas.getCanvasShape());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testWithUnknownType() {
-    new CanvasBuilder()
-        .withCanvasShape(ANON_SHAPE).build();
+    assertThrows(IllegalStateException.class, () -> new CanvasBuilder()
+        .withCanvasShape(ANON_SHAPE).build());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testAddToUnknownType() {
-    new CanvasBuilder()
-        .addToShapes(0, ANON_SHAPE).build();
+    assertThrows(IllegalStateException.class, () -> new CanvasBuilder()
+        .addToShapes(0, ANON_SHAPE).build());
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testSetToUnknownType() {
-    new CanvasBuilder()
-        .setToShapes(0, ANON_SHAPE).build();
+    assertThrows(IllegalStateException.class, () -> new CanvasBuilder()
+        .setToShapes(0, ANON_SHAPE).build());
   }
 
   @Test

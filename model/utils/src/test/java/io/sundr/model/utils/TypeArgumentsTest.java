@@ -22,16 +22,16 @@ import static io.sundr.model.utils.Collections.K;
 import static io.sundr.model.utils.Collections.V;
 import static io.sundr.model.utils.Types.OPTIONAL;
 import static io.sundr.model.utils.Types.STRING_REF;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.builder.Visitor;
 import io.sundr.model.ClassRef;
@@ -69,7 +69,7 @@ public class TypeArgumentsTest {
       .withExtendsList(MY_SUPERCLASS.toReference(OPTIONAL.toReference(E.toReference())))
       .build();
 
-  @Before
+  @BeforeEach
   public void setUp() {
     DefinitionRepository.getRepository().register(Collections.MAP);
     DefinitionRepository.getRepository().register(Collections.HASH_MAP);
@@ -194,8 +194,8 @@ public class TypeArgumentsTest {
   public void getGenericArgumentsMappingsShouldHandleWildcards() {
     ClassRef ref = Collections.MAP.toReference();
     Map<String, TypeRef> map = TypeArguments.getGenericArgumentsMappings(ref);
-    assertTrue(map.get("K") + " instanceof WildcardRef", map.get("K") instanceof WildcardRef);
-    assertTrue(map.get("V") + " instanceof WildcardRef", map.get("V") instanceof WildcardRef);
+    assertTrue(map.get("K") instanceof WildcardRef, map.get("K") + " instanceof WildcardRef");
+    assertTrue(map.get("V") instanceof WildcardRef, map.get("V") + " instanceof WildcardRef");
     assertEquals(2, map.size());
   }
 

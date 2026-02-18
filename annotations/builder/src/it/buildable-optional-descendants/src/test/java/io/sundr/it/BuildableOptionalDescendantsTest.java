@@ -15,7 +15,7 @@
  */
 package io.sundr.it;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import java.util.Optional;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -24,7 +24,7 @@ import java.lang.reflect.WildcardType;
 import io.sundr.builder.VisitableBuilder;
 import io.sundr.model.ClassRef;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class BuildableOptionalDescendantsTest {
 

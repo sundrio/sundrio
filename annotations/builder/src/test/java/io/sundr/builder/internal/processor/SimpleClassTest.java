@@ -16,13 +16,13 @@
 
 package io.sundr.builder.internal.processor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Iterator;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;

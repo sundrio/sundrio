@@ -1,9 +1,9 @@
 package io.sundr.adapter.source.analysis;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.sundr.model.Block;
 import io.sundr.model.Method;
@@ -28,8 +28,8 @@ public class PropertyAccessVisitorTest {
         .endBlock()
         .build();
 
-    assertTrue("Should detect this.propertyName access",
-        methodAccessesProperty(method, "propertyName"));
+    assertTrue(methodAccessesProperty(method, "propertyName"),
+        "Should detect this.propertyName access");
   }
 
   @Test
@@ -44,8 +44,8 @@ public class PropertyAccessVisitorTest {
         .endBlock()
         .build();
 
-    assertTrue("Should detect super.propertyName access",
-        methodAccessesProperty(method, "propertyName"));
+    assertTrue(methodAccessesProperty(method, "propertyName"),
+        "Should detect super.propertyName access");
   }
 
   @Test
@@ -60,8 +60,8 @@ public class PropertyAccessVisitorTest {
         .endBlock()
         .build();
 
-    assertFalse("Should NOT detect null scope propertyName access (local variable)",
-        methodAccessesProperty(method, "propertyName"));
+    assertFalse(methodAccessesProperty(method, "propertyName"),
+        "Should NOT detect null scope propertyName access (local variable)");
   }
 
   @Test
@@ -75,8 +75,8 @@ public class PropertyAccessVisitorTest {
         .endBlock()
         .build();
 
-    assertFalse("Should NOT detect access to different property",
-        methodAccessesProperty(method, "propertyName"));
+    assertFalse(methodAccessesProperty(method, "propertyName"),
+        "Should NOT detect access to different property");
   }
 
   @Test
@@ -86,8 +86,8 @@ public class PropertyAccessVisitorTest {
         .withReturnType(new VoidRef())
         .build(); // No block
 
-    assertFalse("Should handle methods with no block",
-        methodAccessesProperty(method, "propertyName"));
+    assertFalse(methodAccessesProperty(method, "propertyName"),
+        "Should handle methods with no block");
   }
 
   @Test
@@ -99,8 +99,8 @@ public class PropertyAccessVisitorTest {
         .endBlock()
         .build();
 
-    assertFalse("Should handle methods with empty block",
-        methodAccessesProperty(method, "propertyName"));
+    assertFalse(methodAccessesProperty(method, "propertyName"),
+        "Should handle methods with empty block");
   }
 
   // Helper method that simulates the visitor logic from ImpactAnalyzer

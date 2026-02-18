@@ -15,11 +15,11 @@
  */
 package io.sundr.it;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.LinkedList;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LinkedListHolderTest {
 
