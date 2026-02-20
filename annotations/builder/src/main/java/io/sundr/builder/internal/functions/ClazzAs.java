@@ -458,7 +458,7 @@ public class ClazzAs {
             .build())
             .forEach(constructors::add);
 
-        ClassRef validatorRef = new ClassRefBuilder().withFullyQualifiedName("javax.validation.Validator").build();
+        ClassRef validatorRef = new ClassRefBuilder().withFullyQualifiedName("jakarta.validation.Validator").build();
 
         Field validatorProperty = new FieldBuilder().withName("validator").withTypeRef(validatorRef).build();
 

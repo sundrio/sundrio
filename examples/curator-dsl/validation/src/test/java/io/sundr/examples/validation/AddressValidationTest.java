@@ -18,11 +18,11 @@ package io.sundr.examples.validation;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
-
 import org.junit.jupiter.api.Test;
+
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 public class AddressValidationTest {
 
@@ -55,17 +55,20 @@ public class AddressValidationTest {
 
   @Test
   public void shouldNotAcceptZeroNumberViaConstructor() {
-    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder(true).withStreet("Sesame").withNumber(0).build());
+    assertThrows(ConstraintViolationException.class,
+        () -> new DefaultAddressBuilder(true).withStreet("Sesame").withNumber(0).build());
   }
 
   @Test
   public void shouldNotAcceptZeroNumberViaUsingValidation() {
-    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidation().build());
+    assertThrows(ConstraintViolationException.class,
+        () -> new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidation().build());
   }
 
   @Test
   public void shoulNotdAcceptZeroNumberViaUsingValidator() {
-    assertThrows(ConstraintViolationException.class, () -> new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidator(validator).build());
+    assertThrows(ConstraintViolationException.class,
+        () -> new DefaultAddressBuilder().withStreet("Sesame").withNumber(0).usingValidator(validator).build());
   }
 
   @Test

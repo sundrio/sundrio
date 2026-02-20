@@ -18,11 +18,11 @@ package io.sundr.examples.validation;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
-
 import org.junit.jupiter.api.Test;
+
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 public class AddressValidationTest {
 
