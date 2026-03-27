@@ -28,7 +28,7 @@
     <packaging>maven-plugin</packaging>
 
     <properties>
-      <plexus.version>3.5.1</plexus.version>
+      <plexus.version>4.0.3</plexus.version>
     </properties>
 
 
