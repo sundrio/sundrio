@@ -49,4 +49,66 @@ public class LinkedListHolderTest {
         assertEquals(1, item.getList().size());
         assertEquals("foo", item.getList().get(0).getName());
     }
+
+    @Test
+    public void shouldSupportNestedBuilderMethods() {
+        // Test nested builder pattern: addNewList()...endList()
+        // This verifies JDK 25 compatibility for generic type parameter resolution
+        LinkedListHolder item = new LinkedListHolderBuilder()
+            .addNewList()
+                .withId(42)
+                .withName("nested-builder-test")
+            .endList()
+            .build();
+
+        assertNotNull(item.getList());
+        assertEquals(1, item.getList().size());
+        assertEquals(42, item.getList().get(0).getId());
+        assertEquals("nested-builder-test", item.getList().get(0).getName());
+    }
+
+    @Test
+    public void shouldSupportMultipleNestedBuilders() {
+        // Test multiple nested builder calls
+        // This tests that annotation processor handles List<T> bounds correctly
+        LinkedListHolder item = new LinkedListHolderBuilder()
+            .addNewList()
+                .withId(1)
+                .withName("first")
+            .endList()
+            .addNewList()
+                .withId(2)
+                .withName("second")
+            .endList()
+            .build();
+
+        assertNotNull(item.getList());
+        assertEquals(2, item.getList().size());
+        assertEquals(1, item.getList().get(0).getId());
+        assertEquals("first", item.getList().get(0).getName());
+        assertEquals(2, item.getList().get(1).getId());
+        assertEquals("second", item.getList().get(1).getName());
+    }
+
+    @Test
+    public void shouldSupportEditNestedBuilder() {
+        // Test editing existing items with nested builders
+        LinkedListHolder original = new LinkedListHolderBuilder()
+            .addNewList()
+                .withId(10)
+                .withName("original")
+            .endList()
+            .build();
+
+        LinkedListHolder modified = new LinkedListHolderBuilder(original)
+            .editList(0)
+                .withId(20)
+                .withName("modified")
+            .endList()
+            .build();
+
+        assertEquals(1, modified.getList().size());
+        assertEquals(20, modified.getList().get(0).getId());
+        assertEquals("modified", modified.getList().get(0).getName());
+    }
 }
