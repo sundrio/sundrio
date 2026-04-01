@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.sundr.it</groupId>
+        <artifactId>cross-module-buildable-ref</artifactId>
+        <version>@project.version@</version>
+    </parent>
+
+    <artifactId>cross-module-buildable-ref-consumer</artifactId>
+    <name>Sundrio :: Annotations :: Builders :: IT :: Cross-Module BuildableReference :: Consumer</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.sundr.it</groupId>
+            <artifactId>cross-module-buildable-ref-library</artifactId>
+            <version>@project.version@</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>sundr-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sundr</groupId>
+            <artifactId>builder-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+                Use annotationProcessorPaths to isolate the annotation processor ClassLoader
+                from the compile classpath. This reproduces the cross-module @BuildableReference
+                scenario: the library JAR (with MatchExpressionBuilder) is only on the compile
+                classpath, not the processor path. Without the fix in BuilderUtils.isBuildable(TypeRef),
+                the processor cannot detect that MatchExpression is buildable and omits
+                addNewMatchExpression() from the generated LabelSelectorFluent.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>io.sundr</groupId>
+                            <artifactId>builder-annotations</artifactId>
+                            <version>${sundr.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
