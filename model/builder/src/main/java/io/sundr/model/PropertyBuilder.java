@@ -2,10 +2,6 @@ package io.sundr.model;
 
 import io.sundr.builder.VisitableBuilder;
 
-/**
- * @deprecated This class has been replaced by {@link FieldBuilder}, {@link ArgumentBuilder}, and {@link LocalVariableBuilder}.
- */
-@Deprecated
 public class PropertyBuilder extends PropertyFluent<PropertyBuilder> implements VisitableBuilder<Property, PropertyBuilder> {
 
   PropertyFluent<?> fluent;

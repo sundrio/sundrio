@@ -17,11 +17,9 @@
 
 package io.sundr.model.utils;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-
 
 import io.sundr.model.Field;
 import io.sundr.model.FieldBuilder;

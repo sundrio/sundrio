@@ -153,32 +153,32 @@ public class Constants {
 
   //The classes below are created programmatically rather than by class to avoid bringing in more deps
   public static final ClassRef VALIDATION = new TypeDefBuilder()
-      .withPackageName("javax.validation")
+      .withPackageName("jakarta.validation")
       .withName("Validation")
       .build().toInternalReference();
 
   public static final ClassRef VALIDATOR = new TypeDefBuilder()
-      .withPackageName("javax.validation")
+      .withPackageName("jakarta.validation")
       .withName("Validator")
       .build().toInternalReference();
 
   public static final ClassRef VALIDATOR_FACTORY = new TypeDefBuilder()
-      .withPackageName("javax.validation")
+      .withPackageName("jakarta.validation")
       .withName("ValidatorFactory")
       .build().toInternalReference();
 
   public static final ClassRef VALIDATION_EXCEPTION = new TypeDefBuilder()
-      .withPackageName("javax.validation")
+      .withPackageName("jakarta.validation")
       .withName("ValidationException")
       .build().toInternalReference();
 
   public static final ClassRef CONSTRAIN_VIOLATION = new TypeDefBuilder()
-      .withPackageName("javax.validation")
+      .withPackageName("jakarta.validation")
       .withName("ConstraintViolation")
       .build().toInternalReference();
 
   public static final ClassRef CONSTRAIN_VIOLATION_EXCEPTION = new TypeDefBuilder()
-      .withPackageName("javax.validation")
+      .withPackageName("jakarta.validation")
       .withName("ConstraintViolationException")
       .build().toInternalReference();
 

@@ -1092,7 +1092,7 @@ public class BuilderContext {
         .accept(new ApplyImportsFromResources("io/sundr/builder/BaseFluent.java"))
         .build();
 
-    ClassRef validatorRef = ClassRef.forName("javax.validation.Validator");
+    ClassRef validatorRef = ClassRef.forName("jakarta.validation.Validator");
     validationUtils = new TypeDefBuilder()
         .withPackageName("io.sundr.builder.internal.resources")
         .withName("ValidationUtils")
@@ -1164,7 +1164,7 @@ public class BuilderContext {
   private static boolean hasValidatorArg(String c) {
     Class validator;
     try {
-      validator = Class.forName("javax.validation.Validator");
+      validator = Class.forName("jakarta.validation.Validator");
     } catch (ClassNotFoundException e) {
       return false;
     }

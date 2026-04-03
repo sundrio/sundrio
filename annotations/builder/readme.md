@@ -314,13 +314,13 @@ set the `validationEnabled` flag to `true`:
 
 ```java
 package my.demo
-    
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotNull;
 
 public class Demo {
     @NotNull
     private String value;
-    
+
     @Buildable(validationEnabled=true)
     public Demo(....) {
             // ...
