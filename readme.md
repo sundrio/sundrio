@@ -53,6 +53,7 @@ On top of this model, it provides tools that perform tasks, like builder generat
       - [Github Java Parser](adapters/source/readme.md)
     - Annotation processors
       - [Builder Generator](annotations/builder/readme.md)
+      - [Validation Support](annotations/validation/readme.md)
       - [DSL Generator](annotations/dsl/readme.md)
       - [Velocity Transformer](annotations/transform/readme.md)
       - [Resourceify](annotations/resourcecify/readme.md)
@@ -304,6 +305,7 @@ The project also includes so modules that put the code model & adapters into the
 - Template based code
 
 ## [Builders](annotations/builder/readme.md)
+## [Validation Support](annotations/validation/readme.md)
 ## [Domain Specific languages](annotations/dsl/readme.md)
 ## [Template base code generator](annotations/transform/readme.md)
 

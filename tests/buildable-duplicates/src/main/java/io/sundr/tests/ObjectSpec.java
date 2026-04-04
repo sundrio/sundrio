@@ -19,7 +19,7 @@ package io.sundr.tests;
 
 import io.sundr.builder.annotations.Buildable;
 
-@Buildable(editableEnabled = false, validationEnabled = false, generateBuilderPackage = true, lazyCollectionInitEnabled = false, builderPackage = "io.sundr.tests.builder")
+@Buildable(editableEnabled = false, generateBuilderPackage = true, lazyCollectionInitEnabled = false, builderPackage = "io.sundr.tests.builder")
 
 public class ObjectSpec implements Resource {
 

@@ -44,15 +44,28 @@ public @interface Buildable {
 
   boolean editableEnabled() default true;
 
-  boolean validationEnabled() default false;
-
   boolean lazyCollectionInitEnabled() default true;
 
   boolean lazyMapInitEnabled() default true;
 
+  String basePackage() default "";
+
   boolean generateBuilderPackage() default false;
 
   String builderPackage() default Constants.DEFAULT_BUILDER_PACKAGE;
+
+  boolean generateValidationPackage() default false;
+
+  String validationPackage() default Constants.DEFAULT_VALIDATION_PACKAGE;
+
+  /**
+   * @deprecated Validation is no longer enabled via a flag. Add the validation-annotations
+   *             processor to your build and place a {@code XxxValidations} class in the same
+   *             package as your model. This attribute is retained for source compatibility only
+   *             and has no effect.
+   */
+  @Deprecated
+  boolean validationEnabled() default false;
 
   BuildableReference[] refs() default {};
 

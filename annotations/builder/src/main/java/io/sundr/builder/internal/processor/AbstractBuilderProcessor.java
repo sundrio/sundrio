@@ -22,12 +22,18 @@ import static io.sundr.builder.Constants.BUILDABLE;
 import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.EXTERNAL_BUILDABLE;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.lang.model.util.Elements;
+import javax.tools.JavaFileObject;
 
 import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
@@ -81,11 +87,45 @@ public abstract class AbstractBuilderProcessor extends AbstractCodeGeneratingPro
         generate(context.getEditableInterface());
       }
 
-      if (context.isValidationEnabled() && !classExists(context.getBuilderPackage() + ".ValidationUtils")) {
-        generate(context.getValidationUtils());
+      if (context.getGenerateValidationPackage()
+          && !Constants.DEFAULT_VALIDATION_PACKAGE.equals(context.getValidationPackage())
+          && context.isSundrValidationSupported()) {
+        generateValidationPackage(context.getValidationPackage());
       }
+
     } catch (Exception e) {
       //
+    }
+  }
+
+  private static final List<String> VALIDATION_CLASSES = Arrays.asList(
+      "Validator", "Validators", "ValidatingBuilder",
+      "ValidationError", "ValidationResult", "ValidationException");
+
+  void generateValidationPackage(String targetPackage) {
+    BuilderContext context = BuilderContextManager.getContext();
+    String builderPackage = context.getBuilderPackage();
+    for (String name : VALIDATION_CLASSES) {
+      String resourcePath = "io/sundr/validation/" + name + ".java";
+      try (InputStream in = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
+        if (in == null) {
+          continue;
+        }
+        String source = new String(in.readAllBytes(), StandardCharsets.UTF_8)
+            .replace("package io.sundr.validation;", "package " + targetPackage + ";")
+            .replace("io.sundr.validation.", targetPackage + ".");
+        if (!Constants.DEFAULT_BUILDER_PACKAGE.equals(builderPackage)) {
+          source = source.replace("io.sundr.builder.", builderPackage + ".");
+        }
+        String fqn = targetPackage + "." + name;
+        JavaFileObject file = processingEnv.getFiler().createSourceFile(fqn);
+        try (PrintWriter writer = new PrintWriter(file.openWriter())) {
+          writer.print(source);
+        }
+      } catch (IOException e) {
+        processingEnv.getMessager().printMessage(javax.tools.Diagnostic.Kind.WARNING,
+            "Failed to generate " + targetPackage + "." + name + ": " + e.getMessage());
+      }
     }
   }
 

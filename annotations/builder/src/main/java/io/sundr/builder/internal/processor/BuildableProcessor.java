@@ -21,7 +21,6 @@ import static io.sundr.builder.Constants.EDITABLE_ENABLED;
 import static io.sundr.builder.Constants.IGNORE_PROPERTIES;
 import static io.sundr.builder.Constants.LAZY_COLLECTIONS_INIT_ENABLED;
 import static io.sundr.builder.Constants.LAZY_MAP_INIT_ENABLED;
-import static io.sundr.builder.Constants.VALIDATION_ENABLED;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -72,12 +71,10 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
         }
 
         AptContext aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
-        ctx = BuilderContextManager.create(elements, types, buildable.validationEnabled(), buildable.generateBuilderPackage(),
-            buildable.builderPackage());
+        ctx = BuilderContextManager.create(elements, types, buildable);
         TypeDef b = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement(element), aptContext))
             .addToAttributes(BUILDABLE, buildable)
             .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
-            .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
             .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
             .accept(new AddLombokAllArgsConstructor(), new AddLombokGetters(), new AddLombokSetters(),
                 new DuplicateFieldCheck(),
@@ -98,7 +95,6 @@ public class BuildableProcessor extends AbstractBuilderProcessor {
           TypeDef r = new TypeDefBuilder(Adapters.adaptType(Apt.getClassElement(ref), aptContext))
               .addToAttributes(BUILDABLE, buildable)
               .addToAttributes(EDITABLE_ENABLED, buildable.editableEnabled())
-              .addToAttributes(VALIDATION_ENABLED, buildable.validationEnabled())
               .addToAttributes(IGNORE_PROPERTIES, buildable.ignore())
               .accept(new DuplicateFieldCheck(), new Visitor<FieldBuilder>() {
                 @Override

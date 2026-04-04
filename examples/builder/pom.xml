@@ -31,6 +31,9 @@
 
     <modules>
       <module>hello-world</module>
+      <module>hello-validation</module>
+      <module>hello-validation-package</module>
+      <module>hello-base-package</module>
       <module>hello-lombok</module>
       <module>hello-nested</module>
       <module>hello-builder-package</module>
