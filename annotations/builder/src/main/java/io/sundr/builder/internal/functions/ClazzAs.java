@@ -55,6 +55,7 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Construct;
 import io.sundr.model.Declare;
+import io.sundr.model.DotClass;
 import io.sundr.model.Expression;
 import io.sundr.model.Field;
 import io.sundr.model.FieldBuilder;
@@ -348,7 +349,6 @@ public class ClazzAs {
 
   public static final Function<RichTypeDef, TypeDef> BUILDER = FunctionFactory.wrap(new Function<RichTypeDef, TypeDef>() {
     public TypeDef apply(final RichTypeDef item) {
-      final boolean validationEnabled = item.hasAttribute(VALIDATION_ENABLED) ? item.getAttribute(VALIDATION_ENABLED) : false;
       final Modifier[] modifiers = item.isAbstract() ? new Modifier[] { Modifier.PUBLIC, Modifier.ABSTRACT }
           : new Modifier[] { Modifier.PUBLIC };
 
@@ -444,59 +444,79 @@ public class ClazzAs {
       // We don't want to generate equals and hashCode for the builder as in most cases contains self references, leading to stack overflow errors
       //
 
-      if (validationEnabled) {
-        Field validationEnabledProperty = new FieldBuilder().withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF)
-            .withName("validationEnabled").build();
-
-        fields.add(validationEnabledProperty);
-
-        basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
-            .withTypeRef(io.sundr.model.utils.Types.PRIMITIVE_BOOLEAN_REF).withName("validationEnabled").and().withNewBlock()
-            .addToStatements(This.call(c.getArguments()))
-            .addToStatements(new Assign(This.ref("validationEnabled"), LocalVariable.newLocalVariable("validationEnabled")))
-            .endBlock()
-            .build())
-            .forEach(constructors::add);
-
-        ClassRef validatorRef = new ClassRefBuilder().withFullyQualifiedName("jakarta.validation.Validator").build();
-
-        Field validatorProperty = new FieldBuilder().withName("validator").withTypeRef(validatorRef).build();
-
-        fields.add(validatorProperty);
-
-        BuilderContext context = BuilderContextManager.getContext();
-        if (context.isExternalvalidatorSupported()) {
-          LocalVariable validator = LocalVariable.newLocalVariable("validator");
-          basicConstructors.stream().map(c -> new MethodBuilder(c).addNewArgument()
-              .withTypeRef(validatorRef).withName("validator").and().withNewBlock()
-              .addToStatements(This.call(c.getArguments()))
-              .addToStatements(new Assign(This.ref("validator"), validator))
-              .addToStatements(
-                  new Assign(This.ref("validationEnabled"), validator.notNull()))
-              .endBlock().build())
-              .forEach(constructors::add);
-
-          Method usingValidator = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-              .withReturnType(builderRef)
-              .withName("usingValidator")
-              .addNewArgument().withName("validator").withTypeRef(validatorRef).endArgument()
-              .withNewBlock()
-              .addToStatements(Return.newInstance(builderRef, new This(), LocalVariable.newLocalVariable("validator")))
-              .endBlock()
-              .build();
-
-          methods.add(usingValidator);
-        }
-
-        Method usingValidation = new MethodBuilder().withNewModifiers().withPublic().endModifiers()
-            .withReturnType(builderRef)
-            .withName("usingValidation")
-            .withNewBlock()
-            .addToStatements(Return.newInstance(builderRef, new This(), ValueRef.from(true)))
-            .endBlock()
+      BuilderContext context = BuilderContextManager.getContext();
+      if (context.isSundrValidationSupported()) {
+        String vp = context.getValidationPackage();
+        ClassRef sundrValidatorRef = new ClassRefBuilder(Constants.SUNDR_VALIDATOR)
+            .withFullyQualifiedName(vp + ".Validator")
+            .withArguments(itemRef)
+            .build();
+        ClassRef validatingBuilderRef = new ClassRefBuilder(Constants.SUNDR_VALIDATING_BUILDER)
+            .withFullyQualifiedName(vp + ".ValidatingBuilder")
+            .withArguments(itemRef)
+            .build();
+        ClassRef jakartaValidatorRef = new ClassRefBuilder().withFullyQualifiedName("jakarta.validation.Validator").build();
+        ClassRef sundrValidatorsRef = new ClassRefBuilder(Constants.SUNDR_VALIDATORS)
+            .withFullyQualifiedName(vp + ".Validators")
             .build();
 
-        methods.add(usingValidation);
+        methods.add(new MethodBuilder()
+            .withNewModifiers().withPublic().endModifiers()
+            .withReturnType(validatingBuilderRef)
+            .withName("validate")
+            .addNewArgument().withName("first").withTypeRef(sundrValidatorRef).endArgument()
+            .addNewArgument().withName("rest").withTypeRef(sundrValidatorRef.withDimensions(1)).endArgument()
+            .withVarArgPreferred(true)
+            .withNewBlock()
+            .addToStatements(new Return(new Construct(validatingBuilderRef, new This(),
+                LocalVariable.newLocalVariable("first"), LocalVariable.newLocalVariable("rest"))))
+            .endBlock()
+            .build());
+
+        methods.add(new MethodBuilder()
+            .withNewModifiers().withPublic().endModifiers()
+            .withReturnType(validatingBuilderRef)
+            .withName("validateAll")
+            .withNewBlock()
+            .addToStatements(new Return(new Construct(validatingBuilderRef, new This(),
+                sundrValidatorsRef.call("of", new DotClass(itemRef)))))
+            .endBlock()
+            .build());
+
+        methods.add(new MethodBuilder()
+            .withNewModifiers().withPublic().endModifiers()
+            .withReturnType(validatingBuilderRef)
+            .withName("usingValidation")
+            .withNewBlock()
+            .addToStatements(new Return(validatingBuilderRef.call("withJakartaValidation", new This())))
+            .endBlock()
+            .build());
+
+        if (context.isExternalValidatorSupported()) {
+          methods.add(new MethodBuilder()
+              .withNewModifiers().withPublic().endModifiers()
+              .withReturnType(validatingBuilderRef)
+              .withName("usingValidator")
+              .addNewArgument().withName("validator").withTypeRef(jakartaValidatorRef).endArgument()
+              .withNewBlock()
+              .addToStatements(new Return(validatingBuilderRef.call("withJakartaValidator",
+                  new This(), LocalVariable.newLocalVariable("validator"))))
+              .endBlock()
+              .build());
+        }
+
+        if (context.hasValidationMethods(item.getPackageName() + "." + item.getName())) {
+          String validatorsBuilderFqn = item.getPackageName() + "." + item.getName() + "ValidatorsBuilder";
+          ClassRef validatorsBuilderRef = new ClassRefBuilder().withFullyQualifiedName(validatorsBuilderFqn).build();
+          methods.add(new MethodBuilder()
+              .withNewModifiers().withPublic().endModifiers()
+              .withReturnType(validatorsBuilderRef)
+              .withName("usingNewValidator")
+              .withNewBlock()
+              .addToStatements(new Return(new Construct(validatorsBuilderRef, new This())))
+              .endBlock()
+              .build());
+        }
       }
 
       return BuilderContextManager.getContext().getDefinitionRepository()
@@ -656,22 +676,6 @@ public class ClazzAs {
               new MethodCall(ToMethod.getterOrBuildMethodName(property), fluent)));
         });
 
-    BuilderContext context = BuilderContextManager.getContext();
-    final boolean validationEnabled = item.hasAttribute(VALIDATION_ENABLED) ? item.getAttribute(VALIDATION_ENABLED) : false;
-    if (validationEnabled) {
-      Expression validationEnabledProp = This.ref("validationEnabled");
-      ClassRef validationUtils = ClassRef.forName(context.getBuilderPackage() + ".ValidationUtils");
-
-      if (context.isExternalvalidatorSupported()) {
-        statements.add(If.condition(validationEnabledProp)
-            .then(new MethodCall("validate", validationUtils, buildable, This.ref("validator")))
-            .end());
-      } else {
-        statements.add(If.condition(validationEnabledProp)
-            .then(new MethodCall("validate", validationUtils, buildable))
-            .end());
-      }
-    }
     statements.add(Return.variable("buildable"));
     return statements;
   }

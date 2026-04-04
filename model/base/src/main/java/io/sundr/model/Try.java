@@ -82,7 +82,9 @@ public class Try implements Statement {
     }
 
     sb.append(SPACE);
+    sb.append(OB).append(NEWLINE);
     sb.append(tryBlock.render());
+    sb.append(CB);
 
     for (Catch catchBlock : catchBlocks) {
       sb.append(SPACE);
@@ -93,7 +95,9 @@ public class Try implements Statement {
       sb.append(SPACE);
       sb.append("finally");
       sb.append(SPACE);
+      sb.append(OB).append(NEWLINE);
       sb.append(block.render());
+      sb.append(CB);
     });
 
     return sb.toString();
@@ -135,7 +139,9 @@ public class Try implements Statement {
       sb.append(parameter.render());
       sb.append(CP);
       sb.append(SPACE);
+      sb.append(OB).append(NEWLINE);
       sb.append(block.render());
+      sb.append(CB);
       return sb.toString();
     }
   }

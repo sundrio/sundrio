@@ -60,6 +60,8 @@
         <maven-plugin-annotations.version>3.15.1</maven-plugin-annotations.version>
 
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
+        <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
+        <expressly.version>5.0.0</expressly.version>
         <velocity.version>1.7</velocity.version>
         <st4.version>4.3</st4.version>
 
@@ -184,6 +186,18 @@
                 <groupId>jakarta.validation</groupId>
                 <artifactId>jakarta.validation-api</artifactId>
                 <version>${jakarta.validation.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate.validator</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.expressly</groupId>
+                <artifactId>expressly</artifactId>
+                <version>${expressly.version}</version>
             </dependency>
             
             <dependency>

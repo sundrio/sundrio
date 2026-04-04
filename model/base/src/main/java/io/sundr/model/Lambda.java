@@ -56,6 +56,10 @@ public class Lambda implements ExpressionOrStatement {
     //Return is implied so no need to render it.
     if (statement instanceof Return) {
       sb.append(((Return) statement).getExpression().renderExpression());
+    } else if (statement instanceof Block) {
+      sb.append(OB).append(NEWLINE);
+      sb.append(statement.render());
+      sb.append(CB);
     } else {
       sb.append(Renderable.noSemicolon(statement.render()));
     }

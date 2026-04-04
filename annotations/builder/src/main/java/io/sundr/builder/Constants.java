@@ -49,6 +49,7 @@ public class Constants {
   }
 
   public static final String DEFAULT_BUILDER_PACKAGE = "io.sundr.builder";
+  public static final String DEFAULT_VALIDATION_PACKAGE = "io.sundr.validation";
 
   public static final AttributeKey<TypeDef> ORIGIN_TYPEDEF = new AttributeKey<TypeDef>("ORIGIN_TYPEDEF", TypeDef.class);
   public static final AttributeKey<ClassRef> OUTER_TYPE = new AttributeKey<ClassRef>("OUTER_TYPE", ClassRef.class);
@@ -184,4 +185,30 @@ public class Constants {
 
   public static List<ClassRef> VALIDATION_REFS = Arrays.<ClassRef> asList(VALIDATION, VALIDATOR, VALIDATOR_FACTORY,
       VALIDATION_EXCEPTION, CONSTRAIN_VIOLATION, CONSTRAIN_VIOLATION_EXCEPTION, Collections.SET.toInternalReference());
+
+  // Sundrio validation types (in core module)
+  public static final ClassRef SUNDR_VALIDATOR = new TypeDefBuilder()
+      .withPackageName("io.sundr.validation")
+      .withName("Validator")
+      .build().toInternalReference();
+
+  public static final ClassRef SUNDR_VALIDATION_ERROR = new TypeDefBuilder()
+      .withPackageName("io.sundr.validation")
+      .withName("ValidationError")
+      .build().toInternalReference();
+
+  public static final ClassRef SUNDR_VALIDATION_RESULT = new TypeDefBuilder()
+      .withPackageName("io.sundr.validation")
+      .withName("ValidationResult")
+      .build().toInternalReference();
+
+  public static final ClassRef SUNDR_VALIDATING_BUILDER = new TypeDefBuilder()
+      .withPackageName("io.sundr.validation")
+      .withName("ValidatingBuilder")
+      .build().toInternalReference();
+
+  public static final ClassRef SUNDR_VALIDATORS = new TypeDefBuilder()
+      .withPackageName("io.sundr.validation")
+      .withName("Validators")
+      .build().toInternalReference();
 }

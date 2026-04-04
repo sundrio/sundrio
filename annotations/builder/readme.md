@@ -306,27 +306,14 @@ only those nested under circle objects. Here's how the PathAwareTypedVisitor hel
 PathAwareTypedVisitor has access to getParent() and getPath() methods, which provide
 all the required information about the path of the visitable object.                                                                                                                                                                                                                        
 
-### Integration with Bean Validation
+### Integration with Validation
 
-The generated builders can validate the objects before returning them
-(if a validation provider is available). To enable this feature just
-set the `validationEnabled` flag to `true`:
+The generated builders integrate with the [Validation Support](../validation/readme.md) module.
+Add the `validation-annotations` processor to your build to enable validation-aware builder methods
+(`usingValidation()`, `validateAll()`, `usingNewValidator()`, etc.).
 
-```java
-package my.demo
-
-import jakarta.validation.constraints.NotNull;
-
-public class Demo {
-    @NotNull
-    private String value;
-
-    @Buildable(validationEnabled=true)
-    public Demo(....) {
-            // ...
-    }
-}
-```
+> **Note:** The old `validationEnabled` attribute on `@Buildable` is deprecated and has no effect.
+> It is retained only for source compatibility. Use the `validation-annotations` module instead.
 
 ### Editable Builders
 

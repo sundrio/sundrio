@@ -22,7 +22,7 @@ import io.sundr.builder.annotations.Buildable;
 /**
  * This class is the Root class where the buildable processing starts.
  */
-@Buildable(editableEnabled = false, validationEnabled = false, generateBuilderPackage = true, lazyCollectionInitEnabled = false, builderPackage = "io.sundr.tests.builder")
+@Buildable(editableEnabled = false, generateBuilderPackage = true, lazyCollectionInitEnabled = false, builderPackage = "io.sundr.tests.builder")
 public class Root implements Resource {
 
   private final Resource spec;

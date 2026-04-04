@@ -33,6 +33,7 @@
         <module>generator</module>
         <module>resourcecify</module>
         <module>transform</module>
+        <module>validation</module>
     </modules>
 
 </project>

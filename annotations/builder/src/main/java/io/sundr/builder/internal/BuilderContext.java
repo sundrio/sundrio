@@ -29,7 +29,6 @@ import static io.sundr.model.utils.Types.STRING_REF;
 import static io.sundr.model.utils.Types.TYPE;
 import static io.sundr.model.utils.Types.newTypeParamRef;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Spliterator;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -40,6 +39,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
 import io.sundr.adapter.apt.AptContext;
+import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
 import io.sundr.builder.annotations.Inline;
 import io.sundr.model.Attributeable;
@@ -83,20 +83,29 @@ public class BuilderContext {
   private final TypeDef validationUtils;
   private final TypeDef baseFluentClass;
   private final Boolean generateBuilderPackage;
-  private final Boolean validationEnabled;
+  private final Boolean generateValidationPackage;
   private final Boolean externalValidatorSupported;
   private final String builderPackage;
+  private final String validationPackage;
   private final Inline[] inlineables;
   private final BuildableRepository buildableRepository;
 
-  public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage, Boolean validationEnabled,
+  public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage,
       String builderPackage, Inline... inlineables) {
+    this(elements, types, generateBuilderPackage, builderPackage, false,
+        Constants.DEFAULT_VALIDATION_PACKAGE, inlineables);
+  }
+
+  public BuilderContext(Elements elements, Types types, Boolean generateBuilderPackage,
+      String builderPackage, Boolean generateValidationPackage, String validationPackage,
+      Inline... inlineables) {
     this.elements = elements;
     this.types = types;
-    this.validationEnabled = validationEnabled;
     this.aptContext = AptContext.create(elements, types, DefinitionRepository.getRepository());
     this.generateBuilderPackage = generateBuilderPackage;
+    this.generateValidationPackage = generateValidationPackage;
     this.builderPackage = builderPackage;
+    this.validationPackage = validationPackage;
     this.inlineables = inlineables;
 
     buildableRepository = new BuildableRepository();
@@ -1158,24 +1167,7 @@ public class BuilderContext {
         .withAnnotations(new ArrayList<>())
         .build();
 
-    this.externalValidatorSupported = hasValidatorArg(builderPackage + ".ValidationUtils");
-  }
-
-  private static boolean hasValidatorArg(String c) {
-    Class validator;
-    try {
-      validator = Class.forName("jakarta.validation.Validator");
-    } catch (ClassNotFoundException e) {
-      return false;
-    }
-    try {
-      Method m = Class.forName(c).getMethod("validate", Object.class, validator);
-      return true;
-    } catch (ClassNotFoundException e) {
-      return true;
-    } catch (NoSuchMethodException e) {
-      return false;
-    }
+    this.externalValidatorSupported = elements.getTypeElement("jakarta.validation.Validator") != null;
   }
 
   public Elements getElements() {
@@ -1190,12 +1182,46 @@ public class BuilderContext {
     return generateBuilderPackage;
   }
 
-  public Boolean isValidationEnabled() {
-    return validationEnabled;
+  public Boolean getGenerateValidationPackage() {
+    return generateValidationPackage;
   }
 
-  public Boolean isExternalvalidatorSupported() {
-    return validationEnabled && externalValidatorSupported;
+  public String getValidationPackage() {
+    return validationPackage;
+  }
+
+  public Boolean isExternalValidatorSupported() {
+    return externalValidatorSupported;
+  }
+
+  public boolean isSundrValidationSupported() {
+    // validation-annotations is on the compile classpath
+    if (elements.getTypeElement("io.sundr.validation.Validator") != null) {
+      return true;
+    }
+    // validation-annotations is only on annotationProcessorPaths (not compile classpath) and the user
+    // asked to generate the infrastructure — the processor is present when @Validation is resolvable
+    return Boolean.TRUE.equals(generateValidationPackage)
+        && elements.getTypeElement("io.sundr.validation.annotations.Validation") != null;
+  }
+
+  public boolean hasValidationMethods(String targetTypeFqn) {
+    if (elements.getTypeElement("io.sundr.validation.annotations.Validation") == null) {
+      return false;
+    }
+    String pkg = targetTypeFqn.contains(".") ? targetTypeFqn.substring(0, targetTypeFqn.lastIndexOf('.')) : "";
+    String simpleName = targetTypeFqn.contains(".") ? targetTypeFqn.substring(targetTypeFqn.lastIndexOf('.') + 1)
+        : targetTypeFqn;
+    // Check for a class named XxxValidations in the same package (the conventional location for @Validation methods)
+    String validationsClass = pkg.isEmpty() ? simpleName + "Validations" : pkg + "." + simpleName + "Validations";
+    if (elements.getTypeElement(validationsClass) != null) {
+      return true;
+    }
+    // Fallback: check for the generated XxxValidatorsBuilder, which exists when @Validation methods target this type
+    // from a non-conventionally named class
+    String validatorsBuilderClass = pkg.isEmpty() ? simpleName + "ValidatorsBuilder"
+        : pkg + "." + simpleName + "ValidatorsBuilder";
+    return elements.getTypeElement(validatorsBuilderClass) != null;
   }
 
   public String getBuilderPackage() {
@@ -1260,10 +1286,6 @@ public class BuilderContext {
 
   public TypeDef getInlineableBase() {
     return inlineableBase;
-  }
-
-  public Boolean getValidationEnabled() {
-    return validationEnabled;
   }
 
   public TypeDef getInlineableInterface(Inline inline) {

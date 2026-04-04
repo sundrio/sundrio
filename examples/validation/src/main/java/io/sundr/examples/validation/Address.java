@@ -21,7 +21,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-@Buildable(validationEnabled = true)
+@Buildable
 public interface Address {
 
   @NotNull
