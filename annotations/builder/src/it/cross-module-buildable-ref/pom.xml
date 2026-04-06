@@ -31,7 +31,7 @@
 
     <properties>
         <sundr.version>@project.version@</sundr.version>
-        <junit.version>@junit.version@</junit.version>
+        <junit.version>@junit-jupiter.version@</junit.version>
     </properties>
 
     <build>
@@ -66,8 +66,8 @@
                 <version>${sundr.version}</version>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
                 <version>${junit.version}</version>
             </dependency>
         </dependencies>
