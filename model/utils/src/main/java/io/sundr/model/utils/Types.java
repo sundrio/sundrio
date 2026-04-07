@@ -168,7 +168,7 @@ public final class Types {
    *
    * @param type The type to compare.
    * @param targetType The target type.
-   * @param function
+   * @param function The recursive function used to check implements/extends hierarchy.
    * @return true if match, false otherwise.
    */
   public static boolean isInstanceOf(TypeRef type, TypeDef targetType, Function<TypeRef, Boolean> function) {
@@ -413,7 +413,7 @@ public final class Types {
    * Checks if a {@link TypeRef} is an array.
    *
    * @param type The type to check.
-   * @return True if its an array.B
+   * @return True if its an array.
    */
   public static boolean isArray(TypeRef type) {
 
@@ -487,6 +487,7 @@ public final class Types {
   /**
    * Check if type is an internal JDK type.
    *
+   * @param type The type to check.
    * @return true if jdk type, false otherwise.
    */
   public static boolean isJdkType(TypeRef type) {
@@ -528,7 +529,7 @@ public final class Types {
    * Checks if property exists on the specified type.
    *
    * @param typeDef The type.
-   * @param property The property name.
+   * @param name The field name.
    * @return True if method is found, false otherwise.
    */
   public static boolean hasField(TypeDef typeDef, String name) {

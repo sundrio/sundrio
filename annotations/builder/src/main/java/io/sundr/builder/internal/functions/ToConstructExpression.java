@@ -88,7 +88,7 @@ public class ToConstructExpression implements Function<List<Expression>, Express
   /**
    * Checks that a constructor with the required number of arguments is found.
    *
-   * @param arguments
+   * @param arguments The expected number of constructor arguments.
    */
   private void checkConstructorArguments(int arguments) {
     if (arguments == 0 && (typeDef.getConstructors() == null || typeDef.getConstructors().isEmpty())) {
@@ -109,7 +109,7 @@ public class ToConstructExpression implements Function<List<Expression>, Express
   /**
    * Checks that a factory method with the required number of arguments is found.
    *
-   * @param arguments
+   * @param arguments The expected number of factory method arguments.
    */
   private void checkFactoryMethodArguments(int arguments) {
     for (Method m : typeDef.getMethods()) {

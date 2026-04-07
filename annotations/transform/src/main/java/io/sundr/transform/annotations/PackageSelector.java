@@ -28,13 +28,14 @@ public @interface PackageSelector {
   /**
    * The package to use for selecting classes.
    *
-   * @return
+   * @return The package name.
    */
   String value();
 
   /**
+   * The pattern used to filter class names within the package.
    *
-   * @return
+   * @return The class name pattern.
    */
   String pattern() default "[a-zA-Z_$][a-zA-Z0-9_$]*";
 }

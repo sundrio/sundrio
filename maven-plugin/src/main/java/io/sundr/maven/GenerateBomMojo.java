@@ -405,7 +405,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   /**
    * Returns all the session/reactor artifacts topologically sorted.
    *
-   * @return
+   * @return The sorted set of session artifacts.
    */
   private Set<Artifact> getSessionArtifacts() {
     Set<Artifact> result = new LinkedHashSet<Artifact>();
@@ -418,7 +418,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   /**
    * Returns all dependency artifacts in all modules, excluding all reactor artifacts (including attached).
    *
-   * @return
+   * @return The set of project dependency artifacts.
    */
   private Set<Artifact> getProjectDependencies() {
     Set<Artifact> result = new LinkedHashSet<Artifact>();
@@ -433,7 +433,7 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   /**
    * Returns all dependencies defined in dependency management of the root pom.
    *
-   * @return
+   * @return The set of dependency management artifacts.
    */
   private Set<Artifact> getProjectDependencyManagement() {
     Set<Artifact> result = new LinkedHashSet<Artifact>();
@@ -447,9 +447,9 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
   }
 
   /**
-   * Returns all dependencies defined in dependency management of the root pom.
+   * Returns all plugin management entries defined in the root pom.
    *
-   * @return
+   * @return The set of plugin management artifacts.
    */
   private Set<Artifact> getProjectPluginManagement() {
     Set<Artifact> result = new LinkedHashSet<Artifact>();
@@ -466,8 +466,8 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
    * Collects dependencies, including transitives.
    * Project dependencies retain their scope, while test only dependencies (including transitives) will have test scope.
    *
-   * @param projectDependencies
-   * @return
+   * @param projectDependencies The direct project dependencies to resolve transitives from.
+   * @return The full set of artifacts including transitives.
    */
   private Set<Artifact> getDependencies(final Set<Artifact> projectDependencies) {
     Set<Artifact> result = new LinkedHashSet<Artifact>(projectDependencies);

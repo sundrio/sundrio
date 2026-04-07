@@ -26,9 +26,9 @@ import java.lang.annotation.Target;
 public @interface ResourceSelector {
 
   /**
-   * The package to use for selecting classes.
+   * The resource name to use for selecting classes.
    *
-   * @return
+   * @return The resource name.
    */
   String value();
 }

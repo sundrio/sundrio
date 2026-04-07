@@ -774,7 +774,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    * @param source The source type of the reference..
    * @param target The target type.
    * @param targetBuilder The target type builder.
-   * @return
+   * @return The string representation of the converted reference.
    */
   private static String convertReference(String ref, TypeDef source, TypeDef target, TypeDef targetBuilder) {
     StringBuilder sb = new StringBuilder();
@@ -788,7 +788,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    * @param ref The ref.
    * @param source The source type of the reference..
    * @param target The target type.
-   * @return
+   * @return The string representation of the converted reference.
    */
   private static String convertReference(String ref, TypeDef source, TypeDef target) {
     Method ctor = BuilderUtils.findBuildableConstructor(target);
@@ -1047,7 +1047,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    * @param source The source type of the reference (e.g. the annotation).
    * @param target The target type (e.g. the generated pojo).
    * @param targetBuilder The target type builder (e.g. the pojo builder.
-   * @return
+   * @return The string representation of the converted map.
    */
   private static String convertMap(String ref, TypeDef source, TypeDef target, TypeDef targetBuilder) {
     StringBuilder sb = new StringBuilder();
@@ -1065,7 +1065,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    * @param ref The ref.
    * @param source The source type of the reference (e.g. the annotation).
    * @param target The target type (e.g. the generated pojo).
-   * @return
+   * @return The string representation of the converted map.
    */
   private static String convertMap(String ref, TypeDef source, TypeDef target) {
     Method ctor = BuilderUtils.findBuildableConstructor(target);
@@ -1090,7 +1090,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
    *
    * @param ref The reference.
    * @param source The type of the reference.
-   * @param field The field to read.
+   * @param argument The argument to read.
    * @return The code.
    */
   private static String readMapValue(String ref, TypeDef source, Argument argument) {

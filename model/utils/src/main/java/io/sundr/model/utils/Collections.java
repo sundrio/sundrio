@@ -183,6 +183,9 @@ public class Collections {
   /**
    * If the supplied type implements {@link java.util.Collection} (directly or indirectly), determine its generic element type.
    * Otherwise, return {@link Optional#empty()}
+   *
+   * @param type The type to inspect.
+   * @return The element type if present, or empty.
    */
   public static Optional<TypeRef> getCollectionElementType(TypeRef type) {
     return extractArgument(type, AS_COLLECTION, 0);
@@ -191,6 +194,9 @@ public class Collections {
   /**
    * If the supplied type implements {@link java.util.Map} (directly or indirectly), determine its generic key type. Otherwise,
    * return {@link Optional#empty()}
+   *
+   * @param mapType The map type to inspect.
+   * @return The key type if present, or empty.
    */
   public static Optional<TypeRef> getMapKeyType(TypeRef mapType) {
     return extractArgument(mapType, AS_MAP, 0);
@@ -199,6 +205,9 @@ public class Collections {
   /**
    * If the supplied type implements {@link java.util.Map} (directly or indirectly), determine its generic value type.
    * Otherwise, return {@link Optional#empty()}
+   *
+   * @param mapType The map type to inspect.
+   * @return The value type if present, or empty.
    */
   public static Optional<TypeRef> getMapValueType(TypeRef mapType) {
     return extractArgument(mapType, AS_MAP, 1);

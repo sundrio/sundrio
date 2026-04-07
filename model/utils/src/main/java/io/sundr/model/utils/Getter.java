@@ -116,7 +116,7 @@ public class Getter {
    *
    * @param method The method.
    * @param acceptPrefixless Flag to enable support of prefixless getters.
-   * @return
+   * @return True if the method is a getter, false otherwise.
    */
   public static boolean is(Method method, boolean acceptPrefixless) {
     int length = method.getName().length();

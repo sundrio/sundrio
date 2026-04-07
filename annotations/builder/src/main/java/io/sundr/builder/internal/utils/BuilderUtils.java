@@ -272,7 +272,7 @@ public class BuilderUtils {
    * Checks if method has a specific argument.
    *
    * @param method The method.
-   * @param property The argument.
+   * @param variable The argument.
    * @return True if matching argument if found.
    */
   public static boolean methodHasArgument(Method method, Variable<?> variable) {
@@ -590,7 +590,7 @@ public class BuilderUtils {
    * @param field The property.
    * @param typeRef The type reference.
    * @param originType The origin type.
-   *        param useSingular Flag to use singular form
+   * @param useSingular Flag to use singular form.
    * @return The qualified property name.
    */
   public static String qualifyPropertyName(Field field, TypeRef typeRef, TypeDef originType, boolean useSingular) {
