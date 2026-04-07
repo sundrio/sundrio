@@ -393,7 +393,9 @@
                       <goal>jar</goal>
                     </goals>
                     <configuration>
-                      <additionalparam>${javadoc.opts}</additionalparam>
+                      <additionalJOptions>
+                        <additionalJOption>${javadoc.opts}</additionalJOption>
+                      </additionalJOptions>
                     </configuration>
                   </execution>
                 </executions>
