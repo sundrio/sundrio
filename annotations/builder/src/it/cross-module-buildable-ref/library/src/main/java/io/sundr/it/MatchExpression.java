@@ -19,7 +19,7 @@ package io.sundr.it;
 import io.sundr.builder.annotations.Buildable;
 import java.util.List;
 
-@Buildable
+@Buildable(editableEnabled = false, validationEnabled = false, generateBuilderPackage = true, lazyCollectionInitEnabled = false, builderPackage = "io.sundrio.it")
 public class MatchExpression {
 
     private final String key;

@@ -26,7 +26,7 @@ import io.sundr.builder.annotations.BuildableReference;
  * methods (addNewMatchExpression()) on LabelSelectorFluent even though MatchExpression
  * comes from a compiled JAR rather than source.
  */
-@Buildable(refs = { @BuildableReference(LabelSelector.class) })
+@Buildable(editableEnabled = false, validationEnabled = false, generateBuilderPackage = true, lazyCollectionInitEnabled = false, builderPackage = "io.sundrio.it", refs = { @BuildableReference(LabelSelector.class) })
 public class PolicyBinding {
 
     private final String name;

@@ -20,7 +20,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.List;
 import java.util.Map;
 
-@Buildable
+@Buildable(editableEnabled = false, validationEnabled = false, generateBuilderPackage = true, lazyCollectionInitEnabled = false, builderPackage = "io.sundrio.it")
 public class LabelSelector {
 
     private final Map<String, String> matchLabels;
