@@ -153,28 +153,10 @@ public class BuilderUtils {
   }
 
   public static boolean isBuildable(TypeRef typeRef) {
-    if (isRegisteredAsBuildable(typeRef) && canBeBuilt(typeRef)) {
-      return true;
-    }
     if (!(typeRef instanceof ClassRef)) {
       return false;
     }
-    // Fallback for cross-module @BuildableReference: check if a sundrio-generated *Builder exists
-    // on the APT classpath. @Buildable has SOURCE retention so compiled JARs don't carry it;
-    // using getTypeElement() is the only JDK-version-agnostic way to detect a pre-compiled builder.
-    // We verify it's a sundrio builder (not e.g. java.lang.StringBuilder or ProcessBuilder) by
-    // checking it declares a build() method.
-    String builderFQCN = ((ClassRef) typeRef).getFullyQualifiedName() + "Builder";
-    Elements elements = BuilderContextManager.getContext().getElements();
-    if (elements == null) {
-      return false;
-    }
-    TypeElement builderElement = elements.getTypeElement(builderFQCN);
-    if (builderElement == null) {
-      return false;
-    }
-    return builderElement.getEnclosedElements().stream()
-        .anyMatch(e -> e.getKind() == ElementKind.METHOD && e.getSimpleName().contentEquals("build"));
+    return (isRegisteredAsBuildable(typeRef) && canBeBuilt(typeRef)) || hasBuilder((ClassRef) typeRef);
   }
 
   public static boolean isRegisteredAsBuildable(TypeDef typeDef) {
@@ -192,29 +174,39 @@ public class BuilderUtils {
    * @return True if buildable repository contains the ref or builder for the reference is present.
    */
   public static boolean isBuildable(ClassRef ref) {
-    if (BuilderContextManager.getContext().getBuildableRepository().isBuildable(ref)) {
-      return true;
-    }
+    return BuilderContextManager.getContext().getBuildableRepository().isBuildable(ref) || hasBuilder(ref);
+  }
 
+  /**
+   * Checks if a sundrio-generated Builder class exists for the given {@link ClassRef}.
+   *
+   * Looks first in the definition repository (same-module types), then falls back to the APT
+   * {@link Elements} API for cross-module types whose {@code @Buildable} annotation is not visible
+   * at compile time (SOURCE retention). A class is considered to have a builder if a type named
+   * {@code <FQCN>Builder} exists and declares a {@code build()} method.
+   *
+   * @param ref The class reference to check.
+   * @return True if a matching builder is found.
+   */
+  public static boolean hasBuilder(ClassRef ref) {
     String builderFQCN = ref.getFullyQualifiedName() + "Builder";
     TypeDef builder = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(builderFQCN);
-    if (builder == null) {
-      Elements elements = BuilderContextManager.getContext().getElements();
-      if (elements == null) {
-        return false;
-      }
-      TypeElement builderElement = elements.getTypeElement(builderFQCN);
-      return builderElement != null && builderElement.getEnclosedElements().stream()
-          .anyMatch(e -> e.getKind() == ElementKind.METHOD && e.getSimpleName().contentEquals("build"));
+    if (builder != null) {
+      return builder.getMethods()
+          .stream()
+          .filter(m -> "build".equals(m.getName()))
+          .filter(m -> m.getReturnType() instanceof ClassRef)
+          .map(m -> (ClassRef) m.getReturnType())
+          .anyMatch(r -> Assignable.isAssignable(r).from(ref));
     }
 
-    return builder.getMethods()
-        .stream()
-        .filter(m -> "build".equals(m.getName()))
-        .filter(m -> m.getReturnType() instanceof ClassRef)
-        .map(m -> (ClassRef) m.getReturnType())
-        .filter(r -> Assignable.isAssignable(r).from(ref))
-        .count() > 0;
+    Elements elements = BuilderContextManager.getContext().getElements();
+    if (elements == null) {
+      return false;
+    }
+    TypeElement builderElement = elements.getTypeElement(builderFQCN);
+    return builderElement != null && builderElement.getEnclosedElements().stream()
+        .anyMatch(e -> e.getKind() == ElementKind.METHOD && e.getSimpleName().contentEquals("build"));
   }
 
   public static boolean isOrHasBuildableDescendants(Field field) {
