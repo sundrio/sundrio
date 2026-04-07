@@ -88,7 +88,7 @@ public enum Pluralize implements Function<String, String> {
    * Rudimentary implementation of checking whether word is plural or not.
    * It can be further improved to handle complex cases.
    *
-   * @param word
+   * @param word The word to check.
    * @return Boolean value indicating whether it's already plural or not
    */
   private boolean isAlreadyPlural(String word) {

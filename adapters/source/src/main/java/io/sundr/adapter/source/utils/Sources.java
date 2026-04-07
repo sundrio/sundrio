@@ -44,6 +44,7 @@ public class Sources {
    * Read the first {@link TypeDef} instance from an {@link InputStream}.
    *
    * @param path the {@link Path}
+   * @param ctx the {@link AdapterContext}
    * @return the first {@link TypeDef} instance, or throw an exception if none is found.
    */
   public static TypeDef readTypeDefFromPath(Path path, AdapterContext ctx) {
@@ -58,6 +59,7 @@ public class Sources {
    * Read the first {@link TypeDef} instance from an {@link InputStream}.
    *
    * @param is the {@link InputStream}
+   * @param ctx the {@link AdapterContext}
    * @return the first {@link TypeDef} instance, or throw an exception if none is found.
    */
   public static TypeDef readTypeDefFromStream(InputStream is, AdapterContext ctx) {
@@ -68,6 +70,7 @@ public class Sources {
    * Read a {@link List} of {@link TypeDef} instances from an {@link InputStream}.
    *
    * @param is the {@link InputStream}
+   * @param ctx the {@link AdapterContext}
    * @return a {@link List} of {@link TypeDef} instances.
    */
   public static List<TypeDef> readTypeDefsFromStream(InputStream is, AdapterContext ctx) {
@@ -99,7 +102,7 @@ public class Sources {
   /**
    * Read a {@link List} of {@link TypeDeclaration} instances from a classpath resource.
    *
-   * @param resourceName the {@link InputStream}
+   * @param resourceName the classpath resource name
    * @return a {@link List} of {@link TypeDeclaration} instances.
    */
   public static List<TypeDeclaration<?>> readTypesFromResource(String resourceName) {
@@ -110,7 +113,7 @@ public class Sources {
   /**
    * Read a {@link TypeDeclaration} instance from a classpath resource.
    *
-   * @param resourceName the {@link InputStream}
+   * @param resourceName the classpath resource name
    * @return the {@link TypeDeclaration} instance.
    */
   public static TypeDeclaration<?> readTypeFromResource(String resourceName) {
@@ -120,7 +123,7 @@ public class Sources {
   /**
    * Read the first {@link TypeDef} instance from a classpath resource.
    *
-   * @param resourceName the {@link InputStream}
+   * @param resourceName the classpath resource name
    * @param ctx the {@link AdapterContext}
    * @return the first {@link TypeDef} instance, or throw an exception if none is found.
    */
@@ -132,7 +135,8 @@ public class Sources {
   /**
    * Read a {@link List} of {@link TypeDef} instances from a classpath resource.
    *
-   * @param resourceName the {@link InputStream}
+   * @param resourceName the resource name
+   * @param ctx the {@link AdapterContext}
    * @return a {@link List} of {@link TypeDef} instances.
    */
   public static List<TypeDef> readTypeDefsFromResource(String resourceName, AdapterContext ctx) {

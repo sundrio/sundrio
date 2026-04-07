@@ -29,14 +29,14 @@ public @interface AnnotationSelector {
   /**
    * The annotation class to use for selecting classes.
    *
-   * @return
+   * @return The annotation class.
    */
   Class<? extends Annotation> value();
 
   /**
    * The package selector to use to filter selected annotated classes.
    *
-   * @return
+   * @return The package selectors.
    */
   PackageSelector[] packages() default {};
 }

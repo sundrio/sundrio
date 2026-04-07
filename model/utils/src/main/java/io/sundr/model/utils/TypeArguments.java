@@ -107,6 +107,7 @@ public class TypeArguments {
    * However, if the reference does contain generic arguments, their count must be equal to the definition.
    *
    * @param ref The class reference to evaluate. The corresponding definition will be loaded using {@link GetDefinition}
+   * @return A map from type parameter names to their concrete type arguments.
    */
   public static Map<String, TypeRef> getGenericArgumentsMappings(ClassRef ref) {
     return getGenericArgumentsMappings(ref, GetDefinition.of(ref));
@@ -124,7 +125,8 @@ public class TypeArguments {
    * However, if the reference does contain generic arguments, their count must be equal to the definition.
    *
    * @param ref The class reference to evaluate.
-   * @param definition The corresponding definition
+   * @param definition The corresponding definition.
+   * @return A map from type parameter names to their concrete type arguments.
    */
   public static Map<String, TypeRef> getGenericArgumentsMappings(ClassRef ref, TypeDef definition) {
     List<TypeRef> arguments = ref.getArguments();
