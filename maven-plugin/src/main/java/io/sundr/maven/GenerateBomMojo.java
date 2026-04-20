@@ -141,8 +141,17 @@ public class GenerateBomMojo extends AbstractSundrioMojo {
       }
 
       updated.addAll(getAllButCurrent());
-      for (Map.Entry<BomConfig, MavenProject> entry : generated.entrySet()) {
-        build(getSession().clone(), entry.getValue(), updated, entry.getKey().getGoals());
+
+      // Use the main session instead of a cloned session so that lifecycle extensions
+      // (like central-publishing-maven-plugin) can see the BOM artifacts.
+      // We save and restore the original project list to avoid side effects on the reactor.
+      List<MavenProject> originalProjects = getSession().getProjects();
+      try {
+        for (Map.Entry<BomConfig, MavenProject> entry : generated.entrySet()) {
+          build(getSession(), entry.getValue(), updated, entry.getKey().getGoals());
+        }
+      } finally {
+        getSession().setProjects(originalProjects);
       }
     }
   }
