@@ -28,6 +28,10 @@
     <artifactId>validation</artifactId>
     <name>Sundrio :: Examples :: Validation</name>
 
+    <properties>
+        <java.version>17</java.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.sundr</groupId>
