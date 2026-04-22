@@ -22,7 +22,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a method as a validation method for a specific type.
+ * Marks a method as a validation method.
+ * <p>
+ * The target type is inferred from the method's first parameter.
  * <p>
  * The annotated method must be either:
  * <ul>
@@ -71,12 +73,4 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface Validation {
-
-  /**
-   * The target type to validate. If not specified (void.class), the type is inferred
-   * from the method's first parameter.
-   *
-   * @return the target type, or void.class to infer from method signature
-   */
-  Class<?> value() default void.class;
 }
