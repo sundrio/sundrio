@@ -355,9 +355,10 @@ class ToMethod {
             .then(new This().ref(field).assignNew(builder, field),
                 new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("add",
                     new This().ref(field)))
-            .orElse(new This().ref(field).assignNull(),
+            .orElse(
                 new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("remove",
-                    new This().ref(field))));
+                    new This().ref(field)),
+                new This().ref(field).assignNull()));
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       }
