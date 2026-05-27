@@ -47,13 +47,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
-import javax.lang.model.util.Elements;
 
 import io.sundr.adapter.api.AdapterContext;
 import io.sundr.adapter.api.Adapters;
+import io.sundr.adapter.api.TypeLookup;
 import io.sundr.adapter.apt.AptContext;
 import io.sundr.builder.Constants;
 import io.sundr.builder.Visitor;
@@ -180,33 +179,27 @@ public class BuilderUtils {
   /**
    * Checks if a sundrio-generated Builder class exists for the given {@link ClassRef}.
    *
-   * Looks first in the definition repository (same-module types), then falls back to the APT
-   * {@link Elements} API for cross-module types whose {@code @Buildable} annotation is not visible
+   * Looks first in the definition repository (same-module types), then falls back to
+   * {@link TypeLookup} for cross-module types whose {@code @Buildable} annotation is not visible
    * at compile time (SOURCE retention). A class is considered to have a builder if a type named
-   * {@code <FQCN>Builder} exists and declares a {@code build()} method.
+   * {@code <FQCN>Builder} exists and implements sundrio's {@code Builder} interface (directly or
+   * via {@code VisitableBuilder}).
    *
    * @param ref The class reference to check.
    * @return True if a matching builder is found.
    */
   public static boolean hasBuilder(ClassRef ref) {
     String builderFQCN = ref.getFullyQualifiedName() + "Builder";
-    TypeDef builder = BuilderContextManager.getContext().getDefinitionRepository().getDefinition(builderFQCN);
-    if (builder != null) {
-      return builder.getMethods()
-          .stream()
-          .filter(m -> "build".equals(m.getName()))
-          .filter(m -> m.getReturnType() instanceof ClassRef)
-          .map(m -> (ClassRef) m.getReturnType())
-          .anyMatch(r -> Assignable.isAssignable(r).from(ref));
+    BuilderContext context = BuilderContextManager.getContext();
+    TypeDef builder = context.getDefinitionRepository().getDefinition(builderFQCN);
+    if (builder == null) {
+      builder = TypeLookup.lookup(builderFQCN, AdapterContext.getContext()).orElse(null);
     }
-
-    Elements elements = BuilderContextManager.getContext().getElements();
-    if (elements == null) {
+    if (builder == null) {
       return false;
     }
-    TypeElement builderElement = elements.getTypeElement(builderFQCN);
-    return builderElement != null && builderElement.getEnclosedElements().stream()
-        .anyMatch(e -> e.getKind() == ElementKind.METHOD && e.getSimpleName().contentEquals("build"));
+    TypeDef builderInterface = context.getBuilderInterface();
+    return Assignable.isAssignable(builderInterface).from(builder);
   }
 
   public static boolean isOrHasBuildableDescendants(Field field) {
