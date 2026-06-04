@@ -29,9 +29,16 @@ public class Person {
   @NotBlank
   private final String lastName;
 
-  public Person(String firstName, String lastName) {
+  private final int age;
+
+  public Person(String firstName, String lastName, int age) {
     this.firstName = firstName;
     this.lastName = lastName;
+    this.age = age;
+  }
+
+  public Person(String firstName, String lastName) {
+    this(firstName, lastName, 0);
   }
 
   public String getFirstName() {
@@ -42,9 +49,13 @@ public class Person {
     return this.lastName;
   }
 
+  public int getAge() {
+    return this.age;
+  }
+
   @Override
   public String toString() {
-    return firstName + " " + lastName;
+    return firstName + " " + lastName + " (" + age + ")";
   }
 
 }

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -31,6 +32,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -41,15 +43,17 @@ import io.sundr.model.ClassRef;
 import io.sundr.model.Kind;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.validation.internal.ParamInfo;
 import io.sundr.validation.internal.ValidationMethod;
 import io.sundr.validation.internal.visitors.AddCheckMethods;
-import io.sundr.validation.internal.visitors.AddValidateMethod;
 import io.sundr.validation.internal.visitors.AddValidationBuilderFluentMethods;
+import io.sundr.validation.internal.visitors.AddValidatorDsl;
 import io.sundr.validation.internal.visitors.AddValidatorsBuilderFields;
 
 @SupportedAnnotationTypes("io.sundr.validation.annotations.Validation")
 public class ValidationProcessor extends AbstractCodeGeneratingProcessor {
 
+  private static final java.util.Set<String> RESERVED_FIELD_NAMES = java.util.Set.of("item", "validators");
   private static final String VALIDATOR_SUFFIX = "Validator";
   private static final String VALIDATORS_BUILDER_SUFFIX = "ValidatorsBuilder";
   private static final String BUILDABLE_ANNOTATION = "io.sundr.builder.annotations.Buildable";
@@ -68,21 +72,33 @@ public class ValidationProcessor extends AbstractCodeGeneratingProcessor {
       List<ValidationMethod> methods = entry.getValue();
       String validationPackage = resolveValidationPackage(targetTypeFqn);
 
-      generate(buildValidator(targetTypeFqn, methods, validationPackage));
+      generateValidator(targetTypeFqn, methods, validationPackage);
       generate(buildValidatorsBuilder(targetTypeFqn, methods, validationPackage));
     }
 
     return false;
   }
 
-  private TypeDef buildValidator(String targetTypeFqn, List<ValidationMethod> methods, String validationPackage) {
-    return new TypeDefBuilder()
+  private void generateValidator(String targetTypeFqn, List<ValidationMethod> methods, String validationPackage) {
+    String validatorName = getSimpleName(targetTypeFqn) + VALIDATOR_SUFFIX;
+    String validatorFqn = getPackageName(targetTypeFqn).isEmpty()
+        ? validatorName
+        : getPackageName(targetTypeFqn) + "." + validatorName;
+    AddValidatorDsl dslVisitor = new AddValidatorDsl(
+        ClassRef.forName(targetTypeFqn), ClassRef.forName(validatorFqn), methods, validationPackage);
+
+    TypeDef validatorDef = new TypeDefBuilder()
         .withPackageName(getPackageName(targetTypeFqn))
-        .withName(getSimpleName(targetTypeFqn) + VALIDATOR_SUFFIX)
+        .withName(validatorName)
         .withKind(Kind.CLASS)
         .withNewModifiers().withPublic().withFinal().endModifiers()
-        .accept(new AddValidateMethod(ClassRef.forName(targetTypeFqn), methods, validationPackage))
+        .accept(dslVisitor)
         .build();
+    generate(validatorDef);
+
+    if (dslVisitor.needsContextClass()) {
+      generate(dslVisitor.buildContextClass());
+    }
   }
 
   private TypeDef buildValidatorsBuilder(String targetTypeFqn, List<ValidationMethod> methods, String validationPackage) {
@@ -98,7 +114,7 @@ public class ValidationProcessor extends AbstractCodeGeneratingProcessor {
         .withName(builderName)
         .withKind(Kind.CLASS)
         .withNewModifiers().withPublic().withFinal().endModifiers()
-        .accept(new AddValidatorsBuilderFields(targetTypeRef, validationPackage))
+        .accept(new AddValidatorsBuilderFields(targetTypeRef, methods, validationPackage))
         .accept(new AddCheckMethods(selfRef, methods, validationPackage))
         .accept(new AddValidationBuilderFluentMethods(selfRef, targetTypeRef, validationPackage))
         .build();
@@ -127,19 +143,40 @@ public class ValidationProcessor extends AbstractCodeGeneratingProcessor {
   }
 
   private ValidationMethod extractValidationMethod(ExecutableElement method) {
-    if (method.getParameters().size() != 1) {
+    if (method.getParameters().isEmpty()) {
       processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
-          "@Validation method must have exactly one parameter", method);
+          "@Validation method must have at least one parameter", method);
       return null;
     }
 
     boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
     TypeElement enclosingType = (TypeElement) method.getEnclosingElement();
 
-    if (!isStatic && !hasPublicNoArgConstructor(enclosingType)) {
-      processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
-          "@Validation on instance method requires enclosing class to have a public no-arg constructor", method);
-      return null;
+    List<ParamInfo> constructorParams = java.util.Collections.emptyList();
+    if (!isStatic) {
+      constructorParams = extractConstructorParams(enclosingType);
+      if (constructorParams == null) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
+            "@Validation on instance method requires enclosing class to have at least one public constructor",
+            method);
+        return null;
+      }
+    }
+
+    List<ParamInfo> extraParams = new ArrayList<>();
+    for (int i = 1; i < method.getParameters().size(); i++) {
+      VariableElement param = method.getParameters().get(i);
+      String paramName = param.getSimpleName().toString();
+      if (RESERVED_FIELD_NAMES.contains(paramName)) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
+            "@Validation extra parameter name '" + paramName + "' conflicts with a generated field name", method);
+        return null;
+      }
+      TypeMirror paramType = param.asType();
+      extraParams.add(new ParamInfo(
+          getTypeFqn(paramType),
+          paramName,
+          paramType.getKind().isPrimitive()));
     }
 
     TypeMirror targetType = method.getParameters().get(0).asType();
@@ -159,14 +196,38 @@ public class ValidationProcessor extends AbstractCodeGeneratingProcessor {
         enclosingType.getQualifiedName().toString(),
         method.getSimpleName().toString(),
         isStatic,
-        returnsErrors);
+        returnsErrors,
+        extraParams,
+        constructorParams);
   }
 
-  private boolean hasPublicNoArgConstructor(TypeElement type) {
-    return type.getEnclosedElements().stream()
+  private List<ParamInfo> extractConstructorParams(TypeElement type) {
+    List<ExecutableElement> publicConstructors = type.getEnclosedElements().stream()
         .filter(e -> e.getKind() == ElementKind.CONSTRUCTOR)
         .map(e -> (ExecutableElement) e)
-        .anyMatch(c -> c.getParameters().isEmpty() && c.getModifiers().contains(Modifier.PUBLIC));
+        .filter(c -> c.getModifiers().contains(Modifier.PUBLIC))
+        .collect(Collectors.toList());
+
+    if (publicConstructors.isEmpty()) {
+      return null;
+    }
+
+    for (ExecutableElement ctor : publicConstructors) {
+      if (ctor.getParameters().isEmpty()) {
+        return java.util.Collections.emptyList();
+      }
+    }
+
+    ExecutableElement chosen = publicConstructors.get(0);
+    List<ParamInfo> params = new ArrayList<>();
+    for (VariableElement param : chosen.getParameters()) {
+      TypeMirror paramType = param.asType();
+      params.add(new ParamInfo(
+          getTypeFqn(paramType),
+          param.getSimpleName().toString(),
+          paramType.getKind().isPrimitive()));
+    }
+    return params;
   }
 
   private boolean isListOfValidationError(TypeMirror type) {

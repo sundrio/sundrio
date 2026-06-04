@@ -508,6 +508,7 @@ public class ClazzAs {
         if (context.hasValidationMethods(item.getPackageName() + "." + item.getName())) {
           String validatorsBuilderFqn = item.getPackageName() + "." + item.getName() + "ValidatorsBuilder";
           ClassRef validatorsBuilderRef = new ClassRefBuilder().withFullyQualifiedName(validatorsBuilderFqn).build();
+          // No-arg usingNewValidator()
           methods.add(new MethodBuilder()
               .withNewModifiers().withPublic().endModifiers()
               .withReturnType(validatorsBuilderRef)
@@ -516,6 +517,29 @@ public class ClazzAs {
               .addToStatements(new Return(new Construct(validatorsBuilderRef, new This())))
               .endBlock()
               .build());
+
+          // Overloaded usingNewValidator(args...) if validation methods have constructor params
+          java.util.List<io.sundr.model.Property> ctorParams = io.sundr.builder.internal.utils.ValidationUtils
+              .getValidationConstructorParams(
+                  item.getPackageName() + "." + item.getName(), context.getAptContext());
+          if (!ctorParams.isEmpty()) {
+            java.util.List<Expression> constructArgs = new java.util.ArrayList<>();
+            constructArgs.add(new This());
+            MethodBuilder overloadBuilder = new MethodBuilder()
+                .withNewModifiers().withPublic().endModifiers()
+                .withReturnType(validatorsBuilderRef)
+                .withName("usingNewValidator");
+            for (io.sundr.model.Property param : ctorParams) {
+              overloadBuilder = overloadBuilder.addNewArgument()
+                  .withName(param.getName()).withTypeRef(param.getTypeRef()).endArgument();
+              constructArgs.add(LocalVariable.newLocalVariable(param.getTypeRef(), param.getName()));
+            }
+            methods.add(overloadBuilder
+                .withNewBlock()
+                .addToStatements(new Return(new Construct(validatorsBuilderRef, constructArgs)))
+                .endBlock()
+                .build());
+          }
         }
       }
 

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package io.sundr.examples;
+package io.sundr.examples.validation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,15 +43,6 @@ public class PersonValidations {
   }
 
   @Validation
-  public static List<ValidationError> validateAge(Person person, int minAge) {
-    List<ValidationError> errors = new ArrayList<>();
-    if (person.getAge() < minAge) {
-      errors.add(new ValidationError("age", "must be at least " + minAge));
-    }
-    return errors;
-  }
-
-  @Validation
   public static List<ValidationError> validateMinAge(Person person, int minAge) {
     List<ValidationError> errors = new ArrayList<>();
     if (person.getAge() < minAge) {
@@ -65,6 +56,24 @@ public class PersonValidations {
     List<ValidationError> errors = new ArrayList<>();
     if (maxAge > 0 && person.getAge() > maxAge) {
       errors.add(new ValidationError("age", "must be at most " + maxAge));
+    }
+    return errors;
+  }
+
+  @Validation
+  public static List<ValidationError> validateNameLength(Person person, int limit) {
+    List<ValidationError> errors = new ArrayList<>();
+    if (person.getFirstName() != null && person.getFirstName().length() > limit) {
+      errors.add(new ValidationError("firstName", "must be at most " + limit + " characters"));
+    }
+    return errors;
+  }
+
+  @Validation
+  public static List<ValidationError> validateNamePattern(Person person, String limit) {
+    List<ValidationError> errors = new ArrayList<>();
+    if (person.getFirstName() != null && limit != null && !person.getFirstName().matches(limit)) {
+      errors.add(new ValidationError("firstName", "must match pattern " + limit));
     }
     return errors;
   }
