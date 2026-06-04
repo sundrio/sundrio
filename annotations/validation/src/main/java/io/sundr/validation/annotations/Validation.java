@@ -25,18 +25,25 @@ import java.lang.annotation.Target;
  * Marks a method as a validation method.
  * <p>
  * The target type is inferred from the method's first parameter.
+ * Additional parameters beyond the first are treated as extra arguments
+ * that can be supplied via an overloaded {@code checkXxx(args...)} method
+ * on the generated Validator/ValidatorsBuilder. The no-arg {@code checkXxx()} variant
+ * passes default values (null for objects, 0/false for primitives).
  * <p>
  * The annotated method must be either:
  * <ul>
  * <li>A static method</li>
- * <li>An instance method in a class with a public no-arg constructor</li>
+ * <li>An instance method in a class with at least one public constructor.
+ * If the class has no public no-arg constructor, the constructor arguments
+ * are supplied via an overloaded {@code usingNewValidator(args...)} method
+ * on the generated builder.</li>
  * </ul>
  * <p>
  * The method should have one of the following signatures:
  * <ul>
- * <li>{@code List<ValidationError> validate(T item)} - Returns list of errors (empty if valid)</li>
- * <li>{@code T validate(T item)} - Validates and returns the item, throws exception on failure</li>
- * <li>{@code void validate(T item)} - Throws exception on validation failure</li>
+ * <li>{@code List<ValidationError> validate(T item, ...)} - Returns list of errors (empty if valid)</li>
+ * <li>{@code T validate(T item, ...)} - Validates and returns the item, throws exception on failure</li>
+ * <li>{@code void validate(T item, ...)} - Throws exception on validation failure</li>
  * </ul>
  * <p>
  * The annotation processor generates a {@code XXXValidator} class (where XXX is the validated type)

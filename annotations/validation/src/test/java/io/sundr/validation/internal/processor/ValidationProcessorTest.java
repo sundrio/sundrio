@@ -218,11 +218,11 @@ public class ValidationProcessorTest {
         .withProcessors(new ValidationProcessor())
         .compile(validationClass);
 
-    assertThat(compilation).hadErrorContaining("must have exactly one parameter");
+    assertThat(compilation).hadErrorContaining("must have at least one parameter");
   }
 
   @Test
-  public void shouldErrorWhenInstanceMethodWithoutNoArgConstructor() {
+  public void shouldSupportInstanceMethodWithConstructorArgs() {
     JavaFileObject validationClass = JavaFileObjects.forSourceString("test.PersonValidations",
         "package test;\n" +
             "import io.sundr.validation.annotations.Validation;\n" +
@@ -249,7 +249,38 @@ public class ValidationProcessorTest {
         .withProcessors(new ValidationProcessor())
         .compile(validationClass, personClass);
 
-    assertThat(compilation).hadErrorContaining("public no-arg constructor");
+    assertThat(compilation).succeeded();
+  }
+
+  @Test
+  public void shouldErrorWhenInstanceMethodWithoutPublicConstructor() {
+    JavaFileObject validationClass = JavaFileObjects.forSourceString("test.PersonValidations",
+        "package test;\n" +
+            "import io.sundr.validation.annotations.Validation;\n" +
+            "import io.sundr.validation.ValidationError;\n" +
+            "import java.util.List;\n" +
+            "import java.util.ArrayList;\n" +
+            "public class PersonValidations {\n" +
+            "  private final String config;\n" +
+            "  private PersonValidations(String config) { this.config = config; }\n" +
+            "  @Validation\n" +
+            "  public List<ValidationError> validateName(Person person) {\n" +
+            "    return new ArrayList<>();\n" +
+            "  }\n" +
+            "}\n");
+
+    JavaFileObject personClass = JavaFileObjects.forSourceString("test.Person",
+        "package test;\n" +
+            "public class Person {\n" +
+            "  private String name;\n" +
+            "  public String getName() { return name; }\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new ValidationProcessor())
+        .compile(validationClass, personClass);
+
+    assertThat(compilation).hadErrorContaining("at least one public constructor");
   }
 
   @Test
