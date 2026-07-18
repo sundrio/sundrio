@@ -56,15 +56,15 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public Stub when()");
+        .contains("public TemplateServiceMock.Stub when()");
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public CreateStub withId(String value)");
+        .contains("public TemplateServiceMock.CreateStub withId(String value)");
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public CreateStub withOverwrite(boolean value)");
+        .contains("public TemplateServiceMock.CreateStub withOverwrite(boolean value)");
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
@@ -85,15 +85,15 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public Verify verify()");
+        .contains("public TemplateServiceMock.Verify verify()");
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public CreateVerify withId(String value)");
+        .contains("public TemplateServiceMock.CreateVerify withId(String value)");
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public CreateVerify capturingId(ArgumentCaptor<String> captor)");
+        .contains("public TemplateServiceMock.CreateVerify capturingId(ArgumentCaptor<String> captor)");
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
@@ -159,7 +159,7 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.CounterServiceMock")
         .contentsAsUtf8String()
-        .contains("public IncrementStub withDelta(int value)");
+        .contains("public CounterServiceMock.IncrementStub withDelta(int value)");
   }
 
   @Test
@@ -292,7 +292,7 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("public LoadStub load()");
+        .contains("public RepositoryServiceMock.LoadStub load()");
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
@@ -300,15 +300,15 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("public LoadStub withId(String value)");
+        .contains("public RepositoryServiceMock.LoadStub withId(String value)");
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("public LoadStub withSpec(Spec value)");
+        .contains("public RepositoryServiceMock.LoadStub withSpec(Spec value)");
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("public LoadStub withVersion(int value)");
+        .contains("public RepositoryServiceMock.LoadStub withVersion(int value)");
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
@@ -316,11 +316,11 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("public LoadStub withIdAny()");
+        .contains("public RepositoryServiceMock.LoadStub withIdAny()");
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("public LoadStub andNoOtherArgs()");
+        .contains("public RepositoryServiceMock.LoadStub andNoOtherArgs()");
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
@@ -332,7 +332,7 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("public SaveStub save()");
+        .contains("public RepositoryServiceMock.SaveStub save()");
   }
 
   @Test
@@ -360,7 +360,7 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.MixedServiceMock")
         .contentsAsUtf8String()
-        .contains("public OkStub ok()");
+        .contains("public MixedServiceMock.OkStub ok()");
   }
 
   @Test

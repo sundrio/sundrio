@@ -80,6 +80,16 @@ public class MockTarget {
     return ClassRef.forName(getMockFqcn());
   }
 
+  /**
+   * Returns a reference to a class nested inside the generated mock DSL class.
+   *
+   * @param simpleName the simple name of the nested class.
+   * @return the fully qualified reference to the nested class.
+   */
+  public ClassRef nestedRef(String simpleName) {
+    return ClassRef.forName(getMockFqcn() + "." + simpleName);
+  }
+
   public String getPackageName() {
     return definition.getPackageName();
   }
