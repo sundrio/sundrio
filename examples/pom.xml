@@ -37,6 +37,7 @@
         <module>generator</module>
         <module>kubernetes-dsl</module>
         <module>kubernetes-swagger</module>
+        <module>mockito</module>
         <module>validation</module>
     </modules>
  
