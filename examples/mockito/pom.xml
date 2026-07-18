@@ -17,24 +17,21 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>sundr-pom</artifactId>
+        <artifactId>examples</artifactId>
         <groupId>io.sundr</groupId>
         <version>999-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.sundr</groupId>
-    <artifactId>annotations</artifactId>
+    <groupId>io.sundr.examples</groupId>
+    <artifactId>mockito-examples-pom</artifactId>
+    <name>Sundrio :: Examples :: Mockito :: POM</name>
     <packaging>pom</packaging>
-    <name>Sundrio :: Annotations :: POM</name>
+
     <modules>
-        <module>builder</module>
-        <module>dsl</module>
-        <module>generator</module>
-        <module>mockito</module>
-        <module>resourcecify</module>
-        <module>transform</module>
-        <module>validation</module>
+        <module>marker</module>
+        <module>annotated</module>
     </modules>
 
 </project>
