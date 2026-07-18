@@ -24,7 +24,14 @@ import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.PrimitiveRef;
 import io.sundr.model.TypeRef;
 
-public final class MockRefs {
+public final class Constants {
+
+  public static final String MOCK = "mock";
+  public static final String PINNED = "pinned";
+  public static final String SELECTOR = "selector";
+  public static final String EXACT = "exact";
+  public static final String STUB_ROUTER = "Stub";
+  public static final String VERIFY_ROUTER = "Verify";
 
   public static final ClassRef MOCKITO = ClassRef.forName("org.mockito.Mockito");
   public static final ClassRef ARGUMENT_MATCHER = ClassRef.forName("org.mockito.ArgumentMatcher");
@@ -58,7 +65,7 @@ public final class MockRefs {
     PRIMITIVE_ARGS.put("char", ClassRef.forName("io.sundr.mockito.CharArg"));
   }
 
-  private MockRefs() {
+  private Constants() {
   }
 
   /**
