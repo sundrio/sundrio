@@ -57,6 +57,7 @@ On top of this model, it provides tools that perform tasks, like builder generat
       - [DSL Generator](annotations/dsl/readme.md)
       - [Velocity Transformer](annotations/transform/readme.md)
       - [Resourceify](annotations/resourcecify/readme.md)
+      - [Mockito Annotations](annotations/mockito/readme.md)
 
 - Maven 
     - [Maven Bom Generator](maven-plugin/readme.md)
@@ -308,6 +309,7 @@ The project also includes so modules that put the code model & adapters into the
 ## [Validation Support](annotations/validation/readme.md)
 ## [Domain Specific languages](annotations/dsl/readme.md)
 ## [Template base code generator](annotations/transform/readme.md)
+## [Mockito Annotations](annotations/mockito/readme.md)
 
 
 # Compiling 
