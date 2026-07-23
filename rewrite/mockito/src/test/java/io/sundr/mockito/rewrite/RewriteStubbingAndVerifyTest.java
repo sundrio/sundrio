@@ -63,6 +63,7 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "}\n",
             "import static org.mockito.Mockito.mock;\n" +
                 "import svc.LimitsService;\n" +
+                "import svc.Mocks;\n\n" +
                 "class T {\n" +
                 "  void t() throws Exception {\n" +
                 "    LimitsService m = mock(LimitsService.class);\n" +
@@ -84,8 +85,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    when(m.create(eq(\"ID\"), any(), true)).thenReturn(\"X\");\n" +
                 "  }\n" +
                 "}\n",
-            "import static org.mockito.Mockito.mock;\n" +
-                "import svc.TemplateService;\n" +
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
@@ -107,8 +109,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    when(m.find(argThat(s -> s.startsWith(\"tpl-\")))).thenReturn(\"Y\");\n" +
                 "  }\n" +
                 "}\n",
-            "import static org.mockito.Mockito.mock;\n" +
-                "import svc.TemplateService;\n" +
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
@@ -132,8 +135,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    verify(m, never()).delete(\"C\");\n" +
                 "  }\n" +
                 "}\n",
-            "import static org.mockito.Mockito.mock;\n" +
-                "import svc.TemplateService;\n" +
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
@@ -189,8 +193,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    when(m.create(eq(\"ID\"), any(), true)).thenReturn(\"X\");\n" +
                 "  }\n" +
                 "}\n",
-            "import static org.mockito.Mockito.mock;\n" +
-                "import svc.TemplateService;\n" +
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
@@ -218,8 +223,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "}\n",
             "import static org.mockito.Mockito.when;\n" +
                 "import static org.mockito.Mockito.mock;\n" +
-                "import static org.mockito.ArgumentMatchers.eq;\n" +
-                "import svc.TemplateService;\n" +
+                "import static org.mockito.ArgumentMatchers.eq;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  TemplateService getSvc() { return null; }\n" +
                 "  void t() {\n" +
@@ -248,7 +254,8 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "  }\n" +
                 "}\n",
             "import org.springframework.boot.test.mock.mockito.MockBean;\n" +
-                "import svc.TemplateService;\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  @MockBean TemplateService svc;\n" +
                 "  void t() {\n" +
@@ -272,7 +279,8 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "  }\n" +
                 "}\n",
             "import org.mockito.Mockito;\n" +
-                "import svc.TemplateService;\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = Mockito.mock(TemplateService.class);\n" +
@@ -294,8 +302,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    when(this.m.find(eq(\"A\"))).thenReturn(\"X\");\n" +
                 "  }\n" +
                 "}\n",
-            "import static org.mockito.Mockito.mock;\n" +
-                "import svc.TemplateService;\n" +
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  TemplateService m = mock(TemplateService.class);\n" +
                 "  void t() {\n" +
@@ -342,8 +351,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    doReturn(\"X\").when(m).create(\"ID\", \"N\", true);\n" +
                 "  }\n" +
                 "}\n",
-            "import static org.mockito.Mockito.mock;\n" +
-                "import svc.TemplateService;\n" +
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
@@ -368,7 +378,8 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "  }\n" +
                 "}\n",
             "import org.springframework.boot.test.mock.mockito.MockBean;\n" +
-                "import svc.TemplateService;\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  @MockBean TemplateService svc;\n" +
                 "  void t() {\n" +
@@ -390,8 +401,9 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    doThrow(new IllegalStateException()).when(m).delete(\"LOCKED\");\n" +
                 "  }\n" +
                 "}\n",
-            "import static org.mockito.Mockito.mock;\n" +
-                "import svc.TemplateService;\n" +
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
@@ -425,6 +437,65 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    // TODO mockito-annotations: cannot migrate; an argument uses a matcher with no fluent-DSL equivalent (for example a matcher held in a variable). Migrate this call by hand.\n"
                 +
                 "    doReturn(\"X\").when(m).find(argThat(matcher));\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void crossPackageCallSiteGainsAggregatorImport() {
+    rewriteRun(
+        java("package com.acme.a;\n" +
+            "public interface Foo { String find(String id); }\n"),
+        java("package com.acme.b;\n" +
+            "public interface Bar { void delete(String id); }\n"),
+        java(
+            "package com.acme.x;\n" +
+                "import static org.mockito.Mockito.*;\n" +
+                "import com.acme.a.Foo;\n" +
+                "import com.acme.b.Bar;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    Bar bar = mock(Bar.class);\n" +
+                "    when(foo.find(\"ID\")).thenReturn(\"X\");\n" +
+                "    verify(bar).delete(\"A\");\n" +
+                "  }\n" +
+                "}\n",
+            "package com.acme.x;\n" +
+                "import static org.mockito.Mockito.mock;\n\n" +
+                "import com.acme.Mocks;\n" +
+                "import com.acme.a.Foo;\n" +
+                "import com.acme.b.Bar;\n\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    Bar bar = mock(Bar.class);\n" +
+                "    Mocks.mock(foo).when().find().withId(\"ID\").thenReturn(\"X\");\n" +
+                "    Mocks.mock(bar).verify().delete().withId(\"A\").called();\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void samePackageCallSiteImportsOwnPackageMocks() {
+    rewriteRun(
+        java("package com.acme.svc;\n" +
+            "public interface Foo { String find(String id); }\n"),
+        java(
+            "package com.acme.svc;\n" +
+                "import static org.mockito.Mockito.*;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    when(foo.find(\"ID\")).thenReturn(\"X\");\n" +
+                "  }\n" +
+                "}\n",
+            "package com.acme.svc;\n" +
+                "import static org.mockito.Mockito.mock;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    Mocks.mock(foo).when().find().withId(\"ID\").thenReturn(\"X\");\n" +
                 "  }\n" +
                 "}\n"));
   }

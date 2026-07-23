@@ -55,12 +55,46 @@ class RewriteDelegatedStaticsTest implements RewriteTest {
                 "}\n",
             "import static org.mockito.Mockito.mock;\n" +
                 "import org.mockito.InOrder;\n" +
-                "import svc.TemplateService;\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
                 "    Mocks.verifyNoInteractions(m);\n" +
                 "    InOrder order = Mocks.inOrder(m);\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void crossPackageCallSiteGainsAggregatorImport() {
+    rewriteRun(
+        java("package com.acme.a;\n" +
+            "public interface Foo { void delete(String id); }\n"),
+        java("package com.acme.b;\n" +
+            "public interface Bar { void delete(String id); }\n"),
+        java(
+            "package com.acme.x;\n" +
+                "import static org.mockito.Mockito.*;\n" +
+                "import com.acme.a.Foo;\n" +
+                "import com.acme.b.Bar;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    Bar bar = mock(Bar.class);\n" +
+                "    verifyNoInteractions(foo, bar);\n" +
+                "  }\n" +
+                "}\n",
+            "package com.acme.x;\n" +
+                "import static org.mockito.Mockito.mock;\n\n" +
+                "import com.acme.Mocks;\n" +
+                "import com.acme.a.Foo;\n" +
+                "import com.acme.b.Bar;\n\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    Bar bar = mock(Bar.class);\n" +
+                "    Mocks.verifyNoInteractions(foo, bar);\n" +
                 "  }\n" +
                 "}\n"));
   }

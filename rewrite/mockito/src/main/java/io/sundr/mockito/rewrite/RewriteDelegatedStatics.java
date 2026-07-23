@@ -19,7 +19,7 @@ package io.sundr.mockito.rewrite;
 import java.util.Set;
 
 import org.openrewrite.ExecutionContext;
-import org.openrewrite.Recipe;
+import org.openrewrite.ScanningRecipe;
 import org.openrewrite.TreeVisitor;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaTemplate;
@@ -34,7 +34,11 @@ import org.openrewrite.java.tree.JavaType;
  * already folded into a fluent chain) with the corresponding {@code Mocks} call, so a suite needs a
  * single import of the generated aggregator instead of {@code org.mockito.Mockito}.
  */
-public class RewriteDelegatedStatics extends Recipe {
+public class RewriteDelegatedStatics extends ScanningRecipe<RewriteDelegatedStatics.Accumulator> {
+
+  static final class Accumulator {
+    final MarkerPackages.Scan scan = new MarkerPackages.Scan();
+  }
 
   private static final Set<String> DELEGATED = Set.of(
       "verifyNoInteractions", "verifyNoMoreInteractions", "inOrder", "reset", "clearInvocations",
@@ -52,7 +56,18 @@ public class RewriteDelegatedStatics extends Recipe {
   }
 
   @Override
-  public TreeVisitor<?, ExecutionContext> getVisitor() {
+  public Accumulator getInitialValue(ExecutionContext ctx) {
+    return new Accumulator();
+  }
+
+  @Override
+  public TreeVisitor<?, ExecutionContext> getScanner(Accumulator acc) {
+    return MarkerPackages.scanner(acc.scan);
+  }
+
+  @Override
+  public TreeVisitor<?, ExecutionContext> getVisitor(Accumulator acc) {
+    String aggregatorPackage = MarkerPackages.aggregatorPackage(acc.scan);
     return new JavaIsoVisitor<ExecutionContext>() {
       @Override
       public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
@@ -80,7 +95,22 @@ public class RewriteDelegatedStatics extends Recipe {
             .build()
             .apply(getCursor(), mi.getCoordinates().replace());
         maybeRemoveImport(MockitoNames.MOCKITO + "." + mi.getSimpleName());
+        maybeAddAggregatorImport();
         return replaced.withPrefix(mi.getPrefix());
+      }
+
+      /**
+       * Import the generated {@code Mocks} aggregator (generated into the mocked types'
+       * least-common-denominator package) so the rewritten reference resolves from call sites in any
+       * other package; a no-op when the call site already lives in that package.
+       */
+      private void maybeAddAggregatorImport() {
+        if (aggregatorPackage != null) {
+          String fqn = aggregatorPackage.isEmpty()
+              ? MockitoNames.AGGREGATOR
+              : aggregatorPackage + "." + MockitoNames.AGGREGATOR;
+          maybeAddImport(fqn, false);
+        }
       }
 
       /**

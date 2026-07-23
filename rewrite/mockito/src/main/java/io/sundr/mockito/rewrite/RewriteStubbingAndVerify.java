@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.openrewrite.Cursor;
 import org.openrewrite.ExecutionContext;
-import org.openrewrite.Recipe;
+import org.openrewrite.ScanningRecipe;
 import org.openrewrite.TreeVisitor;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaTemplate;
@@ -44,7 +44,11 @@ import org.openrewrite.marker.Markers;
  * Any chain that cannot be rewritten confidently and completely is left exactly as-is with a
  * {@code // TODO mockito-annotations: manual migration} comment inserted above it.
  */
-public class RewriteStubbingAndVerify extends Recipe {
+public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndVerify.Accumulator> {
+
+  static final class Accumulator {
+    final MarkerPackages.Scan scan = new MarkerPackages.Scan();
+  }
 
   @Override
   public String getDisplayName() {
@@ -59,8 +63,18 @@ public class RewriteStubbingAndVerify extends Recipe {
   }
 
   @Override
-  public TreeVisitor<?, ExecutionContext> getVisitor() {
-    return new Visitor();
+  public Accumulator getInitialValue(ExecutionContext ctx) {
+    return new Accumulator();
+  }
+
+  @Override
+  public TreeVisitor<?, ExecutionContext> getScanner(Accumulator acc) {
+    return MarkerPackages.scanner(acc.scan);
+  }
+
+  @Override
+  public TreeVisitor<?, ExecutionContext> getVisitor(Accumulator acc) {
+    return new Visitor(MarkerPackages.aggregatorPackage(acc.scan));
   }
 
   private static final Set<String> DO_FAMILY = Set.of(
@@ -68,9 +82,14 @@ public class RewriteStubbingAndVerify extends Recipe {
 
   private static final class Visitor extends JavaIsoVisitor<ExecutionContext> {
 
+    private final String aggregatorPackage;
     private Cursor cuCursor;
     private final Set<String> consumedMatchers = new java.util.HashSet<>();
     private String mapFailureReason;
+
+    Visitor(String aggregatorPackage) {
+      this.aggregatorPackage = aggregatorPackage;
+    }
 
     @Override
     public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext ctx) {
@@ -113,7 +132,23 @@ public class RewriteStubbingAndVerify extends Recipe {
           .build()
           .apply(getCursor(), mi.getCoordinates().replace());
       removeNowUnusedImports(rootStatic);
+      maybeAddAggregatorImport();
       return replaced.withPrefix(mi.getPrefix());
+    }
+
+    /**
+     * The rewritten call site references the generated {@code Mocks} aggregator, which is generated
+     * into the mocked types' least-common-denominator package. Import it so the reference resolves
+     * from call sites in any other package; a no-op when the call site already lives in that package
+     * or when no aggregator package could be determined.
+     */
+    private void maybeAddAggregatorImport() {
+      if (aggregatorPackage != null) {
+        String fqn = aggregatorPackage.isEmpty()
+            ? MockitoNames.AGGREGATOR
+            : aggregatorPackage + "." + MockitoNames.AGGREGATOR;
+        maybeAddImport(fqn, false);
+      }
     }
 
     private void removeNowUnusedImports(String rootStatic) {

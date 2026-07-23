@@ -71,11 +71,107 @@ class MigrateToMockitoAnnotationsTest implements RewriteTest {
                 "}\n",
             "import org.mockito.Mockito;\n" +
                 "import org.springframework.boot.test.mock.mockito.MockBean;\n" +
-                "import svc.TemplateService;\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  @MockBean TemplateService svc;\n" +
                 "  void t() {\n" +
                 "    Mocks.mock(svc).when().create().withId(\"ID\").thenReturn(\"X\");\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void generatedMarkerAndRewrittenImportAgreeOnPackage() {
+    rewriteRun(
+        spec -> spec.recipe(new StubThenDelegateRecipe.WithMarker()),
+        java("package com.acme.a;\n" +
+            "public interface Foo { String find(String id); }\n"),
+        java("package com.acme.b;\n" +
+            "public interface Bar { void delete(String id); }\n"),
+        java(
+            "package com.acme.x;\n" +
+                "import static org.mockito.Mockito.*;\n" +
+                "import com.acme.a.Foo;\n" +
+                "import com.acme.b.Bar;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    Bar bar = mock(Bar.class);\n" +
+                "    when(foo.find(\"ID\")).thenReturn(\"X\");\n" +
+                "    verify(bar).delete(\"A\");\n" +
+                "  }\n" +
+                "}\n",
+            "package com.acme.x;\n" +
+                "import static org.mockito.Mockito.mock;\n\n" +
+                "import com.acme.Mocks;\n" +
+                "import com.acme.a.Foo;\n" +
+                "import com.acme.b.Bar;\n\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Foo foo = mock(Foo.class);\n" +
+                "    Bar bar = mock(Bar.class);\n" +
+                "    Mocks.mock(foo).when().find().withId(\"ID\").thenReturn(\"X\");\n" +
+                "    Mocks.mock(bar).verify().delete().withId(\"A\").called();\n" +
+                "  }\n" +
+                "}\n"),
+        java(null,
+            "package com.acme;\n\n" +
+                "import io.sundr.mockito.annotations.Mockables;\n" +
+                "import com.acme.a.Foo;\n" +
+                "import com.acme.b.Bar;\n\n" +
+                "@Mockables({ Foo.class, Bar.class })\n" +
+                "public class MocksConfig {\n}\n",
+            spec -> spec.path("src/test/java/com/acme/MocksConfig.java")));
+  }
+
+  /**
+   * The real-world regression: a hand-written marker (named {@code MyMarker}, not {@code MocksConfig})
+   * lives in {@code com.acme.app}, but the mocked types span {@code com.acme.app.sub} and
+   * {@code com.acme.other} whose least-common-denominator is {@code com.acme}. The aggregator lives
+   * in the marker's package, so the rewritten call site must import {@code com.acme.app.Mocks}, NOT
+   * {@code com.acme.Mocks} (the types' LCD, which has no {@code Mocks}). No new marker is generated.
+   */
+  @Test
+  void handWrittenMarkerOutsideTypesLcdDrivesTheImport() {
+    rewriteRun(
+        spec -> spec.recipe(new StubThenDelegateRecipe.WithMarker()),
+        java("package io.sundr.mockito.annotations;\n" +
+            "public @interface Mockables { Class<?>[] value(); }\n"),
+        java("package com.acme.app.sub;\n" +
+            "public interface A { String foo(String id); }\n"),
+        java("package com.acme.other;\n" +
+            "public interface B { void bar(String id); }\n"),
+        java("package com.acme.app;\n" +
+            "import io.sundr.mockito.annotations.Mockables;\n" +
+            "import com.acme.app.sub.A;\n" +
+            "import com.acme.other.B;\n" +
+            "@Mockables({ A.class, B.class })\n" +
+            "public class MyMarker {\n}\n"),
+        java(
+            "package com.acme.app.svc;\n" +
+                "import static org.mockito.Mockito.*;\n" +
+                "import com.acme.app.sub.A;\n" +
+                "import com.acme.other.B;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    A a = mock(A.class);\n" +
+                "    B b = mock(B.class);\n" +
+                "    when(a.foo(\"ID\")).thenReturn(\"X\");\n" +
+                "    verify(b).bar(\"A\");\n" +
+                "  }\n" +
+                "}\n",
+            "package com.acme.app.svc;\n" +
+                "import static org.mockito.Mockito.mock;\n\n" +
+                "import com.acme.app.Mocks;\n" +
+                "import com.acme.app.sub.A;\n" +
+                "import com.acme.other.B;\n\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    A a = mock(A.class);\n" +
+                "    B b = mock(B.class);\n" +
+                "    Mocks.mock(a).when().foo().withId(\"ID\").thenReturn(\"X\");\n" +
+                "    Mocks.mock(b).verify().bar().withId(\"A\").called();\n" +
                 "  }\n" +
                 "}\n"));
   }
@@ -97,7 +193,8 @@ class MigrateToMockitoAnnotationsTest implements RewriteTest {
                 "  }\n" +
                 "}\n",
             "import org.mockito.Mockito;\n" +
-                "import svc.TemplateService;\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = Mockito.mock(TemplateService.class);\n" +
