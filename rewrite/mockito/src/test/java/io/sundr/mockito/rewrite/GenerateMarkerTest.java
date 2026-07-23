@@ -136,6 +136,32 @@ class GenerateMarkerTest implements RewriteTest {
             spec -> spec.path("src/test/java/com/acme/svc/MocksConfig.java")));
   }
 
+  @Test
+  void doesNotGenerateWhenHandWrittenMarkerUnderAnyNameExists() {
+    rewriteRun(
+        java(
+            "package io.sundr.mockito.annotations;\n" +
+                "public @interface Mockables { Class<?>[] value(); }\n"),
+        java(
+            "package com.acme.svc;\n" +
+                "public interface Templates { String render(String id); }\n"),
+        java(
+            "package com.acme.app;\n" +
+                "import io.sundr.mockito.annotations.Mockables;\n" +
+                "import com.acme.svc.Templates;\n" +
+                "@Mockables({ Templates.class })\n" +
+                "public class MyMarker {\n}\n"),
+        java(
+            "package com.acme.tests;\n" +
+                "import static org.mockito.Mockito.mock;\n" +
+                "import com.acme.svc.Templates;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Templates templates = mock(Templates.class);\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
   private static SourceSpecs markerGenerated(String after) {
     return java(null, after, spec -> spec.path("src/test/java/com/acme/MocksConfig.java"));
   }

@@ -41,4 +41,27 @@ public class StubThenDelegateRecipe extends Recipe {
   public List<Recipe> getRecipeList() {
     return List.of(new RewriteStubbingAndVerify(), new RewriteDelegatedStatics());
   }
+
+  /**
+   * Full migration order (marker generation followed by the two rewrites), used to prove that the
+   * package {@code GenerateMarker} emits {@code Mocks} into is the exact package the rewrites import.
+   */
+  public static final class WithMarker extends Recipe {
+
+    @Override
+    public String getDisplayName() {
+      return "Generate marker then rewrite";
+    }
+
+    @Override
+    public String getDescription() {
+      return "Marker generation followed by the stubbing and delegated-statics rewrites.";
+    }
+
+    @Override
+    public List<Recipe> getRecipeList() {
+      return List.of(new GenerateMarker(), new RewriteStubbingAndVerify(),
+          new RewriteDelegatedStatics());
+    }
+  }
 }

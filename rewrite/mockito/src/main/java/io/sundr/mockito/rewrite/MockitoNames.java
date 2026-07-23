@@ -28,8 +28,10 @@ final class MockitoNames {
   static final String MOCKITO = "org.mockito.Mockito";
   static final String ARGUMENT_MATCHERS = "org.mockito.ArgumentMatchers";
   static final String MOCK_ANNOTATION = "org.mockito.Mock";
+  static final String MOCK_BEAN_ANNOTATION = "org.springframework.boot.test.mock.mockito.MockBean";
 
   static final String MOCKABLES_ANNOTATION = "io.sundr.mockito.annotations.Mockables";
+  static final String MOCKABLES_SIMPLE = "Mockables";
 
   static final String AGGREGATOR = "Mocks";
   static final String MARKER = "MocksConfig";
