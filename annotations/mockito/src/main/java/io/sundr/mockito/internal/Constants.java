@@ -32,14 +32,25 @@ public final class Constants {
   public static final String EXACT = "exact";
   public static final String STUB_ROUTER = "Stub";
   public static final String VERIFY_ROUTER = "Verify";
+  public static final String DO_ROUTER = "DoStub";
+  public static final String DO_STUBBER = "DoStubber";
+  public static final String STUBBER = "stubber";
 
   public static final ClassRef MOCKITO = ClassRef.forName("org.mockito.Mockito");
   public static final ClassRef ARGUMENT_MATCHER = ClassRef.forName("org.mockito.ArgumentMatcher");
   public static final ClassRef ARGUMENT_CAPTOR = ClassRef.forName("org.mockito.ArgumentCaptor");
   public static final ClassRef ONGOING_STUBBING = ClassRef.forName("org.mockito.stubbing.OngoingStubbing");
   public static final ClassRef ANSWER = ClassRef.forName("org.mockito.stubbing.Answer");
+  public static final ClassRef STUBBER_TYPE = ClassRef.forName("org.mockito.stubbing.Stubber");
   public static final ClassRef VERIFICATION_MODE = ClassRef.forName("org.mockito.verification.VerificationMode");
+  public static final ClassRef VERIFICATION_WITH_TIMEOUT = ClassRef
+      .forName("org.mockito.verification.VerificationWithTimeout");
+  public static final ClassRef VERIFICATION_AFTER_DELAY = ClassRef
+      .forName("org.mockito.verification.VerificationAfterDelay");
+  public static final ClassRef IN_ORDER = ClassRef.forName("org.mockito.InOrder");
+  public static final ClassRef OBJECT = ClassRef.forName("java.lang.Object");
   public static final ClassRef THROWABLE = ClassRef.forName("java.lang.Throwable");
+  public static final ClassRef CLASS = ClassRef.forName("java.lang.Class");
   public static final ClassRef BOXED_VOID = ClassRef.forName("java.lang.Void");
   public static final ClassRef STRING = ClassRef.forName("java.lang.String");
   public static final ClassRef INTEGER = ClassRef.forName("java.lang.Integer");

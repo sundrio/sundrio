@@ -35,8 +35,10 @@ import io.sundr.adapter.apt.utils.Apt;
 import io.sundr.codegen.apt.processor.AbstractCodeGeneratingProcessor;
 import io.sundr.mockito.annotations.Mockable;
 import io.sundr.mockito.annotations.Mockables;
+import io.sundr.mockito.annotations.OnNameCollision;
 import io.sundr.mockito.internal.MockTarget;
 import io.sundr.mockito.internal.visitors.AddAggregatorMethods;
+import io.sundr.mockito.internal.visitors.AddDoStubClasses;
 import io.sundr.mockito.internal.visitors.AddMockEntryPoints;
 import io.sundr.mockito.internal.visitors.AddStubClasses;
 import io.sundr.mockito.internal.visitors.AddVerifyClasses;
@@ -59,15 +61,19 @@ public class MockableProcessor extends AbstractCodeGeneratingProcessor {
       for (Element element : roundEnv.getElementsAnnotatedWith(annotation)) {
         Mockable mockable = element.getAnnotation(Mockable.class);
         if (mockable != null) {
-          generateMockClass(adapt(element), mockable.prefix(), mockable.suffix(), mockable.verification());
+          generateMockClass(adapt(element), mockable.prefix(), mockable.suffix(),
+              mockable.verification(), mockable.onNameCollision(), element);
         }
 
         Mockables mockables = element.getAnnotation(Mockables.class);
         if (mockables != null) {
           List<MockTarget> targets = new ArrayList<>();
           for (TypeElement type : typesOf(mockables)) {
-            targets.add(generateMockClass(adapt(type), mockables.prefix(), mockables.suffix(),
-                mockables.verification()));
+            MockTarget target = generateMockClass(adapt(type), mockables.prefix(), mockables.suffix(),
+                mockables.verification(), mockables.onNameCollision(), element);
+            if (target != null) {
+              targets.add(target);
+            }
           }
           generateAggregator(element, mockables.aggregator(), targets);
         }
@@ -76,17 +82,62 @@ public class MockableProcessor extends AbstractCodeGeneratingProcessor {
     return false;
   }
 
-  private MockTarget generateMockClass(TypeDef definition, String prefix, String suffix, boolean verification) {
-    MockTarget target = new MockTarget(definition, prefix, suffix, verification);
+  private MockTarget generateMockClass(TypeDef definition, String prefix, String suffix, boolean verification,
+      OnNameCollision onNameCollision, Element origin) {
+    String mockName = resolveMockName(definition, prefix, suffix, onNameCollision, origin);
+    if (mockName == null) {
+      return null;
+    }
+    MockTarget target = new MockTarget(definition, mockName, verification);
     warnOnTargetIssues(target);
     generate(new TypeDefBuilder()
         .withPackageName(target.getPackageName())
         .withName(target.getMockName())
         .withKind(Kind.CLASS)
         .withNewModifiers().withPublic().withFinal().endModifiers()
-        .accept(new AddMockEntryPoints(target), new AddStubClasses(target), new AddVerifyClasses(target))
+        .accept(new AddMockEntryPoints(target), new AddStubClasses(target), new AddVerifyClasses(target),
+            new AddDoStubClasses(target))
         .build());
     return target;
+  }
+
+  /**
+   * Resolves the name of the mock DSL class to generate, applying the collision policy when the
+   * preferred name is already taken by an existing type. Returns {@code null} (after emitting an
+   * error) when generation must be abandoned.
+   */
+  private String resolveMockName(TypeDef definition, String prefix, String suffix,
+      OnNameCollision onNameCollision, Element origin) {
+    String pkg = definition.getPackageName();
+    String preferred = prefix + definition.getName() + suffix;
+    if (!typeExists(pkg, preferred)) {
+      return preferred;
+    }
+    if (onNameCollision == OnNameCollision.FAIL) {
+      processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
+          "'" + preferred + "' already exists; cannot generate a mock DSL for '" + definition.getName()
+              + "'. Rename the existing type or set a different prefix()/suffix().",
+          origin);
+      return null;
+    }
+    String fallback = prefix + definition.getName() + "Generated" + suffix;
+    if (typeExists(pkg, fallback)) {
+      processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR,
+          "Both '" + preferred + "' and the fallback '" + fallback + "' already exist; cannot generate a mock "
+              + "DSL for '" + definition.getName() + "'. Set a custom prefix()/suffix().",
+          origin);
+      return null;
+    }
+    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING,
+        "'" + preferred + "' already exists; generating the mock DSL for '" + definition.getName()
+            + "' as '" + fallback + "' instead. Set prefix()/suffix() to choose the name explicitly.",
+        origin);
+    return fallback;
+  }
+
+  private boolean typeExists(String pkg, String simpleName) {
+    String fqcn = pkg == null || pkg.isEmpty() ? simpleName : pkg + "." + simpleName;
+    return processingEnv.getElementUtils().getTypeElement(fqcn) != null;
   }
 
   private void generateAggregator(Element marker, String aggregator, List<MockTarget> targets) {
@@ -101,12 +152,15 @@ public class MockableProcessor extends AbstractCodeGeneratingProcessor {
       return;
     }
     String packageName = processingEnv.getElementUtils().getPackageOf(marker).getQualifiedName().toString();
+    String aggregatorFqcn = packageName == null || packageName.isEmpty()
+        ? aggregator
+        : packageName + "." + aggregator;
     generate(new TypeDefBuilder()
         .withPackageName(packageName)
         .withName(aggregator)
         .withKind(Kind.CLASS)
         .withNewModifiers().withPublic().withFinal().endModifiers()
-        .accept(new AddAggregatorMethods(targets))
+        .accept(new AddAggregatorMethods(targets, aggregatorFqcn))
         .build());
   }
 

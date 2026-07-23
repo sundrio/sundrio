@@ -26,10 +26,10 @@ public class GreetingServiceMockTest {
 
   @Test
   public void stubsAndVerifiesThroughTheGeneratedDsl() {
-    GreetingServiceMock.stub(service)
+    GreetingServiceMock.mock(service)
         .when().greet().withName("Ada")
         .thenReturn("Hello Ada!");
-    GreetingServiceMock.stub(service)
+    GreetingServiceMock.mock(service)
         .when().countGreetings().withIncludeFormal(true)
         .thenReturn(3);
 
@@ -37,7 +37,7 @@ public class GreetingServiceMockTest {
     assertEquals(3, service.countGreetings("anyone", true));
     assertEquals(0, service.countGreetings("anyone", false));
 
-    GreetingServiceMock.stub(service)
+    GreetingServiceMock.mock(service)
         .verify().greet().withName("Ada")
         .called();
   }

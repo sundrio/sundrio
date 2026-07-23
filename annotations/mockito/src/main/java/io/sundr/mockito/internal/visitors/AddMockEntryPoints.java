@@ -21,15 +21,17 @@ import io.sundr.mockito.internal.Constants;
 import io.sundr.mockito.internal.MockTarget;
 import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Construct;
 import io.sundr.model.LocalVariable;
 import io.sundr.model.Return;
 import io.sundr.model.This;
 import io.sundr.model.TypeDefFluent;
+import io.sundr.model.WildcardRef;
 
 /**
  * Adds the entry points of a generated mock DSL class: the mock field, the private
- * constructor, the static {@code mock()} and {@code stub(mock)} factories and the
+ * constructor, the static {@code mock()} and {@code mock(mock)} factories and the
  * {@code when()} / {@code verify()} mode selectors.
  */
 public class AddMockEntryPoints implements Visitor<TypeDefFluent<?>> {
@@ -72,7 +74,7 @@ public class AddMockEntryPoints implements Visitor<TypeDefFluent<?>> {
     def.addNewMethod()
         .withNewModifiers().withPublic().withStatic().endModifiers()
         .withReturnType(mockRef)
-        .withName("stub")
+        .withName(Constants.MOCK)
         .addNewArgument().withTypeRef(targetRef).withName(Constants.MOCK).endArgument()
         .withNewBlock()
         .addToStatements(new Return(new Construct(mockRef, mockVar)))
@@ -100,5 +102,62 @@ public class AddMockEntryPoints implements Visitor<TypeDefFluent<?>> {
           .endBlock()
           .endMethod();
     }
+
+    addDoFamily(def);
+  }
+
+  /**
+   * Adds the answer-first do-family entry points: each static {@code doX(...)} returns a
+   * {@code DoStubber} wrapping the matching Mockito stubber, whose {@code when(mock)} opens the
+   * answer-first router. The value/answer is supplied here, so the chain closes with {@code done()}.
+   */
+  private void addDoFamily(TypeDefFluent<?> def) {
+    ClassRef doStubberRef = target.nestedRef(target.doStubberName());
+
+    LocalVariable value = LocalVariable.newLocalVariable(Constants.OBJECT, "value");
+    addDoFactory(def, doStubberRef, "doReturn", Constants.OBJECT, "value", false,
+        Constants.MOCKITO.call("doReturn", value));
+
+    ClassRef throwableArray = new ClassRefBuilder(Constants.THROWABLE).withDimensions(1).build();
+    LocalVariable throwables = LocalVariable.newLocalVariable(throwableArray, "throwables");
+    addDoFactory(def, doStubberRef, "doThrow", throwableArray, "throwables", true,
+        Constants.MOCKITO.call("doThrow", throwables));
+
+    ClassRef throwableType = new ClassRefBuilder(Constants.CLASS)
+        .withArguments(new WildcardRef(WildcardRef.BoundKind.EXTENDS,
+            java.util.Collections.singletonList(Constants.THROWABLE), java.util.Collections.emptyMap()))
+        .build();
+    LocalVariable type = LocalVariable.newLocalVariable(throwableType, "throwableType");
+    addDoFactory(def, doStubberRef, "doThrow", throwableType, "throwableType", false,
+        Constants.MOCKITO.call("doThrow", type));
+
+    addDoFactory(def, doStubberRef, "doNothing", null, null, false,
+        Constants.MOCKITO.call("doNothing"));
+
+    ClassRef answerRef = new ClassRefBuilder(Constants.ANSWER)
+        .withArguments(new WildcardRef()).build();
+    LocalVariable answer = LocalVariable.newLocalVariable(answerRef, "answer");
+    addDoFactory(def, doStubberRef, "doAnswer", answerRef, "answer", false,
+        Constants.MOCKITO.call("doAnswer", answer));
+
+    addDoFactory(def, doStubberRef, "doCallRealMethod", null, null, false,
+        Constants.MOCKITO.call("doCallRealMethod"));
+  }
+
+  private void addDoFactory(TypeDefFluent<?> def, ClassRef doStubberRef, String name,
+      ClassRef argumentType, String argumentName, boolean varArg, io.sundr.model.Expression stubberCall) {
+    java.util.List<io.sundr.model.Argument> arguments = argumentType == null
+        ? java.util.Collections.emptyList()
+        : java.util.Collections.singletonList(io.sundr.model.Argument.newArgument(argumentType, argumentName));
+    def.addNewMethod()
+        .withNewModifiers().withPublic().withStatic().endModifiers()
+        .withReturnType(doStubberRef)
+        .withName(name)
+        .withArguments(arguments)
+        .withVarArgPreferred(varArg)
+        .withNewBlock()
+        .addToStatements(new Return(new Construct(doStubberRef, stubberCall)))
+        .endBlock()
+        .endMethod();
   }
 }

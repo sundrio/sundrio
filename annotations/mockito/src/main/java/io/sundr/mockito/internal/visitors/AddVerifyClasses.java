@@ -78,6 +78,7 @@ public class AddVerifyClasses implements Visitor<TypeDefFluent<?>> {
     String className = MockTarget.verifyClassName(name);
     ClassRef selfRef = target.nestedRef(className);
     TypeDefBuilder builder = DslMethods.innerClass(target, className);
+    List<ClassRef> exceptions = DslMethods.unionExceptions(overloads);
 
     if (overloads.size() == 1) {
       Method method = overloads.get(0);
@@ -86,7 +87,7 @@ public class AddVerifyClasses implements Visitor<TypeDefFluent<?>> {
       DslMethods.addCapturing(builder, method.getArguments(), selfRef, false);
       DslMethods.addVerifyTerminals(builder,
           mode -> Collections.singletonList(DslMethods.verification(method, mode)),
-          Collections.singletonList(new This().call("verified", Constants.MOCKITO.call("never"))));
+          Collections.singletonList(new This().call("verified", Constants.MOCKITO.call("never"))), exceptions);
     } else {
       Collection<Argument> union = DslMethods.unionArguments(overloads);
       DslMethods.addSlots(builder, union);
@@ -96,7 +97,7 @@ public class AddVerifyClasses implements Visitor<TypeDefFluent<?>> {
       DslMethods.addCapturing(builder, union, selfRef, true);
       DslMethods.addVerifyTerminals(builder,
           mode -> DslMethods.selectOneDispatch(overloads, method -> DslMethods.verification(method, mode)),
-          DslMethods.fanOutNeverBody(overloads));
+          DslMethods.fanOutNeverBody(overloads), exceptions);
     }
     return builder.build();
   }
