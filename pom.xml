@@ -106,7 +106,8 @@
         <junit-jupiter.version>6.0.2</junit-jupiter.version>
         <hamcrest.version>3.0</hamcrest.version>
         <mockito.version>5.14.2</mockito.version>
-        
+        <openrewrite.version>8.41.0</openrewrite.version>
+
         <!--maven.javadoc.failOnError>false</maven.javadoc.failOnError-->
     </properties>
 
@@ -118,6 +119,7 @@
         <module>tui</module>
         <module>maven-plugin</module>
         <module>annotations</module>
+        <module>rewrite</module>
         <module>components</module>
     </modules>
     
@@ -182,6 +184,14 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.openrewrite</groupId>
+                <artifactId>rewrite-bom</artifactId>
+                <version>${openrewrite.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
             <dependency>
                 <groupId>jakarta.validation</groupId>
