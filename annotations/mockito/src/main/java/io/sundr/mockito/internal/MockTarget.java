@@ -41,16 +41,14 @@ public class MockTarget {
       "equals", "hashCode", "toString", "getClass", "clone", "finalize", "wait", "notify", "notifyAll"));
 
   private final TypeDef definition;
-  private final String prefix;
-  private final String suffix;
+  private final String mockName;
   private final boolean verification;
   private final Map<String, List<Method>> methodsByName = new LinkedHashMap<>();
   private final Map<String, String> skippedMethods = new LinkedHashMap<>();
 
-  public MockTarget(TypeDef definition, String prefix, String suffix, boolean verification) {
+  public MockTarget(TypeDef definition, String mockName, boolean verification) {
     this.definition = definition;
-    this.prefix = prefix;
-    this.suffix = suffix;
+    this.mockName = mockName;
     this.verification = verification;
     index(definition);
   }
@@ -68,7 +66,7 @@ public class MockTarget {
   }
 
   public String getMockName() {
-    return prefix + definition.getName() + suffix;
+    return mockName;
   }
 
   public String getMockFqcn() {
@@ -134,6 +132,26 @@ public class MockTarget {
 
   public static String verifyClassName(String methodName) {
     return Strings.capitalizeFirst(methodName) + "Verify";
+  }
+
+  public static String doStubClassName(String methodName) {
+    return Strings.capitalizeFirst(methodName) + "DoStub";
+  }
+
+  /**
+   * The answer-first router's simple name is prefixed with the mock name so that, referenced
+   * from the aggregator across packages, no two routers import to the same leaf name.
+   */
+  public String doRouterName() {
+    return mockName + "DoStub";
+  }
+
+  /**
+   * The do-family stubber's simple name is prefixed with the mock name for the same
+   * cross-package leaf-name uniqueness the router needs.
+   */
+  public String doStubberName() {
+    return mockName + "DoStubber";
   }
 
   private void index(TypeDef definition) {

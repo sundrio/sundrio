@@ -35,14 +35,17 @@ import java.lang.annotation.Target;
  *
  * For every listed type a companion mock DSL class is generated in the type's package, exactly
  * as if the type carried {@link Mockable}. Additionally an aggregator class (by default named
- * {@code Stubs}) is generated in the marker's package, carrying one {@code stub} overload per
- * listed type, so that a single static import covers the whole suite:
+ * {@code Mocks}) is generated in the marker's package, carrying one {@code mock} overload per
+ * listed type plus {@code when}/{@code verify} passthroughs to Mockito, so that a single static
+ * import covers both the fluent DSL and plain Mockito across the whole suite:
  *
  * <pre>
- * import static com.acme.tests.Stubs.stub;
+ * import static com.acme.tests.Mocks.*;
  *
- * stub(service).when().create().withId("MY_ID").thenReturn("TEMPLATE_ID");
- * stub(service).verify().create().withId("MY_ID").called();
+ * mock(service).when().create().withId("MY_ID").thenReturn("TEMPLATE_ID");
+ * mock(service).verify().create().withId("MY_ID").called();
+ *
+ * when(service.other(any())).thenReturn(42); // plain Mockito, same import
  * </pre>
  */
 @Target({ ElementType.TYPE, ElementType.PACKAGE })
@@ -65,10 +68,15 @@ public @interface Mockables {
   String suffix() default "Mock";
 
   /**
+   * @return the policy applied when a generated class name is already taken by an existing type.
+   */
+  OnNameCollision onNameCollision() default OnNameCollision.RENAME;
+
+  /**
    * @return the simple name of the aggregator class generated in the marker's package;
    *         an empty string disables aggregator generation.
    */
-  String aggregator() default "Stubs";
+  String aggregator() default "Mocks";
 
   /**
    * @return whether the verification half of the DSL should be generated.

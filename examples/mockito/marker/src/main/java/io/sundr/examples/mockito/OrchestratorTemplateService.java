@@ -16,6 +16,7 @@
 
 package io.sundr.examples.mockito;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,4 +42,6 @@ public interface OrchestratorTemplateService {
   String render(TemplateSpec spec);
 
   String render(String id, Map<String, String> parameters);
+
+  String export(String id) throws IOException;
 }

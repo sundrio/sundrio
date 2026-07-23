@@ -29,8 +29,8 @@ import java.lang.annotation.Target;
  * stubbing and verification DSL on top of Mockito:
  *
  * <pre>
- * FooMock.stub(mock).when().create().withId("MY_ID").thenReturn("TEMPLATE_ID");
- * FooMock.stub(mock).verify().create().withId("MY_ID").called();
+ * FooMock.mock(mock).when().create().withId("MY_ID").thenReturn("TEMPLATE_ID");
+ * FooMock.mock(mock).verify().create().withId("MY_ID").called();
  * </pre>
  *
  * Arguments that are not pinned with a {@code withXxx} method default to Mockito
@@ -49,6 +49,11 @@ public @interface Mockable {
    * @return the suffix appended to the target type name to form the generated class name.
    */
   String suffix() default "Mock";
+
+  /**
+   * @return the policy applied when the generated class name is already taken by an existing type.
+   */
+  OnNameCollision onNameCollision() default OnNameCollision.RENAME;
 
   /**
    * @return whether the verification half of the DSL should be generated.

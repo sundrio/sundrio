@@ -85,6 +85,40 @@ final class DslMethods {
         .endConstructor();
   }
 
+  /**
+   * Creates an inner class of the answer-first do-family: it holds a Mockito {@code Stubber}
+   * alongside the mock, and a constructor that assigns both then initializes one slot per
+   * mocked method argument. The stubbing value/answer is carried by the stubber, so the
+   * terminal only needs to replay {@code stubber.when(mock).method(matchers)}.
+   */
+  static TypeDefBuilder doInnerClass(MockTarget target, String name) {
+    ClassRef targetRef = target.getTargetRef();
+    return new TypeDefBuilder()
+        .withPackageName(target.getPackageName())
+        .withName(name)
+        .withKind(Kind.CLASS)
+        .withNewModifiers().withPublic().withStatic().withFinal().endModifiers()
+        .addNewField()
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
+        .withTypeRef(Constants.STUBBER_TYPE).withName(Constants.STUBBER)
+        .endField()
+        .addNewField()
+        .withNewModifiers().withPrivate().withFinal().endModifiers()
+        .withTypeRef(targetRef).withName(Constants.MOCK)
+        .endField()
+        .addNewConstructor()
+        .withNewModifiers().withPrivate().endModifiers()
+        .addNewArgument().withTypeRef(Constants.STUBBER_TYPE).withName(Constants.STUBBER).endArgument()
+        .addNewArgument().withTypeRef(targetRef).withName(Constants.MOCK).endArgument()
+        .withNewBlock()
+        .addToStatements(new Assign(This.ref(Constants.STUBBER),
+            LocalVariable.newLocalVariable(Constants.STUBBER_TYPE, Constants.STUBBER)))
+        .addToStatements(new Assign(This.ref(Constants.MOCK),
+            LocalVariable.newLocalVariable(targetRef, Constants.MOCK)))
+        .endBlock()
+        .endConstructor();
+  }
+
   static void addSlots(TypeDefBuilder builder, Collection<Argument> arguments) {
     List<Statement> slotInits = new ArrayList<>();
     for (Argument argument : arguments) {
@@ -223,7 +257,8 @@ final class DslMethods {
         .endMethod();
   }
 
-  static void addStubbingTerminals(TypeDefBuilder builder, TypeRef returnType, List<Statement> stubBody) {
+  static void addStubbingTerminals(TypeDefBuilder builder, TypeRef returnType, List<Statement> stubBody,
+      List<ClassRef> exceptions) {
     TypeRef boxed = Types.box(returnType);
     ClassRef ongoingRef = new ClassRefBuilder(Constants.ONGOING_STUBBING).withArguments(boxed).build();
     ClassRef answerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(boxed).build();
@@ -234,6 +269,7 @@ final class DslMethods {
         .withReturnType(ongoingRef)
         .withName("thenReturn")
         .addNewArgument().withTypeRef(returnType).withName("value").endArgument()
+        .withExceptions(exceptions)
         .withNewBlock()
         .addToStatements(new Return(new This().call("stub").call("thenReturn", value)))
         .endBlock()
@@ -245,6 +281,7 @@ final class DslMethods {
         .withReturnType(ongoingRef)
         .withName("thenThrow")
         .addNewArgument().withTypeRef(Constants.THROWABLE).withName("throwable").endArgument()
+        .withExceptions(exceptions)
         .withNewBlock()
         .addToStatements(new Return(new This().call("stub").call("thenThrow", throwable)))
         .endBlock()
@@ -256,6 +293,7 @@ final class DslMethods {
         .withReturnType(ongoingRef)
         .withName("thenAnswer")
         .addNewArgument().withTypeRef(answerRef).withName("answer").endArgument()
+        .withExceptions(exceptions)
         .withNewBlock()
         .addToStatements(new Return(new This().call("stub").call("thenAnswer", answer)))
         .endBlock()
@@ -265,6 +303,7 @@ final class DslMethods {
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(ongoingRef)
         .withName("thenCallRealMethod")
+        .withExceptions(exceptions)
         .withNewBlock()
         .addToStatements(new Return(new This().call("stub").call("thenCallRealMethod")))
         .endBlock()
@@ -274,13 +313,15 @@ final class DslMethods {
         .withNewModifiers().withPrivate().endModifiers()
         .withReturnType(ongoingRef)
         .withName("stub")
+        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(stubBody)
         .endBlock()
         .endMethod();
   }
 
-  static void addVoidTerminals(TypeDefBuilder builder, BiFunction<String, Expression[], List<Statement>> bodies) {
+  static void addVoidTerminals(TypeDefBuilder builder, BiFunction<String, Expression[], List<Statement>> bodies,
+      List<ClassRef> exceptions) {
     ClassRef answerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(Constants.BOXED_VOID).build();
 
     LocalVariable throwable = LocalVariable.newLocalVariable(Constants.THROWABLE, "throwable");
@@ -289,6 +330,7 @@ final class DslMethods {
         .withReturnType(Types.VOID)
         .withName("thenThrow")
         .addNewArgument().withTypeRef(Constants.THROWABLE).withName("throwable").endArgument()
+        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(bodies.apply("doThrow", new Expression[] { throwable }))
         .endBlock()
@@ -300,6 +342,7 @@ final class DslMethods {
         .withReturnType(Types.VOID)
         .withName("thenAnswer")
         .addNewArgument().withTypeRef(answerRef).withName("answer").endArgument()
+        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(bodies.apply("doAnswer", new Expression[] { answer }))
         .endBlock()
@@ -309,6 +352,7 @@ final class DslMethods {
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(Types.VOID)
         .withName("doNothing")
+        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(bodies.apply("doNothing", new Expression[0]))
         .endBlock()
@@ -323,7 +367,8 @@ final class DslMethods {
    * numbered private starters (an implementation detail invisible to the DSL surface),
    * and chains span all matches via FanOutStubbing.
    */
-  static void addFanOutStubbing(TypeDefBuilder builder, List<Method> overloads, TypeRef returnType) {
+  static void addFanOutStubbing(TypeDefBuilder builder, List<Method> overloads, TypeRef returnType,
+      List<ClassRef> exceptions) {
     TypeRef boxed = Types.box(returnType);
     ClassRef ongoingRef = new ClassRefBuilder(Constants.ONGOING_STUBBING).withArguments(boxed).build();
     ClassRef answerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(boxed).build();
@@ -336,6 +381,7 @@ final class DslMethods {
           .withReturnType(ongoingRef)
           .withName("stub" + i)
           .addNewArgument().withTypeRef(Types.PRIMITIVE_BOOLEAN_REF).withName("lenient").endArgument()
+          .withExceptions(exceptions)
           .withNewBlock()
           .addToStatements(new If(lenient,
               new Block(new Return(Constants.MOCKITO.call("lenient").call("when", invocation(method))))))
@@ -345,16 +391,17 @@ final class DslMethods {
     }
 
     LocalVariable value = LocalVariable.newLocalVariable(returnType, "value");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenReturn", returnType, "value", value);
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenReturn", returnType, "value", value, exceptions);
     LocalVariable throwable = LocalVariable.newLocalVariable(Constants.THROWABLE, "throwable");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenThrow", Constants.THROWABLE, "throwable", throwable);
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenThrow", Constants.THROWABLE, "throwable", throwable,
+        exceptions);
     LocalVariable answer = LocalVariable.newLocalVariable(answerRef, "answer");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenAnswer", answerRef, "answer", answer);
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenCallRealMethod", null, null, null);
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenAnswer", answerRef, "answer", answer, exceptions);
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenCallRealMethod", null, null, null, exceptions);
   }
 
   private static void addFanOutTerminal(TypeDefBuilder builder, List<Method> overloads, ClassRef ongoingRef,
-      String name, TypeRef argumentType, String argumentName, Expression argumentVar) {
+      String name, TypeRef argumentType, String argumentName, Expression argumentVar, List<ClassRef> exceptions) {
     ClassRef supplierRef = new ClassRefBuilder(Constants.SUPPLIER).withArguments(ongoingRef).build();
     ClassRef listOfStarters = new ClassRefBuilder(Constants.LIST).withArguments(supplierRef).build();
     LocalVariable selected = selectedVar();
@@ -385,20 +432,71 @@ final class DslMethods {
         .withReturnType(ongoingRef)
         .withName(name)
         .withArguments(arguments)
+        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(statements)
         .endBlock()
         .endMethod();
   }
 
+  /**
+   * Adds the answer-first {@code done()} terminal of a single-overload do-family builder: it
+   * replays the pre-built stubber as {@code stubber.when(mock).method(matchers)}, which never
+   * invokes the real method and so is spy- and void-safe.
+   */
+  static void addDoTerminal(TypeDefBuilder builder, Method method, List<ClassRef> exceptions) {
+    builder.addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withReturnType(Types.VOID)
+        .withName("done")
+        .withExceptions(exceptions)
+        .withNewBlock()
+        .addToStatements(doStubbingApply(method))
+        .endBlock()
+        .endMethod();
+  }
+
+  /**
+   * Adds the {@code done()} terminal of a shared do-family builder: it fans out the pre-built
+   * stubber to every overload matching the pinned arguments.
+   */
+  static void addFanOutDoTerminal(TypeDefBuilder builder, List<Method> overloads, List<ClassRef> exceptions) {
+    LocalVariable selected = selectedVar();
+    List<Statement> statements = new ArrayList<>();
+    statements.add(new Declare(selected, selectAllCall()));
+    for (int i = 0; i < overloads.size(); i++) {
+      statements.add(new If(selected.call("contains", ValueRef.from(i)),
+          new Block(doStubbingApply(overloads.get(i)))));
+    }
+    builder.addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withReturnType(Types.VOID)
+        .withName("done")
+        .withExceptions(exceptions)
+        .withNewBlock()
+        .withStatements(statements)
+        .endBlock()
+        .endMethod();
+  }
+
+  /**
+   * Builds {@code this.stubber.when(this.mock).method(slot.resolve(), ...)}; the answer was
+   * supplied up front to the stubber, so this replays it against the mock's method.
+   */
+  private static Statement doStubbingApply(Method method) {
+    return This.ref(Constants.STUBBER).call("when", This.ref(Constants.MOCK))
+        .call(method.getName(), resolveSlots(method));
+  }
+
   static void addVerifyTerminals(TypeDefBuilder builder, Function<LocalVariable, List<Statement>> bodies,
-      List<Statement> neverBody) {
+      List<Statement> neverBody, List<ClassRef> exceptions) {
     LocalVariable mode = LocalVariable.newLocalVariable(Constants.VERIFICATION_MODE, "mode");
     builder.addNewMethod()
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(Types.VOID)
         .withName("verified")
         .addNewArgument().withTypeRef(Constants.VERIFICATION_MODE).withName("mode").endArgument()
+        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(bodies.apply(mode))
         .endBlock()
@@ -408,37 +506,41 @@ final class DslMethods {
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(Types.VOID)
         .withName("never")
+        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(neverBody)
         .endBlock()
         .endMethod();
 
-    addVerificationModeShortcut(builder, "called", Constants.MOCKITO.call("times", ValueRef.from(1)));
-    addVerificationModeShortcut(builder, "atLeastOnce", Constants.MOCKITO.call("atLeastOnce"));
-    addVerificationModeShortcut(builder, "only", Constants.MOCKITO.call("only"));
-    addInvocationCountShortcut(builder, "times");
-    addInvocationCountShortcut(builder, "atLeast");
-    addInvocationCountShortcut(builder, "atMost");
+    addVerificationModeShortcut(builder, "called", Constants.MOCKITO.call("times", ValueRef.from(1)), exceptions);
+    addVerificationModeShortcut(builder, "atLeastOnce", Constants.MOCKITO.call("atLeastOnce"), exceptions);
+    addVerificationModeShortcut(builder, "only", Constants.MOCKITO.call("only"), exceptions);
+    addInvocationCountShortcut(builder, "times", exceptions);
+    addInvocationCountShortcut(builder, "atLeast", exceptions);
+    addInvocationCountShortcut(builder, "atMost", exceptions);
   }
 
-  private static void addVerificationModeShortcut(TypeDefBuilder builder, String name, Expression modeExpression) {
+  private static void addVerificationModeShortcut(TypeDefBuilder builder, String name, Expression modeExpression,
+      List<ClassRef> exceptions) {
     builder.addNewMethod()
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(Types.VOID)
         .withName(name)
+        .withExceptions(exceptions)
         .withNewBlock()
         .addToStatements(new This().call("verified", modeExpression))
         .endBlock()
         .endMethod();
   }
 
-  private static void addInvocationCountShortcut(TypeDefBuilder builder, String name) {
+  private static void addInvocationCountShortcut(TypeDefBuilder builder, String name, List<ClassRef> exceptions) {
     LocalVariable invocations = LocalVariable.newLocalVariable(Types.PRIMITIVE_INT_REF, "invocations");
     builder.addNewMethod()
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(Types.VOID)
         .withName(name)
         .addNewArgument().withTypeRef(Types.PRIMITIVE_INT_REF).withName("invocations").endArgument()
+        .withExceptions(exceptions)
         .withNewBlock()
         .addToStatements(new This().call("verified", Constants.MOCKITO.call(name, invocations)))
         .endBlock()
@@ -518,6 +620,21 @@ final class DslMethods {
       }
     }
     return union.values();
+  }
+
+  /**
+   * Collects the exceptions declared across every overload of the group, deduplicated by
+   * fully qualified name in a stable order. Generated DSL methods emit real invocations of
+   * the mocked method, so they must propagate its checked exceptions to compile.
+   */
+  static List<ClassRef> unionExceptions(List<Method> overloads) {
+    Map<String, ClassRef> union = new LinkedHashMap<>();
+    for (Method method : overloads) {
+      for (ClassRef exception : method.getExceptions()) {
+        union.putIfAbsent(exception.getFullyQualifiedName(), exception);
+      }
+    }
+    return new ArrayList<>(union.values());
   }
 
   /**

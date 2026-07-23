@@ -52,7 +52,7 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public static TemplateServiceMock stub(TemplateService mock)");
+        .contains("public static TemplateServiceMock mock(TemplateService mock)");
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
@@ -180,6 +180,70 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldGenerateAnswerFirstDoFamily() {
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(TEMPLATE_SERVICE);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public static TemplateServiceMock.TemplateServiceMockDoStubber doReturn(Object value)");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public static TemplateServiceMock.TemplateServiceMockDoStubber doThrow(Throwable... throwables)");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains(
+            "public static TemplateServiceMock.TemplateServiceMockDoStubber doThrow(Class<? extends Throwable> throwableType)");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public static TemplateServiceMock.TemplateServiceMockDoStubber doNothing()");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public static TemplateServiceMock.TemplateServiceMockDoStubber doCallRealMethod()");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public TemplateServiceMock.CreateDoStub withId(String value)");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public void done()");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("this.stubber.when(this.mock).delete(this.id.resolve())");
+  }
+
+  @Test
+  public void shouldDeclareCheckedExceptionsOnDoFamilyTerminal() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.ExportService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "import java.io.IOException;\n" +
+            "@Mockable\n" +
+            "public interface ExportService {\n" +
+            "  String export(String id) throws IOException;\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.ExportServiceMock")
+        .contentsAsUtf8String()
+        .contains("public void done() throws IOException");
+  }
+
+  @Test
   public void shouldGenerateMocksAndAggregatorForMockablesMarker() {
     JavaFileObject templateService = JavaFileObjects.forSourceString("test.TemplateService",
         "package test;\n" +
@@ -208,19 +272,19 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.TemplateServiceMock")
         .contentsAsUtf8String()
-        .contains("public static TemplateServiceMock stub(TemplateService mock)");
+        .contains("public static TemplateServiceMock mock(TemplateService mock)");
     assertThat(compilation)
-        .generatedSourceFile("test.mocks.Stubs")
+        .generatedSourceFile("test.mocks.Mocks")
         .contentsAsUtf8String()
-        .contains("public static TemplateServiceMock stub(TemplateService mock)");
+        .contains("public static TemplateServiceMock mock(TemplateService mock)");
     assertThat(compilation)
-        .generatedSourceFile("test.mocks.Stubs")
+        .generatedSourceFile("test.mocks.Mocks")
         .contentsAsUtf8String()
-        .contains("return TemplateServiceMock.stub(mock)");
+        .contains("return TemplateServiceMock.mock(mock)");
     assertThat(compilation)
-        .generatedSourceFile("test.mocks.Stubs")
+        .generatedSourceFile("test.mocks.Mocks")
         .contentsAsUtf8String()
-        .contains("public static PaymentServiceMock stub(PaymentService mock)");
+        .contains("public static PaymentServiceMock mock(PaymentService mock)");
   }
 
   @Test
@@ -243,7 +307,7 @@ public class MockableProcessorTest {
 
     assertThat(compilation).succeeded();
     org.junit.jupiter.api.Assertions.assertTrue(compilation.generatedSourceFiles().stream()
-        .noneMatch(file -> file.getName().endsWith("Stubs.java")));
+        .noneMatch(file -> file.getName().endsWith("Mocks.java")));
   }
 
   @Test
@@ -253,11 +317,11 @@ public class MockableProcessorTest {
             "public interface SoloService {\n" +
             "  String name();\n" +
             "}\n");
-    JavaFileObject marker = JavaFileObjects.forSourceString("test.Stubs",
+    JavaFileObject marker = JavaFileObjects.forSourceString("test.Mocks",
         "package test;\n" +
             "import io.sundr.mockito.annotations.Mockables;\n" +
             "@Mockables(SoloService.class)\n" +
-            "class Stubs {\n" +
+            "class Mocks {\n" +
             "}\n");
 
     Compilation compilation = javac()
@@ -381,6 +445,55 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.MockNamedService")
         .contentsAsUtf8String()
-        .contains("public static MockNamedService stub(NamedService mock)");
+        .contains("public static MockNamedService mock(NamedService mock)");
+  }
+
+  @Test
+  public void shouldRenameWhenMockNameAlreadyExists() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.NamedService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface NamedService {\n" +
+            "  String name();\n" +
+            "}\n");
+    JavaFileObject existing = JavaFileObjects.forSourceString("test.NamedServiceMock",
+        "package test;\n" +
+            "public class NamedServiceMock {\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service, existing);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation).hadWarningContaining("NamedServiceMock' already exists");
+    assertThat(compilation)
+        .generatedSourceFile("test.NamedServiceGeneratedMock")
+        .contentsAsUtf8String()
+        .contains("public static NamedServiceGeneratedMock mock(NamedService mock)");
+  }
+
+  @Test
+  public void shouldFailWhenMockNameExistsAndPolicyIsFail() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.NamedService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "import io.sundr.mockito.annotations.OnNameCollision;\n" +
+            "@Mockable(onNameCollision = OnNameCollision.FAIL)\n" +
+            "public interface NamedService {\n" +
+            "  String name();\n" +
+            "}\n");
+    JavaFileObject existing = JavaFileObjects.forSourceString("test.NamedServiceMock",
+        "package test;\n" +
+            "public class NamedServiceMock {\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service, existing);
+
+    assertThat(compilation).failed();
+    assertThat(compilation).hadErrorContaining("NamedServiceMock' already exists");
   }
 }

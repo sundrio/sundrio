@@ -79,6 +79,7 @@ public class AddStubClasses implements Visitor<TypeDefFluent<?>> {
     ClassRef selfRef = target.nestedRef(className);
     TypeDefBuilder builder = DslMethods.innerClass(target, className);
     boolean isVoid = overloads.get(0).getReturnType() instanceof VoidRef;
+    List<ClassRef> exceptions = DslMethods.unionExceptions(overloads);
 
     if (overloads.size() == 1) {
       Method method = overloads.get(0);
@@ -86,10 +87,11 @@ public class AddStubClasses implements Visitor<TypeDefFluent<?>> {
       DslMethods.addWithers(builder, method.getArguments(), selfRef, false);
       if (isVoid) {
         DslMethods.addVoidTerminals(builder, (doName, doArgs) -> Collections
-            .singletonList(DslMethods.doStubbing(method, Constants.MOCKITO.call(doName, doArgs))));
+            .singletonList(DslMethods.doStubbing(method, Constants.MOCKITO.call(doName, doArgs))), exceptions);
       } else {
         DslMethods.addStubbingTerminals(builder, method.getReturnType(),
-            Collections.singletonList(new Return(Constants.MOCKITO.call("when", DslMethods.invocation(method)))));
+            Collections.singletonList(new Return(Constants.MOCKITO.call("when", DslMethods.invocation(method)))),
+            exceptions);
       }
     } else {
       Collection<Argument> union = DslMethods.unionArguments(overloads);
@@ -98,9 +100,10 @@ public class AddStubClasses implements Visitor<TypeDefFluent<?>> {
       DslMethods.addWithers(builder, union, selfRef, true);
       DslMethods.addAnyPins(builder, union, selfRef);
       if (isVoid) {
-        DslMethods.addVoidTerminals(builder, (doName, doArgs) -> DslMethods.fanOutVoidBody(overloads, doName, doArgs));
+        DslMethods.addVoidTerminals(builder,
+            (doName, doArgs) -> DslMethods.fanOutVoidBody(overloads, doName, doArgs), exceptions);
       } else {
-        DslMethods.addFanOutStubbing(builder, overloads, overloads.get(0).getReturnType());
+        DslMethods.addFanOutStubbing(builder, overloads, overloads.get(0).getReturnType(), exceptions);
       }
     }
     return builder.build();

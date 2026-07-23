@@ -208,14 +208,63 @@ public class MockDslRuntimeTest {
     assertEquals(true, failure.getMessage().contains("code"));
   }
 
+  @Test
+  public void shouldStubAnswerFirstWithDoReturn() {
+    Object mock = mock();
+
+    Object stub = doStubOf(mock, "doReturn", types(Object.class), args("MATCHED"), "create");
+    call(stub, "withId", types(String.class), args("MY_ID"));
+    call(stub, "done", types(), args());
+
+    assertEquals("MATCHED", create(mock, "MY_ID", "name", true));
+    assertNull(create(mock, "OTHER", "name", true));
+  }
+
+  @Test
+  public void shouldStubVoidMethodAnswerFirstWithDoThrowAndDoNothing() {
+    Object mock = mock();
+
+    Object throwing = doStubOf(mock, "doThrow", types(Throwable[].class),
+        args((Object) new Throwable[] { new IllegalStateException("boom") }), "delete");
+    call(throwing, "withId", types(String.class), args("BAD"));
+    call(throwing, "done", types(), args());
+
+    Object nothing = doStubOf(mock, "doNothing", types(), args(), "delete");
+    call(nothing, "withId", types(String.class), args("OK"));
+    call(nothing, "done", types(), args());
+
+    IllegalStateException failure = assertThrows(IllegalStateException.class, () -> delete(mock, "BAD"));
+    assertEquals("boom", failure.getMessage());
+    delete(mock, "OK");
+  }
+
+  @Test
+  public void shouldFanOutAnswerFirstOverAllMatchingOverloads() {
+    Object mock = mock();
+
+    Object shared = doStubOf(mock, "doReturn", types(Object.class), args("SHARED"), "render");
+    call(shared, "withId", types(String.class), args("A"));
+    call(shared, "done", types(), args());
+
+    assertEquals("SHARED", render(mock, "A"));
+    assertEquals("SHARED", render(mock, "A", "html"));
+    assertNull(render(mock, "B"));
+  }
+
+  private static Object doStubOf(Object mock, String doFactory, Class<?>[] doTypes, Object[] doArgs, String method) {
+    Object stubber = call(mockDslClass, null, doFactory, doTypes, doArgs);
+    Object router = call(stubber, "when", types(serviceClass), args(mock));
+    return call(router, method, types(), args());
+  }
+
   private static Object stubOf(Object mock, String method) {
-    Object handle = call(mockDslClass, null, "stub", types(serviceClass), args(mock));
+    Object handle = call(mockDslClass, null, "mock", types(serviceClass), args(mock));
     Object router = call(handle, "when", types(), args());
     return call(router, method, types(), args());
   }
 
   private static Object verifyOf(Object mock, String method) {
-    Object handle = call(mockDslClass, null, "stub", types(serviceClass), args(mock));
+    Object handle = call(mockDslClass, null, "mock", types(serviceClass), args(mock));
     Object router = call(handle, "verify", types(), args());
     return call(router, method, types(), args());
   }
@@ -233,19 +282,19 @@ public class MockDslRuntimeTest {
   }
 
   private static Object createStub(Object mock) {
-    Object handle = call(mockDslClass, null, "stub", types(serviceClass), args(mock));
+    Object handle = call(mockDslClass, null, "mock", types(serviceClass), args(mock));
     Object router = call(handle, "when", types(), args());
     return call(router, "create", types(), args());
   }
 
   private static Object deleteStub(Object mock) {
-    Object handle = call(mockDslClass, null, "stub", types(serviceClass), args(mock));
+    Object handle = call(mockDslClass, null, "mock", types(serviceClass), args(mock));
     Object router = call(handle, "when", types(), args());
     return call(router, "delete", types(), args());
   }
 
   private static Object createVerify(Object mock) {
-    Object handle = call(mockDslClass, null, "stub", types(serviceClass), args(mock));
+    Object handle = call(mockDslClass, null, "mock", types(serviceClass), args(mock));
     Object router = call(handle, "verify", types(), args());
     return call(router, "create", types(), args());
   }
