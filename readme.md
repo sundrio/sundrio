@@ -59,6 +59,9 @@ On top of this model, it provides tools that perform tasks, like builder generat
       - [Resourceify](annotations/resourcecify/readme.md)
       - [Mockito Annotations](annotations/mockito/readme.md)
 
+- Migration
+    - [Mockito Annotations Recipe](rewrite/mockito/readme.md)
+
 - Maven 
     - [Maven Bom Generator](maven-plugin/readme.md)
 

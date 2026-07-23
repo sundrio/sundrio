@@ -1,6 +1,6 @@
 # Mockito Examples
 
-Two examples demonstrating `mockito-annotations`: a generated, typed, fluent stubbing and
+Examples demonstrating `mockito-annotations`: a generated, typed, fluent stubbing and
 verification DSL on top of Mockito. Instead of
 
 ```java
@@ -12,8 +12,8 @@ Mockito.when(service.create(Mockito.any(), Mockito.any(), Mockito.anyBoolean(),
 you write
 
 ```java
-stub(service).when().create().thenReturn("TEMPLATE_ID");
-stub(service).when().create().withId("MY_ID").withOverwrite(true).thenReturn("SPECIAL");
+mock(service).when().create().thenReturn("TEMPLATE_ID");
+mock(service).when().create().withId("MY_ID").withOverwrite(true).thenReturn("SPECIAL");
 ```
 
 ## Marker (recommended)
@@ -41,19 +41,19 @@ The four essential stubbing shapes, shown on the seven-argument
 
 ```java
 // (i) no argument specified: every argument defaults to any() / anyBoolean() / ...
-stub(service).when().create()
+mock(service).when().create()
     .thenReturn("TEMPLATE_ID");
 
 // (ii) one argument pinned to an exact value, the rest stay any()
-stub(service).when().create().withId("MY_ID")
+mock(service).when().create().withId("MY_ID")
     .thenReturn("MATCHED");
 
 // (iii) one argument matched with a custom matcher
-stub(service).when().create().withIdMatching(id -> id.startsWith("tpl-"))
+mock(service).when().create().withIdMatching(id -> id.startsWith("tpl-"))
     .thenReturn("MATCHED");
 
 // (iv) two arguments matched together
-stub(service).when().create()
+mock(service).when().create()
     .withIdMatching(id -> id.startsWith("tpl-"))
     .withOwnerMatching(owner -> owner.endsWith("@acme.com"))
     .thenReturn("MATCHED");
@@ -63,17 +63,29 @@ Beyond the basics — layering, consecutive answers and void methods:
 
 ```java
 // later stubbings win for overlapping matches: broad default first, special case after
-stub(service).when().create().thenReturn("DEFAULT");
-stub(service).when().create().withId("MY_ID").withOverwrite(true).thenReturn("SPECIAL");
+mock(service).when().create().thenReturn("DEFAULT");
+mock(service).when().create().withId("MY_ID").withOverwrite(true).thenReturn("SPECIAL");
 
 // terminals return Mockito's OngoingStubbing, so consecutive answers chain
-stub(service).when().find().withId("MY_ID")
+mock(service).when().find().withId("MY_ID")
     .thenReturn(Optional.of(spec))
     .thenReturn(Optional.empty());
 
 // void methods use the do-family under the hood
-stub(service).when().delete().withId("LOCKED")
+mock(service).when().delete().withId("LOCKED")
     .thenThrow(new IllegalStateException("template is locked"));
+```
+
+The **answer-first do-family** gives the answer up front and closes with `done()`. It compiles to
+Mockito's `doX(...).when(mock).method(matchers)`, which never invokes the real method during
+stubbing — the spy- and void-safe way to stub. It reuses the same withers and overload fan-out as
+the `when()` form:
+
+```java
+doReturn("TEMPLATE_ID").when(service).create().withId("MY_ID").done();
+doThrow(new IllegalStateException("locked")).when(service).delete().withId("LOCKED").done();
+doNothing().when(service).delete().withId("OK").done();
+doReturn("SHARED").when(service).render().withId("tpl-1").done();  // fans out over overloads
 ```
 
 Overloaded methods share a single DSL method carrying the union of all withers, and a
@@ -85,12 +97,12 @@ Pins that fit no overload fail fast. For `render(id)` / `render(spec)` /
 
 ```java
 // one line stubs render(id) AND render(id, parameters)
-stub(service).when().render().withId("tpl-1").thenReturn("SHARED");
+mock(service).when().render().withId("tpl-1").thenReturn("SHARED");
 
 // per-overload behavior when it matters
-stub(service).when().render().withId("tpl-1").thenReturn("A");                     // both id-overloads
-stub(service).when().render().withId("tpl-1").withParametersAny().thenReturn("B"); // only render(id, parameters)
-stub(service).when().render().withId("tpl-2").andNoOtherArgs().thenReturn("C");    // only render(id)
+mock(service).when().render().withId("tpl-1").thenReturn("A");                     // both id-overloads
+mock(service).when().render().withId("tpl-1").withParametersAny().thenReturn("B"); // only render(id, parameters)
+mock(service).when().render().withId("tpl-2").andNoOtherArgs().thenReturn("C");    // only render(id)
 ```
 
 When several overloads are stubbed at once the stubbings are lenient, so strict stubbing
@@ -100,38 +112,84 @@ signature — disambiguate with more pins, `withXxxAny()` or `andNoOtherArgs()` 
 `never()` fans out to every matching overload. Overload groups must share one return type
 and one type per parameter name; otherwise the processor warns and skips that method name.
 
+### Checked exceptions
+
+When a mocked method declares checked exceptions, the generated terminals propagate them, so
+the test method simply declares (or handles) them as it would for a direct call:
+
+```java
+// OrchestratorTemplateService.export(String id) throws IOException
+
+@Test
+void exportStub() throws IOException {
+    mock(service).when().export().withId("tpl-1").thenReturn("EXPORTED");
+    mock(service).verify().export().withId("tpl-1").called();
+}
+```
+
 Verification and capturing:
 
 ```java
-stub(service).verify().create().withId("MY_ID").called();
-stub(service).verify().delete().never();
+mock(service).verify().create().withId("MY_ID").called();
+mock(service).verify().delete().never();
 
 ArgumentCaptor<TemplateSpec> captured = ArgumentCaptor.forClass(TemplateSpec.class);
-stub(service).verify().create().capturingSpec(captured).called();
+mock(service).verify().create().capturingSpec(captured).called();
 ```
 
-The marker also generates a `Stubs` aggregator in its package, so one static import covers
-every mock of the suite:
+The marker also generates a `Mocks` aggregator in its package, so one static import covers
+every mock of the suite — for both the fluent DSL and plain Mockito:
 
 ```java
-import static io.sundr.examples.mockito.Stubs.stub;
+import static io.sundr.examples.mockito.Mocks.*;
 
-stub(templates).when().create().withId("MY_ID").thenReturn("TEMPLATE_ID");
-stub(payments).when().charge().withAmountCents(2500L).thenReturn(42L);
+mock(templates).when().create().withId("MY_ID").thenReturn("TEMPLATE_ID");
+mock(payments).when().charge().withAmountCents(2500L).thenReturn(42L);
 
-stub(templates).verify().create().withId("MY_ID").called();
-stub(payments).verify().refund().never();
+mock(templates).verify().create().withId("MY_ID").called();
+mock(payments).verify().refund().never();
 ```
+
+The aggregator also exposes the answer-first do-family — `doReturn`, `doThrow` (throwable or
+`Class<? extends Throwable>`), `doNothing`, `doAnswer`, `doCallRealMethod` — each opening a
+`when(mock).method()<withers>.done()` chain over any mockable type:
+
+```java
+doReturn("TEMPLATE_ID").when(templates).create().withId("MY_ID").done();
+doNothing().when(templates).delete().withId("OK").done();
+```
+
+The same import also exposes the common Mockito statics, delegated straight through, so a test
+can drop to raw Mockito without a second import: `when`, `verify` (both arities),
+`verifyNoInteractions`, `verifyNoMoreInteractions`, `inOrder`, `reset`, `clearInvocations`,
+`timeout` and `after`.
+
+```java
+when(payments.charge("ACC-9", 100L)).thenReturn(7L);
+verify(payments).charge("ACC-9", 100L);
+
+verifyNoInteractions(templates);
+
+InOrder order = inOrder(payments);
+order.verify(payments).charge("ACC-1", 10L);
+order.verify(payments).refund("ACC-1", 10L);
+```
+
+Argument matchers (`anyXxx`, `eq`, `argThat`, ...) are intentionally *not* delegated: the
+fluent path expresses matching through `withXxxMatching` / `withXxxAny`, and on the raw path
+they belong to their own home, `org.mockito.ArgumentMatchers.*` — keeping them there preserves
+the fluent-vs-raw boundary and avoids the stateful-matcher misuse a facade would invite.
 
 ### What gets generated
 
 | Class | Purpose |
 |-------|---------|
-| `OrchestratorTemplateServiceMock` | Entry points `mock()` and `stub(mock)`; the handle exposes `when()` and `verify()` |
+| `OrchestratorTemplateServiceMock` | Entry points `mock()` (fresh mock) and `mock(existing)` (wrap a mock); the handle exposes `when()` and `verify()` |
 | `...Mock.Stub` / `...Mock.Verify` | Routers with one method per stubbable target method |
 | `...Mock.CreateStub` | Per-method builder: `withXxx(value)`, `withXxxMatching(matcher)`, `thenReturn/thenThrow/thenAnswer/thenCallRealMethod` |
 | `...Mock.CreateVerify` | Per-method builder: withers plus `capturingXxx(captor)`, `called()/times(n)/never()/atLeastOnce()/atLeast(n)/atMost(n)/only()/verified(mode)` |
-| `Stubs` | Aggregator with one `stub` overload per mockable type |
+| `...Mock` do-family | Static `doReturn/doThrow/doNothing/doAnswer/doCallRealMethod` entry points returning a `DoStubber`; `when(mock)` opens the answer-first router whose `...DoStub` per-method builders reuse the withers and close with `done()` |
+| `Mocks` | Aggregator with one `mock` overload per mockable type, the answer-first do-family (`doReturn/doThrow/doNothing/doAnswer/doCallRealMethod`), plus passthroughs to the common Mockito statics (`when`, `verify`, `verifyNoInteractions`, `verifyNoMoreInteractions`, `inOrder`, `reset`, `clearInvocations`, `timeout`, `after`) |
 
 ### Matcher semantics
 
@@ -176,7 +234,7 @@ public interface GreetingService {
 
 ```java
 GreetingService service = GreetingServiceMock.mock();
-GreetingServiceMock.stub(service).when().greet().withName("Ada").thenReturn("Hello Ada!");
+GreetingServiceMock.mock(service).when().greet().withName("Ada").thenReturn("Hello Ada!");
 ```
 
 Because the generated class references Mockito, `mockito-core` must be visible to the main
@@ -196,4 +254,13 @@ compilation (`provided` scope keeps it out of the runtime dependency tree):
 
 Both annotations accept `prefix` / `suffix` to control the generated class name
 (defaults: no prefix, `Mock` suffix), and `@Mockables` additionally accepts
-`aggregator` (default `Stubs`, empty string disables it).
+`aggregator` (default `Mocks`, empty string disables it).
+
+## Lombok
+
+**Location:** [lombok/](lombok/)
+
+Integration test proving the DSL is generated against Lombok-generated members: getters and
+setters become stubbable/verifiable, while Lombok's `equals`/`hashCode`/`toString` are excluded.
+Uses the marker flow with real Lombok on the annotation-processor path, and requires
+`-parameters` so the setter withers keep their field-derived names.
