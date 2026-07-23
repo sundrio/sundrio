@@ -106,6 +106,7 @@
         <junit-jupiter.version>6.0.2</junit-jupiter.version>
         <hamcrest.version>3.0</hamcrest.version>
         <mockito.version>5.14.2</mockito.version>
+        <lombok.version>1.18.42</lombok.version>
         <openrewrite.version>8.41.0</openrewrite.version>
 
         <!--maven.javadoc.failOnError>false</maven.javadoc.failOnError-->
@@ -275,6 +276,12 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
 
             <dependency>

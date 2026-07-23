@@ -32,6 +32,7 @@
     <modules>
         <module>marker</module>
         <module>annotated</module>
+        <module>lombok</module>
     </modules>
 
 </project>
