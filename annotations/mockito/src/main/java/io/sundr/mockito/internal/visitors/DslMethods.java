@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -43,12 +44,16 @@ import io.sundr.model.Kind;
 import io.sundr.model.Lambda;
 import io.sundr.model.LocalVariable;
 import io.sundr.model.Method;
+import io.sundr.model.Property;
 import io.sundr.model.Return;
 import io.sundr.model.Statement;
 import io.sundr.model.This;
+import io.sundr.model.Throw;
+import io.sundr.model.Try;
 import io.sundr.model.TypeDefBuilder;
 import io.sundr.model.TypeRef;
 import io.sundr.model.ValueRef;
+import io.sundr.model.WildcardRef;
 import io.sundr.model.utils.Types;
 import io.sundr.utils.Strings;
 
@@ -261,7 +266,8 @@ final class DslMethods {
       List<ClassRef> exceptions) {
     TypeRef boxed = Types.box(returnType);
     ClassRef ongoingRef = new ClassRefBuilder(Constants.ONGOING_STUBBING).withArguments(boxed).build();
-    ClassRef answerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(boxed).build();
+    ClassRef wildcardAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(new WildcardRef()).build();
+    ClassRef typedAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(boxed).build();
 
     LocalVariable value = LocalVariable.newLocalVariable(returnType, "value");
     builder.addNewMethod()
@@ -287,15 +293,27 @@ final class DslMethods {
         .endBlock()
         .endMethod();
 
-    LocalVariable answer = LocalVariable.newLocalVariable(answerRef, "answer");
+    LocalVariable answer = LocalVariable.newLocalVariable(wildcardAnswerRef, "answer");
     builder.addNewMethod()
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(ongoingRef)
         .withName("thenAnswer")
-        .addNewArgument().withTypeRef(answerRef).withName("answer").endArgument()
+        .addNewArgument().withTypeRef(wildcardAnswerRef).withName("answer").endArgument()
         .withExceptions(exceptions)
         .withNewBlock()
         .addToStatements(new Return(new This().call("stub").call("thenAnswer", answer)))
+        .endBlock()
+        .endMethod();
+
+    LocalVariable typedAnswer = LocalVariable.newLocalVariable(typedAnswerRef, "answer");
+    builder.addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withReturnType(ongoingRef)
+        .withName("thenAnswerTyped")
+        .addNewArgument().withTypeRef(typedAnswerRef).withName("answer").endArgument()
+        .withExceptions(exceptions)
+        .withNewBlock()
+        .addToStatements(new Return(new This().call("stub").call("thenAnswer", typedAnswer)))
         .endBlock()
         .endMethod();
 
@@ -322,7 +340,8 @@ final class DslMethods {
 
   static void addVoidTerminals(TypeDefBuilder builder, BiFunction<String, Expression[], List<Statement>> bodies,
       List<ClassRef> exceptions) {
-    ClassRef answerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(Constants.BOXED_VOID).build();
+    ClassRef wildcardAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(new WildcardRef()).build();
+    ClassRef typedAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(Constants.BOXED_VOID).build();
 
     LocalVariable throwable = LocalVariable.newLocalVariable(Constants.THROWABLE, "throwable");
     builder.addNewMethod()
@@ -336,15 +355,27 @@ final class DslMethods {
         .endBlock()
         .endMethod();
 
-    LocalVariable answer = LocalVariable.newLocalVariable(answerRef, "answer");
+    LocalVariable answer = LocalVariable.newLocalVariable(wildcardAnswerRef, "answer");
     builder.addNewMethod()
         .withNewModifiers().withPublic().endModifiers()
         .withReturnType(Types.VOID)
         .withName("thenAnswer")
-        .addNewArgument().withTypeRef(answerRef).withName("answer").endArgument()
+        .addNewArgument().withTypeRef(wildcardAnswerRef).withName("answer").endArgument()
         .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(bodies.apply("doAnswer", new Expression[] { answer }))
+        .endBlock()
+        .endMethod();
+
+    LocalVariable typedAnswer = LocalVariable.newLocalVariable(typedAnswerRef, "answer");
+    builder.addNewMethod()
+        .withNewModifiers().withPublic().endModifiers()
+        .withReturnType(Types.VOID)
+        .withName("thenAnswerTyped")
+        .addNewArgument().withTypeRef(typedAnswerRef).withName("answer").endArgument()
+        .withExceptions(exceptions)
+        .withNewBlock()
+        .withStatements(bodies.apply("doAnswer", new Expression[] { typedAnswer }))
         .endBlock()
         .endMethod();
 
@@ -381,27 +412,55 @@ final class DslMethods {
           .withReturnType(ongoingRef)
           .withName("stub" + i)
           .addNewArgument().withTypeRef(Types.PRIMITIVE_BOOLEAN_REF).withName("lenient").endArgument()
-          .withExceptions(exceptions)
           .withNewBlock()
-          .addToStatements(new If(lenient,
-              new Block(new Return(Constants.MOCKITO.call("lenient").call("when", invocation(method))))))
-          .addToStatements(new Return(Constants.MOCKITO.call("when", invocation(method))))
+          .withStatements(launderedStubBody(method, lenient, exceptions))
           .endBlock()
           .endMethod();
     }
 
+    ClassRef wildcardAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(new WildcardRef()).build();
     LocalVariable value = LocalVariable.newLocalVariable(returnType, "value");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenReturn", returnType, "value", value, exceptions);
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenReturn", "thenReturn", returnType, "value", value);
     LocalVariable throwable = LocalVariable.newLocalVariable(Constants.THROWABLE, "throwable");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenThrow", Constants.THROWABLE, "throwable", throwable,
-        exceptions);
-    LocalVariable answer = LocalVariable.newLocalVariable(answerRef, "answer");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenAnswer", answerRef, "answer", answer, exceptions);
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenCallRealMethod", null, null, null, exceptions);
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenThrow", "thenThrow", Constants.THROWABLE, "throwable",
+        throwable);
+    LocalVariable answer = LocalVariable.newLocalVariable(wildcardAnswerRef, "answer");
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenAnswer", "thenAnswer", wildcardAnswerRef, "answer", answer);
+    LocalVariable typedAnswer = LocalVariable.newLocalVariable(answerRef, "answer");
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenAnswerTyped", "thenAnswer", answerRef, "answer", typedAnswer);
+    addFanOutTerminal(builder, overloads, ongoingRef, "thenCallRealMethod", "thenCallRealMethod", null, null, null);
+  }
+
+  /**
+   * Builds the body of a fan-out {@code stubN(lenient)} starter. The starter runs inside a
+   * {@code Supplier<OngoingStubbing<?>>} lambda whose {@code get()} cannot throw checked
+   * exceptions, yet the wrapped {@code Mockito.when(this.mock.method(...))} invokes a method
+   * declared to throw. Registering a stub never actually invokes the real method, so any
+   * declared checked exception is laundered into a {@code RuntimeException}, keeping the
+   * starter free of a {@code throws} clause and the enclosing lambda legal.
+   */
+  private static List<Statement> launderedStubBody(Method method, LocalVariable lenient, List<ClassRef> exceptions) {
+    Statement lenientReturn = new If(lenient,
+        new Block(new Return(Constants.MOCKITO.call("lenient").call("when", invocation(method)))));
+    Statement strictReturn = new Return(Constants.MOCKITO.call("when", invocation(method)));
+    if (exceptions.isEmpty()) {
+      List<Statement> statements = new ArrayList<>();
+      statements.add(lenientReturn);
+      statements.add(strictReturn);
+      return statements;
+    }
+
+    LocalVariable caught = LocalVariable.newLocalVariable(Constants.THROWABLE, "t");
+    Try tryCatch = new Try(
+        new Block(lenientReturn, strictReturn),
+        Collections.singletonList(new Try.Catch(Property.newProperty(Constants.THROWABLE, "t"),
+            new Block(new Throw(new Construct(Constants.RUNTIME_EXCEPTION, caught))))),
+        Optional.empty());
+    return Collections.singletonList(tryCatch);
   }
 
   private static void addFanOutTerminal(TypeDefBuilder builder, List<Method> overloads, ClassRef ongoingRef,
-      String name, TypeRef argumentType, String argumentName, Expression argumentVar, List<ClassRef> exceptions) {
+      String name, String underlyingName, TypeRef argumentType, String argumentName, Expression argumentVar) {
     ClassRef supplierRef = new ClassRefBuilder(Constants.SUPPLIER).withArguments(ongoingRef).build();
     ClassRef listOfStarters = new ClassRefBuilder(Constants.LIST).withArguments(supplierRef).build();
     LocalVariable selected = selectedVar();
@@ -421,7 +480,7 @@ final class DslMethods {
           new Block(starters.call("add", starter))));
     }
     Expression step = new Lambda("stubbing",
-        (Expression) (argumentVar == null ? stubbing.call(name) : stubbing.call(name, argumentVar)));
+        (Expression) (argumentVar == null ? stubbing.call(underlyingName) : stubbing.call(underlyingName, argumentVar)));
     statements.add(new Return(Constants.FAN_OUT_STUBBING.call("of", starters, step)));
 
     List<Argument> arguments = argumentType == null
@@ -432,7 +491,6 @@ final class DslMethods {
         .withReturnType(ongoingRef)
         .withName(name)
         .withArguments(arguments)
-        .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(statements)
         .endBlock()
