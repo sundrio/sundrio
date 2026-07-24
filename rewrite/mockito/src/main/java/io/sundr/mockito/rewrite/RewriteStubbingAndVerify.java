@@ -326,6 +326,7 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
         mapFailureReason = MockitoNames.REASON_NO_TYPE;
         return null;
       }
+      boolean overloaded = isOverloaded(mt);
       List<String> withers = new ArrayList<>();
       for (int i = 0; i < args.size(); i++) {
         String param = paramNames.get(i);
@@ -334,7 +335,7 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
           return null;
         }
         String cap = MockitoNames.capitalize(param);
-        String wither = mapArgument(args.get(i), cap, verify);
+        String wither = mapArgument(args.get(i), cap, verify, overloaded);
         if (UNMAPPABLE.equals(wither)) {
           mapFailureReason = MockitoNames.REASON_UNMAPPABLE_ARG;
           return null;
@@ -346,13 +347,34 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
       return withers;
     }
 
-    private String mapArgument(Expression arg, String cap, boolean verify) {
+    /**
+     * A mocked method is overloaded when its declaring type declares more than one method sharing
+     * its name. Then an {@code any()} argument's slot is load-bearing: it selects the overload by
+     * arity, so it must be pinned rather than dropped. If the declaring type's methods cannot be
+     * enumerated (type not fully on the rewrite classpath), treat it as not overloaded so the
+     * current, cleaner behavior applies rather than guessing.
+     */
+    private boolean isOverloaded(JavaType.Method mt) {
+      JavaType.FullyQualified declaring = mt.getDeclaringType();
+      if (declaring == null) {
+        return false;
+      }
+      int sameName = 0;
+      for (JavaType.Method candidate : declaring.getMethods()) {
+        if (candidate.getName().equals(mt.getName())) {
+          sameName++;
+        }
+      }
+      return sameName > 1;
+    }
+
+    private String mapArgument(Expression arg, String cap, boolean verify, boolean overloaded) {
       if (arg instanceof J.MethodInvocation) {
         J.MethodInvocation mi = (J.MethodInvocation) arg;
         String name = mi.getSimpleName();
         if (MockitoNames.ANY_MATCHERS.contains(name)) {
           consumedMatchers.add(name);
-          return null;
+          return overloaded ? ".with" + cap + "Any()" : null;
         }
         if ("eq".equals(name)) {
           consumedMatchers.add(name);
