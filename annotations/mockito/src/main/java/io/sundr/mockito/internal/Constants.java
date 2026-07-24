@@ -50,6 +50,7 @@ public final class Constants {
   public static final ClassRef IN_ORDER = ClassRef.forName("org.mockito.InOrder");
   public static final ClassRef OBJECT = ClassRef.forName("java.lang.Object");
   public static final ClassRef THROWABLE = ClassRef.forName("java.lang.Throwable");
+  public static final ClassRef RUNTIME_EXCEPTION = ClassRef.forName("java.lang.RuntimeException");
   public static final ClassRef CLASS = ClassRef.forName("java.lang.Class");
   public static final ClassRef BOXED_VOID = ClassRef.forName("java.lang.Void");
   public static final ClassRef STRING = ClassRef.forName("java.lang.String");

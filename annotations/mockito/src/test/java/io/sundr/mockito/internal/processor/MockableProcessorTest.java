@@ -76,6 +76,23 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldGenerateLenientAndTypedAnswerTerminals() {
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(TEMPLATE_SERVICE);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public OngoingStubbing<String> thenAnswer(Answer<?> answer)");
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .contains("public OngoingStubbing<String> thenAnswerTyped(Answer<String> answer)");
+  }
+
+  @Test
   public void shouldGenerateVerifyDsl() {
     Compilation compilation = javac()
         .withProcessors(new MockableProcessor())
@@ -581,5 +598,35 @@ public class MockableProcessorTest {
 
     assertThat(compilation).failed();
     assertThat(compilation).hadErrorContaining("NamedServiceMock' already exists");
+  }
+
+  @Test
+  public void shouldLaunderCheckedExceptionsInFanOutStarters() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.ImageRepo",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface ImageRepo {\n" +
+            "  String render(String id) throws java.io.IOException;\n" +
+            "  String render(String id, int scale) throws java.io.IOException;\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.ImageRepoMock")
+        .contentsAsUtf8String()
+        .contains("private OngoingStubbing<String> stub0(boolean lenient) {");
+    assertThat(compilation)
+        .generatedSourceFile("test.ImageRepoMock")
+        .contentsAsUtf8String()
+        .doesNotContain("stub0(boolean lenient) throws");
+    assertThat(compilation)
+        .generatedSourceFile("test.ImageRepoMock")
+        .contentsAsUtf8String()
+        .contains("throw new RuntimeException(t);");
   }
 }
