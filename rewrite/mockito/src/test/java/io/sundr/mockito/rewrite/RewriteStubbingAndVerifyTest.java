@@ -48,6 +48,12 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
       "  String getStats() throws Exception;\n" +
       "}\n";
 
+  private static final String OVERLOADED_SERVICE = "package svc;\n" +
+      "public interface Svc {\n" +
+      "  void exec(String id, String op);\n" +
+      "  void exec(Integer code, String op, boolean force);\n" +
+      "}\n";
+
   @Test
   void noArgMethodWithThrowsMigrates() {
     rewriteRun(
@@ -472,6 +478,54 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "    Bar bar = mock(Bar.class);\n" +
                 "    Mocks.mock(foo).when().find().withId(\"ID\").thenReturn(\"X\");\n" +
                 "    Mocks.mock(bar).verify().delete().withId(\"A\").called();\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void verifyOnOverloadedMethodPinsAnyMatchers() {
+    rewriteRun(
+        java(OVERLOADED_SERVICE),
+        java(
+            "import static org.mockito.Mockito.*;\n" +
+                "import svc.Svc;\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    verify(m).exec(any(), any());\n" +
+                "  }\n" +
+                "}\n",
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.Svc;\n\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    Mocks.mock(m).verify().exec().withIdAny().withOpAny().called();\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void stubbingOnOverloadedMethodPinsAnyMatchers() {
+    rewriteRun(
+        java(OVERLOADED_SERVICE),
+        java(
+            "import static org.mockito.Mockito.*;\n" +
+                "import svc.Svc;\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    doNothing().when(m).exec(any(), any());\n" +
+                "  }\n" +
+                "}\n",
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.Svc;\n\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    Mocks.doNothing().when(m).exec().withIdAny().withOpAny().done();\n" +
                 "  }\n" +
                 "}\n"));
   }
