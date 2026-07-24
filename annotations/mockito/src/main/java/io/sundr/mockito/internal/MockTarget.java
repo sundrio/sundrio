@@ -215,7 +215,7 @@ public class MockTarget {
   }
 
   private boolean isStubbable(Method method) {
-    if (method.getModifiers().isStatic() || method.getModifiers().isPrivate() || method.getModifiers().isFinal()) {
+    if (!method.getModifiers().isPublic() || method.getModifiers().isStatic() || method.getModifiers().isFinal()) {
       return false;
     }
     if (OBJECT_METHODS.contains(method.getName())) {

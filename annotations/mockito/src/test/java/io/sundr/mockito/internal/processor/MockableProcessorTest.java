@@ -130,6 +130,41 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldStubOnlyPublicMethods() {
+    JavaFileObject base = JavaFileObjects.forSourceString("test.Accessor",
+        "package test;\n" +
+            "public abstract class Accessor {\n" +
+            "  protected String convert(Exception e) { return e.getMessage(); }\n" +
+            "  String packagePrivate() { return \"x\"; }\n" +
+            "}\n");
+    JavaFileObject service = JavaFileObjects.forSourceString("test.RabbitService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public class RabbitService extends Accessor {\n" +
+            "  public String send(String message) { return message; }\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(base, service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.RabbitServiceMock")
+        .contentsAsUtf8String()
+        .contains("send()");
+    assertThat(compilation)
+        .generatedSourceFile("test.RabbitServiceMock")
+        .contentsAsUtf8String()
+        .doesNotContain("convert");
+    assertThat(compilation)
+        .generatedSourceFile("test.RabbitServiceMock")
+        .contentsAsUtf8String()
+        .doesNotContain("packagePrivate");
+  }
+
+  @Test
   public void shouldSkipVerifyDslWhenDisabled() {
     JavaFileObject service = JavaFileObjects.forSourceString("test.QuietService",
         "package test;\n" +
