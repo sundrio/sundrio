@@ -526,11 +526,7 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
-        .contains("Mockito.lenient()");
-    assertThat(compilation)
-        .generatedSourceFile("test.RepositoryServiceMock")
-        .contentsAsUtf8String()
-        .contains("FanOutStubbing.of(starters");
+        .contains("DoStubbing.ofAll(appliers)");
     assertThat(compilation)
         .generatedSourceFile("test.RepositoryServiceMock")
         .contentsAsUtf8String()
@@ -654,11 +650,7 @@ public class MockableProcessorTest {
     assertThat(compilation)
         .generatedSourceFile("test.ImageRepoMock")
         .contentsAsUtf8String()
-        .contains("private OngoingStubbing<String> stub0(boolean lenient) {");
-    assertThat(compilation)
-        .generatedSourceFile("test.ImageRepoMock")
-        .contentsAsUtf8String()
-        .doesNotContain("stub0(boolean lenient) throws");
+        .contains("private DoStubbing<String> stub() throws IOException {");
     assertThat(compilation)
         .generatedSourceFile("test.ImageRepoMock")
         .contentsAsUtf8String()

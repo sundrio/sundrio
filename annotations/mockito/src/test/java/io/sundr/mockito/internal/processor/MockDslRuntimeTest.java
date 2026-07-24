@@ -34,6 +34,7 @@ import javax.tools.JavaFileObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.stubbing.Answer;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
@@ -286,6 +287,77 @@ public class MockDslRuntimeTest {
     assertEquals("SHARED", render(mock, "A"));
     assertEquals("SHARED", render(mock, "A", "html"));
     assertNull(render(mock, "B"));
+  }
+
+  @Test
+  public void shouldPinAfterBroadAnswerWithoutInvokingPriorAnswer() {
+    JavaFileObject svc = JavaFileObjects.forSourceString("test.PropSvc",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface PropSvc<T> {\n" +
+            "  T getProperty(String name);\n" +
+            "}\n");
+
+    Compilation compilation = javac().withProcessors(new MockableProcessor()).compile(svc);
+    assertThat(compilation).succeeded();
+
+    ClassLoader loader = loaderOf(compilation);
+    Class<?> svcClass = loadFrom(loader, "test.PropSvc");
+    Class<?> svcMockClass = loadFrom(loader, "test.PropSvcMock");
+
+    Object mock = call(svcMockClass, null, "mock", types(), args());
+
+    Answer<Object> echo = invocation -> "ECHO:" + invocation.getArgument(0).toString();
+    Object broad = getPropertyStub(svcClass, svcMockClass, mock);
+    call(broad, "thenAnswer", types(Answer.class), args(echo));
+
+    Object pinned = getPropertyStub(svcClass, svcMockClass, mock);
+    call(pinned, "withName", types(String.class), args("X"));
+    call(pinned, "thenReturn", types(Object.class), args("PINNED"));
+
+    assertEquals("PINNED", call(svcClass, mock, "getProperty", types(String.class), args("X")));
+    assertEquals("ECHO:OTHER", call(svcClass, mock, "getProperty", types(String.class), args("OTHER")));
+  }
+
+  private static Object getPropertyStub(Class<?> svcClass, Class<?> svcMockClass, Object mock) {
+    Object handle = call(svcMockClass, null, "mock", types(svcClass), args(mock));
+    Object router = call(handle, "when", types(), args());
+    return call(router, "getProperty", types(), args());
+  }
+
+  @Test
+  public void shouldPinAfterBroadAnswerAcrossOverloadsWithoutInvokingPriorAnswer() {
+    JavaFileObject svc = JavaFileObjects.forSourceString("test.PropSvc2",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface PropSvc2<T> {\n" +
+            "  T getProperty(String name);\n" +
+            "  T getProperty(String name, String namespace);\n" +
+            "}\n");
+
+    Compilation compilation = javac().withProcessors(new MockableProcessor()).compile(svc);
+    assertThat(compilation).succeeded();
+
+    ClassLoader loader = loaderOf(compilation);
+    Class<?> svcClass = loadFrom(loader, "test.PropSvc2");
+    Class<?> svcMockClass = loadFrom(loader, "test.PropSvc2Mock");
+
+    Object mock = call(svcMockClass, null, "mock", types(), args());
+
+    Answer<Object> echo = invocation -> "ECHO:" + invocation.getArgument(0).toString();
+    Object broad = getPropertyStub(svcClass, svcMockClass, mock);
+    call(broad, "withName", types(String.class), args("X"));
+    call(broad, "thenAnswer", types(Answer.class), args(echo));
+
+    Object pinned = getPropertyStub(svcClass, svcMockClass, mock);
+    call(pinned, "withName", types(String.class), args("X"));
+    call(pinned, "andNoOtherArgs", types(), args());
+    call(pinned, "thenReturn", types(Object.class), args("PINNED"));
+
+    assertEquals("PINNED", call(svcClass, mock, "getProperty", types(String.class), args("X")));
+    assertEquals("ECHO:X", call(svcClass, mock, "getProperty", types(String.class, String.class), args("X", "ns")));
   }
 
   private static Object doStubOf(Object mock, String doFactory, Class<?>[] doTypes, Object[] doArgs, String method) {

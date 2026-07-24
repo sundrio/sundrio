@@ -89,9 +89,7 @@ public class AddStubClasses implements Visitor<TypeDefFluent<?>> {
         DslMethods.addVoidTerminals(builder, (doName, doArgs) -> Collections
             .singletonList(DslMethods.doStubbing(method, Constants.MOCKITO.call(doName, doArgs))), exceptions);
       } else {
-        DslMethods.addStubbingTerminals(builder, method.getReturnType(),
-            Collections.singletonList(new Return(Constants.MOCKITO.call("when", DslMethods.invocation(method)))),
-            exceptions);
+        DslMethods.addStubbingTerminals(builder, method, method.getReturnType(), exceptions);
       }
     } else {
       Collection<Argument> union = DslMethods.unionArguments(overloads);
