@@ -262,10 +262,31 @@ final class DslMethods {
         .endMethod();
   }
 
-  static void addStubbingTerminals(TypeDefBuilder builder, TypeRef returnType, List<Statement> stubBody,
+  /**
+   * Adds the non-void stubbing terminals of a single-overload builder. The private {@code stub()}
+   * returns a {@link io.sundr.mockito.DoStubbing} whose applier replays the answer sequence as
+   * {@code doXxx(...).when(mock).method(matchers)}. That form never invokes the mocked method, so
+   * registering a stubbing never fires a previously registered broad answer (avoiding the NPE the
+   * {@code when(mock.method(matchers))} form triggers) while keeping the fluent chaining surface.
+   */
+  static void addStubbingTerminals(TypeDefBuilder builder, Method method, TypeRef returnType,
+      List<ClassRef> exceptions) {
+    Statement stubReturn = new Return(Constants.DO_STUBBING.call("of", doApplier(method)));
+    addNonVoidTerminals(builder, returnType, Collections.singletonList(stubReturn), exceptions);
+  }
+
+  /**
+   * Adds the public {@code thenXxx} terminals and the private {@code stub()} of a non-void
+   * builder. Every terminal delegates to {@code this.stub().thenXxx(...)}; {@code stub()} returns
+   * a {@link io.sundr.mockito.DoStubbing} whose {@code doXxx(...).when(mock).method(matchers)}
+   * applier(s) never invoke the mocked method, so registering a stub never fires a prior broad
+   * answer, and consecutive answers chain by replaying the whole sequence through the do-family.
+   */
+  private static void addNonVoidTerminals(TypeDefBuilder builder, TypeRef returnType, List<Statement> stubBody,
       List<ClassRef> exceptions) {
     TypeRef boxed = Types.box(returnType);
     ClassRef ongoingRef = new ClassRefBuilder(Constants.ONGOING_STUBBING).withArguments(boxed).build();
+    ClassRef doStubbingRef = new ClassRefBuilder(Constants.DO_STUBBING).withArguments(boxed).build();
     ClassRef wildcardAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(new WildcardRef()).build();
     ClassRef typedAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(boxed).build();
 
@@ -329,13 +350,41 @@ final class DslMethods {
 
     builder.addNewMethod()
         .withNewModifiers().withPrivate().endModifiers()
-        .withReturnType(ongoingRef)
+        .withReturnType(doStubbingRef)
         .withName("stub")
         .withExceptions(exceptions)
         .withNewBlock()
         .withStatements(stubBody)
         .endBlock()
         .endMethod();
+  }
+
+  /**
+   * Builds the {@code stubber -> stubber.when(this.mock).method(matchers)} applier passed to
+   * {@link io.sundr.mockito.DoStubbing}; it registers the accumulated do-family stubber against
+   * the mocked method without ever invoking it. The applier runs as a {@code Consumer<Stubber>}
+   * whose {@code accept} cannot throw checked exceptions, yet the invocation names a method
+   * declared to throw. Registering a stub never actually invokes the method, so any declared
+   * checked exception is laundered into a {@code RuntimeException}, keeping the lambda legal.
+   */
+  private static Expression doApplier(Method method) {
+    return new Lambda(Constants.STUBBER, launderedApplierBody(method));
+  }
+
+  private static Statement launderedApplierBody(Method method) {
+    LocalVariable stubber = LocalVariable.newLocalVariable(Constants.STUBBER_TYPE, Constants.STUBBER);
+    Statement register = (Statement) stubber.call("when", This.ref(Constants.MOCK))
+        .call(method.getName(), resolveSlots(method));
+    if (method.getExceptions().isEmpty()) {
+      return register;
+    }
+    LocalVariable caught = LocalVariable.newLocalVariable(Constants.THROWABLE, "t");
+    Try tryCatch = new Try(
+        new Block(register),
+        Collections.singletonList(new Try.Catch(Property.newProperty(Constants.THROWABLE, "t"),
+            new Block(new Throw(new Construct(Constants.RUNTIME_EXCEPTION, caught))))),
+        Optional.empty());
+    return new Block(tryCatch);
   }
 
   static void addVoidTerminals(TypeDefBuilder builder, BiFunction<String, Expression[], List<Statement>> bodies,
@@ -391,110 +440,33 @@ final class DslMethods {
   }
 
   /**
-   * Adds the stubbing side of a shared builder: every overload matching the pinned
-   * arguments is stubbed, multi-matches leniently so strict stubbing does not flag the
-   * variants a test never exercises. Mockito forbids starting a stubbing while another is
-   * unfinished, so each terminal completes every overload's stubbing inline through the
-   * numbered private starters (an implementation detail invisible to the DSL surface),
-   * and chains span all matches via FanOutStubbing.
+   * Adds the stubbing side of a shared builder: every overload matching the pinned arguments is
+   * stubbed through the answer-first do-family, so registering a stub never invokes the mocked
+   * method and never fires a prior broad answer. The private {@code stub()} collects one applier
+   * per matched overload and hands them to {@link io.sundr.mockito.DoStubbing}, which fans the
+   * shared answer chain out to all of them, leniently when more than one matches so strict stubbing
+   * does not flag the variants a test never exercises.
    */
   static void addFanOutStubbing(TypeDefBuilder builder, List<Method> overloads, TypeRef returnType,
       List<ClassRef> exceptions) {
-    TypeRef boxed = Types.box(returnType);
-    ClassRef ongoingRef = new ClassRefBuilder(Constants.ONGOING_STUBBING).withArguments(boxed).build();
-    ClassRef answerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(boxed).build();
+    ClassRef stubberConsumerRef = new ClassRefBuilder(Constants.CONSUMER).withArguments(Constants.STUBBER_TYPE).build();
+    ClassRef listOfAppliers = new ClassRefBuilder(Constants.LIST).withArguments(stubberConsumerRef).build();
 
-    LocalVariable lenient = lenientVar();
-    for (int i = 0; i < overloads.size(); i++) {
-      Method method = overloads.get(i);
-      builder.addNewMethod()
-          .withNewModifiers().withPrivate().endModifiers()
-          .withReturnType(ongoingRef)
-          .withName("stub" + i)
-          .addNewArgument().withTypeRef(Types.PRIMITIVE_BOOLEAN_REF).withName("lenient").endArgument()
-          .withNewBlock()
-          .withStatements(launderedStubBody(method, lenient, exceptions))
-          .endBlock()
-          .endMethod();
-    }
-
-    ClassRef wildcardAnswerRef = new ClassRefBuilder(Constants.ANSWER).withArguments(new WildcardRef()).build();
-    LocalVariable value = LocalVariable.newLocalVariable(returnType, "value");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenReturn", "thenReturn", returnType, "value", value);
-    LocalVariable throwable = LocalVariable.newLocalVariable(Constants.THROWABLE, "throwable");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenThrow", "thenThrow", Constants.THROWABLE, "throwable",
-        throwable);
-    LocalVariable answer = LocalVariable.newLocalVariable(wildcardAnswerRef, "answer");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenAnswer", "thenAnswer", wildcardAnswerRef, "answer", answer);
-    LocalVariable typedAnswer = LocalVariable.newLocalVariable(answerRef, "answer");
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenAnswerTyped", "thenAnswer", answerRef, "answer", typedAnswer);
-    addFanOutTerminal(builder, overloads, ongoingRef, "thenCallRealMethod", "thenCallRealMethod", null, null, null);
-  }
-
-  /**
-   * Builds the body of a fan-out {@code stubN(lenient)} starter. The starter runs inside a
-   * {@code Supplier<OngoingStubbing<?>>} lambda whose {@code get()} cannot throw checked
-   * exceptions, yet the wrapped {@code Mockito.when(this.mock.method(...))} invokes a method
-   * declared to throw. Registering a stub never actually invokes the real method, so any
-   * declared checked exception is laundered into a {@code RuntimeException}, keeping the
-   * starter free of a {@code throws} clause and the enclosing lambda legal.
-   */
-  private static List<Statement> launderedStubBody(Method method, LocalVariable lenient, List<ClassRef> exceptions) {
-    Statement lenientReturn = new If(lenient,
-        new Block(new Return(Constants.MOCKITO.call("lenient").call("when", invocation(method)))));
-    Statement strictReturn = new Return(Constants.MOCKITO.call("when", invocation(method)));
-    if (exceptions.isEmpty()) {
-      List<Statement> statements = new ArrayList<>();
-      statements.add(lenientReturn);
-      statements.add(strictReturn);
-      return statements;
-    }
-
-    LocalVariable caught = LocalVariable.newLocalVariable(Constants.THROWABLE, "t");
-    Try tryCatch = new Try(
-        new Block(lenientReturn, strictReturn),
-        Collections.singletonList(new Try.Catch(Property.newProperty(Constants.THROWABLE, "t"),
-            new Block(new Throw(new Construct(Constants.RUNTIME_EXCEPTION, caught))))),
-        Optional.empty());
-    return Collections.singletonList(tryCatch);
-  }
-
-  private static void addFanOutTerminal(TypeDefBuilder builder, List<Method> overloads, ClassRef ongoingRef,
-      String name, String underlyingName, TypeRef argumentType, String argumentName, Expression argumentVar) {
-    ClassRef supplierRef = new ClassRefBuilder(Constants.SUPPLIER).withArguments(ongoingRef).build();
-    ClassRef listOfStarters = new ClassRefBuilder(Constants.LIST).withArguments(supplierRef).build();
     LocalVariable selected = selectedVar();
-    LocalVariable lenient = lenientVar();
-    LocalVariable starters = LocalVariable.newLocalVariable(listOfStarters, "starters");
-    LocalVariable stubbing = LocalVariable.newLocalVariable("stubbing");
+    LocalVariable appliers = LocalVariable.newLocalVariable(listOfAppliers, "appliers");
 
     List<Statement> statements = new ArrayList<>();
     statements.add(new Declare(selected, selectAllCall()));
-    statements.add(new Declare(lenient, new GreaterThan(selected.call("size"), ValueRef.from(1))));
-    statements.add(new Declare(starters,
-        new Construct(Constants.ARRAY_LIST, Collections.singletonList((TypeRef) supplierRef),
+    statements.add(new Declare(appliers,
+        new Construct(Constants.ARRAY_LIST, Collections.singletonList((TypeRef) stubberConsumerRef),
             Collections.emptyList())));
     for (int i = 0; i < overloads.size(); i++) {
-      Expression starter = new Lambda(Collections.emptyList(), (Expression) new This().call("stub" + i, lenient));
       statements.add(new If(selected.call("contains", ValueRef.from(i)),
-          new Block(starters.call("add", starter))));
+          new Block(appliers.call("add", doApplier(overloads.get(i))))));
     }
-    Expression step = new Lambda("stubbing",
-        (Expression) (argumentVar == null ? stubbing.call(underlyingName) : stubbing.call(underlyingName, argumentVar)));
-    statements.add(new Return(Constants.FAN_OUT_STUBBING.call("of", starters, step)));
+    statements.add(new Return(Constants.DO_STUBBING.call("ofAll", appliers)));
 
-    List<Argument> arguments = argumentType == null
-        ? Collections.emptyList()
-        : Collections.singletonList(Argument.newArgument(argumentType, argumentName));
-    builder.addNewMethod()
-        .withNewModifiers().withPublic().endModifiers()
-        .withReturnType(ongoingRef)
-        .withName(name)
-        .withArguments(arguments)
-        .withNewBlock()
-        .withStatements(statements)
-        .endBlock()
-        .endMethod();
+    addNonVoidTerminals(builder, returnType, statements, exceptions);
   }
 
   /**
@@ -705,14 +677,6 @@ final class DslMethods {
   static Statement verification(Method method, LocalVariable mode) {
     return Constants.MOCKITO.call("verify", This.ref(Constants.MOCK), mode).call(method.getName(),
         resolveSlots(method));
-  }
-
-  /**
-   * Builds {@code this.mock.method(slot.resolve(), ...)}; slots resolve left to right so
-   * Mockito registers one matcher per argument in parameter order.
-   */
-  static Expression invocation(Method method) {
-    return This.ref(Constants.MOCK).call(method.getName(), resolveSlots(method));
   }
 
   private static Expression[] resolveSlots(Method method) {

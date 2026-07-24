@@ -60,9 +60,11 @@ public final class Constants {
   public static final ClassRef LIST = ClassRef.forName("java.util.List");
   public static final ClassRef ARRAY_LIST = ClassRef.forName("java.util.ArrayList");
   public static final ClassRef SUPPLIER = ClassRef.forName("java.util.function.Supplier");
+  public static final ClassRef CONSUMER = ClassRef.forName("java.util.function.Consumer");
   public static final ClassRef ARG = ClassRef.forName("io.sundr.mockito.Arg");
   public static final ClassRef OVERLOAD_SELECTOR = ClassRef.forName("io.sundr.mockito.OverloadSelector");
   public static final ClassRef FAN_OUT_STUBBING = ClassRef.forName("io.sundr.mockito.FanOutStubbing");
+  public static final ClassRef DO_STUBBING = ClassRef.forName("io.sundr.mockito.DoStubbing");
 
   private static final Map<String, ClassRef> PRIMITIVE_ARGS = new HashMap<>();
 
