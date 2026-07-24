@@ -239,6 +239,43 @@ public class MockDslRuntimeTest {
   }
 
   @Test
+  public void shouldStubMethodReturningClassTypeVariable() {
+    JavaFileObject repo = JavaFileObjects.forSourceString("test.Repo",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface Repo<T extends CharSequence> {\n" +
+            "  T findById(String id);\n" +
+            "}\n");
+
+    Compilation compilation = javac().withProcessors(new MockableProcessor()).compile(repo);
+    assertThat(compilation).succeeded();
+
+    ClassLoader loader = loaderOf(compilation);
+    Class<?> repoClass = loadFrom(loader, "test.Repo");
+    Class<?> repoMockClass = loadFrom(loader, "test.RepoMock");
+
+    Object mock = call(repoMockClass, null, "mock", types(), args());
+    Object handle = call(repoMockClass, null, "mock", types(repoClass), args(mock));
+    Object router = call(handle, "when", types(), args());
+    Object stub = call(router, "findById", types(), args());
+    call(stub, "withId", types(String.class), args("a"));
+    call(stub, "thenReturn", types(CharSequence.class), args("MATCHED"));
+
+    Object result = call(repoClass, mock, "findById", types(String.class), args("a"));
+    assertEquals("MATCHED", result);
+    assertNull(call(repoClass, mock, "findById", types(String.class), args("b")));
+  }
+
+  private static Class<?> loadFrom(ClassLoader loader, String name) {
+    try {
+      return loader.loadClass(name);
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Test
   public void shouldFanOutAnswerFirstOverAllMatchingOverloads() {
     Object mock = mock();
 
