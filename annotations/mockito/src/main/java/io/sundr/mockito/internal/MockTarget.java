@@ -17,6 +17,7 @@
 package io.sundr.mockito.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,9 +26,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.sundr.model.Argument;
+import io.sundr.model.ArgumentBuilder;
 import io.sundr.model.ClassRef;
+import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Method;
+import io.sundr.model.MethodBuilder;
 import io.sundr.model.TypeDef;
+import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
 import io.sundr.utils.Strings;
@@ -45,11 +50,16 @@ public class MockTarget {
   private final boolean verification;
   private final Map<String, List<Method>> methodsByName = new LinkedHashMap<>();
   private final Map<String, String> skippedMethods = new LinkedHashMap<>();
+  private final Map<String, ClassRef> classTypeVarErasures = new LinkedHashMap<>();
 
   public MockTarget(TypeDef definition, String mockName, boolean verification) {
     this.definition = definition;
     this.mockName = mockName;
     this.verification = verification;
+    for (TypeParamDef parameter : definition.getParameters()) {
+      List<ClassRef> bounds = parameter.getBounds();
+      classTypeVarErasures.put(parameter.getName(), bounds.isEmpty() ? TypeDef.OBJECT_REF : bounds.get(0));
+    }
     index(definition);
   }
 
@@ -61,8 +71,17 @@ public class MockTarget {
     return verification;
   }
 
+  /**
+   * The reference to the mocked type used throughout the generated DSL. Type parameters are erased
+   * to the raw type: the generated mock class is not itself generic, and methods that use a type
+   * variable are not stubbable, so keeping {@code <T>} would only leave the type variable unresolved.
+   */
   public ClassRef getTargetRef() {
-    return definition.toInternalReference();
+    ClassRef ref = definition.toInternalReference();
+    if (ref.getArguments().isEmpty()) {
+      return ref;
+    }
+    return new ClassRefBuilder(ref).withArguments(Collections.emptyList()).build();
   }
 
   public String getMockName() {
@@ -156,7 +175,8 @@ public class MockTarget {
 
   private void index(TypeDef definition) {
     Map<String, List<Method>> grouped = definition.getMethods().stream()
-        .filter(MockTarget::isStubbable)
+        .filter(this::isStubbable)
+        .map(this::eraseClassTypeVariables)
         .collect(Collectors.groupingBy(Method::getName, LinkedHashMap::new, Collectors.toList()));
 
     for (Map.Entry<String, List<Method>> entry : grouped.entrySet()) {
@@ -194,7 +214,7 @@ public class MockTarget {
     return null;
   }
 
-  private static boolean isStubbable(Method method) {
+  private boolean isStubbable(Method method) {
     if (method.getModifiers().isStatic() || method.getModifiers().isPrivate() || method.getModifiers().isFinal()) {
       return false;
     }
@@ -204,23 +224,73 @@ public class MockTarget {
     if (!method.getParameters().isEmpty()) {
       return false;
     }
-    if (containsTypeVariable(method.getReturnType())) {
+    if (containsUnerasableTypeVariable(method.getReturnType())) {
       return false;
     }
     for (Argument argument : method.getArguments()) {
-      if (containsTypeVariable(argument.getTypeRef())) {
+      if (containsUnerasableTypeVariable(argument.getTypeRef())) {
         return false;
       }
     }
     return true;
   }
 
-  private static boolean containsTypeVariable(TypeRef type) {
+  /**
+   * A type variable is unerasable when it does not belong to the mocked type's own parameters:
+   * the class parameters are erased to their bounds, but a method-level variable (e.g. {@code <R>})
+   * has no single meaningful erasure and disqualifies the method.
+   */
+  private boolean containsUnerasableTypeVariable(TypeRef type) {
     if (type instanceof TypeParamRef) {
-      return true;
+      return !classTypeVarErasures.containsKey(((TypeParamRef) type).getName());
     }
     if (type instanceof ClassRef) {
-      return ((ClassRef) type).getArguments().stream().anyMatch(MockTarget::containsTypeVariable);
+      return ((ClassRef) type).getArguments().stream().anyMatch(this::containsUnerasableTypeVariable);
+    }
+    return false;
+  }
+
+  private Method eraseClassTypeVariables(Method method) {
+    List<Argument> erasedArguments = method.getArguments().stream()
+        .map(argument -> new ArgumentBuilder(argument).withTypeRef(erase(argument.getTypeRef())).build())
+        .collect(Collectors.toList());
+    return new MethodBuilder(method)
+        .withReturnType(erase(method.getReturnType()))
+        .withArguments(erasedArguments)
+        .build();
+  }
+
+  /**
+   * Erases the mocked type's own type variables: a bare class variable becomes its bound (or
+   * {@code Object}), and a class reference carrying a class variable among its arguments is erased
+   * to its raw form, matching the raw target type the generated mock references.
+   */
+  private TypeRef erase(TypeRef type) {
+    if (type instanceof TypeParamRef) {
+      TypeParamRef paramRef = (TypeParamRef) type;
+      ClassRef erasure = classTypeVarErasures.get(paramRef.getName());
+      if (erasure == null) {
+        return type;
+      }
+      return new ClassRefBuilder(erasure).withDimensions(paramRef.getDimensions()).build();
+    }
+    if (type instanceof ClassRef) {
+      ClassRef classRef = (ClassRef) type;
+      boolean carriesClassVariable = classRef.getArguments().stream()
+          .anyMatch(this::containsClassTypeVariable);
+      if (carriesClassVariable) {
+        return new ClassRefBuilder(classRef).withArguments(Collections.emptyList()).build();
+      }
+    }
+    return type;
+  }
+
+  private boolean containsClassTypeVariable(TypeRef type) {
+    if (type instanceof TypeParamRef) {
+      return classTypeVarErasures.containsKey(((TypeParamRef) type).getName());
+    }
+    if (type instanceof ClassRef) {
+      return ((ClassRef) type).getArguments().stream().anyMatch(this::containsClassTypeVariable);
     }
     return false;
   }

@@ -134,6 +134,92 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldEraseTypeParametersOfGenericMockableType() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.GenericService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface GenericService<T> {\n" +
+            "  String describe();\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.GenericServiceMock")
+        .contentsAsUtf8String()
+        .contains("private final GenericService mock");
+    assertThat(compilation)
+        .generatedSourceFile("test.GenericServiceMock")
+        .contentsAsUtf8String()
+        .contains("public static GenericService mock()");
+    assertThat(compilation)
+        .generatedSourceFile("test.GenericServiceMock")
+        .contentsAsUtf8String()
+        .doesNotContain("<T>");
+  }
+
+  @Test
+  public void shouldStubMethodsUsingClassOwnTypeVariable() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.Repo",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface Repo<T> {\n" +
+            "  T findById(String id);\n" +
+            "  java.util.List<T> findAll();\n" +
+            "  <R> R convert(R in);\n" +
+            "  void delete(String id);\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.RepoMock")
+        .contentsAsUtf8String()
+        .contains("public RepoMock.FindByIdStub findById()");
+    assertThat(compilation)
+        .generatedSourceFile("test.RepoMock")
+        .contentsAsUtf8String()
+        .contains("thenReturn(Object value)");
+    assertThat(compilation)
+        .generatedSourceFile("test.RepoMock")
+        .contentsAsUtf8String()
+        .contains("public RepoMock.FindAllStub findAll()");
+    assertThat(compilation)
+        .generatedSourceFile("test.RepoMock")
+        .contentsAsUtf8String()
+        .doesNotContain("convert");
+  }
+
+  @Test
+  public void shouldEraseBoundedClassTypeVariableToItsBound() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.BoundedRepo",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface BoundedRepo<T extends CharSequence> {\n" +
+            "  T findById(String id);\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.BoundedRepoMock")
+        .contentsAsUtf8String()
+        .contains("thenReturn(CharSequence value)");
+  }
+
+  @Test
   public void shouldUseTypedSlotsForPrimitiveArguments() {
     JavaFileObject service = JavaFileObjects.forSourceString("test.CounterService",
         "package test;\n" +
