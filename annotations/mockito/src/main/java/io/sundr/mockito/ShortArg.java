@@ -77,4 +77,26 @@ public final class ShortArg {
         return ArgumentMatchers.anyShort();
     }
   }
+
+  /**
+   * Tests whether a recorded invocation argument satisfies this slot's pin, used to select the
+   * invoked overload rather than to register a Mockito matcher.
+   *
+   * @param actual the recorded argument value.
+   * @return true when the slot is unpinned or the actual value satisfies the pin.
+   */
+  public boolean matches(Object actual) {
+    switch (kind) {
+      case EQ:
+        return java.util.Objects.equals(value, actual);
+      case MATCHING:
+        try {
+          return matcher.matches((Short) actual);
+        } catch (ClassCastException e) {
+          return false;
+        }
+      default:
+        return true;
+    }
+  }
 }

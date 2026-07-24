@@ -43,6 +43,7 @@ import io.sundr.model.If;
 import io.sundr.model.Kind;
 import io.sundr.model.Lambda;
 import io.sundr.model.LocalVariable;
+import io.sundr.model.LogicalAnd;
 import io.sundr.model.Method;
 import io.sundr.model.Property;
 import io.sundr.model.Return;
@@ -623,10 +624,39 @@ final class DslMethods {
       chain = new If(new Equals(selected, ValueRef.from(i)), new Block(branch.apply(overloads.get(i))), chain);
     }
     List<Statement> statements = new ArrayList<>();
-    statements.add(new Declare(selected,
-        This.ref(Constants.SELECTOR).call("selectOne", This.ref(Constants.PINNED), This.ref(Constants.EXACT))));
+    statements.add(new Declare(selected, selectOneInvokedCall(overloads)));
     statements.add(chain);
     return statements;
+  }
+
+  /**
+   * Builds {@code this.selector.selectOneInvoked(pinned, exact, this.mock, "method", matchers)}
+   * where {@code matchers} is one {@code Predicate<Object[]>} per overload, index-aligned with
+   * registration, testing whether a recorded invocation's arguments belong to that overload.
+   */
+  private static Expression selectOneInvokedCall(List<Method> overloads) {
+    Expression[] matchers = overloads.stream()
+        .map(DslMethods::overloadInvocationMatcher)
+        .toArray(Expression[]::new);
+    Expression matcherList = Constants.ARRAYS.call("asList", matchers);
+    return This.ref(Constants.SELECTOR).call("selectOneInvoked", This.ref(Constants.PINNED), This.ref(Constants.EXACT),
+        This.ref(Constants.MOCK), ValueRef.from(overloads.get(0).getName()), matcherList);
+  }
+
+  /**
+   * Builds {@code args -> args.length == n && this.slot0.matches(args[0]) && ...} for one overload:
+   * a recorded invocation belongs to the overload when its argument count matches and every pinned
+   * slot accepts the recorded value in that position.
+   */
+  private static Expression overloadInvocationMatcher(Method overload) {
+    LocalVariable args = LocalVariable.newLocalVariable(Constants.OBJECT_ARRAY, "args");
+    List<Argument> arguments = overload.getArguments();
+    Expression condition = new Equals(args.property("length"), ValueRef.from(arguments.size()));
+    for (int i = 0; i < arguments.size(); i++) {
+      Expression slotMatches = This.ref(slotName(arguments.get(i))).call("matches", args.index(i));
+      condition = new LogicalAnd(condition, slotMatches);
+    }
+    return new Lambda("args", condition);
   }
 
   private static LocalVariable selectedVar() {

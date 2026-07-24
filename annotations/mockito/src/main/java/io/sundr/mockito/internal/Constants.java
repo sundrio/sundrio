@@ -49,6 +49,8 @@ public final class Constants {
       .forName("org.mockito.verification.VerificationAfterDelay");
   public static final ClassRef IN_ORDER = ClassRef.forName("org.mockito.InOrder");
   public static final ClassRef OBJECT = ClassRef.forName("java.lang.Object");
+  public static final ClassRef OBJECT_ARRAY = ClassRef.forName("java.lang.Object").withDimensions(1);
+  public static final ClassRef ARRAYS = ClassRef.forName("java.util.Arrays");
   public static final ClassRef THROWABLE = ClassRef.forName("java.lang.Throwable");
   public static final ClassRef RUNTIME_EXCEPTION = ClassRef.forName("java.lang.RuntimeException");
   public static final ClassRef CLASS = ClassRef.forName("java.lang.Class");

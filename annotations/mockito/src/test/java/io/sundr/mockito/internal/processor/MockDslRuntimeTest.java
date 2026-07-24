@@ -175,15 +175,26 @@ public class MockDslRuntimeTest {
   }
 
   @Test
-  public void shouldRequireUnambiguousPinsForPositiveVerification() {
+  public void shouldThrowWhenPositiveVerificationMatchesTwoInvokedOverloads() {
     Object mock = mock();
     render(mock, "A");
+    render(mock, "A", "html");
 
     Object ambiguous = verifyOf(mock, "render");
     call(ambiguous, "withId", types(String.class), args("A"));
     IllegalStateException ambiguity = assertThrows(IllegalStateException.class,
         () -> call(ambiguous, "called", types(), args()));
     assertEquals(true, ambiguity.getMessage().contains("andNoOtherArgs"));
+  }
+
+  @Test
+  public void shouldAutoSelectTheInvokedOverloadForPositiveVerification() {
+    Object mock = mock();
+    render(mock, "A");
+
+    Object autoSelected = verifyOf(mock, "render");
+    call(autoSelected, "withId", types(String.class), args("A"));
+    call(autoSelected, "called", types(), args());
 
     Object precise = verifyOf(mock, "render");
     call(precise, "withId", types(String.class), args("A"));
@@ -193,6 +204,26 @@ public class MockDslRuntimeTest {
     Object never = verifyOf(mock, "render");
     call(never, "withId", types(String.class), args("Z"));
     call(never, "never", types(), args());
+
+    ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+    Object capturing = verifyOf(mock, "render");
+    call(capturing, "capturingId", types(ArgumentCaptor.class), args(captor));
+    call(capturing, "called", types(), args());
+    assertEquals("A", captor.getValue());
+  }
+
+  @Test
+  public void shouldAutoSelectTheInvokedOverloadWithoutAnyPins() {
+    Object mock = mock();
+    render(mock, "A", "html");
+
+    Object twoArg = verifyOf(mock, "render");
+    call(twoArg, "times", types(int.class), args(1));
+
+    Object oneArgNever = verifyOf(mock, "render");
+    call(oneArgNever, "withId", types(String.class), args("A"));
+    call(oneArgNever, "andNoOtherArgs", types(), args());
+    call(oneArgNever, "never", types(), args());
   }
 
   @Test
