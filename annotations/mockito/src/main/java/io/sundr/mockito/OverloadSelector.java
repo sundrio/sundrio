@@ -22,6 +22,10 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+
+import org.mockito.Mockito;
+import org.mockito.invocation.Invocation;
 
 /**
  * Matches overloads against the arguments pinned on a stubbing or verification builder.
@@ -80,10 +84,64 @@ public final class OverloadSelector {
   public int selectOne(Collection<String> pinned, boolean exact) {
     List<Integer> selected = selectAll(pinned, exact);
     if (selected.size() > 1) {
-      throw new IllegalStateException("The pinned arguments " + pinned + " match " + selected.size()
-          + " overloads of " + overloads
-          + "; pin more arguments, use a withXxxAny() pin or andNoOtherArgs() to disambiguate");
+      throw ambiguous(pinned, selected);
     }
     return selected.get(0);
+  }
+
+  /**
+   * Returns the single overload to target for a positive verification, auto-selecting by which
+   * overload was actually invoked when the pinned arguments alone match more than one.
+   * <p>
+   * When the pinned names match exactly one overload, that overload is returned unchanged. When
+   * they match several, the recorded invocations on the mock are inspected: an overload counts as
+   * invoked when at least one recorded invocation of {@code methodName} satisfies its matcher.
+   * Exactly one invoked overload is returned. If none was invoked, the first candidate is returned
+   * so native verification reports the missing invocation. If two or more distinct overloads were
+   * invoked, the positive count is genuinely ambiguous and an {@link IllegalStateException} is thrown.
+   *
+   * @param pinned the names pinned via {@code withXxx} methods.
+   * @param exact when true, only the overload whose parameters are exactly the pinned names matches.
+   * @param mock the mock the verification targets.
+   * @param methodName the mocked method name shared by the overloads.
+   * @param perOverloadMatchers a matcher per registered overload, index-aligned with registration,
+   *        testing whether a recorded invocation's arguments belong to that overload.
+   * @return the index of the overload to verify.
+   */
+  public int selectOneInvoked(Collection<String> pinned, boolean exact, Object mock, String methodName,
+      List<Predicate<Object[]>> perOverloadMatchers) {
+    List<Integer> candidates = selectAll(pinned, exact);
+    if (candidates.size() == 1) {
+      return candidates.get(0);
+    }
+
+    List<Invocation> recorded = new ArrayList<>(Mockito.mockingDetails(mock).getInvocations());
+    List<Integer> invoked = new ArrayList<>();
+    for (Integer candidate : candidates) {
+      Predicate<Object[]> matcher = perOverloadMatchers.get(candidate);
+      for (Invocation invocation : recorded) {
+        if (!invocation.getMethod().getName().equals(methodName)) {
+          continue;
+        }
+        if (matcher.test(invocation.getArguments())) {
+          invoked.add(candidate);
+          break;
+        }
+      }
+    }
+
+    if (invoked.size() == 1) {
+      return invoked.get(0);
+    }
+    if (invoked.isEmpty()) {
+      return candidates.get(0);
+    }
+    throw ambiguous(pinned, invoked);
+  }
+
+  private IllegalStateException ambiguous(Collection<String> pinned, List<Integer> matches) {
+    return new IllegalStateException("The pinned arguments " + pinned + " match " + matches.size()
+        + " overloads of " + overloads
+        + "; pin more arguments, use a withXxxAny() pin or andNoOtherArgs() to disambiguate");
   }
 }
