@@ -415,7 +415,7 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
             && isMatcherOwned(mi)) {
           consumedMatchers.add(name);
           String expected = text(mi.getArguments().get(0));
-          return ".with" + cap + "Matching(__s -> __s != null && __s." + name + "(" + expected + "))";
+          return ".with" + cap + MockitoNames.capitalize(name) + "(" + expected + ")";
         }
         if ("capture".equals(name) && mi.getSelect() != null) {
           return verify ? ".capturing" + cap + "(" + text(mi.getSelect()) + ")" : UNMAPPABLE;

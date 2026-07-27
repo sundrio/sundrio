@@ -17,6 +17,7 @@
 package io.sundr.mockito.internal.visitors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -45,6 +46,7 @@ import io.sundr.model.Lambda;
 import io.sundr.model.LocalVariable;
 import io.sundr.model.LogicalAnd;
 import io.sundr.model.Method;
+import io.sundr.model.NotEquals;
 import io.sundr.model.Property;
 import io.sundr.model.Return;
 import io.sundr.model.Statement;
@@ -209,7 +211,38 @@ final class DslMethods {
           .withArguments(Types.box(argumentType)).build();
       addFluentMethod(builder, selfRef, "with" + capitalized + "Matching", matcherRef, "matcher",
           This.ref(slot).call("matching", LocalVariable.newLocalVariable(matcherRef, "matcher")), slot, trackPinned);
+
+      if (Constants.STRING.equals(argumentType)) {
+        addStringPredicateWithers(builder, selfRef, capitalized, slot, trackPinned);
+      }
     }
+  }
+
+  private static final List<String> STRING_PREDICATES = Arrays.asList(
+      "Contains", "StartsWith", "EndsWith", "Matches");
+
+  /**
+   * Adds the string-predicate withers of a {@link String} argument: {@code withXxxContains},
+   * {@code withXxxStartsWith}, {@code withXxxEndsWith} and {@code withXxxMatches}. Each pins the slot
+   * to a null-safe matcher {@code s -> s != null && s.<predicate>(expected)}, giving the same reach
+   * as Mockito's {@code contains}/{@code startsWith}/{@code endsWith}/{@code matches} without the
+   * caller writing a lambda.
+   */
+  private static void addStringPredicateWithers(TypeDefBuilder builder, ClassRef selfRef, String capitalized,
+      String slot, boolean trackPinned) {
+    for (String predicate : STRING_PREDICATES) {
+      LocalVariable expected = LocalVariable.newLocalVariable(Constants.STRING, "expected");
+      LocalVariable candidate = LocalVariable.newLocalVariable(Constants.STRING, "s");
+      Expression predicateCall = candidate.call(predicateMethod(predicate), expected);
+      Expression body = new LogicalAnd(new NotEquals(candidate, ValueRef.NULL), predicateCall);
+      Statement slotStatement = This.ref(slot).call("matching", new Lambda("s", body));
+      addFluentMethod(builder, selfRef, "with" + capitalized + predicate, Constants.STRING, "expected",
+          slotStatement, slot, trackPinned);
+    }
+  }
+
+  private static String predicateMethod(String predicate) {
+    return Character.toLowerCase(predicate.charAt(0)) + predicate.substring(1);
   }
 
   /**

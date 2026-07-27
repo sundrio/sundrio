@@ -448,7 +448,7 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
   }
 
   @Test
-  void stringMatcherMapsToMatchingLambdaNotExactWither() {
+  void stringMatcherMapsToDedicatedStringWither() {
     rewriteRun(
         java(SERVICE),
         java(
@@ -466,8 +466,7 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "class T {\n" +
                 "  void t() {\n" +
                 "    TemplateService m = mock(TemplateService.class);\n" +
-                "    Mocks.mock(m).verify().find().withIdMatching(__s -> __s != null && __s.contains(\"lobby\")).called();\n"
-                +
+                "    Mocks.mock(m).verify().find().withIdContains(\"lobby\").called();\n" +
                 "  }\n" +
                 "}\n"));
   }
