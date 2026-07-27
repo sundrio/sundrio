@@ -103,9 +103,9 @@ class MigrateToMockitoAnnotationsTest implements RewriteTest {
                 "  }\n" +
                 "}\n",
             "package com.acme.x;\n" +
-                "import static org.mockito.Mockito.mock;\n\n" +
-                "import com.acme.Mocks;\n" +
+                "import static org.mockito.Mockito.mock;\n" +
                 "import com.acme.a.Foo;\n" +
+                "import com.acme.a.Mocks;\n" +
                 "import com.acme.b.Bar;\n\n" +
                 "class SomeTest {\n" +
                 "  void t() {\n" +
@@ -116,13 +116,12 @@ class MigrateToMockitoAnnotationsTest implements RewriteTest {
                 "  }\n" +
                 "}\n"),
         java(null,
-            "package com.acme;\n\n" +
+            "package com.acme.a;\n\n" +
                 "import io.sundr.mockito.annotations.Mockables;\n" +
-                "import com.acme.a.Foo;\n" +
                 "import com.acme.b.Bar;\n\n" +
                 "@Mockables({ Foo.class, Bar.class })\n" +
                 "public class MocksConfig {\n}\n",
-            spec -> spec.path("src/test/java/com/acme/MocksConfig.java")));
+            spec -> spec.path("src/test/java/com/acme/a/MocksConfig.java")));
   }
 
   /**

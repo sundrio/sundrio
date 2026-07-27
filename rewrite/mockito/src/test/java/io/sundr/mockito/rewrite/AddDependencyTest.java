@@ -31,20 +31,7 @@ class AddDependencyTest implements RewriteTest {
 
   @Override
   public void defaults(RecipeSpec spec) {
-    spec.recipeFromYaml(
-        "type: specs.openrewrite.org/v1beta/recipe\n" +
-            "name: io.sundr.mockito.rewrite.AddMockitoAnnotations\n" +
-            "displayName: Add mockito-annotations\n" +
-            "description: Adds the mockito-annotations test dependency.\n" +
-            "recipeList:\n" +
-            "  - org.openrewrite.maven.AddDependency:\n" +
-            "      groupId: io.sundr\n" +
-            "      artifactId: mockito-annotations\n" +
-            "      version: latest.release\n" +
-            "      scope: test\n" +
-            "      onlyIfUsing: org.mockito.Mockito\n" +
-            "      acceptTransitive: true\n",
-        "io.sundr.mockito.rewrite.AddMockitoAnnotations")
+    spec.recipe(new AddMockitoAnnotationsDependency())
         .parser(JavaParser.fromJavaVersion().classpath("mockito-core"))
         .afterTypeValidationOptions(TypeValidation.none());
   }
@@ -76,8 +63,64 @@ class AddDependencyTest implements RewriteTest {
                     "</project>\n",
                 spec -> spec.after(pom -> {
                   org.assertj.core.api.Assertions.assertThat(pom)
-                      .contains("mockito-annotations");
+                      .contains("mockito-annotations")
+                      .contains(AddMockitoAnnotationProcessorPath.FALLBACK_VERSION)
+                      .doesNotContain("latest.release");
                   return pom;
                 }))));
+  }
+
+  // The regression: a module mocks only through a @MockBean field (no literal Mockito type usage a
+  // plain onlyIfUsing would catch). The dependency must still be added, because the marker generator
+  // treats it as a mocking module. Marker and dependency share the same scan, so they agree.
+  @Test
+  void addsDependencyToModuleThatMocksViaMockBeanOnly() {
+    rewriteRun(
+        mavenProject("proj",
+            srcTestJava(
+                java("package org.springframework.boot.test.mock.mockito;\n" +
+                    "public @interface MockBean {}\n"),
+                java("package svc;\n" +
+                    "public interface TemplateService { String render(String id); }\n"),
+                java(
+                    "package com.acme.tests;\n" +
+                        "import org.springframework.boot.test.mock.mockito.MockBean;\n" +
+                        "import svc.TemplateService;\n" +
+                        "class SomeTest {\n" +
+                        "  @MockBean TemplateService svc;\n" +
+                        "}\n")),
+            pomXml(
+                "<project>\n" +
+                    "  <modelVersion>4.0.0</modelVersion>\n" +
+                    "  <groupId>com.example</groupId>\n" +
+                    "  <artifactId>proj</artifactId>\n" +
+                    "  <version>1.0</version>\n" +
+                    "</project>\n",
+                spec -> spec.after(pom -> {
+                  org.assertj.core.api.Assertions.assertThat(pom)
+                      .contains("mockito-annotations")
+                      .contains(AddMockitoAnnotationProcessorPath.FALLBACK_VERSION);
+                  return pom;
+                }))));
+  }
+
+  // A module with no mocks at all is left untouched: no marker, no dependency.
+  @Test
+  void leavesNonMockingModuleWithoutDependency() {
+    rewriteRun(
+        mavenProject("proj",
+            srcTestJava(
+                java(
+                    "package com.acme.tests;\n" +
+                        "class PlainTest {\n" +
+                        "  int add(int a, int b) { return a + b; }\n" +
+                        "}\n")),
+            pomXml(
+                "<project>\n" +
+                    "  <modelVersion>4.0.0</modelVersion>\n" +
+                    "  <groupId>com.example</groupId>\n" +
+                    "  <artifactId>proj</artifactId>\n" +
+                    "  <version>1.0</version>\n" +
+                    "</project>\n")));
   }
 }

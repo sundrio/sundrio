@@ -30,13 +30,8 @@ recipeList:
       scope: test
       onlyIfUsing: org.mockito.Mockito
       acceptTransitive: true
-  - org.openrewrite.maven.AddDependency:
-      groupId: io.sundr
-      artifactId: mockito-annotations
-      version: latest.release
-      scope: test
-      onlyIfUsing: org.mockito.Mockito
-      acceptTransitive: true
+  - io.sundr.mockito.rewrite.AddMockitoAnnotationsDependency
+  - io.sundr.mockito.rewrite.AddMockitoAnnotationProcessorPath
   - io.sundr.mockito.rewrite.GenerateMarker
   - io.sundr.mockito.rewrite.RewriteStubbingAndVerify
   - io.sundr.mockito.rewrite.RewriteDelegatedStatics
