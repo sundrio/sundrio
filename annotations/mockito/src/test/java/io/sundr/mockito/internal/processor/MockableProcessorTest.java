@@ -247,6 +247,34 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldGenerateStringPredicateWithersForStringArguments() {
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(TEMPLATE_SERVICE);
+
+    assertThat(compilation).succeeded();
+    for (String predicate : new String[] { "Contains", "StartsWith", "EndsWith", "Matches" }) {
+      assertThat(compilation)
+          .generatedSourceFile("test.TemplateServiceMock")
+          .contentsAsUtf8String()
+          .contains("public TemplateServiceMock.CreateStub withId" + predicate + "(String expected)");
+    }
+  }
+
+  @Test
+  public void shouldNotGenerateStringPredicateWithersForNonStringArguments() {
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(TEMPLATE_SERVICE);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.TemplateServiceMock")
+        .contentsAsUtf8String()
+        .doesNotContain("withOverwriteContains");
+  }
+
+  @Test
   public void shouldStubMethodDeclaringItsOwnTypeVariable() {
     JavaFileObject service = JavaFileObjects.forSourceString("test.Adapter",
         "package test;\n" +
