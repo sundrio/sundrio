@@ -411,6 +411,12 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
           consumedMatchers.add(name);
           return ".with" + cap + "Matching(" + text(matcher) + ")";
         }
+        if (MockitoNames.STRING_MATCHERS.contains(name) && mi.getArguments().size() == 1
+            && isMatcherOwned(mi)) {
+          consumedMatchers.add(name);
+          String expected = text(mi.getArguments().get(0));
+          return ".with" + cap + "Matching(__s -> __s != null && __s." + name + "(" + expected + "))";
+        }
         if ("capture".equals(name) && mi.getSelect() != null) {
           return verify ? ".capturing" + cap + "(" + text(mi.getSelect()) + ")" : UNMAPPABLE;
         }
@@ -453,6 +459,20 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
       JavaType.Method mt = mi.getMethodType();
       return mt != null && mt.getDeclaringType() != null
           && MockitoNames.MOCKITO.equals(mt.getDeclaringType().getFullyQualifiedName());
+    }
+
+    /**
+     * Whether the invocation is a Mockito argument matcher, declared on either {@code Mockito} or
+     * {@code ArgumentMatchers}. Guards the string-matcher mapping so a user method that merely shares
+     * a name (e.g. a domain {@code contains(...)}) is never rewritten into a matcher lambda.
+     */
+    private boolean isMatcherOwned(J.MethodInvocation mi) {
+      JavaType.Method mt = mi.getMethodType();
+      if (mt == null || mt.getDeclaringType() == null) {
+        return false;
+      }
+      String owner = mt.getDeclaringType().getFullyQualifiedName();
+      return MockitoNames.MOCKITO.equals(owner) || MockitoNames.ARGUMENT_MATCHERS.equals(owner);
     }
 
     private String renderArgs(List<Expression> args) {

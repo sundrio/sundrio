@@ -66,6 +66,13 @@ final class MockitoNames {
       "argThat", "intThat", "longThat", "doubleThat", "floatThat", "shortThat", "byteThat",
       "charThat", "booleanThat");
 
+  /**
+   * String matchers that take a single argument and constrain the value by a {@link String}
+   * predicate. They produce a Mockito matcher (returning a null placeholder), so they cannot be
+   * passed to an exact-value wither; each maps to an equivalent {@code ArgumentMatcher} lambda.
+   */
+  static final Set<String> STRING_MATCHERS = Set.of("contains", "startsWith", "endsWith", "matches");
+
   private MockitoNames() {
   }
 
