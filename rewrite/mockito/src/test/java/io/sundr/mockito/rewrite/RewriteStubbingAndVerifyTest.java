@@ -448,6 +448,31 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
   }
 
   @Test
+  void stringMatcherMapsToMatchingLambdaNotExactWither() {
+    rewriteRun(
+        java(SERVICE),
+        java(
+            "import static org.mockito.Mockito.*;\n" +
+                "import svc.TemplateService;\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    TemplateService m = mock(TemplateService.class);\n" +
+                "    verify(m).find(contains(\"lobby\"));\n" +
+                "  }\n" +
+                "}\n",
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    TemplateService m = mock(TemplateService.class);\n" +
+                "    Mocks.mock(m).verify().find().withIdMatching(__s -> __s != null && __s.contains(\"lobby\")).called();\n"
+                +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
   void verifyResultAssignedToVariableDropsTheLeftHandSide() {
     rewriteRun(
         java(SERVICE),
