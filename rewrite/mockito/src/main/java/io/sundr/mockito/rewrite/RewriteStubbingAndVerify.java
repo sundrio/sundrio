@@ -222,7 +222,7 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
       }
       String args = renderArgs(mi.getArguments());
       String text = "Mocks.mock(" + receiver + ").when()." + invoked.getSimpleName() + "()"
-          + String.join("", withers) + "." + terminal + "(" + args + ")";
+          + String.join("", withers) + arityLock(invoked) + "." + terminal + "(" + args + ")";
       return Rewrite.of(text);
     }
 
@@ -264,7 +264,7 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
       }
       String value = renderArgs(doCall.getArguments());
       String text = "Mocks." + doCall.getSimpleName() + "(" + value + ").when(" + receiver + ")."
-          + mi.getSimpleName() + "()" + String.join("", withers) + ".done()";
+          + mi.getSimpleName() + "()" + String.join("", withers) + arityLock(mi) + ".done()";
       return Rewrite.of(text);
     }
 
@@ -303,8 +303,17 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
         }
       }
       String text = "Mocks.mock(" + receiver + ").verify()." + mi.getSimpleName() + "()"
-          + String.join("", withers) + "." + terminal;
+          + String.join("", withers) + arityLock(mi) + "." + terminal;
       return Rewrite.ofVoid(text);
+    }
+
+    /**
+     * The {@code .andNoOtherArgs()} refiner when the invoked overload is ambiguous by pinned
+     * arguments alone (a longer same-name overload exists), or an empty string otherwise.
+     */
+    private String arityLock(J.MethodInvocation invoked) {
+      JavaType.Method mt = invoked.getMethodType();
+      return mt != null && needsArityLock(mt) ? ".andNoOtherArgs()" : "";
     }
 
     private String verificationTerminal(Expression mode) {
@@ -389,6 +398,33 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
         }
       }
       return sameName > 1;
+    }
+
+    /**
+     * Whether the pinned arguments alone leave the invoked overload ambiguous, so the migrated chain
+     * must append {@code andNoOtherArgs()} to lock it to this arity. This happens when a shorter
+     * overload's parameter list is a prefix of a longer one: pinning only the shared leading
+     * arguments (as {@code verify(m).f(any(), any())} on the shorter form does) matches both. The
+     * compiler already resolved {@code mt} to the shorter overload by arity; without the lock the
+     * runtime selector cannot recover that.
+     */
+    private boolean needsArityLock(JavaType.Method mt) {
+      JavaType.FullyQualified declaring = mt.getDeclaringType();
+      if (declaring == null) {
+        return false;
+      }
+      List<String> thisParams = mt.getParameterNames();
+      for (JavaType.Method candidate : declaring.getMethods()) {
+        if (candidate == mt || !candidate.getName().equals(mt.getName())) {
+          continue;
+        }
+        List<String> candidateParams = candidate.getParameterNames();
+        if (candidateParams.size() > thisParams.size()
+            && candidateParams.subList(0, thisParams.size()).equals(thisParams)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     private String mapArgument(Expression arg, String cap, boolean verify, boolean overloaded) {
