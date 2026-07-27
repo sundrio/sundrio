@@ -54,6 +54,12 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
       "  void exec(Integer code, String op, boolean force);\n" +
       "}\n";
 
+  private static final String PREFIX_OVERLOAD_SERVICE = "package svc;\n" +
+      "public interface Svc {\n" +
+      "  void create(String templateId, String stackName);\n" +
+      "  void create(String templateId, String stackName, boolean prefetched, String requestId);\n" +
+      "}\n";
+
   @Test
   void noArgMethodWithThrowsMigrates() {
     rewriteRun(
@@ -550,6 +556,56 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
                 "  void t() {\n" +
                 "    Svc m = mock(Svc.class);\n" +
                 "    Mocks.mock(m).verify().exec().withIdAny().withOpAny().called();\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void verifyOnShorterPrefixOverloadLocksArity() {
+    rewriteRun(
+        java(PREFIX_OVERLOAD_SERVICE),
+        java(
+            "import static org.mockito.Mockito.*;\n" +
+                "import svc.Svc;\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    verify(m).create(any(), any());\n" +
+                "  }\n" +
+                "}\n",
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.Svc;\n\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    Mocks.mock(m).verify().create().withTemplateIdAny().withStackNameAny().andNoOtherArgs().called();\n"
+                +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
+  void verifyOnLongerPrefixOverloadDoesNotLockArity() {
+    rewriteRun(
+        java(PREFIX_OVERLOAD_SERVICE),
+        java(
+            "import static org.mockito.Mockito.*;\n" +
+                "import svc.Svc;\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    verify(m).create(any(), any(), anyBoolean(), any());\n" +
+                "  }\n" +
+                "}\n",
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.Svc;\n\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    Svc m = mock(Svc.class);\n" +
+                "    Mocks.mock(m).verify().create().withTemplateIdAny().withStackNameAny().withPrefetchedAny().withRequestIdAny().called();\n"
+                +
                 "  }\n" +
                 "}\n"));
   }
