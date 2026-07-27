@@ -16,9 +16,7 @@
 
 package io.sundr.mockito.rewrite;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -43,14 +41,47 @@ final class MarkerPackages {
   }
 
   /**
-   * The shared state accumulated while scanning all sources: every type used as a mock, and the
-   * package of every existing {@code @Mockables}-annotated marker class (the aggregator lives in the
-   * marker's package). The rewriters and the marker generator all populate and read this so they
-   * agree on the single aggregator location.
+   * The per-module mocked types and existing marker packages accumulated while scanning. Each
+   * module gets its own {@code @Mockables} marker (and hence its own {@code Mocks} aggregator), so
+   * the mocked types and any hand-written marker package are tracked separately per module rather
+   * than globally.
    */
-  static final class Scan {
+  static final class Module {
     final TreeSet<String> mockTypes = new TreeSet<>();
     final TreeSet<String> markerPackages = new TreeSet<>();
+  }
+
+  /**
+   * The shared state accumulated while scanning all sources, partitioned by module base directory
+   * (see {@link #moduleBaseDir}). The marker generator emits one marker per module at the module's
+   * least-common-denominator package, and the rewriters resolve each call site's {@code Mocks}
+   * aggregator from the module the call site belongs to.
+   */
+  static final class Scan {
+    final java.util.Map<String, Module> modules = new java.util.TreeMap<>();
+
+    Module module(String baseDir) {
+      return modules.computeIfAbsent(baseDir, k -> new Module());
+    }
+  }
+
+  /**
+   * The module base directory of a test source path, i.e. everything preceding {@code src/test/java}
+   * (empty for a single-module project rooted at the reactor). In a multi-module reactor OpenRewrite
+   * paths are reactor-root relative, so the generated marker must be written under the same module
+   * the mocks were found in, not at the root.
+   *
+   * @param sourcePath a test source path, reactor-root relative.
+   * @return the module base dir with a trailing slash, or an empty string when the path is already
+   *         at {@code src/test/java} with no module prefix or is not a test source.
+   */
+  static String moduleBaseDir(java.nio.file.Path sourcePath) {
+    String normalized = sourcePath.toString().replace('\\', '/');
+    int idx = normalized.indexOf("src/test/java/");
+    if (idx <= 0) {
+      return "";
+    }
+    return normalized.substring(0, idx);
   }
 
   /**
@@ -138,30 +169,28 @@ final class MarkerPackages {
    * marker generator and the rewriters observe the same existing markers and mocked types.
    */
   static JavaIsoVisitor<org.openrewrite.ExecutionContext> scanner(Scan scan) {
-    JavaIsoVisitor<org.openrewrite.ExecutionContext> collector = collector(scan.mockTypes);
     return new JavaIsoVisitor<org.openrewrite.ExecutionContext>() {
+
+      @Override
+      public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu,
+          org.openrewrite.ExecutionContext ctx) {
+        String baseDir = moduleBaseDir(cu.getSourcePath());
+        TreeSet<String> typesHere = new TreeSet<>();
+        collector(typesHere).visit(cu, ctx);
+        if (!typesHere.isEmpty()) {
+          scan.module(baseDir).mockTypes.addAll(typesHere);
+        }
+        return super.visitCompilationUnit(cu, ctx);
+      }
 
       @Override
       public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl,
           org.openrewrite.ExecutionContext ctx) {
         if (classDecl.getType() != null && hasMockablesAnnotation(classDecl)) {
-          scan.markerPackages.add(packageOf(classDecl.getType().getFullyQualifiedName()));
+          String baseDir = moduleBaseDir(getCursor().firstEnclosing(J.CompilationUnit.class).getSourcePath());
+          scan.module(baseDir).markerPackages.add(packageOf(classDecl.getType().getFullyQualifiedName()));
         }
         return super.visitClassDeclaration(classDecl, ctx);
-      }
-
-      @Override
-      public J.VariableDeclarations visitVariableDeclarations(J.VariableDeclarations multiVariable,
-          org.openrewrite.ExecutionContext ctx) {
-        collector.visitVariableDeclarations(multiVariable, ctx);
-        return super.visitVariableDeclarations(multiVariable, ctx);
-      }
-
-      @Override
-      public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method,
-          org.openrewrite.ExecutionContext ctx) {
-        collector.visitMethodInvocation(method, ctx);
-        return super.visitMethodInvocation(method, ctx);
       }
     };
   }
@@ -191,19 +220,27 @@ final class MarkerPackages {
   }
 
   /**
-   * The package the {@code Mocks} aggregator lives in, resolved from the shared {@link Scan} in this
-   * priority order: (1) the package of an existing {@code @Mockables}-annotated marker if one was
-   * found anywhere in the sources, because the aggregator is generated into the marker's package;
-   * (2) otherwise the least-common-denominator package of the mocked types, which is where
-   * {@link GenerateMarker} will create a fresh marker. Returns {@code null} when neither a marker nor
-   * a mocked type was found so callers can skip adding an import that would point nowhere. When more
-   * than one marker exists the first in sorted order is chosen deterministically.
+   * The package the {@code Mocks} aggregator lives in for the module owning {@code baseDir}, resolved
+   * in this priority order: (1) the package of an existing {@code @Mockables}-annotated marker in
+   * that module if one exists, because the aggregator is generated into the marker's package;
+   * (2) otherwise the least-common-denominator package of that module's mocked types, which is where
+   * {@link GenerateMarker} will create a fresh marker. Returns {@code null} when the module has
+   * neither a marker nor a mocked type so callers can skip an import that would point nowhere. When
+   * more than one marker exists in the module the first in sorted order is chosen deterministically.
+   *
+   * @param scan the accumulated scan.
+   * @param baseDir the module base directory of the call site being rewritten.
+   * @return the aggregator package for that module, or {@code null}.
    */
-  static String aggregatorPackage(Scan scan) {
-    if (!scan.markerPackages.isEmpty()) {
-      return scan.markerPackages.first();
+  static String aggregatorPackage(Scan scan, String baseDir) {
+    Module module = scan.modules.get(baseDir);
+    if (module == null) {
+      return null;
     }
-    return aggregatorPackage(scan.mockTypes);
+    if (!module.markerPackages.isEmpty()) {
+      return module.markerPackages.first();
+    }
+    return aggregatorPackage(module.mockTypes);
   }
 
   /**
@@ -216,35 +253,33 @@ final class MarkerPackages {
     if (mockTypes.isEmpty()) {
       return null;
     }
-    return leastCommonPackage(mockTypes);
+    return markerPackage(mockTypes);
   }
 
-  static String leastCommonPackage(Collection<String> types) {
-    List<String> packages = new ArrayList<>();
+  /**
+   * The concrete package the marker (and {@code Mocks} aggregator) is placed in for a set of mocked
+   * types: the package the most mocked types belong to. A common prefix would collapse to the empty
+   * (default) package when the types live in unrelated package trees, so instead the modal package
+   * is chosen, which always names a real package that already holds mocked types. Ties are broken by
+   * natural package-name order for determinism.
+   *
+   * @param types the fully qualified names of the mocked types.
+   * @return the package holding the most mocked types, never empty when {@code types} is non-empty.
+   */
+  static String markerPackage(Collection<String> types) {
+    java.util.Map<String, Integer> counts = new java.util.TreeMap<>();
     for (String fqn : types) {
-      packages.add(packageOf(fqn));
+      counts.merge(packageOf(fqn), 1, Integer::sum);
     }
-    if (packages.isEmpty()) {
-      return "";
-    }
-    String[] first = packages.get(0).split("\\.");
-    int common = first.length;
-    for (String p : packages) {
-      String[] parts = p.split("\\.");
-      int i = 0;
-      while (i < common && i < parts.length && parts[i].equals(first[i])) {
-        i++;
+    String best = "";
+    int bestCount = -1;
+    for (java.util.Map.Entry<String, Integer> entry : counts.entrySet()) {
+      if (entry.getValue() > bestCount) {
+        best = entry.getKey();
+        bestCount = entry.getValue();
       }
-      common = i;
     }
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < common; i++) {
-      if (i > 0) {
-        sb.append('.');
-      }
-      sb.append(first[i]);
-    }
-    return sb.toString();
+    return best;
   }
 
   static String packageOf(String fqn) {

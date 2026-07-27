@@ -67,8 +67,16 @@ public class RewriteDelegatedStatics extends ScanningRecipe<RewriteDelegatedStat
 
   @Override
   public TreeVisitor<?, ExecutionContext> getVisitor(Accumulator acc) {
-    String aggregatorPackage = MarkerPackages.aggregatorPackage(acc.scan);
     return new JavaIsoVisitor<ExecutionContext>() {
+      private String aggregatorPackage;
+
+      @Override
+      public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext ctx) {
+        aggregatorPackage = MarkerPackages.aggregatorPackage(acc.scan,
+            MarkerPackages.moduleBaseDir(cu.getSourcePath()));
+        return super.visitCompilationUnit(cu, ctx);
+      }
+
       @Override
       public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
         J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);

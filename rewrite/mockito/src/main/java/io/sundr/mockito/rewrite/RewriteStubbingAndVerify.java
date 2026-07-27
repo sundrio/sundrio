@@ -74,7 +74,7 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
 
   @Override
   public TreeVisitor<?, ExecutionContext> getVisitor(Accumulator acc) {
-    return new Visitor(MarkerPackages.aggregatorPackage(acc.scan));
+    return new Visitor(acc.scan);
   }
 
   private static final Set<String> DO_FAMILY = Set.of(
@@ -82,18 +82,20 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
 
   private static final class Visitor extends JavaIsoVisitor<ExecutionContext> {
 
-    private final String aggregatorPackage;
+    private final MarkerPackages.Scan scan;
+    private String aggregatorPackage;
     private Cursor cuCursor;
     private final Set<String> consumedMatchers = new java.util.HashSet<>();
     private String mapFailureReason;
 
-    Visitor(String aggregatorPackage) {
-      this.aggregatorPackage = aggregatorPackage;
+    Visitor(MarkerPackages.Scan scan) {
+      this.scan = scan;
     }
 
     @Override
     public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext ctx) {
       cuCursor = new Cursor(null, cu);
+      aggregatorPackage = MarkerPackages.aggregatorPackage(scan, MarkerPackages.moduleBaseDir(cu.getSourcePath()));
       return super.visitCompilationUnit(cu, ctx);
     }
 
