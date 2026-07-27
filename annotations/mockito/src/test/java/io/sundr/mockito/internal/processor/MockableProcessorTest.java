@@ -275,6 +275,63 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldStubUserMethodSharingAnObjectMethodName() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.PageService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface PageService {\n" +
+            "  String clone(String id);\n" +
+            "  boolean equals(String a, String b);\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.PageServiceMock")
+        .contentsAsUtf8String()
+        .contains("public PageServiceMock.CloneStub clone()");
+    assertThat(compilation)
+        .generatedSourceFile("test.PageServiceMock")
+        .contentsAsUtf8String()
+        .contains("public PageServiceMock.EqualsStub equals()");
+  }
+
+  @Test
+  public void shouldSkipTheRealObjectMethods() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.Widget",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface Widget {\n" +
+            "  String describe();\n" +
+            "  boolean equals(Object other);\n" +
+            "  int hashCode();\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation)
+        .generatedSourceFile("test.WidgetMock")
+        .contentsAsUtf8String()
+        .contains("describe()");
+    assertThat(compilation)
+        .generatedSourceFile("test.WidgetMock")
+        .contentsAsUtf8String()
+        .doesNotContain("EqualsStub");
+    assertThat(compilation)
+        .generatedSourceFile("test.WidgetMock")
+        .contentsAsUtf8String()
+        .doesNotContain("HashCodeStub");
+  }
+
+  @Test
   public void shouldStubMethodDeclaringItsOwnTypeVariable() {
     JavaFileObject service = JavaFileObjects.forSourceString("test.Adapter",
         "package test;\n" +
