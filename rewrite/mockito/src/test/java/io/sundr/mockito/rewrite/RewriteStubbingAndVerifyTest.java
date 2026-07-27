@@ -448,6 +448,30 @@ class RewriteStubbingAndVerifyTest implements RewriteTest {
   }
 
   @Test
+  void verifyResultAssignedToVariableDropsTheLeftHandSide() {
+    rewriteRun(
+        java(SERVICE),
+        java(
+            "import static org.mockito.Mockito.*;\n" +
+                "import svc.TemplateService;\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    TemplateService m = mock(TemplateService.class);\n" +
+                "    String result = verify(m).find(\"ID\");\n" +
+                "  }\n" +
+                "}\n",
+            "import static org.mockito.Mockito.mock;\n\n" +
+                "import svc.Mocks;\n" +
+                "import svc.TemplateService;\n\n" +
+                "class T {\n" +
+                "  void t() {\n" +
+                "    TemplateService m = mock(TemplateService.class);\n" +
+                "    Mocks.mock(m).verify().find().withId(\"ID\").called();\n" +
+                "  }\n" +
+                "}\n"));
+  }
+
+  @Test
   void crossPackageCallSiteGainsAggregatorImport() {
     rewriteRun(
         java("package com.acme.a;\n" +

@@ -129,6 +129,12 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
         markTodo(rewrite.reason);
         return mi;
       }
+      if (rewrite.voidTerminal) {
+        J.VariableDeclarations enclosingDecl = initializerDeclaration(mi);
+        if (enclosingDecl != null) {
+          doAfterVisit(new DropInitializerVisitor(enclosingDecl));
+        }
+      }
       J.MethodInvocation replaced = JavaTemplate.builder(rewrite.text)
           .contextSensitive()
           .build()
@@ -136,6 +142,21 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
       removeNowUnusedImports(rootStatic);
       maybeAddAggregatorImport();
       return replaced.withPrefix(mi.getPrefix());
+    }
+
+    /**
+     * The variable declaration whose sole initializer is {@code mi}, or {@code null} if {@code mi}
+     * is not a variable initializer. A verify chain rewrites to a {@code void} terminal, so an
+     * assignment of the original Mockito verify result (which returned the method's type) must lose
+     * its left-hand side rather than assign {@code void}.
+     */
+    private J.VariableDeclarations initializerDeclaration(J.MethodInvocation mi) {
+      J.VariableDeclarations decl = getCursor().firstEnclosing(J.VariableDeclarations.class);
+      if (decl == null || decl.getVariables().size() != 1) {
+        return null;
+      }
+      Expression initializer = decl.getVariables().get(0).getInitializer();
+      return initializer != null && initializer.getId().equals(mi.getId()) ? decl : null;
     }
 
     /**
@@ -283,7 +304,7 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
       }
       String text = "Mocks.mock(" + receiver + ").verify()." + mi.getSimpleName() + "()"
           + String.join("", withers) + "." + terminal;
-      return Rewrite.of(text);
+      return Rewrite.ofVoid(text);
     }
 
     private String verificationTerminal(Expression mode) {
@@ -445,6 +466,36 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
 
   private static final String UNMAPPABLE = "<unmappable>";
 
+  /**
+   * Drops the left-hand side of a variable declaration, leaving only its initializer as an
+   * expression statement. Used when a verify chain whose Mockito form returned the method's type is
+   * rewritten to a {@code void} terminal: {@code Type x = Mockito.verify(m).f();} becomes
+   * {@code Mocks.mock(m).verify().f().called();}. The initializer is preserved verbatim (it has
+   * already been rewritten by the enclosing visitor), only the declaration is unwrapped.
+   */
+  private static final class DropInitializerVisitor extends JavaIsoVisitor<ExecutionContext> {
+    private final J.VariableDeclarations target;
+
+    DropInitializerVisitor(J.VariableDeclarations target) {
+      this.target = target;
+    }
+
+    @Override
+    public J.Block visitBlock(J.Block block, ExecutionContext ctx) {
+      J.Block b = super.visitBlock(block, ctx);
+      return b.withStatements(org.openrewrite.internal.ListUtils.map(b.getStatements(), statement -> {
+        if (!(statement instanceof J.VariableDeclarations) || !statement.getId().equals(target.getId())) {
+          return statement;
+        }
+        Expression initializer = ((J.VariableDeclarations) statement).getVariables().get(0).getInitializer();
+        if (!(initializer instanceof Statement)) {
+          return statement;
+        }
+        return ((Statement) initializer).withPrefix(statement.getPrefix());
+      }));
+    }
+  }
+
   /** Attaches a manual-migration TODO comment, explaining the reason, to a statement's prefix. */
   private static final class TodoCommentVisitor extends JavaIsoVisitor<ExecutionContext> {
     private final Statement target;
@@ -495,19 +546,25 @@ public class RewriteStubbingAndVerify extends ScanningRecipe<RewriteStubbingAndV
     final String text;
     final boolean unmappable;
     final String reason;
+    final boolean voidTerminal;
 
-    private Rewrite(String text, boolean unmappable, String reason) {
+    private Rewrite(String text, boolean unmappable, String reason, boolean voidTerminal) {
       this.text = text;
       this.unmappable = unmappable;
       this.reason = reason;
+      this.voidTerminal = voidTerminal;
     }
 
     static Rewrite of(String text) {
-      return new Rewrite(text, false, null);
+      return new Rewrite(text, false, null, false);
+    }
+
+    static Rewrite ofVoid(String text) {
+      return new Rewrite(text, false, null, true);
     }
 
     static Rewrite unmappable(String reason) {
-      return new Rewrite(null, true, reason);
+      return new Rewrite(null, true, reason, false);
     }
   }
 }
