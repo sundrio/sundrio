@@ -16,6 +16,7 @@
 
 package io.sundr.mockito.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import io.sundr.model.TypeDef;
 import io.sundr.model.TypeParamDef;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeRef;
+import io.sundr.model.functions.GetDefinition;
 import io.sundr.utils.Strings;
 
 /**
@@ -174,7 +176,7 @@ public class MockTarget {
   }
 
   private void index(TypeDef definition) {
-    Map<String, List<Method>> grouped = definition.getMethods().stream()
+    Map<String, List<Method>> grouped = collectMethods(definition).stream()
         .filter(this::isStubbable)
         .map(this::eraseTypeVariables)
         .collect(Collectors.groupingBy(Method::getName, LinkedHashMap::new, Collectors.toList()));
@@ -187,6 +189,108 @@ public class MockTarget {
         skippedMethods.put(entry.getKey(), issue);
       }
     }
+  }
+
+  /**
+   * Collects the target's own methods together with every method inherited from a supertype,
+   * substituting each supertype's type variables with the arguments the target binds them to (for
+   * example {@code CrudRepo<Domain, String>} turns an inherited {@code List<T> findAll(List<ID>)}
+   * into {@code List<Domain> findAll(List<String>)}). The source adapter only reports directly
+   * declared methods, so without this an interface that inherits its whole surface (a Spring Data
+   * repository, say) would generate an empty DSL. Methods overridden lower in the hierarchy win, and
+   * {@link Object} is not traversed.
+   */
+  private List<Method> collectMethods(TypeDef definition) {
+    Map<String, Method> bySignature = new LinkedHashMap<>();
+    collectMethods(definition, Collections.emptyMap(), bySignature, new HashSet<>());
+    return new ArrayList<>(bySignature.values());
+  }
+
+  private void collectMethods(TypeDef definition, Map<String, TypeRef> substitutions,
+      Map<String, Method> bySignature, Set<String> visited) {
+    if (definition == null || !visited.add(definition.getFullyQualifiedName())) {
+      return;
+    }
+    for (Method method : definition.getMethods()) {
+      Method substituted = substituteTypeVariables(method, substitutions);
+      bySignature.putIfAbsent(signatureKey(substituted), substituted);
+    }
+    for (ClassRef superRef : supertypes(definition)) {
+      TypeDef superDef = GetDefinition.of(superRef);
+      if (superDef == null || TypeDef.OBJECT.getFullyQualifiedName().equals(superRef.getFullyQualifiedName())) {
+        continue;
+      }
+      collectMethods(superDef, composeSubstitutions(superDef, superRef, substitutions), bySignature, visited);
+    }
+  }
+
+  private static List<ClassRef> supertypes(TypeDef definition) {
+    List<ClassRef> supertypes = new ArrayList<>(definition.getExtendsList());
+    supertypes.addAll(definition.getImplementsList());
+    return supertypes;
+  }
+
+  /**
+   * Builds the type-variable bindings visible inside {@code superDef} when reached through
+   * {@code superRef}: each of the supertype's parameters mapped to the matching argument in
+   * {@code superRef}, with any argument that is itself a variable resolved through the caller's own
+   * {@code outer} substitutions so bindings chain across several levels of inheritance.
+   */
+  private static Map<String, TypeRef> composeSubstitutions(TypeDef superDef, ClassRef superRef,
+      Map<String, TypeRef> outer) {
+    Map<String, TypeRef> result = new LinkedHashMap<>();
+    List<TypeParamDef> parameters = superDef.getParameters();
+    List<TypeRef> arguments = superRef.getArguments();
+    for (int i = 0; i < parameters.size() && i < arguments.size(); i++) {
+      result.put(parameters.get(i).getName(), resolve(arguments.get(i), outer));
+    }
+    return result;
+  }
+
+  private static TypeRef resolve(TypeRef type, Map<String, TypeRef> substitutions) {
+    if (type instanceof TypeParamRef) {
+      TypeRef bound = substitutions.get(((TypeParamRef) type).getName());
+      return bound != null ? bound : type;
+    }
+    return type;
+  }
+
+  private static Method substituteTypeVariables(Method method, Map<String, TypeRef> substitutions) {
+    if (substitutions.isEmpty()) {
+      return method;
+    }
+    List<Argument> arguments = method.getArguments().stream()
+        .map(argument -> new ArgumentBuilder(argument)
+            .withTypeRef(substitute(argument.getTypeRef(), substitutions)).build())
+        .collect(Collectors.toList());
+    return new MethodBuilder(method)
+        .withReturnType(substitute(method.getReturnType(), substitutions))
+        .withArguments(arguments)
+        .build();
+  }
+
+  private static TypeRef substitute(TypeRef type, Map<String, TypeRef> substitutions) {
+    if (type instanceof TypeParamRef) {
+      TypeRef bound = substitutions.get(((TypeParamRef) type).getName());
+      return bound != null ? bound : type;
+    }
+    if (type instanceof ClassRef) {
+      ClassRef classRef = (ClassRef) type;
+      if (classRef.getArguments().isEmpty()) {
+        return type;
+      }
+      List<TypeRef> arguments = classRef.getArguments().stream()
+          .map(argument -> substitute(argument, substitutions))
+          .collect(Collectors.toList());
+      return new ClassRefBuilder(classRef).withArguments(arguments).build();
+    }
+    return type;
+  }
+
+  private static String signatureKey(Method method) {
+    return method.getName() + method.getArguments().stream()
+        .map(argument -> argument.getTypeRef().render())
+        .collect(Collectors.joining(",", "(", ")"));
   }
 
   /**
@@ -256,13 +360,13 @@ public class MockTarget {
   }
 
   /**
-   * The type-variable erasures visible inside a method: the mocked type's own parameters plus the
-   * method's own type parameters, each erased to a bound or {@code Object}. The method's type
-   * parameters are recovered from the signature rather than {@code method.getParameters()}, because
-   * the source adapter does not populate that list: any type variable appearing in the return type
-   * or an argument type that is not one of the class parameters is a method-level variable and is
-   * erased to its declared bound when known, otherwise to {@code Object}. This keeps a method that
-   * declares its own type parameters stubbable.
+   * The type-variable erasures usable when stubbing a method: the mocked type's own parameters plus
+   * any method-level type variable that appears <em>only</em> in the return type. A free variable in
+   * the return position erases safely to {@code Object} (the terminal is just {@code thenReturn}),
+   * but one in an argument position cannot: the adapter discards the method's {@code <S extends T>}
+   * clause, so the real bound (e.g. {@code save(S extends Domain)}) is unknown and erasing the
+   * argument to {@code Object} would not compile against the bounded signature. Argument free
+   * variables therefore stay unerasable, which makes {@link #isStubbable} skip the method.
    */
   private Map<String, ClassRef> erasuresFor(Method method) {
     Map<String, ClassRef> erasures = new LinkedHashMap<>(classTypeVarErasures);
@@ -270,23 +374,33 @@ public class MockTarget {
       List<ClassRef> bounds = parameter.getBounds();
       erasures.put(parameter.getName(), bounds.isEmpty() ? TypeDef.OBJECT_REF : bounds.get(0));
     }
-    collectMethodTypeVariables(method.getReturnType(), erasures);
+    Set<String> argumentVariables = new HashSet<>();
     for (Argument argument : method.getArguments()) {
-      collectMethodTypeVariables(argument.getTypeRef(), erasures);
+      collectFreeVariables(argument.getTypeRef(), argumentVariables);
+    }
+    Set<String> returnVariables = new HashSet<>();
+    collectFreeVariables(method.getReturnType(), returnVariables);
+    for (String variable : returnVariables) {
+      if (!argumentVariables.contains(variable)) {
+        erasures.putIfAbsent(variable, TypeDef.OBJECT_REF);
+      }
     }
     return erasures;
   }
 
   /**
-   * Records every type variable in the given type that is not already a known erasure as a
-   * method-level variable erased to {@code Object}. Recurses into class-reference type arguments.
+   * Records every type-variable name in the type that is not a mocked-type parameter, recursing into
+   * class-reference type arguments. These are the method-level (free) variables of the signature.
    */
-  private void collectMethodTypeVariables(TypeRef type, Map<String, ClassRef> erasures) {
+  private void collectFreeVariables(TypeRef type, Set<String> names) {
     if (type instanceof TypeParamRef) {
-      erasures.putIfAbsent(((TypeParamRef) type).getName(), TypeDef.OBJECT_REF);
+      String name = ((TypeParamRef) type).getName();
+      if (!classTypeVarErasures.containsKey(name)) {
+        names.add(name);
+      }
     } else if (type instanceof ClassRef) {
       for (TypeRef argument : ((ClassRef) type).getArguments()) {
-        collectMethodTypeVariables(argument, erasures);
+        collectFreeVariables(argument, names);
       }
     }
   }

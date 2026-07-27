@@ -332,6 +332,83 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldInheritMethodsFromGenericSuperinterfaceSubstitutingTypeArguments() {
+    JavaFileObject domain = JavaFileObjects.forSourceString("test.Domain",
+        "package test;\n" +
+            "public class Domain {}\n");
+    JavaFileObject service = JavaFileObjects.forSourceString("test.DomainDAO",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "import java.util.List;\n" +
+            "interface CrudRepo<T, ID> {\n" +
+            "  List<T> findAllByIdIn(List<ID> ids);\n" +
+            "  void emit(T message);\n" +
+            "}\n" +
+            "@Mockable\n" +
+            "public interface DomainDAO extends CrudRepo<test.Domain, String> {}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service, domain);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation).generatedSourceFile("test.DomainDAOMock").contentsAsUtf8String()
+        .contains("public DomainDAOMock.FindAllByIdInStub findAllByIdIn()");
+    assertThat(compilation).generatedSourceFile("test.DomainDAOMock").contentsAsUtf8String()
+        .contains("withIds(List<String> value)");
+    assertThat(compilation).generatedSourceFile("test.DomainDAOMock").contentsAsUtf8String()
+        .contains("capturingMessage(ArgumentCaptor<Domain> captor)");
+    assertThat(compilation).generatedSourceFile("test.DomainDAOMock").contentsAsUtf8String()
+        .doesNotContain("ArgumentCaptor<Object>");
+  }
+
+  @Test
+  public void shouldSkipInheritedMethodWithABoundedOwnTypeVariableInAnArgument() {
+    JavaFileObject domain = JavaFileObjects.forSourceString("test.Domain",
+        "package test;\n" +
+            "public class Domain {}\n");
+    JavaFileObject service = JavaFileObjects.forSourceString("test.DomainDAO",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "interface CrudRepo<T, ID> {\n" +
+            "  <S extends T> S save(S entity);\n" +
+            "  T findById(ID id);\n" +
+            "}\n" +
+            "@Mockable\n" +
+            "public interface DomainDAO extends CrudRepo<test.Domain, String> {}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service, domain);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation).generatedSourceFile("test.DomainDAOMock").contentsAsUtf8String()
+        .contains("public DomainDAOMock.FindByIdStub findById()");
+    assertThat(compilation).generatedSourceFile("test.DomainDAOMock").contentsAsUtf8String()
+        .doesNotContain("SaveStub");
+  }
+
+  @Test
+  public void shouldInheritMethodsFromNonGenericSuperinterface() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.Repo",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "interface BaseRepo { String describe(); }\n" +
+            "@Mockable\n" +
+            "public interface Repo extends BaseRepo { void ping(String s); }\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation).generatedSourceFile("test.RepoMock").contentsAsUtf8String()
+        .contains("describe()");
+    assertThat(compilation).generatedSourceFile("test.RepoMock").contentsAsUtf8String()
+        .contains("ping()");
+  }
+
+  @Test
   public void shouldStubMethodDeclaringItsOwnTypeVariable() {
     JavaFileObject service = JavaFileObjects.forSourceString("test.Adapter",
         "package test;\n" +
