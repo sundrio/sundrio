@@ -42,8 +42,8 @@ import io.sundr.utils.Strings;
  */
 public class MockTarget {
 
-  private static final Set<String> OBJECT_METHODS = new HashSet<>(Arrays.asList(
-      "equals", "hashCode", "toString", "getClass", "clone", "finalize", "wait", "notify", "notifyAll"));
+  private static final Set<String> NO_ARG_OBJECT_METHODS = new HashSet<>(Arrays.asList(
+      "hashCode", "toString", "getClass", "clone", "finalize", "notify", "notifyAll"));
 
   private final TypeDef definition;
   private final String mockName;
@@ -214,11 +214,33 @@ public class MockTarget {
     return null;
   }
 
+  /**
+   * Whether the method is one of {@link Object}'s own methods, matched by name and signature. A
+   * user-declared method that merely shares a name (for example {@code clone(String, Principal)} or
+   * a two-argument {@code equals}) is not an {@link Object} method and stays stubbable; only the
+   * real overrides ({@code clone()}, {@code equals(Object)}, {@code wait(...)}, and the other no-arg
+   * ones) are skipped, since they cannot be meaningfully stubbed.
+   */
+  private static boolean isObjectMethod(Method method) {
+    String name = method.getName();
+    int arity = method.getArguments().size();
+    if (NO_ARG_OBJECT_METHODS.contains(name)) {
+      return arity == 0;
+    }
+    if ("equals".equals(name)) {
+      return arity == 1;
+    }
+    if ("wait".equals(name)) {
+      return arity <= 2;
+    }
+    return false;
+  }
+
   private boolean isStubbable(Method method) {
     if (!method.getModifiers().isPublic() || method.getModifiers().isStatic() || method.getModifiers().isFinal()) {
       return false;
     }
-    if (OBJECT_METHODS.contains(method.getName())) {
+    if (isObjectMethod(method)) {
       return false;
     }
     Map<String, ClassRef> erasures = erasuresFor(method);
