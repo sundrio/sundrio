@@ -244,10 +244,36 @@ public class MockableProcessorTest {
         .generatedSourceFile("test.RepoMock")
         .contentsAsUtf8String()
         .contains("public RepoMock.FindAllStub findAll()");
+  }
+
+  @Test
+  public void shouldStubMethodDeclaringItsOwnTypeVariable() {
+    JavaFileObject service = JavaFileObjects.forSourceString("test.Adapter",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface Adapter {\n" +
+            "  <T> T transmit();\n" +
+            "  <R extends Number> R measure();\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
     assertThat(compilation)
-        .generatedSourceFile("test.RepoMock")
+        .generatedSourceFile("test.AdapterMock")
         .contentsAsUtf8String()
-        .doesNotContain("convert");
+        .contains("public AdapterMock.TransmitStub transmit()");
+    assertThat(compilation)
+        .generatedSourceFile("test.AdapterMock")
+        .contentsAsUtf8String()
+        .contains("public AdapterMock.MeasureStub measure()");
+    assertThat(compilation)
+        .generatedSourceFile("test.AdapterMock")
+        .contentsAsUtf8String()
+        .doesNotContain("<T>");
   }
 
   @Test
