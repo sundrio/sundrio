@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.SourceSpecs;
 import org.openrewrite.test.TypeValidation;
 
 class GenerateMarkerTest implements RewriteTest {
@@ -38,15 +37,15 @@ class GenerateMarkerTest implements RewriteTest {
   }
 
   @Test
-  void leastCommonPackageWithSharedPrefix() {
-    assertThat(GenerateMarker.leastCommonPackage(List.of(
-        "com.acme.svc.Foo", "com.acme.pay.Bar"))).isEqualTo("com.acme");
+  void markerPackagePicksTheModalPackage() {
+    assertThat(GenerateMarker.markerPackage(List.of(
+        "com.acme.svc.Foo", "com.acme.svc.Baz", "com.acme.pay.Bar"))).isEqualTo("com.acme.svc");
   }
 
   @Test
-  void leastCommonPackageWithNoSharedPrefix() {
-    assertThat(GenerateMarker.leastCommonPackage(List.of(
-        "com.acme.Foo", "org.other.Bar"))).isEmpty();
+  void markerPackageNeverEmptyForUnrelatedPackages() {
+    assertThat(GenerateMarker.markerPackage(List.of(
+        "com.acme.Foo", "org.other.Bar"))).isNotEmpty();
   }
 
   @Test
@@ -70,17 +69,17 @@ class GenerateMarkerTest implements RewriteTest {
                 "    Templates templates = mock(Templates.class);\n" +
                 "  }\n" +
                 "}\n"),
-        markerGenerated(
-            "package com.acme;\n\n" +
+        java(null,
+            "package com.acme.pay;\n\n" +
                 "import io.sundr.mockito.annotations.Mockables;\n" +
-                "import com.acme.pay.Payments;\n" +
                 "import com.acme.svc.Templates;\n\n" +
                 "@Mockables({ Payments.class, Templates.class })\n" +
-                "public class MocksConfig {\n}\n"));
+                "public class MocksConfig {\n}\n",
+            spec -> spec.path("src/test/java/com/acme/pay/MocksConfig.java")));
   }
 
   @Test
-  void generatesMarkerInRootPackageWhenNoSharedPrefix() {
+  void generatesMarkerInModalPackageWhenNoSharedPrefix() {
     rewriteRun(
         java(
             "package com.acme;\n" +
@@ -100,12 +99,12 @@ class GenerateMarkerTest implements RewriteTest {
                 "  }\n" +
                 "}\n"),
         java(null,
-            "import io.sundr.mockito.annotations.Mockables;\n" +
-                "import com.acme.Templates;\n" +
+            "package com.acme;\n\n" +
+                "import io.sundr.mockito.annotations.Mockables;\n" +
                 "import org.other.Payments;\n\n" +
                 "@Mockables({ Templates.class, Payments.class })\n" +
                 "public class MocksConfig {\n}\n",
-            spec -> spec.path("src/test/java/MocksConfig.java")));
+            spec -> spec.path("src/test/java/com/acme/MocksConfig.java")));
   }
 
   @Test
@@ -162,7 +161,73 @@ class GenerateMarkerTest implements RewriteTest {
                 "}\n"));
   }
 
-  private static SourceSpecs markerGenerated(String after) {
-    return java(null, after, spec -> spec.path("src/test/java/com/acme/MocksConfig.java"));
+  @Test
+  void generatesMarkerUnderSubmoduleInMultiModuleReactor() {
+    rewriteRun(
+        java(
+            "package com.acme.svc;\n" +
+                "public interface Templates { String render(String id); }\n",
+            spec -> spec.path("cloudcomposer/src/main/java/com/acme/svc/Templates.java")),
+        java(
+            "package com.acme.tests;\n" +
+                "import static org.mockito.Mockito.mock;\n" +
+                "import com.acme.svc.Templates;\n" +
+                "class SomeTest {\n" +
+                "  void t() {\n" +
+                "    Templates templates = mock(Templates.class);\n" +
+                "  }\n" +
+                "}\n",
+            spec -> spec.path("cloudcomposer/src/test/java/com/acme/tests/SomeTest.java")),
+        java(null,
+            "package com.acme.svc;\n\n" +
+                "import io.sundr.mockito.annotations.Mockables;\n\n" +
+                "@Mockables({ Templates.class })\n" +
+                "public class MocksConfig {\n}\n",
+            spec -> spec.path("cloudcomposer/src/test/java/com/acme/svc/MocksConfig.java")));
+  }
+
+  @Test
+  void generatesOnePerModuleMarkerScopedToEachModulesOwnMocks() {
+    rewriteRun(
+        // module A: mocks Templates
+        java(
+            "package com.acme.svc;\n" +
+                "public interface Templates { String render(String id); }\n",
+            spec -> spec.path("moduleA/src/main/java/com/acme/svc/Templates.java")),
+        java(
+            "package com.acme.a;\n" +
+                "import static org.mockito.Mockito.mock;\n" +
+                "import com.acme.svc.Templates;\n" +
+                "class ATest {\n" +
+                "  void t() { Templates t = mock(Templates.class); }\n" +
+                "}\n",
+            spec -> spec.path("moduleA/src/test/java/com/acme/a/ATest.java")),
+        // module B: mocks Payments only
+        java(
+            "package com.acme.pay;\n" +
+                "public interface Payments { long charge(long cents); }\n",
+            spec -> spec.path("moduleB/src/main/java/com/acme/pay/Payments.java")),
+        java(
+            "package com.acme.b;\n" +
+                "import static org.mockito.Mockito.mock;\n" +
+                "import com.acme.pay.Payments;\n" +
+                "class BTest {\n" +
+                "  void t() { Payments p = mock(Payments.class); }\n" +
+                "}\n",
+            spec -> spec.path("moduleB/src/test/java/com/acme/b/BTest.java")),
+        // module A's marker: only Templates, under moduleA
+        java(null,
+            "package com.acme.svc;\n\n" +
+                "import io.sundr.mockito.annotations.Mockables;\n\n" +
+                "@Mockables({ Templates.class })\n" +
+                "public class MocksConfig {\n}\n",
+            spec -> spec.path("moduleA/src/test/java/com/acme/svc/MocksConfig.java")),
+        // module B's marker: only Payments, under moduleB
+        java(null,
+            "package com.acme.pay;\n\n" +
+                "import io.sundr.mockito.annotations.Mockables;\n\n" +
+                "@Mockables({ Payments.class })\n" +
+                "public class MocksConfig {\n}\n",
+            spec -> spec.path("moduleB/src/test/java/com/acme/pay/MocksConfig.java")));
   }
 }

@@ -86,9 +86,9 @@ class RewriteDelegatedStaticsTest implements RewriteTest {
                 "  }\n" +
                 "}\n",
             "package com.acme.x;\n" +
-                "import static org.mockito.Mockito.mock;\n\n" +
-                "import com.acme.Mocks;\n" +
+                "import static org.mockito.Mockito.mock;\n" +
                 "import com.acme.a.Foo;\n" +
+                "import com.acme.a.Mocks;\n" +
                 "import com.acme.b.Bar;\n\n" +
                 "class SomeTest {\n" +
                 "  void t() {\n" +

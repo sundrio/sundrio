@@ -19,7 +19,6 @@ package io.sundr.mockito.rewrite;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -44,10 +43,6 @@ public class GenerateMarker extends ScanningRecipe<GenerateMarker.Accumulator> {
 
   static final class Accumulator {
     final MarkerPackages.Scan scan = new MarkerPackages.Scan();
-
-    boolean markerExists() {
-      return !scan.markerPackages.isEmpty();
-    }
   }
 
   @Override
@@ -84,6 +79,12 @@ public class GenerateMarker extends ScanningRecipe<GenerateMarker.Accumulator> {
         if (enclosing == null) {
           return a;
         }
+        String baseDir = MarkerPackages.moduleBaseDir(
+            getCursor().firstEnclosing(J.CompilationUnit.class).getSourcePath());
+        MarkerPackages.Module module = acc.scan.modules.get(baseDir);
+        if (module == null) {
+          return a;
+        }
         TreeSet<String> present = new TreeSet<>();
         if (a.getArguments() != null) {
           for (var arg : a.getArguments()) {
@@ -101,7 +102,7 @@ public class GenerateMarker extends ScanningRecipe<GenerateMarker.Accumulator> {
           }
         }
         TreeSet<String> merged = new TreeSet<>(present);
-        merged.addAll(acc.scan.mockTypes);
+        merged.addAll(module.mockTypes);
         if (merged.size() == present.size()) {
           return a;
         }
@@ -124,21 +125,26 @@ public class GenerateMarker extends ScanningRecipe<GenerateMarker.Accumulator> {
   @Override
   public Collection<SourceFile> generate(Accumulator acc, Collection<SourceFile> generatedInThisCycle,
       ExecutionContext ctx) {
-    if (acc.markerExists() || acc.scan.mockTypes.isEmpty()) {
-      return Collections.emptyList();
+    List<SourceFile> generated = new ArrayList<>();
+    for (var entry : acc.scan.modules.entrySet()) {
+      String moduleBaseDir = entry.getKey();
+      MarkerPackages.Module module = entry.getValue();
+      if (!module.markerPackages.isEmpty() || module.mockTypes.isEmpty()) {
+        continue;
+      }
+      String pkg = markerPackage(module.mockTypes);
+      String source = markerSource(pkg, module.mockTypes);
+      SourceFile parsed = JavaParser.fromJavaVersion().build()
+          .parse(ctx, source)
+          .findFirst()
+          .orElse(null);
+      if (parsed == null) {
+        continue;
+      }
+      generated.add(parsed.withSourcePath(Paths.get(
+          moduleBaseDir + "src/test/java/" + pkg.replace('.', '/') + "/" + MockitoNames.MARKER + ".java")));
     }
-    String pkg = leastCommonPackage(acc.scan.mockTypes);
-    String source = markerSource(pkg, acc.scan.mockTypes);
-    SourceFile parsed = JavaParser.fromJavaVersion().build()
-        .parse(ctx, source)
-        .findFirst()
-        .orElse(null);
-    if (parsed == null) {
-      return Collections.emptyList();
-    }
-    SourceFile generated = parsed.withSourcePath(Paths.get(
-        "src/test/java/" + pkg.replace('.', '/') + "/" + MockitoNames.MARKER + ".java"));
-    return Collections.singletonList(generated);
+    return generated;
   }
 
   static String markerSource(String pkg, Collection<String> types) {
@@ -163,7 +169,7 @@ public class GenerateMarker extends ScanningRecipe<GenerateMarker.Accumulator> {
     return sb.toString();
   }
 
-  static String leastCommonPackage(Collection<String> types) {
-    return MarkerPackages.leastCommonPackage(types);
+  static String markerPackage(Collection<String> types) {
+    return MarkerPackages.markerPackage(types);
   }
 }
