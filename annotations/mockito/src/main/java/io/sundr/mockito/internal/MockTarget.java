@@ -294,8 +294,11 @@ public class MockTarget {
   }
 
   /**
-   * Overloads share one stub builder, which requires a single return type and a single
-   * type per parameter name. Returns the reason a group cannot be unified, null otherwise.
+   * Overloads share one stub builder, which requires a single return type. A parameter name whose
+   * type differs across overloads is not a failure: its shared slot is widened to {@code Object}
+   * (see {@code DslMethods.unionArguments}), so {@code withXxx(Object)}, {@code withXxxAny()} and
+   * matchers all still work and the invoked overload is selected at runtime from the actual
+   * arguments. Returns the reason a group genuinely cannot be unified, null otherwise.
    */
   private static String overloadIssue(List<Method> overloads) {
     if (overloads.size() == 1) {
@@ -304,16 +307,6 @@ public class MockTarget {
     long returnTypes = overloads.stream().map(m -> m.getReturnType().render()).distinct().count();
     if (returnTypes > 1) {
       return "overloads with different return types are not supported yet";
-    }
-    Map<String, String> typeByName = new LinkedHashMap<>();
-    for (Method method : overloads) {
-      for (Argument argument : method.getArguments()) {
-        String type = argument.getTypeRef().render();
-        String existing = typeByName.putIfAbsent(argument.getName(), type);
-        if (existing != null && !existing.equals(type)) {
-          return "parameter '" + argument.getName() + "' has conflicting types across overloads";
-        }
-      }
     }
     return null;
   }
@@ -424,13 +417,31 @@ public class MockTarget {
   private Method eraseTypeVariables(Method method) {
     Map<String, ClassRef> erasures = erasuresFor(method);
     List<Argument> erasedArguments = method.getArguments().stream()
-        .map(argument -> new ArgumentBuilder(argument).withTypeRef(erase(argument.getTypeRef(), erasures)).build())
+        .map(argument -> eraseArgument(argument, erasures))
         .collect(Collectors.toList());
     return new MethodBuilder(method)
         .withParameters(Collections.emptyList())
         .withReturnType(erase(method.getReturnType(), erasures))
         .withArguments(erasedArguments)
         .build();
+  }
+
+  /**
+   * Erases an argument's type like {@link #erase}, additionally tagging it with
+   * {@link Constants#TYPE_VARIABLE_ARG} when its declared type was a bare class type variable. The
+   * type still erases to {@code Object} so the slot and mock invocation stay raw, but the tag lets
+   * {@code DslMethods} re-expose the wither as generic so the call site infers the concrete type.
+   */
+  private Argument eraseArgument(Argument argument, Map<String, ClassRef> erasures) {
+    TypeRef type = argument.getTypeRef();
+    boolean classTypeVariable = type instanceof TypeParamRef
+        && ((TypeParamRef) type).getDimensions() == 0
+        && classTypeVarErasures.containsKey(((TypeParamRef) type).getName());
+    ArgumentBuilder builder = new ArgumentBuilder(argument).withTypeRef(erase(type, erasures));
+    if (classTypeVariable) {
+      builder.addToAttributes(Constants.TYPE_VARIABLE_ARG, Boolean.TRUE);
+    }
+    return builder.build();
   }
 
   /**

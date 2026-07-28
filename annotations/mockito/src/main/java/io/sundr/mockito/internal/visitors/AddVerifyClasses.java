@@ -95,8 +95,9 @@ public class AddVerifyClasses implements Visitor<TypeDefFluent<?>> {
       DslMethods.addWithers(builder, union, selfRef, true);
       DslMethods.addAnyPins(builder, union, selfRef);
       DslMethods.addCapturing(builder, union, selfRef, true);
+      java.util.Set<String> widened = DslMethods.widenedArgumentNames(overloads);
       DslMethods.addVerifyTerminals(builder,
-          mode -> DslMethods.selectOneDispatch(overloads, method -> DslMethods.verification(method, mode)),
+          mode -> DslMethods.selectOneDispatch(overloads, method -> DslMethods.verification(method, mode, widened)),
           DslMethods.fanOutNeverBody(overloads), exceptions);
     }
     return builder.build();
