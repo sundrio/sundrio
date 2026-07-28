@@ -26,6 +26,15 @@ import io.sundr.model.TypeRef;
 
 public final class Constants {
 
+  /**
+   * Marks an argument whose declared type was one of the mocked type's own type variables, erased to
+   * {@code Object} for the slot and body but re-exposed as a fresh generic parameter on the withers
+   * so the call site infers the concrete type. See {@code MockTarget.eraseArgument} and
+   * {@code DslMethods.addWithers}.
+   */
+  public static final io.sundr.model.AttributeKey<Boolean> TYPE_VARIABLE_ARG = new io.sundr.model.AttributeKey<>(
+      "TYPE_VARIABLE_ARG", Boolean.class);
+
   public static final String MOCK = "mock";
   public static final String PINNED = "pinned";
   public static final String SELECTOR = "selector";

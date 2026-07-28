@@ -389,6 +389,105 @@ public class MockableProcessorTest {
   }
 
   @Test
+  public void shouldLetCallerInferTypeArgumentForGenericMockTargetCaptor() {
+    JavaFileObject event = JavaFileObjects.forSourceString("test.StreamEvent",
+        "package test;\n" +
+            "public class StreamEvent {}\n");
+    JavaFileObject service = JavaFileObjects.forSourceString("test.IStreamerService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface IStreamerService<T> {\n" +
+            "  void emitMessage(T message);\n" +
+            "}\n");
+    // A caller that pins the captor to a concrete StreamEvent and stubs with a concrete value:
+    // both must compile against the generated (raw) mock, so the withers must be generic.
+    JavaFileObject caller = JavaFileObjects.forSourceString("test.Caller",
+        "package test;\n" +
+            "import org.mockito.ArgumentCaptor;\n" +
+            "class Caller {\n" +
+            "  void run(IStreamerService<StreamEvent> streamerService, StreamEvent event) {\n" +
+            "    ArgumentCaptor<StreamEvent> captor = ArgumentCaptor.forClass(StreamEvent.class);\n" +
+            "    IStreamerServiceMock.mock(streamerService).verify().emitMessage().capturingMessage(captor).called();\n"
+            +
+            "    IStreamerServiceMock.mock(streamerService).when().emitMessage().withMessage(event);\n" +
+            "  }\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(event, service, caller);
+
+    assertThat(compilation).succeeded();
+  }
+
+  @Test
+  public void shouldLetCallerInferTypeArgumentForGenericMockTargetOverloadedMethod() {
+    JavaFileObject event = JavaFileObjects.forSourceString("test.StreamEvent",
+        "package test;\n" +
+            "public class StreamEvent {}\n");
+    // emit is overloaded and one overload's argument is the type variable T: the shared builder must
+    // still expose a generic wither so the caller's concrete type is inferred.
+    JavaFileObject service = JavaFileObjects.forSourceString("test.IStreamerService",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "@Mockable\n" +
+            "public interface IStreamerService<T> {\n" +
+            "  void emit(T message);\n" +
+            "  void emit(T message, String topic);\n" +
+            "}\n");
+    JavaFileObject caller = JavaFileObjects.forSourceString("test.Caller",
+        "package test;\n" +
+            "import org.mockito.ArgumentCaptor;\n" +
+            "class Caller {\n" +
+            "  void run(IStreamerService<StreamEvent> streamerService, StreamEvent event) {\n" +
+            "    ArgumentCaptor<StreamEvent> captor = ArgumentCaptor.forClass(StreamEvent.class);\n" +
+            "    IStreamerServiceMock.mock(streamerService).verify().emit()"
+            + ".withMessage(event).withTopicAny().called();\n" +
+            "    IStreamerServiceMock.mock(streamerService).verify().emit()"
+            + ".capturingMessage(captor).withTopicAny().called();\n" +
+            "  }\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(event, service, caller);
+
+    assertThat(compilation).succeeded();
+  }
+
+  @Test
+  public void shouldUnifyOverloadsWithConflictingParameterTypes() {
+    // Two overloads name the parameter 'ids' but with different types (List vs Set). The shared
+    // builder must widen that slot to Object rather than skip the whole method, and the generated
+    // mock must still compile (each overload invocation casts the resolved slot to its own type).
+    JavaFileObject service = JavaFileObjects.forSourceString("test.Svc",
+        "package test;\n" +
+            "import io.sundr.mockito.annotations.Mockable;\n" +
+            "import java.util.List;\n" +
+            "import java.util.Set;\n" +
+            "@Mockable\n" +
+            "public interface Svc {\n" +
+            "  java.util.List<String> findAllByIdIn(List<String> ids);\n" +
+            "  java.util.List<String> findAllByIdIn(Set<String> ids);\n" +
+            "}\n");
+
+    Compilation compilation = javac()
+        .withProcessors(new MockableProcessor())
+        .compile(service);
+
+    assertThat(compilation).succeeded();
+    assertThat(compilation).generatedSourceFile("test.SvcMock").contentsAsUtf8String()
+        .contains("public SvcMock.FindAllByIdInStub findAllByIdIn()");
+    assertThat(compilation).generatedSourceFile("test.SvcMock").contentsAsUtf8String()
+        .contains("withIds(Object value)");
+    assertThat(compilation).generatedSourceFile("test.SvcMock").contentsAsUtf8String()
+        .contains("findAllByIdIn((List<String>) this.ids.resolve())");
+    assertThat(compilation).generatedSourceFile("test.SvcMock").contentsAsUtf8String()
+        .contains("findAllByIdIn((Set<String>) this.ids.resolve())");
+  }
+
+  @Test
   public void shouldInheritMethodsFromNonGenericSuperinterface() {
     JavaFileObject service = JavaFileObjects.forSourceString("test.Repo",
         "package test;\n" +
