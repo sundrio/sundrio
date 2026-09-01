@@ -3,11 +3,11 @@ package io.sundr.model;
 public class ReturnDslThisStep implements Statement {
 
   public Return ref(String fieldName) {
-    return new Return(new This().ref(fieldName));
+    return new Return(This.ref(fieldName));
   }
 
   public Return ref(Field field) {
-    return new Return(new This().ref(field));
+    return new Return(This.ref(field));
   }
 
   public Return call(String methodName, Expression... arguments) {
