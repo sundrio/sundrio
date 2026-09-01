@@ -204,7 +204,7 @@ class ToMethod {
 
       methodBuilder.withNewBlock()
           .withStatements(
-              new Return(customizer.doWithItem(new This().ref(field).call("get", type.indexExpression(field)))))
+              new Return(customizer.doWithItem(This.ref(field).call("get", type.indexExpression(field)))))
           .endBlock()
           .build();
       return methodBuilder.build();
@@ -326,8 +326,8 @@ class ToMethod {
 
       if (IS_MAP.apply(type)) {
         statements.add(If.isNull(field)
-            .then(new This().ref(field).assignNull())
-            .orElse(new This().ref(field).assignNew(LinkedHashMap.class, field)));
+            .then(This.ref(field).assignNull())
+            .orElse(This.ref(field).assignNew(LinkedHashMap.class, field)));
 
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
@@ -341,9 +341,9 @@ class ToMethod {
 
         Field item = Field.newField(unwrapped, "item");
         statements.add(If.notNull(field)
-            .then(new This().ref(field).assignNew(newInstanceType),
+            .then(This.ref(field).assignNew(newInstanceType),
                 new Foreach(item, field, new This().call(addToMethodName, item)))
-            .orElse(new This().ref(field).assignNull()));
+            .orElse(This.ref(field).assignNull()));
 
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
@@ -352,13 +352,13 @@ class ToMethod {
       if (isBuildable(unwrapped) && !isAbstract(unwrapped)) {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
         statements.add(If.notNull(field)
-            .then(new This().ref(field).assignNew(builder, field),
+            .then(This.ref(field).assignNew(builder, field),
                 new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("add",
-                    new This().ref(field)))
+                    This.ref(field)))
             .orElse(
                 new This().property("_visitables").call("get", ValueRef.from(field.getName())).call("remove",
-                    new This().ref(field)),
-                new This().ref(field).assignNull()));
+                    This.ref(field)),
+                This.ref(field).assignNull()));
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
       }
@@ -367,19 +367,19 @@ class ToMethod {
         Field builder = Field.newField(VISITABLE_BUILDER_REF.apply((ClassRef) unwrapped), "builder");
         Field targetField = Field.newField(builder.getTypeRef(), fieldName);
         statements.add(If.isNull(targetField)
-            .then(new This().ref(targetField).assignNull(),
-                new This().ref("_visitables").call("remove", ValueRef.from(targetField.getName())),
+            .then(This.ref(targetField).assignNull(),
+                This.ref("_visitables").call("remove", ValueRef.from(targetField.getName())),
                 new Return(Expression.cast(returnType, new This())))
             .orElse(new Declare(builder, Expression.newCall("builder", targetField)),
-                new This().ref("_visitables").call("get", ValueRef.from(targetField.getName())).call("clear"),
-                new This().ref("_visitables").call("get", ValueRef.from(targetField.getName())).call("add",
+                This.ref("_visitables").call("get", ValueRef.from(targetField.getName())).call("clear"),
+                This.ref("_visitables").call("get", ValueRef.from(targetField.getName())).call("add",
                     builder),
-                new This().ref(targetField).assign(builder),
+                This.ref(targetField).assign(builder),
                 new Return(Expression.cast(returnType, new This()))));
         return statements;
       }
 
-      statements.add(new This().ref(field).assign(field));
+      statements.add(This.ref(field).assign(field));
       statements.add(new Return(Expression.cast(returnType, new This())));
       return statements;
     }
