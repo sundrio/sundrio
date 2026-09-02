@@ -642,7 +642,7 @@ public class ClazzAs {
         Expression getterCall = new MethodCall(g.getName(), instance);
 
         // Add cast if needed
-        Expression finalExpression = field.getTypeRef() instanceof TypeParamRef ? getterCall.cast(field.getTypeRef())
+        Expression finalExpression = field.getTypeRef() instanceof TypeParamRef ? getterCall.cast(field)
             : getterCall;
 
         ifStatements.add(new MethodCall("with" + field.getNameCapitalized(), targetRef, finalExpression));

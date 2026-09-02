@@ -1141,7 +1141,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     // Generate: (Type) ((Map)map).getOrDefault("fieldName", defaultValue)
     Expression mapCast = new io.sundr.model.Enclosed(expression.cast(Map.class));
     Expression mapGetOrDefault = mapCast.call("getOrDefault", key, defaultValueExpr);
-    return mapGetOrDefault.cast(field.getTypeRef());
+    return mapGetOrDefault.cast(field);
   }
 
   private static Expression readMapValueExpression(Expression expression, TypeDef source, Argument argument) {
@@ -1368,7 +1368,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
             defaultValue)
             .call("toArray",
                 Expression.lambda("size", Expression.createNewArray(getter.getReturnType(), Field.newField(("size")))))
-            .cast(field.getTypeRef()));
+            .cast(field));
   }
 
   /**
