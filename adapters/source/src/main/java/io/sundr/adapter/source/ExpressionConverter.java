@@ -41,7 +41,6 @@ import io.sundr.model.Argument;
 import io.sundr.model.Assign;
 import io.sundr.model.BitwiseAnd;
 import io.sundr.model.BitwiseOr;
-import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ContextRef;
 import io.sundr.model.Declare;
@@ -342,7 +341,7 @@ public class ExpressionConverter {
       CastExpr castExpr = (CastExpr) expression;
       TypeRef targetType = TYPEREF_ADAPTER.apply(castExpr.getType());
       io.sundr.model.Expression expr = convertExpression(castExpr.getExpression());
-      return new Cast(targetType, expr);
+      return expr.cast(targetType);
     }
     return null;
   }

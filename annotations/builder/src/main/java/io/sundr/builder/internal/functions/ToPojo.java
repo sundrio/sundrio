@@ -64,7 +64,6 @@ import io.sundr.model.ArgumentBuilder;
 import io.sundr.model.Assign;
 import io.sundr.model.AttributeKey;
 import io.sundr.model.Attributeable;
-import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Declare;
@@ -623,7 +622,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
                       Return.variable(s).call("split", ",[ ]*")),
 
               If.condition(o.instanceOf(List.class))
-                  .then(new Declare(l, new Cast(List.class, o)),
+                  .then(new Declare(l, o.cast(List.class)),
                       new Declare(larray, Expression.createNewArray(String.class, l.call("size"))),
                       For.init(i, 0)
                           .eq(i, l.call("size"))
@@ -931,8 +930,8 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       Expression mapExpression = new Ternary(expression.instanceOf(Map.class),
           expression.cast(Map.class).call("getOrDefault", key, defaultValue),
           ValueRef.from(defaultValue));
-      return new Cast(typeRef, ((ClassRef) typeRef).call("valueOf",
-          Expression.call(String.class, "valueOf", mapExpression)));
+      return ((ClassRef) typeRef).call("valueOf",
+          Expression.call(String.class, "valueOf", mapExpression)).cast(typeRef);
     } else {
       Expression mapGetResult = expression.cast(Map.class).call("getOrDefault", key, ValueRef.NULL);
       Expression notNullCheck = Expression.notNull(mapGetResult);
@@ -1142,7 +1141,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     // Generate: (Type) ((Map)map).getOrDefault("fieldName", defaultValue)
     Expression mapCast = new io.sundr.model.Enclosed(expression.cast(Map.class));
     Expression mapGetOrDefault = mapCast.call("getOrDefault", key, defaultValueExpr);
-    return new Cast(field.getTypeRef(), mapGetOrDefault);
+    return mapGetOrDefault.cast(field.getTypeRef());
   }
 
   private static Expression readMapValueExpression(Expression expression, TypeDef source, Argument argument) {
@@ -1328,14 +1327,14 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
         TypeDef getterType = GetDefinition.of((ClassRef) getterTypeRef);
         if (Types.STRING.equals(getterType)) {
           return new Ternary(expression.instanceOf(Map.class),
-              new MethodCall("toStringArray", (Expression) null, new Cast(Map.class, expression).call("get", getterName)),
+              new MethodCall("toStringArray", (Expression) null, expression.cast(Map.class).call("get", getterName)),
               new MethodCall("toStringArray", (Expression) null, expression));
         } else {
           return ClassRef.forClass(Arrays.class).call("stream",
-              new Cast(Map[].class, new Ternary(expression.instanceOf(Map.class),
+              new Ternary(expression.instanceOf(Map.class),
                   expression.cast(Map.class).call("getOrDefault", getterName,
-                      new Cast(Map[].class, ValueRef.from("new Map[0]"))),
-                  new Cast(Map[].class, ValueRef.from("new Map[0]")))))
+                      ValueRef.from("new Map[0]").cast(Map[].class)),
+                  ValueRef.from("new Map[0]").cast(Map[].class)).cast(Map[].class))
               .call("map", Expression.lambda(nextRef, convertMapExpression(Field.newField(nextRef), fieldType)))
               .call("toArray", Expression.lambda("size",
                   Expression.createNewArray(fieldType.toInternalReference(), Field.newField(("size")))));
@@ -1364,11 +1363,12 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     Expression getterName = ValueRef.from(getter.getName());
     Expression defaultValue = parseDefaultValueExpression(getDefaultValue(field), field.getTypeRef());
     return ClassRef.forClass(Arrays.class).call("stream",
-        new Cast(field.getTypeRef(), new Ternary(expression.instanceOf(Map.class),
+        new Ternary(expression.instanceOf(Map.class),
             expression.cast(Map.class).call("getOrDefault", getterName, defaultValue),
             defaultValue)
             .call("toArray",
-                Expression.lambda("size", Expression.createNewArray(getter.getReturnType(), Field.newField(("size")))))));
+                Expression.lambda("size", Expression.createNewArray(getter.getReturnType(), Field.newField(("size")))))
+            .cast(field.getTypeRef()));
   }
 
   /**
