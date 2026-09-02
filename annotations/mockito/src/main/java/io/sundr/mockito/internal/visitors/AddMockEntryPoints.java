@@ -22,7 +22,6 @@ import io.sundr.mockito.internal.MockTarget;
 import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Construct;
 import io.sundr.model.LocalVariable;
 import io.sundr.model.Return;
 import io.sundr.model.This;
@@ -77,7 +76,7 @@ public class AddMockEntryPoints implements Visitor<TypeDefFluent<?>> {
         .withName(Constants.MOCK)
         .addNewArgument().withTypeRef(targetRef).withName(Constants.MOCK).endArgument()
         .withNewBlock()
-        .addToStatements(new Return(new Construct(mockRef, mockVar)))
+        .addToStatements(new Return(mockRef.construct(mockVar)))
         .endBlock()
         .endMethod();
 
@@ -87,7 +86,7 @@ public class AddMockEntryPoints implements Visitor<TypeDefFluent<?>> {
         .withReturnType(stubRouterRef)
         .withName("when")
         .withNewBlock()
-        .addToStatements(new Return(new Construct(stubRouterRef, This.ref(Constants.MOCK))))
+        .addToStatements(new Return(stubRouterRef.construct(This.ref(Constants.MOCK))))
         .endBlock()
         .endMethod();
 
@@ -98,7 +97,7 @@ public class AddMockEntryPoints implements Visitor<TypeDefFluent<?>> {
           .withReturnType(verifyRouterRef)
           .withName("verify")
           .withNewBlock()
-          .addToStatements(new Return(new Construct(verifyRouterRef, This.ref(Constants.MOCK))))
+          .addToStatements(new Return(verifyRouterRef.construct(This.ref(Constants.MOCK))))
           .endBlock()
           .endMethod();
     }
@@ -156,7 +155,7 @@ public class AddMockEntryPoints implements Visitor<TypeDefFluent<?>> {
         .withArguments(arguments)
         .withVarArgPreferred(varArg)
         .withNewBlock()
-        .addToStatements(new Return(new Construct(doStubberRef, stubberCall)))
+        .addToStatements(new Return(doStubberRef.construct(stubberCall)))
         .endBlock()
         .endMethod();
   }

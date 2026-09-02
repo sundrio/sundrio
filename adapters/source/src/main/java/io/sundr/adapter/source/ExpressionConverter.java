@@ -43,7 +43,6 @@ import io.sundr.model.BitwiseAnd;
 import io.sundr.model.BitwiseOr;
 import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
-import io.sundr.model.Construct;
 import io.sundr.model.ContextRef;
 import io.sundr.model.Declare;
 import io.sundr.model.Divide;
@@ -231,7 +230,7 @@ public class ExpressionConverter {
       for (Expression argument : objectCreationExpr.getArguments()) {
         arguments.add(convertExpression(argument));
       }
-      return new Construct(classRef, parameters, arguments);
+      return classRef.construct(parameters, arguments);
     } else if (expression instanceof MethodCallExpr) {
       MethodCallExpr methodCallExpr = (MethodCallExpr) expression;
       String methodName = methodCallExpr.getNameAsString();

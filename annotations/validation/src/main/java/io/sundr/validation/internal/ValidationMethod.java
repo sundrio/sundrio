@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.sundr.model.ClassRef;
-import io.sundr.model.Construct;
 import io.sundr.model.Expression;
 import io.sundr.model.LocalVariable;
 import io.sundr.model.Statement;
@@ -197,8 +196,8 @@ public class ValidationMethod {
       return (Expression) enclosingRef.call(methodName, allMethodArgs);
     }
     Expression scope = ctorArgs.isEmpty()
-        ? new Construct(enclosingRef)
-        : new Construct(enclosingRef, ctorArgs);
+        ? enclosingRef.construct()
+        : enclosingRef.construct(ctorArgs);
     return (Expression) scope.call(methodName, allMethodArgs);
   }
 
@@ -209,8 +208,8 @@ public class ValidationMethod {
       return enclosingRef.call(methodName, allMethodArgs);
     }
     Expression scope = ctorArgs.isEmpty()
-        ? new Construct(enclosingRef)
-        : new Construct(enclosingRef, ctorArgs);
+        ? enclosingRef.construct()
+        : enclosingRef.construct(ctorArgs);
     return scope.call(methodName, allMethodArgs);
   }
 

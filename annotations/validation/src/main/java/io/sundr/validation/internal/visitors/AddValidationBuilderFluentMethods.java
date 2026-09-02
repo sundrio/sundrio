@@ -20,7 +20,6 @@ import io.sundr.builder.Visitor;
 import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Construct;
 import io.sundr.model.Expression;
 import io.sundr.model.Return;
 import io.sundr.model.Ternary;
@@ -55,8 +54,7 @@ public class AddValidationBuilderFluentMethods implements Visitor<TypeDefFluent<
 
     Expression withJakarta = validatingBuilderRef.call("withJakartaValidation",
         This.ref("builder"), This.ref("validators"));
-    Expression withoutJakarta = new Construct(validatingBuilderRef,
-        This.ref("builder"), This.ref("validators"));
+    Expression withoutJakarta = validatingBuilderRef.construct(This.ref("builder"), This.ref("validators"));
 
     def.addNewMethod()
         .withNewModifiers().withPublic().endModifiers()

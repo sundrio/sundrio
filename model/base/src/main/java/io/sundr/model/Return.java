@@ -27,11 +27,11 @@ public class Return implements Statement {
   }
 
   public static Return newInstance(ClassRef type, Expression... arguments) {
-    return new Return(new Construct(type, arguments));
+    return new Return(type.construct(arguments));
   }
 
   public static Return newInstance(ClassRef type, java.util.List<Expression> arguments) {
-    return new Return(new Construct(type, arguments));
+    return new Return(type.construct(arguments));
   }
 
   public static Return newInstance(Class type, Expression... arguments) {

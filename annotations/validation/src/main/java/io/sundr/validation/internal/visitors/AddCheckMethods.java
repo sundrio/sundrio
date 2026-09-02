@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import io.sundr.builder.Visitor;
 import io.sundr.model.Block;
 import io.sundr.model.ClassRef;
-import io.sundr.model.Construct;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
 import io.sundr.model.ExpressionOrStatement;
@@ -148,10 +147,11 @@ public class AddCheckMethods implements Visitor<TypeDefFluent<?>> {
       LocalVariable lambdaErrors = LocalVariable.newLocalVariable(Collections.LIST.toReference(customErrorRef), "errors");
       LocalVariable baseError = LocalVariable.newLocalVariable(baseErrorRef, "__e");
       return new Lambda("item", new Block(
-          new Declare(lambdaErrors, new Construct(Collections.ARRAY_LIST.toReference())),
+          new Declare(lambdaErrors, Collections.ARRAY_LIST.toReference().construct()),
           new Foreach(baseError, callExpr,
-              new Block(lambdaErrors.call("add", new Construct(customErrorRef,
-                  baseError.call("getPath"), baseError.call("getMessage"), baseError.call("getInvalidValue"))))),
+              new Block(lambdaErrors.call("add",
+                  customErrorRef.construct(baseError.call("getPath"), baseError.call("getMessage"),
+                      baseError.call("getInvalidValue"))))),
           new Return(lambdaErrors)));
     }
 
@@ -181,11 +181,11 @@ public class AddCheckMethods implements Visitor<TypeDefFluent<?>> {
                 new Block(lambdaErrors.call("addAll", e.call("getErrors")))),
             new Try.Catch(Property.newProperty(runtimeExceptionRef, "re"),
                 new Block(lambdaErrors.call("add",
-                    new Construct(validationErrorRef, ValueRef.from(""), re.call("getMessage")))))),
+                    validationErrorRef.construct(ValueRef.from(""), re.call("getMessage")))))),
         Optional.empty());
 
     return new Lambda("item", new Block(
-        new Declare(lambdaErrors, new Construct(Collections.ARRAY_LIST.toReference())),
+        new Declare(lambdaErrors, Collections.ARRAY_LIST.toReference().construct()),
         tryCatch,
         new Return(lambdaErrors)));
   }

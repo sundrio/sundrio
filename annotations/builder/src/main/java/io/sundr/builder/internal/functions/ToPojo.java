@@ -67,7 +67,6 @@ import io.sundr.model.Attributeable;
 import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Construct;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
 import io.sundr.model.Field;
@@ -484,7 +483,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
         additionalMethods.add(staticBuilder);
 
         // Build chain of method calls for default values
-        Expression builderExpr = new Construct(pojoBuilder.toInternalReference());
+        Expression builderExpr = pojoBuilder.toInternalReference().construct();
 
         for (Method m : item.getMethods()) {
           if (m.hasAttribute(DEFAULT_VALUE)) {
@@ -802,7 +801,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
   }
 
   private static Expression convertReferenceExpression(Expression ref, TypeDef source, TypeDef target, TypeDef targetBuilder) {
-    return new io.sundr.model.Construct(targetBuilder.toInternalReference(), convertReferenceExpression(ref, source, target));
+    return targetBuilder.toInternalReference().construct(convertReferenceExpression(ref, source, target));
   }
 
   private static Expression convertReferenceExpression(Expression ref, TypeDef source, TypeDef target) {
@@ -810,7 +809,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     List<Expression> arguments = ctor.getArguments().stream()
         .map(p -> readFieldExpression(ref, source, p))
         .collect(toList());
-    return new io.sundr.model.Construct(target.toInternalReference(), arguments);
+    return target.toInternalReference().construct(arguments);
   }
 
   private static Expression readFieldExpression(Expression ref, TypeDef source, Argument argument) {
@@ -1056,7 +1055,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
   }
 
   private static Expression convertMapExpression(Expression expression, TypeDef target, TypeDef targetBuilder) {
-    return new io.sundr.model.Construct(targetBuilder.toInternalReference(), convertMapExpression(expression, target));
+    return targetBuilder.toInternalReference().construct(convertMapExpression(expression, target));
   }
 
   /**
@@ -1082,7 +1081,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
     Method ctor = BuilderUtils.findBuildableConstructor(target);
     List<Expression> arguments = ctor.getArguments().stream().map(p -> readMapValueExpression(expression, target, p))
         .collect(toList());
-    return new io.sundr.model.Construct(target.toInternalReference(), arguments);
+    return target.toInternalReference().construct(arguments);
   }
 
   /**
