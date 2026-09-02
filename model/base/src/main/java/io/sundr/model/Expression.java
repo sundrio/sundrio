@@ -259,7 +259,7 @@ public interface Expression extends Renderable, WithReferences {
   }
 
   default Assign assignNew(ClassRef type, Expression... arguments) {
-    return new Assign(this, new Construct(type, arguments));
+    return new Assign(this, type.construct(arguments));
   }
 
   default Assign assignNull() {
@@ -271,7 +271,7 @@ public interface Expression extends Renderable, WithReferences {
   }
 
   public static Construct createNew(ClassRef type, Expression... arguments) {
-    return new Construct(type, arguments);
+    return type.construct(arguments);
   }
 
   public static NewArray createNewArray(Class type, Expression... expressions) {

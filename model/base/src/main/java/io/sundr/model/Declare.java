@@ -62,11 +62,11 @@ public class Declare implements ExpressionOrStatement {
 
   public static Declare newInstance(String name, ClassRef type, Expression... arguments) {
     if (arguments.length == 0) {
-      return new Declare(LocalVariable.newLocalVariable(type, name), new Construct(type));
+      return new Declare(LocalVariable.newLocalVariable(type, name), type.construct());
     } else if (arguments.length == 1) {
-      return new Declare(LocalVariable.newLocalVariable(type, name), new Construct(type, arguments[0]));
+      return new Declare(LocalVariable.newLocalVariable(type, name), type.construct(arguments[0]));
     } else {
-      return new Declare(LocalVariable.newLocalVariable(type, name), new Construct(type, arguments));
+      return new Declare(LocalVariable.newLocalVariable(type, name), type.construct(arguments));
     }
   }
 

@@ -33,7 +33,6 @@ import io.sundr.model.Assign;
 import io.sundr.model.Block;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Construct;
 import io.sundr.model.Declare;
 import io.sundr.model.Expression;
 import io.sundr.model.ExpressionOrStatement;
@@ -166,7 +165,7 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
   private void addOfMethod(TypeDefFluent<?> def, Map<String, ParamInfo> allContextFields) {
     List<Expression> constructArgs = new ArrayList<>();
     constructArgs.add(LocalVariable.newLocalVariable(targetTypeRef, "item"));
-    constructArgs.add(new Construct(Collections.ARRAY_LIST.toReference()));
+    constructArgs.add(Collections.ARRAY_LIST.toReference().construct());
     for (Map.Entry<String, ParamInfo> entry : allContextFields.entrySet()) {
       constructArgs.add(ValidationMethod.defaultExpression(entry.getValue()));
     }
@@ -177,7 +176,7 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
         .withName("of")
         .addNewArgument().withName("item").withTypeRef(targetTypeRef).endArgument()
         .withNewBlock()
-        .addToStatements(new Return(new Construct(selfRef, constructArgs)))
+        .addToStatements(new Return(selfRef.construct(constructArgs)))
         .endBlock()
         .endMethod();
   }
@@ -199,7 +198,7 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
     }
 
     methodBuilder.withNewBlock()
-        .addToStatements(new Return(new Construct(contextRef, contextArgs)))
+        .addToStatements(new Return(contextRef.construct(contextArgs)))
         .endBlock()
         .endMethod();
   }
@@ -303,9 +302,9 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
     }
 
     List<Statement> statements = new ArrayList<>();
-    statements.add(new Declare(newValidators, new Construct(Collections.ARRAY_LIST.toReference(), This.ref("validators"))));
+    statements.add(new Declare(newValidators, Collections.ARRAY_LIST.toReference().construct(This.ref("validators"))));
     statements.add(newValidators.call("add", (Expression) lambda));
-    statements.add(new Return(new Construct(selfRef, constructArgs)));
+    statements.add(new Return(selfRef.construct(constructArgs)));
     return statements;
   }
 
@@ -324,7 +323,7 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
         .withReturnType(listOfErrorsRef)
         .withName("validate")
         .withNewBlock()
-        .addToStatements(new Declare(errors, new Construct(Collections.ARRAY_LIST.toReference())))
+        .addToStatements(new Declare(errors, Collections.ARRAY_LIST.toReference().construct()))
         .addToStatements(new Foreach(v, This.ref("validators"),
             new Block(errors.call("addAll", v.call("validate", This.ref("item"))))))
         .addToStatements(new Return(errors))
@@ -398,10 +397,11 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
       LocalVariable lambdaErrors = LocalVariable.newLocalVariable(Collections.LIST.toReference(customErrorRef), "errors");
       LocalVariable baseError = LocalVariable.newLocalVariable(baseErrorRef, "__e");
       return new Lambda("item", new Block(
-          new Declare(lambdaErrors, new Construct(Collections.ARRAY_LIST.toReference())),
+          new Declare(lambdaErrors, Collections.ARRAY_LIST.toReference().construct()),
           new Foreach(baseError, callExpr,
-              new Block(lambdaErrors.call("add", new Construct(customErrorRef,
-                  baseError.call("getPath"), baseError.call("getMessage"), baseError.call("getInvalidValue"))))),
+              new Block(lambdaErrors.call("add",
+                  customErrorRef.construct(baseError.call("getPath"), baseError.call("getMessage"),
+                      baseError.call("getInvalidValue"))))),
           new Return(lambdaErrors)));
     }
 
@@ -429,11 +429,11 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
                 new Block(lambdaErrors.call("addAll", e.call("getErrors")))),
             new Try.Catch(Property.newProperty(runtimeExceptionRef, "re"),
                 new Block(lambdaErrors.call("add",
-                    new Construct(validationErrorRef, ValueRef.from(""), re.call("getMessage")))))),
+                    validationErrorRef.construct(ValueRef.from(""), re.call("getMessage")))))),
         Optional.empty());
 
     return new Lambda("item", new Block(
-        new Declare(lambdaErrors, new Construct(Collections.ARRAY_LIST.toReference())),
+        new Declare(lambdaErrors, Collections.ARRAY_LIST.toReference().construct()),
         tryCatch,
         new Return(lambdaErrors)));
   }
@@ -505,7 +505,7 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
 
     List<Expression> outerConstructArgs = new ArrayList<>();
     outerConstructArgs.add(LocalVariable.newLocalVariable(targetTypeRef, "item"));
-    outerConstructArgs.add(new Construct(Collections.ARRAY_LIST.toReference()));
+    outerConstructArgs.add(Collections.ARRAY_LIST.toReference().construct());
     for (String name : allContextFields.keySet()) {
       outerConstructArgs.add(This.ref(name));
     }
@@ -516,7 +516,7 @@ public class AddValidatorDsl implements Visitor<TypeDefFluent<?>> {
         .withName("of")
         .addNewArgument().withName("item").withTypeRef(targetTypeRef).endArgument()
         .withNewBlock()
-        .addToStatements(new Return(new Construct(selfRef, outerConstructArgs)))
+        .addToStatements(new Return(selfRef.construct(outerConstructArgs)))
         .endBlock()
         .endMethod();
 

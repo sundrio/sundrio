@@ -36,7 +36,6 @@ import io.sundr.model.Block;
 import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Construct;
 import io.sundr.model.Declare;
 import io.sundr.model.Equals;
 import io.sundr.model.Expression;
@@ -141,7 +140,7 @@ final class DslMethods {
           .withTypeRef(slotRef).withName(slot)
           .endField();
       slotInits.add(new Assign(This.ref(slot),
-          new Construct(slotRef, new ArrayList<>(slotRef.getArguments()), Collections.emptyList())));
+          slotRef.construct(new ArrayList<>(slotRef.getArguments()), Collections.emptyList())));
     }
     builder.editFirstConstructor()
         .editBlock()
@@ -169,7 +168,7 @@ final class DslMethods {
         .withTypeRef(Types.PRIMITIVE_BOOLEAN_REF).withName(Constants.EXACT)
         .endField();
 
-    Expression selectorInit = new Construct(Constants.OVERLOAD_SELECTOR);
+    Expression selectorInit = Constants.OVERLOAD_SELECTOR.construct();
     for (Method method : overloads) {
       Expression[] names = method.getArguments().stream()
           .map(argument -> (Expression) ValueRef.from(slotName(argument)))
@@ -179,8 +178,7 @@ final class DslMethods {
 
     List<Statement> inits = new ArrayList<>();
     inits.add(new Assign(This.ref(Constants.PINNED),
-        new Construct(Constants.LINKED_HASH_SET, Collections.singletonList((TypeRef) Constants.STRING),
-            Collections.emptyList())));
+        Constants.LINKED_HASH_SET.construct(Collections.singletonList((TypeRef) Constants.STRING), Collections.emptyList())));
     inits.add(new Assign(This.ref(Constants.SELECTOR), selectorInit));
     builder.editFirstConstructor()
         .editBlock()
@@ -482,7 +480,7 @@ final class DslMethods {
     Try tryCatch = new Try(
         new Block(register),
         Collections.singletonList(new Try.Catch(Property.newProperty(Constants.THROWABLE, "t"),
-            new Block(new Throw(new Construct(Constants.RUNTIME_EXCEPTION, caught))))),
+            new Block(new Throw(Constants.RUNTIME_EXCEPTION.construct(caught))))),
         Optional.empty());
     return new Block(tryCatch);
   }
@@ -559,8 +557,7 @@ final class DslMethods {
     List<Statement> statements = new ArrayList<>();
     statements.add(new Declare(selected, selectAllCall()));
     statements.add(new Declare(appliers,
-        new Construct(Constants.ARRAY_LIST, Collections.singletonList((TypeRef) stubberConsumerRef),
-            Collections.emptyList())));
+        Constants.ARRAY_LIST.construct(Collections.singletonList((TypeRef) stubberConsumerRef), Collections.emptyList())));
     for (int i = 0; i < overloads.size(); i++) {
       statements.add(new If(selected.call("contains", i),
           new Block(appliers.call("add", doApplier(overloads.get(i), widened)))));

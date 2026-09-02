@@ -26,7 +26,6 @@ import io.sundr.mockito.internal.Constants;
 import io.sundr.mockito.internal.MockTarget;
 import io.sundr.model.Argument;
 import io.sundr.model.ClassRef;
-import io.sundr.model.Construct;
 import io.sundr.model.Method;
 import io.sundr.model.Return;
 import io.sundr.model.This;
@@ -67,7 +66,7 @@ public class AddStubClasses implements Visitor<TypeDefFluent<?>> {
           .withReturnType(stubRef)
           .withName(name)
           .withNewBlock()
-          .addToStatements(new Return(new Construct(stubRef, This.ref(Constants.MOCK))))
+          .addToStatements(new Return(stubRef.construct(This.ref(Constants.MOCK))))
           .endBlock()
           .endMethod();
     }

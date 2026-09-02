@@ -114,7 +114,7 @@ public final class PropertyAs {
         argumentsWithItem.add(Argument.newArgument(unwrapped, "item"));
         statementsWithItem
             .add(new Assign(This.ref("builder"),
-                new io.sundr.model.Construct(builderType, new This(), Property.newProperty("item"))));
+                builderType.construct(new This(), Property.newProperty("item"))));
         constructors.add(new MethodBuilder()
             .withName("")
             .withReturnType(nestedRef)

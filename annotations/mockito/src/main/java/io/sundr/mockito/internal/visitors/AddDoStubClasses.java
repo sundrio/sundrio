@@ -25,7 +25,6 @@ import io.sundr.mockito.internal.Constants;
 import io.sundr.mockito.internal.MockTarget;
 import io.sundr.model.Argument;
 import io.sundr.model.ClassRef;
-import io.sundr.model.Construct;
 import io.sundr.model.LocalVariable;
 import io.sundr.model.Method;
 import io.sundr.model.Return;
@@ -79,7 +78,7 @@ public class AddDoStubClasses implements Visitor<TypeDefFluent<?>> {
         .addNewArgument().withTypeRef(Constants.STUBBER_TYPE).withName(Constants.STUBBER).endArgument()
         .addNewArgument().withTypeRef(targetRef).withName(Constants.MOCK).endArgument()
         .withNewBlock()
-        .addToStatements(new Return(new Construct(routerRef, stubber, mock)))
+        .addToStatements(new Return(routerRef.construct(stubber, mock)))
         .endBlock()
         .endMethod();
   }
@@ -111,7 +110,7 @@ public class AddDoStubClasses implements Visitor<TypeDefFluent<?>> {
         .withName("when")
         .addNewArgument().withTypeRef(targetRef).withName(Constants.MOCK).endArgument()
         .withNewBlock()
-        .addToStatements(new Return(new Construct(routerRef, This.ref(Constants.STUBBER), mock)))
+        .addToStatements(new Return(routerRef.construct(This.ref(Constants.STUBBER), mock)))
         .endBlock()
         .endMethod()
         .build();
@@ -151,7 +150,7 @@ public class AddDoStubClasses implements Visitor<TypeDefFluent<?>> {
           .withReturnType(doStubRef)
           .withName(name)
           .withNewBlock()
-          .addToStatements(new Return(new Construct(doStubRef, This.ref(Constants.STUBBER), This.ref(Constants.MOCK))))
+          .addToStatements(new Return(doStubRef.construct(This.ref(Constants.STUBBER), This.ref(Constants.MOCK))))
           .endBlock()
           .endMethod();
     }

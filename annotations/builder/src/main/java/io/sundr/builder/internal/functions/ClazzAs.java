@@ -53,7 +53,6 @@ import io.sundr.model.Block;
 import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Construct;
 import io.sundr.model.Declare;
 import io.sundr.model.DotClass;
 import io.sundr.model.Expression;
@@ -318,7 +317,7 @@ public class ClazzAs {
         Statement returnStatement = new Return(
             new Cast(
                 BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam),
-                new Construct(builderRef, new Cast(dunwraped, item))));
+                builderRef.construct(new Cast(dunwraped, item))));
 
         cases.put(ValueRef.from(packageName + "." + classShortName), new Block(returnStatement));
       }
@@ -376,14 +375,14 @@ public class ClazzAs {
           .withNewModifiers().withPublic().endModifiers()
           .withNewBlock()
           .addToStatements(
-              hasDefaultConstructor(item) ? This.construct(new Construct(item.toInternalReference()))
+              hasDefaultConstructor(item) ? This.construct(item.toInternalReference().construct())
                   : new Assign(This.ref("fluent"), new This()))
           .endBlock().build();
 
       Method fluentConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock()
           .addToStatements(hasDefaultConstructor(item)
-              ? This.construct(LocalVariable.newLocalVariable("fluent"), new Construct(item.toInternalReference()))
+              ? This.construct(LocalVariable.newLocalVariable("fluent"), item.toInternalReference().construct())
               : new Assign(This.ref("fluent"), LocalVariable.newLocalVariable("fluent")))
           .endBlock().build();
 
@@ -468,8 +467,8 @@ public class ClazzAs {
             .addNewArgument().withName("rest").withTypeRef(sundrValidatorRef.withDimensions(1)).endArgument()
             .withVarArgPreferred(true)
             .withNewBlock()
-            .addToStatements(new Return(new Construct(validatingBuilderRef, new This(),
-                LocalVariable.newLocalVariable("first"), LocalVariable.newLocalVariable("rest"))))
+            .addToStatements(new Return(validatingBuilderRef.construct(new This(), LocalVariable.newLocalVariable("first"),
+                LocalVariable.newLocalVariable("rest"))))
             .endBlock()
             .build());
 
@@ -478,8 +477,8 @@ public class ClazzAs {
             .withReturnType(validatingBuilderRef)
             .withName("validateAll")
             .withNewBlock()
-            .addToStatements(new Return(new Construct(validatingBuilderRef, new This(),
-                sundrValidatorsRef.call("of", new DotClass(itemRef)))))
+            .addToStatements(
+                new Return(validatingBuilderRef.construct(new This(), sundrValidatorsRef.call("of", new DotClass(itemRef)))))
             .endBlock()
             .build());
 
@@ -514,7 +513,7 @@ public class ClazzAs {
               .withReturnType(validatorsBuilderRef)
               .withName("usingNewValidator")
               .withNewBlock()
-              .addToStatements(new Return(new Construct(validatorsBuilderRef, new This())))
+              .addToStatements(new Return(validatorsBuilderRef.construct(new This())))
               .endBlock()
               .build());
 
@@ -536,7 +535,7 @@ public class ClazzAs {
             }
             methods.add(overloadBuilder
                 .withNewBlock()
-                .addToStatements(new Return(new Construct(validatorsBuilderRef, constructArgs)))
+                .addToStatements(new Return(validatorsBuilderRef.construct(constructArgs)))
                 .endBlock()
                 .build());
           }
@@ -629,7 +628,7 @@ public class ClazzAs {
           new Ternary(
               Expression.notNull(instance),
               instance,
-              new Construct(ClassRef.forName(clazz.getFullyQualifiedName())))));
+              ClassRef.forName(clazz.getFullyQualifiedName()).construct())));
     }
 
     LocalVariable instance = LocalVariable.newLocalVariable("instance");
@@ -685,7 +684,7 @@ public class ClazzAs {
     LocalVariable buildable = LocalVariable.newLocalVariable("buildable");
     statements.add(new Declare(
         LocalVariable.newLocalVariable(instanceType.toInternalReference(), "buildable"),
-        new Construct(instanceType.toReference(), constructorArgs)));
+        instanceType.toReference().construct(constructorArgs)));
 
     Predicate<Field> propertyFilter = isFieldApplicable(item, false);
     item.getAllFields().stream()

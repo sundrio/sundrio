@@ -26,7 +26,6 @@ import io.sundr.model.Argument;
 import io.sundr.model.Assign;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
-import io.sundr.model.Construct;
 import io.sundr.model.Expression;
 import io.sundr.model.Kind;
 import io.sundr.model.LocalVariable;
@@ -146,7 +145,7 @@ public class AddAggregatorMethods implements Visitor<TypeDefFluent<?>> {
         .withArguments(arguments)
         .withVarArgPreferred(varArg)
         .withNewBlock()
-        .addToStatements(new Return(new Construct(doStubberRef, stubberCall)))
+        .addToStatements(new Return(doStubberRef.construct(stubberCall)))
         .endBlock()
         .endMethod();
   }
