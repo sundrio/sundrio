@@ -376,14 +376,14 @@ public class ClazzAs {
           .withNewModifiers().withPublic().endModifiers()
           .withNewBlock()
           .addToStatements(
-              hasDefaultConstructor(item) ? This.call(new Construct(item.toInternalReference()))
+              hasDefaultConstructor(item) ? This.construct(new Construct(item.toInternalReference()))
                   : new Assign(This.ref("fluent"), new This()))
           .endBlock().build();
 
       Method fluentConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock()
           .addToStatements(hasDefaultConstructor(item)
-              ? This.call(LocalVariable.newLocalVariable("fluent"), new Construct(item.toInternalReference()))
+              ? This.construct(LocalVariable.newLocalVariable("fluent"), new Construct(item.toInternalReference()))
               : new Assign(This.ref("fluent"), LocalVariable.newLocalVariable("fluent")))
           .endBlock().build();
 
@@ -716,7 +716,7 @@ public class ClazzAs {
         .withAnnotations(annotations)
         .withReturnType(constructorType.toReference())
         .withNewBlock()
-        .addToStatements(Super.call(
+        .addToStatements(Super.construct(
             constructor.getArguments().stream()
                 .map(arg -> (Expression) LocalVariable.newLocalVariable(arg.getName()))
                 .toArray(Expression[]::new)))

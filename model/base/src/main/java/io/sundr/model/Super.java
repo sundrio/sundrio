@@ -4,12 +4,25 @@ import java.util.List;
 
 public class Super implements Expression {
 
-  public static MethodCall call(Expression... arguments) {
+  /**
+   * Creates a super constructor delegation, rendered as {@code super(...)}.
+   * This is distinct from calling a method on super, which is {@code super.name(...)}.
+   *
+   * @param arguments the constructor arguments
+   * @return the constructor delegation call
+   */
+  public static MethodCall construct(Expression... arguments) {
     return new MethodCall("super", (Expression) null, arguments);
   }
 
-  public static MethodCall call(List<? extends Expression> arguments) {
-    return call(arguments.toArray(new Expression[0]));
+  /**
+   * Creates a super constructor delegation, rendered as {@code super(...)}.
+   *
+   * @param arguments the constructor arguments
+   * @return the constructor delegation call
+   */
+  public static MethodCall construct(List<? extends Expression> arguments) {
+    return construct(arguments.toArray(new Expression[0]));
   }
 
   /**
@@ -19,8 +32,8 @@ public class Super implements Expression {
    * @param arguments the constructor arguments, each a literal or an expression
    * @return the constructor delegation call
    */
-  public static MethodCall call(Object... arguments) {
-    return call(ValueRef.toExpressions(arguments));
+  public static MethodCall construct(Object... arguments) {
+    return construct(ValueRef.toExpressions(arguments));
   }
 
   @Override

@@ -12,12 +12,25 @@ public class This implements Expression {
     return new FieldRef(field, new This());
   }
 
-  public static MethodCall call(Expression... arguments) {
+  /**
+   * Creates a this constructor delegation, rendered as {@code this(...)}.
+   * This is distinct from calling a method on this, which is {@code this.name(...)}.
+   *
+   * @param arguments the constructor arguments
+   * @return the constructor delegation call
+   */
+  public static MethodCall construct(Expression... arguments) {
     return new MethodCall("this", (Expression) null, arguments);
   }
 
-  public static MethodCall call(List<? extends Expression> arguments) {
-    return call(arguments.toArray(new Expression[0]));
+  /**
+   * Creates a this constructor delegation, rendered as {@code this(...)}.
+   *
+   * @param arguments the constructor arguments
+   * @return the constructor delegation call
+   */
+  public static MethodCall construct(List<? extends Expression> arguments) {
+    return construct(arguments.toArray(new Expression[0]));
   }
 
   /**
@@ -27,8 +40,8 @@ public class This implements Expression {
    * @param arguments the constructor arguments, each a literal or an expression
    * @return the constructor delegation call
    */
-  public static MethodCall call(Object... arguments) {
-    return call(ValueRef.toExpressions(arguments));
+  public static MethodCall construct(Object... arguments) {
+    return construct(ValueRef.toExpressions(arguments));
   }
 
   @Override
