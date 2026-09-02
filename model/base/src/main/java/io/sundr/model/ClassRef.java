@@ -164,4 +164,39 @@ public class ClassRef extends TypeRef implements WithFullyQualifiedName, Express
     return new DotClass(this);
   }
 
+  /**
+   * Creates an instantiation of this type, rendered as {@code new Type(...)}.
+   *
+   * @param arguments the constructor arguments
+   * @return the instantiation
+   */
+  public Construct construct(Expression... arguments) {
+    return new Construct(this, arguments);
+  }
+
+  /**
+   * Creates an instantiation of this type, rendered as {@code new Type(...)}.
+   *
+   * @param arguments the constructor arguments
+   * @return the instantiation
+   */
+  public Construct construct(List<Expression> arguments) {
+    return new Construct(this, arguments);
+  }
+
+  /**
+   * Creates an instantiation of this type with explicit type parameters,
+   * rendered as {@code new Type
+   *
+  <P>
+   * (...)}.
+   *
+   * @param parameters the type parameters
+   * @param arguments the constructor arguments
+   * @return the instantiation
+   */
+  public Construct construct(List<TypeRef> parameters, List<Expression> arguments) {
+    return new Construct(this, parameters, arguments);
+  }
+
 }
