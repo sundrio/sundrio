@@ -33,7 +33,6 @@ import io.sundr.mockito.internal.MockTarget;
 import io.sundr.model.Argument;
 import io.sundr.model.Assign;
 import io.sundr.model.Block;
-import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Declare;
@@ -212,7 +211,7 @@ final class DslMethods {
 
       Expression valueArg = LocalVariable.newLocalVariable(argumentType, "value");
       if (generic) {
-        valueArg = new Cast(Constants.OBJECT, valueArg);
+        valueArg = valueArg.cast(Constants.OBJECT);
       }
       addFluentMethod(builder, selfRef, "with" + capitalized, argumentType, "value",
           This.ref(slot).call("eq", valueArg), slot, trackPinned, typeParameters);
@@ -223,7 +222,7 @@ final class DslMethods {
           .withArguments(Constants.OBJECT).build();
       Expression matcherArg = LocalVariable.newLocalVariable(matcherRef, "matcher");
       if (generic) {
-        matcherArg = new Cast(objectMatcherRef, matcherArg);
+        matcherArg = matcherArg.cast(objectMatcherRef);
       }
       addFluentMethod(builder, selfRef, "with" + capitalized + "Matching", matcherRef, "matcher",
           This.ref(slot).call("matching", matcherArg), slot, trackPinned, typeParameters);
@@ -316,7 +315,7 @@ final class DslMethods {
       if (generic) {
         ClassRef objectCaptorRef = new ClassRefBuilder(Constants.ARGUMENT_CAPTOR)
             .withArguments(Constants.OBJECT).build();
-        captorArg = new Cast(objectCaptorRef, captorArg);
+        captorArg = captorArg.cast(objectCaptorRef);
       }
       addFluentMethod(builder, selfRef, "capturing" + capitalized, captorRef, "captor",
           This.ref(slot).call("capturing", captorArg), slot, trackPinned, typeParameters);
@@ -854,7 +853,7 @@ final class DslMethods {
         .map(argument -> {
           Expression resolved = This.ref(slotName(argument)).call("resolve");
           return widenedNames.contains(argument.getName())
-              ? new Cast(argument.getTypeRef(), resolved)
+              ? resolved.cast(argument.getTypeRef())
               : resolved;
         })
         .collect(Collectors.toList());

@@ -71,7 +71,7 @@ public class Declare implements ExpressionOrStatement {
   }
 
   public static Declare cast(String name, ClassRef type, Expression target) {
-    return new Declare(LocalVariable.newLocalVariable(type, name), new Cast(type, target));
+    return new Declare(LocalVariable.newLocalVariable(type, name), target.cast(type));
   }
 
   public List<LocalVariable> getLocalVariables() {

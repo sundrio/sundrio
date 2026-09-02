@@ -50,7 +50,6 @@ import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.Argument;
 import io.sundr.model.Assign;
 import io.sundr.model.Block;
-import io.sundr.model.Cast;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
 import io.sundr.model.Declare;
@@ -315,9 +314,8 @@ public class ClazzAs {
         // Create the return statement for this case
         LocalVariable item = LocalVariable.newLocalVariable("item");
         Statement returnStatement = new Return(
-            new Cast(
-                BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam),
-                builderRef.construct(new Cast(dunwraped, item))));
+            builderRef.construct(item.cast(dunwraped))
+                .cast(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam)));
 
         cases.put(ValueRef.from(packageName + "." + classShortName), new Block(returnStatement));
       }
@@ -328,8 +326,8 @@ public class ClazzAs {
           .expression(new MethodCall("getName", new MethodCall("getClass", item)))
           .cases(cases)
           .defaultCase(
-              new Return(new Cast(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam),
-                  new MethodCall("builderOf", (Expression) null, item))));
+              new Return(new MethodCall("builderOf", (Expression) null, item)
+                  .cast(BuilderContextManager.getContext().getVisitableBuilderInterface().toReference(typeParam))));
 
       // Use the appropriate type parameter for the method
       TypeParamDef methodTypeParam = Types.T;
@@ -644,7 +642,7 @@ public class ClazzAs {
         Expression getterCall = new MethodCall(g.getName(), instance);
 
         // Add cast if needed
-        Expression finalExpression = field.getTypeRef() instanceof TypeParamRef ? new Cast(field.getTypeRef(), getterCall)
+        Expression finalExpression = field.getTypeRef() instanceof TypeParamRef ? getterCall.cast(field.getTypeRef())
             : getterCall;
 
         ifStatements.add(new MethodCall("with" + field.getNameCapitalized(), targetRef, finalExpression));

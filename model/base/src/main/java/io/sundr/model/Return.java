@@ -47,7 +47,7 @@ public class Return implements Statement {
   }
 
   public static Return This(ClassRef castTo) {
-    return new Return(new Cast(castTo, new This()));
+    return new Return(new This().cast(castTo));
   }
 
   public static ReturnDslVariableStep variable(Variable<?> variable) {
