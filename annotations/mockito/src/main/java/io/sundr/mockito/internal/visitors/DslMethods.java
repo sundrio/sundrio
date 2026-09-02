@@ -853,7 +853,7 @@ final class DslMethods {
         .map(argument -> {
           Expression resolved = This.ref(slotName(argument)).call("resolve");
           return widenedNames.contains(argument.getName())
-              ? resolved.cast(argument.getTypeRef())
+              ? resolved.cast(argument)
               : resolved;
         })
         .collect(Collectors.toList());
