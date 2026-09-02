@@ -402,7 +402,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       List<Expression> superArgs = constructor.getArguments().stream()
           .map(p -> new FieldRef(Strings.toFieldName(p.getName()), null))
           .collect(java.util.stream.Collectors.toList());
-      statements.add(Super.call(superArgs));
+      statements.add(Super.construct(superArgs));
       for (Field p : fields) {
         statements.add(initializeField(p, initialize));
       }
