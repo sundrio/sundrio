@@ -290,7 +290,7 @@ final class DslMethods {
     for (Argument argument : arguments) {
       String slot = slotName(argument);
       List<Statement> statements = new ArrayList<>();
-      statements.add(This.ref(Constants.PINNED).call("add", ValueRef.from(slot)));
+      statements.add(This.ref(Constants.PINNED).call("add", slot));
       statements.add(new Return(new This()));
       builder.addNewMethod()
           .withNewModifiers().withPublic().endModifiers()
@@ -343,7 +343,7 @@ final class DslMethods {
     List<Statement> statements = new ArrayList<>();
     statements.add(slotStatement);
     if (trackPinned) {
-      statements.add(This.ref(Constants.PINNED).call("add", ValueRef.from(slot)));
+      statements.add(This.ref(Constants.PINNED).call("add", slot));
     }
     statements.add(new Return(new This()));
     builder.addNewMethod()
@@ -562,7 +562,7 @@ final class DslMethods {
         new Construct(Constants.ARRAY_LIST, Collections.singletonList((TypeRef) stubberConsumerRef),
             Collections.emptyList())));
     for (int i = 0; i < overloads.size(); i++) {
-      statements.add(new If(selected.call("contains", ValueRef.from(i)),
+      statements.add(new If(selected.call("contains", i),
           new Block(appliers.call("add", doApplier(overloads.get(i), widened)))));
     }
     statements.add(new Return(Constants.DO_STUBBING.call("ofAll", appliers)));
@@ -597,7 +597,7 @@ final class DslMethods {
     List<Statement> statements = new ArrayList<>();
     statements.add(new Declare(selected, selectAllCall()));
     for (int i = 0; i < overloads.size(); i++) {
-      statements.add(new If(selected.call("contains", ValueRef.from(i)),
+      statements.add(new If(selected.call("contains", i),
           new Block(doStubbingApply(overloads.get(i), widened))));
     }
     builder.addNewMethod()
@@ -648,7 +648,7 @@ final class DslMethods {
         .endBlock()
         .endMethod();
 
-    addVerificationModeShortcut(builder, "called", Constants.MOCKITO.call("times", ValueRef.from(1)), exceptions);
+    addVerificationModeShortcut(builder, "called", Constants.MOCKITO.call("times", 1), exceptions);
     addVerificationModeShortcut(builder, "atLeastOnce", Constants.MOCKITO.call("atLeastOnce"), exceptions);
     addVerificationModeShortcut(builder, "only", Constants.MOCKITO.call("only"), exceptions);
     addInvocationCountShortcut(builder, "times", exceptions);
@@ -695,7 +695,7 @@ final class DslMethods {
       Method method = overloads.get(i);
       Statement doLenient = doStubbing(method, Constants.MOCKITO.call("lenient").call(doName, doArgs), widened);
       Statement doStrict = doStubbing(method, Constants.MOCKITO.call(doName, doArgs), widened);
-      statements.add(new If(selected.call("contains", ValueRef.from(i)),
+      statements.add(new If(selected.call("contains", i),
           new Block(new If(lenient, new Block(doLenient), new Block(doStrict)))));
     }
     return statements;
@@ -715,7 +715,7 @@ final class DslMethods {
       Method method = overloads.get(i);
       Statement verifyNever = Constants.MOCKITO.call("verify", This.ref(Constants.MOCK), Constants.MOCKITO.call("never"))
           .call(method.getName(), resolveSlots(method, widened));
-      statements.add(new If(selected.call("contains", ValueRef.from(i)), new Block(verifyNever)));
+      statements.add(new If(selected.call("contains", i), new Block(verifyNever)));
     }
     return statements;
   }
@@ -747,7 +747,7 @@ final class DslMethods {
         .toArray(Expression[]::new);
     Expression matcherList = Constants.ARRAYS.call("asList", matchers);
     return This.ref(Constants.SELECTOR).call("selectOneInvoked", This.ref(Constants.PINNED), This.ref(Constants.EXACT),
-        This.ref(Constants.MOCK), ValueRef.from(overloads.get(0).getName()), matcherList);
+        This.ref(Constants.MOCK), overloads.get(0).getName(), matcherList);
   }
 
   /**

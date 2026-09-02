@@ -206,6 +206,18 @@ public interface Expression extends Renderable, WithReferences {
     return new MethodCall(method.getName(), this, expression);
   }
 
+  /**
+   * Calls a method on this expression, accepting literal values in place of expressions.
+   * Literals are wrapped in a {@link ValueRef}, expressions are used as is.
+   *
+   * @param name the name of the method to call
+   * @param arguments the method arguments, each a literal or an expression
+   * @return the method call
+   */
+  default MethodCall call(String name, Object... arguments) {
+    return new MethodCall(name, this, ValueRef.toExpressions(arguments));
+  }
+
   default Index index(Expression expression) {
     return new Index(this, expression);
   }
