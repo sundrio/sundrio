@@ -82,6 +82,27 @@ public interface Expression extends Renderable, WithReferences {
     return cast(ClassRef.forClass(type));
   }
 
+  /**
+   * Casts an expression to the type of the given variable.
+   *
+   * @param variable the variable whose type to cast to
+   * @param expression the expression to cast
+   * @return the cast expression
+   */
+  public static Expression cast(Variable<?> variable, Expression expression) {
+    return cast(variable.getTypeRef(), expression);
+  }
+
+  /**
+   * Casts this expression to the type of the given variable.
+   *
+   * @param variable the variable whose type to cast to
+   * @return the cast expression
+   */
+  default Expression cast(Variable<?> variable) {
+    return cast(variable.getTypeRef());
+  }
+
   public static Expression eq(Expression left, Expression right) {
     return new Equals(left, right);
   }
