@@ -315,12 +315,12 @@ class ToMethod {
       if (isBuildable(unwrapped)) {
         if (IS_COLLECTION.apply(type)) {
           statements.add(If.notNull(This.ref(fieldName))
-              .then(new This().property("_visitables").call("get", fieldName).call("clear"))
+              .then(This.ref("_visitables").call("get", fieldName).call("clear"))
               .end());
         } else if (IS_MAP.apply(type)) {
           // There is no such thing as buildable map yet.
         } else {
-          statements.add(new This().property("_visitables").call("remove", fieldName));
+          statements.add(This.ref("_visitables").call("remove", fieldName));
         }
       }
 
@@ -353,10 +353,10 @@ class ToMethod {
         ClassRef builder = BUILDER_REF.apply((ClassRef) unwrapped);
         statements.add(If.notNull(field)
             .then(This.ref(field).assignNew(builder, field),
-                new This().property("_visitables").call("get", field.getName()).call("add",
+                This.ref("_visitables").call("get", field.getName()).call("add",
                     This.ref(field)))
             .orElse(
-                new This().property("_visitables").call("get", field.getName()).call("remove",
+                This.ref("_visitables").call("get", field.getName()).call("remove",
                     This.ref(field)),
                 This.ref(field).assignNull()));
         statements.add(new Return(Expression.cast(returnType, new This())));
