@@ -93,7 +93,6 @@ import io.sundr.model.TypeParamDefBuilder;
 import io.sundr.model.TypeParamRef;
 import io.sundr.model.TypeParamRefBuilder;
 import io.sundr.model.TypeRef;
-import io.sundr.model.ValueRef;
 import io.sundr.model.Variable;
 import io.sundr.model.WildcardRef;
 import io.sundr.model.WithFullyQualifiedName;
@@ -830,12 +829,12 @@ public class BuilderUtils {
   public static List<Statement> toString(String name, Collection<Field> fields) {
     List<Statement> statements = new ArrayList<>();
     statements.add(Declare.newInstance("sb", StringBuilder.class));
-    statements.add(Field.newField("sb").call("append", ValueRef.from("{")));
+    statements.add(Field.newField("sb").call("append", "{"));
     Iterator<Field> iter = fields.iterator();
     while (iter.hasNext()) {
       statements.addAll(ifNotNullToStringStatements(iter.next(), iter.hasNext()));
     }
-    statements.add(Field.newField("sb").call("append", ValueRef.from("}")));
+    statements.add(Field.newField("sb").call("append", "}"));
     statements.add(Return.variable("sb").call("toString"));
     return statements;
   }
@@ -848,10 +847,10 @@ public class BuilderUtils {
 
     // Primitives should be displayed no matter what.
     if (field.getTypeRef() instanceof PrimitiveRef) {
-      statements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
+      statements.add(sbRef.call("append", propertyName + ":"));
       statements.add(sbRef.call("append", propertyRef));
       if (hasNext) {
-        statements.add(sbRef.call("append", ValueRef.from(",")));
+        statements.add(sbRef.call("append", ","));
       }
       return statements;
     }
@@ -859,10 +858,10 @@ public class BuilderUtils {
     // Collections and Maps need null and empty checks
     if (Collections.isCollection(field.getTypeRef()) || Types.isMap(field.getTypeRef())) {
       List<Statement> thenStatements = new ArrayList<>();
-      thenStatements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
+      thenStatements.add(sbRef.call("append", propertyName + ":"));
       thenStatements.add(sbRef.call("append", propertyRef));
       if (hasNext) {
-        thenStatements.add(sbRef.call("append", ValueRef.from(",")));
+        thenStatements.add(sbRef.call("append", ","));
       }
 
       statements.add(If.not(propertyRef.isNull())
@@ -873,10 +872,10 @@ public class BuilderUtils {
 
     // Other reference types need null checks
     List<Statement> thenStatements = new ArrayList<>();
-    thenStatements.add(sbRef.call("append", ValueRef.from(propertyName + ":")));
+    thenStatements.add(sbRef.call("append", propertyName + ":"));
     thenStatements.add(sbRef.call("append", propertyRef));
     if (hasNext) {
-      thenStatements.add(sbRef.call("append", ValueRef.from(",")));
+      thenStatements.add(sbRef.call("append", ","));
     }
 
     statements.add(If.not(propertyRef.isNull()).then(thenStatements));

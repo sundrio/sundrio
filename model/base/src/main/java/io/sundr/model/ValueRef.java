@@ -28,6 +28,31 @@ public class ValueRef implements Expression {
     return new ValueRef(array);
   }
 
+  /**
+   * Converts a value to an {@link Expression}, wrapping literals in a {@link ValueRef}.
+   * Values that are already expressions are returned as is.
+   *
+   * @param value the value to convert, may be a literal or an expression
+   * @return the value as an expression
+   */
+  public static Expression toExpression(Object value) {
+    return value instanceof Expression ? (Expression) value : new ValueRef(value);
+  }
+
+  /**
+   * Converts an array of values to expressions, wrapping literals in a {@link ValueRef}.
+   *
+   * @param values the values to convert, each may be a literal or an expression
+   * @return the values as expressions
+   */
+  public static Expression[] toExpressions(Object... values) {
+    Expression[] expressions = new Expression[values.length];
+    for (int i = 0; i < values.length; i++) {
+      expressions[i] = toExpression(values[i]);
+    }
+    return expressions;
+  }
+
   public Object getValue() {
     return value;
   }

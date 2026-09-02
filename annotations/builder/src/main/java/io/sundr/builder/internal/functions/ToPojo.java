@@ -621,7 +621,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
               If.condition(o.instanceOf(Types.STRING_REF))
                   .then(new Declare(s, o.cast(Types.STRING_REF)),
-                      Return.variable(s).call("split", ValueRef.from(",[ ]*"))),
+                      Return.variable(s).call("split", ",[ ]*")),
 
               If.condition(o.instanceOf(List.class))
                   .then(new Declare(l, new Cast(List.class, o)),
@@ -930,12 +930,12 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
     if (field.hasAttribute(DEFAULT_VALUE)) {
       Expression mapExpression = new Ternary(expression.instanceOf(Map.class),
-          expression.cast(Map.class).call("getOrDefault", ValueRef.from(key), ValueRef.from(defaultValue)),
+          expression.cast(Map.class).call("getOrDefault", key, defaultValue),
           ValueRef.from(defaultValue));
       return new Cast(typeRef, ((ClassRef) typeRef).call("valueOf",
           Expression.call(String.class, "valueOf", mapExpression)));
     } else {
-      Expression mapGetResult = expression.cast(Map.class).call("getOrDefault", ValueRef.from(key), ValueRef.NULL);
+      Expression mapGetResult = expression.cast(Map.class).call("getOrDefault", key, ValueRef.NULL);
       Expression notNullCheck = Expression.notNull(mapGetResult);
       Expression enumValueOf = ((ClassRef) typeRef).call("valueOf",
           Expression.call(String.class, "valueOf", mapGetResult));
@@ -1142,7 +1142,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
 
     // Generate: (Type) ((Map)map).getOrDefault("fieldName", defaultValue)
     Expression mapCast = new io.sundr.model.Enclosed(expression.cast(Map.class));
-    Expression mapGetOrDefault = mapCast.call("getOrDefault", ValueRef.from(key), defaultValueExpr);
+    Expression mapGetOrDefault = mapCast.call("getOrDefault", key, defaultValueExpr);
     return new Cast(field.getTypeRef(), mapGetOrDefault);
   }
 
@@ -1175,7 +1175,7 @@ public class ToPojo implements Function<RichTypeDef, TypeDef> {
       }
       if (getterTypeDef.isAnnotation()) {
         return readAnnotationValueExpression(
-            Expression.cast(Map.class, expression.call("get", ValueRef.from(getterOf(source, field).getName()))),
+            Expression.cast(Map.class, expression.call("get", getterOf(source, field).getName())),
             GetDefinition.of((ClassRef) getterTypeRef), field);
       }
     }
